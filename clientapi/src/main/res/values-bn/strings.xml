@@ -7,7 +7,5 @@
     <string name="close">বন্ধ করুন</string>
     <string name="invalid_intentAction_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ এন্ট্রি),আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
     <string name="invalid_metadata_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ মেটাডাটা),আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
-    <string name="verify_guid_not_found_online_message">যাচাইয়ের জন্য নির্বাচিত ব্যক্তি ডাটাবেসে নেই</string>
-    <string name="verify_guid_not_found_offline_message">ব্যক্তি খুঁজে পাওয়া যায়নি, দয়া করে নিশ্চিত করুন যে আপনি ইন্টারনেটে সংযুক্ত আছেন এবং আবার চেষ্টা করুন</string>
 
 </resources>

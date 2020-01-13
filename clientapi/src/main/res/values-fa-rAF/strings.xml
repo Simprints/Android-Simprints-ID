@@ -4,7 +4,5 @@
 
     <string name="invalid_intentAction_message">در تنظیمات (invalid Intent Action) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
     <string name="invalid_metadata_message">در تنظیمات (invalid metadata) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
-    <string name="verify_guid_not_found_online_message">شخص که برای تشخیص انتخاب شده در دیتابیس موجود نمیباشد</string>
-    <string name="verify_guid_not_found_offline_message">معلومات شخص را نتوانستیم پیدا کنیم، لطفاً خود را مطمئن سازید که با انترنت وصل هستید و دوباره کوشش کنید</string>
 
 </resources>

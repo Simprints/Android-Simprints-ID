@@ -9,8 +9,6 @@
     <string name="register_title">شامل شدن</string>
     <string name="identify_title">مشخص کردن</string>
     <string name="verify_title">تشخیص</string>
-    <string name="settings_title">تنظیمات</string>
-    <string name="alert_title">هشدار</string>
     <string name="refusal_label">فورم انکار</string>
 
 
@@ -20,7 +18,6 @@
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
     <!-- Loading Messages-->
-    <string name="connect_scanner_loading">در حال آماده شدن</string>
     <string name="connect_scanner_bt_connect">در حال تماس با Vero..</string>
     <string name="connect_scanner_wake_un20">بر حال کردن UN20..</string>
     <string name="connect_scanner_setup">آماده ساختن Vero..</string>
@@ -40,7 +37,6 @@
     <string name="rescan_label_question">اسکن دوباره ؟</string>
     <string name="scan_label">اسکن</string>
     <string name="cancel_button" tools:ignore="ButtonCase">لغو کردن</string>
-    <string name="ok">اوکی</string>
     <string name="scan">اسکن</string>
     <!-- Content Descriptions -->
 
@@ -71,13 +67,9 @@
 
     <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->
-    <string name="configuration_error_title">خطا در تنظیمات</string>
-    <string name="verify_guid_not_found_title">شخص دریافت نشد</string>
     <string name="error_occurred_title">اشتباه رخ داد</string>
     <string name="low_battery_title">چارچ بطری کم است</string>
     <!-- Error Message Text -->
-    <string name="verify_guid_not_found_online_message">شخص که برای تشخیص انتخاب شده در دیتابیس موجود نمیباشد</string>
-    <string name="verify_guid_not_found_offline_message">معلومات شخص را نتوانستیم پیدا کنیم، لطفاً خود را مطمئن سازید که با انترنت وصل هستید و دوباره کوشش کنید</string>
     <string name="bluetooth_not_supported_message">در این دستگاه بلوتوت کار نمیدهد، لطفاً با ادمین تماس بگیرید</string>
     <string name="bluetooth_not_enabled_message">بلوتوت فعال نیست، لطفاْ مطمین شوید که بلوتوت در تنظیمات فعال گردیده و دوباره کوشش نمایید</string>
     <string name="multiple_scanners_found_message">بیشتر از یک اسکنر با این موبایل وصل گردید، لطفا اسکنر را که نیاز ندارید ارتباط اش را با موبایل قطع کنید</string>
@@ -92,8 +84,6 @@
 
     <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
-    <string name="preference_app_version_title">نسخه اپلیکیشن:</string>
-    <string name="preference_scanner_version_title">نسخه یا نوع اسکنر :</string>
     <!-- Button Labels -->
     <!-- Recovery dialogs -->
 
