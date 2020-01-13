@@ -20,7 +20,8 @@ class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.ERRO
         SCANNER_LOW_BATTERY,
         @Deprecated("Fingerprint module doesn't triggers it anymore")
         UNKNOWN_BLUETOOTH_ISSUE,
-        LOGIN_NOT_COMPLETE
+        LOGIN_NOT_COMPLETE,
+        ROOTED_DEVICE
     }
 }
 
@@ -32,4 +33,5 @@ fun ErrorCallbackEvent.Reason.fromDomainToApi() =
         UNEXPECTED_ERROR -> ApiErrorCallback.ApiReason.UNEXPECTED_ERROR
         BLUETOOTH_NOT_SUPPORTED -> ApiErrorCallback.ApiReason.BLUETOOTH_NOT_SUPPORTED
         LOGIN_NOT_COMPLETE -> ApiErrorCallback.ApiReason.LOGIN_NOT_COMPLETE
+        ROOTED_DEVICE -> ApiErrorCallback.ApiReason.ROOTED_DEVICE
     }
