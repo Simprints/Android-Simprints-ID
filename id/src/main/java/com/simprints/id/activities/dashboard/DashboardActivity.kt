@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
-import com.simprints.id.activities.consent.ConsentViewModel
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -16,13 +16,19 @@ import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import javax.inject.Inject
+import androidx.lifecycle.Observer
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 
 class DashboardActivity : AppCompatActivity() {
 
 
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
+    @Inject lateinit var peopleSyncManager: PeopleSyncManager
+
     lateinit var viewModel: DashboardViewModel
-    private val viewModelFactory = DashboardViewModelFactory()
+    lateinit var viewModelFactory: DashboardViewModelFactory
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -36,18 +42,25 @@ class DashboardActivity : AppCompatActivity() {
         val component = (application as Application).component
         component.inject(this)
         title = androidResourcesHelper.getString(R.string.dashboard_label)
-
+        viewModelFactory = DashboardViewModelFactory(peopleSyncManager)
         viewModel = ViewModelProvider(this, viewModelFactory).get(DashboardViewModel::class.java)
-
         setupActionBar()
 
-        setMenuItemClickListener()
+        observeForSyncCardState()
+    }
+
+    private fun observeForSyncCardState() {
+        viewModel.syncCardState.observe(this, Observer<DashboardSyncCardState> {
+            syncCardDisplayer.displayState(it)
+        })
     }
 
     private fun setupActionBar() {
         dashboardToolbar.title = androidResourcesHelper.getString(R.string.dashboard_label)
         setSupportActionBar(dashboardToolbar)
         supportActionBar?.elevation = 4F
+
+        setMenuItemClickListener()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

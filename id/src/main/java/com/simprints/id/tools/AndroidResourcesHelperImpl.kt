@@ -1,7 +1,9 @@
 package com.simprints.id.tools
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Resources
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 
@@ -85,4 +87,6 @@ class AndroidResourcesHelperImpl(val context: Context) : AndroidResourcesHelper 
     override fun getString(resId: Int, params: Array<Any>): String = context.getString(resId, *params)
     override fun getStringArray(res: Int): Array<String> = context.resources.getStringArray(res)
     override fun getDrawable(res: Int): Drawable? = ContextCompat.getDrawable(context, res)
+    override fun getColor(color: Int): ColorStateList? = ContextCompat.getColorStateList(context, color)
+
 }
