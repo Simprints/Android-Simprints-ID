@@ -5,7 +5,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEv
 import com.simprints.id.data.analytics.eventdata.models.local.DbSession
 import com.simprints.id.data.analytics.eventdata.models.local.toDomain
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.exceptions.unexpected.SessionNotFoundException
@@ -18,7 +18,7 @@ import io.realm.Sort
 import timber.log.Timber
 
 open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
-                                           private val secureDataManager: SecureDataManager) : SessionEventsLocalDbManager {
+                                           private val secureDataManager: SecureLocalDbKeyProvider) : SessionEventsLocalDbManager {
 
     companion object {
         const val PROJECT_ID = "projectId"
