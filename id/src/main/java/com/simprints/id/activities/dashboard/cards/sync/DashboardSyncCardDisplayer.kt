@@ -7,6 +7,6 @@ import androidx.cardview.widget.CardView
 
 interface DashboardSyncCardDisplayer {
 
-    fun initRoot(root: LinearLayout)
+    fun initRoot(syncCardsRootLayout: LinearLayout)
     fun displayState(syncCardState: DashboardSyncCardState)
 }

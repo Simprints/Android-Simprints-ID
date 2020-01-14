@@ -1,5 +1,6 @@
 package com.simprints.id.data.analytics.eventdata.controllers.domain
 
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession

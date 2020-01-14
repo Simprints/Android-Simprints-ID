@@ -474,7 +474,7 @@
     <string name="confirm_module_selection_title">Modules selected</string>
     <string name="confirm_module_selection_yes">Confirm</string>
     <string name="confirm_module_selection_cancel">Cancel</string>
-    <string name="sync_card_complete">Complete</string>
+    <string name="sync_card_complete">Sync complete</string>
     <string name="sync_card_connecting">Connecting…</string>
     <string name="sync_card_progress">Syncing… %1$s</string>
     <!-- endregion -->

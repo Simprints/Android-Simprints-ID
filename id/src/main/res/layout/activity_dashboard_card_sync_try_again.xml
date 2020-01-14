@@ -19,13 +19,14 @@
             android:text="@string/dashboard_card_sync_title" />
 
         <TextView
-            android:id="@+id/dashboard_sync_card_select_modules_message"
+            android:id="@+id/dashboard_sync_card_try_again_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Sync incomplete"
             android:textSize="16sp" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/dashboard_sync_card_try_again_sync_button"
             style="@style/SimprintsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -19,6 +19,7 @@
             android:text="@string/dashboard_card_sync_title" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/dashboard_sync_card_default_state_sync_button"
             style="@style/SimprintsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
