@@ -67,9 +67,9 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
                 summary = getString(R.string.preference_summary_settings_fingers)
             }
 
-            getPreferenceForSelectModules().apply {
-                title = getString(R.string.preference_select_modules_title)
-                summary = getString(R.string.preference_summary_modules)
+            getPreferenceForSyncInformation().apply {
+                title = androidResourcesHelper.getString(R.string.preference_sync_information_title)
+                summary = androidResourcesHelper.getString(R.string.preference_summary_sync_information)
             }
 
             getPreferenceForAbout().title = getString(R.string.preference_app_details_title)
@@ -106,17 +106,11 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun getPreferenceForLanguage(): Preference =
         findPreference(getKeyForLanguagePreference())
 
-    override fun getPreferenceForSelectModules(): Preference =
-        findPreference(getKeyForSelectModulesPreference())
-
     override fun getPreferenceForDefaultFingers(): Preference =
         findPreference(getKeyForDefaultFingersPreference())
 
     override fun getKeyForLanguagePreference(): String =
         androidResourcesHelper.getString(R.string.preference_select_language_key)
-
-    override fun getKeyForSelectModulesPreference(): String =
-        androidResourcesHelper.getString(R.string.preference_select_modules_key)
 
     override fun getKeyForDefaultFingersPreference(): String =
         androidResourcesHelper.getString(R.string.preference_select_fingers_key)
@@ -124,19 +118,16 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun getPreferenceForAbout(): Preference =
         findPreference(getKeyForAboutPreference())
 
+    override fun getPreferenceForSyncInformation(): Preference =
+        findPreference(getKeyForSyncInfoPreference())
+
     override fun getKeyForAboutPreference(): String =
         androidResourcesHelper.getString(R.string.preference_app_details_key)
 
+    override fun getKeyForSyncInfoPreference(): String =
+        androidResourcesHelper.getString(R.string.preference_sync_info_key)
+
     override fun setSelectModulePreferenceEnabled(enabled: Boolean) {
-        getPreferenceForSelectModules().isEnabled = enabled
-    }
-
-    override fun showToastForNoModulesSelected() {
-        Toast.makeText(activity, androidResourcesHelper.getString(R.string.settings_no_modules_toast), Toast.LENGTH_LONG).show()
-    }
-
-    override fun showToastForTooManyModulesSelected(maxModules: Int) {
-        Toast.makeText(activity, androidResourcesHelper.getString(R.string.settings_too_many_modules_toast, arrayOf(maxModules)), Toast.LENGTH_LONG).show()
     }
 
     override fun showToastForInvalidSelectionOfFingers() {
@@ -149,9 +140,9 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
         }
     }
 
-    override fun openModuleSelectionActivity() {
+    override fun openSyncInfoActivity() {
         activity.runOnUiThreadIfStillRunning {
-            (activity as SettingsActivity).openModuleSelectionActivity()
+            (activity as SettingsActivity).openSyncInformationActivity()
         }
     }
 }

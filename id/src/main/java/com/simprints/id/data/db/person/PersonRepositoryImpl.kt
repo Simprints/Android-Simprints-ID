@@ -13,6 +13,7 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
 import com.simprints.id.data.db.syncstatus.downsyncinfo.getStatusId
 import com.simprints.id.domain.GROUP
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import io.reactivex.Single
@@ -68,47 +69,57 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                     it.userId,
                     it.moduleId,
                     syncScope.modes,
-                    personLocalDataSource.count(PersonLocalDataSource.Query(
-                        projectId = it.projectId,
-                        userId = it.userId,
-                        moduleId = it.moduleId)))
+                    getPeopleCountFromLocal(it),
+                    DEFAULT_DELETE_UPDATE_COUNT_FOR_LOCAL,
+                    DEFAULT_DELETE_UPDATE_COUNT_FOR_LOCAL)
             }
         )
 
-    override suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult =
-        try {
-            val person = personLocalDataSource.load(PersonLocalDataSource.Query(personId = patientId)).first()
-            PersonFetchResult(person, LOCAL)
-        } catch (t: Throwable) {
-            tryToFetchPersonFromRemote(projectId, patientId).also { personFetchResult ->
-                personFetchResult.person?.let { savePersonInLocal(it) }
-            }
-        }
+    private fun getPeopleCountFromLocal(subSyncScope: SubSyncScope) = with (subSyncScope) {
+        personLocalDataSource.count(PersonLocalDataSource.Query(
+            projectId = projectId,
+            userId = userId,
+            moduleId = moduleId))
+    }
 
-    private suspend fun tryToFetchPersonFromRemote(projectId: String, patientId: String): PersonFetchResult =
-        suspendCancellableCoroutine { cont ->
+        override suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult =
+            try {
+                val person = personLocalDataSource.load(PersonLocalDataSource.Query(personId = patientId)).first()
+                PersonFetchResult(person, LOCAL)
+            } catch (t: Throwable) {
+                tryToFetchPersonFromRemote(projectId, patientId).also { personFetchResult ->
+                    personFetchResult.person?.let { savePersonInLocal(it) }
+                }
+            }
+
+        private suspend fun tryToFetchPersonFromRemote(projectId: String, patientId: String): PersonFetchResult =
+            suspendCancellableCoroutine { cont ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    personRemoteDataSource.downloadPerson(patientId = patientId, projectId = projectId)
+                        .subscribeBy(
+                            onSuccess = { cont.resumeSafely(PersonFetchResult(it, REMOTE)) },
+                            onError = { cont.resumeWithExceptionSafely(it) }
+                        )
+                }
+            }
+
+        private fun savePersonInLocal(person: Person) {
             CoroutineScope(Dispatchers.IO).launch {
-                personRemoteDataSource.downloadPerson(patientId = patientId, projectId = projectId)
-                    .subscribeBy(
-                    onSuccess = { cont.resumeSafely(PersonFetchResult(it, REMOTE)) },
-                    onError = { cont.resumeWithExceptionSafely(it) }
-                )
+                personLocalDataSource.insertOrUpdate(listOf(person))
             }
         }
 
-    private fun savePersonInLocal(person: Person) {
-        CoroutineScope(Dispatchers.IO).launch {
-            personLocalDataSource.insertOrUpdate(listOf(person))
+        override suspend fun saveAndUpload(person: Person) {
+            personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))
+            scheduleUpsync(person.projectId, person.userId)
         }
-    }
 
-    override suspend fun saveAndUpload(person: Person) {
-        personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))
-        scheduleUpsync(person.projectId, person.userId)
-    }
+        @Suppress("UNUSED_PARAMETER")
+        private fun scheduleUpsync(projectId: String, userId: String) {
+            peopleUpSyncMaster.schedule(projectId/*, userId*/)
+        }
 
-    @Suppress("UNUSED_PARAMETER")
-    private fun scheduleUpsync(projectId: String, userId: String) {
-        peopleUpSyncMaster.schedule(projectId/*, userId*/)
+        companion object {
+        private const val DEFAULT_DELETE_UPDATE_COUNT_FOR_LOCAL = 0
     }
 }

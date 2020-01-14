@@ -6,9 +6,4 @@
     <item
         android:id="@+id/menuSettings"
         android:title="@string/menu_settings" />
-
-    <item
-        android:id="@+id/debug"
-        android:title="Debug"
-        android:visible="false" />
 </menu>

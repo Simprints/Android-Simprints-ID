@@ -25,6 +25,7 @@ interface SettingsPreferencesManager {
     var organizationName: String
 
     var logoExists: Boolean
+    var consentRequired: Boolean
 
     var modalities: List<Modality>
     var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>

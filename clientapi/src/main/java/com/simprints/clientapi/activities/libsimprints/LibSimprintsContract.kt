@@ -13,13 +13,13 @@ interface LibSimprintsContract {
 
     interface View : BaseView<Presenter>, RequestContract.RequestView {
 
-        fun returnRegistration(registration: Registration, flowCompletedCheck: Boolean)
+        fun returnRegistration(registration: Registration, sessionId: String, flowCompletedCheck: Boolean)
 
         fun returnIdentification(identifications: ArrayList<Identification>, sessionId: String, flowCompletedCheck: Boolean)
 
-        fun returnVerification(verification: Verification, flowCompletedCheck: Boolean)
+        fun returnVerification(verification: Verification, sessionId: String, flowCompletedCheck: Boolean)
 
-        fun returnRefusalForms(refusalForm: RefusalForm, flowCompletedCheck: Boolean)
+        fun returnRefusalForms(refusalForm: RefusalForm, sessionId: String, flowCompletedCheck: Boolean)
 
         fun returnConfirmation(identificationOutcome: Boolean)
 

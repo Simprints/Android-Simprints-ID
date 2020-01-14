@@ -3,14 +3,14 @@ package com.simprints.id.data.prefs
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.JsonSyntaxException
-import com.simprints.id.data.db.person.domain.FingerIdentifier
-import com.simprints.testtools.common.di.DependencyRule.SpyRule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.GROUP
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.common.di.DependencyRule.SpyRule
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.verifyExactly
 import com.simprints.testtools.common.syntax.verifyOnce

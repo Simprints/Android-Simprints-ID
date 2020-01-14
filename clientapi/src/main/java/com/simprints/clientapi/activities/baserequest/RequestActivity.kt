@@ -62,8 +62,6 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         launchAlert(this, clientApiAlert)
     }
 
-    override fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean) = sendCancelResult()
-
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
         isActivityRestored = true

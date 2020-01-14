@@ -25,8 +25,9 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
                              private val faceStepProcessor: FaceStepProcessor,
                              private val coreStepProcessor: CoreStepProcessor,
-                             sessionEventsManager: SessionEventsManager) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, sessionEventsManager) {
+                             sessionEventsManager: SessionEventsManager,
+                             consentRequired: Boolean) :
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, sessionEventsManager, consentRequired) {
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppVerifyRequest)

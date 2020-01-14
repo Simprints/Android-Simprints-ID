@@ -1,6 +1,7 @@
 package com.simprints.id.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.LanguageHelper
@@ -10,6 +11,7 @@ import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
+import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -42,8 +44,7 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.data.secure.SecureDataManagerImpl
+import com.simprints.id.data.secure.*
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
@@ -75,6 +76,7 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -137,7 +139,7 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideKeystoreManager(ctx: Context): KeystoreManager = KeystoreManagerImpl(ctx)
+    open fun provideKeystoreManager(): KeystoreManager = KeystoreManagerImpl()
 
     @Provides
     @Singleton
@@ -145,8 +147,18 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSecureDataManager(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager, randomGenerator: RandomGenerator): SecureDataManager =
-        SecureDataManagerImpl(keystoreManager, preferencesManager, randomGenerator)
+    open fun provideSecureLocalDbKeyProvider(@Named("EncryptedSharedPreferences") encryptedSharedPrefs: SharedPreferences,
+                                             randomGenerator: RandomGenerator,
+                                             unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
+        SecureLocalDbKeyProviderImpl(
+            encryptedSharedPrefs,
+            randomGenerator,
+            unsecuredLocalDbKeyProvider)
+
+    @Provides
+    @Singleton
+    open fun provideLegacyLocalDbKeyProvider(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager): LegacyLocalDbKeyProvider =
+        LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager)
 
     @Provides
     open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager):
@@ -172,7 +184,7 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(ctx: Context,
-                                                secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
+                                                secureDataManager: SecureLocalDbKeyProvider): SessionEventsLocalDbManager =
         RealmSessionEventsDbManagerImpl(ctx, secureDataManager)
 
     @Provides
@@ -287,5 +299,19 @@ open class AppModule {
                                               sessionEventsManager: SessionEventsManager,
                                               timeHelper: TimeHelper) =
         FetchGuidViewModelFactory(personRepository, simNetworkUtils, sessionEventsManager, timeHelper)
+
+    @Provides
+    open fun provideSyncInformationViewModelFactory(personRepository: PersonRepository,
+                                                    personLocalDataSource: PersonLocalDataSource,
+                                                    preferencesManager: PreferencesManager,
+                                                    loginInfoManager: LoginInfoManager,
+                                                    syncScopesBuilder: SyncScopesBuilder) =
+        SyncInformationViewModelFactory(personRepository, personLocalDataSource, preferencesManager,
+            loginInfoManager.getSignedInProjectIdOrEmpty(), syncScopesBuilder)
+
+    @Provides
+    @Named("EncryptedSharedPreferences")
+    open fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
+        EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
 }
 
