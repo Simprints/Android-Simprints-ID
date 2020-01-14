@@ -57,7 +57,7 @@ enum class AlertActivityViewModel(val type: Type,
     ),
 
     ROOTED_DEVICE(
-        type = Type.ConfigurationError(title = R.string.alert_title,
+        type = Type.ConfigurationError(title = R.string.rooted_device_title,
             backgroundColor = R.color.simprints_red,
             mainDrawable = R.drawable.error_icon),
         leftButton = ButtonAction.Close,
