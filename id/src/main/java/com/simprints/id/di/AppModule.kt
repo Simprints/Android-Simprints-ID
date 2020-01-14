@@ -263,7 +263,8 @@ open class AppModule {
 
     @Provides
     open fun provideDashboardSyncCardDisplayer(androidResourcesHelper: AndroidResourcesHelper,
+                                               timeHelper: TimeHelper,
                                                ctx: Context): DashboardSyncCardDisplayer =
-        DashboardSyncCardDisplayerImpl(androidResourcesHelper, ctx)
+        DashboardSyncCardDisplayerImpl(androidResourcesHelper, timeHelper, ctx)
 }
 

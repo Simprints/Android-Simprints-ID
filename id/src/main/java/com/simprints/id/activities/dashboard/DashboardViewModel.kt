@@ -12,10 +12,10 @@ class DashboardViewModel(val peopleSyncManager: PeopleSyncManager) : ViewModel()
     private val peopleSyncStateLiveData = MutableLiveData<PeopleSyncState>()
 
     val syncCardState = Transformations.map(peopleSyncStateLiveData) {
-        DashboardSyncCardState.SyncDefault(Date())
+        DashboardSyncCardState.SyncProgress(Date(), 10, 100)
     }
 
     fun emit() {
-        peopleSyncStateLiveData.value = PeopleSyncState("", 0, 0, emptyList(), emptyList())
+        peopleSyncStateLiveData.value = PeopleSyncState("", 10, 100, emptyList(), emptyList())
     }
 }

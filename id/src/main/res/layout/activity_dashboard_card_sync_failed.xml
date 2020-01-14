@@ -19,7 +19,6 @@
             android:text="@string/dashboard_card_sync_title" />
 
         <LinearLayout
-            android:id="@+id/dashboard_sync_card_progress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -27,13 +26,14 @@
             android:layout_marginBottom="@dimen/activity_dashboard_card_sync_space_above_last_sync">
 
             <ImageView
+                android:id="@+id/dashboard_sync_card_failed_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/simprints_red"
                 android:src="@drawable/error_hint_wifi" />
 
             <TextView
-                android:id="@+id/dashboard_sync_card_select_settings_message"
+                android:id="@+id/dashboard_sync_card_failed_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
