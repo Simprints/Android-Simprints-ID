@@ -38,8 +38,9 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         loadClientApiKoinModules()
     }
 
-    override fun returnRegistration(registrationId: String, flowCompletedCheck: Boolean) = Intent().let {
+    override fun returnRegistration(registrationId: String, sessionId: String, flowCompletedCheck: Boolean) = Intent().let {
         it.putExtra(ODK_REGISTRATION_ID_KEY, registrationId)
+        it.putExtra(ODK_SESSION_ID, sessionId)
         it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
 
         sendOkResult(it)
@@ -59,16 +60,17 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         sendOkResult(it)
     }
 
-    override fun returnVerification(id: String, confidence: String, tier: String, flowCompletedCheck: Boolean) = Intent().let {
+    override fun returnVerification(id: String, confidence: String, tier: String, sessionId: String, flowCompletedCheck: Boolean) = Intent().let {
         it.putExtra(ODK_GUIDS_KEY, id)
         it.putExtra(ODK_CONFIDENCES_KEY, confidence)
         it.putExtra(ODK_TIERS_KEY, tier)
+        it.putExtra(ODK_SESSION_ID, sessionId)
         it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
 
         sendOkResult(it)
     }
 
-    override fun returnExitForm(reason: String, extra: String, flowCompletedCheck: Boolean) = Intent().let {
+    override fun returnExitForm(reason: String, extra: String, sessionId: String, flowCompletedCheck: Boolean) = Intent().let {
         it.putExtra(ODK_EXIT_REASON, reason)
         it.putExtra(ODK_EXIT_EXTRA, extra)
         it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
@@ -81,7 +83,9 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         sendOkResult(it)
     }
 
-    override fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean) = Intent().let {
+    override fun returnErrorToClient(errorResponse: ErrorResponse,
+                                     flowCompletedCheck: Boolean,
+                                     sessionId: String) = Intent().let {
         it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
         sendOkResult(it)
     }

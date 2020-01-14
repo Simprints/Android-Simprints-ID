@@ -14,7 +14,7 @@ import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
-import com.simprints.id.data.secure.SecureDataManagerImpl
+import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.whenever
@@ -66,7 +66,7 @@ object RobolectricTestMocker {
         editor.putString(LoginInfoManagerImpl.PROJECT_ID, if (logged) projectId else "")
         editor.putString(LoginInfoManagerImpl.USER_ID, if (logged) userId else "")
         editor.putBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, logged)
-        editor.putString(SecureDataManagerImpl.SHARED_PREFS_KEY_FOR_REALM_KEY + projectId, if (logged) realmKey else "")
+        editor.putString(LegacyLocalDbKeyProviderImpl.SHARED_PREFS_KEY_FOR_REALM_KEY + projectId, if (logged) realmKey else "")
         editor.commit()
         return this
     }

@@ -149,7 +149,6 @@ class SignerManagerTest {
         verifyRemoteManagerGotSignedOut()
         verifyLastDownSyncInfoGotDeleted()
         verifyLastUpSyncInfoGotDeleted()
-        verifyAllSharedPreferencesExceptRealmKeysGotCleared()
     }
 
     private fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, token).test()
@@ -196,7 +195,6 @@ class SignerManagerTest {
     private fun verifyRemoteManagerGotSignedOut() = verify { remoteDbManager.signOut() }
     private fun verifyLastDownSyncInfoGotDeleted() = verify { downSyncDao.deleteAll() }
     private fun verifyLastUpSyncInfoGotDeleted() = verify { upSyncDao.deleteAll() }
-    private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() = verify { preferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
 
     private fun verifySignedInFailed(it: TestObserver<Void>) {
         assertThat(it.errorCount()).isEqualTo(1)
