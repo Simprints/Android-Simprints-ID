@@ -83,7 +83,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun initTimeoutBar(): ScanningTimeoutBar =
-        if (fingerprintPreferencesManager.saveImages) {
+        if (fingerprintPreferencesManager.saveFingerprintImages) {
             ScanningWithImageTransferTimeoutBar(context, view.progressBar, scanningTimeoutMs, imageTransferTimeoutMs)
         } else {
             ScanningOnlyTimeoutBar(context, view.progressBar, scanningTimeoutMs)
@@ -234,7 +234,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun shouldProceedToImageTransfer(quality: Int) =
-        fingerprintPreferencesManager.saveImages &&
+        fingerprintPreferencesManager.saveFingerprintImages &&
             (quality >= qualityThreshold || presenter.tooManyBadScans(presenter.currentFinger()))
 
     private fun proceedToImageTransfer() {
