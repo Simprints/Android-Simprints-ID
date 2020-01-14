@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.di
 
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import com.simprints.fingerprint.activities.alert.AlertContract
 import com.simprints.fingerprint.activities.alert.AlertPresenter
@@ -38,11 +39,7 @@ import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
-import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
-import com.simprints.fingerprintscannermock.simulated.SimulationMode
-import com.simprints.fingerprintscannermock.simulated.common.SimulatedFinger
-import com.simprints.fingerprintscannermock.simulated.common.SimulationSpeedBehaviour
-import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
@@ -95,7 +92,7 @@ object KoinInjector {
     }
 
     private fun Module.defineBuildersForDomainClasses() {
-        single<BluetoothComponentAdapter> { SimulatedBluetoothAdapter(SimulatedScannerManager(SimulationMode.V2, simulationSpeedBehaviour = SimulationSpeedBehaviour.REALISTIC, simulatedFingers = arrayOf(SimulatedFinger.PERSON_1_FINGER_1_VERSION_1_BAD_SCAN, SimulatedFinger.PERSON_1_FINGER_1_VERSION_1_GOOD_SCAN))) }
+        single<BluetoothComponentAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
         single<ScannerFactory> { ScannerFactoryImpl(get(), get()) }
         single<ScannerManager> { ScannerManagerImpl(get(), get()) }

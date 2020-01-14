@@ -29,7 +29,7 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
 
     override fun create(macAddress: String): ScannerWrapper {
         // TODO : Determine whether to create a ScannerV1 or a ScannerV2
-        return createScannerV2(macAddress)
+        return createScannerV1(macAddress)
     }
 
     fun createScannerV1(macAddress: String): ScannerWrapper =
