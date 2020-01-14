@@ -2,5 +2,5 @@ package com.simprints.id.tools
 
 interface RandomGenerator {
 
-    fun generateByteArray(length: Int): ByteArray
+    fun generateByteArray(length: Int = 64): ByteArray
 }

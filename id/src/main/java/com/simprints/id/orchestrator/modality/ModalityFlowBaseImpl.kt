@@ -21,18 +21,25 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProcessor,
                                     private val fingerprintStepProcessor: FingerprintStepProcessor,
                                     private val faceStepProcessor: FaceStepProcessor,
-                                    private val sessionEventsManager: SessionEventsManager): ModalityFlow {
+                                    private val sessionEventsManager: SessionEventsManager,
+                                    private val consentRequired: Boolean): ModalityFlow {
 
     override val steps: MutableList<Step> = mutableListOf()
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         when (appRequest.type) {
-            AppRequestType.ENROL -> steps.add(buildConsentStep(ConsentType.ENROL))
-            AppRequestType.IDENTIFY -> steps.add(buildConsentStep(ConsentType.IDENTIFY))
+            AppRequestType.ENROL -> addConsentStepIfRequired(ConsentType.ENROL)
+            AppRequestType.IDENTIFY -> addConsentStepIfRequired(ConsentType.IDENTIFY)
             AppRequestType.VERIFY -> {
                 addVerifyStep(appRequest)
-                steps.add(buildConsentStep(ConsentType.VERIFY))
+                addConsentStepIfRequired(ConsentType.VERIFY)
             }
+        }
+    }
+
+    private fun addConsentStepIfRequired(consentType: ConsentType) {
+        if (consentRequired) {
+            steps.add(buildConsentStep(consentType))
         }
     }
 
