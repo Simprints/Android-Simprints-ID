@@ -17,7 +17,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                             private val action: String?,
                             private val sessionEventsManager: ClientApiSessionEventsManager,
