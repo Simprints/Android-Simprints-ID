@@ -38,7 +38,7 @@ abstract class CheckLoginPresenter(
 
     protected fun checkSignedInStateAndMoveOn() {
         try {
-            checkNonRootedDeviceOrThrow()
+            deviceManager.checkIfDeviceIsRooted()
             checkSignedInOrThrow()
             handleSignedInUser()
         } catch (t: Throwable) {
@@ -65,14 +65,6 @@ abstract class CheckLoginPresenter(
 
     abstract fun handleSignedInUser()
     abstract fun handleNotSignedInUser()
-
-    /**
-     * @throws RootedDeviceException
-     */
-    private fun checkNonRootedDeviceOrThrow() {
-        if (deviceManager.isDeviceRooted())
-            throw RootedDeviceException()
-    }
 
     /**
      * @throws DifferentProjectIdSignedInException

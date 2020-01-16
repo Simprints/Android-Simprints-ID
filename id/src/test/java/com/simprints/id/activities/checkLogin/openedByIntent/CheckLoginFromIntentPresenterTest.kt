@@ -12,6 +12,7 @@ import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.exceptions.unexpected.RootedDeviceException
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule
@@ -165,20 +166,21 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun withRootedDevice_shouldLogException() {
+        val exception = RootedDeviceException()
         val presenterSpy = spy(CheckLoginFromIntentPresenter(mock(), "device_id", app.component))
-        whenever { presenterSpy.deviceManager.isDeviceRooted() } thenReturn true
+        whenever { presenterSpy.deviceManager.checkIfDeviceIsRooted() } thenThrow exception
 
         presenterSpy.start()
 
         verifyOnce(presenterSpy.crashReportManager) {
-            logExceptionOrSafeException(anyNotNull())
+            logExceptionOrSafeException(exception)
         }
     }
 
     @Test
     fun withRootedDevice_shouldShowAlertScreen() {
         val presenterSpy = spy(CheckLoginFromIntentPresenter(mock(), "device_id", app.component))
-        whenever(presenterSpy.deviceManager) { isDeviceRooted() } thenReturn true
+        whenever(presenterSpy.deviceManager) { checkIfDeviceIsRooted() } thenThrow RootedDeviceException()
 
         presenterSpy.start()
 
