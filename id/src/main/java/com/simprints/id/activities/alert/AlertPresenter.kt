@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
                      val component: AppComponent,
-                     private val alertType:  AlertType) : AlertContract.Presenter {
+                     private val alertType: AlertType) : AlertContract.Presenter {
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionManager: SessionEventsManager
@@ -75,6 +75,7 @@ class AlertPresenter(val view: AlertContract.View,
             AlertType.GUID_NOT_FOUND_ONLINE,
             AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN,
             AlertType.DIFFERENT_USER_ID_SIGNED_IN,
+            AlertType.ROOTED_DEVICE,
             AlertType.SAFETYNET_ERROR -> {
                 view.closeActivityAfterCloseButton()
             }

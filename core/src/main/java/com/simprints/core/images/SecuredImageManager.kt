@@ -4,5 +4,6 @@ interface SecuredImageManager {
 
     //Encryption involved
     suspend fun saveSecurely(image: ByteArray): SecuredImageRef
+
 }
 

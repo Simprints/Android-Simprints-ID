@@ -8,9 +8,11 @@ import com.simprints.clientapi.domain.responses.*
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.reactivex.Completable
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class RequestPresenterTest {
 
     private val projectIdField = "some_project_id"
@@ -20,7 +22,7 @@ class RequestPresenterTest {
     private val extraField = mapOf("extraField" to "someExtraField")
 
     @Before
-    fun setUp(){
+    fun setUp() {
         BaseUnitTestConfig()
             .rescheduleRxMainThread()
             .coroutinesMainThread()
@@ -57,14 +59,13 @@ class RequestPresenterTest {
 
         verifyNever(clientApiSessionEventsManagerMock) { addSuspiciousIntentEvent(anyNotNull()) }
     }
+
 }
 
-class ImplRequestPresenter(view: RequestContract.RequestView,
-                           clientApiSessionEventsManager: ClientApiSessionEventsManager) :
-    RequestPresenter(
-        view,
-        clientApiSessionEventsManager
-    ) {
+class ImplRequestPresenter(
+    view: RequestContract.RequestView,
+    clientApiSessionEventsManager: ClientApiSessionEventsManager
+) : RequestPresenter(view, clientApiSessionEventsManager) {
 
     override suspend fun start() {}
     override fun handleEnrollResponse(enroll: EnrollResponse) {}
@@ -73,4 +74,5 @@ class ImplRequestPresenter(view: RequestContract.RequestView,
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {}
     override fun handleConfirmationResponse(response: ConfirmationResponse) {}
     override fun handleResponseError(errorResponse: ErrorResponse) {}
+
 }
