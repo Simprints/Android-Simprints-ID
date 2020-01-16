@@ -55,9 +55,11 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     }
 
     override fun returnRefusalForms(refusalForm: RefusalForm,
+                                    sessionId: String,
                                     flowCompletedCheck: Boolean) = Intent().let {
 
         it.putExtra(Constants.SIMPRINTS_REFUSAL_FORM, refusalForm)
+        it.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
         it.putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, flowCompletedCheck)
         sendOkResult(it)
     }
@@ -67,10 +69,16 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         sendOkResult(it)
     }
 
-    override fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean) {
+    override fun returnErrorToClient(errorResponse: ErrorResponse,
+                                     flowCompletedCheck: Boolean,
+                                     sessionId: String) {
         setResult(
             errorResponse.reason.libSimprintsResultCode(),
-            Intent().putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, flowCompletedCheck))
+            Intent().let {
+                it.putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, flowCompletedCheck)
+                it.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
+            }
+        )
         finish()
     }
 

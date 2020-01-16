@@ -120,8 +120,8 @@ interface AppComponent {
     fun inject(peopleSyncMasterWorker: PeopleSyncMasterWorker)
     fun inject(peopleUpSyncUploaderWorker: PeopleUpSyncUploaderWorker)
     fun inject(peopleUpSyncCountWorker: PeopleUpSyncCountWorker)
-    fun inject(syncInformationActivity: SyncInformationActivity)
     fun inject(imageUpSyncWorker: ImageUpSyncWorker)
+    fun inject(syncInformationActivity: SyncInformationActivity)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager
