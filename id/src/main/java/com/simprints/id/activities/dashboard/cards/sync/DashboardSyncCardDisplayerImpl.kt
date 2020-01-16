@@ -6,14 +6,16 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.tools.AndroidResourcesHelper
-import android.widget.LinearLayout
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.extensions.getColorResCompat
 import org.jetbrains.anko.layoutInflater
+import org.jetbrains.anko.textColor
 
 
 class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResourcesHelper,
@@ -66,13 +68,16 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     private fun prepareSyncCompleteView(syncCardState: SyncComplete): View =
         viewForCompleteState.apply {
             progressCardConnectingProgress().visibility = GONE
-            progressCardSyncProgress().visibility = VISIBLE
-            progressCardSyncProgress().progress = 100
-            progressCardStateText().visibility = VISIBLE
-            progressCardStateText().setTextColor(R.color.simprints_green)
-            progressCardStateText().text = androidResourcesHelper.getString(R.string.sync_card_complete)
+            with(progressCardSyncProgress()) {
+                visibility = VISIBLE
+                progress = 100
+            }
+            with(progressCardStateText()) {
+                visibility = VISIBLE
+                setTextColor(R.color.simprints_green)
+                text = androidResourcesHelper.getString(R.string.dashboard_sync_card_complete)
+            }
             displayLastSyncTime(syncCardState, lastSyncText())
-
             visibility = VISIBLE
         }
 
@@ -80,22 +85,33 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     private fun prepareSyncConnectingView(syncCardState: SyncConnecting): View =
         viewForConnectingState.apply {
             progressCardConnectingProgress().visibility = VISIBLE
-            progressCardSyncProgress().visibility = VISIBLE
-            progressCardSyncProgress().progress = (100 * (syncCardState.progress.toFloat() / syncCardState.total.toFloat())).toInt()
-            progressCardStateText().visibility = VISIBLE
-            progressCardStateText().text = androidResourcesHelper.getString(R.string.sync_card_connecting)
-            displayLastSyncTime(syncCardState, lastSyncText())
+            with(progressCardSyncProgress()) {
+                visibility = VISIBLE
+                progress = (100 * (syncCardState.progress.toFloat() / syncCardState.total.toFloat())).toInt()
+            }
+            with(progressCardStateText()) {
+                visibility = VISIBLE
+                text = androidResourcesHelper.getString(R.string.dashboard_sync_card_connecting)
+                textColor = context.getColorResCompat(android.R.attr.textColorPrimary)
+            }
 
+            displayLastSyncTime(syncCardState, lastSyncText())
             visibility = VISIBLE
         }
+
 
     private fun prepareProgressView(syncCardState: SyncProgress): View =
         viewForProgressState.apply {
             progressCardConnectingProgress().visibility = GONE
-            progressCardSyncProgress().visibility = VISIBLE
-            progressCardSyncProgress().progress = (100 * (syncCardState.progress.toFloat() / syncCardState.total.toFloat())).toInt()
-            progressCardStateText().visibility = VISIBLE
-            progressCardStateText().text = androidResourcesHelper.getString(R.string.sync_card_progress, arrayOf("${syncCardState.progress}/${syncCardState.total}"))
+            with(progressCardSyncProgress()) {
+                visibility = VISIBLE
+                progress = (100 * (syncCardState.progress.toFloat() / syncCardState.total.toFloat())).toInt()
+            }
+            with(progressCardStateText()) {
+                visibility = VISIBLE
+                text = androidResourcesHelper.getString(R.string.dashboard_sync_card_progress, arrayOf("${syncCardState.progress}/${syncCardState.total}"))
+                textColor = context.getColorResCompat(android.R.attr.textColorPrimary)
+            }
             displayLastSyncTime(syncCardState, lastSyncText())
 
             visibility = VISIBLE

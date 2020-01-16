@@ -23,17 +23,17 @@
             android:layout_marginBottom="@dimen/activity_dashboard_card_sync_space_above_last_sync"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:paddingBottom="2dp"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingBottom="2dp">
 
             <TextView
                 android:id="@+id/dashboard_sync_card_select_no_modules_message"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_weight="1"
-                android:text="Please select modules to sync"
+                android:text="@string/dashboard_sync_card_no_modules_message"
                 android:textSize="16sp" />
 
             <androidx.appcompat.widget.AppCompatButton
@@ -45,7 +45,7 @@
                 android:background="@drawable/button_rounded_corners_gray"
                 android:elevation="2dp"
                 android:stateListAnimator="@null"
-                android:text="MODULES"
+                android:text="@string/dashboard_sync_card_no_modules_button"
                 android:translationZ="2dp" />
         </LinearLayout>
 
@@ -53,8 +53,7 @@
             android:id="@+id/dashboard_sync_card_last_sync"
             style="@style/DashboardCardStyleLastSync"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Last sync: 1 day ago" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

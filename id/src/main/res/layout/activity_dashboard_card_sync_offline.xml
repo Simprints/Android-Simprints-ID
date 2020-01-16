@@ -39,7 +39,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
-                android:text="Please turn on internet connection in settings"
+                android:text="@string/dashboard_sync_card_offline_message"
                 android:textSize="16sp" />
 
             <androidx.appcompat.widget.AppCompatButton
@@ -51,7 +51,7 @@
                 android:background="@drawable/button_rounded_corners_gray"
                 android:elevation="2dp"
                 android:stateListAnimator="@null"
-                android:text="settings"
+                android:text="@string/dashboard_sync_card_offline_button"
                 android:translationZ="2dp" />
         </LinearLayout>
 
@@ -59,8 +59,7 @@
             android:id="@+id/dashboard_sync_card_last_sync"
             style="@style/DashboardCardStyleLastSync"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Last sync: 1 day ago" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
