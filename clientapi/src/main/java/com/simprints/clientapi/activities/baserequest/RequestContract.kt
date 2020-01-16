@@ -10,60 +10,36 @@ import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.responses.*
 
-
 interface RequestContract {
 
     interface RequestView {
-
         val action: String?
-
         val extras: Map<String, Any?>?
-
         val presenter: Presenter
-
         val enrollExtractor: EnrollExtractor
-
         val verifyExtractor: VerifyExtractor
-
         val identifyExtractor: IdentifyExtractor
-
         val confirmIdentityExtractor: ConfirmIdentityExtractor
 
         fun sendSimprintsRequest(request: BaseRequest)
-
         fun sendSimprintsConfirmation(request: BaseConfirmation)
-
         fun handleClientRequestError(clientApiAlert: ClientApiAlert)
-
         fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean, sessionId: String)
     }
 
     interface Presenter {
-
         suspend fun start()
-
         fun processEnrollRequest()
-
         fun processIdentifyRequest()
-
         fun processVerifyRequest()
-
         fun processConfirmIdentityRequest()
-
         fun handleEnrollResponse(enroll: EnrollResponse)
-
         fun handleIdentifyResponse(identify: IdentifyResponse)
-
         fun handleVerifyResponse(verify: VerifyResponse)
-
         fun handleRefusalResponse(refusalForm: RefusalFormResponse)
-
         fun handleResponseError(errorResponse: ErrorResponse)
-
         fun validateAndSendRequest(builder: ClientRequestBuilder)
-
         fun handleConfirmationResponse(response: ConfirmationResponse)
-
     }
 
 }

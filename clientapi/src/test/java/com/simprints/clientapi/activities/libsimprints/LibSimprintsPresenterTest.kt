@@ -27,7 +27,6 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.util.*
 
-
 class LibSimprintsPresenterTest {
 
     companion object {
