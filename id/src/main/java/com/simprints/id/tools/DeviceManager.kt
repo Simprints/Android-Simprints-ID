@@ -1,5 +1,8 @@
 package com.simprints.id.tools
 
+import com.simprints.id.exceptions.unexpected.RootedDeviceException
+
 interface DeviceManager {
-    fun isDeviceRooted(): Boolean
+    @Throws(RootedDeviceException::class)
+    fun checkIfDeviceIsRooted()
 }

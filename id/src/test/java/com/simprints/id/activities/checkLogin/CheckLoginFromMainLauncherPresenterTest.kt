@@ -5,10 +5,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherPresenter
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.exceptions.unexpected.RootedDeviceException
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.spy
+import com.simprints.testtools.common.syntax.verifyOnce
+import com.simprints.testtools.common.syntax.whenever
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,18 +42,19 @@ class CheckLoginFromMainLauncherPresenterTest {
 
     @Test
     fun withRootedDevice_shouldLogException() {
-        whenever { presenterSpy.deviceManager.isDeviceRooted() } thenReturn true
+        val exception = RootedDeviceException()
+        whenever { presenterSpy.deviceManager.checkIfDeviceIsRooted() } thenThrow exception
 
         presenterSpy.start()
 
         verifyOnce(presenterSpy.crashReportManager) {
-            logExceptionOrSafeException(anyNotNull())
+            logExceptionOrSafeException(exception)
         }
     }
 
     @Test
     fun withRootedDevice_shouldShowAlertScreen() {
-        whenever(presenterSpy.deviceManager) { isDeviceRooted() } thenReturn true
+        whenever(presenterSpy.deviceManager) { checkIfDeviceIsRooted() } thenThrow RootedDeviceException()
 
         presenterSpy.start()
 
