@@ -16,7 +16,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 class CommCarePresenter(private val view: CommCareContract.View,
                         private val action: String?,
                         private val sessionEventsManager: ClientApiSessionEventsManager,
@@ -51,7 +50,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(enroll.guid, sessionEventsManager.getCurrentSessionId(), flowCompletedCheck)
+            view.returnRegistration(enroll.guid, getCurrentSessionId(), flowCompletedCheck)
         }
     }
 
@@ -69,7 +68,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnErrorToClient(errorResponse, flowCompletedCheck)
+            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionId())
         }
     }
 
@@ -81,7 +80,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
                 verify.matchResult.confidence,
                 Tier.valueOf(verify.matchResult.tier.name),
                 verify.matchResult.guidFound,
-                sessionEventsManager.getCurrentSessionId(),
+                getCurrentSessionId(),
                 flowCompletedCheck
             )
         }
@@ -91,9 +90,12 @@ class CommCarePresenter(private val view: CommCareContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnExitForms(refusalForm.reason, refusalForm.extra, flowCompletedCheck)
+            view.returnExitForms(refusalForm.reason, refusalForm.extra,
+                getCurrentSessionId(), flowCompletedCheck)
         }
     }
+
+    private suspend fun getCurrentSessionId() = sessionEventsManager.getCurrentSessionId()
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)

@@ -14,7 +14,7 @@ interface OdkContract {
 
         fun returnVerification(id: String, confidence: String, tier: String, sessionId: String, flowCompletedCheck:Boolean)
 
-        fun returnExitForm(reason: String, extra: String, flowCompletedCheck:Boolean)
+        fun returnExitForm(reason: String, extra: String, sessionId: String, flowCompletedCheck:Boolean)
 
         fun returnConfirmation(flowCompletedCheck: Boolean)
 
