@@ -19,7 +19,7 @@ interface LibSimprintsContract {
 
         fun returnVerification(verification: Verification, sessionId: String, flowCompletedCheck: Boolean)
 
-        fun returnRefusalForms(refusalForm: RefusalForm, flowCompletedCheck: Boolean)
+        fun returnRefusalForms(refusalForm: RefusalForm, sessionId: String, flowCompletedCheck: Boolean)
 
         fun returnConfirmation(identificationOutcome: Boolean)
 

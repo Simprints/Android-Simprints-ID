@@ -103,7 +103,6 @@ open class Application : MultiDexApplication() {
         }
     }
 
-    
     private fun Module.defineBuildersForCoreManagers() {
         factory { component.getPreferencesManager() }
         factory { component.getAnalyticsManager() }
@@ -122,4 +121,5 @@ open class Application : MultiDexApplication() {
         super.onTerminate()
         stopKoin()
     }
+
 }

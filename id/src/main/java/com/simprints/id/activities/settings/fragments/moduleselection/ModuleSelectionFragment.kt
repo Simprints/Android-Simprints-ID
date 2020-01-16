@@ -39,10 +39,10 @@ class ModuleSelectionFragment(
     private val application: Application
 ) : Fragment(), ModuleSelectionListener, ChipClickListener {
 
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var viewModelFactory: ModuleViewModelFactory
     @Inject lateinit var peopleSyncManager: PeopleSyncManager
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
-    @Inject lateinit var preferencesManager: PreferencesManager
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 

@@ -170,6 +170,22 @@ class AlertActivityTest {
         }
     }
 
+    @Test
+    fun withRootedDevice_theRightAlertShouldAppear() {
+        launchAlertActivity(AlertActRequest(AlertType.ROOTED_DEVICE))
+        ensureAlertScreenLaunched(AlertActivityViewModel.ROOTED_DEVICE)
+    }
+
+    @Test
+    fun withRootedDevice_userClicksClose_shouldFinishWithTheRightResult() {
+        val scenario = launchAlertActivity(AlertActRequest(AlertType.ROOTED_DEVICE))
+        ensureAlertScreenLaunched(AlertActivityViewModel.ROOTED_DEVICE)
+
+        onView(withId(R.id.alertLeftButton)).perform(click())
+
+        verifyIntentReturned(scenario.result, AlertType.ROOTED_DEVICE, ButtonAction.CLOSE)
+    }
+
     private fun launchAlertActivity(request: AlertActRequest? = null): ActivityScenario<AlertActivity> =
         ActivityScenario.launch(Intent().apply {
             setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, AlertActivity::class.qualifiedName!!)

@@ -38,7 +38,6 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.response.A
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.MIN_BACKOFF_SECS
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncState
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.android.runOnActivity
@@ -157,7 +156,6 @@ class PeopleSyncIntegrationTest {
 
     @Test
     fun downloadFails_shouldSyncFail() {
-        MIN_BACKOFF_SECS = 0
         runSyncTest { continuation, activity ->
             mockResponsesForSync(projectSyncScope)
             mockDispatcher.downResponse = null
@@ -168,7 +166,6 @@ class PeopleSyncIntegrationTest {
 
     @Test
     fun downCountFails_shouldSyncFail() {
-        MIN_BACKOFF_SECS = 0
         runSyncTest { continuation, activity ->
             mockResponsesForSync(projectSyncScope)
             mockDispatcher.countResponse = null

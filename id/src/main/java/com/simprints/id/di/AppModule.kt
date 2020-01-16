@@ -58,6 +58,8 @@ import com.simprints.id.secure.SignerManagerImpl
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
+import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
+import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.*
 import com.simprints.id.tools.extensions.deviceId
@@ -87,12 +89,19 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSignerManager(projectRepository: ProjectRepository,
-                                  remoteDbManager: RemoteDbManager,
-                                  loginInfoManager: LoginInfoManager,
-                                  preferencesManager: PreferencesManager,
-                                  syncManager: SyncManager): SignerManager =
-        SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, syncManager)
+    open fun provideSignerManager(
+        projectRepository: ProjectRepository,
+        remoteDbManager: RemoteDbManager,
+        loginInfoManager: LoginInfoManager,
+        preferencesManager: PreferencesManager,
+        syncManager: SyncManager
+    ): SignerManager = SignerManagerImpl(
+        projectRepository,
+        remoteDbManager,
+        loginInfoManager,
+        preferencesManager,
+        syncManager
+    )
 
     @Provides
     @Singleton
@@ -210,6 +219,12 @@ open class AppModule {
             context.deviceId, loginInfoManager, analyticsManager, crashReportManager, timeHelper, sessionEventsManager)
 
     @Provides
+    @Singleton
+    open fun provideImageUpSyncScheduler(
+        context: Context
+    ): ImageUpSyncScheduler = ImageUpSyncSchedulerImpl(context)
+
+    @Provides
     open fun getConsentDataManager(prefs: ImprovedSharedPreferences, remoteConfigWrapper: RemoteConfigWrapper): ConsentLocalDataSource =
         ConsentLocalDataSourceImpl(prefs, remoteConfigWrapper)
 
@@ -266,5 +281,8 @@ open class AppModule {
                                                timeHelper: TimeHelper,
                                                ctx: Context): DashboardSyncCardDisplayer =
         DashboardSyncCardDisplayerImpl(androidResourcesHelper, timeHelper, ctx)
+
+    @Provides
+    open fun provideDeviceManager(context: Context): DeviceManager = DeviceManagerImpl(context)
 }
 

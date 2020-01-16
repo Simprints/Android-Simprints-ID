@@ -56,6 +56,15 @@ enum class AlertActivityViewModel(val type: Type,
         message = R.string.safetynet_down_alert_message
     ),
 
+    ROOTED_DEVICE(
+        type = Type.ConfigurationError(title = R.string.rooted_device_title,
+            backgroundColor = R.color.simprints_red,
+            mainDrawable = R.drawable.error_icon),
+        leftButton = ButtonAction.Close,
+        rightButton = ButtonAction.None,
+        message = R.string.rooted_device_message
+    ),
+
     UNEXPECTED_ERROR(
         type = Type.UnexpectedError(),
         leftButton = ButtonAction.Close,
@@ -72,6 +81,7 @@ enum class AlertActivityViewModel(val type: Type,
                 AlertType.SAFETYNET_ERROR -> SAFETYNET_ERROR
                 AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
                 AlertType.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
+                AlertType.ROOTED_DEVICE -> ROOTED_DEVICE
             }
     }
 
