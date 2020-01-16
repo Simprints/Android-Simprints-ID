@@ -1,24 +1,38 @@
 package com.simprints.id.activities.dashboard
 
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncState
 import java.util.*
 
 class DashboardViewModel(val peopleSyncManager: PeopleSyncManager) : ViewModel() {
 
-    //private val peopleSyncStateLiveData = peopleSyncManager.getLastSyncState()
-    private val peopleSyncStateLiveData = MutableLiveData<PeopleSyncState>()
+    var syncCardState = MediatorLiveData<DashboardSyncCardState>()
 
-    val syncCardState = Transformations.map(peopleSyncStateLiveData) {
-        DashboardSyncCardState.SyncProgress(Date(), 10, 100)
+    init {
+        syncCardState.addSource(getLiveDataDefaultState()) { value -> syncCardState.setValue(value) }
+        syncCardState.addSource(getLiveDataForSyncState()) { value -> syncCardState.setValue(value) }
+        syncCardState.addSource(getLiveDataForConnectivityState()) { value -> syncCardState.setValue(value) }
+        syncCardState.addSource(getLiveDataForSyncState()) { value -> syncCardState.setValue(value) }
+
     }
 
-    //StopShip: use only for debug - it will be gone when the business logic is wired up to the UI
-    fun emit() {
-        peopleSyncStateLiveData.value = PeopleSyncState("", 10, 100, emptyList(), emptyList())
+    private fun getLiveDataDefaultState() = MutableLiveData<DashboardSyncCardState>().apply {
+        value = DashboardSyncCardState.SyncDefault(Date())
     }
+
+    private fun getLiveDataForSyncState() =
+        peopleSyncManager.getLastSyncState().map {
+            DashboardSyncCardState.SyncProgress(Date(), 10, 100)
+        }
+
+    private fun getLiveDataForConnectivityState() =
+        MutableLiveData<DashboardSyncCardState>()
+
+
+    private fun getLiveDataForModuleState() =
+        MutableLiveData<DashboardSyncCardState>()
 }
