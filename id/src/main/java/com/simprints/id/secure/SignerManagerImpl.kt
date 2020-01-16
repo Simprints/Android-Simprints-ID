@@ -10,11 +10,13 @@ import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 
-open class SignerManagerImpl(private var projectRepository: ProjectRepository,
-                             private val remote: RemoteDbManager,
-                             private val loginInfoManager: LoginInfoManager,
-                             private val preferencesManager: PreferencesManager,
-                             private val syncManager: SyncManager) : SignerManager {
+open class SignerManagerImpl(
+    private var projectRepository: ProjectRepository,
+    private val remote: RemoteDbManager,
+    private val loginInfoManager: LoginInfoManager,
+    private val preferencesManager: PreferencesManager,
+    private val syncManager: SyncManager
+) : SignerManager {
 
     override fun signIn(projectId: String, userId: String, token: Token): Completable =
         remote.signIn(token.value)
@@ -46,4 +48,5 @@ open class SignerManagerImpl(private var projectRepository: ProjectRepository,
         syncManager.deleteLastSyncInfo()
         preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
     }
+
 }
