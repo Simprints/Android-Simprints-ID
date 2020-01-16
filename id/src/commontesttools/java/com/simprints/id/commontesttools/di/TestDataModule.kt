@@ -17,7 +17,6 @@ import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
 import com.simprints.testtools.common.di.DependencyRule
-import javax.inject.Singleton
 
 class TestDataModule(
     private val projectLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
@@ -31,19 +30,10 @@ class TestDataModule(
     private val imageRepositoryRule: DependencyRule = DependencyRule.RealRule
 ) : DataModule() {
 
-    override fun providePersonRemoteDataSource(
-        remoteDbManager: RemoteDbManager
-    ): PersonRemoteDataSource = personRemoteDataSourceRule.resolveDependency {
-        super.providePersonRemoteDataSource(remoteDbManager)
-    }
-
-    override fun provideProjectLocalDataSource(
-        ctx: Context,
-        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-        loginInfoManager: LoginInfoManager
-    ): ProjectLocalDataSource = projectLocalDataSourceRule.resolveDependency {
-        super.provideProjectLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager)
-    }
+    override fun provideProjectLocalDataSource(ctx: Context,
+                                               secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
+                                               loginInfoManager: LoginInfoManager): ProjectLocalDataSource =
+        projectLocalDataSourceRule.resolveDependency { super.provideProjectLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager) }
 
     override fun provideProjectRemoteDataSource(
         remoteDbManager: RemoteDbManager
@@ -72,15 +62,6 @@ class TestDataModule(
         )
     }
 
-    @Singleton
-    override fun providePersonLocalDataSource(
-        ctx: Context,
-        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-        loginInfoManager: LoginInfoManager
-    ): PersonLocalDataSource = personLocalDataSourceRule.resolveDependency {
-        super.providePersonLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager)
-    }
-
     override fun provideImageLocalDataSource(
         context: Context
     ): ImageLocalDataSource = imageLocalDataSourceRule.resolveDependency {
@@ -96,5 +77,13 @@ class TestDataModule(
     ): ImageRepository = imageRepositoryRule.resolveDependency {
         super.provideImageRepository(localDataSource, remoteDataSource)
     }
+
+    override fun providePersonRemoteDataSource(remoteDbManager: RemoteDbManager): PersonRemoteDataSource =
+        personRemoteDataSourceRule.resolveDependency { super.providePersonRemoteDataSource(remoteDbManager) }
+
+    override fun providePersonLocalDataSource(ctx: Context,
+                                              secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
+                                              loginInfoManager: LoginInfoManager): PersonLocalDataSource =
+        personLocalDataSourceRule.resolveDependency { super.providePersonLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager) }
 
 }

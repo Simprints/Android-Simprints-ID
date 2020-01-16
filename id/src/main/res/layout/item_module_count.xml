@@ -9,16 +9,16 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_weight="0.85"
-        android:textSize="16sp"
-        android:padding="5dp"/>
+        android:layout_weight="1"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/moduleCountText"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.15"
         android:textSize="16sp"
+        android:layout_marginEnd="20dp"
+        android:gravity="end"
         android:padding="5dp"/>
 
 </LinearLayout>

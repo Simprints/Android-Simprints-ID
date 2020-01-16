@@ -23,6 +23,7 @@ import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.tools.DeviceManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -45,7 +46,8 @@ class TestAppModule(
     var secureApiInterfaceRule: DependencyRule = RealRule,
     var longConsentManagerRule: DependencyRule = RealRule,
     var syncStatusDatabaseRule: DependencyRule = RealRule,
-    private var encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) }
+    private var encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) },
+    var deviceManagerRule: DependencyRule = RealRule
 ) : AppModule() {
 
     override fun provideCrashManager(): CrashReportManager =
@@ -127,4 +129,7 @@ class TestAppModule(
 
     override fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
         encryptedSharedPreferencesRule.resolveDependency { super.provideEncryptedSharedPreferences(app) }
+    override fun provideDeviceManager(context: Context): DeviceManager =
+
+        deviceManagerRule.resolveDependency { super.provideDeviceManager(context) }
 }
