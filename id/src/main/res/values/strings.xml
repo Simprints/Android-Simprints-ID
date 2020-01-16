@@ -370,6 +370,17 @@
     <string name="dashboard_card_project_title">Project</string>
     <string name="records_up_to_date">All records are updated</string>
 
+    <string name="dashboard_sync_card_complete">Sync complete</string>
+    <string name="dashboard_sync_card_incomplete">Sync incomplete</string>
+    <string name="dashboard_sync_card_connecting">Connecting…</string>
+    <string name="dashboard_sync_card_progress">Syncing… %1$s</string>
+    <string name="dashboard_sync_card_sync_button">SYNC NOW</string>
+    <string name="dashboard_sync_card_failed_message">Sync failed. Please contact your supervisor</string>
+    <string name="dashboard_sync_card_no_modules_message">Please select modules to sync</string>
+    <string name="dashboard_sync_card_no_modules_button">MODULES</string>
+    <string name="dashboard_sync_card_offline_message">Please turn on internet connection in settings</string>
+    <string name="dashboard_sync_card_offline_button">Settings</string>
+
     <string name="dashboard_card_localdb_sync_user_title">People enrolled by user</string>
     <string name="dashboard_card_localdb_sync_module_title">People enrolled in selected modules</string>
     <string name="dashboard_card_localdb_sync_project_title">People enrolled in project</string>
@@ -387,7 +398,6 @@
     <string name="dashboard_card_identification_title">Last Identification</string>
     <string name="dashboard_card_currentuser_title">Current user</string>
     <string name="dashboard_card_enrolment_info">Enrolment Info</string>
-    <string name="dashboard_card_sync_now">Sync Now</string>
     <string name="dashboard_card_available_on_phone">Available on Phone</string>
     <string name="dashboard_card_to_upload">To Upload</string>
     <string name="dashboard_card_to_download">To Download</string>
@@ -474,9 +484,6 @@
     <string name="confirm_module_selection_title">Modules selected</string>
     <string name="confirm_module_selection_yes">Confirm</string>
     <string name="confirm_module_selection_cancel">Cancel</string>
-    <string name="sync_card_complete">Sync complete</string>
-    <string name="sync_card_connecting">Connecting…</string>
-    <string name="sync_card_progress">Syncing… %1$s</string>
     <!-- endregion -->
 
 </resources>

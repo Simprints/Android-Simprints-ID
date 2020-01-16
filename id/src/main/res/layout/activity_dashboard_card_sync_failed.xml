@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:text="Sync failed. Please contact your supervisor"
+                android:text="@string/dashboard_sync_card_failed_message"
                 android:textSize="16sp"
                 android:textColor="@color/simprints_red" />
         </LinearLayout>
@@ -47,7 +47,6 @@
             android:id="@+id/dashboard_sync_card_last_sync"
             style="@style/DashboardCardStyleLastSync"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Last sync: 1 day ago" />
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
