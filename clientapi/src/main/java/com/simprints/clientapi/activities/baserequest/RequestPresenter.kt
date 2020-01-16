@@ -10,11 +10,8 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.domain.ClientBase
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
-import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.extensions.doInBackground
-import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
-
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 private var eventsManager: ClientApiSessionEventsManager)
@@ -67,10 +64,6 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         }.also {
             view.handleClientRequestError(it)
         }
-    }
-
-    override fun handleResponseError(errorResponse: ErrorResponse) {
-        view.returnErrorToClient(errorResponse, errorResponse.isFlowCompletedWithCurrentError())
     }
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {

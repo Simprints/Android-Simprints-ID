@@ -23,28 +23,32 @@ import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.tools.DeviceManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
 
-class TestAppModule(app: Application,
-                    var remoteDbManagerRule: DependencyRule = RealRule,
-                    var remoteSessionsManagerRule: DependencyRule = RealRule,
-                    var dbManagerRule: DependencyRule = RealRule,
-                    var secureDataManagerRule: DependencyRule = RealRule,
-                    var loginInfoManagerRule: DependencyRule = RealRule,
-                    var randomGeneratorRule: DependencyRule = RealRule,
-                    var keystoreManagerRule: DependencyRule = RealRule,
-                    var crashReportManagerRule: DependencyRule = RealRule,
-                    var sessionEventsManagerRule: DependencyRule = RealRule,
-                    var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
-                    var simNetworkUtilsRule: DependencyRule = RealRule,
-                    var secureApiInterfaceRule: DependencyRule = RealRule,
-                    var longConsentManagerRule: DependencyRule = RealRule,
-                    var syncStatusDatabaseRule: DependencyRule = RealRule,
-                    private var encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) }) : AppModule() {
+class TestAppModule(
+    app: Application,
+    var remoteDbManagerRule: DependencyRule = RealRule,
+    var remoteSessionsManagerRule: DependencyRule = RealRule,
+    var dbManagerRule: DependencyRule = RealRule,
+    var secureDataManagerRule: DependencyRule = RealRule,
+    var loginInfoManagerRule: DependencyRule = RealRule,
+    var randomGeneratorRule: DependencyRule = RealRule,
+    var keystoreManagerRule: DependencyRule = RealRule,
+    var crashReportManagerRule: DependencyRule = RealRule,
+    var sessionEventsManagerRule: DependencyRule = RealRule,
+    var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
+    var simNetworkUtilsRule: DependencyRule = RealRule,
+    var secureApiInterfaceRule: DependencyRule = RealRule,
+    var longConsentManagerRule: DependencyRule = RealRule,
+    var syncStatusDatabaseRule: DependencyRule = RealRule,
+    private var encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) },
+    var deviceManagerRule: DependencyRule = RealRule
+) : AppModule() {
 
     override fun provideCrashManager(): CrashReportManager =
         crashReportManagerRule.resolveDependency { super.provideCrashManager() }
@@ -58,12 +62,21 @@ class TestAppModule(app: Application,
     override fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager =
         remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager(loginInfoManager) }
 
-    override fun provideSignerManager(projectRepository: ProjectRepository,
-                                      remoteDbManager: RemoteDbManager,
-                                      loginInfoManager: LoginInfoManager,
-                                      preferencesManager: PreferencesManager,
-                                      syncManager: SyncManager): SignerManager =
-        dbManagerRule.resolveDependency { super.provideSignerManager(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, syncManager) }
+    override fun provideSignerManager(
+        projectRepository: ProjectRepository,
+        remoteDbManager: RemoteDbManager,
+        loginInfoManager: LoginInfoManager,
+        preferencesManager: PreferencesManager,
+        syncManager: SyncManager
+    ): SignerManager = dbManagerRule.resolveDependency {
+        super.provideSignerManager(
+            projectRepository,
+            remoteDbManager,
+            loginInfoManager,
+            preferencesManager,
+            syncManager
+        )
+    }
 
     override fun provideSecureLocalDbKeyProvider(encryptedSharedPrefs: SharedPreferences,
                                                  randomGenerator: RandomGenerator,
@@ -71,7 +84,7 @@ class TestAppModule(app: Application,
         secureDataManagerRule.resolveDependency { super.provideSecureLocalDbKeyProvider(encryptedSharedPrefs, randomGenerator, unsecuredLocalDbKeyProvider) }
 
     override fun provideLegacyLocalDbKeyProvider(preferencesManager: PreferencesManager,
-                                                   keystoreManager: KeystoreManager): LegacyLocalDbKeyProvider =
+                                                 keystoreManager: KeystoreManager): LegacyLocalDbKeyProvider =
         secureDataManagerRule.resolveDependency { super.provideLegacyLocalDbKeyProvider(preferencesManager, keystoreManager) }
 
     override fun provideKeystoreManager(): KeystoreManager =
@@ -80,14 +93,23 @@ class TestAppModule(app: Application,
     override fun provideSecureApiInterface(): SecureApiInterface =
         secureApiInterfaceRule.resolveDependency { super.provideSecureApiInterface() }
 
-    override fun provideSessionEventsManager(ctx: Context,
-                                             sessionEventsSyncManager: SessionEventsSyncManager,
-                                             sessionEventsLocalDbManager: SessionEventsLocalDbManager,
-                                             preferencesManager: PreferencesManager,
-                                             timeHelper: TimeHelper,
-                                             crashReportManager: CrashReportManager): SessionEventsManager =
-
-        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, crashReportManager) }
+    override fun provideSessionEventsManager(
+        ctx: Context,
+        sessionEventsSyncManager: SessionEventsSyncManager,
+        sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+        preferencesManager: PreferencesManager,
+        timeHelper: TimeHelper,
+        crashReportManager: CrashReportManager
+    ): SessionEventsManager = sessionEventsManagerRule.resolveDependency {
+        super.provideSessionEventsManager(
+            ctx,
+            sessionEventsSyncManager,
+            sessionEventsLocalDbManager,
+            preferencesManager,
+            timeHelper,
+            crashReportManager
+        )
+    }
 
     override fun provideSessionEventsLocalDbManager(ctx: Context,
                                                     secureDataManager: SecureLocalDbKeyProvider): SessionEventsLocalDbManager =
@@ -107,4 +129,7 @@ class TestAppModule(app: Application,
 
     override fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
         encryptedSharedPreferencesRule.resolveDependency { super.provideEncryptedSharedPreferences(app) }
+    override fun provideDeviceManager(context: Context): DeviceManager =
+
+        deviceManagerRule.resolveDependency { super.provideDeviceManager(context) }
 }

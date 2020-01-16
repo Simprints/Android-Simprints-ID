@@ -28,23 +28,26 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/recordsToUploadCardView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginStart="10dp"
-        app:layout_constraintBottom_toBottomOf="@+id/recordsToDownloadCardView"
+        android:layout_marginTop="15dp"
+        app:layout_constraintHeight_min="wrap"
+        app:layout_constraintBottom_toBottomOf="@+id/recordsCardsBarrier"
         app:layout_constraintEnd_toStartOf="@+id/recordsToDownloadCardView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/recordsToDownloadCardView">
+        app:layout_constraintTop_toBottomOf="@+id/moduleSelectionButton">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="10dp">
 
             <TextView
                 android:id="@+id/recordsToUploadText"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.75"
                 android:gravity="center"
                 android:padding="5dp"
                 android:textColor="@android:color/black"
@@ -53,7 +56,8 @@
             <TextView
                 android:id="@+id/recordsToUploadCount"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.25"
                 android:layout_gravity="center"
                 android:textSize="16sp" />
 
@@ -67,20 +71,22 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
+        app:layout_constraintBottom_toBottomOf="@+id/recordsToUploadCardView"
         app:layout_constraintEnd_toStartOf="@+id/recordsToDeleteCardView"
         app:layout_constraintStart_toEndOf="@+id/recordsToUploadCardView"
         app:layout_constraintTop_toBottomOf="@+id/moduleSelectionButton">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="10dp">
 
             <TextView
                 android:id="@+id/recordsToDownloadText"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.75"
                 android:gravity="center"
                 android:padding="5dp"
                 android:textColor="@android:color/black"
@@ -89,7 +95,8 @@
             <TextView
                 android:id="@+id/recordsToDownloadCount"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.25"
                 android:layout_gravity="center"
                 android:textSize="16sp" />
 
@@ -101,24 +108,27 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/recordsToDeleteCardView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="15dp"
         android:layout_marginEnd="10dp"
-        app:layout_constraintBottom_toBottomOf="@+id/recordsToDownloadCardView"
+        app:layout_constraintHeight_min="wrap"
+        app:layout_constraintBottom_toBottomOf="@+id/recordsCardsBarrier"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/recordsToDownloadCardView"
-        app:layout_constraintTop_toTopOf="@+id/recordsToDownloadCardView">
+        app:layout_constraintTop_toBottomOf="@+id/moduleSelectionButton">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="10dp">
 
             <TextView
                 android:id="@+id/recordsToDeleteText"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.75"
                 android:gravity="center"
                 android:padding="5dp"
                 android:textColor="@android:color/black"
@@ -127,7 +137,8 @@
             <TextView
                 android:id="@+id/recordsToDeleteCount"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.25"
                 android:layout_gravity="center"
                 android:textSize="16sp" />
 
@@ -140,7 +151,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-
         app:layout_constraintEnd_toEndOf="@+id/recordsToDeleteCardView"
         app:layout_constraintStart_toStartOf="@+id/recordsToUploadCardView"
         app:layout_constraintTop_toBottomOf="@+id/recordsToDownloadCardView">
@@ -197,7 +207,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -251,5 +260,11 @@
         </LinearLayout>
     </TabHost>
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/recordsCardsBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="recordsToUploadCardView,recordsToDownloadCardView,recordsToDeleteCardView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

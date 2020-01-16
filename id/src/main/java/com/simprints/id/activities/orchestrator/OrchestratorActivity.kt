@@ -22,11 +22,11 @@ class OrchestratorActivity : AppCompatActivity() {
 
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var orchestratorViewModelFactory: OrchestratorViewModelFactory
-    lateinit var appRequest: AppRequest
-
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var timeHelper: TimeHelper
+
+    lateinit var appRequest: AppRequest
 
     private var newActivity = true
 
@@ -82,7 +82,7 @@ class OrchestratorActivity : AppCompatActivity() {
         vm.ongoingStep.observe(this, observerForNextStep)
         vm.appResponse.observe(this, observerForFinalResponse)
 
-        if(newActivity) {
+        if (newActivity) {
             vm.clearState()
         }
         newActivity = false
@@ -97,4 +97,5 @@ class OrchestratorActivity : AppCompatActivity() {
         super.onDestroy()
         vm.saveState()
     }
+
 }
