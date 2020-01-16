@@ -45,7 +45,7 @@ class OdkPresenter(private val view: OdkContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
             sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
-            view.returnErrorToClient(errorResponse, flowCompletedCheck)
+            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionId())
         }
     }
 
@@ -53,7 +53,7 @@ class OdkPresenter(private val view: OdkContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(enroll.guid, sessionEventsManager.getCurrentSessionId(), flowCompletedCheck)
+            view.returnRegistration(enroll.guid, getCurrentSessionId(), flowCompletedCheck)
         }
     }
 
@@ -79,7 +79,7 @@ class OdkPresenter(private val view: OdkContract.View,
                 verify.matchResult.guidFound,
                 verify.matchResult.confidence.toString(),
                 verify.matchResult.tier.toString(),
-                sessionEventsManager.getCurrentSessionId(),
+                getCurrentSessionId(),
                 flowCompletedCheck
             )
         }
@@ -89,9 +89,11 @@ class OdkPresenter(private val view: OdkContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnExitForm(refusalForm.reason, refusalForm.extra, flowCompletedCheck)
+            view.returnExitForm(refusalForm.reason, refusalForm.extra, getCurrentSessionId(), flowCompletedCheck)
         }
     }
+
+    private suspend fun getCurrentSessionId() = sessionEventsManager.getCurrentSessionId()
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)

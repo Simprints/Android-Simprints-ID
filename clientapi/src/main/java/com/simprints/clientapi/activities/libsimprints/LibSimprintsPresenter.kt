@@ -17,7 +17,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                             private val action: String?,
                             private val sessionEventsManager: ClientApiSessionEventsManager,
@@ -43,7 +42,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnErrorToClient(errorResponse, flowCompletedCheck)
+            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionId())
         }
     }
 
@@ -51,7 +50,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(Registration(enroll.guid), sessionEventsManager.getCurrentSessionId(), flowCompletedCheck)
+            view.returnRegistration(Registration(enroll.guid), getCurrentSessionId(), flowCompletedCheck)
         }
     }
 
@@ -78,7 +77,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                     matchResult.confidence,
                     matchResult.tier.fromDomainToLibsimprintsTier(),
                     matchResult.guidFound)
-                view.returnVerification(verification, sessionEventsManager.getCurrentSessionId(), flowCompletedCheck)
+                view.returnVerification(verification, getCurrentSessionId(), flowCompletedCheck)
             }
         }
     }
@@ -87,9 +86,12 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra), flowCompletedCheck)
+            view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra),
+                getCurrentSessionId(), flowCompletedCheck)
         }
     }
+
+    private suspend fun getCurrentSessionId() = sessionEventsManager.getCurrentSessionId()
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
