@@ -13,7 +13,6 @@ import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.extensions.doInBackground
 
-
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 private var eventsManager: ClientApiSessionEventsManager)
     : RequestContract.Presenter {

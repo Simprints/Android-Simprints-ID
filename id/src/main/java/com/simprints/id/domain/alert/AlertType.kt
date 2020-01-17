@@ -8,7 +8,8 @@ enum class AlertType {
     DIFFERENT_PROJECT_ID_SIGNED_IN,
     DIFFERENT_USER_ID_SIGNED_IN,
     SAFETYNET_ERROR,
-    UNEXPECTED_ERROR
+    UNEXPECTED_ERROR,
+    ROOTED_DEVICE
 }
 
 fun AlertType.fromAlertToAlertTypeEvent() = when (this) {
@@ -18,4 +19,5 @@ fun AlertType.fromAlertToAlertTypeEvent() = when (this) {
     AlertType.SAFETYNET_ERROR -> AlertScreenEvent.AlertScreenEventType.SAFETYNET_ERROR
     AlertType.GUID_NOT_FOUND_ONLINE -> AlertScreenEvent.AlertScreenEventType.GUID_NOT_FOUND_ONLINE
     AlertType.GUID_NOT_FOUND_OFFLINE -> AlertScreenEvent.AlertScreenEventType.GUID_NOT_FOUND_OFFLINE
+    AlertType.ROOTED_DEVICE -> AlertScreenEvent.AlertScreenEventType.ROOTED_DEVICE
 }

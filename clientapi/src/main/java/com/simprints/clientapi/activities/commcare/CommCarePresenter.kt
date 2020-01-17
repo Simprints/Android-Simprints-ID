@@ -16,7 +16,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 class CommCarePresenter(private val view: CommCareContract.View,
                         private val action: String?,
                         private val sessionEventsManager: ClientApiSessionEventsManager,

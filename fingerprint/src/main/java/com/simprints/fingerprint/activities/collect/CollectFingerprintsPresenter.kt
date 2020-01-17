@@ -204,7 +204,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         if (isScanning()) {
             stopCapturing()
         } else {
-            scanningHelper.stopReconnecting()
+            scanningHelper.stopScannerCommunications()
             view.startRefusalActivity()
         }
     }
@@ -233,7 +233,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun saveImagesAndProceedToFinish(fingerprints: List<Finger>) {
-        runBlocking {
+        runBlocking { // TODO : Use viewModelScope once converted to MVVM
             fingerprints.forEach { finger ->
                 finger.imageBytes?.let { imageBytes ->
                     finger.template?.imageRef = imageManager.save(imageBytes)
