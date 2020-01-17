@@ -204,7 +204,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         if (isScanning()) {
             stopCapturing()
         } else {
-            scanningHelper.stopReconnecting()
+            scanningHelper.stopScannerCommunications()
             view.startRefusalActivity()
         }
     }
