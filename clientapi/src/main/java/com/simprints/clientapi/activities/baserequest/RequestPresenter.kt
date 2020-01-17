@@ -83,7 +83,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
 
     private fun handleRootedDevice(exception: RootedDeviceException) {
         crashReportManager.logExceptionOrSafeException(exception)
-        // TODO: show red error screen
+        view.handleClientRequestError(ROOTED_DEVICE)
     }
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {
