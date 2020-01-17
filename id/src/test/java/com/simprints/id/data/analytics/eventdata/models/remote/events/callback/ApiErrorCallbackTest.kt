@@ -54,12 +54,4 @@ class ApiErrorCallbackTest {
         assertThat(domain.fromDomainToApi()).isEqualTo(api)
     }
 
-    @Test
-    fun rootedDevice_fromDomainToApi() {
-        val domain = ErrorCallbackEvent.Reason.ROOTED_DEVICE
-        val api = ApiErrorCallback.ApiReason.UNEXPECTED_ERROR
-
-        assertThat(domain.fromDomainToApi()).isEqualTo(api)
-    }
-
 }

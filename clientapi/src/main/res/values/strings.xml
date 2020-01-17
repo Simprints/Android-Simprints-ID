@@ -1,22 +1,25 @@
 <resources>
-    <!-- Module Title -->
+    <!-- region Module Title -->
     <string name="dynamic_module_title_clientapi" translatable="false">Client API</string>
-
     <string name="app_name" translatable="false">Client API</string>
+    <!-- endregion -->
 
-    <!-- Error Screen Layout -->
+    <!-- region Error Screen Layout -->
     <string name="main_error_graphic" translatable="false">Main Error Graphic</string>
     <string name="hint_error_graphic" translatable="false">Hint Error Graphic</string>
     <string name="failed_to_retrieve_message" translatable="false">Failed to retrieve message</string>
+    <!-- endregion -->
 
-    <!-- Error Screen Text -->
+    <!-- region Error Screen Text -->
     <string name="configuration_error_title">Configuration Error</string>
     <string name="configuration_error_message">A configuration error has occurred (%1$s), please contact your system administrator</string>
+    <string name="rooted_device_title">Rooted device detected</string>
+    <string name="rooted_device_message">1. Contact your supervisor - rooted device detected\n2. Tap Close</string>
+    <!-- endregion -->
 
     <!-- region GUID selection -->
     <string name="guid_selection_data_sent">Data sent</string>
     <string name="guid_selection_result_sent">Result sent</string>
     <string name="close">Close</string>
     <!-- endregion -->
-
 </resources>
