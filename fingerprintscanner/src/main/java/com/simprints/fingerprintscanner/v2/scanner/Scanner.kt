@@ -192,6 +192,13 @@ class Scanner(
             )
         ).map { it.image }
 
+    fun getImageQualityScore(): Single<Int> =
+        assertUn20On().andThen(
+            sendCommandAndReceiveResponse<GetImageQualityResponse>(
+                GetImageQualityCommand()
+            )
+        ).map { it.imageQualityScore }
+
     companion object {
         val DEFAULT_DPI = Dpi(500)
         val DEFAULT_TEMPLATE_TYPE = TemplateType.ISO_19794_2_2011

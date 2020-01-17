@@ -9,15 +9,14 @@ import com.simprints.fingerprintscanner.v2.tools.primitives.unsignedToInt
 
 class GetTemplateResponse(val templateData: TemplateData) : Un20Response(Un20MessageType.GetTemplate(templateData.templateType.byte)) {
 
-    override fun getDataBytes(): ByteArray = byteArrayOf(templateData.quality.toByte(), templateData.template)
+    override fun getDataBytes(): ByteArray = byteArrayOf(templateData.template)
 
     companion object {
         fun fromBytes(minorResponseByte: Byte, data: ByteArray) =
             GetTemplateResponse(
                 TemplateData(
                     templateType = TemplateType.fromBytes(byteArrayOf(minorResponseByte)),
-                    quality = data[0].unsignedToInt(),
-                    template = data.sliceArray(1 until data.size)
+                    template = data
                 )
             )
     }
