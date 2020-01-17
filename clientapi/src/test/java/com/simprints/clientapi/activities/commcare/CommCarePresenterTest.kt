@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.commcare
 
+import com.nhaarman.mockitokotlin2.eq
 import com.simprints.clientapi.activities.commcare.CommCarePresenter.Companion.ACTION_CONFIRM_IDENTITY
 import com.simprints.clientapi.activities.commcare.CommCarePresenter.Companion.ACTION_IDENTIFY
 import com.simprints.clientapi.activities.commcare.CommCarePresenter.Companion.ACTION_REGISTER
@@ -25,7 +26,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import java.util.*
-
 
 class CommCarePresenterTest {
 
@@ -145,8 +145,13 @@ class CommCarePresenterTest {
     @Test
     fun handleResponseError_ShouldCallActionError() {
         val error = ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID)
-        CommCarePresenter(view, "", mock(), mock(), mockSharedPrefs()).handleResponseError(error)
-        verifyOnce(view) { returnErrorToClient(error, RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        val sessionId = UUID.randomUUID().toString()
+        val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
+        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
+
+        CommCarePresenter(view, "", sessionEventsManagerMock, mock(), mockSharedPrefs()).handleResponseError(error)
+
+        verifyOnce(view) { returnErrorToClient(eq(error), eq(RETURN_FOR_FLOW_COMPLETED_CHECK), eq(sessionId)) }
     }
 
     private fun mockSessionManagerToCreateSession() = mock<ClientApiSessionEventsManager>().apply {

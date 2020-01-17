@@ -11,14 +11,13 @@ import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import javax.inject.Inject
 
-
 class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
                              component: AppComponent) :
     SettingsAboutContract.Presenter {
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var signerManager: SignerManager
-    @Inject lateinit var syncSchedulerHelper: SyncManager
+    @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var sessionEventManager: SessionEventsManager
     @Inject lateinit var recentEventsManager: RecentEventsPreferencesManager
     @Inject lateinit var longConsentManager: LongConsentManager
@@ -87,7 +86,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
 
     override suspend fun logout() {
         signerManager.signOut()
-        syncSchedulerHelper.cancelBackgroundSyncs()
+        syncManager.cancelBackgroundSyncs()
         longConsentManager.deleteLongConsents()
         sessionEventManager.signOut()
 

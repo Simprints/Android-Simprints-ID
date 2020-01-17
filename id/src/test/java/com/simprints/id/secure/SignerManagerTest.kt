@@ -16,7 +16,7 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import io.reactivex.Completable
 import io.reactivex.observers.TestObserver
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 
@@ -40,7 +40,8 @@ class SignerManagerTest {
             remoteDbManager,
             loginInfoManager,
             preferencesManager,
-            syncManager)
+            syncManager
+        )
 
         mockkStatic("com.simprints.id.tools.extensions.PerformanceMonitoring_extKt")
         every { any<Completable>().trace(any()) }.answers { this.value }
@@ -140,9 +141,8 @@ class SignerManagerTest {
         tester.awaitAndAssertSuccess()
     }
 
-
     @Test
-    fun signOut_shouldRemoveAnyState() = runBlocking {
+    fun signOut_shouldRemoveAnyState() = runBlockingTest {
         every { loginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         signerManager.signOut()
