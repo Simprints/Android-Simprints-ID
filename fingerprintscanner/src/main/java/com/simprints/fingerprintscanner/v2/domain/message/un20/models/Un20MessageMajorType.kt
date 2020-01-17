@@ -13,5 +13,6 @@ enum class Un20MessageMajorType(val majorByte: Byte) {
 
     // 0x4_ : Image commands
     GET_SUPPORTED_IMAGE_FORMATS(0x40),
-    GET_IMAGE(0x41)
+    GET_IMAGE(0x41),
+    GET_IMAGE_QUALITY(0x42)
 }

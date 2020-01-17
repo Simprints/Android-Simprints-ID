@@ -79,6 +79,7 @@ class SimulatedCommandInputStream {
                     is Un20MessageType.GetTemplate -> GetTemplateCommand.fromBytes(minorTypeByte, data)
                     Un20MessageType.GetSupportedImageFormats -> GetSupportedImageFormatsCommand.fromBytes(data)
                     is Un20MessageType.GetImage -> GetImageCommand.fromBytes(minorTypeByte, data)
+                    Un20MessageType.GetImageQuality -> GetImageQualityCommand.fromBytes(data)
                 }
             }
     }

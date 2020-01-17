@@ -187,9 +187,8 @@ class ScannerTest {
 
     @Test
     fun scanner_acquireTemplateWithUn20On_receivesTemplate() {
-        val templateQuality = 80
         val template = byteArrayOf(0x10, 0x20, 0x30, 0x40)
-        val expectedResponseData = byteArrayOf(templateQuality, template)
+        val expectedResponseData = byteArrayOf(template)
 
         val responseSubject = PublishSubject.create<Un20Response>()
 
@@ -201,7 +200,7 @@ class ScannerTest {
         val mockMessageOutputStream = setupMock<MessageOutputStream> {
             whenThis { sendMessage(isA<GetTemplateCommand>()) } then {
                 Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(GetTemplateResponse(TemplateData(Scanner.DEFAULT_TEMPLATE_TYPE, templateQuality, template)))
+                    responseSubject.onNext(GetTemplateResponse(TemplateData(Scanner.DEFAULT_TEMPLATE_TYPE, template)))
                 }
             }
         }
@@ -215,7 +214,7 @@ class ScannerTest {
         testObserver.awaitAndAssertSuccess()
         testObserver.assertValueCount(1)
         testObserver.values().first().let {
-            assertThat(byteArrayOf(it.quality, it.template)).isEqualTo(expectedResponseData)
+            assertThat(byteArrayOf(it.template)).isEqualTo(expectedResponseData)
         }
 
     }

@@ -19,6 +19,7 @@ class Un20ResponseParser : MessageParser<Un20Response> {
                 is Un20MessageType.GetTemplate -> GetTemplateResponse.fromBytes(minorTypeByte, data)
                 Un20MessageType.GetSupportedImageFormats -> GetSupportedImageFormatsResponse.fromBytes(data)
                 is Un20MessageType.GetImage -> GetImageResponse.fromBytes(minorTypeByte, data)
+                Un20MessageType.GetImageQuality -> GetImageQualityResponse.fromBytes(data)
             }
         }
 }

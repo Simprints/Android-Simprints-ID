@@ -27,12 +27,12 @@ class SimulatedUn20ResponseHelper(private val simulatedScannerManager: Simulated
             is GetSupportedTemplateTypesCommand -> GetSupportedTemplateTypesResponse(setOf(TemplateType.ISO_19794_2_2011))
             is GetTemplateCommand -> GetTemplateResponse(TemplateData(
                 command.templateType,
-                simulatedScannerManager.currentMockFinger().toV2().imageQuality,
                 simulatedScannerManager.currentMockFinger().toV2().templateBytes
             )
                 .also { simulatedScannerManager.cycleToNextFinger() })
             is GetSupportedImageFormatsCommand -> GetSupportedImageFormatsResponse(setOf(ImageFormat.RAW))
             is GetImageCommand -> GetImageResponse(command.imageFormat, Random.nextBytes(120000)) // TODO
+            is GetImageQualityCommand -> GetImageQualityResponse(simulatedScannerManager.currentMockFinger().toV2().imageQuality)
             else -> throw UnsupportedOperationException("Unmocked response to $command in SimulatedUn20ResponseHelper")
         }
 
