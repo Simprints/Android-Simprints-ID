@@ -2,6 +2,7 @@ package com.simprints.id.activities.dashboard
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -14,6 +15,7 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
+import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
@@ -62,16 +64,24 @@ class DashboardActivity : AppCompatActivity() {
         })
 
         syncCardDisplayer.userWantsToOpenSettings.observe(this, Observer {
-            startActivity(Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS))
+            openSettings()
         })
 
         syncCardDisplayer.userWantsToSelectAModule.observe(this, Observer {
-            //StopShip: to implement
+            openSelectModules()
         })
 
         syncCardDisplayer.userWantsToSync.observe(this, Observer {
             peopleSyncManager.sync()
         })
+    }
+
+    private fun openSettings() {
+        startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS))
+    }
+
+    private fun openSelectModules() {
+        startActivity(Intent(this, ModuleSelectionActivity::class.java))
     }
 
     private fun setupActionBar() {
