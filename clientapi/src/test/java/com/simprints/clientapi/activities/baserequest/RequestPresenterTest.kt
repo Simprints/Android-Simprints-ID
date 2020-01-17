@@ -2,9 +2,11 @@ package com.simprints.clientapi.activities.baserequest
 
 import com.google.common.truth.Truth
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
+import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.requests.EnrollRequest
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.reactivex.Completable
@@ -37,7 +39,7 @@ class RequestPresenterTest {
             whenever(this) { build() } thenReturn EnrollRequest(projectIdField, moduleIdField, userIdField, metadataField, extraField)
         }
 
-        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock)
+        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock, mock(), mock())
         presenter.validateAndSendRequest(requestBuilder)
 
         verifyOnce(clientApiSessionEventsManagerMock) {
@@ -54,7 +56,7 @@ class RequestPresenterTest {
             whenever(this) { build() } thenReturn EnrollRequest(projectIdField, moduleIdField, userIdField, metadataField, emptyMap())
         }
 
-        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock)
+        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock, mock(), mock())
         presenter.validateAndSendRequest(requestBuilder)
 
         verifyNever(clientApiSessionEventsManagerMock) { addSuspiciousIntentEvent(anyNotNull()) }
@@ -64,10 +66,12 @@ class RequestPresenterTest {
 
 class ImplRequestPresenter(
     view: RequestContract.RequestView,
-    clientApiSessionEventsManager: ClientApiSessionEventsManager
-) : RequestPresenter(view, clientApiSessionEventsManager) {
+    clientApiSessionEventsManager: ClientApiSessionEventsManager,
+    deviceManager: DeviceManager,
+    crashReportManager: ClientApiCrashReportManager
+) : RequestPresenter(view, clientApiSessionEventsManager, deviceManager, crashReportManager) {
 
-    override suspend fun start() {}
+    override suspend fun processRequest() {}
     override fun handleEnrollResponse(enroll: EnrollResponse) {}
     override fun handleIdentifyResponse(identify: IdentifyResponse) {}
     override fun handleVerifyResponse(verify: VerifyResponse) {}
