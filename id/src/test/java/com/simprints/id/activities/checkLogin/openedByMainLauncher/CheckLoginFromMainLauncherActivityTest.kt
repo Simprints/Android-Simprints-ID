@@ -37,10 +37,7 @@ class CheckLoginFromMainLauncherActivityTest {
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
 
     private val module by lazy {
-        TestAppModule(app,
-            remoteDbManagerRule = MockRule,
-            secureDataManagerRule = MockRule,
-            deviceManagerRule = MockRule)
+        TestAppModule(app, remoteDbManagerRule = MockRule, secureDataManagerRule = MockRule)
     }
 
     @Before
