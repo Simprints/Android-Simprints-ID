@@ -284,9 +284,10 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         scannerManager.scanner { setUiIdle() }.doInBackground()
     }
 
-    fun stopReconnecting() {
+    fun stopScannerCommunications() {
         reconnectingTask?.dispose()
-        scannerManager.scanner { disconnect() }.doInBackground()
+        imageTransferTask?.dispose()
+        disconnectScannerIfNeeded()
     }
 
     fun disconnectScannerIfNeeded() {
