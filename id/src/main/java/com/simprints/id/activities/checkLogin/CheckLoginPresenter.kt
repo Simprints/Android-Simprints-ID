@@ -13,7 +13,6 @@ import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.exceptions.unexpected.RootedDeviceException
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.tools.DeviceManager
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
@@ -30,7 +29,6 @@ abstract class CheckLoginPresenter(
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
-    @Inject lateinit var deviceManager: DeviceManager
 
     init {
         component.inject(this)
@@ -38,7 +36,6 @@ abstract class CheckLoginPresenter(
 
     protected fun checkSignedInStateAndMoveOn() {
         try {
-            deviceManager.checkIfDeviceIsRooted()
             checkSignedInOrThrow()
             handleSignedInUser()
         } catch (t: Throwable) {
