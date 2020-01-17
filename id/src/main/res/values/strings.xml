@@ -166,7 +166,7 @@
     <string name="error_occurred_title">Error occurred</string>
     <string name="alert_try_again">Try again</string>
     <string name="low_battery_title">Low battery</string>
-    <string name="rooted_device_title">Rooted device detected</string>
+
     <!-- Error Message Text -->
     <string name="invalid_projectId_message">A configuration error has occurred (invalid Project Id), please contact your system administrator</string>
     <string name="invalid_selectedId_message">A configuration error has occurred (invalid Selected Id), please contact your system administrator</string>
@@ -197,7 +197,6 @@
     <string name="low_battery_message">Scanner battery low, please charge your scanner</string>
     <string name="unforeseen_error_message">Please try again and if Simprints does not work contact your system administrator</string>
     <string name="safetynet_down_alert_message">1. Please try again after 5–10 minutes \n 2. Tap close</string>
-    <string name="rooted_device_message">1. Contact your supervisor - rooted device detected\n2. Tap Close</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">CLOSE</string>
     <string name="try_again_label">Try Again</string>
