@@ -18,5 +18,6 @@ internal fun ErrorResponse.isFlowCompletedWithCurrentError(): Boolean =
         ErrorResponse.Reason.INVALID_VERIFY_ID,
         ErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED,
         ErrorResponse.Reason.GUID_NOT_FOUND_ONLINE -> Constants.RETURN_FOR_FLOW_COMPLETED
-        ErrorResponse.Reason.LOGIN_NOT_COMPLETE -> Constants.RETURN_FOR_FLOW_NOT_COMPLETED
+        ErrorResponse.Reason.LOGIN_NOT_COMPLETE,
+        ErrorResponse.Reason.ROOTED_DEVICE -> Constants.RETURN_FOR_FLOW_NOT_COMPLETED
     }
