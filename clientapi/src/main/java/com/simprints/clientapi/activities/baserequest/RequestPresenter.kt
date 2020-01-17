@@ -27,9 +27,8 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         try {
             deviceManager.checkIfDeviceIsRooted()
             processRequest()
-        } catch (ex: RootedDeviceException) {
-            crashReportManager.logExceptionOrSafeException(ex)
-            // TODO: show red error screen
+        } catch (exception: RootedDeviceException) {
+            handleRootedDevice(exception)
         }
     }
 
@@ -77,10 +76,14 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
             is InvalidSessionIdException -> INVALID_SESSION_ID
             is InvalidUserIdException -> INVALID_USER_ID
             is InvalidVerifyIdException -> INVALID_VERIFY_ID
-            is RootedDeviceException -> ROOTED_DEVICE
         }.also {
             view.handleClientRequestError(it)
         }
+    }
+
+    private fun handleRootedDevice(exception: RootedDeviceException) {
+        crashReportManager.logExceptionOrSafeException(exception)
+        // TODO: show red error screen
     }
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {
