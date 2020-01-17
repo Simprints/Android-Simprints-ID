@@ -23,6 +23,7 @@ class ErrorPresenter(val view: ErrorContract.View,
             ClientApiAlert.INVALID_SESSION_ID -> Rid.string.invalid_sessionId_message
             ClientApiAlert.INVALID_USER_ID -> Rid.string.invalid_userId_message
             ClientApiAlert.INVALID_VERIFY_ID -> Rid.string.invalid_verifyId_message
+            ClientApiAlert.ROOTED_DEVICE -> Rid.string.rooted_device_message
         }.let {
             view.getStringFromResources(it)
         }
