@@ -25,7 +25,6 @@ import org.junit.Before
 import org.junit.Test
 import java.util.*
 
-
 class OdkPresenterTest {
 
     private val view = mock<OdkActivity>()
@@ -39,7 +38,6 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
-
         val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
 
