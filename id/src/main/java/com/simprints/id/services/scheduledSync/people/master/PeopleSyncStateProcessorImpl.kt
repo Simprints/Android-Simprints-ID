@@ -34,7 +34,8 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
                 MutableLiveData<PeopleSyncState>().apply {
                     with(syncWorkers) {
                         val progress = calculateProgressForDownSync() + calculateProgressForUpSync()
-                        val total = calculateTotalForDownSync() + calculateTotalForUpSync()
+                        val total = calculateTotalForSync()
+
                         val upSyncStates = upSyncUploadersStates() + upSyncCountersStates()
                         val downSyncStates = downSyncDownloadersStates() + downSyncCountersStates()
 
@@ -70,16 +71,26 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
     private fun List<WorkInfo>.completedWorkers() =
         this.filter { it.state == WorkInfo.State.SUCCEEDED }
 
-    private fun List<WorkInfo>.calculateTotalForDownSync(): Int {
-        val countersCompleted = this.filterByTags(tagForType(DOWN_COUNTER)).completedWorkers()
-        val counter = countersCompleted.firstOrNull()
-        return counter?.getDownCountsFromOutput()?.sumBy { it.fromDownSync() } ?: -1
+    private fun List<WorkInfo>.calculateTotalForSync(): Int? {
+        val totalDown = calculateTotalForDownSync()
+        val totalUp = calculateTotalForUpSync()
+        return if (totalUp != null && totalDown != null) {
+            totalUp + totalDown
+        } else {
+            null
+        }
     }
 
-    private fun List<WorkInfo>.calculateTotalForUpSync(): Int {
+    private fun List<WorkInfo>.calculateTotalForDownSync(): Int? {
+        val countersCompleted = this.filterByTags(tagForType(DOWN_COUNTER)).completedWorkers()
+        val counter = countersCompleted.firstOrNull()
+        return counter?.getDownCountsFromOutput()?.sumBy { it.fromDownSync() }
+    }
+
+    private fun List<WorkInfo>.calculateTotalForUpSync(): Int? {
         val countersCompleted = this.filterByTags(tagForType(UP_COUNTER)).completedWorkers()
         val counter = countersCompleted.firstOrNull()
-        return counter?.getUpCountsFromOutput()?.totalCount() ?: -1
+        return counter?.getUpCountsFromOutput()?.totalCount()
     }
 
     private fun List<WorkInfo>.upSyncUploadersStates(): List<WorkerState> =
@@ -113,8 +124,10 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
     }
 
     private fun List<WorkInfo>.filterByTags(vararg tagsToFilter: String) =
-        this.filter { it.tags.firstOrNull { tag ->
-            tagsToFilter.contains(tag) } != null
+        this.filter {
+            it.tags.firstOrNull { tag ->
+                tagsToFilter.contains(tag)
+            } != null
         }.sortedBy { it ->
             it.tags.first { it.contains(TAG_SCHEDULED_AT) }
         }

@@ -62,6 +62,8 @@ import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.*
+import com.simprints.id.tools.device.DeviceManager
+import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -257,10 +259,10 @@ open class AppModule {
 
     @Provides
     open fun provideFetchGuidViewModelFactory(personRepository: PersonRepository,
-                                              simNetworkUtils: SimNetworkUtils,
+                                              deviceManager: DeviceManager,
                                               sessionEventsManager: SessionEventsManager,
                                               timeHelper: TimeHelper) =
-        FetchGuidViewModelFactory(personRepository, simNetworkUtils, sessionEventsManager, timeHelper)
+        FetchGuidViewModelFactory(personRepository, deviceManager, sessionEventsManager, timeHelper)
 
     @Provides
     open fun provideSyncInformationViewModelFactory(personRepository: PersonRepository,
