@@ -5,11 +5,11 @@ import com.simprints.moduleapi.common.ISecuredImageRef
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class SecuredImageRef(override val uri: String) : ImageRef(uri), Parcelable
+data class SecuredImageRef(override val path: String) : ImageRef(path), Parcelable
 
-fun SecuredImageRef.fromDomainToModuleApi(): ISecuredImageRef = SecuredImageRefImpl(uri)
+fun SecuredImageRef.fromDomainToModuleApi(): ISecuredImageRef = SecuredImageRefImpl(path)
 
 
 
 @Parcelize
-private class SecuredImageRefImpl(override val uri: String): ISecuredImageRef
+private class SecuredImageRefImpl(override val path: String): ISecuredImageRef

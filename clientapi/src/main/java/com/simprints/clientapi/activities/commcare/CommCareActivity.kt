@@ -76,11 +76,13 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override fun returnExitForms(reason: String,
                                  extra: String,
+                                 sessionId: String,
                                  flowCompletedCheck: Boolean) = Intent().let {
 
         val data = Bundle().apply {
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
             putString(EXIT_REASON, reason)
+            putString(SIMPRINTS_SESSION_ID, sessionId)
             putString(EXIT_EXTRA, extra)
         }
 
@@ -98,10 +100,12 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     }
 
     override fun returnErrorToClient(errorResponse: ErrorResponse,
-                                     flowCompletedCheck: Boolean) = Intent().let {
+                                     flowCompletedCheck: Boolean,
+                                     sessionId: String) = Intent().let {
 
         val data = Bundle().apply {
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
+            putString(SIMPRINTS_SESSION_ID, sessionId)
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)

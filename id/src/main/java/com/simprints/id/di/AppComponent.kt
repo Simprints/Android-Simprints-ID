@@ -42,6 +42,7 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
+import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker
@@ -113,6 +114,7 @@ interface AppComponent {
     fun inject(peopleSyncMasterWorker: PeopleSyncMasterWorker)
     fun inject(peopleUpSyncUploaderWorker: PeopleUpSyncUploaderWorker)
     fun inject(peopleUpSyncCountWorker: PeopleUpSyncCountWorker)
+    fun inject(imageUpSyncWorker: ImageUpSyncWorker)
     fun inject(syncInformationActivity: SyncInformationActivity)
 
     fun getSessionEventsManager(): SessionEventsManager
