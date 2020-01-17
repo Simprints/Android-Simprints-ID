@@ -39,7 +39,8 @@ class CheckLoginFromMainLauncherActivityTest {
     private val module by lazy {
         TestAppModule(app,
             remoteDbManagerRule = MockRule,
-            secureDataManagerRule = MockRule)
+            secureDataManagerRule = MockRule,
+            deviceManagerRule = MockRule)
     }
 
     @Before
