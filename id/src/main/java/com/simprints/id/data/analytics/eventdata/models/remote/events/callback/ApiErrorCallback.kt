@@ -32,5 +32,4 @@ fun ErrorCallbackEvent.Reason.fromDomainToApi() =
         UNEXPECTED_ERROR -> ApiErrorCallback.ApiReason.UNEXPECTED_ERROR
         BLUETOOTH_NOT_SUPPORTED -> ApiErrorCallback.ApiReason.BLUETOOTH_NOT_SUPPORTED
         LOGIN_NOT_COMPLETE -> ApiErrorCallback.ApiReason.LOGIN_NOT_COMPLETE
-        ROOTED_DEVICE -> ApiErrorCallback.ApiReason.UNEXPECTED_ERROR
     }

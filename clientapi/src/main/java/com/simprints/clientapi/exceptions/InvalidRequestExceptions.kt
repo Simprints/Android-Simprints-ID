@@ -11,3 +11,4 @@ class InvalidSelectedIdException(message: String = "") : InvalidRequestException
 class InvalidSessionIdException(message: String = "") : InvalidRequestException(message)
 class InvalidUserIdException(message: String = "") : InvalidRequestException(message)
 class InvalidVerifyIdException(message: String = "") : InvalidRequestException(message)
+class RootedDeviceException(message: String = "") : InvalidRequestException(message)

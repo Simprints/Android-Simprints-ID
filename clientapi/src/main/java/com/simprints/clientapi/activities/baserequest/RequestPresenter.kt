@@ -61,6 +61,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
             is InvalidSessionIdException -> INVALID_SESSION_ID
             is InvalidUserIdException -> INVALID_USER_ID
             is InvalidVerifyIdException -> INVALID_VERIFY_ID
+            is RootedDeviceException -> ROOTED_DEVICE
         }.also {
             view.handleClientRequestError(it)
         }

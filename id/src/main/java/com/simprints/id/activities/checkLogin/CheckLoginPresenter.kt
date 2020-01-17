@@ -11,7 +11,6 @@ import com.simprints.id.domain.alert.AlertType.*
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
-import com.simprints.id.exceptions.unexpected.RootedDeviceException
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
@@ -42,10 +41,6 @@ abstract class CheckLoginPresenter(
             Timber.e(t)
 
             when (t) {
-                is RootedDeviceException -> {
-                    crashReportManager.logExceptionOrSafeException(t)
-                    view.openAlertActivityForError(ROOTED_DEVICE)
-                }
                 is DifferentProjectIdSignedInException -> view.openAlertActivityForError(DIFFERENT_PROJECT_ID_SIGNED_IN)
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(DIFFERENT_USER_ID_SIGNED_IN)
                 is NotSignedInException -> handleNotSignedInUser().also {

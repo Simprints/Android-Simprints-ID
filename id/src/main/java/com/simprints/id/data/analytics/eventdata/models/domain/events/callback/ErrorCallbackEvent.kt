@@ -19,8 +19,7 @@ class ErrorCallbackEvent(starTime: Long,
         GUID_NOT_FOUND_ONLINE,
         UNEXPECTED_ERROR,
         BLUETOOTH_NOT_SUPPORTED,
-        LOGIN_NOT_COMPLETE,
-        ROOTED_DEVICE;
+        LOGIN_NOT_COMPLETE;
 
         companion object {
             fun fromAppResponseErrorReasonToEventReason(appResponseErrorReason: AppErrorResponse.Reason) =
@@ -31,7 +30,6 @@ class ErrorCallbackEvent(starTime: Long,
                     AppErrorResponse.Reason.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
                     AppErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                     AppErrorResponse.Reason.LOGIN_NOT_COMPLETE -> LOGIN_NOT_COMPLETE
-                    AppErrorResponse.Reason.ROOTED_DEVICE -> ROOTED_DEVICE
                 }
         }
     }
