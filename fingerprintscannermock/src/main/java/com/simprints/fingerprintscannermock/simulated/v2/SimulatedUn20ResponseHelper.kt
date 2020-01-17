@@ -3,10 +3,7 @@ package com.simprints.fingerprintscannermock.simulated.v2
 import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Command
 import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Response
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.*
-import com.simprints.fingerprintscanner.v2.domain.message.un20.models.ImageFormat
-import com.simprints.fingerprintscanner.v2.domain.message.un20.models.TemplateData
-import com.simprints.fingerprintscanner.v2.domain.message.un20.models.TemplateType
-import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Un20AppVersion
+import com.simprints.fingerprintscanner.v2.domain.message.un20.models.*
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.*
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.common.RealisticSpeedBehaviour
@@ -31,7 +28,7 @@ class SimulatedUn20ResponseHelper(private val simulatedScannerManager: Simulated
             )
                 .also { simulatedScannerManager.cycleToNextFinger() })
             is GetSupportedImageFormatsCommand -> GetSupportedImageFormatsResponse(setOf(ImageFormat.RAW))
-            is GetImageCommand -> GetImageResponse(command.imageFormat, Random.nextBytes(120000)) // TODO
+            is GetImageCommand -> GetImageResponse(ImageData(command.imageFormat, Random.nextBytes(120000), Random.nextBytes(2))) // TODO
             is GetImageQualityCommand -> GetImageQualityResponse(simulatedScannerManager.currentMockFinger().toV2().imageQuality)
             else -> throw UnsupportedOperationException("Unmocked response to $command in SimulatedUn20ResponseHelper")
         }
