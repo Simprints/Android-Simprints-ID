@@ -7,6 +7,7 @@ import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.CaptureF
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetImageCommand
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetTemplateCommand
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.CaptureFingerprintResult
+import com.simprints.fingerprintscanner.v2.domain.message.un20.models.ImageData
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.TemplateData
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.CaptureFingerprintResponse
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetImageResponse
@@ -222,6 +223,7 @@ class ScannerTest {
     @Test
     fun scanner_acquireImageWithUn20On_receivesImage() {
         val image = byteArrayOf(0x10, 0x20, 0x30, 0x40)
+        val crcCheck = byteArrayOf(0x01, 0x02)
 
         val responseSubject = PublishSubject.create<Un20Response>()
 
@@ -233,7 +235,7 @@ class ScannerTest {
         val mockMessageOutputStream = setupMock<MessageOutputStream> {
             whenThis { sendMessage(isA<GetImageCommand>()) } then {
                 Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(GetImageResponse(Scanner.DEFAULT_IMAGE_FORMAT, image))
+                    responseSubject.onNext(GetImageResponse(ImageData(Scanner.DEFAULT_IMAGE_FORMAT, image, crcCheck)))
                 }
             }
         }
@@ -246,6 +248,6 @@ class ScannerTest {
         val testObserver = scanner.acquireImage().testSubscribe()
         testObserver.awaitAndAssertSuccess()
         testObserver.assertValueCount(1)
-        assertThat(testObserver.values().first()).isEqualTo(image)
+        assertThat(testObserver.values().first().image).isEqualTo(image)
     }
 }

@@ -70,7 +70,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     override fun acquireImage(): Single<AcquireImageResponse> =
         scannerV2.acquireImage()
             .map { imageBytes ->
-                AcquireImageResponse(imageBytes)
+                AcquireImageResponse(imageBytes.image)
             }
 
     override fun setUiIdle(): Completable = scannerV2.setSmileLedState(scannerUiHelper.idleLedState())

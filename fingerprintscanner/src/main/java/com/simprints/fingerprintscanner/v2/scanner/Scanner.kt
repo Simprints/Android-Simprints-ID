@@ -185,12 +185,12 @@ class Scanner(
             )
         ).map { it.supportedImageFormats }
 
-    fun acquireImage(imageFormat: ImageFormat = DEFAULT_IMAGE_FORMAT): Single<ByteArray> =
+    fun acquireImage(imageFormat: ImageFormat = DEFAULT_IMAGE_FORMAT): Single<ImageData> =
         assertUn20On().andThen(
             sendCommandAndReceiveResponse<GetImageResponse>(
                 GetImageCommand(imageFormat)
             )
-        ).map { it.image }
+        ).map { it.imageData }
 
     fun getImageQualityScore(): Single<Int> =
         assertUn20On().andThen(
