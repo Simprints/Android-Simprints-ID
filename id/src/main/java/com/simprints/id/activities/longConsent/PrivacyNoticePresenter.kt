@@ -7,10 +7,11 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.id.tools.device.DeviceManager
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class PrivacyNoticePresenter(val view: PrivacyNoticeContract.View,
@@ -19,7 +20,7 @@ class PrivacyNoticePresenter(val view: PrivacyNoticeContract.View,
     @Inject lateinit var longConsentManager: LongConsentManager
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var simNetworkUtils: SimNetworkUtils
+    @Inject lateinit var deviceManager: DeviceManager
 
     init {
         component.inject(this)
@@ -36,7 +37,8 @@ class PrivacyNoticePresenter(val view: PrivacyNoticeContract.View,
     }
 
     override fun downloadLongConsent() {
-        if (simNetworkUtils.isConnected()) {
+        val isConnected = runBlocking { deviceManager.isConnected() }
+        if (isConnected) {
             logMessageForCrashReportWithNetworkTrigger("Starting download for long consent")
             view.setDownloadInProgress(true)
             startDownloadingLongConsent()

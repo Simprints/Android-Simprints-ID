@@ -29,8 +29,7 @@
                 android:id="@+id/dashboard_sync_card_failed_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/simprints_red"
-                android:src="@drawable/error_hint_wifi" />
+                android:src="@drawable/sync_failed_icon" />
 
             <TextView
                 android:id="@+id/dashboard_sync_card_failed_message"

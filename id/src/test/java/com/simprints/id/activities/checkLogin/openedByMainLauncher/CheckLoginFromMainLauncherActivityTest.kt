@@ -15,7 +15,7 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
 import com.simprints.id.testtools.state.RobolectricTestMocker.initLogInStateMock
 import com.simprints.id.testtools.state.RobolectricTestMocker.setUserLogInState
-import com.simprints.id.tools.DeviceManager
+import com.simprints.id.tools.device.DeviceManager
 import com.simprints.testtools.common.di.DependencyRule.MockRule
 import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
