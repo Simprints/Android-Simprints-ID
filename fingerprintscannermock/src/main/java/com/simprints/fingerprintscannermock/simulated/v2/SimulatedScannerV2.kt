@@ -1,11 +1,11 @@
 package com.simprints.fingerprintscannermock.simulated.v2
 
 import android.annotation.SuppressLint
-import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
-import com.simprints.fingerprintscanner.v2.domain.message.OutgoingMessage
-import com.simprints.fingerprintscanner.v2.domain.message.vero.events.TriggerButtonPressedEvent
-import com.simprints.fingerprintscanner.v2.domain.message.vero.events.Un20StateChangeEvent
-import com.simprints.fingerprintscanner.v2.domain.message.vero.models.DigitalValue
+import com.simprints.fingerprintscanner.v2.domain.main.message.IncomingMessage
+import com.simprints.fingerprintscanner.v2.domain.main.message.OutgoingMessage
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.TriggerButtonPressedEvent
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedScanner
 import io.reactivex.Flowable

@@ -1,10 +1,10 @@
 package com.simprints.fingerprintscannermock.simulated.v2
 
-import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Command
-import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Response
-import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.*
-import com.simprints.fingerprintscanner.v2.domain.message.un20.models.*
-import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.*
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Command
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Response
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.commands.*
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.*
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.*
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.common.RealisticSpeedBehaviour
 import com.simprints.fingerprintscannermock.simulated.common.SimulationSpeedBehaviour

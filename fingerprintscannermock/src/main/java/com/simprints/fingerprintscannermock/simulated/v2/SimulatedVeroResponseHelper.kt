@@ -1,10 +1,10 @@
 package com.simprints.fingerprintscannermock.simulated.v2
 
-import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroCommand
-import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroResponse
-import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.*
-import com.simprints.fingerprintscanner.v2.domain.message.vero.models.*
-import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.*
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroCommand
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroResponse
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.*
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.*
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.*
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.common.RealisticSpeedBehaviour
 import com.simprints.fingerprintscannermock.simulated.common.SimulationSpeedBehaviour

@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.scanner
 
-import com.simprints.fingerprintscanner.v2.domain.message.vero.models.SmileLedState
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.SmileLedState
 
 data class ScannerState(
     var connected: Boolean?,
