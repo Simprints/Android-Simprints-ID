@@ -220,6 +220,7 @@ dependencies {
     testImplementation deps.testing.espresso.intents
     testImplementation deps.testing.espresso.contrib
     testImplementation deps.testing.truth
+    testImplementation deps.testing.kotlin
 
     testImplementation deps.testing.mockito.core
     testImplementation deps.testing.mockito.inline

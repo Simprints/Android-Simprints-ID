@@ -1,6 +1,5 @@
 package com.simprints.id.services.scheduledSync.people.up.workers
 
-import com.google.firebase.FirebaseNetworkException
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperation
 import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperationResult
@@ -10,8 +9,6 @@ import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
-import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
 import com.simprints.id.tools.extensions.bufferedChunks
@@ -19,7 +16,6 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import java.io.IOException
 import java.util.*
 
 // TODO: uncomment userId when multitenancy is properly implemented
@@ -95,23 +91,9 @@ class PeopleUpSyncUploaderTask(
         ))
     }
 
-    private fun uploadPeople(people: List<Person>) {
-        try {
-            if (people.isNotEmpty()) {
-                personRemoteDataSource
-                    .uploadPeople(projectId, people)
-                    .blockingAwait()
-            }
-        } catch (exception: IOException) {
-            throw TransientSyncFailureException(cause = exception)
-        } catch (exception: SimprintsInternalServerException) {
-            throw TransientSyncFailureException(cause = exception)
-        } catch (exception: RuntimeException) {
-            throw if (exception.cause is FirebaseNetworkException || exception.cause is IOException) {
-                TransientSyncFailureException(cause = exception)
-            } else {
-                exception
-            }
+    private suspend fun uploadPeople(people: List<Person>) {
+        if (people.isNotEmpty()) {
+            personRemoteDataSource.uploadPeople(projectId, people)
         }
     }
 
@@ -123,5 +105,4 @@ class PeopleUpSyncUploaderTask(
     private suspend fun updateLastUpSyncTime(peopleUpSyncOperation: PeopleUpSyncOperation) {
         peopleUpSyncScopeRepository.insertOrUpdate(peopleUpSyncOperation)
     }
-
 }

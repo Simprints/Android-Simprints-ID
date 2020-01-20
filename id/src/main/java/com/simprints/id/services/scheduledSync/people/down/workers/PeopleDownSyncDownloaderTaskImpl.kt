@@ -1,7 +1,6 @@
 package com.simprints.id.services.scheduledSync.people.down.workers
 
 import com.google.gson.stream.JsonReader
-import com.simprints.core.tools.coroutines.retryIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
@@ -19,6 +18,7 @@ import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCount
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.bufferedChunks
+import com.simprints.id.tools.utils.retrySimNetworkCalls
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
@@ -73,7 +73,7 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
     }
 
     private suspend fun makeDownSyncApiCallAndGetResponse(client: PeopleRemoteInterface): ResponseBody =
-        retryIO(times = RETRY_ATTEMPTS_FOR_NETWORK_CALLS) {
+        retrySimNetworkCalls(client, {
             with(downSyncOperation) {
                 client.downSync(
                     projectId, userId, moduleId,
@@ -81,7 +81,7 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
                     lastResult?.lastPatientUpdatedAt,
                     PipeSeparatorWrapperForURLListParam(*modes.map { it.fromDomainToApi() }.toTypedArray()))
             }
-        }
+        }, "downSync")
 
     private fun setupJsonReaderFromResponse(response: ResponseBody): JsonReader =
         JsonReader(InputStreamReader(response.byteStream()) as Reader?)
@@ -162,6 +162,5 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
 
     companion object {
         const val BATCH_SIZE_FOR_DOWNLOADING = 200
-        private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5
     }
 }

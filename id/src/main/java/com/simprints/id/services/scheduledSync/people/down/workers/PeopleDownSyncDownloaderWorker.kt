@@ -8,6 +8,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
+import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
@@ -58,7 +59,14 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
             resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to totalDownloaded))
         } catch (t: Throwable) {
             logFailure(t)
+            retryOrFailIfCloudIntegrationError(t)
+        }
+    }
 
+    private fun retryOrFailIfCloudIntegrationError(t: Throwable): Result {
+        return if (t is SyncCloudIntegrationException) {
+            resultSetter.failure()
+        } else {
             resultSetter.retry()
         }
     }
