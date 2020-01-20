@@ -1,10 +1,10 @@
 package com.simprints.fingerprintscanner.testtools
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprintscanner.v2.domain.packet.Channel
-import com.simprints.fingerprintscanner.v2.domain.packet.Packet
-import com.simprints.fingerprintscanner.v2.domain.packet.PacketProtocol
-import com.simprints.fingerprintscanner.v2.incoming.packet.PacketParser
+import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
+import com.simprints.fingerprintscanner.v2.domain.main.packet.Packet
+import com.simprints.fingerprintscanner.v2.domain.main.packet.PacketProtocol
+import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketParser
 import kotlin.random.Random
 
 fun hollowPacketWithRawBytes(bytes: ByteArray) =

@@ -1,13 +1,13 @@
 package com.simprints.fingerprintscannermock.simulated.v2
 
-import com.simprints.fingerprintscanner.v2.domain.message.OutgoingMessage
-import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Command
-import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroCommand
-import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.SetSmileLedStateCommand
-import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.SetTriggerButtonActiveCommand
-import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.SetUn20OnCommand
-import com.simprints.fingerprintscanner.v2.domain.message.vero.models.DigitalValue.FALSE
-import com.simprints.fingerprintscanner.v2.domain.message.vero.models.DigitalValue.TRUE
+import com.simprints.fingerprintscanner.v2.domain.main.message.OutgoingMessage
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Command
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroCommand
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.SetSmileLedStateCommand
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.SetTriggerButtonActiveCommand
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.SetUn20OnCommand
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue.FALSE
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue.TRUE
 
 fun SimulatedScannerStateV2.updateStateAccordingToOutgoingMessage(command: OutgoingMessage) {
     when (command) {

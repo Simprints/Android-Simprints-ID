@@ -1,8 +1,9 @@
 package com.simprints.fingerprintscanner.v2.outgoing
 
-import com.simprints.fingerprintscanner.v2.domain.message.OutgoingMessage
-import com.simprints.fingerprintscanner.v2.outgoing.message.MessageSerializer
-import com.simprints.fingerprintscanner.v2.outgoing.packet.PacketDispatcher
+import com.simprints.fingerprintscanner.v2.domain.main.message.OutgoingMessage
+import com.simprints.fingerprintscanner.v2.outgoing.main.MessageOutputStream
+import com.simprints.fingerprintscanner.v2.outgoing.main.message.MessageSerializer
+import com.simprints.fingerprintscanner.v2.outgoing.main.packet.PacketDispatcher
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Completable
 import org.junit.Test

@@ -1,11 +1,11 @@
 package com.simprints.fingerprintscannermock.simulated.v2
 
-import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
-import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Response
-import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroEvent
-import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroResponse
-import com.simprints.fingerprintscanner.v2.domain.packet.Channel
-import com.simprints.fingerprintscanner.v2.domain.packet.PacketProtocol
+import com.simprints.fingerprintscanner.v2.domain.main.message.IncomingMessage
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Response
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroEvent
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroResponse
+import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
+import com.simprints.fingerprintscanner.v2.domain.main.packet.PacketProtocol
 
 class SimulatedResponseOutputStream {
 
