@@ -20,6 +20,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterMainModeCom
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
+import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import io.reactivex.Completable
@@ -83,9 +84,9 @@ class Scanner(
         sendRootModeCommandAndReceiveResponse<EnterMainModeResponse>(
             EnterMainModeCommand()
         ).completeOnceReceived()
-            .doOnComplete { handleMainModeEntered() }
+            .andThen(handleMainModeEntered())
 
-    private fun handleMainModeEntered() {
+    private fun handleMainModeEntered() = completable {
         rootMessageStream.disconnect()
         mainMessageStream.connect(inputStream, outputStream)
         state.triggerButtonActive = true
