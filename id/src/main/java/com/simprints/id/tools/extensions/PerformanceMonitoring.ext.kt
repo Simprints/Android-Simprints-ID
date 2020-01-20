@@ -11,6 +11,8 @@ private const val CALL_SUCCESS_NAME = "call_success"
 private const val FAILURE: Long = 0
 private const val SUCCESS: Long = 1
 
+fun trace(traceName: String) = FirebasePerformance.getInstance().newTrace(traceName)
+
 fun Completable.trace(traceName: String): Completable {
     val trace = FirebasePerformance.getInstance().newTrace(traceName)
     return this.doOnSubscribe { trace.start() }
@@ -48,6 +50,4 @@ private fun Trace.setSuccess(success: Boolean) =
     else {
         this.incrementMetric(CALL_SUCCESS_NAME, FAILURE)
     }
-
-
 

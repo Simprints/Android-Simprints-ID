@@ -8,19 +8,23 @@ suspend fun <T> retryIO(
     initialDelay: Long = 100, // 0.1 second
     maxDelay: Long = 1000,    // 1 second
     factor: Double = 1.0, // 2 per exponential backoff
-    block: suspend () -> T): T
-{
+    runBlock: suspend () -> T,
+    retryThrowable: suspend (t: Throwable) -> Boolean = { true }): T {
     var currentDelay = initialDelay
     repeat(times - 1) {
         try {
-            return block()
+            return runBlock()
         } catch (t: Throwable) {
             Timber.d("IO failed")
+
+            if (!retryThrowable(t)) {
+                throw t
+            }
             // you can log an error here and/or make a more finer-grained
             // analysis of the cause to see if retry is needed
         }
         delay(currentDelay)
         currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)
     }
-    return block() // last attempt
+    return runBlock() // last attempt
 }

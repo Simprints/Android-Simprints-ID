@@ -74,7 +74,7 @@ def crashlytics = [
     ndk : "com.crashlytics.sdk.android:crashlytics-ndk:2.0.5@aar"
 ]
 
-def retrofit_version = "2.6.0"
+def retrofit_version = "2.7.1"
 def okttp_version = "4.2.2"
 def retrofit = [
     core         : "com.squareup.retrofit2:retrofit:$retrofit_version",
@@ -130,6 +130,7 @@ def espresso_version = "3.2.0-alpha04"
 def robolectric_version = "4.1"
 def testing = [
     junit          : "junit:junit:4.13-beta-2",
+    kotlin         : "io.kotlintest:kotlintest-runner-junit5:3.3.2",
     robolectric    : [
         core    : "org.robolectric:robolectric:$robolectric_version",
         multidex: "org.robolectric:multidex:3.4.2"

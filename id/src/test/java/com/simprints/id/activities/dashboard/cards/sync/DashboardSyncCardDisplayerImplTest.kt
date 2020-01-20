@@ -1,7 +1,8 @@
 package com.simprints.id.activities.dashboard.cards.sync
 
 import android.content.Context
-import android.view.View.*
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -13,11 +14,11 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.AndroidResourcesHelperImpl
 import com.simprints.id.tools.TimeHelperImpl
 import org.junit.Before
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
@@ -171,7 +172,7 @@ class DashboardSyncCardDisplayerImplTest {
             assertThat(progressMessage()).isEqualTo("$SYNC_CARD_PROGRESS_STATE_STATE_MESSAGE ${progressState.progress}/${progressState.total}")
             assertThat(progressConnectingProgressBar().visibility).isEqualTo(GONE)
             assertThat(progressSyncProgressBar().visibility).isEqualTo(VISIBLE)
-            assertThat(progressSyncProgressBar().progress).isEqualTo((100 * (progressState.progress.toFloat() / progressState.total.toFloat())).toInt())
+            assertThat(progressSyncProgressBar().progress).isEqualTo((100 * (progressState.progress.toFloat() / (progressState.total ?: 0))).toInt())
             assessLastSyncTime()
             assertThat(cardContent.childCount).isEqualTo(4)
         }
@@ -187,7 +188,7 @@ class DashboardSyncCardDisplayerImplTest {
             assertThat(progressMessage()).isEqualTo(SYNC_CARD_CONNECTING_STATE_STATE_MESSAGE)
             assertThat(progressConnectingProgressBar().visibility).isEqualTo(VISIBLE)
             assertThat(progressSyncProgressBar().visibility).isEqualTo(VISIBLE)
-            assertThat(progressSyncProgressBar().progress).isEqualTo((100 * (connectingState.progress.toFloat() / connectingState.total.toFloat())).toInt())
+            assertThat(progressSyncProgressBar().progress).isEqualTo((100 * (connectingState.progress.toFloat() / (connectingState.total ?: 0))).toInt())
             assessLastSyncTime()
             assertThat(cardContent.childCount).isEqualTo(4)
         }
