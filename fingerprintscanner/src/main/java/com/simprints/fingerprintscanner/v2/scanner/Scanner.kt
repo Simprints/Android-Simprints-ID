@@ -13,8 +13,8 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.LedSt
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.SmileLedState
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.*
-import com.simprints.fingerprintscanner.v2.incoming.main.MessageInputStream
-import com.simprints.fingerprintscanner.v2.outgoing.main.MessageOutputStream
+import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
+import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import io.reactivex.Completable
@@ -26,9 +26,9 @@ import java.io.InputStream
 import java.io.OutputStream
 
 class Scanner(
-    private val messageInputStream: MessageInputStream,
-    private val messageOutputStream: MessageOutputStream
-) : Connectable {
+    private val mainMessageStream: MainMessageStream,
+    private val rootMessageStream: RootMessageStream
+) {
 
     val state = ScannerState(
         connected = false,
@@ -42,28 +42,26 @@ class Scanner(
 
     private val disposables = mutableListOf<Disposable>()
 
-    override fun connect(inputStream: InputStream, outputStream: OutputStream) {
-        messageInputStream.connect(inputStream)
-        messageOutputStream.connect(outputStream)
+    fun connect(inputStream: InputStream, outputStream: OutputStream) {
+        mainMessageStream.connect(inputStream, outputStream)
         state.connected = true
         state.triggerButtonActive = true
         disposables.add(subscribeTriggerButtonListeners())
     }
 
-    override fun disconnect() {
-        messageInputStream.disconnect()
-        messageOutputStream.disconnect()
+    fun disconnect() {
+        mainMessageStream.disconnect()
         state.connected = false
         state.triggerButtonActive = false
         disposables.forEach { it.dispose() }
     }
 
     private inline fun <reified R : IncomingMessage> sendCommandAndReceiveResponse(command: OutgoingMessage): Single<R> =
-        messageOutputStream.sendMessage(command)
-            .andThen(messageInputStream.receiveResponse())
+        mainMessageStream.outgoing.sendMessage(command)
+            .andThen(mainMessageStream.incoming.receiveResponse())
 
     private fun subscribeTriggerButtonListeners() =
-        messageInputStream.veroEvents
+        mainMessageStream.incoming.veroEvents
             .filterCast<TriggerButtonPressedEvent>()
             .subscribeBy(onNext = {
                 triggerButtonListeners.forEach { it.onNext(Unit) }
@@ -84,7 +82,7 @@ class Scanner(
         sendCommandAndReceiveResponse<SetUn20OnResponse>(
             SetUn20OnCommand(DigitalValue.TRUE)
         ).completeOnceReceived()
-            .andThen(messageInputStream.veroEvents)
+            .andThen(mainMessageStream.incoming.veroEvents)
             .filterCast<Un20StateChangeEvent> { it.value == DigitalValue.TRUE }
             .completeOnceReceived()
             .doOnComplete { state.un20On = true }
@@ -93,7 +91,7 @@ class Scanner(
         sendCommandAndReceiveResponse<SetUn20OnResponse>(
             SetUn20OnCommand(DigitalValue.FALSE)
         ).completeOnceReceived()
-            .andThen(messageInputStream.veroEvents)
+            .andThen(mainMessageStream.incoming.veroEvents)
             .filterCast<Un20StateChangeEvent> { it.value == DigitalValue.FALSE }
             .completeOnceReceived()
             .doOnComplete { state.un20On = false }

@@ -9,6 +9,8 @@ object RootMessageProtocol : Protocol {
 
     override val byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN
 
+    const val MAX_PAYLOAD_SIZE = 1020
+
     const val HEADER_SIZE: Int = 4
     val HEADER_INDICES: IntRange = 0..3
     val LENGTH_INDICES_IN_HEADER: IntRange = 2..3

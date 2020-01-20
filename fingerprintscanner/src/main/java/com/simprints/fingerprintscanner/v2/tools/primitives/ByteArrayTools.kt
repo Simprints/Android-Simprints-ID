@@ -33,3 +33,5 @@ fun <T> ByteArray.extract(getType: ByteBuffer.() -> T, position: IntRange? = nul
         else
             this
     ).apply { order(byteOrder) }.getType()
+
+fun ByteArray.chunked(size: Int) = toList().chunked(size).map { it.toByteArray() }
