@@ -7,7 +7,7 @@ enum class VeroMessageType(val majorByte: Byte, val minorByte: Byte) {
 
     // 0x2_ : UN20 control
     GET_UN20_ON(0x20, 0x10),
-    SET_UN20_ON(0x20, 0x20),
+    SET_UN20_ON(0x20, 0x11),
     UN20_STATE_CHANGE(0x2A, 0x00),
 
     // 0x3_ : Trigger button control
