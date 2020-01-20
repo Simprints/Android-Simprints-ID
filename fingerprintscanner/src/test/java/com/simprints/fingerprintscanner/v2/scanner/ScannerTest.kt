@@ -23,6 +23,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.Se
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.SetUn20OnResponse
 import com.simprints.fingerprintscanner.v2.incoming.main.MessageInputStream
 import com.simprints.fingerprintscanner.v2.outgoing.main.MessageOutputStream
+import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.testSubscribe
@@ -46,7 +47,7 @@ class ScannerTest {
         val mockInputStream = mock<InputStream>()
         val mockOutputStream = mock<OutputStream>()
 
-        val scanner = Scanner(mockMessageInputStream, mockMessageOutputStream)
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), mock())
         scanner.connect(mockInputStream, mockOutputStream)
 
         verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
@@ -62,7 +63,7 @@ class ScannerTest {
         }
         val mockMessageOutputStream = mock<MessageOutputStream>()
 
-        val scanner = Scanner(mockMessageInputStream, mockMessageOutputStream)
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), mock())
         scanner.connect(mock(), mock())
 
         val testObserver = TestObserver<Unit>()
@@ -94,7 +95,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream)
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), mock())
         scanner.connect(mock(), mock())
 
         scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().awaitAndAssertSuccess()
@@ -121,7 +122,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream)
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), mock())
         scanner.connect(mock(), mock())
 
         val smileLedState = SmileLedState(
@@ -153,7 +154,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream).apply {
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), mock()).apply {
             connect(mock(), mock())
             state.un20On = true
         }
@@ -178,7 +179,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream).apply {
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), mock()).apply {
             connect(mock(), mock())
             state.un20On = null
         }
@@ -206,7 +207,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream).apply {
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), mock()).apply {
             connect(mock(), mock())
             state.un20On = true
         }
@@ -240,7 +241,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream).apply {
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), mock()).apply {
             connect(mock(), mock())
             state.un20On = true
         }
