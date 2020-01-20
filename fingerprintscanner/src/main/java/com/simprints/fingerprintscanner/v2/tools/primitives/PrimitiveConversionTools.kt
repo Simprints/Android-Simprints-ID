@@ -38,6 +38,32 @@ fun Int.toByteArray(byteOrder: ByteOrder): ByteArray =
         }
     }
 
+fun Long.toByteArray(byteOrder: ByteOrder): ByteArray =
+    let {
+        when (byteOrder) {
+            ByteOrder.LITTLE_ENDIAN -> byteArrayOf(
+                (it and 0xFFFFFFFF),
+                ((it ushr 8) and 0xFFFFFFFF),
+                ((it ushr 16) and 0xFFFFFFFF),
+                ((it ushr 24) and 0xFFFFFFFF),
+                ((it ushr 32) and 0xFFFFFFFF),
+                ((it ushr 40) and 0xFFFFFFFF),
+                ((it ushr 48) and 0xFFFFFFFF),
+                ((it ushr 56) and 0xFFFFFFFF)
+            )
+            else -> byteArrayOf(
+                ((it ushr 56) and 0xFFFFFFFF),
+                ((it ushr 48) and 0xFFFFFFFF),
+                ((it ushr 40) and 0xFFFFFFFF),
+                ((it ushr 32) and 0xFFFFFFFF),
+                ((it ushr 24) and 0xFFFFFFFF),
+                ((it ushr 16) and 0xFFFFFFFF),
+                ((it ushr 8) and 0xFFFFFFFF),
+                (it and 0xFFFFFFFF)
+            )
+        }
+    }
+
 /** @throws IllegalArgumentException if odd number of hex characters */
 fun String.hexToByteArray(): ByteArray {
     val s = stripWhiteSpaceToLowercase()
