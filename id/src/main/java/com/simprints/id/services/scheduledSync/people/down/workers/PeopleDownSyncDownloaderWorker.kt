@@ -13,7 +13,7 @@ import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import javax.inject.Inject
 
 class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
@@ -94,11 +94,11 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
         crashReportLog<PeopleDownSyncDownloaderWorker>(message)
 }
 
-fun WorkInfo.extractDownSyncProgress(progressCache: PeopleSyncProgressCache): Int? {
+fun WorkInfo.extractDownSyncProgress(peopleSyncCache: PeopleSyncCache): Int? {
     val progress = this.progress.getInt(PROGRESS_DOWN_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_DOWN_SYNC, -1)
 
     //When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
-    val cached = progressCache.getProgress(id.toString())
+    val cached = peopleSyncCache.readProgress(id.toString())
     return maxOf(progress, output, cached)
 }

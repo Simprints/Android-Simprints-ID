@@ -1,6 +1,6 @@
 package com.simprints.id.services.scheduledSync.people.up.controllers
 
-import androidx.work.WorkRequest
+import androidx.work.OneTimeWorkRequest
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
 
 interface PeopleUpSyncWorkersBuilder {
@@ -13,5 +13,5 @@ interface PeopleUpSyncWorkersBuilder {
         const val TAG_PEOPLE_UP_SYNC_ALL_COUNTERS = "TAG_PEOPLE_UP_SYNC_ALL_COUNTERS"
     }
 
-    fun buildUpSyncWorkerChain(uniqueSyncId: String?): List<WorkRequest>
+    fun buildUpSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest>
 }

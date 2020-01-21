@@ -1,13 +1,13 @@
 package com.simprints.id.services.scheduledSync.people.up.controllers
 
 import androidx.work.*
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.UPLOADER
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.UP_COUNTER
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.TAG_SCHEDULED_AT
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.UPLOADER
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.UP_COUNTER
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder.Companion.TAG_PEOPLE_UP_SYNC_ALL_COUNTERS
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder.Companion.TAG_PEOPLE_UP_SYNC_ALL_UPLOADERS
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder.Companion.TAG_PEOPLE_UP_SYNC_ALL_WORKERS
@@ -20,27 +20,27 @@ import java.util.concurrent.TimeUnit
 class PeopleUpSyncWorkersBuilderImpl : PeopleUpSyncWorkersBuilder {
 
 
-    override fun buildUpSyncWorkerChain(uniqueSyncId: String?): List<WorkRequest> {
+    override fun buildUpSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest> {
         val uniqueUpSyncId = UUID.randomUUID().toString()
         return listOf(buildUpSyncWorkers(uniqueSyncId, uniqueUpSyncId)) + buildCountWorker(uniqueSyncId, uniqueUpSyncId)
     }
 
     private fun buildUpSyncWorkers(uniqueSyncID: String?,
-                                   uniqueUpSyncId: String): WorkRequest =
+                                   uniqueUpSyncId: String): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(PeopleUpSyncUploaderWorker::class.java)
             .upSyncWorker(uniqueSyncID, uniqueUpSyncId, getUpSyncWorkerConstraints())
             .addTag(tagForType(UPLOADER))
             .addTag(TAG_PEOPLE_UP_SYNC_ALL_UPLOADERS)
-            .build()
+            .build() as OneTimeWorkRequest
 
 
     private fun buildCountWorker(uniqueSyncID: String?,
-                                 uniqueUpSyncID: String): WorkRequest =
+                                 uniqueUpSyncID: String): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(PeopleUpSyncCountWorker::class.java)
             .upSyncWorker(uniqueSyncID, uniqueUpSyncID)
             .addTag(tagForType(UP_COUNTER))
             .addTag(TAG_PEOPLE_UP_SYNC_ALL_COUNTERS)
-            .build()
+            .build() as OneTimeWorkRequest
 
     private fun getUpSyncWorkerConstraints() =
         Constraints.Builder()

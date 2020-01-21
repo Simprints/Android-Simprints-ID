@@ -18,15 +18,15 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactoryImpl
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilderImpl
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTaskImpl
 import com.simprints.id.services.scheduledSync.people.master.*
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCacheImpl
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManagerImpl
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCacheImpl
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutorImpl
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilderImpl
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
@@ -54,9 +54,9 @@ open class SyncModule {
     open fun providePeopleDownSyncDownloaderTask(personLocalDataSource: PersonLocalDataSource,
                                                  personRemoteDataSource: PersonRemoteDataSource,
                                                  downSyncScopeRepository: PeopleDownSyncScopeRepository,
-                                                 progressCache: PeopleSyncProgressCache,
+                                                 peopleSyncCache: PeopleSyncCache,
                                                  timeHelper: TimeHelper): PeopleDownSyncDownloaderTask =
-        PeopleDownSyncDownloaderTaskImpl(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, progressCache, timeHelper)
+        PeopleDownSyncDownloaderTaskImpl(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, peopleSyncCache, timeHelper)
 
     @Provides
     open fun provideSessionEventsSyncManager(): SessionEventsSyncManager =
@@ -65,9 +65,9 @@ open class SyncModule {
 
     @Provides
     open fun providePeopleSyncStateProcessor(ctx: Context,
-                                             progressCache: PeopleSyncProgressCache,
+                                             peopleSyncCache: PeopleSyncCache,
                                              personRepository: PersonRepository): PeopleSyncStateProcessor =
-        PeopleSyncStateProcessorImpl(ctx, personRepository, progressCache)
+        PeopleSyncStateProcessorImpl(ctx, personRepository, peopleSyncCache)
 
     @Provides
     open fun providePeopleSyncManager(ctx: Context,
@@ -92,8 +92,8 @@ open class SyncModule {
     )
 
     @Provides
-    open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: PeopleDownSyncScopeRepository): PeopleDownSyncWorkersFactory =
-        PeopleDownSyncWorkersFactoryImpl(downSyncScopeRepository)
+    open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: PeopleDownSyncScopeRepository): PeopleDownSyncWorkersBuilder =
+        PeopleDownSyncWorkersBuilderImpl(downSyncScopeRepository)
 
 
     @Provides
@@ -110,8 +110,8 @@ open class SyncModule {
 
     @Provides
     open fun providePeopleUpSyncManager(ctx: Context,
-                                        peopleUpSyncWorkersBuilder: PeopleUpSyncWorkersBuilder): PeopleUpSyncManager =
-        PeopleUpSyncManagerImpl(ctx, peopleUpSyncWorkersBuilder)
+                                        peopleUpSyncWorkersBuilder: PeopleUpSyncWorkersBuilder): PeopleUpSyncExecutor =
+        PeopleUpSyncExecutorImpl(ctx, peopleUpSyncWorkersBuilder)
 
 
     @Provides
@@ -120,7 +120,7 @@ open class SyncModule {
         PeopleUpSyncScopeRepositoryImpl(loginInfoManager, operationLocalDataSource)
 
     @Provides
-    open fun providePeopleSyncProgressCache(ctx: Context): PeopleSyncProgressCache =
-        PeopleSyncProgressCacheImpl(ctx)
+    open fun providePeopleSyncProgressCache(ctx: Context): PeopleSyncCache =
+        PeopleSyncCacheImpl(ctx)
 
 }

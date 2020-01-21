@@ -11,15 +11,15 @@ import com.simprints.id.data.db.common.models.totalCount
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.services.scheduledSync.people.down.workers.extractDownSyncProgress
 import com.simprints.id.services.scheduledSync.people.down.workers.getDownCountsFromOutput
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.internal.SyncWorkersLiveDataProvider
 import com.simprints.id.services.scheduledSync.people.master.internal.SyncWorkersLiveDataProviderImpl
 import com.simprints.id.services.scheduledSync.people.master.internal.didFailBecauseCloudIntegration
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState.SyncWorkerInfo
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.Companion.fromWorkInfo
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.*
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.Companion.fromWorkInfo
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.TAG_SCHEDULED_AT
 import com.simprints.id.services.scheduledSync.people.up.workers.extractUpSyncProgress
@@ -28,7 +28,7 @@ import timber.log.Timber
 
 class PeopleSyncStateProcessorImpl(val ctx: Context,
                                    val personRepository: PersonRepository,
-                                   private val progressCache: PeopleSyncProgressCache,
+                                   private val peopleSyncCache: PeopleSyncCache,
                                    private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider = SyncWorkersLiveDataProviderImpl(ctx)) : PeopleSyncStateProcessor {
 
     override fun getLastSyncState(): LiveData<PeopleSyncState> =
@@ -53,7 +53,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
 
     private fun observerForLastSyncId(): LiveData<String> {
         return syncWorkersLiveDataProvider.getMasterWorkersLiveData().switchMap { masterWorkers ->
-            Timber.d("I/SYNC Update from MASTER_SYNC_SCHEDULERS}")
+            Timber.d("I/SYNC Update from MASTER_SYNC_SCHEDULERS")
 
             val completedSyncMaster = masterWorkers.completedWorkers()
             MutableLiveData<String>().apply {
@@ -111,7 +111,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
     private fun List<WorkInfo>.calculateProgressForDownSync(): Int {
         val downWorkers = this.filterByTags(tagForType(DOWNLOADER))
         val progresses = downWorkers.map { worker ->
-            worker.extractDownSyncProgress(progressCache)
+            worker.extractDownSyncProgress(peopleSyncCache)
         }
 
         return progresses.filterNotNull().sum()
@@ -120,7 +120,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
     private fun List<WorkInfo>.calculateProgressForUpSync(): Int {
         val upWorkers = this.filterByTags(tagForType(UPLOADER))
         val progresses = upWorkers.map { worker ->
-            worker.extractUpSyncProgress(progressCache)
+            worker.extractUpSyncProgress(peopleSyncCache)
         }
 
         return progresses.filterNotNull().sum()

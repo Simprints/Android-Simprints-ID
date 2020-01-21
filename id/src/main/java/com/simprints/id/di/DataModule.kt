@@ -24,7 +24,7 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -55,9 +55,9 @@ open class DataModule {
     @Provides
     open fun providePersonRepository(personLocalDataSource: PersonLocalDataSource,
                                      personRemoteDataSource: PersonRemoteDataSource,
-                                     peopleUpSyncManager: PeopleUpSyncManager,
+                                     peopleUpSyncExecutor: PeopleUpSyncExecutor,
                                      downSyncScopeRepository: PeopleDownSyncScopeRepository): PersonRepository =
-        PersonRepositoryImpl(personRemoteDataSource, personLocalDataSource, downSyncScopeRepository, peopleUpSyncManager)
+        PersonRepositoryImpl(personRemoteDataSource, personLocalDataSource, downSyncScopeRepository, peopleUpSyncExecutor)
 
 
     @Provides

@@ -10,7 +10,7 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.tools.extensions.bufferedChunks
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -27,7 +27,7 @@ class PeopleUpSyncUploaderTask(
     private val personRemoteDataSource: PersonRemoteDataSource,
     private val batchSize: Int,
     private val peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
-    private val cache: PeopleSyncProgressCache
+    private val cache: PeopleSyncCache
 ) {
 
     /**
@@ -50,7 +50,7 @@ class PeopleUpSyncUploaderTask(
     suspend fun execute(workerId: String,
                         workerProgressCountReporter: WorkerProgressCountReporter): Int {
         try {
-            count = cache.getProgress(workerId)
+            count = cache.readProgress(workerId)
             workerProgressCountReporter.reportCount(count)
 
             personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true))
@@ -59,7 +59,7 @@ class PeopleUpSyncUploaderTask(
                     upSyncBatch(it)
                     count += it.size
 
-                    cache.setProgress(workerId, count)
+                    cache.saveProgress(workerId, count)
                     workerProgressCountReporter.reportCount(count)
                 }
 

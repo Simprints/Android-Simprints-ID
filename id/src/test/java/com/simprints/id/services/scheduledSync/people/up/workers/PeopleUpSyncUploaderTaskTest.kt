@@ -7,7 +7,7 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.assertThrows
 import io.kotlintest.shouldThrow
@@ -27,7 +27,7 @@ class PeopleUpSyncUploaderTaskTest {
     private val personLocalDataSource: PersonLocalDataSource = mockk(relaxed = true)
     private val personRemoteDataSource: PersonRemoteDataSource = mockk(relaxed = true)
     private val peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository = mockk(relaxed = true)
-    private val peopleSyncProgressCache: PeopleSyncProgressCache = mockk(relaxed = true)
+    private val peopleSyncCache: PeopleSyncCache = mockk(relaxed = true)
 
     private val uniqueWorkerId = "uniqueWorkerId"
     private val projectIdToSync = "projectIdToSync"
@@ -37,7 +37,7 @@ class PeopleUpSyncUploaderTaskTest {
     private val task = PeopleUpSyncUploaderTask(
         loginInfoManager, personLocalDataSource, personRemoteDataSource,
         batchSize, peopleUpSyncScopeRepository,
-        peopleSyncProgressCache
+        peopleSyncCache
     )
 
     private val notYetSyncedPerson1 = Person(

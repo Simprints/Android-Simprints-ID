@@ -2,6 +2,8 @@ package com.simprints.id.services.scheduledSync.people.down.workers
 
 import android.content.Context
 import androidx.work.WorkInfo
+import androidx.work.WorkInfo.State.*
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.google.gson.reflect.TypeToken
@@ -12,13 +14,20 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.DOWNLOADER
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.UPLOADER
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
 import javax.inject.Inject
 
-class PeopleDownSyncCountWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
+class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
 
     companion object {
         const val OUTPUT_COUNT_WORKER_DOWN = "OUTPUT_COUNT_WORKER_DOWN"
     }
+
+    private val wm: WorkManager
+        get() = WorkManager.getInstance(context)
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var personRepository: PersonRepository
@@ -50,8 +59,28 @@ class PeopleDownSyncCountWorker(context: Context, params: WorkerParameters) : Si
             )
         } catch (t: Throwable) {
             logFailure(t)
-            resultSetter.retry()
+
+            if (isSyncStillRunning()) {
+                resultSetter.retry()
+            } else {
+                //If sync is not running, the count is useless
+                resultSetter.success()
+            }
         }
+    }
+
+    private fun isSyncStillRunning(): Boolean {
+        val masterSyncIdTag = this.tags.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }
+            ?: return false
+
+        val workers = wm.getWorkInfosByTag(masterSyncIdTag).get()
+        return workers?.let {
+            val downloaders = it.filter { it.tags.contains(tagForType(DOWNLOADER)) }
+            val uploaders = it.filter { it.tags.contains(tagForType(UPLOADER)) }
+            (downloaders + uploaders).any {
+                listOf(RUNNING, SUCCEEDED, ENQUEUED).contains(it.state)
+            }
+        } ?: false
     }
 
     private suspend fun getDownCount(syncScope: PeopleDownSyncScope) =

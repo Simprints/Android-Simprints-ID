@@ -20,6 +20,7 @@ import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.device.DeviceManager
 import kotlinx.android.synthetic.main.activity_dashboard.*
@@ -34,6 +35,7 @@ class DashboardActivity : AppCompatActivity() {
     @Inject lateinit var deviceManager: DeviceManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository
+    @Inject lateinit var peopleSyncCache: PeopleSyncCache
 
     private lateinit var viewModel: DashboardViewModel
     private lateinit var viewModelFactory: DashboardViewModelFactory
@@ -50,7 +52,7 @@ class DashboardActivity : AppCompatActivity() {
         val component = (application as Application).component
         component.inject(this)
         title = androidResourcesHelper.getString(R.string.dashboard_label)
-        viewModelFactory = DashboardViewModelFactory(peopleSyncManager, deviceManager, preferencesManager, peopleDownSyncScopeRepository)
+        viewModelFactory = DashboardViewModelFactory(peopleSyncManager, deviceManager, preferencesManager, peopleDownSyncScopeRepository, peopleSyncCache)
         viewModel = ViewModelProvider(this, viewModelFactory).get(DashboardViewModel::class.java)
         setupActionBar()
 
