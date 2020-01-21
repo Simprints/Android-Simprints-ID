@@ -13,7 +13,7 @@ interface AndroidResourcesHelper {
 
     fun getDrawable(res: Int): Drawable?
     fun getStringPlural(stringQuantityKey: Int, quantity: Int, params: Array<Any>): String
-    fun getColor(color: Int): ColorStateList?
+    fun getColorStateList(color: Int): ColorStateList?
 
     companion object {
         fun build(app: Application): AndroidResourcesHelper =

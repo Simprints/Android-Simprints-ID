@@ -1,6 +1,7 @@
 package com.simprints.id.activities.dashboard.cards.sync
 
 import android.content.Context
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageView
@@ -9,6 +10,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
 import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -111,13 +113,13 @@ class DashboardSyncCardDisplayerImplTest {
     private fun LinearLayout.assessFailedStateSyncUI() {
         assertThat(childCount).isEqualTo(1)
         val card = this.children.first() as CardView
-        val cardContent = card.children.first() as LinearLayout
+        val cardContent = card.children.first() as ConstraintLayout
         with(cardContent) {
             assertThat(cardTitle()).isEqualTo(SYNC_CARD_TITLE)
             assertThat(failedMessage()).isEqualTo(SYNC_CARD_FAILED_STATE_MESSAGE)
             assertThat(failedIcon().visibility).isEqualTo(VISIBLE)
             assessLastSyncTime()
-            assertThat(cardContent.childCount).isEqualTo(3)
+            assertThat(cardContent.childCount).isEqualTo(4)
         }
     }
 
@@ -138,43 +140,44 @@ class DashboardSyncCardDisplayerImplTest {
     private fun LinearLayout.assessNoModulesStateSyncUI() {
         assertThat(childCount).isEqualTo(1)
         val card = this.children.first() as CardView
-        val cardContent = card.children.first() as LinearLayout
+        val cardContent = card.children.first() as ConstraintLayout
         with(cardContent) {
             assertThat(cardTitle()).isEqualTo(SYNC_CARD_TITLE)
             assertThat(noModulesMessage()).isEqualTo(SYNC_CARD_NO_MODULES_STATE_MESSAGE)
             assertThat(noModulesModulesButton().visibility).isEqualTo(VISIBLE)
             assertThat(noModulesModulesButton().text).isEqualTo(SYNC_CARD_NO_MODULES_STATE_BUTTON)
             assessLastSyncTime()
-            assertThat(cardContent.childCount).isEqualTo(3)
+            assertThat(cardContent.childCount).isEqualTo(4)
         }
     }
 
     private fun LinearLayout.assessOfflineStateSyncUI() {
         assertThat(childCount).isEqualTo(1)
         val card = this.children.first() as CardView
-        val cardContent = card.children.first() as LinearLayout
+        val cardContent = card.children.first() as ConstraintLayout
         with(cardContent) {
             assertThat(cardTitle()).isEqualTo(SYNC_CARD_TITLE)
             assertThat(offlineMessage()).isEqualTo(SYNC_CARD_OFFLINE_STATE_MESSAGE)
             assertThat(offlineIcon().visibility).isEqualTo(VISIBLE)
             assertThat(offlineSettingsButton().visibility).isEqualTo(VISIBLE)
             assessLastSyncTime()
-            assertThat(cardContent.childCount).isEqualTo(3)
+            assertThat(cardContent.childCount).isEqualTo(5)
         }
     }
 
     private fun LinearLayout.assessProgressStateSyncUI(progressState: SyncProgress) {
         assertThat(childCount).isEqualTo(1)
         val card = this.children.first() as CardView
-        val cardContent = card.children.first() as LinearLayout
+        val cardContent = card.children.first() as ConstraintLayout
         with(cardContent) {
             assertThat(cardTitle()).isEqualTo(SYNC_CARD_TITLE)
             assertThat(progressMessage()).isEqualTo("$SYNC_CARD_PROGRESS_STATE_STATE_MESSAGE ${progressState.progress}/${progressState.total}")
             assertThat(progressConnectingProgressBar().visibility).isEqualTo(GONE)
             assertThat(progressSyncProgressBar().visibility).isEqualTo(VISIBLE)
-            assertThat(progressSyncProgressBar().progress).isEqualTo((100 * (progressState.progress.toFloat() / (progressState.total ?: 0))).toInt())
+            assertThat(progressSyncProgressBar().progress).isEqualTo((100 * (progressState.progress.toFloat() / (progressState.total
+                ?: 0))).toInt())
             assessLastSyncTime()
-            assertThat(cardContent.childCount).isEqualTo(4)
+            assertThat(cardContent.childCount).isEqualTo(5)
         }
     }
 
@@ -182,22 +185,22 @@ class DashboardSyncCardDisplayerImplTest {
     private fun LinearLayout.assessConnectingStateSyncUI(connectingState: SyncConnecting) {
         assertThat(childCount).isEqualTo(1)
         val card = this.children.first() as CardView
-        val cardContent = card.children.first() as LinearLayout
+        val cardContent = card.children.first() as ConstraintLayout
         with(cardContent) {
             assertThat(cardTitle()).isEqualTo(SYNC_CARD_TITLE)
             assertThat(progressMessage()).isEqualTo(SYNC_CARD_CONNECTING_STATE_STATE_MESSAGE)
             assertThat(progressConnectingProgressBar().visibility).isEqualTo(VISIBLE)
             assertThat(progressSyncProgressBar().visibility).isEqualTo(VISIBLE)
-            assertThat(progressSyncProgressBar().progress).isEqualTo((100 * (connectingState.progress.toFloat() / (connectingState.total ?: 0))).toInt())
+            assertThat(progressSyncProgressBar().progress).isEqualTo((100 * (connectingState.progress.toFloat() / connectingState.total!!.toFloat())).toInt())
             assessLastSyncTime()
-            assertThat(cardContent.childCount).isEqualTo(4)
+            assertThat(cardContent.childCount).isEqualTo(5)
         }
     }
 
     private fun LinearLayout.assessCompleteStateSyncUI() {
         assertThat(childCount).isEqualTo(1)
         val card = this.children.first() as CardView
-        val cardContent = card.children.first() as LinearLayout
+        val cardContent = card.children.first() as ConstraintLayout
         with(cardContent) {
             assertThat(cardTitle()).isEqualTo(SYNC_CARD_TITLE)
             assertThat(progressMessage()).isEqualTo(SYNC_CARD_COMPLETE_STATE_STATE_MESSAGE)
@@ -205,33 +208,33 @@ class DashboardSyncCardDisplayerImplTest {
             assertThat(progressSyncProgressBar().visibility).isEqualTo(VISIBLE)
             assertThat(progressSyncProgressBar().progress).isEqualTo(100)
             assessLastSyncTime()
-            assertThat(cardContent.childCount).isEqualTo(4)
+            assertThat(cardContent.childCount).isEqualTo(5)
         }
     }
 
-    private fun LinearLayout.cardTitle() = this.findViewById<TextView>(R.id.dashboard_sync_card_title).text.toString()
-    private fun LinearLayout.lastSyncTime() = this.findViewById<TextView>(R.id.dashboard_sync_card_last_sync).text.toString()
+    private fun View.cardTitle() = this.findViewById<TextView>(R.id.dashboard_sync_card_title).text.toString()
+    private fun View.lastSyncTime() = this.findViewById<TextView>(R.id.dashboard_sync_card_last_sync).text.toString()
 
-    private fun LinearLayout.defaultSyncButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_default_state_sync_button).text.toString()
+    private fun View.defaultSyncButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_default_state_sync_button).text.toString()
 
-    private fun LinearLayout.failedMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_failed_message).text.toString()
-    private fun LinearLayout.failedIcon() = this.findViewById<ImageView>(R.id.dashboard_sync_card_failed_icon)
+    private fun View.failedMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_failed_message).text.toString()
+    private fun View.failedIcon() = this.findViewById<ImageView>(R.id.dashboard_sync_card_failed_icon)
 
-    private fun LinearLayout.tryAgainMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_try_again_message).text.toString()
-    private fun LinearLayout.tryAgainSyncButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_try_again_sync_button)
+    private fun View.tryAgainMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_try_again_message).text.toString()
+    private fun View.tryAgainSyncButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_try_again_sync_button)
 
-    private fun LinearLayout.noModulesMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_select_no_modules_message).text.toString()
-    private fun LinearLayout.noModulesModulesButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_select_no_modules_button)
+    private fun View.noModulesMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_select_no_modules_message).text.toString()
+    private fun View.noModulesModulesButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_select_no_modules_button)
 
-    private fun LinearLayout.offlineMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_offline_message).text.toString()
-    private fun LinearLayout.offlineIcon() = this.findViewById<ImageView>(R.id.dashboard_sync_card_offline_icon)
-    private fun LinearLayout.offlineSettingsButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_offline_button)
+    private fun View.offlineMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_offline_message).text.toString()
+    private fun View.offlineIcon() = this.findViewById<ImageView>(R.id.dashboard_sync_card_offline_icon)
+    private fun View.offlineSettingsButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_offline_button)
 
-    private fun LinearLayout.progressMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_progress_message).text.toString()
-    private fun LinearLayout.progressConnectingProgressBar() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)
-    private fun LinearLayout.progressSyncProgressBar() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_sync_progress_bar)
+    private fun View.progressMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_progress_message).text.toString()
+    private fun View.progressConnectingProgressBar() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)
+    private fun View.progressSyncProgressBar() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_sync_progress_bar)
 
-    private fun LinearLayout.assessLastSyncTime() = assertThat(lastSyncTime()).isEqualTo(LAST_SYNC_TEXT)
+    private fun View.assessLastSyncTime() = assertThat(lastSyncTime()).isEqualTo(LAST_SYNC_TEXT)
 
     companion object {
         const val SYNC_CARD_TITLE = "Sync status"

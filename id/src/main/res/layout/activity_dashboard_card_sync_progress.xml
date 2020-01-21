@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/DashboardCardStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         style="@style/DashboardCardStyleRoot"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,29 +17,33 @@
             style="@style/DashboardCardStyleTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/dashboard_card_sync_title" />
+            android:text="@string/dashboard_card_sync_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/dashboard_sync_card_progress_message"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_marginTop="@dimen/activity_dashboard_card_space_below_title"
+            android:text="@string/dashboard_sync_card_connecting"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@id/dashboard_sync_card_progress_indeterminate_progress_bar"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dashboard_sync_card_title" />
 
-            <TextView
-                android:id="@+id/dashboard_sync_card_progress_message"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/dashboard_sync_card_connecting"
-                android:textSize="16sp" />
-
-            <ProgressBar
-                android:id="@+id/dashboard_sync_card_progress_indeterminate_progress_bar"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_gravity="center"
-                android:indeterminate="true"
-                android:indeterminateTint="@android:color/darker_gray" />
-        </LinearLayout>
+        <ProgressBar
+            android:id="@+id/dashboard_sync_card_progress_indeterminate_progress_bar"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:indeterminateTint="@android:color/darker_gray"
+            app:layout_constraintBottom_toBottomOf="@+id/dashboard_sync_card_progress_message"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/dashboard_sync_card_progress_message"
+            app:layout_constraintTop_toTopOf="@+id/dashboard_sync_card_progress_message" />
 
         <ProgressBar
             android:id="@+id/dashboard_sync_card_progress_sync_progress_bar"
@@ -46,16 +51,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="@dimen/activity_dashboard_card_sync_space_above_last_sync"
-            android:indeterminate="false" />
+            android:indeterminate="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dashboard_sync_card_progress_message" />
 
         <TextView
             android:id="@+id/dashboard_sync_card_last_sync"
             style="@style/DashboardCardStyleLastSync"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_dashboard_card_sync_space_above_last_sync"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dashboard_sync_card_progress_sync_progress_bar" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>
