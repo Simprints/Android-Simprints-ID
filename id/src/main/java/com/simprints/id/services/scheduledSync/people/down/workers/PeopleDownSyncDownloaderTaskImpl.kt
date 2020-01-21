@@ -15,7 +15,7 @@ import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.fromDomainToApi
 import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.bufferedChunks
 import com.simprints.id.tools.utils.retrySimNetworkCalls

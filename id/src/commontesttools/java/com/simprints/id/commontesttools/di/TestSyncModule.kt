@@ -18,7 +18,7 @@ import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessor
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder

@@ -1,7 +1,7 @@
 package com.simprints.id.services.scheduledSync.people.up.controllers
 
 import androidx.work.WorkRequest
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
 
 interface PeopleUpSyncWorkersBuilder {
 

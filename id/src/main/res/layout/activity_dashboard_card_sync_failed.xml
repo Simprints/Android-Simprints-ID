@@ -35,7 +35,7 @@
 
         <TextView
             android:id="@+id/dashboard_sync_card_failed_message"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/dashboard_sync_card_failed_message"
             android:textColor="@color/simprints_red"

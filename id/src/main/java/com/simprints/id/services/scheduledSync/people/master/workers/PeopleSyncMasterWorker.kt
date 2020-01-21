@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.people.master
+package com.simprints.id.services.scheduledSync.people.master.workers
 
 import android.content.Context
 import androidx.work.*
@@ -6,23 +6,14 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
 import java.util.*
 import javax.inject.Inject
 
 class PeopleSyncMasterWorker(private val appContext: Context,
                              params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
-
-    @Inject
-    override lateinit var crashReportManager: CrashReportManager
-    @Inject
-    lateinit var downSyncWorkerFactory: PeopleDownSyncWorkersFactory
-    @Inject
-    lateinit var upSyncWorkerBuilder: PeopleUpSyncWorkersBuilder
-    @Inject
-    lateinit var preferenceManager: PreferencesManager
-    @Inject
-    lateinit var peopleSyncProgressCache: PeopleSyncProgressCache
 
     companion object {
         const val MIN_BACKOFF_SECS = 15L
@@ -37,6 +28,12 @@ class PeopleSyncMasterWorker(private val appContext: Context,
 
         const val OUTPUT_LAST_SYNC_ID = "OUTPUT_LAST_SYNC_ID"
     }
+
+    @Inject override lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var downSyncWorkerFactory: PeopleDownSyncWorkersFactory
+    @Inject lateinit var upSyncWorkerBuilder: PeopleUpSyncWorkersBuilder
+    @Inject lateinit var preferenceManager: PreferencesManager
+    @Inject lateinit var peopleSyncProgressCache: PeopleSyncProgressCache
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(appContext)
@@ -94,7 +91,7 @@ class PeopleSyncMasterWorker(private val appContext: Context,
         upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID)
 
     private fun clearWorkerHistory(uniqueId: String) {
-        val otherDownSyncWorkers = syncWorkers.filter { !it.tags.contains("${TAG_MASTER_SYNC_ID}$uniqueId") }
+        val otherDownSyncWorkers = syncWorkers.filter { !it.tags.contains("$TAG_MASTER_SYNC_ID$uniqueId") }
         val syncWorkersWithoutSyncId = syncWorkers.filter { getTagWithSyncId(it.tags) == null && it.state != WorkInfo.State.CANCELLED }
         (otherDownSyncWorkers + syncWorkersWithoutSyncId).forEach { wm.cancelWorkById(it.id) }
     }

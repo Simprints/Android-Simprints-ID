@@ -23,6 +23,8 @@ import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDow
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTaskImpl
 import com.simprints.id.services.scheduledSync.people.master.*
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCacheImpl
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManagerImpl
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder

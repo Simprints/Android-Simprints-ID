@@ -9,9 +9,10 @@ import androidx.work.WorkInfo.State.FAILED
 import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.workDataOf
 import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.DOWNLOADER
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.DOWNLOADER
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.MockKAnnotations
