@@ -20,6 +20,8 @@ class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimC
         const val OUTPUT_COUNT_WORKER_UP = "OUTPUT_COUNT_WORKER_UP"
     }
 
+    override val tag: String = PeopleUpSyncCountWorker::class.java.simpleName
+
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var personRepository: PersonRepository
     @Inject lateinit var peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository
@@ -29,12 +31,11 @@ class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimC
             getComponent<PeopleUpSyncCountWorker> { it.inject(this) }
 
             val upSyncScope = peopleUpSyncScopeRepository.getUpSyncScope()
-            crashlyticsLog("Preparing upSync counter for $upSyncScope")
+            crashlyticsLog("Start - $upSyncScope")
 
             execute(upSyncScope)
         } catch (t: Throwable) {
-            logFailure(t)
-            resultSetter.failure()
+            fail(t)
         }
     }
 
@@ -42,24 +43,13 @@ class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimC
         val upCount = getUpCount(upSyncScope)
         val output = JsonHelper.gson.toJson(upCount)
 
-        logSuccess("Up count task done for $upSyncScope: $output")
+        return success(workDataOf(
+            OUTPUT_COUNT_WORKER_UP to JsonHelper.gson.toJson(upCount)), "Total to upload: $output")
 
-        return resultSetter.success(workDataOf(
-            OUTPUT_COUNT_WORKER_UP to JsonHelper.gson.toJson(upCount))
-        )
     }
 
     private fun getUpCount(syncScope: PeopleUpSyncScope) =
         PeopleCount(created = personRepository.count(PersonLocalDataSource.Query(toSync = true)))
-
-    private fun logFailure(t: Throwable) =
-        logFailure<PeopleUpSyncUploaderWorker>(t)
-
-    private fun logSuccess(message: String) =
-        logSuccess<PeopleUpSyncUploaderWorker>(message)
-
-    private fun crashlyticsLog(message: String) =
-        crashReportLog<PeopleUpSyncUploaderWorker>(message)
 
 }
 

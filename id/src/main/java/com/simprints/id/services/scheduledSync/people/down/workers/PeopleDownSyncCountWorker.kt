@@ -26,6 +26,8 @@ class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) 
         const val OUTPUT_COUNT_WORKER_DOWN = "OUTPUT_COUNT_WORKER_DOWN"
     }
 
+    override val tag: String = PeopleDownSyncCountWorker::class.java.simpleName
+
     private val wm: WorkManager
         get() = WorkManager.getInstance(context)
 
@@ -38,12 +40,11 @@ class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) 
             getComponent<PeopleDownSyncCountWorker> { it.inject(this) }
 
             val downSyncScope = downSyncScopeRepository.getDownSyncScope()
-            crashlyticsLog("Preparing count request for $downSyncScope")
+            crashlyticsLog("Start - Params: $downSyncScope")
 
             execute(downSyncScope)
         } catch (t: Throwable) {
-            logFailure(t)
-            resultSetter.failure()
+            fail(t)
         }
     }
 
@@ -52,19 +53,15 @@ class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) 
             val downCount = getDownCount(downSyncScope)
             val output = JsonHelper.gson.toJson(downCount)
 
-            logSuccess("Count done for $downSyncScope: $output}")
-
-            resultSetter.success(workDataOf(
-                OUTPUT_COUNT_WORKER_DOWN to output)
-            )
+            success(workDataOf(OUTPUT_COUNT_WORKER_DOWN to output), output)
         } catch (t: Throwable) {
-            logFailure(t)
+            fail(t)
 
             if (isSyncStillRunning()) {
-                resultSetter.retry()
+                retry(t)
             } else {
                 //If sync is not running, the count is useless
-                resultSetter.success()
+                success()
             }
         }
     }
@@ -85,15 +82,6 @@ class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) 
 
     private suspend fun getDownCount(syncScope: PeopleDownSyncScope) =
         personRepository.countToDownSync(syncScope)
-
-    private fun logFailure(t: Throwable) =
-        logFailure<PeopleDownSyncCountWorker>(t)
-
-    private fun logSuccess(message: String) =
-        logSuccess<PeopleDownSyncCountWorker>(message)
-
-    private fun crashlyticsLog(message: String) =
-        crashReportLog<PeopleDownSyncCountWorker>(message)
 
 }
 

@@ -13,6 +13,8 @@ class ImageUpSyncWorker(
     params: WorkerParameters
 ) : SimCoroutineWorker(context, params) {
 
+    override val tag: String = ImageUpSyncWorker::class.java.simpleName
+
     @Inject lateinit var imageRepository: ImageRepository
 
     @Inject
@@ -20,6 +22,7 @@ class ImageUpSyncWorker(
 
     override suspend fun doWork(): Result {
         (applicationContext as Application).component.inject(this)
+        crashlyticsLog("Start")
 
         val success = try {
             imageRepository.uploadStoredImagesAndDelete()
@@ -29,9 +32,9 @@ class ImageUpSyncWorker(
         }
 
         return if (success)
-            Result.success()
+            success()
         else
-            Result.retry()
+            retry()
     }
 
 }
