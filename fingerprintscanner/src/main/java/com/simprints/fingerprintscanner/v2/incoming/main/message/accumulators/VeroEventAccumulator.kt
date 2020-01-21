@@ -5,4 +5,4 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroMessageP
 import com.simprints.fingerprintscanner.v2.incoming.main.message.parsers.VeroEventParser
 
 class VeroEventAccumulator(veroEventParser: VeroEventParser) :
-    PacketToMessageAccumulator<VeroEvent>(VeroMessageProtocol, veroEventParser)
+    PacketToMainMessageAccumulator<VeroEvent>(VeroMessageProtocol, veroEventParser)
