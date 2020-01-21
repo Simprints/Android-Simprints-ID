@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard.cards.project.repository
 
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectWrapper
@@ -9,7 +8,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 
 class DashboardProjectDetailsRepository(
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE) val projectRepository: ProjectRepository,
+    private val projectRepository: ProjectRepository,
     private val loginInfoManager: LoginInfoManager,
     private val preferencesManager: PreferencesManager
 ) {
