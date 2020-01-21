@@ -281,10 +281,9 @@ open class AppModule {
 
     @Provides
     open fun provideDashboardProjectDetailsCardDisplayer(
-        context: Context,
         androidResourcesHelper: AndroidResourcesHelper
     ): DashboardProjectDetailsCardDisplayer = DashboardProjectDetailsCardDisplayerImpl(
-        context, androidResourcesHelper
+        androidResourcesHelper
     )
 }
 

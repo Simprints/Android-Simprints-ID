@@ -4,9 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/DashboardCardStyle"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/margin_large"
+    android:layout_marginEnd="@dimen/margin_large">
 
     <LinearLayout
+        android:id="@+id/dashboard_project_details_card"
         style="@style/DashboardCardStyleRoot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
