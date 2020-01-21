@@ -7,7 +7,7 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.models.PeopleCount
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.DOWNLOADED
@@ -149,9 +149,9 @@ private fun createUpSyncCounterWorker(state: WorkInfo.State,
 
 fun createCommonDownSyncTags(uniqueMasterSyncId: String?,
                              uniqueSyncId: String?) = listOf(
-    "${PeopleDownSyncWorkersFactory.TAG_DOWN_MASTER_SYNC_ID}${uniqueSyncId}",
+    "${PeopleDownSyncWorkersBuilder.TAG_DOWN_MASTER_SYNC_ID}${uniqueSyncId}",
     "${PeopleSyncMasterWorker.TAG_SCHEDULED_AT}${Date().time}",
-    PeopleDownSyncWorkersFactory.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS,
+    PeopleDownSyncWorkersBuilder.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS,
     PeopleSyncMasterWorker.TAG_PEOPLE_SYNC_ALL_WORKERS,
     "${PeopleSyncMasterWorker.TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
 )

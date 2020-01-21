@@ -9,7 +9,7 @@ import androidx.work.WorkInfo.State.FAILED
 import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.workDataOf
 import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.internal.SyncWorkersLiveDataProvider
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.DOWNLOADER
@@ -54,13 +54,13 @@ class PeopleSyncStateProcessorImplTest {
     lateinit var peopleSyncStateProcessor: PeopleSyncStateProcessor
     @RelaxedMockK lateinit var personRepository: PersonRepository
     @RelaxedMockK lateinit var syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider
-    @RelaxedMockK lateinit var peopleSyncProgressCache: PeopleSyncProgressCache
+    @RelaxedMockK lateinit var peopleSyncCache: PeopleSyncCache
 
     @Before
     fun setUp() {
         UnitTestConfig(this).setupWorkManager()
         MockKAnnotations.init(this)
-        peopleSyncStateProcessor = PeopleSyncStateProcessorImpl(ctx, personRepository, peopleSyncProgressCache, syncWorkersLiveDataProvider)
+        peopleSyncStateProcessor = PeopleSyncStateProcessorImpl(ctx, personRepository, peopleSyncCache, syncWorkersLiveDataProvider)
         mockDependencies()
     }
 
@@ -137,7 +137,7 @@ class PeopleSyncStateProcessorImplTest {
     private fun mockDependencies() {
         every { syncWorkersLiveDataProvider.getMasterWorkersLiveData() } returns masterWorkersLiveData
         every { syncWorkersLiveDataProvider.getSyncWorkersLiveData(any()) } returns syncWorkersLiveData
-        every { peopleSyncProgressCache.getProgress(any()) } returns 0
+        every { peopleSyncCache.readProgress(any()) } returns 0
     }
 }
 

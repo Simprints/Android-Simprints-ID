@@ -15,7 +15,7 @@ import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.fromDomainToApi
 import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.bufferedChunks
 import com.simprints.id.tools.utils.retrySimNetworkCalls
@@ -31,7 +31,7 @@ import java.util.*
 class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDataSource,
                                        val personRemoteDataSource: PersonRemoteDataSource,
                                        private val downSyncScopeRepository: PeopleDownSyncScopeRepository,
-                                       private val cache: PeopleSyncProgressCache,
+                                       private val cache: PeopleSyncCache,
                                        val timeHelper: TimeHelper) : PeopleDownSyncDownloaderTask {
 
     private lateinit var downSyncOperation: PeopleDownSyncOperation
@@ -45,7 +45,7 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
         this.downSyncOperation = downSyncOperation
         this.downSyncWorkerProgressReporter = downSyncWorkerProgressReporter
 
-        count = cache.getProgress(workerId)
+        count = cache.readProgress(workerId)
         downSyncWorkerProgressReporter.reportCount(count)
 
         var reader: JsonReader? = null
@@ -57,7 +57,7 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
             flowPeople.bufferedChunks(BATCH_SIZE_FOR_DOWNLOADING).collect {
                 saveBatchAndUpdateDownSyncStatus(it)
                 count += it.size
-                cache.setProgress(workerId, count)
+                cache.saveProgress(workerId, count)
                 downSyncWorkerProgressReporter.reportCount(count)
             }
             updateDownSyncInfo(COMPLETE)

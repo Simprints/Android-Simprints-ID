@@ -12,7 +12,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -27,7 +27,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
     @Inject lateinit var personRemoteDataSource: PersonRemoteDataSource
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository
-    @Inject lateinit var peopleSyncProgressCache: PeopleSyncProgressCache
+    @Inject lateinit var peopleSyncCache: PeopleSyncCache
 
     override suspend fun doWork(): Result {
         return try {
@@ -38,7 +38,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
                 loginInfoManager, personLocalDataSource, personRemoteDataSource,
                 PATIENT_UPLOAD_BATCH_SIZE,
                 peopleUpSyncScopeRepository,
-                peopleSyncProgressCache
+                peopleSyncCache
             )
 
             val totalUploaded = task.execute(this.id.toString(), this)
@@ -82,11 +82,11 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
     }
 }
 
-fun WorkInfo.extractUpSyncProgress(progressCache: PeopleSyncProgressCache): Int? {
+fun WorkInfo.extractUpSyncProgress(peopleSyncCache: PeopleSyncCache): Int? {
     val progress = this.progress.getInt(PROGRESS_UP_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_UP_SYNC, -1)
 
     //When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
-    val cached = progressCache.getProgress(id.toString())
+    val cached = peopleSyncCache.readProgress(id.toString())
     return maxOf(progress, output, cached)
 }

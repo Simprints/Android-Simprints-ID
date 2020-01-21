@@ -1,6 +1,6 @@
 package com.simprints.id.services.scheduledSync.people.up.controllers
 
-interface PeopleUpSyncManager {
+interface PeopleUpSyncExecutor {
 
     fun sync()
 }

@@ -5,9 +5,12 @@ import androidx.work.*
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.LAST_SYNC_REPORTER
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleLastSyncReporterWorker.Companion.SYNC_ID_TO_MARK_AS_COMPLETED
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
 import java.util.*
 import javax.inject.Inject
@@ -30,10 +33,10 @@ class PeopleSyncMasterWorker(private val appContext: Context,
     }
 
     @Inject override lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var downSyncWorkerFactory: PeopleDownSyncWorkersFactory
+    @Inject lateinit var downSyncWorkerBuilder: PeopleDownSyncWorkersBuilder
     @Inject lateinit var upSyncWorkerBuilder: PeopleUpSyncWorkersBuilder
     @Inject lateinit var preferenceManager: PreferencesManager
-    @Inject lateinit var peopleSyncProgressCache: PeopleSyncProgressCache
+    @Inject lateinit var peopleSyncCache: PeopleSyncCache
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(appContext)
@@ -59,8 +62,9 @@ class PeopleSyncMasterWorker(private val appContext: Context,
 
             return if (!isSyncRunning()) {
                 val chain = upSyncWorkersChain(uniqueSyncId) + downSyncWorkersChain(uniqueSyncId)
-                wm.enqueue(chain)
-                peopleSyncProgressCache.clear()
+                wm.beginWith(chain).then(lastSyncWorker(uniqueSyncId)).enqueue()
+
+                peopleSyncCache.clearProgresses()
                 logSuccess("Master work done: new id $uniqueSyncId")
                 clearWorkerHistory(uniqueSyncId)
                 resultSetter.success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId))
@@ -76,18 +80,27 @@ class PeopleSyncMasterWorker(private val appContext: Context,
         }
     }
 
-    private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<WorkRequest> {
+    private fun lastSyncWorker(uniqueSyncID: String): OneTimeWorkRequest =
+        OneTimeWorkRequest.Builder(PeopleLastSyncReporterWorker::class.java)
+            .addTag("${TAG_MASTER_SYNC_ID}${uniqueSyncID}")
+            .addTag("${TAG_SCHEDULED_AT}${Date().time}")
+            .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
+            .addTag(tagForType(LAST_SYNC_REPORTER))
+            .setInputData(workDataOf(SYNC_ID_TO_MARK_AS_COMPLETED to uniqueSyncID))
+            .build()
+
+    private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
         val backgroundOnForPeriodicSync = preferenceManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.PERIODIC_BACKGROUND] == true
         val downSyncChainRequired = isOneTimeMasterWorker || backgroundOnForPeriodicSync
 
         return if (downSyncChainRequired) {
-            downSyncWorkerFactory.buildDownSyncWorkerChain(uniqueSyncID)
+            downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncID)
         } else {
             emptyList()
         }
     }
 
-    private fun upSyncWorkersChain(uniqueSyncID: String): List<WorkRequest> =
+    private fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =
         upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID)
 
     private fun clearWorkerHistory(uniqueId: String) {

@@ -15,7 +15,7 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.testtools.common.di.DependencyRule
 
 class TestDataModule(
@@ -51,13 +51,13 @@ class TestDataModule(
     override fun providePersonRepository(
         personLocalDataSource: PersonLocalDataSource,
         personRemoteDataSource: PersonRemoteDataSource,
-        peopleUpSyncManager: PeopleUpSyncManager,
+        peopleUpSyncExecutor: PeopleUpSyncExecutor,
         downSyncScopeRepository: PeopleDownSyncScopeRepository
     ): PersonRepository = personRepositoryRule.resolveDependency {
         super.providePersonRepository(
             personLocalDataSource,
             personRemoteDataSource,
-            peopleUpSyncManager,
+            peopleUpSyncExecutor,
             downSyncScopeRepository
         )
     }

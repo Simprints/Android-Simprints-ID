@@ -13,7 +13,7 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.id.testtools.UnitTestConfig
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -38,7 +38,7 @@ class PersonRepositoryTest {
 
     @RelaxedMockK lateinit var remoteDataSource: PersonRemoteDataSource
     @RelaxedMockK lateinit var localDataSource: PersonLocalDataSource
-    @RelaxedMockK lateinit var peopleUpSyncManager: PeopleUpSyncManager
+    @RelaxedMockK lateinit var peopleUpSyncExecutor: PeopleUpSyncExecutor
     @RelaxedMockK lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
 
     private lateinit var personRepository: PersonRepository
@@ -47,7 +47,7 @@ class PersonRepositoryTest {
     fun setup() {
         UnitTestConfig(this).coroutinesMainThread()
         MockKAnnotations.init(this, relaxUnitFun = true)
-        personRepository = PersonRepositoryImpl(remoteDataSource, localDataSource, downSyncScopeRepository, peopleUpSyncManager)
+        personRepository = PersonRepositoryImpl(remoteDataSource, localDataSource, downSyncScopeRepository, peopleUpSyncExecutor)
     }
 
     @Test
@@ -72,7 +72,7 @@ class PersonRepositoryTest {
         personRepository.saveAndUpload(person)
 
         coVerify { localDataSource.insertOrUpdate(listOf(person)) }
-        verify { peopleUpSyncManager.sync() }
+        verify { peopleUpSyncExecutor.sync() }
     }
 
     @Test

@@ -45,6 +45,7 @@ import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleLastSyncReporterWorker
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker
@@ -116,6 +117,7 @@ interface AppComponent {
     fun inject(peopleUpSyncCountWorker: PeopleUpSyncCountWorker)
     fun inject(imageUpSyncWorker: ImageUpSyncWorker)
     fun inject(syncInformationActivity: SyncInformationActivity)
+    fun inject(peopleLastSyncReporterWorker: PeopleLastSyncReporterWorker)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager

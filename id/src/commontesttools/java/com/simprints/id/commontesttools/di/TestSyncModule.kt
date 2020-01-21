@@ -15,12 +15,12 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.SyncModule
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessor
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
@@ -61,14 +61,14 @@ class TestSyncModule(
         personLocalDataSource: PersonLocalDataSource,
         personRemoteDataSource: PersonRemoteDataSource,
         downSyncScopeRepository: PeopleDownSyncScopeRepository,
-        progressCache: PeopleSyncProgressCache,
+        peopleSyncCache: PeopleSyncCache,
         timeHelper: TimeHelper
     ): PeopleDownSyncDownloaderTask = peopleDownSyncDownloaderTaskRule.resolveDependency {
         super.providePeopleDownSyncDownloaderTask(
             personLocalDataSource,
             personRemoteDataSource,
             downSyncScopeRepository,
-            progressCache,
+            peopleSyncCache,
             timeHelper
         )
     }
@@ -80,10 +80,10 @@ class TestSyncModule(
     @Singleton
     override fun providePeopleSyncStateProcessor(
         ctx: Context,
-        progressCache: PeopleSyncProgressCache,
+        peopleSyncCache: PeopleSyncCache,
         personRepository: PersonRepository
     ): PeopleSyncStateProcessor = peopleSyncStateProcessor.resolveDependency {
-        super.providePeopleSyncStateProcessor(ctx, progressCache, personRepository)
+        super.providePeopleSyncStateProcessor(ctx, peopleSyncCache, personRepository)
     }
 
     @Singleton
@@ -116,7 +116,7 @@ class TestSyncModule(
     @Singleton
     override fun provideDownSyncWorkerBuilder(
         downSyncScopeRepository: PeopleDownSyncScopeRepository
-    ): PeopleDownSyncWorkersFactory = peopleDownSyncWorkersBuilderRule.resolveDependency {
+    ): PeopleDownSyncWorkersBuilder = peopleDownSyncWorkersBuilderRule.resolveDependency {
         super.provideDownSyncWorkerBuilder(downSyncScopeRepository)
     }
 
@@ -141,7 +141,7 @@ class TestSyncModule(
     override fun providePeopleUpSyncManager(
         ctx: Context,
         peopleUpSyncWorkersBuilder: PeopleUpSyncWorkersBuilder
-    ): PeopleUpSyncManager = peopleUpSyncManagerRule.resolveDependency {
+    ): PeopleUpSyncExecutor = peopleUpSyncManagerRule.resolveDependency {
         super.providePeopleUpSyncManager(ctx, peopleUpSyncWorkersBuilder)
     }
 

@@ -158,7 +158,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
         }
 
     private fun displayLastSyncTime(syncCardState: DashboardSyncCardState, textView: TextView) {
-        val lastSyncTimeText = timeHelper.readableBetweenNowAndTime(syncCardState.lastSyncTime)
+        val lastSyncTimeText = syncCardState.lastSyncTime?.let { timeHelper.readableBetweenNowAndTime(it) } ?: ""
         textView.text = androidResourcesHelper.getString(R.string.dashboard_card_sync_last_sync, arrayOf(lastSyncTimeText))
     }
 

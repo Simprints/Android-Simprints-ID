@@ -8,6 +8,7 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.ModuleSyncScope
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState.SyncWorkerInfo
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.*
@@ -17,7 +18,8 @@ import java.util.*
 class DashboardViewModel(peopleSyncManager: PeopleSyncManager,
                          deviceManager: DeviceManager,
                          private val preferencesManager: PreferencesManager,
-                         private val syncScopeRepository: PeopleDownSyncScopeRepository) : ViewModel() {
+                         private val syncScopeRepository: PeopleDownSyncScopeRepository,
+                         private val cacheSync: PeopleSyncCache) : ViewModel() {
 
     var syncCardState = MediatorLiveData<DashboardSyncCardState>()
 
@@ -41,39 +43,39 @@ class DashboardViewModel(peopleSyncManager: PeopleSyncManager,
     private fun emitCardNewState(isConnected: Boolean,
                                  isModuleSelectionRequired: Boolean,
                                  syncState: PeopleSyncState?) {
-        val lastSyncData = Date()
+        val lastSyncData = cacheSync.lastSuccessfulSyncTime
 
-        val newState = if (isModuleSelectionRequired) {
-            SyncNoModules(lastSyncData)
-        } else if (isConnected) {
-            processNewCardStateBasedOnSyncState(syncState)
-        } else {
-            SyncOffline(lastSyncData)
+        val newState = when {
+            isModuleSelectionRequired -> SyncNoModules(lastSyncData)
+            isConnected -> processNewCardStateBasedOnSyncState(syncState, lastSyncData)
+            else -> SyncOffline(lastSyncData)
         }
 
         syncCardState.value = newState
     }
 
-    private fun processNewCardStateBasedOnSyncState(syncState: PeopleSyncState?): DashboardSyncCardState =
+    private fun processNewCardStateBasedOnSyncState(syncState: PeopleSyncState?,
+                                                    lastSyncData: Date?): DashboardSyncCardState =
         syncState?.let {
             val hasSyncRunRecentlyOrIsRunning = it.downSyncWorkersInfo.isNotEmpty() && it.upSyncWorkersInfo.isNotEmpty()
             return if (hasSyncRunRecentlyOrIsRunning) {
-                processRecentSyncState(it)
+                processRecentSyncState(it, lastSyncData)
             } else {
-                SyncDefault(Date())
+                SyncDefault(lastSyncData)
             }
-        } ?: SyncDefault(Date())
+        } ?: SyncDefault(lastSyncData)
 
-    private fun processRecentSyncState(syncState: PeopleSyncState): DashboardSyncCardState {
+    private fun processRecentSyncState(syncState: PeopleSyncState,
+                                       lastSyncData: Date?): DashboardSyncCardState {
         val downSyncStates = syncState.downSyncWorkersInfo
         val upSyncStates = syncState.upSyncWorkersInfo
         val allSyncStates = downSyncStates + upSyncStates
         return when {
-            isSyncCompleted(allSyncStates) -> SyncComplete(Date())
-            isSyncConnecting(allSyncStates) -> SyncConnecting(Date(), syncState.progress, syncState.total)
-            isSyncFailedBecauseCloudIntegration(allSyncStates) -> SyncFailed(Date())
-            isSyncFailed(allSyncStates) -> SyncTryAgain(Date())
-            else -> SyncProgress(Date(), syncState.progress, syncState.total)
+            isSyncCompleted(allSyncStates) -> SyncComplete(lastSyncData)
+            isSyncConnecting(allSyncStates) -> SyncConnecting(lastSyncData, syncState.progress, syncState.total)
+            isSyncFailedBecauseCloudIntegration(allSyncStates) -> SyncFailed(lastSyncData)
+            isSyncFailed(allSyncStates) -> SyncTryAgain(lastSyncData)
+            else -> SyncProgress(lastSyncData, syncState.progress, syncState.total)
         }
     }
 

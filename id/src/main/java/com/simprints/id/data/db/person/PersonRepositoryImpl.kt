@@ -9,13 +9,13 @@ import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import kotlinx.coroutines.flow.first
 
 class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
                            val downSyncScopeRepository: PeopleDownSyncScopeRepository,
-                           private val peopleUpSyncManager: PeopleUpSyncManager) :
+                           private val peopleUpSyncExecutor: PeopleUpSyncExecutor) :
     PersonRepository,
     PersonLocalDataSource by personLocalDataSource,
     PersonRemoteDataSource by personRemoteDataSource {
@@ -43,6 +43,6 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
 
     override suspend fun saveAndUpload(person: Person) {
         personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))
-        peopleUpSyncManager.sync()
+        peopleUpSyncExecutor.sync()
     }
 }

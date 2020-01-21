@@ -25,7 +25,7 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.fromDomainToGetApi
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelperImpl
@@ -91,7 +91,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
     @RelaxedMockK lateinit var personRemoteDataSourceMock: PersonRemoteDataSource
     @RelaxedMockK lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
     @RelaxedMockK lateinit var personLocalDataSourceMock: PersonLocalDataSource
-    @RelaxedMockK lateinit var peopleSyncProgressCache: PeopleSyncProgressCache
+    @RelaxedMockK lateinit var peopleSyncCache: PeopleSyncCache
 
     private val module by lazy {
         TestAppModule(app,
@@ -218,7 +218,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
                 personLocalDataSourceMock,
                 personRemoteDataSourceMock,
                 downSyncScopeRepository,
-                peopleSyncProgressCache,
+                peopleSyncCache,
                 TimeHelperImpl())
 
             assertThrows<Throwable> {
@@ -267,7 +267,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
             personLocalDataSourceMock,
             personRemoteDataSourceMock,
             downSyncScopeRepository,
-            peopleSyncProgressCache,
+            peopleSyncCache,
             TimeHelperImpl())
 
         syncTask.execute(downSyncOps, uniqueWorkerId, mockk(relaxed = true))

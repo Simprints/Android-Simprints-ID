@@ -9,8 +9,8 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactoryImpl
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory.Companion.TAG_DOWN_MASTER_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_DOWN_MASTER_SYNC_ID
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
@@ -25,7 +25,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
-class PeopleDownSyncWorkersFactoryImplTest {
+class PeopleDownSyncWorkersBuilderImplTest {
 
     val builder = PeopleDownSyncOperationFactoryImpl()
     private val modes = listOf(Modes.FINGERPRINT, Modes.FACE)
@@ -35,13 +35,13 @@ class PeopleDownSyncWorkersFactoryImplTest {
         builder.buildModuleSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, modes, null),
         builder.buildModuleSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID_2, modes, null))
 
-    private lateinit var peopleDownSyncWorkersFactory: PeopleDownSyncWorkersFactory
+    private lateinit var peopleDownSyncWorkersFactory: PeopleDownSyncWorkersBuilder
     private lateinit var peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository
 
     @Before
     fun setUp() {
         peopleDownSyncScopeRepository = mockk(relaxed = true)
-        peopleDownSyncWorkersFactory = PeopleDownSyncWorkersFactoryImpl(peopleDownSyncScopeRepository)
+        peopleDownSyncWorkersFactory = PeopleDownSyncWorkersBuilderImpl(peopleDownSyncScopeRepository)
     }
 
     @Test
