@@ -3,6 +3,9 @@ package com.simprints.fingerprint.activities.collect.timeoutbar
 import android.content.Context
 import android.os.CountDownTimer
 import android.widget.ProgressBar
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar.Companion.FINISHED_PROGRESS
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar.Companion.INITIAL_PROGRESS
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar.Companion.PROGRESS_INCREMENT
 
 class ScanningWithImageTransferTimeoutBar(
     override val context: Context,
@@ -14,38 +17,38 @@ class ScanningWithImageTransferTimeoutBar(
     private var scanningCountDownTimer: CountDownTimer? = null
     private var imageTransferCountDownTimer: CountDownTimer? = null
 
-    private var scanningProgress = 0
-    private var imageTransferProgress = 0
+    private var scanningProgress = INITIAL_PROGRESS
+    private var imageTransferProgress = INITIAL_PROGRESS
 
     override fun startTimeoutBar() {
-        progressBar.progress = 0
-        scanningProgress = 0
-        imageTransferProgress = 0
+        progressBar.progress = INITIAL_PROGRESS
+        scanningProgress = INITIAL_PROGRESS
+        imageTransferProgress = INITIAL_PROGRESS
         scanningCountDownTimer = createScanningTimer().also { it.start() }
         imageTransferCountDownTimer = createImageTransferTimer()
     }
 
     private fun createScanningTimer(): CountDownTimer =
-        object : CountDownTimer(scanningTimeoutMs, (scanningTimeoutMs / 50)) {
+        object : CountDownTimer(scanningTimeoutMs, (scanningTimeoutMs / SCANNING_STEP_FINISHED_PROGRESS)) {
             override fun onTick(millisUntilFinished: Long) {
-                scanningProgress += 1
+                scanningProgress += PROGRESS_INCREMENT
                 progressBar.progress = scanningProgress
             }
 
             override fun onFinish() {
-                progressBar.progress = 50
+                progressBar.progress = SCANNING_STEP_FINISHED_PROGRESS
             }
         }
 
     private fun createImageTransferTimer(): CountDownTimer =
-        object : CountDownTimer(imageTransferTimeoutMs, (imageTransferTimeoutMs / 50)) {
+        object : CountDownTimer(imageTransferTimeoutMs, (imageTransferTimeoutMs / SCANNING_STEP_FINISHED_PROGRESS)) {
             override fun onTick(millisUntilFinished: Long) {
-                imageTransferProgress += 1
-                progressBar.progress = 50 + imageTransferProgress
+                imageTransferProgress += PROGRESS_INCREMENT
+                progressBar.progress = SCANNING_STEP_FINISHED_PROGRESS + imageTransferProgress
             }
 
             override fun onFinish() {
-                progressBar.progress = 100
+                progressBar.progress = FINISHED_PROGRESS
             }
         }
 
@@ -71,11 +74,15 @@ class ScanningWithImageTransferTimeoutBar(
     override fun handleCancelled() {
         scanningCountDownTimer?.let {
             it.cancel()
-            progressBar.progress = 0
+            progressBar.progress = INITIAL_PROGRESS
         }
         imageTransferCountDownTimer?.let {
             it.cancel()
-            progressBar.progress = 0
+            progressBar.progress = INITIAL_PROGRESS
         }
+    }
+
+    companion object {
+        const val SCANNING_STEP_FINISHED_PROGRESS = 50 // Half-way through the progress bar
     }
 }
