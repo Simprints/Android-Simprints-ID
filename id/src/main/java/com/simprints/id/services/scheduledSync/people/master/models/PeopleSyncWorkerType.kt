@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.people.master
+package com.simprints.id.services.scheduledSync.people.master.models
 
 
 enum class PeopleSyncWorkerType {
@@ -9,8 +9,8 @@ enum class PeopleSyncWorkerType {
 
     companion object {
 
-        const val TAG_PEOPLE_SYNC_WORKER_TYPE = "TAG_PEOPLE_SYNC_WORKER_TYPE_"
+        private const val TAG_PEOPLE_SYNC_WORKER_TYPE = "TAG_PEOPLE_SYNC_WORKER_TYPE_"
 
-        fun tagForType(type: PeopleSyncWorkerType) = "${TAG_PEOPLE_SYNC_WORKER_TYPE}${type}"
+        fun tagForType(type: PeopleSyncWorkerType) = "$TAG_PEOPLE_SYNC_WORKER_TYPE${type}"
     }
 }

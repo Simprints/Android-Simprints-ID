@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.people.master
+package com.simprints.id.services.scheduledSync.people.master.internal
 
 interface PeopleSyncProgressCache {
 
