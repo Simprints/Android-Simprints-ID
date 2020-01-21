@@ -196,11 +196,11 @@
     <string name="consent_share_data_yes">ব্র্যাক এবং সিমপ্রিন্টস (একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান) আপনার আঙ্গুলের ছাপ সম্পর্কিত তথ্য ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে।</string>
     <string name="dashboard_card_available_on_phone">ফোন এ সংরক্ষিত</string>
     <string name="dashboard_card_calculating">হিসাাব করা হচ্ছে</string>
-    <string name="dashboard_card_currentuser_title">বর্তমান ব্যবহারকারী</string>
+    <string name="dashboard_card_current_user">বর্তমান ব্যবহারকারী: %1$s</string>
     <string name="dashboard_card_enrol_title">সর্বশেষ নিবন্ধন</string>
     <string name="dashboard_card_enrolment_info">নিবন্ধন তথ্য</string>
     <string name="dashboard_card_identification_title">সর্বশেষ সনাক্তকরন</string>
-    <string name="dashboard_card_lastscanner_title">স্ক্যানার ব্যবহার করা হয়েছে</string>
+    <string name="dashboard_card_scanner_used">স্ক্যানার ব্যবহার করা হয়েছে: %1$s</string>
     <string name="dashboard_card_localdb_sync_module_title">নির্বাচিত মডিউলে নিবন্ধন করা ব্যক্তিবর্গ</string>
     <string name="dashboard_card_localdb_sync_project_title">প্রজেক্ট এ নিবন্ধন করা ব্যক্তিবর্গ</string>
     <string name="dashboard_card_localdb_sync_user_title">ব্যবহারকারী দ্বারা নিবন্ধন করা ব্যক্তিবর্গ</string>
