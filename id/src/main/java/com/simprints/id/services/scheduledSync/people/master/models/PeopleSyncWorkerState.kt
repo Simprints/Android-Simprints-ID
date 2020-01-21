@@ -2,13 +2,13 @@ package com.simprints.id.services.scheduledSync.people.master.models
 
 import androidx.work.WorkInfo
 
-sealed class PeopleWorkerState {
-    object Enqueued : PeopleWorkerState()
-    object Running : PeopleWorkerState()
-    object Succeeded : PeopleWorkerState()
-    class Failed(val failedBecauseCloudIntegration: Boolean) : PeopleWorkerState()
-    object Blocked : PeopleWorkerState()
-    object Cancelled : PeopleWorkerState()
+sealed class PeopleSyncWorkerState {
+    object Enqueued : PeopleSyncWorkerState()
+    object Running : PeopleSyncWorkerState()
+    object Succeeded : PeopleSyncWorkerState()
+    class Failed(val failedBecauseCloudIntegration: Boolean = false) : PeopleSyncWorkerState()
+    object Blocked : PeopleSyncWorkerState()
+    object Cancelled : PeopleSyncWorkerState()
 
     companion object {
         fun fromWorkInfo(state: WorkInfo.State,
