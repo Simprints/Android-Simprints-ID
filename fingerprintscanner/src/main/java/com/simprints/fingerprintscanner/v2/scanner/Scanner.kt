@@ -40,20 +40,13 @@ class Scanner(
     private lateinit var inputStream: InputStream
     private lateinit var outputStream: OutputStream
 
-    val state = ScannerState(
-        connected = false,
-        mode = null,
-        un20On = null,
-        triggerButtonActive = null,
-        smileLedState = null,
-        batteryPercentCharge = null
-    )
+    val state = disconnectedScannerState()
 
     val triggerButtonListeners = mutableSetOf<Observer<Unit>>()
 
-    private val disposables = mutableListOf<Disposable>()
+    private var scannerTriggerListenerDisposable: Disposable? = null
 
-    fun connect(inputStream: InputStream, outputStream: OutputStream) {
+    fun connect(inputStream: InputStream, outputStream: OutputStream): Completable = completable {
         this.inputStream = inputStream
         this.outputStream = outputStream
         state.connected = true
@@ -62,20 +55,32 @@ class Scanner(
         rootMessageStream.connect(inputStream, outputStream)
     }
 
-    fun disconnect() {
+    fun disconnect(): Completable = completable {
         when (state.mode) {
             ROOT -> rootMessageStream.disconnect()
             MAIN -> {
                 mainMessageStream.disconnect()
-                state.triggerButtonActive = false
-                disposables.forEach { it.dispose() }
+                scannerTriggerListenerDisposable?.dispose()
             }
             CYPRESS_OTA -> TODO()
             STM_OTA -> TODO()
             null -> {/* Do nothing */
             }
         }
-        state.connected = false
+        resetStateToDisconnected()
+    }
+
+    private fun resetStateToDisconnected() {
+        with(state) {
+            disconnectedScannerState().let {
+                connected = it.connected
+                mode = it.mode
+                un20On = it.un20On
+                triggerButtonActive = it.triggerButtonActive
+                smileLedState = it.smileLedState
+                batteryPercentCharge = it.batteryPercentCharge
+            }
+        }
     }
 
     private fun assertMode(mode: Mode) = Completable.fromAction {
@@ -107,7 +112,7 @@ class Scanner(
         mainMessageStream.connect(inputStream, outputStream)
         state.triggerButtonActive = true
         state.mode = MAIN
-        disposables.add(subscribeTriggerButtonListeners())
+        scannerTriggerListenerDisposable = subscribeTriggerButtonListeners()
     }
 
     private inline fun <reified R : IncomingMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMessage): Single<R> =
