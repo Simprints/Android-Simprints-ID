@@ -1,13 +1,13 @@
 package com.simprints.fingerprintscanner.testtools
 
-import com.simprints.fingerprintscanner.v2.domain.main.message.IncomingMessage
+import com.simprints.fingerprintscanner.v2.domain.main.message.IncomingMainMessage
 import com.simprints.fingerprintscanner.v2.domain.main.message.MessageProtocol
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.PacketToMessageAccumulator
-import com.simprints.fingerprintscanner.v2.incoming.main.message.parsers.MessageParser
+import com.simprints.fingerprintscanner.v2.incoming.MessageParser
 import com.simprints.fingerprintscanner.v2.tools.primitives.unsignedToInt
 import java.nio.ByteOrder
 
-class TestMessage(private val bytes: ByteArray) : IncomingMessage {
+class TestMessage(private val bytes: ByteArray) : IncomingMainMessage {
 
     override fun getBytes(): ByteArray = bytes
 }

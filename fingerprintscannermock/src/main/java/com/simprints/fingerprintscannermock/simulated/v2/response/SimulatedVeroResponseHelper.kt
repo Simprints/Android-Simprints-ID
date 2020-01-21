@@ -1,4 +1,4 @@
-package com.simprints.fingerprintscannermock.simulated.v2
+package com.simprints.fingerprintscannermock.simulated.v2.response
 
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroCommand
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroResponse
@@ -8,6 +8,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.*
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.common.RealisticSpeedBehaviour
 import com.simprints.fingerprintscannermock.simulated.common.SimulationSpeedBehaviour
+import com.simprints.fingerprintscannermock.simulated.v2.SimulatedScannerV2
 
 class SimulatedVeroResponseHelper(private val simulatedScannerManager: SimulatedScannerManager,
                                   private val simulatedScannerV2: SimulatedScannerV2) : SimulatedResponseHelperV2<VeroCommand, VeroResponse> {

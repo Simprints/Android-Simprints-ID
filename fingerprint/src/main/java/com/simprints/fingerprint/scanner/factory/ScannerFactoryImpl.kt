@@ -16,10 +16,17 @@ import com.simprints.fingerprintscanner.v2.incoming.main.message.parsers.VeroRes
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.ByteArrayToPacketAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketParser
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketRouter
+import com.simprints.fingerprintscanner.v2.incoming.root.RootMessageInputStream
+import com.simprints.fingerprintscanner.v2.incoming.root.RootResponseAccumulator
+import com.simprints.fingerprintscanner.v2.incoming.root.RootResponseParser
 import com.simprints.fingerprintscanner.v2.outgoing.main.MessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.main.message.MessageSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.main.packet.PacketDispatcher
 import com.simprints.fingerprintscanner.v2.outgoing.main.packet.PacketSerializer
+import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
+import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageSerializer
+import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
+import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
 import com.simprints.fingerprintscanner.v2.tools.lang.objects
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
@@ -40,19 +47,29 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
     fun createScannerV2(macAddress: String): ScannerWrapper =
         ScannerWrapperV2(
             ScannerV2(
-                MessageInputStream(
-                    PacketRouter(
-                        Channel.Remote::class.objects(),
-                        { source },
-                        ByteArrayToPacketAccumulator(PacketParser())
+                MainMessageStream(
+                    MessageInputStream(
+                        PacketRouter(
+                            Channel.Remote::class.objects(),
+                            { source },
+                            ByteArrayToPacketAccumulator(PacketParser())
+                        ),
+                        VeroResponseAccumulator(VeroResponseParser()),
+                        VeroEventAccumulator(VeroEventParser()),
+                        Un20ResponseAccumulator(Un20ResponseParser())
                     ),
-                    VeroResponseAccumulator(VeroResponseParser()),
-                    VeroEventAccumulator(VeroEventParser()),
-                    Un20ResponseAccumulator(Un20ResponseParser())
+                    MessageOutputStream(
+                        MessageSerializer(PacketParser()),
+                        PacketDispatcher(PacketSerializer())
+                    )
                 ),
-                MessageOutputStream(
-                    MessageSerializer(PacketParser()),
-                    PacketDispatcher(PacketSerializer())
+                RootMessageStream(
+                    RootMessageInputStream(
+                        RootResponseAccumulator(RootResponseParser())
+                    ),
+                    RootMessageOutputStream(
+                        RootMessageSerializer()
+                    )
                 )
             ),
             scannerUiHelper,

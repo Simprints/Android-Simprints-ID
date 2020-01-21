@@ -1,4 +1,4 @@
-package com.simprints.fingerprintscanner.v2.domain.main.message
+package com.simprints.fingerprintscanner.v2.domain
 
 interface Message {
 

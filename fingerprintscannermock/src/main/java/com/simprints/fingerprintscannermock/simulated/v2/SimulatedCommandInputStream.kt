@@ -9,13 +9,21 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroMessageP
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.*
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.VeroMessageType.*
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
+import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
+import com.simprints.fingerprintscanner.v2.domain.root.RootMessageProtocol
+import com.simprints.fingerprintscanner.v2.domain.root.RootMessageType.*
+import com.simprints.fingerprintscanner.v2.domain.root.commands.*
+import com.simprints.fingerprintscanner.v2.incoming.MessageParser
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.PacketToMessageAccumulator
-import com.simprints.fingerprintscanner.v2.incoming.main.message.parsers.MessageParser
 import com.simprints.fingerprintscanner.v2.incoming.main.message.toMessageStream
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.ByteArrayToPacketAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketParser
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketRouter
+import com.simprints.fingerprintscanner.v2.tools.accumulator.ByteArrayAccumulator
+import com.simprints.fingerprintscanner.v2.tools.accumulator.accumulateAndTakeElements
+import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import io.reactivex.Flowable
+import io.reactivex.schedulers.Schedulers
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
@@ -31,6 +39,14 @@ class SimulatedCommandInputStream {
             ByteArrayToPacketAccumulator(PacketParser())
         ).also { it.connect(inputStream) }
 
+    val rootCommands: Flowable<RootCommand> =
+        inputStream
+            .toFlowable()
+            .accumulateAndTakeElements(RootCommandAccumulator(RootCommandParser()))
+            .subscribeOn(Schedulers.io())
+            .publish()
+            .autoConnect()
+
     val veroCommands: Flowable<VeroCommand> = router.incomingPacketChannels[Channel.Remote.VeroServer]?.toMessageStream(VeroCommandAccumulator(VeroCommandParser()))
         ?: throw IllegalStateException()
     val un20Commands: Flowable<Un20Command> = router.incomingPacketChannels[Channel.Remote.Un20Server]?.toMessageStream(Un20CommandAccumulator(Un20CommandParser()))
@@ -41,9 +57,30 @@ class SimulatedCommandInputStream {
         outputStream.flush()
     }
 
+    class RootCommandAccumulator(rootCommandParser: RootCommandParser) : ByteArrayAccumulator<ByteArray, RootCommand>(
+        fragmentAsByteArray = { it },
+        canComputeElementLength = { bytes -> bytes.size >= RootMessageProtocol.HEADER_SIZE },
+        computeElementLength = { bytes -> RootMessageProtocol.getTotalLengthFromHeader(bytes.sliceArray(RootMessageProtocol.HEADER_INDICES)) },
+        buildElement = { bytes -> rootCommandParser.parse(bytes) }
+    )
+
     class VeroCommandAccumulator(veroCommandParser: VeroCommandParser) : PacketToMessageAccumulator<VeroCommand>(VeroMessageProtocol, veroCommandParser)
 
     class Un20CommandAccumulator(un20CommandParser: Un20CommandParser) : PacketToMessageAccumulator<Un20Command>(Un20MessageProtocol, un20CommandParser)
+
+    class RootCommandParser : MessageParser<RootCommand> {
+
+        override fun parse(messageBytes: ByteArray): RootCommand =
+            RootMessageProtocol.getDataBytes(messageBytes).let { data ->
+                when (RootMessageProtocol.getMessageType(messageBytes)) {
+                    ENTER_MAIN_MODE -> EnterMainModeCommand.fromBytes(data)
+                    ENTER_CYPRESS_OTA_MODE -> EnterCypressOtaModeCommand.fromBytes(data)
+                    ENTER_STM_OTA_MODE -> EnterStmOtaModeCommand.fromBytes(data)
+                    GET_VERSION -> GetVersionCommand.fromBytes(data)
+                    SET_VERSION -> SetVersionCommand.fromBytes(data)
+                }
+            }
+    }
 
     class VeroCommandParser : MessageParser<VeroCommand> {
 

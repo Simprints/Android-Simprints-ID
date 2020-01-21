@@ -2,8 +2,8 @@ package com.simprints.fingerprintscanner.v2.scanner
 
 import com.simprints.fingerprintscanner.v2.domain.Mode
 import com.simprints.fingerprintscanner.v2.domain.Mode.*
-import com.simprints.fingerprintscanner.v2.domain.main.message.IncomingMessage
-import com.simprints.fingerprintscanner.v2.domain.main.message.OutgoingMessage
+import com.simprints.fingerprintscanner.v2.domain.main.message.IncomingMainMessage
+import com.simprints.fingerprintscanner.v2.domain.main.message.OutgoingMainMessage
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.commands.*
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.*
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.*
@@ -115,7 +115,7 @@ class Scanner(
         scannerTriggerListenerDisposable = subscribeTriggerButtonListeners()
     }
 
-    private inline fun <reified R : IncomingMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMessage): Single<R> =
+    private inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
         mainMessageStream.outgoing.sendMessage(command)
             .andThen(mainMessageStream.incoming.receiveResponse())
 
