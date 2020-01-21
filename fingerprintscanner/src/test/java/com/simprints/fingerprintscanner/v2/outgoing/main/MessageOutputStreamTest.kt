@@ -1,4 +1,4 @@
-package com.simprints.fingerprintscanner.v2.outgoing
+package com.simprints.fingerprintscanner.v2.outgoing.main
 
 import com.simprints.fingerprintscanner.v2.domain.main.message.OutgoingMessage
 import com.simprints.fingerprintscanner.v2.outgoing.main.MessageOutputStream

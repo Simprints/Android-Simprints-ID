@@ -1,4 +1,4 @@
-package com.simprints.fingerprintscanner.v2.incoming
+package com.simprints.fingerprintscanner.v2.incoming.main
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprintscanner.testtools.chunked
@@ -10,7 +10,6 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.Digit
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.GetUn20OnResponse
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Packet
-import com.simprints.fingerprintscanner.v2.incoming.main.MessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.Un20ResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroEventAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroResponseAccumulator
