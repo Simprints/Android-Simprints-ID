@@ -8,6 +8,8 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
+import com.simprints.id.activities.dashboard.cards.project.DashboardProjectDetailsCardDisplayer
+import com.simprints.id.activities.dashboard.cards.project.DashboardProjectDetailsCardDisplayerImpl
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
@@ -276,5 +278,13 @@ open class AppModule {
 
     @Provides
     open fun provideDeviceManager(context: Context): DeviceManager = DeviceManagerImpl(context)
+
+    @Provides
+    open fun provideDashboardProjectDetailsCardDisplayer(
+        context: Context,
+        androidResourcesHelper: AndroidResourcesHelper
+    ): DashboardProjectDetailsCardDisplayer = DashboardProjectDetailsCardDisplayerImpl(
+        context, androidResourcesHelper
+    )
 }
 
