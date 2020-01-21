@@ -26,6 +26,8 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
 
     }
 
+    override val tag: String = PeopleDownSyncDownloaderWorker::class.java.simpleName
+
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var peopleDownSyncDownloaderTask: PeopleDownSyncDownloaderTask
     @Inject lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
@@ -39,13 +41,11 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
         return try {
             getComponent<PeopleDownSyncDownloaderWorker> { it.inject(this) }
             val downSyncOperation = extractSubSyncScopeFromInput()
-            crashlyticsLog("Preparing downSync request for $downSyncOperation")
+            crashlyticsLog("Start - Params: $downSyncOperation")
 
             execute(downSyncOperation)
         } catch (t: Throwable) {
-            logFailure(t)
-
-            resultSetter.failure()
+            fail(t)
         }
     }
 
@@ -56,20 +56,17 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
                 id.toString(),
                 this)
 
-            logSuccess("DownSync done for $downSyncOperation $totalDownloaded")
-
-            resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to totalDownloaded))
+            success(workDataOf(OUTPUT_DOWN_SYNC to totalDownloaded), "Total downloaded: $totalDownloaded for $downSyncOperation")
         } catch (t: Throwable) {
-            logFailure(t)
             retryOrFailIfCloudIntegrationError(t)
         }
     }
 
     private fun retryOrFailIfCloudIntegrationError(t: Throwable): Result {
         return if (t is SyncCloudIntegrationException) {
-            resultSetter.failure(workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
+            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
         } else {
-            resultSetter.retry()
+            retry(t)
         }
     }
 
@@ -83,15 +80,6 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
             workDataOf(PROGRESS_DOWN_SYNC to count)
         )
     }
-
-    private fun logFailure(t: Throwable) =
-        logFailure<PeopleDownSyncDownloaderWorker>(t)
-
-    private fun logSuccess(message: String) =
-        logSuccess<PeopleDownSyncDownloaderWorker>(message)
-
-    private fun crashlyticsLog(message: String) =
-        crashReportLog<PeopleDownSyncDownloaderWorker>(message)
 }
 
 fun WorkInfo.extractDownSyncProgress(peopleSyncCache: PeopleSyncCache): Int? {

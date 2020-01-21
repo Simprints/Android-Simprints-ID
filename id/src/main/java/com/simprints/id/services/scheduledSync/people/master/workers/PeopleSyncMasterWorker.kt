@@ -32,6 +32,8 @@ class PeopleSyncMasterWorker(private val appContext: Context,
         const val OUTPUT_LAST_SYNC_ID = "OUTPUT_LAST_SYNC_ID"
     }
 
+    override val tag: String = PeopleSyncMasterWorker::class.java.simpleName
+
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var downSyncWorkerBuilder: PeopleDownSyncWorkersBuilder
     @Inject lateinit var upSyncWorkerBuilder: PeopleUpSyncWorkersBuilder
@@ -58,25 +60,24 @@ class PeopleSyncMasterWorker(private val appContext: Context,
     override suspend fun doWork(): Result {
         return try {
             getComponent<PeopleSyncMasterWorker> { it.inject(this) }
-            crashlyticsLog("Preparing master work")
+            crashlyticsLog("Start")
 
             return if (!isSyncRunning()) {
                 val chain = upSyncWorkersChain(uniqueSyncId) + downSyncWorkersChain(uniqueSyncId)
                 wm.beginWith(chain).then(lastSyncWorker(uniqueSyncId)).enqueue()
 
                 peopleSyncCache.clearProgresses()
-                logSuccess("Master work done: new id $uniqueSyncId")
                 clearWorkerHistory(uniqueSyncId)
-                resultSetter.success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId))
+                success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId),
+                    "Master work done: new id $uniqueSyncId")
             } else {
                 val lastSyncId = getLastSyncId()
 
-                logSuccess("Master work done: id already exists $lastSyncId")
-                resultSetter.success(workDataOf(OUTPUT_LAST_SYNC_ID to lastSyncId))
+                success(workDataOf(OUTPUT_LAST_SYNC_ID to lastSyncId),
+                    "Master work done: id already exists $lastSyncId")
             }
         } catch (t: Throwable) {
-            logFailure(t)
-            resultSetter.failure()
+            fail(t)
         }
     }
 
@@ -123,13 +124,4 @@ class PeopleSyncMasterWorker(private val appContext: Context,
     private fun getWorkInfoForRunningSyncWorkers(): List<WorkInfo>? {
         return syncWorkers?.filter { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }
     }
-
-    private fun logFailure(t: Throwable) =
-        logFailure<PeopleSyncMasterWorker>(t)
-
-    private fun logSuccess(message: String) =
-        logSuccess<PeopleSyncMasterWorker>(message)
-
-    private fun crashlyticsLog(message: String) =
-        crashReportLog<PeopleSyncMasterWorker>(message)
 }

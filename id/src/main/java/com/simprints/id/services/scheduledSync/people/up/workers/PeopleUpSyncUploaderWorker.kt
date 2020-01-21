@@ -22,6 +22,8 @@ import javax.inject.Inject
 @InternalCoroutinesApi
 class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
+    override val tag: String = PeopleUpSyncUploaderWorker::class.java.simpleName
+
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var personLocalDataSource: PersonLocalDataSource
     @Inject lateinit var personRemoteDataSource: PersonRemoteDataSource
@@ -32,7 +34,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
     override suspend fun doWork(): Result {
         return try {
             getComponent<PeopleUpSyncUploaderWorker> { it.inject(this) }
-            crashlyticsLog("Preparing upSync")
+            crashlyticsLog("Start")
 
             val task = PeopleUpSyncUploaderTask(
                 loginInfoManager, personLocalDataSource, personRemoteDataSource,
@@ -42,20 +44,17 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
             )
 
             val totalUploaded = task.execute(this.id.toString(), this)
-            logSuccess("Upsync task done $totalUploaded")
-
-            resultSetter.success(workDataOf(OUTPUT_UP_SYNC to totalUploaded))
+            success(workDataOf(OUTPUT_UP_SYNC to totalUploaded), "Total uploaded: $totalUploaded")
         } catch (t: Throwable) {
-            logFailure(t)
             retryOrFailIfCloudIntegrationError(t)
         }
     }
 
     private fun retryOrFailIfCloudIntegrationError(t: Throwable): Result {
         return if (t is SyncCloudIntegrationException) {
-            resultSetter.failure(workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
+            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
         } else {
-            resultSetter.retry()
+            retry(t)
         }
     }
 
@@ -64,15 +63,6 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
             workDataOf(PROGRESS_UP_SYNC to count)
         )
     }
-
-    private fun logFailure(t: Throwable) =
-        logFailure<PeopleUpSyncUploaderWorker>(t)
-
-    private fun logSuccess(message: String) =
-        logSuccess<PeopleUpSyncUploaderWorker>(message)
-
-    private fun crashlyticsLog(message: String) =
-        crashReportLog<PeopleUpSyncUploaderWorker>(message)
 
     companion object {
         const val PATIENT_UPLOAD_BATCH_SIZE = 80
