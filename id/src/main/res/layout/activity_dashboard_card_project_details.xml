@@ -20,14 +20,14 @@
             style="@style/DashboardCardStyleTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:text="World domination project" />
+            tools:text="Cohesu Project" />
 
         <TextView
             android:id="@+id/dashboard_project_details_card_current_user"
             style="@style/SimprintsStyle.TextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:text="Current User: Pinky and the Brain" />
+            tools:text="Current User: Some User" />
 
         <TextView
             android:id="@+id/dashboard_project_details_card_scanner_used"
