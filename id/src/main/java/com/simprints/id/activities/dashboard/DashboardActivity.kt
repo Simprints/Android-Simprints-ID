@@ -10,11 +10,13 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
-import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.activity_dashboard_card_project_details.*
@@ -26,7 +28,9 @@ import javax.inject.Inject
 class DashboardActivity : AppCompatActivity() {
 
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
-    @Inject lateinit var dashboardProjectDetailsRepository: DashboardProjectDetailsRepository
+    @Inject lateinit var projectRepository: ProjectRepository
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var projectDetailsCardDisplayer: DashboardProjectDetailsCardDisplayer
 
     lateinit var viewModel: DashboardViewModel
@@ -79,7 +83,9 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     private fun setupViewModel() {
-        viewModelFactory = DashboardViewModelFactory(dashboardProjectDetailsRepository)
+        viewModelFactory = DashboardViewModelFactory(
+            projectRepository, loginInfoManager, preferencesManager
+        )
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(
             DashboardViewModel::class.java
