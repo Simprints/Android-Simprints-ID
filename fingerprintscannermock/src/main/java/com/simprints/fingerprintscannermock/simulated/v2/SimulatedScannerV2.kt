@@ -7,15 +7,14 @@ import com.simprints.fingerprintscanner.v2.domain.message.vero.events.TriggerBut
 import com.simprints.fingerprintscanner.v2.domain.message.vero.events.Un20StateChangeEvent
 import com.simprints.fingerprintscanner.v2.domain.message.vero.models.DigitalValue
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
-import com.simprints.fingerprintscannermock.simulated.common.ScannerState
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedScanner
 import io.reactivex.Flowable
 import io.reactivex.rxkotlin.subscribeBy
 import java.io.OutputStream
 
 class SimulatedScannerV2(simulatedScannerManager: SimulatedScannerManager,
-                         scannerState: ScannerState = ScannerState())
-    : SimulatedScanner(simulatedScannerManager, scannerState) {
+                         val scannerState: SimulatedScannerStateV2 = SimulatedScannerStateV2())
+    : SimulatedScanner(simulatedScannerManager) {
 
     private lateinit var returnStream: OutputStream
 

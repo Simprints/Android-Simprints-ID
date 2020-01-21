@@ -6,6 +6,9 @@ import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Response
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.CaptureFingerprintCommand
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetImageCommand
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetTemplateCommand
+import com.simprints.fingerprintscanner.v2.domain.message.un20.models.CaptureFingerprintResult
+import com.simprints.fingerprintscanner.v2.domain.message.un20.models.ImageData
+import com.simprints.fingerprintscanner.v2.domain.message.un20.models.TemplateData
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.CaptureFingerprintResponse
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetImageResponse
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetTemplateResponse
@@ -20,6 +23,7 @@ import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.SetSmil
 import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.SetUn20OnResponse
 import com.simprints.fingerprintscanner.v2.incoming.MessageInputStream
 import com.simprints.fingerprintscanner.v2.outgoing.MessageOutputStream
+import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.BackpressureStrategy
@@ -121,11 +125,11 @@ class ScannerTest {
         scanner.connect(mock(), mock())
 
         val smileLedState = SmileLedState(
-            LedState(LedMode.ON, 0x00, 0x00 ,0x04),
-            LedState(LedMode.ON, 0x00, 0x00 ,0x04),
-            LedState(LedMode.ON, 0x00, 0x00 ,0x04),
-            LedState(LedMode.ON, 0x00, 0x00 ,0x04),
-            LedState(LedMode.ON, 0x00, 0x00 ,0x04)
+            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04)
         )
 
         scanner.setSmileLedState(smileLedState).testSubscribe().awaitAndAssertSuccess()
@@ -144,7 +148,7 @@ class ScannerTest {
         val mockMessageOutputStream = setupMock<MessageOutputStream> {
             whenThis { sendMessage(isA<CaptureFingerprintCommand>()) } then {
                 Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResponse.ResponseCode.OK))
+                    responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResult.OK))
                 }
             }
         }
@@ -169,7 +173,7 @@ class ScannerTest {
         val mockMessageOutputStream = setupMock<MessageOutputStream> {
             whenThis { sendMessage(isA<CaptureFingerprintCommand>()) } then {
                 Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResponse.ResponseCode.OK))
+                    responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResult.OK))
                 }
             }
         }
@@ -185,6 +189,7 @@ class ScannerTest {
     @Test
     fun scanner_acquireTemplateWithUn20On_receivesTemplate() {
         val template = byteArrayOf(0x10, 0x20, 0x30, 0x40)
+        val expectedResponseData = byteArrayOf(template)
 
         val responseSubject = PublishSubject.create<Un20Response>()
 
@@ -196,7 +201,7 @@ class ScannerTest {
         val mockMessageOutputStream = setupMock<MessageOutputStream> {
             whenThis { sendMessage(isA<GetTemplateCommand>()) } then {
                 Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(GetTemplateResponse(Scanner.DEFAULT_TEMPLATE_TYPE, template))
+                    responseSubject.onNext(GetTemplateResponse(TemplateData(Scanner.DEFAULT_TEMPLATE_TYPE, template)))
                 }
             }
         }
@@ -209,12 +214,16 @@ class ScannerTest {
         val testObserver = scanner.acquireTemplate().testSubscribe()
         testObserver.awaitAndAssertSuccess()
         testObserver.assertValueCount(1)
-        assertThat(testObserver.values().first()).isEqualTo(template)
+        testObserver.values().first().let {
+            assertThat(byteArrayOf(it.template)).isEqualTo(expectedResponseData)
+        }
+
     }
 
     @Test
     fun scanner_acquireImageWithUn20On_receivesImage() {
         val image = byteArrayOf(0x10, 0x20, 0x30, 0x40)
+        val crcCheck = byteArrayOf(0x01, 0x02)
 
         val responseSubject = PublishSubject.create<Un20Response>()
 
@@ -226,7 +235,7 @@ class ScannerTest {
         val mockMessageOutputStream = setupMock<MessageOutputStream> {
             whenThis { sendMessage(isA<GetImageCommand>()) } then {
                 Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(GetImageResponse(Scanner.DEFAULT_IMAGE_FORMAT, image))
+                    responseSubject.onNext(GetImageResponse(ImageData(Scanner.DEFAULT_IMAGE_FORMAT, image, crcCheck)))
                 }
             }
         }
@@ -239,6 +248,6 @@ class ScannerTest {
         val testObserver = scanner.acquireImage().testSubscribe()
         testObserver.awaitAndAssertSuccess()
         testObserver.assertValueCount(1)
-        assertThat(testObserver.values().first()).isEqualTo(image)
+        assertThat(testObserver.values().first().image).isEqualTo(image)
     }
 }

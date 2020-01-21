@@ -11,7 +11,6 @@ import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSuppo
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
-import com.simprints.fingerprintscanner.v2.tools.primitives.unsignedToInt
 import io.reactivex.Completable
 import io.reactivex.Observer
 import io.reactivex.Single
@@ -59,16 +58,19 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     override fun sensorShutDown(): Completable = scannerV2.turnUn20OffAndAwaitStateChangeEvent()
 
     override fun captureFingerprint(timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
-        scannerV2.captureFingerprint()
-            .andThen(scannerV2.getImageQuality())
-            .flatMap {
-                imageQuality -> scannerV2.acquireTemplate().map { template -> CaptureFingerprintResponse(template, imageQuality.unsignedToInt()) }
+        scannerV2.captureFingerprint().ignoreElement() // TODO : Add in error propagation for no finger detected etc.
+            .andThen(scannerV2.getImageQualityScore())
+            .flatMap { imageQuality ->
+                scannerV2.acquireTemplate()
+                    .map { templateData ->
+                        CaptureFingerprintResponse(templateData.template, imageQuality)
+                    }
             }
 
     override fun acquireImage(): Single<AcquireImageResponse> =
         scannerV2.acquireImage()
             .map { imageBytes ->
-                AcquireImageResponse(imageBytes)
+                AcquireImageResponse(imageBytes.image)
             }
 
     override fun setUiIdle(): Completable = scannerV2.setSmileLedState(scannerUiHelper.idleLedState())

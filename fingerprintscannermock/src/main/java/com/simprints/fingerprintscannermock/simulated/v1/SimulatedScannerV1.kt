@@ -2,13 +2,12 @@ package com.simprints.fingerprintscannermock.simulated.v1
 
 import com.simprints.fingerprintscanner.v1.Message
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
-import com.simprints.fingerprintscannermock.simulated.common.ScannerState
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedScanner
 import java.io.OutputStream
 
 class SimulatedScannerV1(simulatedScannerManager: SimulatedScannerManager,
-                         scannerState: ScannerState = ScannerState())
-    : SimulatedScanner(simulatedScannerManager, scannerState) {
+                         val scannerState: SimulatedScannerStateV1 = SimulatedScannerStateV1())
+    : SimulatedScanner(simulatedScannerManager) {
 
     private val responseHelper = SimulatedResponseHelperV1(simulatedScannerManager, this)
 

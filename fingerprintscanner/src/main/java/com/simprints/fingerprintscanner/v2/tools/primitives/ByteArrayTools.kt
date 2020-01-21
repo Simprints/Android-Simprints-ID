@@ -9,6 +9,7 @@ fun byteArrayOf(vararg elements: Any): ByteArray {
         when (it) {
             is Byte -> bytes.add(it)
             is Int -> bytes.add(it.toByte())
+            is ByteArray -> bytes.addAll(it.toList())
             else -> throw IllegalArgumentException("Must provide either Byte or Int for byteArrayOf literal")
         }
     }
