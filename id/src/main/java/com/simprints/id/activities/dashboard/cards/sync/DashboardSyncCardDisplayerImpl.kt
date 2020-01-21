@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard.cards.sync
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.view.View.GONE
@@ -64,87 +63,67 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
         }
     }
 
-    @SuppressLint("ResourceAsColor")
     private fun prepareSyncCompleteView(syncCardState: SyncComplete): View =
-        viewForCompleteState.apply {
+        withVisible(viewForCompleteState) {
             progressCardConnectingProgress().visibility = GONE
-            with(progressCardSyncProgress()) {
-                visibility = VISIBLE
+            withVisible(progressCardSyncProgress()) {
                 progress = 100
             }
-            with(progressCardStateText()) {
-                visibility = VISIBLE
-                setTextColor(R.color.simprints_green)
+            withVisible(progressCardStateText()) {
+                setTextColor(androidResourcesHelper.getColorStateList(R.color.simprints_green))
                 text = androidResourcesHelper.getString(R.string.dashboard_sync_card_complete)
             }
             displayLastSyncTime(syncCardState, lastSyncText())
-            visibility = VISIBLE
         }
 
 
     private fun prepareSyncConnectingView(syncCardState: SyncConnecting): View =
-        viewForConnectingState.apply {
+        withVisible(viewForConnectingState) {
             progressCardConnectingProgress().visibility = VISIBLE
-            with(progressCardSyncProgress()) {
-                visibility = VISIBLE
-                progress = (100 * (syncCardState.progress.toFloat() / syncCardState.total.toFloat())).toInt()
-            }
-            with(progressCardStateText()) {
-                visibility = VISIBLE
+            setPercentageInProgressBar(progressCardSyncProgress(), syncCardState.progress, syncCardState.total)
+            withVisible(progressCardStateText()) {
                 text = androidResourcesHelper.getString(R.string.dashboard_sync_card_connecting)
                 textColor = context.getColorResCompat(android.R.attr.textColorPrimary)
             }
 
             displayLastSyncTime(syncCardState, lastSyncText())
-            visibility = VISIBLE
         }
 
-
     private fun prepareProgressView(syncCardState: SyncProgress): View =
-        viewForProgressState.apply {
+        withVisible(viewForProgressState) {
             progressCardConnectingProgress().visibility = GONE
-            with(progressCardSyncProgress()) {
-                visibility = VISIBLE
-                progress = (100 * (syncCardState.progress.toFloat() / syncCardState.total.toFloat())).toInt()
-            }
-            with(progressCardStateText()) {
-                visibility = VISIBLE
+            setPercentageInProgressBar(progressCardSyncProgress(), syncCardState.progress, syncCardState.total)
+
+            withVisible(progressCardStateText()) {
                 text = androidResourcesHelper.getString(R.string.dashboard_sync_card_progress, arrayOf("${syncCardState.progress}/${syncCardState.total}"))
                 textColor = context.getColorResCompat(android.R.attr.textColorPrimary)
             }
             displayLastSyncTime(syncCardState, lastSyncText())
-
-            visibility = VISIBLE
         }
 
     private fun prepareSyncOfflineView(syncCardState: DashboardSyncCardState): View =
-        viewForOfflineState.apply {
+        withVisible(viewForOfflineState) {
             displayLastSyncTime(syncCardState, lastSyncText())
-            visibility = VISIBLE
         }
 
     private fun prepareNoModulesStateView(syncCardState: DashboardSyncCardState): View =
-        viewForNoModulesState.apply {
+        withVisible(viewForNoModulesState) {
             displayLastSyncTime(syncCardState, lastSyncText())
-            visibility = VISIBLE
         }
 
     private fun prepareTryAgainStateView(syncCardState: DashboardSyncCardState): View =
-        viewForTryAgainState.apply {
+        withVisible(viewForTryAgainState) {
             displayLastSyncTime(syncCardState, lastSyncText())
-            visibility = VISIBLE
         }
 
     private fun prepareSyncDefaultStateView(syncCardState: DashboardSyncCardState): View =
-        viewForDefaultState.apply {
+        withVisible(viewForDefaultState) {
             displayLastSyncTime(syncCardState, lastSyncText())
-            visibility = VISIBLE
         }
 
     private fun prepareSyncFailedStateView(syncCardState: DashboardSyncCardState): View =
-        viewForSyncFailedState.apply {
+        withVisible(viewForSyncFailedState) {
             displayLastSyncTime(syncCardState, lastSyncText())
-            visibility = VISIBLE
         }
 
     private fun displayLastSyncTime(syncCardState: DashboardSyncCardState, textView: TextView) {
@@ -155,6 +134,24 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     private fun removeOldViewState() {
         root.removeAllViews()
     }
+
+    private inline fun <T : View> withVisible(view: T, block: T.() -> Unit): T =
+        view.apply {
+            block(view)
+            visibility = VISIBLE
+        }
+
+    private fun setPercentageInProgressBar(progressBar: ProgressBar,
+                                           progressValue: Int,
+                                           totalValue: Int) {
+        withVisible(progressBar) {
+            progress = getPercentageForProgress(progressValue, totalValue)
+        }
+    }
+
+    private fun getPercentageForProgress(progress: Int, total: Int) =
+        (100 * (progress.toFloat() / total.toFloat())).toInt()
+
 
     private fun View.progressCardConnectingProgress() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)
     private fun View.progressCardSyncProgress() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_sync_progress_bar)

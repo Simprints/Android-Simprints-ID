@@ -4,21 +4,21 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import javax.inject.Inject
-import androidx.lifecycle.Observer
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -27,8 +27,8 @@ class DashboardActivity : AppCompatActivity() {
     @Inject lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
     @Inject lateinit var peopleSyncManager: PeopleSyncManager
 
-    lateinit var viewModel: DashboardViewModel
-    lateinit var viewModelFactory: DashboardViewModelFactory
+    private lateinit var viewModel: DashboardViewModel
+    private lateinit var viewModelFactory: DashboardViewModelFactory
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
