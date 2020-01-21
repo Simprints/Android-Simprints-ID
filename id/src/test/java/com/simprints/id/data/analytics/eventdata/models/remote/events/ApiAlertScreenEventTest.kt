@@ -167,12 +167,4 @@ class ApiAlertScreenEventTest {
         assertThat(fromDomainToApi(domain)).isEqualTo(api)
     }
 
-    @Test
-    fun rootedDevice_fromDomainToApi() {
-        val domain = AlertScreenEvent.AlertScreenEventType.ROOTED_DEVICE
-        val api = ApiAlertScreenEvent.ApiAlertScreenEvent.UNEXPECTED_ERROR
-
-        assertThat(fromDomainToApi(domain)).isEqualTo(api)
-    }
-
 }
