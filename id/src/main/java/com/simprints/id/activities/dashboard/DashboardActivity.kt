@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
-import com.simprints.id.activities.consent.ConsentViewModel
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -19,7 +18,6 @@ import javax.inject.Inject
 
 class DashboardActivity : AppCompatActivity() {
 
-
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     lateinit var viewModel: DashboardViewModel
     private val viewModelFactory = DashboardViewModelFactory()
@@ -27,7 +25,6 @@ class DashboardActivity : AppCompatActivity() {
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
         private const val LOGOUT_RESULT_CODE = 1
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,4 +83,5 @@ class DashboardActivity : AppCompatActivity() {
         startActivity(Intent(this, RequestLoginActivity::class.java))
         finish()
     }
+
 }
