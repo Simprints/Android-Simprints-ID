@@ -1,12 +1,16 @@
 package com.simprints.fingerprintscanner.v2.incoming.main.packet
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprintscanner.testtools.*
+import com.simprints.fingerprintscanner.testtools.hollowPacketWithRawBytes
+import com.simprints.fingerprintscanner.testtools.reduceString
+import com.simprints.fingerprintscanner.testtools.stripWhiteSpaceToLowercase
+import com.simprints.fingerprintscanner.testtools.toHexStrings
+import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
 import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
 import com.simprints.testtools.common.syntax.setupMock
 import com.simprints.testtools.common.syntax.whenThis
-import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
 import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.rxkotlin.toFlowable
 import org.junit.Test

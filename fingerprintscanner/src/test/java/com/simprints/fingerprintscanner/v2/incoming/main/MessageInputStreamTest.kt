@@ -1,7 +1,6 @@
 package com.simprints.fingerprintscanner.v2.incoming.main
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprintscanner.testtools.chunked
 import com.simprints.fingerprintscanner.testtools.packetWithSourceAndPayload
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.TemplateType
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.GetSupportedTemplateTypesResponse
@@ -17,6 +16,7 @@ import com.simprints.fingerprintscanner.v2.incoming.main.message.parsers.Un20Res
 import com.simprints.fingerprintscanner.v2.incoming.main.message.parsers.VeroEventParser
 import com.simprints.fingerprintscanner.v2.incoming.main.message.parsers.VeroResponseParser
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketRouter
+import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.common.syntax.mock
@@ -128,7 +128,7 @@ class MessageInputStreamTest {
     }
 
     @Test
-    fun messageInputStream_receiveDifferentResponsesThenCorrect_correctlyForwardsResponse() {
+    fun messageInputStream_receiveDifferentResponses_forwardsOnlyCorrectResponse() {
         val messageBytes = "20 11 01 00 00 30 10 01 00 FF 20 10 01 00 FF".hexToByteArray()
         val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Channel.Remote.VeroServer, it) }
         val expectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
