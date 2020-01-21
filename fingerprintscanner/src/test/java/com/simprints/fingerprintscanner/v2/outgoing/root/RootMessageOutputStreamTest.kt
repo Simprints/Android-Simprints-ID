@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.eq
 import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterMainModeCommand
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
+import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.reactive.testSubscribe
@@ -34,6 +35,8 @@ class RootMessageOutputStreamTest {
 
         messageOutputStream.sendMessage(message).test().await()
         outputStream.close()
+
+        testSubscriber.awaitCompletionWithNoErrors()
 
         assertThat(testSubscriber.values().reduce { acc, bytes -> acc + bytes })
             .isEqualTo(packets.reduce { acc, bytes -> acc + bytes })
