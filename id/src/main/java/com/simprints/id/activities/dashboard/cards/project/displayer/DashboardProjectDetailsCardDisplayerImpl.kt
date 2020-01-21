@@ -1,9 +1,10 @@
-package com.simprints.id.activities.dashboard.cards.project
+package com.simprints.id.activities.dashboard.cards.project.displayer
 
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.simprints.id.R
+import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectWrapper
 import com.simprints.id.tools.AndroidResourcesHelper
 

@@ -1,4 +1,4 @@
-package com.simprints.id.activities.dashboard.cards.project
+package com.simprints.id.activities.dashboard.cards.project.displayer
 
 import android.widget.LinearLayout
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectWrapper
