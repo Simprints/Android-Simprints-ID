@@ -16,7 +16,7 @@ class PeopleSyncCacheImpl(ctx: Context) : PeopleSyncCache {
         }
         set(value) {
             field = value
-            edit.putLong(KEY_LAST_SYNC_TIME, -1).apply()
+            edit.putLong(KEY_LAST_SYNC_TIME, value?.time ?: -1).apply()
         }
 
 

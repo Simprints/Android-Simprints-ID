@@ -77,6 +77,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
             progressCardConnectingProgress().visibility = GONE
             withVisible(progressCardSyncProgress()) {
                 progress = 100
+                isIndeterminate = false
                 val green = androidResourcesHelper.getColorStateList(R.color.simprints_green)
                 green?.let {
                     progressDrawable.setColorFilter(it.defaultColor, PorterDuff.Mode.SRC_IN)
