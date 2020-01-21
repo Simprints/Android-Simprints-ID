@@ -11,3 +11,12 @@ data class ScannerState(
     var smileLedState: SmileLedState?,
     var batteryPercentCharge: Int?
 )
+
+fun disconnectedScannerState() =
+    ScannerState(
+        connected = false,
+        mode = null,
+        un20On = null,
+        triggerButtonActive = null,
+        smileLedState = null,
+        batteryPercentCharge = null)
