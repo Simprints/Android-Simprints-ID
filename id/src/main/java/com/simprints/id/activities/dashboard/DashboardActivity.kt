@@ -10,13 +10,11 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
+import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.activity_dashboard_card_project_details.*
@@ -28,9 +26,7 @@ import javax.inject.Inject
 class DashboardActivity : AppCompatActivity() {
 
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
-    @Inject lateinit var projectRepository: ProjectRepository
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var dashboardProjectDetailsRepository: DashboardProjectDetailsRepository
     @Inject lateinit var projectDetailsCardDisplayer: DashboardProjectDetailsCardDisplayer
 
     lateinit var viewModel: DashboardViewModel
@@ -69,14 +65,21 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.app_menu, menu)
+
+        menu?.findItem(R.id.menuSettings)?.title = androidResourcesHelper.getString(R.string.menu_settings)
+        menu?.findItem(R.id.menuPrivacyNotice)?.title = androidResourcesHelper.getString(R.string.menu_privacy_notice)
+
+        return true
+    }
+
     private fun setupCards() {
         projectDetailsCardDisplayer.initRoot(dashboard_project_details_card)
     }
 
     private fun setupViewModel() {
-        viewModelFactory = DashboardViewModelFactory(
-            projectRepository, loginInfoManager, preferencesManager
-        )
+        viewModelFactory = DashboardViewModelFactory(dashboardProjectDetailsRepository)
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(
             DashboardViewModel::class.java
@@ -86,15 +89,6 @@ class DashboardActivity : AppCompatActivity() {
     private fun setupActionBar() {
         dashboardToolbar.title = androidResourcesHelper.getString(R.string.dashboard_label)
         setSupportActionBar(dashboardToolbar)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.app_menu, menu)
-
-        menu?.findItem(R.id.menuSettings)?.title = androidResourcesHelper.getString(R.string.menu_settings)
-        menu?.findItem(R.id.menuPrivacyNotice)?.title = androidResourcesHelper.getString(R.string.menu_privacy_notice)
-
-        return true
     }
 
     private fun setMenuItemClickListener() {
