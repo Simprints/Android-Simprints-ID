@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
-import com.simprints.id.activities.dashboard.cards.project.DashboardProjectDetailsCardDisplayer
+import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
