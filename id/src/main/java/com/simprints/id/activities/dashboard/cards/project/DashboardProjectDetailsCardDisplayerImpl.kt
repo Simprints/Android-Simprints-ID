@@ -25,7 +25,7 @@ class DashboardProjectDetailsCardDisplayerImpl(
     }
 
     private fun inflateCard(root: LinearLayout) = context.layoutInflater.inflate(
-        R.layout.activity_login, root, false
+        R.layout.activity_dashboard_card_project_details, root, false
     )
 
 }
