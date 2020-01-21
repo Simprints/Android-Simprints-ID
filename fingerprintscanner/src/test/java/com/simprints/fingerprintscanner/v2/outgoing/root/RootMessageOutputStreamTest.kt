@@ -40,6 +40,5 @@ class RootMessageOutputStreamTest {
 
         assertThat(testSubscriber.values().reduce { acc, bytes -> acc + bytes })
             .isEqualTo(packets.reduce { acc, bytes -> acc + bytes })
-        assertThat(testSubscriber.valueCount()).isEqualTo(packets.size)
     }
 }
