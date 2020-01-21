@@ -11,12 +11,13 @@ import android.text.style.ForegroundColorSpan
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncOperationLocalDataSource
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.*
 import kotlinx.android.synthetic.main.activity_debug.*
 import javax.inject.Inject
 
@@ -37,7 +38,7 @@ class DebugActivity : AppCompatActivity() {
         setContentView(R.layout.activity_debug)
 
         peopleSyncManager.getLastSyncState().observe(this, Observer {
-            val states = (it.downSyncStates.map { it.state } + it.upSyncStates.map { it.state })
+            val states = (it.downSyncWorkersInfo.map { it.state } + it.upSyncWorkersInfo.map { it.state })
             val message =
                 "${it.syncId.takeLast(3)} - " +
                 "${states.toDebugActivitySyncState().name} - " +
@@ -93,12 +94,12 @@ class DebugActivity : AppCompatActivity() {
         return spannableString
     }
 
-    private fun List<WorkInfo.State>.toDebugActivitySyncState(): DebugActivitySyncState =
+    private fun List<PeopleSyncWorkerState>.toDebugActivitySyncState(): DebugActivitySyncState =
         when {
             isEmpty() -> DebugActivitySyncState.NOT_RUNNING
-            this.any { it == WorkInfo.State.RUNNING } -> DebugActivitySyncState.RUNNING
-            this.any { it == WorkInfo.State.ENQUEUED } -> DebugActivitySyncState.CONNECTING
-            this.all { it == WorkInfo.State.SUCCEEDED } -> DebugActivitySyncState.SUCCESS
+            this.any { it is Running } -> DebugActivitySyncState.RUNNING
+            this.any { it is Enqueued } -> DebugActivitySyncState.CONNECTING
+            this.all { it is Succeeded } -> DebugActivitySyncState.SUCCESS
             else -> DebugActivitySyncState.FAILED
         }
 

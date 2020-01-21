@@ -1,8 +1,5 @@
 package com.simprints.id.services.scheduledSync.people.master
 
-import androidx.work.WorkInfo
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.Companion.TAG_PEOPLE_SYNC_WORKER_TYPE
-
 
 enum class PeopleSyncWorkerType {
     DOWN_COUNTER,
@@ -17,6 +14,3 @@ enum class PeopleSyncWorkerType {
         fun tagForType(type: PeopleSyncWorkerType) = "${TAG_PEOPLE_SYNC_WORKER_TYPE}${type}"
     }
 }
-
-fun WorkInfo.extractSyncWorkerType() =
-    this.tags.first { it.contains(TAG_PEOPLE_SYNC_WORKER_TYPE) }?.removePrefix(TAG_PEOPLE_SYNC_WORKER_TYPE)

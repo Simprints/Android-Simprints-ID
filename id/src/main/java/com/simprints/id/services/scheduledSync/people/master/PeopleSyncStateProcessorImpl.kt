@@ -5,20 +5,23 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
 import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.models.fromDownSync
 import com.simprints.id.data.db.common.models.totalCount
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.services.scheduledSync.people.down.workers.extractDownSyncProgress
 import com.simprints.id.services.scheduledSync.people.down.workers.getDownCountsFromOutput
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_SCHEDULED_AT
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncState.WorkerState
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.*
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.SyncWorkersLiveDataProvider
+import com.simprints.id.services.scheduledSync.people.master.internal.SyncWorkersLiveDataProviderImpl
+import com.simprints.id.services.scheduledSync.people.master.internal.didFailBecauseCloudIntegration
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState.SyncWorkerInfo
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.*
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.Companion.fromWorkInfo
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.TAG_SCHEDULED_AT
 import com.simprints.id.services.scheduledSync.people.up.workers.extractUpSyncProgress
 import com.simprints.id.services.scheduledSync.people.up.workers.getUpCountsFromOutput
 import timber.log.Timber
@@ -93,17 +96,17 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
         return counter?.getUpCountsFromOutput()?.totalCount()
     }
 
-    private fun List<WorkInfo>.upSyncUploadersStates(): List<WorkerState> =
-        this.filterByTags(tagForType(UPLOADER)).groupBy { it }.values.flatten().map { WorkerState(UPLOADER, it.state) }
+    private fun List<WorkInfo>.upSyncUploadersStates(): List<SyncWorkerInfo> =
+        filterByTags(tagForType(UPLOADER)).map { SyncWorkerInfo(UPLOADER, fromWorkInfo(it.state, it.didFailBecauseCloudIntegration())) }
 
-    private fun List<WorkInfo>.downSyncDownloadersStates(): List<WorkerState> =
-        this.filterByTags(tagForType(DOWNLOADER)).groupBy { it }.values.flatten().map { WorkerState(DOWNLOADER, it.state) }
+    private fun List<WorkInfo>.downSyncDownloadersStates(): List<SyncWorkerInfo> =
+        filterByTags(tagForType(DOWNLOADER)).map { SyncWorkerInfo(DOWNLOADER, fromWorkInfo(it.state, it.didFailBecauseCloudIntegration())) }
 
-    private fun List<WorkInfo>.downSyncCountersStates(): List<WorkerState> =
-        this.filterByTags(tagForType(DOWN_COUNTER)).groupBy { it }.values.flatten().map { WorkerState(DOWN_COUNTER, it.state) }
+    private fun List<WorkInfo>.downSyncCountersStates(): List<SyncWorkerInfo> =
+        filterByTags(tagForType(DOWN_COUNTER)).map { SyncWorkerInfo(DOWN_COUNTER, fromWorkInfo(it.state, it.didFailBecauseCloudIntegration())) }
 
-    private fun List<WorkInfo>.upSyncCountersStates(): List<WorkerState> =
-        this.filterByTags(tagForType(UP_COUNTER)).groupBy { it }.values.flatten().map { WorkerState(UP_COUNTER, it.state) }
+    private fun List<WorkInfo>.upSyncCountersStates(): List<SyncWorkerInfo> =
+        filterByTags(tagForType(UP_COUNTER)).map { SyncWorkerInfo(UP_COUNTER, fromWorkInfo(it.state, it.didFailBecauseCloudIntegration())) }
 
     private fun List<WorkInfo>.calculateProgressForDownSync(): Int {
         val downWorkers = this.filterByTags(tagForType(DOWNLOADER))
@@ -131,22 +134,4 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
         }.sortedBy { it ->
             it.tags.first { it.contains(TAG_SCHEDULED_AT) }
         }
-}
-
-interface SyncWorkersLiveDataProvider {
-    fun getMasterWorkersLiveData(): LiveData<List<WorkInfo>>
-    fun getSyncWorkersLiveData(uniqueSyncId: String): LiveData<List<WorkInfo>>
-}
-
-class SyncWorkersLiveDataProviderImpl(val ctx: Context) : SyncWorkersLiveDataProvider {
-
-    private val wm: WorkManager
-        get() = WorkManager.getInstance(ctx)
-
-
-    override fun getMasterWorkersLiveData(): LiveData<List<WorkInfo>> =
-        wm.getWorkInfosByTagLiveData(MASTER_SYNC_SCHEDULERS)
-
-    override fun getSyncWorkersLiveData(uniqueSyncId: String): LiveData<List<WorkInfo>> =
-        wm.getWorkInfosByTagLiveData("${TAG_MASTER_SYNC_ID}${uniqueSyncId}")
 }

@@ -2,6 +2,7 @@ package com.simprints.id.services.scheduledSync.people.common
 
 import android.content.Context
 import androidx.work.CoroutineWorker
+import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager

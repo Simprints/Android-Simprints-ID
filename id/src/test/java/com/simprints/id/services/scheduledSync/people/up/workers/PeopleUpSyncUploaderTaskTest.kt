@@ -7,7 +7,7 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncProgressCache
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.assertThrows
 import io.kotlintest.shouldThrow

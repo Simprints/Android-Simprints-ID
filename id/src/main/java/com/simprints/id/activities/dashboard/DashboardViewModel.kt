@@ -2,14 +2,15 @@ package com.simprints.id.activities.dashboard
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import androidx.work.WorkInfo.State.*
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.ModuleSyncScope
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncState
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState.SyncWorkerInfo
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.*
 import com.simprints.id.tools.device.DeviceManager
 import java.util.*
 
@@ -55,7 +56,7 @@ class DashboardViewModel(peopleSyncManager: PeopleSyncManager,
 
     private fun processNewCardStateBasedOnSyncState(syncState: PeopleSyncState?): DashboardSyncCardState =
         syncState?.let {
-            val hasSyncRunRecentlyOrIsRunning = it.downSyncStates.isNotEmpty() && it.upSyncStates.isNotEmpty()
+            val hasSyncRunRecentlyOrIsRunning = it.downSyncWorkersInfo.isNotEmpty() && it.upSyncWorkersInfo.isNotEmpty()
             return if (hasSyncRunRecentlyOrIsRunning) {
                 processRecentSyncState(it)
             } else {
@@ -64,25 +65,29 @@ class DashboardViewModel(peopleSyncManager: PeopleSyncManager,
         } ?: SyncDefault(Date())
 
     private fun processRecentSyncState(syncState: PeopleSyncState): DashboardSyncCardState {
-        val downSyncStates = syncState.downSyncStates
-        val upSyncStates = syncState.upSyncStates
+        val downSyncStates = syncState.downSyncWorkersInfo
+        val upSyncStates = syncState.upSyncWorkersInfo
         val allSyncStates = downSyncStates + upSyncStates
         return when {
             isSyncCompleted(allSyncStates) -> SyncComplete(Date())
             isSyncConnecting(allSyncStates) -> SyncConnecting(Date(), syncState.progress, syncState.total)
+            isSyncFailedBecauseCloudIntegration(allSyncStates) -> SyncFailed(Date())
             isSyncFailed(allSyncStates) -> SyncTryAgain(Date())
             else -> SyncProgress(Date(), syncState.progress, syncState.total)
         }
     }
 
-    private fun isSyncFailed(allSyncStates: List<PeopleSyncState.WorkerState>) =
-        allSyncStates.all { arrayOf(FAILED, BLOCKED, CANCELLED).contains(it.state) }
+    private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<SyncWorkerInfo>) =
+        allSyncStates.all { it.state is Failed && it.state.failedBecauseCloudIntegration }
 
-    private fun isSyncConnecting(allSyncStates: List<PeopleSyncState.WorkerState>) =
-        allSyncStates.any { it.state == ENQUEUED }
+    private fun isSyncFailed(allSyncStates: List<SyncWorkerInfo>) =
+        allSyncStates.all { it.state is Failed || it.state is Blocked || it.state is Cancelled }
 
-    private fun isSyncCompleted(allSyncStates: List<PeopleSyncState.WorkerState>) =
-        allSyncStates.all { it.state == SUCCEEDED }
+    private fun isSyncConnecting(allSyncStates: List<SyncWorkerInfo>) =
+        allSyncStates.any { it.state is Enqueued }
+
+    private fun isSyncCompleted(allSyncStates: List<SyncWorkerInfo>) =
+        allSyncStates.all { it.state is Succeeded }
 
 
     private fun isModuleSelectionRequired() =

@@ -38,7 +38,7 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.response.A
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncState
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.android.runOnActivity
 import com.simprints.testtools.common.di.DependencyRule
@@ -256,16 +256,16 @@ class MockDispatcher : Dispatcher() {
 }
 
 private fun PeopleSyncState.anySyncWorkersStillRunning(): Boolean =
-    downSyncStates.plus(upSyncStates).any { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }
+    downSyncWorkersInfo.plus(upSyncWorkersInfo).any { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }
 
 private fun PeopleSyncState.assertSyncRetries() {
-    assertThat((downSyncStates.plus(upSyncStates)).any { it.state == WorkInfo.State.ENQUEUED }).isTrue()
+    assertThat((downSyncWorkersInfo.plus(upSyncWorkersInfo)).any { it.state == WorkInfo.State.ENQUEUED }).isTrue()
 }
 
 private fun PeopleSyncState.assertSyncSucceeds(total: Int) {
     assertThat(total).isEqualTo(total)
     assertThat(progress).isEqualTo(total)
-    assertThat((downSyncStates.plus(upSyncStates)).all { it.state == WorkInfo.State.SUCCEEDED }).isTrue()
+    assertThat((downSyncWorkersInfo.plus(upSyncWorkersInfo)).all { it.state == WorkInfo.State.SUCCEEDED }).isTrue()
 }
 
 fun Person.fromDomainToGetApi(deleted: Boolean = false): ApiGetPerson =
