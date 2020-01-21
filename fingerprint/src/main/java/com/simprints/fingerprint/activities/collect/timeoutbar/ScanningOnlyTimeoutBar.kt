@@ -3,6 +3,9 @@ package com.simprints.fingerprint.activities.collect.timeoutbar
 import android.content.Context
 import android.os.CountDownTimer
 import android.widget.ProgressBar
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar.Companion.FINISHED_PROGRESS
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar.Companion.INITIAL_PROGRESS
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar.Companion.PROGRESS_INCREMENT
 
 class ScanningOnlyTimeoutBar(
     override val context: Context,
@@ -12,23 +15,23 @@ class ScanningOnlyTimeoutBar(
 
     private var countDownTimer: CountDownTimer? = null
 
-    private var scanningProgress = 0
+    private var scanningProgress = INITIAL_PROGRESS
 
     override fun startTimeoutBar() {
-        progressBar.progress = 0
-        scanningProgress = 0
+        progressBar.progress = INITIAL_PROGRESS
+        scanningProgress = INITIAL_PROGRESS
         countDownTimer = createScanningTimer().also { it.start() }
     }
 
     private fun createScanningTimer(): CountDownTimer =
-        object : CountDownTimer(scanningTimeoutMs, (scanningTimeoutMs / 100)) {
+        object : CountDownTimer(scanningTimeoutMs, (scanningTimeoutMs / FINISHED_PROGRESS)) {
             override fun onTick(millisUntilFinished: Long) {
-                scanningProgress += 1
+                scanningProgress += PROGRESS_INCREMENT
                 progressBar.progress = scanningProgress
             }
 
             override fun onFinish() {
-                progressBar.progress = 100
+                progressBar.progress = FINISHED_PROGRESS
             }
         }
 
@@ -46,7 +49,7 @@ class ScanningOnlyTimeoutBar(
     override fun handleCancelled() {
         countDownTimer?.let {
             it.cancel()
-            progressBar.progress = 0
+            progressBar.progress = INITIAL_PROGRESS
         }
     }
 }

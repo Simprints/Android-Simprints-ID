@@ -13,7 +13,7 @@ class VeroEventParser : MessageParser<VeroEvent> {
             when (VeroMessageProtocol.getMessageType(messageBytes)) {
                 VeroMessageType.UN20_STATE_CHANGE -> Un20StateChangeEvent.fromBytes(data)
                 VeroMessageType.TRIGGER_BUTTON_PRESSED -> TriggerButtonPressedEvent.fromBytes(data)
-                VeroMessageType.GET_FIRMWARE_VERSION,
+                VeroMessageType.GET_STM_FIRMWARE_VERSION,
                 VeroMessageType.GET_UN20_ON,
                 VeroMessageType.SET_UN20_ON,
                 VeroMessageType.GET_TRIGGER_BUTTON_ACTIVE,
@@ -22,8 +22,7 @@ class VeroEventParser : MessageParser<VeroEvent> {
                 VeroMessageType.GET_BLUETOOTH_LED_STATE,
                 VeroMessageType.GET_POWER_LED_STATE,
                 VeroMessageType.SET_SMILE_LED_STATE,
-                VeroMessageType.SET_BLUETOOTH_LED_STATE,
-                VeroMessageType.SET_POWER_LED_STATE -> TODO("exception handling")
+                VeroMessageType.GET_BATTERY_PERCENT_CHARGE -> TODO("exception handling")
             }
         }
 }

@@ -1,12 +1,14 @@
 package com.simprints.fingerprintscannermock.simulated
 
-import com.simprints.fingerprintscannermock.simulated.common.ScannerState
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedFinger
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedScanner
+import com.simprints.fingerprintscannermock.simulated.common.SimulatedScannerState
 import com.simprints.fingerprintscannermock.simulated.common.SimulationSpeedBehaviour
 import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothDevice
 import com.simprints.fingerprintscannermock.simulated.tools.OutputStreamInterceptor
+import com.simprints.fingerprintscannermock.simulated.v1.SimulatedScannerStateV1
 import com.simprints.fingerprintscannermock.simulated.v1.SimulatedScannerV1
+import com.simprints.fingerprintscannermock.simulated.v2.SimulatedScannerStateV2
 import com.simprints.fingerprintscannermock.simulated.v2.SimulatedScannerV2
 import io.reactivex.Observer
 import io.reactivex.observers.DisposableObserver
@@ -16,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class SimulatedScannerManager(
     simulationMode: SimulationMode,
-    scannerState: ScannerState = ScannerState(),
+    scannerState: SimulatedScannerState? = null,
     val simulationSpeedBehaviour: SimulationSpeedBehaviour = SimulationSpeedBehaviour.INSTANT,
     private val simulatedFingers: Array<SimulatedFinger> = SimulatedFinger.person1TwoFingersGoodScan,
     private val pairedScannerAddresses: Set<String> = setOf(DEFAULT_MAC_ADDRESS),
@@ -28,8 +30,10 @@ class SimulatedScannerManager(
 
     private val simulatedScanner: SimulatedScanner =
         when (simulationMode) {
-            SimulationMode.V1 -> SimulatedScannerV1(this, scannerState)
-            SimulationMode.V2 -> SimulatedScannerV2(this, scannerState)
+            SimulationMode.V1 -> SimulatedScannerV1(this, scannerState as? SimulatedScannerStateV1
+                ?: SimulatedScannerStateV1())
+            SimulationMode.V2 -> SimulatedScannerV2(this, scannerState as? SimulatedScannerStateV2
+                ?: SimulatedScannerStateV2())
         }
 
     private val mockFingerIndex = AtomicInteger(0)

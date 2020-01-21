@@ -5,8 +5,7 @@ import com.simprints.fingerprintscannermock.simulated.common.SimulationSpeedBeha
 import com.simprints.fingerprintscannermock.simulated.common.SimulationSpeedBehaviour.REALISTIC
 import java.io.OutputStream
 
-abstract class SimulatedScanner(val scannerManager: SimulatedScannerManager,
-                                var scannerState: ScannerState = ScannerState()) {
+abstract class SimulatedScanner(val scannerManager: SimulatedScannerManager) {
 
     abstract fun handleAppToScannerEvent(bytes: ByteArray, returnStream: OutputStream)
 

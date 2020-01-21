@@ -6,5 +6,6 @@ data class ScannerState(
     var connected: Boolean?,
     var un20On: Boolean?,
     var triggerButtonActive: Boolean?,
-    var smileLedState: SmileLedState?
+    var smileLedState: SmileLedState?,
+    var batteryPercentCharge: Int?
 )
