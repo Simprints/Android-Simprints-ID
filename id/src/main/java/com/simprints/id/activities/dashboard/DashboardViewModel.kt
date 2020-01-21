@@ -17,7 +17,7 @@ class DashboardViewModel(
     private val projectDetailsLiveData = MutableLiveData<DashboardProjectWrapper>()
 
     suspend fun getProjectDetails(): LiveData<DashboardProjectWrapper> {
-        val title = projectRepository.loadAndRefreshCache(
+        val title = projectRepository.loadFromCache(
             loginInfoManager.getSignedInProjectIdOrEmpty()
         )?.name ?: ""
         val lastUser = preferencesManager.lastUserUsed
