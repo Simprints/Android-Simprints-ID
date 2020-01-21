@@ -4,10 +4,11 @@ import com.simprints.fingerprintscanner.v2.domain.root.RootMessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.root.RootMessageType.*
 import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.responses.*
+import com.simprints.fingerprintscanner.v2.incoming.MessageParser
 
-class RootResponseParser {
+class RootResponseParser : MessageParser<RootResponse> {
 
-    fun parse(messageBytes: ByteArray): RootResponse =
+    override fun parse(messageBytes: ByteArray): RootResponse =
         RootMessageProtocol.getDataBytes(messageBytes).let { data ->
             when (RootMessageProtocol.getMessageType(messageBytes)) {
                 ENTER_MAIN_MODE -> EnterMainModeResponse.fromBytes(data)

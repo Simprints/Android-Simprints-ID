@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.outgoing.main.message
 
-import com.simprints.fingerprintscanner.v2.domain.main.message.OutgoingMessage
+import com.simprints.fingerprintscanner.v2.domain.main.message.OutgoingMainMessage
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Command
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroCommand
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
@@ -10,7 +10,7 @@ import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketParser
 
 class MessageSerializer(private val packetParser: PacketParser) {
 
-    fun serialize(message: OutgoingMessage): List<Packet> =
+    fun serialize(message: OutgoingMainMessage): List<Packet> =
         message
             .getBytes()
             .asList()

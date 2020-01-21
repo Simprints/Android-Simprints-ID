@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.incoming.main
 
-import com.simprints.fingerprintscanner.v2.domain.main.message.IncomingMessage
+import com.simprints.fingerprintscanner.v2.domain.main.message.IncomingMainMessage
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Response
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroEvent
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroResponse
@@ -42,7 +42,7 @@ class MessageInputStream(
         packetRouter.disconnect()
     }
 
-    inline fun <reified R : IncomingMessage> receiveResponse(): Single<R> =
+    inline fun <reified R : IncomingMainMessage> receiveResponse(): Single<R> =
         when {
             isSubclass<R, VeroResponse>() -> veroResponses
             isSubclass<R, Un20Response>() -> un20Responses

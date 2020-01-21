@@ -1,4 +1,4 @@
-package com.simprints.fingerprintscannermock.simulated.v2
+package com.simprints.fingerprintscannermock.simulated.v2.response
 
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Command
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Response
@@ -8,6 +8,9 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.*
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.common.RealisticSpeedBehaviour
 import com.simprints.fingerprintscannermock.simulated.common.SimulationSpeedBehaviour
+import com.simprints.fingerprintscannermock.simulated.v2.SimulatedFingerV2
+import com.simprints.fingerprintscannermock.simulated.v2.SimulatedScannerV2
+import com.simprints.fingerprintscannermock.simulated.v2.toV2
 import kotlin.random.Random
 
 class SimulatedUn20ResponseHelper(private val simulatedScannerManager: SimulatedScannerManager,

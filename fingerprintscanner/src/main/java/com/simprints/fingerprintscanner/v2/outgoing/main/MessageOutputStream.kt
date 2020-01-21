@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.outgoing.main
 
-import com.simprints.fingerprintscanner.v2.domain.main.message.OutgoingMessage
+import com.simprints.fingerprintscanner.v2.domain.main.message.OutgoingMainMessage
 import com.simprints.fingerprintscanner.v2.outgoing.OutgoingConnectable
 import com.simprints.fingerprintscanner.v2.outgoing.main.message.MessageSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.main.packet.PacketDispatcher
@@ -11,7 +11,7 @@ class MessageOutputStream(
     private val packetDispatcher: PacketDispatcher
 ) : OutgoingConnectable by packetDispatcher {
 
-    fun sendMessage(message: OutgoingMessage): Completable =
+    fun sendMessage(message: OutgoingMainMessage): Completable =
         messageSerializer.serialize(message).let {
             packetDispatcher.dispatch(it)
         }
