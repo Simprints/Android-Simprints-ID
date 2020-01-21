@@ -35,8 +35,8 @@ class DashboardActivity : AppCompatActivity() {
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository
 
-    lateinit var viewModel: DashboardViewModel
-    lateinit var viewModelFactory: DashboardViewModelFactory
+    private lateinit var viewModel: DashboardViewModel
+    private lateinit var viewModelFactory: DashboardViewModelFactory
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
