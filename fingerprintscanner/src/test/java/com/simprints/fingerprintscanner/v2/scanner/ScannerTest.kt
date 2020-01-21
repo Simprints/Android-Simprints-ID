@@ -18,12 +18,21 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.Set
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.SetUn20OnCommand
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.TriggerButtonPressedEvent
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.*
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.LedState
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.OperationResultCode
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.SmileLedState
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.SetSmileLedStateResponse
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.SetUn20OnResponse
+import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
+import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterMainModeCommand
+import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
 import com.simprints.fingerprintscanner.v2.incoming.main.MessageInputStream
+import com.simprints.fingerprintscanner.v2.incoming.root.RootMessageInputStream
 import com.simprints.fingerprintscanner.v2.outgoing.main.MessageOutputStream
+import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
+import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.testSubscribe
@@ -39,7 +48,8 @@ import java.io.OutputStream
 class ScannerTest {
 
     @Test
-    fun scannerConnect_callsConnectOnMessageStreams() {
+    fun scannerConnectThenEnterMainMode_callsConnectOnMainMessageStreams() {
+
         val mockMessageInputStream = setupMock<MessageInputStream> {
             whenThis { veroEvents } thenReturn Flowable.empty()
         }
@@ -47,8 +57,10 @@ class ScannerTest {
         val mockInputStream = mock<InputStream>()
         val mockOutputStream = mock<OutputStream>()
 
-        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), mock())
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock())
         scanner.connect(mockInputStream, mockOutputStream)
+
+        scanner.enterMainMode().blockingAwait()
 
         verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
         verifyOnce(mockMessageOutputStream) { connect(mockOutputStream) }
@@ -63,8 +75,9 @@ class ScannerTest {
         }
         val mockMessageOutputStream = mock<MessageOutputStream>()
 
-        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), mock())
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock())
         scanner.connect(mock(), mock())
+        scanner.enterMainMode().blockingAwait()
 
         val testObserver = TestObserver<Unit>()
         scanner.triggerButtonListeners.add(testObserver)
@@ -126,11 +139,11 @@ class ScannerTest {
         scanner.connect(mock(), mock())
 
         val smileLedState = SmileLedState(
-            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
-            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
-            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
-            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
-            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04)
+            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04)
         )
 
         scanner.setSmileLedState(smileLedState).testSubscribe().awaitAndAssertSuccess()
@@ -250,5 +263,25 @@ class ScannerTest {
         testObserver.awaitAndAssertSuccess()
         testObserver.assertValueCount(1)
         assertThat(testObserver.values().first().image).isEqualTo(image)
+    }
+
+    private fun setupRootMessageStreamMock(): RootMessageStream {
+
+        val responseSubject = PublishSubject.create<RootResponse>()
+
+        val spyRootMessageInputStream = spy(RootMessageInputStream(mock())).apply {
+            whenThis { connect(anyNotNull()) } thenDoNothing {}
+            whenThis { disconnect() } thenDoNothing {}
+            rootResponseStream = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
+        }
+        val mockRootMessageOutputStream = setupMock<RootMessageOutputStream> {
+            whenThis { sendMessage(isA<EnterMainModeCommand>()) } then {
+                Completable.complete().doAfterTerminate {
+                    responseSubject.onNext(EnterMainModeResponse())
+                }
+            }
+        }
+
+        return RootMessageStream(spyRootMessageInputStream, mockRootMessageOutputStream)
     }
 }
