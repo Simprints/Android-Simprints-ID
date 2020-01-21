@@ -81,5 +81,5 @@ fun ClientApiAlert.fromAlertToAlertTypeEvent(): CoreAlertScreenEventType =
         ClientApiAlert.INVALID_SESSION_ID -> CoreAlertScreenEventType.INVALID_SESSION_ID
         ClientApiAlert.INVALID_USER_ID -> CoreAlertScreenEventType.INVALID_USER_ID
         ClientApiAlert.INVALID_VERIFY_ID -> CoreAlertScreenEventType.INVALID_VERIFY_ID
-        ClientApiAlert.ROOTED_DEVICE -> CoreAlertScreenEventType.ROOTED_DEVICE
+        ClientApiAlert.ROOTED_DEVICE -> CoreAlertScreenEventType.UNEXPECTED_ERROR
     }
