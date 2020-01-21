@@ -17,9 +17,10 @@ import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProc
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.UNIQUE_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.UNIQUE_UP_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.UPLOADED
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.*
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.*
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncCountWorker
@@ -28,26 +29,26 @@ import java.util.*
 
 fun PeopleSyncState.assertConnectingSyncState() {
     assertProgressAndTotal(syncId, total, progress)
-    assertThat(downSyncWorkersInfo.count { it.state == ENQUEUED }).isEqualTo(1)
-    upSyncWorkersInfo.all { it.state == SUCCEEDED }
+    assertThat(downSyncWorkersInfo.count { it.state is Enqueued }).isEqualTo(1)
+    upSyncWorkersInfo.all { it.state is Succeeded }
 }
 
 fun PeopleSyncState.assertFailingSyncState() {
     assertProgressAndTotal(syncId, total, progress)
-    assertThat(downSyncWorkersInfo.count { it.state == FAILED }).isEqualTo(1)
-    upSyncWorkersInfo.all { it.state == SUCCEEDED }
+    assertThat(downSyncWorkersInfo.count { it.state is Failed }).isEqualTo(1)
+    upSyncWorkersInfo.all { it.state is Succeeded }
 }
 
 fun PeopleSyncState.assertSuccessfulSyncState() {
     assertProgressAndTotal(syncId, total, progress)
-    downSyncWorkersInfo.all { it.state == SUCCEEDED }
-    upSyncWorkersInfo.all { it.state == SUCCEEDED }
+    downSyncWorkersInfo.all { it.state is Succeeded }
+    upSyncWorkersInfo.all { it.state is Succeeded }
 }
 
 fun PeopleSyncState.assertRunningSyncState() {
     assertProgressAndTotal(syncId, total, progress)
-    assertThat(downSyncWorkersInfo.count { it.state == RUNNING }).isEqualTo(1)
-    upSyncWorkersInfo.all { it.state == SUCCEEDED }
+    assertThat(downSyncWorkersInfo.count { it.state is Running }).isEqualTo(1)
+    upSyncWorkersInfo.all { it.state is Succeeded }
 }
 
 private fun assertProgressAndTotal(syncId: String, total: Int?, progress: Int) {
