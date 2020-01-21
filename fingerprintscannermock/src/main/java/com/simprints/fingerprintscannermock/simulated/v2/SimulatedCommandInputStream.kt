@@ -1,5 +1,7 @@
 package com.simprints.fingerprintscannermock.simulated.v2
 
+import com.simprints.fingerprintscanner.v2.domain.Mode
+import com.simprints.fingerprintscanner.v2.domain.Mode.*
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Command
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20MessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.commands.*
@@ -29,32 +31,42 @@ import java.io.PipedOutputStream
 
 class SimulatedCommandInputStream {
 
-    private val outputStream = PipedOutputStream()
-    private val inputStream = PipedInputStream().also { it.connect(outputStream) }
+    private val rootOutputStream = PipedOutputStream()
+    private val rootInputStream = PipedInputStream().also { it.connect(rootOutputStream) }
+
+    private val mainOutputStream = PipedOutputStream()
+    private val mainInputStream = PipedInputStream().also { it.connect(mainOutputStream) }
 
     private val router =
         PacketRouter(
             listOf(Channel.Remote.VeroServer, Channel.Remote.Un20Server),
             { destination },
-            ByteArrayToPacketAccumulator(PacketParser())
-        ).also { it.connect(inputStream) }
+            ByteArrayToPacketAccumulator(PacketParser(false))
+        ).also { it.connect(mainInputStream) }
 
     val rootCommands: Flowable<RootCommand> =
-        inputStream
+        rootInputStream
             .toFlowable()
             .accumulateAndTakeElements(RootCommandAccumulator(RootCommandParser()))
             .subscribeOn(Schedulers.io())
             .publish()
-            .autoConnect()
+            .also { it.connect() }
 
     val veroCommands: Flowable<VeroCommand> = router.incomingPacketChannels[Channel.Remote.VeroServer]?.toMessageStream(VeroCommandAccumulator(VeroCommandParser()))
         ?: throw IllegalStateException()
     val un20Commands: Flowable<Un20Command> = router.incomingPacketChannels[Channel.Remote.Un20Server]?.toMessageStream(Un20CommandAccumulator(Un20CommandParser()))
         ?: throw IllegalStateException()
 
-    fun updateWithNewBytes(bytes: ByteArray) {
-        outputStream.write(bytes)
-        outputStream.flush()
+    fun updateWithNewBytes(bytes: ByteArray, mode: Mode) {
+        when (mode) {
+            ROOT -> rootOutputStream
+            MAIN -> mainOutputStream
+            CYPRESS_OTA -> throw IllegalStateException()
+            STM_OTA -> throw IllegalStateException()
+        }.apply {
+            write(bytes)
+            flush()
+        }
     }
 
     class RootCommandAccumulator(rootCommandParser: RootCommandParser) : ByteArrayAccumulator<ByteArray, RootCommand>(

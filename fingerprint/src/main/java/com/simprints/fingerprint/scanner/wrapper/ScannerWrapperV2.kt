@@ -43,7 +43,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             bluetoothAdapter.cancelDiscovery()
             socket.connect()
             scannerV2.connect(socket.getInputStream(), socket.getOutputStream())
-                .andThen(scannerV2.enterMainMode())
+                .andThen(Completable.defer { scannerV2.enterMainMode() })
         } catch (e: IOException) {
             Completable.error(ScannerDisconnectedException())
         }
