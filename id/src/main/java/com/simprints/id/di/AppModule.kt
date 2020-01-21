@@ -10,6 +10,8 @@ import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
 import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
 import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayerImpl
+import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
+import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepositoryImpl
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
@@ -285,5 +287,17 @@ open class AppModule {
     ): DashboardProjectDetailsCardDisplayer = DashboardProjectDetailsCardDisplayerImpl(
         androidResourcesHelper
     )
+
+    @Provides
+    open fun provideDashboardProjectDetailsRepository(
+        projectRepository: ProjectRepository,
+        loginInfoManager: LoginInfoManager,
+        preferencesManager: PreferencesManager
+    ): DashboardProjectDetailsRepository = DashboardProjectDetailsRepositoryImpl(
+        projectRepository,
+        loginInfoManager,
+        preferencesManager
+    )
+
 }
 
