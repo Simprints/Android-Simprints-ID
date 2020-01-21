@@ -25,13 +25,13 @@ import io.reactivex.Flowable
 import io.reactivex.rxkotlin.toFlowable
 import org.junit.Test
 
-class MessageInputStreamTest {
+class MainMessageInputStreamTest {
 
     private val packetRouter = mock<PacketRouter>()
     private val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
     private val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
     private val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
-    private val messageInputStream = MessageInputStream(packetRouter, veroResponseAccumulator, veroEventAccumulator, un20ResponseAccumulator)
+    private val messageInputStream = MainMessageInputStream(packetRouter, veroResponseAccumulator, veroEventAccumulator, un20ResponseAccumulator)
 
     @Test
     fun messageInputStream_receiveVeroResponse_correctlyForwardsResponse() {

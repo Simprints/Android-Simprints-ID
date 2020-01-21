@@ -6,7 +6,7 @@ import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV2
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
-import com.simprints.fingerprintscanner.v2.incoming.main.MessageInputStream
+import com.simprints.fingerprintscanner.v2.incoming.main.MainMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.Un20ResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroEventAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroResponseAccumulator
@@ -19,8 +19,8 @@ import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketRouter
 import com.simprints.fingerprintscanner.v2.incoming.root.RootMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.root.RootResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.root.RootResponseParser
-import com.simprints.fingerprintscanner.v2.outgoing.main.MessageOutputStream
-import com.simprints.fingerprintscanner.v2.outgoing.main.message.MessageSerializer
+import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
+import com.simprints.fingerprintscanner.v2.outgoing.main.message.MainMessageSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.main.packet.PacketDispatcher
 import com.simprints.fingerprintscanner.v2.outgoing.main.packet.PacketSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
@@ -48,7 +48,7 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
         ScannerWrapperV2(
             ScannerV2(
                 MainMessageStream(
-                    MessageInputStream(
+                    MainMessageInputStream(
                         PacketRouter(
                             Channel.Remote::class.objects(),
                             { source },
@@ -58,8 +58,8 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                         VeroEventAccumulator(VeroEventParser()),
                         Un20ResponseAccumulator(Un20ResponseParser())
                     ),
-                    MessageOutputStream(
-                        MessageSerializer(PacketParser()),
+                    MainMessageOutputStream(
+                        MainMessageSerializer(PacketParser()),
                         PacketDispatcher(PacketSerializer())
                     )
                 ),

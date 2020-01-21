@@ -16,8 +16,8 @@ import com.simprints.fingerprintscanner.v2.domain.root.RootMessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.root.RootMessageType.*
 import com.simprints.fingerprintscanner.v2.domain.root.commands.*
 import com.simprints.fingerprintscanner.v2.incoming.MessageParser
-import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.PacketToMessageAccumulator
-import com.simprints.fingerprintscanner.v2.incoming.main.message.toMessageStream
+import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.PacketToMainMessageAccumulator
+import com.simprints.fingerprintscanner.v2.incoming.main.message.toMainMessageStream
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.ByteArrayToPacketAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketParser
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketRouter
@@ -52,9 +52,9 @@ class SimulatedCommandInputStream {
             .publish()
             .also { it.connect() }
 
-    val veroCommands: Flowable<VeroCommand> = router.incomingPacketChannels[Channel.Remote.VeroServer]?.toMessageStream(VeroCommandAccumulator(VeroCommandParser()))
+    val veroCommands: Flowable<VeroCommand> = router.incomingPacketChannels[Channel.Remote.VeroServer]?.toMainMessageStream(VeroCommandAccumulator(VeroCommandParser()))
         ?: throw IllegalStateException()
-    val un20Commands: Flowable<Un20Command> = router.incomingPacketChannels[Channel.Remote.Un20Server]?.toMessageStream(Un20CommandAccumulator(Un20CommandParser()))
+    val un20Commands: Flowable<Un20Command> = router.incomingPacketChannels[Channel.Remote.Un20Server]?.toMainMessageStream(Un20CommandAccumulator(Un20CommandParser()))
         ?: throw IllegalStateException()
 
     fun updateWithNewBytes(bytes: ByteArray, mode: Mode) {
@@ -76,9 +76,9 @@ class SimulatedCommandInputStream {
         buildElement = { bytes -> rootCommandParser.parse(bytes) }
     )
 
-    class VeroCommandAccumulator(veroCommandParser: VeroCommandParser) : PacketToMessageAccumulator<VeroCommand>(VeroMessageProtocol, veroCommandParser)
+    class VeroCommandAccumulator(veroCommandParser: VeroCommandParser) : PacketToMainMessageAccumulator<VeroCommand>(VeroMessageProtocol, veroCommandParser)
 
-    class Un20CommandAccumulator(un20CommandParser: Un20CommandParser) : PacketToMessageAccumulator<Un20Command>(Un20MessageProtocol, un20CommandParser)
+    class Un20CommandAccumulator(un20CommandParser: Un20CommandParser) : PacketToMainMessageAccumulator<Un20Command>(Un20MessageProtocol, un20CommandParser)
 
     class RootCommandParser : MessageParser<RootCommand> {
 

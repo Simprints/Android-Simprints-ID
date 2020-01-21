@@ -19,7 +19,7 @@ class MessageStreamTest {
 
         val testSubscriber = packets
             .toFlowable()
-            .toMessageStream(TestMessageAccumulator(TestMessageParser()))
+            .toMainMessageStream(TestMessageAccumulator(TestMessageParser()))
             .testSubscribe()
 
         testSubscriber.awaitCompletionWithNoErrors()
@@ -38,7 +38,7 @@ class MessageStreamTest {
 
         val testSubscriber = packets
             .toFlowable()
-            .toMessageStream(TestMessageAccumulator(TestMessageParser()))
+            .toMainMessageStream(TestMessageAccumulator(TestMessageParser()))
             .testSubscribe()
 
         testSubscriber.awaitCompletionWithNoErrors()
@@ -57,7 +57,7 @@ class MessageStreamTest {
 
         val testSubscriber = packets
             .toFlowable()
-            .toMessageStream(TestMessageAccumulator(TestMessageParser()))
+            .toMainMessageStream(TestMessageAccumulator(TestMessageParser()))
             .testSubscribe()
 
         testSubscriber.awaitCompletionWithNoErrors()

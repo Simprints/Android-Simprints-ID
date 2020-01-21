@@ -28,9 +28,9 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.Se
 import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterMainModeCommand
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
-import com.simprints.fingerprintscanner.v2.incoming.main.MessageInputStream
+import com.simprints.fingerprintscanner.v2.incoming.main.MainMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.root.RootMessageInputStream
-import com.simprints.fingerprintscanner.v2.outgoing.main.MessageOutputStream
+import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
@@ -80,10 +80,10 @@ class ScannerTest {
     @Test
     fun scanner_connectThenEnterMainMode_callsConnectOnMainMessageStreams() {
 
-        val mockMessageInputStream = setupMock<MessageInputStream> {
+        val mockMessageInputStream = setupMock<MainMessageInputStream> {
             whenThis { veroEvents } thenReturn Flowable.empty()
         }
-        val mockMessageOutputStream = mock<MessageOutputStream>()
+        val mockMessageOutputStream = mock<MainMessageOutputStream>()
         val mockInputStream = mock<InputStream>()
         val mockOutputStream = mock<OutputStream>()
 
@@ -98,7 +98,7 @@ class ScannerTest {
 
     @Test
     fun scanner_connectThenEnterMainMode_stateIsInMainMode() {
-        val mockMessageInputStream = setupMock<MessageInputStream> {
+        val mockMessageInputStream = setupMock<MainMessageInputStream> {
             whenThis { veroEvents } thenReturn Flowable.empty()
         }
 
@@ -112,13 +112,13 @@ class ScannerTest {
 
     @Test
     fun scanner_connectThenTurnUn20On_throwsException() {
-        val messageInputStreamSpy = spy(MessageInputStream(mock(), mock(), mock(), mock())).apply {
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
             whenThis { connect(anyNotNull()) } thenDoNothing {}
             veroResponses = Flowable.empty()
             veroEvents = Flowable.empty()
             un20Responses = Flowable.empty()
         }
-        val mockMessageOutputStream = setupMock<MessageOutputStream> {
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(anyNotNull()) } thenReturn Completable.complete()
         }
 
@@ -132,10 +132,10 @@ class ScannerTest {
     fun scannerVeroEvents_differentKindsOfEventsCreated_forwardsOnlyTriggerEventsToObservers() {
         val eventsSubject = PublishSubject.create<VeroEvent>()
 
-        val mockMessageInputStream = setupMock<MessageInputStream> {
+        val mockMessageInputStream = setupMock<MainMessageInputStream> {
             whenThis { veroEvents } thenReturn eventsSubject.toFlowable(BackpressureStrategy.BUFFER)
         }
-        val mockMessageOutputStream = mock<MessageOutputStream>()
+        val mockMessageOutputStream = mock<MainMessageOutputStream>()
 
         val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock())
         scanner.connect(mock(), mock()).blockingAwait()
@@ -156,12 +156,12 @@ class ScannerTest {
         val eventsSubject = PublishSubject.create<VeroEvent>()
         val responseSubject = PublishSubject.create<VeroResponse>()
 
-        val messageInputStreamSpy = spy(MessageInputStream(mock(), mock(), mock(), mock())).apply {
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
             whenThis { connect(anyNotNull()) } thenDoNothing {}
             veroResponses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             veroEvents = eventsSubject.toFlowable(BackpressureStrategy.BUFFER)
         }
-        val mockMessageOutputStream = setupMock<MessageOutputStream> {
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<SetUn20OnCommand>()) } then {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(SetUn20OnResponse(OperationResultCode.OK))
@@ -185,12 +185,12 @@ class ScannerTest {
     fun scanner_setSmileLedState_changesStateCorrectly() {
         val responseSubject = PublishSubject.create<VeroResponse>()
 
-        val messageInputStreamSpy = spy(MessageInputStream(mock(), mock(), mock(), mock())).apply {
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
             whenThis { connect(anyNotNull()) } thenDoNothing {}
             veroResponses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             veroEvents = Flowable.empty()
         }
-        val mockMessageOutputStream = setupMock<MessageOutputStream> {
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<SetSmileLedStateCommand>()) } then {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(SetSmileLedStateResponse(OperationResultCode.OK))
@@ -218,12 +218,12 @@ class ScannerTest {
     fun scanner_captureFingerprintWithUn20On_receivesFingerprint() {
         val responseSubject = PublishSubject.create<Un20Response>()
 
-        val messageInputStreamSpy = spy(MessageInputStream(mock(), mock(), mock(), mock())).apply {
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
             whenThis { connect(anyNotNull()) } thenDoNothing {}
             un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             veroEvents = Flowable.empty()
         }
-        val mockMessageOutputStream = setupMock<MessageOutputStream> {
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<CaptureFingerprintCommand>()) } then {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResult.OK))
@@ -244,12 +244,12 @@ class ScannerTest {
     fun scanner_captureFingerprintWithUn20Off_throwsException() {
         val responseSubject = PublishSubject.create<Un20Response>()
 
-        val messageInputStreamSpy = spy(MessageInputStream(mock(), mock(), mock(), mock())).apply {
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
             whenThis { connect(anyNotNull()) } thenDoNothing {}
             un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             veroEvents = Flowable.empty()
         }
-        val mockMessageOutputStream = setupMock<MessageOutputStream> {
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<CaptureFingerprintCommand>()) } then {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResult.OK))
@@ -273,12 +273,12 @@ class ScannerTest {
 
         val responseSubject = PublishSubject.create<Un20Response>()
 
-        val messageInputStreamSpy = spy(MessageInputStream(mock(), mock(), mock(), mock())).apply {
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
             whenThis { connect(anyNotNull()) } thenDoNothing {}
             un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             veroEvents = Flowable.empty()
         }
-        val mockMessageOutputStream = setupMock<MessageOutputStream> {
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<GetTemplateCommand>()) } then {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(GetTemplateResponse(TemplateData(Scanner.DEFAULT_TEMPLATE_TYPE, template)))
@@ -308,12 +308,12 @@ class ScannerTest {
 
         val responseSubject = PublishSubject.create<Un20Response>()
 
-        val messageInputStreamSpy = spy(MessageInputStream(mock(), mock(), mock(), mock())).apply {
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
             whenThis { connect(anyNotNull()) } thenDoNothing {}
             un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             veroEvents = Flowable.empty()
         }
-        val mockMessageOutputStream = setupMock<MessageOutputStream> {
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<GetImageCommand>()) } then {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(GetImageResponse(ImageData(Scanner.DEFAULT_IMAGE_FORMAT, image, crcCheck)))

@@ -7,15 +7,14 @@ import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprintscanner.v2.domain.main.packet.PacketProtocol
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketParser
+import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 
-class MessageSerializer(private val packetParser: PacketParser) {
+class MainMessageSerializer(private val packetParser: PacketParser) {
 
     fun serialize(message: OutgoingMainMessage): List<Packet> =
         message
             .getBytes()
-            .asList()
             .chunked(PacketProtocol.MAX_PAYLOAD_SIZE)
-            .map { it.toByteArray() }
             .map {
                 val destination = when (message) {
                     is VeroCommand -> Channel.Remote.VeroServer

@@ -9,7 +9,7 @@ import com.simprints.fingerprintscanner.v2.incoming.IncomingConnectable
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.Un20ResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroEventAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroResponseAccumulator
-import com.simprints.fingerprintscanner.v2.incoming.main.message.toMessageStream
+import com.simprints.fingerprintscanner.v2.incoming.main.message.toMainMessageStream
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketRouter
 import com.simprints.fingerprintscanner.v2.tools.lang.isSubclass
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
@@ -17,7 +17,7 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import java.io.InputStream
 
-class MessageInputStream(
+class MainMessageInputStream(
     private val packetRouter: PacketRouter,
     private val veroResponseAccumulator: VeroResponseAccumulator,
     private val veroEventAccumulator: VeroEventAccumulator,
@@ -30,11 +30,11 @@ class MessageInputStream(
 
     override fun connect(inputStream: InputStream) {
         packetRouter.connect(inputStream)
-        veroResponses = packetRouter.incomingPacketChannels[Channel.Remote.VeroServer]?.toMessageStream(veroResponseAccumulator)
+        veroResponses = packetRouter.incomingPacketChannels[Channel.Remote.VeroServer]?.toMainMessageStream(veroResponseAccumulator)
             ?: throw TODO("exception handling")
-        veroEvents = packetRouter.incomingPacketChannels[Channel.Remote.VeroEvent]?.toMessageStream(veroEventAccumulator)
+        veroEvents = packetRouter.incomingPacketChannels[Channel.Remote.VeroEvent]?.toMainMessageStream(veroEventAccumulator)
             ?: throw TODO("exception handling")
-        un20Responses = packetRouter.incomingPacketChannels[Channel.Remote.Un20Server]?.toMessageStream(un20ResponseAccumulator)
+        un20Responses = packetRouter.incomingPacketChannels[Channel.Remote.Un20Server]?.toMainMessageStream(un20ResponseAccumulator)
             ?: throw TODO("exception handling")
     }
 
