@@ -18,7 +18,12 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.*
 import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
 import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterMainModeCommand
+import com.simprints.fingerprintscanner.v2.domain.root.commands.GetVersionCommand
+import com.simprints.fingerprintscanner.v2.domain.root.commands.SetVersionCommand
+import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
+import com.simprints.fingerprintscanner.v2.domain.root.responses.GetVersionResponse
+import com.simprints.fingerprintscanner.v2.domain.root.responses.SetVersionResponse
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
@@ -27,6 +32,7 @@ import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import io.reactivex.Completable
 import io.reactivex.Observer
 import io.reactivex.Single
+import io.reactivex.Single.defer
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import java.io.InputStream
@@ -96,8 +102,30 @@ class Scanner(
     }
 
     private inline fun <reified R : RootResponse> sendRootModeCommandAndReceiveResponse(command: RootCommand): Single<R> =
-        rootMessageStream.outgoing.sendMessage(command)
-            .andThen(rootMessageStream.incoming.receiveResponse())
+        defer {
+            rootMessageStream.outgoing.sendMessage(command)
+                .andThen(rootMessageStream.incoming.receiveResponse<R>())
+        }
+
+    private inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
+        defer {
+            mainMessageStream.outgoing.sendMessage(command)
+                .andThen(mainMessageStream.incoming.receiveResponse<R>())
+        }
+
+    fun getVersionInformation(): Single<UnifiedVersionInformation> =
+        assertMode(ROOT).andThen(
+            sendRootModeCommandAndReceiveResponse<GetVersionResponse>(
+                GetVersionCommand()
+            ))
+            .map { it.version }
+
+    fun setVersionInformation(versionInformation: UnifiedVersionInformation): Completable =
+        assertMode(ROOT).andThen(
+            sendRootModeCommandAndReceiveResponse<SetVersionResponse>(
+                SetVersionCommand(versionInformation)
+            ))
+            .completeOnceReceived()
 
     fun enterMainMode(): Completable =
         assertMode(ROOT).andThen(
@@ -114,10 +142,6 @@ class Scanner(
         state.mode = MAIN
         scannerTriggerListenerDisposable = subscribeTriggerButtonListeners()
     }
-
-    private inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
-        mainMessageStream.outgoing.sendMessage(command)
-            .andThen(mainMessageStream.incoming.receiveResponse())
 
     private fun subscribeTriggerButtonListeners() =
         mainMessageStream.incoming.veroEvents
