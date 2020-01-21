@@ -29,4 +29,10 @@ interface ScanningTimeoutBar {
             else -> return
         }
     }
+
+    companion object {
+        const val INITIAL_PROGRESS = 0
+        const val FINISHED_PROGRESS = 100
+        const val PROGRESS_INCREMENT = 1
+    }
 }

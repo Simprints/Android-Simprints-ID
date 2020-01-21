@@ -42,8 +42,12 @@ class CollectFingerprintsIndicatorsHelper(private val context: Context,
     }
 
     private fun handleIndicatorClick(fingerPosition: Int) {
-        if (presenter.currentFinger().status != FingerStatus.COLLECTING && presenter.currentFinger().status != FingerStatus.TRANSFERRING_IMAGE) {
+        if (progressBarIsBusy()) {
             view.viewPager.currentItem = fingerPosition
         }
     }
+
+    private fun progressBarIsBusy() =
+        presenter.currentFinger().status != FingerStatus.COLLECTING &&
+            presenter.currentFinger().status != FingerStatus.TRANSFERRING_IMAGE
 }
