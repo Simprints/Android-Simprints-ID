@@ -85,4 +85,5 @@ class AndroidResourcesHelperImpl(val context: Context) : AndroidResourcesHelper 
     override fun getString(resId: Int, params: Array<Any>): String = context.getString(resId, *params)
     override fun getStringArray(res: Int): Array<String> = context.resources.getStringArray(res)
     override fun getDrawable(res: Int): Drawable? = ContextCompat.getDrawable(context, res)
+    override fun getColour(colourId: Int): Int = ContextCompat.getColor(context, colourId)
 }

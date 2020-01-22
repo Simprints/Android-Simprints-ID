@@ -9,6 +9,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
+import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
@@ -16,13 +17,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
-class CommCarePresenter(private val view: CommCareContract.View,
-                        private val action: String?,
-                        private val sessionEventsManager: ClientApiSessionEventsManager,
-                        private val crashReportManager: ClientApiCrashReportManager,
-                        private val sharedPreferencesManager: SharedPreferencesManager)
-    : RequestPresenter(view, sessionEventsManager), CommCareContract.Presenter {
+class CommCarePresenter(
+    private val view: CommCareContract.View,
+    private val action: String?,
+    private val sessionEventsManager: ClientApiSessionEventsManager,
+    private val sharedPreferencesManager: SharedPreferencesManager,
+    deviceManager: DeviceManager,
+    crashReportManager: ClientApiCrashReportManager
+) : RequestPresenter(
+    view,
+    sessionEventsManager,
+    deviceManager,
+    crashReportManager
+), CommCareContract.Presenter {
 
     companion object {
         private const val PACKAGE_NAME = "com.simprints.commcare"
@@ -32,7 +39,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
         const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
     }
 
-    override suspend fun start() {
+    override suspend fun processRequest() {
         if (action != ACTION_CONFIRM_IDENTITY) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)

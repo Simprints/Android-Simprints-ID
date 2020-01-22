@@ -92,5 +92,8 @@
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
 
+    <string name="test_loading_candidates">در حال آماده سازی اشتراک کنندگان</string>
+    <string name="test_loaded_candidates_one"> فرد یا اشتراک کننده آماده است %d</string>
+    <string name="test_loaded_candidates_other"> افراد یا اشتراک کنندگان آماده شدند %d</string>
 
 </resources>
