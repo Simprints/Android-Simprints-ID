@@ -486,6 +486,7 @@
     <string name="confirm_module_selection_title">Modules selected</string>
     <string name="confirm_module_selection_yes">Confirm</string>
     <string name="confirm_module_selection_cancel">Cancel</string>
+    <string name="dashboard_sync_card_try_again_button">TRY AGAIN</string>
     <!-- endregion -->
 
 </resources>
