@@ -193,9 +193,6 @@ dependencies {
     api deps.koin.android
     api deps.koin.viewmodel
 
-    // RootBeer (root detection)
-    implementation deps.rootbeer.core
-
     // Test
     testImplementation project(':fingerprintscannermock')
     testImplementation deps.testing.retrofit
