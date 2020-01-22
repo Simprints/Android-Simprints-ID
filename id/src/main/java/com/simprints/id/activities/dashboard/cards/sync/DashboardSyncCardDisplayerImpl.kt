@@ -47,7 +47,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
 
     private fun createViewForSyncState(layout: Int, root: ViewGroup) =
         ctx.layoutInflater.inflate(layout, root, false).also {
-            this.textViewCardTitle().text = androidResourcesHelper.getString(R.string.dashboard_card_sync_title)
+            it.textViewCardTitle().text = androidResourcesHelper.getString(R.string.dashboard_card_sync_title)
         }
 
     override fun displayState(syncCardState: DashboardSyncCardState) {
