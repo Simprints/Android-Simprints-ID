@@ -18,6 +18,7 @@ import com.simprints.id.services.scheduledSync.people.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.DOWNLOADER
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.UPLOADER
+import com.simprints.id.tools.delegates.lazyVar
 import javax.inject.Inject
 
 class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
@@ -28,8 +29,9 @@ class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) 
 
     override val tag: String = PeopleDownSyncCountWorker::class.java.simpleName
 
-    private val wm: WorkManager
-        get() = WorkManager.getInstance(context)
+    var wm: WorkManager by lazyVar {
+        WorkManager.getInstance(context)
+    }
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var personRepository: PersonRepository
@@ -54,14 +56,13 @@ class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) 
             val output = JsonHelper.gson.toJson(downCount)
 
             success(workDataOf(OUTPUT_COUNT_WORKER_DOWN to output), output)
-        } catch (t: Throwable) {
-            fail(t)
 
+        } catch (t: Throwable) {
             if (isSyncStillRunning()) {
                 retry(t)
             } else {
-                //If sync is not running, the count is useless
-                success()
+                t.printStackTrace()
+                success(message = "Succeed because count is not required any more.")
             }
         }
     }
