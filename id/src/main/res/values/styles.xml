@@ -94,24 +94,44 @@
 
     <style name="ClientApiTheme.Transparent" parent="AppTheme.Transparent" />
 
+    <!-- Dashboard -->
     <style name="DashboardCardStyle">
-        <item name="android:layout_marginLeft">4dp</item>
-        <item name="android:layout_marginTop">16dp</item>
-        <item name="android:layout_marginRight">4dp</item>
-        <item name="android:layout_marginBottom">4dp</item>
-        <item name="cardCornerRadius">5dp</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:layout_marginLeft">12dp</item>
+        <item name="android:layout_marginRight">12dp</item>
+        <item name="android:layout_marginBottom">0dp</item>
+        <item name="cardCornerRadius">8dp</item>
     </style>
 
     <style name="DashboardCardStyleRoot">
         <item name="android:orientation">vertical</item>
-        <item name="android:padding">8dp</item>
+        <item name="android:layout_margin">14dp</item>
+        <item name="android:gravity">center</item>
     </style>
 
     <style name="DashboardCardStyleTitle">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:layout_gravity">left</item>
+        <item name="android:layout_marginBottom">@dimen/activity_dashboard_card_space_below_title</item>
     </style>
 
-    <style name="DashboardCardStyleContent"></style>
+    <style name="DashboardCardStyleLastSync">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
 
+    <!-- Common -->
+    <style name="SimprintsButton" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/button_rounded_corners_orange</item>
+        <item name="android:fontFamily">font/muli</item>
+        <item name="android:textColor">@color/simprints_white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:padding">3dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+    </style>
+
+    <dimen name="activity_dashboard_card_space_below_title">12dp</dimen>
 </resources>

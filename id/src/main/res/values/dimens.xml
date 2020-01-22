@@ -25,5 +25,6 @@
     <dimen name="text_size_chip">14sp</dimen>
     <dimen name="text_size_toolbar_title">18sp</dimen>
     <dimen name="text_size_large">16sp</dimen>
+    <dimen name="activity_dashboard_card_sync_space_above_last_sync">16dp</dimen>
     <!-- endregion -->
 </resources>

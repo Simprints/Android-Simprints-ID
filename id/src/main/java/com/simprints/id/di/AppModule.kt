@@ -8,6 +8,8 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayerImpl
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
@@ -273,6 +275,12 @@ open class AppModule {
     @Named("EncryptedSharedPreferences")
     open fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
         EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
+
+    @Provides
+    open fun provideDashboardSyncCardDisplayer(androidResourcesHelper: AndroidResourcesHelper,
+                                               timeHelper: TimeHelper,
+                                               ctx: Context): DashboardSyncCardDisplayer =
+        DashboardSyncCardDisplayerImpl(androidResourcesHelper, timeHelper, ctx)
 
     @Provides
     open fun provideDeviceManager(context: Context): DeviceManager = DeviceManagerImpl(context)
