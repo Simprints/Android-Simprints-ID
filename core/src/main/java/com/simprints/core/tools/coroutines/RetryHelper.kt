@@ -9,7 +9,7 @@ suspend fun <T> retryIO(
     maxDelay: Long = 1000,    // 1 second
     factor: Double = 1.0, // 2 per exponential backoff
     runBlock: suspend () -> T,
-    retryThrowable: suspend (t: Throwable) -> Boolean = { true }): T {
+    retryIf: suspend (t: Throwable) -> Boolean = { true }): T {
     var currentDelay = initialDelay
     repeat(times - 1) {
         try {
@@ -17,7 +17,7 @@ suspend fun <T> retryIO(
         } catch (t: Throwable) {
             Timber.d("IO failed")
 
-            if (!retryThrowable(t)) {
+            if (!retryIf(t)) {
                 throw t
             }
             // you can log an error here and/or make a more finer-grained

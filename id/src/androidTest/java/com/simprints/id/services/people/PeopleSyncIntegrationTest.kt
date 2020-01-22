@@ -6,7 +6,6 @@ import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
-import androidx.work.WorkInfo
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.extentions.resumeSafely
@@ -39,6 +38,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.*
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.android.runOnActivity
 import com.simprints.testtools.common.di.DependencyRule
@@ -256,16 +256,16 @@ class MockDispatcher : Dispatcher() {
 }
 
 private fun PeopleSyncState.anySyncWorkersStillRunning(): Boolean =
-    downSyncWorkersInfo.plus(upSyncWorkersInfo).any { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }
+    downSyncWorkersInfo.plus(upSyncWorkersInfo).any { it.state is Running || it.state is Enqueued }
 
 private fun PeopleSyncState.assertSyncRetries() {
-    assertThat((downSyncWorkersInfo.plus(upSyncWorkersInfo)).any { it.state == WorkInfo.State.ENQUEUED }).isTrue()
+    assertThat((downSyncWorkersInfo.plus(upSyncWorkersInfo)).any { it.state is Enqueued }).isTrue()
 }
 
 private fun PeopleSyncState.assertSyncSucceeds(total: Int) {
     assertThat(total).isEqualTo(total)
     assertThat(progress).isEqualTo(total)
-    assertThat((downSyncWorkersInfo.plus(upSyncWorkersInfo)).all { it.state == WorkInfo.State.SUCCEEDED }).isTrue()
+    assertThat((downSyncWorkersInfo.plus(upSyncWorkersInfo)).all { it.state is Succeeded }).isTrue()
 }
 
 fun Person.fromDomainToGetApi(deleted: Boolean = false): ApiGetPerson =
