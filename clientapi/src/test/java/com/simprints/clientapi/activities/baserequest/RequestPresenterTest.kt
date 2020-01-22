@@ -108,7 +108,9 @@ class ImplRequestPresenter(
     crashReportManager: ClientApiCrashReportManager
 ) : RequestPresenter(view, clientApiSessionEventsManager, deviceManager, crashReportManager) {
 
-    override suspend fun processRequest() {}
+    override suspend fun start() {
+        runIfDeviceIsNotRooted {}
+    }
     override fun handleEnrollResponse(enroll: EnrollResponse) {}
     override fun handleIdentifyResponse(identify: IdentifyResponse) {}
     override fun handleVerifyResponse(verify: VerifyResponse) {}

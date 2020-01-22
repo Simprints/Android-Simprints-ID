@@ -31,18 +31,20 @@ class LibSimprintsPresenter(
     crashReportManager
 ), LibSimprintsContract.Presenter {
 
-    override suspend fun processRequest() {
+    override suspend fun start() {
         if (action != SIMPRINTS_SELECT_GUID_INTENT) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
 
-        when (action) {
-            SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
-            SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
-            SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
-            SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentityRequest()
-            else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+        runIfDeviceIsNotRooted {
+            when (action) {
+                SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
+                SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
+                SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
+                SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentityRequest()
+                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+            }
         }
     }
 
