@@ -1,43 +1,57 @@
 package com.simprints.id.services.scheduledSync.people.master.internal
 
-import android.content.Context
 import android.content.SharedPreferences
+import com.simprints.id.tools.extensions.getMap
+import com.simprints.id.tools.extensions.putMap
+import com.simprints.id.tools.extensions.save
 import java.util.*
 
-class PeopleSyncCacheImpl(ctx: Context) : PeopleSyncCache {
+class PeopleSyncCacheImpl(private val sharedPreferences: SharedPreferences) : PeopleSyncCache {
 
-    private val sharedPrefs: SharedPreferences = ctx.getSharedPreferences(PEOPLE_SYNC_CACHE, Context.MODE_PRIVATE)
-    private val edit = sharedPrefs.edit()
+    private val editor = sharedPreferences.edit()
 
     override var lastSuccessfulSyncTime: Date? = null
         get() {
-            val dateLong = sharedPrefs.getLong(KEY_LAST_SYNC_TIME, -1)
+            val dateLong = sharedPreferences.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1)
             return if (dateLong > -1) Date(dateLong) else null
         }
         set(value) {
             field = value
-            edit.putLong(KEY_LAST_SYNC_TIME, value?.time ?: -1).apply()
+            editor.putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, value?.time ?: -1).apply()
         }
 
 
     override fun readProgress(workerId: String): Int =
-        sharedPrefs.getInt(workerId, 0)
+        readAllProgresses()[workerId] ?: 0
 
     override fun saveProgress(workerId: String, progress: Int) {
-        edit.putInt(workerId, progress).apply()
+        val progresses = readAllProgresses()
+        progresses[workerId] = progress
+        storeAllProgresses(progresses)
+    }
+
+    private fun readAllProgresses(): MutableMap<String, Int> =
+        sharedPreferences
+            .getMap(PEOPLE_SYNC_CACHE_PROGRESSES_KEY, emptyMap())
+            .mapValues { it.value.toInt() }
+            .toMutableMap()
+
+    private fun storeAllProgresses(progresses: Map<String, Int>) {
+        saveInSharedPrefs { it.putMap(PEOPLE_SYNC_CACHE_PROGRESSES_KEY, progresses.mapValues { it.value.toString() }) }
     }
 
     override fun clearProgresses() {
-        edit.clear().apply()
+        saveInSharedPrefs { it.putMap(PEOPLE_SYNC_CACHE_PROGRESSES_KEY, emptyMap()) }
     }
 
-    override fun clearLastSyncTime() {
-        lastSuccessfulSyncTime = null
+    private fun saveInSharedPrefs(transaction: (SharedPreferences.Editor) -> Unit) {
+        with(sharedPreferences) {
+            save(transaction)
+        }
     }
 
-    private companion object {
-        const val PEOPLE_SYNC_CACHE = "PEOPLE_SYNC_CACHE"
-        private const val KEY_LAST_SYNC_TIME = "KEY_LAST_SYNC_TIME"
-
+    companion object {
+        const val PEOPLE_SYNC_CACHE_PROGRESSES_KEY = "PEOPLE_SYNC_CACHE_PROGRESSES_KEY"
+        const val PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY = "PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY"
     }
 }
