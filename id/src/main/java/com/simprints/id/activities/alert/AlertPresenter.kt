@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
                      val component: AppComponent,
-                     private val alertType:  AlertType) : AlertContract.Presenter {
+                     private val alertType: AlertType) : AlertContract.Presenter {
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionManager: SessionEventsManager

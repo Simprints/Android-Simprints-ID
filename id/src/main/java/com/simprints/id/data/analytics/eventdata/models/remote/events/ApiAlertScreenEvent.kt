@@ -11,7 +11,6 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
     constructor(alertScreenEventDomain: AlertScreenEvent) :
         this(alertScreenEventDomain.relativeStartTime ?: 0, fromDomainToApi(alertScreenEventDomain.alertType))
 
-
     @Keep
     enum class ApiAlertScreenEvent {
         DIFFERENT_PROJECT_ID,

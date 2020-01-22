@@ -2,6 +2,7 @@ package com.simprints.id.testtools.di
 
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivityTest
+import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentPresenterTest
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivityTest
 import com.simprints.id.activities.consent.ConsentActivityTest
 import com.simprints.id.activities.dashboard.DashboardCardsFactoryTest
@@ -57,4 +58,5 @@ interface AppComponentForTests : AppComponent {
     fun inject(longConsentManagerImplTest: LongConsentManagerImplTest)
     fun inject(moduleViewModelTest: ModuleViewModelTest)
     fun inject(consentActivityTest: ConsentActivityTest)
+    fun inject(checkLoginFromIntentPresenterTest: CheckLoginFromIntentPresenterTest)
 }

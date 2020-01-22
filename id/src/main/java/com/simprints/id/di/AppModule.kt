@@ -313,5 +313,6 @@ open class AppModule {
     @Named("EncryptedSharedPreferences")
     open fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
         EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
+
 }
 

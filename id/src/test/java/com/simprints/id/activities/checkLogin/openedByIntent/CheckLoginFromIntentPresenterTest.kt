@@ -1,5 +1,8 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -8,25 +11,37 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
+import org.robolectric.annotation.Config
 
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class)
 class CheckLoginFromIntentPresenterTest {
 
-    private val view = spy<CheckLoginFromIntentActivity>()
+    private val app = ApplicationProvider.getApplicationContext<TestApplication>()
+
+    private val appModule by lazy {
+        TestAppModule(app, crashReportManagerRule = DependencyRule.MockRule)
+    }
+
+    private val viewSpy = spy<CheckLoginFromIntentActivity>()
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).rescheduleRxMainThread()
+        UnitTestConfig(this, appModule).fullSetup()
     }
 
     @Test
     fun givenCheckLoginFromIntentPresenter_setupIsCalled_shouldAddCalloutEvent() {
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock())).apply {
+        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(viewSpy, "device_id", mock())).apply {
 
             whenever(view) { parseRequest() } thenReturn mock<AppEnrolRequest>()
             remoteConfigFetcher = mock()
@@ -55,7 +70,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun givenCheckLoginFromIntentPresenter_buildRequestIsCalledForEnrolment_buildsEnrolmentCallout() {
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock()))
+        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(viewSpy, "device_id", mock()))
 
         checkLoginFromIntentPresenter.appRequest = mock<AppEnrolRequest>().apply {
             whenever(this) { projectId } thenReturn "projectId"
@@ -73,7 +88,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun givenCheckLoginFromIntentPresenter_buildRequestIsCalledForIdentification_buildsIdentificationCallout() {
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock()))
+        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(viewSpy, "device_id", mock()))
 
         checkLoginFromIntentPresenter.appRequest = mock<AppIdentifyRequest>().apply {
             whenever(this) { projectId } thenReturn "projectId"
@@ -91,7 +106,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun givenCheckLoginFromIntentPresenter_buildRequestIsCalledForVerification_buildsVerificationCallout() {
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock()))
+        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(viewSpy, "device_id", mock()))
 
         checkLoginFromIntentPresenter.appRequest = mock<AppVerifyRequest>().apply {
             whenever(this) { projectId } thenReturn "projectId"
@@ -111,7 +126,7 @@ class CheckLoginFromIntentPresenterTest {
     @Test
     fun givenCheckLoginFromIntentPresenter_setupIsCalled_shouldAddInfoToSession() {
 
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock())).apply {
+        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(viewSpy, "device_id", mock())).apply {
 
             whenever(view) { parseRequest() } thenReturn mock<AppEnrolRequest>()
 
@@ -142,4 +157,5 @@ class CheckLoginFromIntentPresenterTest {
 
         verifyOnce(checkLoginFromIntentPresenter) { addAnalyticsInfoAndProjectId() }
     }
+
 }
