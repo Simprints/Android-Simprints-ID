@@ -9,6 +9,4 @@ interface PeopleSyncCache {
     fun readProgress(workerId: String): Int
     fun saveProgress(workerId: String, progress: Int)
     fun clearProgresses()
-
-    fun clearLastSyncTime()
 }

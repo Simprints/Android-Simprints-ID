@@ -1,6 +1,7 @@
 package com.simprints.id.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepositoryImpl
@@ -22,7 +23,10 @@ import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDow
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilderImpl
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTaskImpl
-import com.simprints.id.services.scheduledSync.people.master.*
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManagerImpl
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessor
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImpl
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCacheImpl
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
@@ -34,6 +38,7 @@ import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMana
 import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -120,7 +125,7 @@ open class SyncModule {
         PeopleUpSyncScopeRepositoryImpl(loginInfoManager, operationLocalDataSource)
 
     @Provides
-    open fun providePeopleSyncProgressCache(ctx: Context): PeopleSyncCache =
-        PeopleSyncCacheImpl(ctx)
+    open fun providePeopleSyncProgressCache(@Named("EncryptedSharedPreferences") encryptedSharedPrefs: SharedPreferences): PeopleSyncCache =
+        PeopleSyncCacheImpl(encryptedSharedPrefs)
 
 }
