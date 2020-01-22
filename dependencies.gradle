@@ -130,7 +130,7 @@ def espresso_version = "3.2.0-alpha04"
 def robolectric_version = "4.1"
 def testing = [
     junit          : "junit:junit:4.13-beta-2",
-    kotlin         : "io.kotlintest:kotlintest-runner-junit5:3.3.2",
+    kotlin         : "io.kotlintest:kotlintest-runner-junit4:3.4.2",
     robolectric    : [
         core    : "org.robolectric:robolectric:$robolectric_version",
         multidex: "org.robolectric:multidex:3.4.2"

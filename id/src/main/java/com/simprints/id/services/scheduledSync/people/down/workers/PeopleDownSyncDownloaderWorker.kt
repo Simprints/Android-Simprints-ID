@@ -23,7 +23,6 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
         const val PROGRESS_DOWN_SYNC = "PROGRESS_DOWN_SYNC"
         const val OUTPUT_DOWN_SYNC = "OUTPUT_DOWN_SYNC"
         const val OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION = "FAILED_BECAUSE_CLOUD_INTEGRATION"
-
     }
 
     override val tag: String = PeopleDownSyncDownloaderWorker::class.java.simpleName

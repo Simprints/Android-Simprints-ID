@@ -9,8 +9,10 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.domain.modality.Modes
+import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -44,38 +46,52 @@ class PeopleDownSyncDownloaderWorkerTest {
     fun setUp() {
         UnitTestConfig(this).setupWorkManager()
         app.component = mockk(relaxed = true)
-        peopleDownSyncDownloaderWorker = createWorker()
+        val correctInputData = JsonHelper.gson.toJson(projectSyncOp)
+        peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
+        coEvery { peopleDownSyncDownloaderWorker.downSyncScopeRepository.refreshDownSyncOperationFromDb(any()) } returns null
+    }
+
+    @Test
+    fun downSyncWorker_shouldParseInputDataCorrectly() = runBlockingTest {
+        with(peopleDownSyncDownloaderWorker) {
+            doWork()
+            coEvery { peopleDownSyncDownloaderTask.execute(projectSyncOp, any(), any()) }
+        }
     }
 
     @Test
     fun downSyncWorker_shouldExecuteTheTask() = runBlockingTest {
-        val correctInputData = JsonHelper.gson.toJson(projectSyncOp)
-        peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
-        coEvery { peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask.execute(any(), any(), any()) } returns 0
-        coEvery { peopleDownSyncDownloaderWorker.downSyncScopeRepository.refreshDownSyncOperationFromDb(any()) } returns null
+        with(peopleDownSyncDownloaderWorker) {
+            coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any()) } returns 0
 
-        peopleDownSyncDownloaderWorker.doWork()
+            doWork()
 
-        coVerify { peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask.execute(any(), any(), any()) }
-        verify { peopleDownSyncDownloaderWorker.resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to 0)) }
+            coVerify { peopleDownSyncDownloaderTask.execute(any(), any(), any()) }
+            verify { resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to 0)) }
+        }
     }
 
 
     @Test
-    fun downSyncWorker_shouldParseInputDataCorrectly() = runBlockingTest {
-        val correctInputData = JsonHelper.gson.toJson(projectSyncOp)
-        peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
+    fun downSyncWorker_failForCloudIntegration_shouldFail() = runBlockingTest {
+        with(peopleDownSyncDownloaderWorker) {
+            coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any()) } throws SyncCloudIntegrationException("Cloud integration", Throwable())
 
-        peopleDownSyncDownloaderWorker.doWork()
+            doWork()
 
-        coEvery { peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask.execute(projectSyncOp, any(), any()) }
+            verify { resultSetter.failure(workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true)) }
+        }
     }
 
     @Test
-    fun downSyncWorker_wrongInput_shouldFail() = runBlockingTest {
-        peopleDownSyncDownloaderWorker.doWork()
+    fun downSyncWorker_failForNetworkIssue_shouldRetry() = runBlockingTest {
+        with(peopleDownSyncDownloaderWorker) {
+            coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any()) } throws Throwable("Network Exception")
 
-        verify { peopleDownSyncDownloaderWorker.resultSetter.failure() }
+            doWork()
+
+            verify { resultSetter.retry() }
+        }
     }
 
     private fun createWorker(inputData: Data? = null) =
