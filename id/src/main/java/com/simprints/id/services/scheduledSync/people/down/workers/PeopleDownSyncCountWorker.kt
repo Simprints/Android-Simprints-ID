@@ -14,10 +14,10 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
+import com.simprints.id.services.scheduledSync.people.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.DOWNLOADER
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.UPLOADER
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
 import javax.inject.Inject
 
 class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
