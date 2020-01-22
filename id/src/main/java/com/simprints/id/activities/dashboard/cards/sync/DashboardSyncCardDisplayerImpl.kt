@@ -20,6 +20,7 @@ import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.getColorResCompat
 import org.jetbrains.anko.layoutInflater
 import org.jetbrains.anko.textColor
+import java.util.*
 
 
 class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResourcesHelper,
@@ -54,10 +55,13 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     }
 
     private fun createViewForSyncState(layout: Int, root: ViewGroup) =
-        ctx.layoutInflater.inflate(layout, root, false)
+        ctx.layoutInflater.inflate(layout, root, false).also {
+            it.textViewCardTitle().text = getString(R.string.dashboard_card_sync_title)
+        }
 
     override fun displayState(syncCardState: DashboardSyncCardState) {
         removeOldViewState()
+
         when (syncCardState) {
             is SyncDefault -> prepareSyncDefaultStateView(syncCardState)
             is SyncFailed -> prepareSyncFailedStateView(syncCardState)
@@ -87,21 +91,21 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
                 setTextColor(androidResourcesHelper.getColorStateList(R.color.simprints_green))
                 text = androidResourcesHelper.getString(R.string.dashboard_sync_card_complete)
             }
-            displayLastSyncTime(syncCardState, lastSyncText())
+            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
         }
 
 
     private fun prepareSyncConnectingView(syncCardState: SyncConnecting): View =
         withVisible(viewForConnectingState) {
             withVisible(progressCardStateText()) {
-                text = androidResourcesHelper.getString(R.string.dashboard_sync_card_connecting)
+                text = getString(R.string.dashboard_sync_card_connecting)
                 textColor = context.getColorResCompat(android.R.attr.textColorPrimary)
             }
             withVisible(progressCardSyncProgress()) {
                 setSyncProgress(syncCardState.progress, syncCardState.total)
             }
 
-            displayLastSyncTime(syncCardState, lastSyncText())
+            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
         }
 
 
@@ -117,49 +121,71 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
             withVisible(progressCardSyncProgress()) {
                 setSyncProgress(syncCardState.progress, syncCardState.total)
             }
-            displayLastSyncTime(syncCardState, lastSyncText())
+            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
         }
 
     private fun prepareSyncOfflineView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForOfflineState) {
-            displayLastSyncTime(syncCardState, lastSyncText())
-            buttonOpenSettings().setOnClickListener {
-                userWantsToOpenSettings.send()
+            with(titleCardOffline()) {
+                text = getString(R.string.dashboard_sync_card_offline_message)
             }
+            with(buttonOpenSettings()) {
+                text = getString(R.string.dashboard_sync_card_offline_button)
+                setOnClickListener {
+                    userWantsToOpenSettings.send()
+                }
+            }
+            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
         }
 
     private fun prepareNoModulesStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForNoModulesState) {
-            displayLastSyncTime(syncCardState, lastSyncText())
-            buttonSelectModule().setOnClickListener {
-                userWantsToSelectAModule.send()
+            with(titleCardSelectModule()) {
+                text = getString(R.string.dashboard_sync_card_no_modules_message)
             }
-
+            with(buttonSelectModule()) {
+                text = getString(R.string.dashboard_sync_card_no_modules_button)
+                setOnClickListener {
+                    userWantsToSelectAModule.send()
+                }
+            }
+            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
         }
+
 
     private fun prepareTryAgainStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForTryAgainState) {
-            displayLastSyncTime(syncCardState, lastSyncText())
-            buttonProgressSync().setOnClickListener {
-                userWantsToSync.send()
+            with(titleCardTryAgain()) {
+                text = getString(R.string.dashboard_sync_card_incomplete)
             }
+            with(buttonProgressSync()) {
+                text = getString(R.string.dashboard_sync_card_try_again_button)
+                setOnClickListener {
+                    userWantsToSync.send()
+                }
+            }
+            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
         }
 
     private fun prepareSyncDefaultStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForDefaultState) {
-            displayLastSyncTime(syncCardState, lastSyncText())
-            buttonDefaultSync().setOnClickListener {
-                userWantsToSync.send()
+            withVisible(buttonDefaultSync()) {
+                text = getString(R.string.dashboard_sync_card_sync_button)
+                setOnClickListener {
+                    userWantsToSync.send()
+                }
             }
+            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
         }
 
     private fun prepareSyncFailedStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForSyncFailedState) {
-            displayLastSyncTime(syncCardState, lastSyncText())
+            titleCardFailed().text = getString(R.string.dashboard_sync_card_failed_message)
+            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
         }
 
-    private fun displayLastSyncTime(syncCardState: DashboardSyncCardState, textView: TextView) {
-        val lastSyncTimeText = syncCardState.lastSyncTime?.let { timeHelper.readableBetweenNowAndTime(it) } ?: ""
+    private fun displayLastSyncTime(lastSyncTime: Date?, textView: TextView) {
+        val lastSyncTimeText = lastSyncTime?.let { timeHelper.readableBetweenNowAndTime(lastSyncTime) } ?: ""
         textView.text = androidResourcesHelper.getString(R.string.dashboard_card_sync_last_sync, arrayOf(lastSyncTimeText))
     }
 
@@ -173,11 +199,18 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
             visibility = VISIBLE
         }
 
+    private fun getString(res: Int) = androidResourcesHelper.getString(res)
+
+    private fun View.textViewCardTitle() = this.findViewById<TextView>(R.id.dashboard_sync_card_title)
     private fun View.progressCardConnectingProgress() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)
     private fun View.progressCardSyncProgress() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_sync_progress_bar)
     private fun View.progressCardStateText() = this.findViewById<TextView>(R.id.dashboard_sync_card_progress_message)
 
-    private fun View.buttonSelectModule() = this.findViewById<TextView>(R.id.dashboard_sync_card_select_no_modules_button)
+    private fun View.titleCardOffline() = this.findViewById<TextView>(R.id.dashboard_sync_card_offline_message)
+    private fun View.titleCardTryAgain() = this.findViewById<TextView>(R.id.dashboard_sync_card_try_again_message)
+    private fun View.titleCardFailed() = this.findViewById<TextView>(R.id.dashboard_sync_card_failed_message)
+    private fun View.titleCardSelectModule() = this.findViewById<TextView>(R.id.dashboard_sync_card_select_no_modules_message)
+    private fun View.buttonSelectModule() = this.findViewById<Button>(R.id.dashboard_sync_card_select_no_modules_button)
     private fun View.buttonOpenSettings() = this.findViewById<Button>(R.id.dashboard_sync_card_offline_button)
     private fun View.buttonDefaultSync() = this.findViewById<Button>(R.id.dashboard_sync_card_default_state_sync_button)
     private fun View.buttonProgressSync() = this.findViewById<Button>(R.id.dashboard_sync_card_try_again_sync_button)

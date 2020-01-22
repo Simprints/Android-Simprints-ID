@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         style="@style/DashboardCardStyleRoot"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -18,17 +18,17 @@
             style="@style/DashboardCardStyleTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/dashboard_card_sync_title"
+            android:text="Placeholder - sync card title"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText" />
 
         <ImageView
             android:id="@+id/dashboard_sync_card_failed_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/activity_dashboard_card_space_below_title"
-            android:background="@color/simprints_red"
-            android:src="@drawable/error_hint_wifi"
+            android:src="@drawable/sync_no_connection"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dashboard_sync_card_title" />
 
@@ -37,13 +37,13 @@
             android:id="@+id/dashboard_sync_card_failed_message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/dashboard_sync_card_failed_message"
-            android:textColor="@color/simprints_red"
+            android:text="Placeholder - failed message"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/dashboard_sync_card_failed_icon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/dashboard_sync_card_failed_icon"
-            app:layout_constraintTop_toTopOf="@+id/dashboard_sync_card_failed_icon" />
+            app:layout_constraintTop_toTopOf="@+id/dashboard_sync_card_failed_icon"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/dashboard_sync_card_last_sync"
