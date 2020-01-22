@@ -50,7 +50,7 @@ class ScannerTest {
 
     @Test
     fun scanner_callEnterModeBeforeConnect_throwsException() {
-        val scanner = Scanner(mock(), setupRootMessageStreamMock())
+        val scanner = Scanner(mock(), mock())
         scanner.enterMainMode().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
     }
 
@@ -112,17 +112,7 @@ class ScannerTest {
 
     @Test
     fun scanner_connectThenTurnUn20On_throwsException() {
-        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
-            whenThis { connect(anyNotNull()) } thenDoNothing {}
-            veroResponses = Flowable.empty()
-            veroEvents = Flowable.empty()
-            un20Responses = Flowable.empty()
-        }
-        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
-            whenThis { sendMessage(anyNotNull()) } thenReturn Completable.complete()
-        }
-
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock())
+        val scanner = Scanner(mock(), setupRootMessageStreamMock())
         scanner.connect(mock(), mock()).blockingAwait()
 
         scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
