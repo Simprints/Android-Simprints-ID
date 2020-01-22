@@ -6,7 +6,6 @@ import com.simprints.fingerprintscanner.v2.domain.OutgoingMessage
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.TriggerButtonPressedEvent
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue
-import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedScanner
 import com.simprints.fingerprintscannermock.simulated.v2.response.SimulatedResponseHelperV2

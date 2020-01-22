@@ -17,13 +17,9 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFi
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.*
 import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
 import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
-import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterMainModeCommand
-import com.simprints.fingerprintscanner.v2.domain.root.commands.GetVersionCommand
-import com.simprints.fingerprintscanner.v2.domain.root.commands.SetVersionCommand
+import com.simprints.fingerprintscanner.v2.domain.root.commands.*
 import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
-import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
-import com.simprints.fingerprintscanner.v2.domain.root.responses.GetVersionResponse
-import com.simprints.fingerprintscanner.v2.domain.root.responses.SetVersionResponse
+import com.simprints.fingerprintscanner.v2.domain.root.responses.*
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
@@ -134,6 +130,22 @@ class Scanner(
             ))
             .completeOnceReceived()
             .andThen(handleMainModeEntered())
+
+    fun enterCypressOtaMode(): Completable =
+        assertMode(ROOT).andThen(
+            sendRootModeCommandAndReceiveResponse<EnterCypressOtaModeResponse>(
+                EnterCypressOtaModeCommand()
+            ))
+            .completeOnceReceived()
+            .doOnComplete { state.mode = CYPRESS_OTA } // TODO : handle Cypress OTA mode entered
+
+    fun enterStmOtaMode(): Completable =
+        assertMode(ROOT).andThen(
+            sendRootModeCommandAndReceiveResponse<EnterStmOtaModeResponse>(
+                EnterStmOtaModeCommand()
+            ))
+            .completeOnceReceived()
+            .doOnComplete { state.mode = STM_OTA } // TODO : handle STM OTA mode entered
 
     private fun handleMainModeEntered() = completable {
         rootMessageStream.disconnect()

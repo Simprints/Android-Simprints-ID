@@ -1,11 +1,8 @@
 package com.simprints.fingerprintscannermock.simulated.v2.response
 
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
 import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.commands.*
-import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprintscanner.v2.domain.root.responses.*
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.common.RealisticSpeedBehaviour
@@ -20,12 +17,7 @@ class SimulatedRootResponseHelper(private val simulatedScannerManager: Simulated
             is EnterMainModeCommand -> EnterMainModeResponse()
             is EnterCypressOtaModeCommand -> EnterCypressOtaModeResponse()
             is EnterStmOtaModeCommand -> EnterStmOtaModeResponse()
-            is GetVersionCommand -> GetVersionResponse(UnifiedVersionInformation(
-                masterFirmwareVersion = 1,
-                cypressFirmwareVersion = 1,
-                stmFirmwareVersion = StmFirmwareVersion(2, 3, 4, 5),
-                un20AppVersion = Un20AppVersion(8,9,0,1)
-            ))
+            is GetVersionCommand -> GetVersionResponse(simulatedScannerV2.scannerState.versionInfo)
             is SetVersionCommand -> SetVersionResponse()
             else -> throw UnsupportedOperationException("Un-mocked response to $command in SimulatedRootResponseHelper")
         }
