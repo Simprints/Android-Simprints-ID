@@ -43,7 +43,7 @@ class DashboardViewModel(peopleSyncManager: PeopleSyncManager,
     private fun emitCardNewState(isConnected: Boolean,
                                  isModuleSelectionRequired: Boolean,
                                  syncState: PeopleSyncState?) {
-        val lastSyncData = cacheSync.lastSuccessfulSyncTime
+        val lastSyncData = cacheSync.readLastSuccessfulSyncTime()
 
         val newState = when {
             isModuleSelectionRequired -> SyncNoModules(lastSyncData)

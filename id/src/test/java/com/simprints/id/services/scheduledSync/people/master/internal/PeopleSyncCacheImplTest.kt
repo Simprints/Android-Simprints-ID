@@ -59,7 +59,7 @@ class PeopleSyncCacheImplTest {
     @Test
     fun cache_shouldStoreLastTime() {
         val now = Date()
-        peopleSyncCache.lastSuccessfulSyncTime = now
+        peopleSyncCache.storeLastSuccessfulSyncTime(now)
         val stored = sharedPrefs.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, 0)
         assertThat(stored).isEqualTo(now.time)
     }
@@ -69,7 +69,7 @@ class PeopleSyncCacheImplTest {
         val now = Date()
         sharedPrefs.edit().putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, now.time).apply()
 
-        val stored = peopleSyncCache.lastSuccessfulSyncTime
+        val stored = peopleSyncCache.readLastSuccessfulSyncTime()
 
         assertThat(stored?.time).isEqualTo(now.time)
     }

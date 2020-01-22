@@ -4,7 +4,8 @@ import java.util.*
 
 interface PeopleSyncCache {
 
-    var lastSuccessfulSyncTime: Date?
+    fun readLastSuccessfulSyncTime(): Date?
+    fun storeLastSuccessfulSyncTime(lastSyncTime: Date?)
 
     fun readProgress(workerId: String): Int
     fun saveProgress(workerId: String, progress: Int)
