@@ -10,16 +10,14 @@ class PeopleSyncCacheImpl(private val sharedPreferences: SharedPreferences) : Pe
 
     private val editor = sharedPreferences.edit()
 
-    override var lastSuccessfulSyncTime: Date? = null
-        get() {
-            val dateLong = sharedPreferences.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1)
-            return if (dateLong > -1) Date(dateLong) else null
-        }
-        set(value) {
-            field = value
-            editor.putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, value?.time ?: -1).apply()
-        }
+    override fun readLastSuccessfulSyncTime(): Date? {
+        val dateLong = sharedPreferences.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1)
+        return if (dateLong > -1) Date(dateLong) else null
+    }
 
+    override fun storeLastSuccessfulSyncTime(lastSyncTime: Date?) {
+        editor.putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, lastSyncTime?.time ?: -1).apply()
+    }
 
     override fun readProgress(workerId: String): Int =
         readAllProgresses()[workerId] ?: 0
