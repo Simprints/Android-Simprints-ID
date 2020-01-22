@@ -14,8 +14,8 @@ class ErrorPresenter(val view: ErrorContract.View,
     }
 
     private fun setUpView(clientApiAlert: ClientApiAlert) {
+        view.setErrorTitleText(getErrorTitle(clientApiAlert))
         with(view) {
-            setErrorTitleText(getErrorTitle(clientApiAlert))
             setErrorMessageText(getErrorMessage(clientApiAlert))
             setBackgroundColour(getBackgroundColour(clientApiAlert))
             setErrorHintVisible(isErrorHintVisible(clientApiAlert))
@@ -37,6 +37,7 @@ class ErrorPresenter(val view: ErrorContract.View,
             view.getStringFromResources(it)
         }
 
+
     private fun getErrorTitle(clientApiAlert: ClientApiAlert): String = when (clientApiAlert) {
         ClientApiAlert.ROOTED_DEVICE -> R.string.rooted_device_title
         else -> R.string.configuration_error_title
@@ -46,6 +47,7 @@ class ErrorPresenter(val view: ErrorContract.View,
         ClientApiAlert.ROOTED_DEVICE -> R.color.alert_red
         else -> R.color.alert_yellow
     }.let(view::getColourFromResources)
+
 
     private fun isErrorHintVisible(clientApiAlert: ClientApiAlert): Boolean {
         return clientApiAlert != ClientApiAlert.ROOTED_DEVICE
