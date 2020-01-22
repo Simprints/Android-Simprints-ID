@@ -16,7 +16,7 @@ class MainMessageSerializerTest {
         val packetParser = PacketParser()
 
         val message = SetUn20OnCommand(DigitalValue.TRUE)
-        val expectedPackets = listOf(packetParser.parse("A0 10 05 00 20 11 01 00 FF".hexToByteArray()))
+        val expectedPackets = listOf(packetParser.parse("A0 10 05 00 20 20 01 00 FF".hexToByteArray()))
 
         val messageSerializer = MainMessageSerializer(packetParser)
 

@@ -30,9 +30,9 @@ import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Observer
 import io.reactivex.Single
-import io.reactivex.Single.defer
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import java.io.InputStream
@@ -102,13 +102,13 @@ class Scanner(
     }
 
     private inline fun <reified R : RootResponse> sendRootModeCommandAndReceiveResponse(command: RootCommand): Single<R> =
-        defer {
+        Single.defer {
             rootMessageStream.outgoing.sendMessage(command)
                 .andThen(rootMessageStream.incoming.receiveResponse<R>())
         }
 
     private inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
-        defer {
+        Single.defer {
             mainMessageStream.outgoing.sendMessage(command)
                 .andThen(mainMessageStream.incoming.receiveResponse<R>())
         }
@@ -169,7 +169,7 @@ class Scanner(
                 SetUn20OnCommand(DigitalValue.TRUE)
             ))
             .completeOnceReceived()
-            .andThen(mainMessageStream.incoming.veroEvents)
+            .andThen(Flowable.defer { mainMessageStream.incoming.veroEvents })
             .filterCast<Un20StateChangeEvent> { it.value == DigitalValue.TRUE }
             .completeOnceReceived()
             .doOnComplete { state.un20On = true }
@@ -180,7 +180,7 @@ class Scanner(
                 SetUn20OnCommand(DigitalValue.FALSE)
             ))
             .completeOnceReceived()
-            .andThen(mainMessageStream.incoming.veroEvents)
+            .andThen(Flowable.defer { mainMessageStream.incoming.veroEvents })
             .filterCast<Un20StateChangeEvent> { it.value == DigitalValue.FALSE }
             .completeOnceReceived()
             .doOnComplete { state.un20On = false }

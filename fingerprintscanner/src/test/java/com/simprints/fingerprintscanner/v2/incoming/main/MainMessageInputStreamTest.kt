@@ -129,7 +129,7 @@ class MainMessageInputStreamTest {
 
     @Test
     fun messageInputStream_receiveDifferentResponses_forwardsOnlyCorrectResponse() {
-        val messageBytes = "20 11 01 00 00 30 10 01 00 FF 20 10 01 00 FF".hexToByteArray()
+        val messageBytes = "20 20 01 00 00 30 10 01 00 FF 20 10 01 00 FF".hexToByteArray()
         val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Channel.Remote.VeroServer, it) }
         val expectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
 
