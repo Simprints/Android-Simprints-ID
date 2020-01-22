@@ -186,17 +186,13 @@
 
     <Button
         android:id="@+id/moduleSelectionButton"
-        style="?android:attr/borderlessButtonStyle"
+        style="@style/SimprintsButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="15dp"
-        android:background="@drawable/button_rounded_corners"
-        android:fontFamily="@font/muli"
-        android:textColor="@color/simprints_white"
-        android:textSize="16sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
