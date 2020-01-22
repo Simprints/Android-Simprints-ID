@@ -16,15 +16,17 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactoryImpl
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult.DownSyncState.COMPLETE
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.person.remote.PipeSeparatorWrapperForURLListParam
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
+import com.simprints.id.data.db.person.remote.models.ApiModes
 import com.simprints.id.data.db.person.remote.models.fromDomainToGetApi
 import com.simprints.id.domain.modality.Modes
+import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -34,6 +36,7 @@ import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.mockserver.assertPathUrlParam
 import com.simprints.testtools.unit.mockserver.assertQueryUrlParam
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import io.kotlintest.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import io.reactivex.Single
@@ -47,7 +50,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.util.*
 import kotlin.math.ceil
 
 @RunWith(AndroidJUnit4::class)
@@ -230,24 +232,65 @@ class PeopleDownSyncDownloaderTaskImplTest {
     @Test
     fun continueFromAPreviousSync_shouldSuccess() {
         runBlocking {
-            runBlocking {
-                val nPeopleToDownload = 407
-                val nPeopleToDelete = 0
-                val lastPatientId = "lastPatientId"
-                val lastPatientUpdateAt = 123123123L
+            val nPeopleToDownload = 0
+            val nPeopleToDelete = 123
 
-                val syncOp = projectSyncOp.copy(lastResult =
-                PeopleDownSyncOperationResult(COMPLETE, lastPatientId, lastPatientUpdateAt, Date().time))
+            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, moduleSyncOp)
 
-                runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, syncOp)
+            val peopleRequestUrl = mockServer.takeRequest().requestedUrl()
+            assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
+            assertQueryUrlParam(peopleRequestUrl, "moduleId", DEFAULT_MODULE_ID)
+        }
+    }
 
-                val peopleRequestUrl = mockServer.takeRequest().requestedUrl()
-                assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
-                assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", lastPatientId)
-                assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", "$lastPatientUpdateAt")
+
+    @Test
+    fun downSyncRequestFailsDueToIntegrationIssue_shouldImmediatelyFail() {
+        runBlocking {
+            mockServer.enqueue(MockResponse().setResponseCode(404))
+            val syncTask = PeopleDownSyncDownloaderTaskImpl(
+                personLocalDataSourceMock,
+                personRemoteDataSourceMock,
+                downSyncScopeRepository,
+                peopleSyncCache,
+                TimeHelperImpl())
+
+            shouldThrow<SyncCloudIntegrationException> {
+                syncTask.execute(projectSyncOp, uniqueWorkerId, mockk(relaxed = true))
+            }
+            assertThat(mockServer.requestCount).isEqualTo(1)
+        }
+    }
+
+
+    @Test
+    fun downSyncRequestFailsDueToNetworkIssue_shouldRetry() {
+        runBlocking {
+            val clientMock = mockClientToThrowFirstAndThenExecuteNetworkCall()
+            coEvery { personRemoteDataSourceMock.getPeopleApiClient() } returns clientMock
+
+            runDownSyncAndVerifyConditions(100, 0, projectSyncOp)
+
+            assertThat(mockServer.requestCount).isEqualTo(1)
+            coVerify(exactly = 2) { clientMock.downSync(any(), any(), any(), any(), any(), any()) }
+        }
+    }
+
+    private fun mockClientToThrowFirstAndThenExecuteNetworkCall(): PeopleRemoteInterface {
+        val remotePeopleApi: PeopleRemoteInterface = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl).api
+        return mockk {
+            coEvery { downSync(any(), any(), any(), any(), any(), any()) } throws Throwable("Network issue") coAndThen {
+                remotePeopleApi.downSync(
+                    args[0] as String,
+                    args[1] as String?,
+                    args[2] as String?,
+                    args[3] as String?,
+                    args[4] as Long?,
+                    args[5] as PipeSeparatorWrapperForURLListParam<ApiModes>)
             }
         }
     }
+
 
     private suspend fun runDownSyncAndVerifyConditions(
         nPeopleToDownload: Int,
@@ -256,11 +299,11 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
         val batchesForSavingInLocal = calculateCorrectNumberOfBatches(nPeopleToDownload)
         val batchesForDeletion = calculateCorrectNumberOfBatches(nPeopleToDelete)
-        val batchesForOperations = calculateCorrectNumberOfBatches(nPeopleToDownload + nPeopleToDelete)
 
         val peopleToDownload = prepareResponseForDownSyncOperation(downSyncOps, nPeopleToDownload)
         val peopleToDelete = peopleResponseForSubScopeForDeletion(downSyncOps, nPeopleToDelete)
         val opsStream = peopleToDelete.plus(peopleToDownload)
+
         mockServer.enqueue(mockSuccessfulResponseForPatients(opsStream))
 
         val syncTask = PeopleDownSyncDownloaderTaskImpl(

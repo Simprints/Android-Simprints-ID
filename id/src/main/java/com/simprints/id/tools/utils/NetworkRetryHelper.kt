@@ -29,5 +29,5 @@ suspend fun <T, V : SimRemoteInterface> retrySimNetworkCalls(client: V,
                 }
             }
         },
-        retryThrowable = { it !is SyncCloudIntegrationException })
+        retryIf = { it !is SyncCloudIntegrationException })
 }
