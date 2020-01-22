@@ -6,16 +6,31 @@ import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidato
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
+import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.ClientBase
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.extensions.doInBackground
+import com.simprints.clientapi.tools.DeviceManager
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
-                                private var eventsManager: ClientApiSessionEventsManager)
+                                private val eventsManager: ClientApiSessionEventsManager,
+                                private val deviceManager: DeviceManager,
+                                protected val crashReportManager: ClientApiCrashReportManager)
     : RequestContract.Presenter {
+
+    protected abstract suspend fun processRequest()
+
+    override suspend fun start() {
+        try {
+            deviceManager.checkIfDeviceIsRooted()
+            processRequest()
+        } catch (exception: RootedDeviceException) {
+            handleRootedDevice(exception)
+        }
+    }
 
     override fun processEnrollRequest() = validateAndSendRequest(
         EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))
@@ -66,6 +81,11 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         }
     }
 
+    private fun handleRootedDevice(exception: RootedDeviceException) {
+        crashReportManager.logExceptionOrSafeException(exception)
+        view.handleClientRequestError(ROOTED_DEVICE)
+    }
+
     private fun addSuspiciousEventIfRequired(request: ClientBase) {
         if (request.unknownExtras.isNotEmpty()) {
             eventsManager.addSuspiciousIntentEvent(request.unknownExtras).doInBackground()
@@ -76,4 +96,5 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         eventsManager.addInvalidIntentEvent(view.action ?: "", view.extras ?: emptyMap())
             .doInBackground()
     }
+
 }

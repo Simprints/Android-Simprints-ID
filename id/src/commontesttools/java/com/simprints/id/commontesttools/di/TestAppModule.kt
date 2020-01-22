@@ -32,7 +32,6 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.tools.DeviceManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -62,8 +61,7 @@ class TestAppModule(
     var downSyncTaskRule: DependencyRule = RealRule,
     var syncSchedulerHelperRule: DependencyRule = RealRule,
     var downSyncManagerRule: DependencyRule = RealRule,
-    var encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) },
-    var deviceManagerRule: DependencyRule = RealRule
+    var encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) }
 ) : AppModule() {
 
     override fun provideCrashManager(): CrashReportManager =
@@ -153,8 +151,5 @@ class TestAppModule(
 
     override fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
         encryptedSharedPreferencesRule.resolveDependency { super.provideEncryptedSharedPreferences(app) }
-
-    override fun provideDeviceManager(context: Context): DeviceManager =
-        deviceManagerRule.resolveDependency { super.provideDeviceManager(context) }
 
 }
