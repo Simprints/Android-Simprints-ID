@@ -7,7 +7,7 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.models.PeopleCount
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
+import com.simprints.id.services.scheduledSync.people.common.*
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.DOWNLOADED
@@ -21,8 +21,6 @@ import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncSt
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.*
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.*
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker
 import java.util.*
@@ -149,20 +147,20 @@ private fun createUpSyncCounterWorker(state: WorkInfo.State,
 
 fun createCommonDownSyncTags(uniqueMasterSyncId: String?,
                              uniqueSyncId: String?) = listOf(
-    "${PeopleDownSyncWorkersBuilder.TAG_DOWN_MASTER_SYNC_ID}${uniqueSyncId}",
-    "${PeopleSyncMasterWorker.TAG_SCHEDULED_AT}${Date().time}",
-    PeopleDownSyncWorkersBuilder.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS,
-    PeopleSyncMasterWorker.TAG_PEOPLE_SYNC_ALL_WORKERS,
-    "${PeopleSyncMasterWorker.TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
+    "${TAG_DOWN_MASTER_SYNC_ID}${uniqueSyncId}",
+    "${TAG_SCHEDULED_AT}${Date().time}",
+    TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS,
+    TAG_PEOPLE_SYNC_ALL_WORKERS,
+    "${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
 )
 
 private fun createCommonUpSyncTags(uniqueMasterSyncId: String?,
                                    uniqueSyncId: String?) = listOf(
-    "${PeopleUpSyncWorkersBuilder.TAG_UP_MASTER_SYNC_ID}${uniqueSyncId}",
-    "${PeopleSyncMasterWorker.TAG_SCHEDULED_AT}${Date().time}",
-    PeopleUpSyncWorkersBuilder.TAG_PEOPLE_UP_SYNC_ALL_WORKERS,
-    PeopleSyncMasterWorker.TAG_PEOPLE_SYNC_ALL_WORKERS,
-    "${PeopleSyncMasterWorker.TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
+    "${TAG_UP_MASTER_SYNC_ID}${uniqueSyncId}",
+    "${TAG_SCHEDULED_AT}${Date().time}",
+    TAG_PEOPLE_UP_SYNC_ALL_WORKERS,
+    TAG_PEOPLE_SYNC_ALL_WORKERS,
+    "${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
 )
 
 fun createWorkInfo(state: WorkInfo.State,

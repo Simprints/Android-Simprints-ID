@@ -9,6 +9,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.models.fromDownSync
 import com.simprints.id.data.db.common.models.totalCount
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.services.scheduledSync.people.common.filterByTags
 import com.simprints.id.services.scheduledSync.people.down.workers.extractDownSyncProgress
 import com.simprints.id.services.scheduledSync.people.down.workers.getDownCountsFromOutput
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
@@ -21,7 +22,6 @@ import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWo
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.*
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.TAG_SCHEDULED_AT
 import com.simprints.id.services.scheduledSync.people.up.workers.extractUpSyncProgress
 import com.simprints.id.services.scheduledSync.people.up.workers.getUpCountsFromOutput
 import timber.log.Timber
@@ -125,13 +125,4 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
 
         return progresses.filterNotNull().sum()
     }
-
-    private fun List<WorkInfo>.filterByTags(vararg tagsToFilter: String) =
-        this.filter {
-            it.tags.firstOrNull { tag ->
-                tagsToFilter.contains(tag)
-            } != null
-        }.sortedBy { it ->
-            it.tags.first { it.contains(TAG_SCHEDULED_AT) }
-        }
 }

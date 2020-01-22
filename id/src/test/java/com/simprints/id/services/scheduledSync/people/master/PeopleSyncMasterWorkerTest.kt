@@ -7,16 +7,13 @@ import androidx.work.WorkInfo.State.ENQUEUED
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.people.common.*
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger.PERIODIC_BACKGROUND
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder.Companion.TAG_PEOPLE_UP_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -80,7 +77,7 @@ class PeopleSyncMasterWorkerTest {
     }
 
     @Test
-    fun masterPeriodicSyncWorker_syncNotGoingAndBackgroundOff_shouldEnqueueOnyUpWorkers() = runBlockingTest {
+    fun masterPeriodicSyncWorker_syncNotGoingAndBackgroundOff_shouldEnqueueOnlyUpWorkers() = runBlockingTest {
         with(masterWorker) {
             val uniqueSyncId = masterWorker.uniqueSyncId
             prepareSyncWorkers(uniqueSyncId)
@@ -138,14 +135,17 @@ class PeopleSyncMasterWorkerTest {
     }
 
     private fun assertSyncWorkersAreEnqueued(uniqueSyncId: String) {
-        val downWorkers = wm.getWorkInfosByTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId").get()
+        val workers = wm.getWorkInfosByTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId").get()
+        val downWorkers = workers.filterByTags(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
+
         assertThat(downWorkers).isNotEmpty()
         assertThat(downWorkers.first().state).isEqualTo(ENQUEUED)
     }
 
     private fun assertOnlyUpSyncWorkersAreEnqueued(uniqueSyncId: String) {
         val syncWorkers = wm.getWorkInfosByTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId").get()
-        assertThat(syncWorkers).hasSize(1)
+        val lastSyncReporterWorkersCount = 1
+        assertThat(syncWorkers).hasSize(1 + lastSyncReporterWorkersCount)
 
         val downWorkers = wm.getWorkInfosByTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS).get()
         assertThat(downWorkers).hasSize(0)
@@ -166,7 +166,7 @@ class PeopleSyncMasterWorkerTest {
         coEvery { masterWorker.upSyncWorkerBuilder.buildUpSyncWorkerChain(any()) } returns buildUpSyncWorkers(uniqueSyncId)
     }
 
-    private fun buildDownSyncWorkers(uniqueSyncId: String): List<WorkRequest> =
+    private fun buildDownSyncWorkers(uniqueSyncId: String): List<OneTimeWorkRequest> =
         listOf(OneTimeWorkRequestBuilder<PeopleDownSyncDownloaderWorker>()
             .setConstraints(constraintsForWorkers())
             .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
@@ -174,7 +174,7 @@ class PeopleSyncMasterWorkerTest {
             .addTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId")
             .build())
 
-    private fun buildUpSyncWorkers(uniqueSyncId: String): List<WorkRequest> =
+    private fun buildUpSyncWorkers(uniqueSyncId: String): List<OneTimeWorkRequest> =
         listOf(OneTimeWorkRequestBuilder<PeopleUpSyncUploaderWorker>()
             .setConstraints(constraintsForWorkers())
             .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
