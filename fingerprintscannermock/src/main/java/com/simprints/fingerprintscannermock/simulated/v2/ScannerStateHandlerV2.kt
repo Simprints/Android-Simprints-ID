@@ -13,6 +13,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
 import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterCypressOtaModeCommand
 import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterMainModeCommand
 import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterStmOtaModeCommand
+import com.simprints.fingerprintscanner.v2.domain.root.commands.SetVersionCommand
 
 fun SimulatedScannerStateV2.updateStateAccordingToOutgoingMessage(command: OutgoingMessage) {
     when (command) {
@@ -26,6 +27,9 @@ fun SimulatedScannerStateV2.updateStateAccordingToOutgoingMessage(command: Outgo
                 }
                 is EnterStmOtaModeCommand -> {
                     mode = Mode.STM_OTA
+                }
+                is SetVersionCommand -> {
+                    versionInfo = command.version
                 }
                 else -> {
                     /* do nothing */
