@@ -11,7 +11,7 @@ import okhttp3.ResponseBody
 import retrofit2.http.*
 
 @JvmSuppressWildcards
-interface PeopleRemoteInterface: SimRemoteInterface {
+interface PeopleRemoteInterface : SimRemoteInterface {
 
     companion object {
         var baseUrl = NetworkConstants.baseUrl
@@ -29,7 +29,7 @@ interface PeopleRemoteInterface: SimRemoteInterface {
 
     @POST("projects/{projectId}/patients")
     suspend fun uploadPeople(@Path("projectId") projectId: String,
-                     @Body patientsJson: HashMap<String, List<ApiPostPerson>>)
+                             @Body patientsJson: HashMap<String, List<ApiPostPerson>>)
 
     @GET("projects/{projectId}/patients/{patientId}")
     suspend fun requestPerson(

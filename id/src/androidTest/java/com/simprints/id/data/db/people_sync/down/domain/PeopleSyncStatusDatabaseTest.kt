@@ -117,7 +117,7 @@ class PeopleSyncStatusDatabaseTest {
         val newOp = projectSyncOp.copy(lastResult = downSyncOperationResult)
         downSyncOperationOperationDao.insertOrReplaceDownSyncOperation(newOp.fromDomainToDb())
         val opStored = downSyncOperationOperationDao.getDownSyncOperation(extractKeyFrom(newOp))
-        assertThat(opStored).isEqualTo(newOp.fromDomainToDb())
+        assertThat(opStored.first()).isEqualTo(newOp.fromDomainToDb())
     }
 
     private suspend fun assertSaveAndRead(downSyncOp: PeopleDownSyncOperation) {
