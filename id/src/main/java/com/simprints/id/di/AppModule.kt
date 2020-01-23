@@ -46,6 +46,7 @@ import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.secure.*
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
@@ -60,6 +61,7 @@ import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.*
 import com.simprints.id.tools.device.DeviceManager
@@ -96,12 +98,14 @@ open class AppModule {
         remoteDbManager: RemoteDbManager,
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
+        peopleSyncManager: PeopleSyncManager,
         syncManager: SyncManager
     ): SignerManager = SignerManagerImpl(
         projectRepository,
         remoteDbManager,
         loginInfoManager,
         preferencesManager,
+        peopleSyncManager,
         syncManager
     )
 
@@ -140,11 +144,11 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSecureLocalDbKeyProvider(@Named("EncryptedSharedPreferences") encryptedSharedPrefs: SharedPreferences,
+    open fun provideSecureLocalDbKeyProvider(builder: EncryptedSharedPreferencesBuilder,
                                              randomGenerator: RandomGenerator,
                                              unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
         SecureLocalDbKeyProviderImpl(
-            encryptedSharedPrefs,
+            builder.buildEncryptedSharedPreferences(FILENAME_FOR_REALM_KEY_SHARED_PREFS),
             randomGenerator,
             unsecuredLocalDbKeyProvider)
 
@@ -274,9 +278,13 @@ open class AppModule {
             loginInfoManager.getSignedInProjectIdOrEmpty(), peopleDownSyncScopeRepository)
 
     @Provides
+    open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =
+        EncryptedSharedPreferencesBuilderImpl(app)
+
+    @Provides
     @Named("EncryptedSharedPreferences")
-    open fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
-        EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
+    open fun provideEncryptedSharedPreferences(builder: EncryptedSharedPreferencesBuilder): SharedPreferences =
+        builder.buildEncryptedSharedPreferences()
 
     @Provides
     open fun provideDashboardSyncCardDisplayer(androidResourcesHelper: AndroidResourcesHelper,

@@ -7,6 +7,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.SyncManager
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 
@@ -15,6 +16,7 @@ open class SignerManagerImpl(
     private val remote: RemoteDbManager,
     private val loginInfoManager: LoginInfoManager,
     private val preferencesManager: PreferencesManager,
+    private val peopleSyncManager: PeopleSyncManager,
     private val syncManager: SyncManager
 ) : SignerManager {
 
@@ -45,7 +47,7 @@ open class SignerManagerImpl(
         loginInfoManager.cleanCredentials()
         remote.signOut()
         syncManager.cancelBackgroundSyncs()
-        syncManager.deleteLastSyncInfo()
+        peopleSyncManager.deleteSyncInfo()
         preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
     }
 

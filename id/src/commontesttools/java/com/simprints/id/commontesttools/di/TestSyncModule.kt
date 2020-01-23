@@ -18,8 +18,8 @@ import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessor
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
@@ -89,26 +89,23 @@ class TestSyncModule(
     @Singleton
     override fun providePeopleSyncManager(
         ctx: Context,
-        peopleSyncStateProcessor: PeopleSyncStateProcessor
+        peopleSyncStateProcessor: PeopleSyncStateProcessor,
+        peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
+        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
+        peopleSyncCache: PeopleSyncCache
     ): PeopleSyncManager = peopleSyncManagerRule.resolveDependency {
-        super.providePeopleSyncManager(ctx, peopleSyncStateProcessor)
+        super.providePeopleSyncManager(ctx, peopleSyncStateProcessor, peopleUpSyncScopeRepository, peopleDownSyncScopeRepository, peopleSyncCache)
     }
 
     @Singleton
     override fun provideSyncManager(
-        preferencesManager: PreferencesManager,
         sessionEventsSyncManager: SessionEventsSyncManager,
         peopleSyncManager: PeopleSyncManager,
-        peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
-        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
         imageUpSyncScheduler: ImageUpSyncScheduler
     ): SyncManager = syncManagerRule.resolveDependency {
         super.provideSyncManager(
-            preferencesManager,
             sessionEventsSyncManager,
             peopleSyncManager,
-            peopleUpSyncScopeRepository,
-            peopleDownSyncScopeRepository,
             imageUpSyncScheduler
         )
     }
