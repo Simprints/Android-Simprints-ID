@@ -7,6 +7,7 @@ import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
@@ -22,12 +23,18 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.tools.AndroidResourcesHelper
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import kotlinx.android.synthetic.main.activity_dashboard.*
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.ticker
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 class DashboardActivity : AppCompatActivity() {
 
+    private var syncAgainTicker: ReceiveChannel<Unit>? = null
 
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
@@ -36,6 +43,7 @@ class DashboardActivity : AppCompatActivity() {
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository
     @Inject lateinit var peopleSyncCache: PeopleSyncCache
+    @Inject lateinit var timeHelper: TimeHelper
 
     private lateinit var viewModel: DashboardViewModel
     private lateinit var viewModelFactory: DashboardViewModelFactory
@@ -43,7 +51,7 @@ class DashboardActivity : AppCompatActivity() {
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
         private const val LOGOUT_RESULT_CODE = 1
-
+        private const val ONE_MINUTE = 1000 * 60L
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +60,7 @@ class DashboardActivity : AppCompatActivity() {
         val component = (application as Application).component
         component.inject(this)
         title = androidResourcesHelper.getString(R.string.dashboard_label)
-        viewModelFactory = DashboardViewModelFactory(peopleSyncManager, deviceManager, preferencesManager, peopleDownSyncScopeRepository, peopleSyncCache)
+        viewModelFactory = DashboardViewModelFactory(peopleSyncManager, deviceManager, preferencesManager, peopleDownSyncScopeRepository, peopleSyncCache, timeHelper)
         viewModel = ViewModelProvider(this, viewModelFactory).get(DashboardViewModel::class.java)
         setupActionBar()
 
@@ -61,21 +69,52 @@ class DashboardActivity : AppCompatActivity() {
 
     private fun observeForSyncCardState() {
         syncCardDisplayer.initRoot(dashboard_sync_card)
-        viewModel.syncCardState.observe(this, Observer<DashboardSyncCardState> {
+        viewModel.syncCardState.observe(this@DashboardActivity, Observer<DashboardSyncCardState> {
             syncCardDisplayer.displayState(it)
         })
 
-        syncCardDisplayer.userWantsToOpenSettings.observe(this, Observer {
+        syncCardDisplayer.userWantsToOpenSettings.observe(this@DashboardActivity, Observer {
             openSettings()
         })
 
-        syncCardDisplayer.userWantsToSelectAModule.observe(this, Observer {
+        syncCardDisplayer.userWantsToSelectAModule.observe(this@DashboardActivity, Observer {
             openSelectModules()
         })
 
-        syncCardDisplayer.userWantsToSync.observe(this, Observer {
+        syncCardDisplayer.userWantsToSync.observe(this@DashboardActivity, Observer {
             peopleSyncManager.sync()
         })
+
+        lifecycleScope.launchWhenResumed {
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            stopTickerToCheckIfSyncIsRequired()
+            syncAgainTicker = ticker(delayMillis = ONE_MINUTE, initialDelayMillis = 100)
+            syncAgainTicker?.let {
+                for (event in it) {
+                    Timber.d("Launch sync if required")
+                    viewModel.syncIfRequired()
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            syncCardDisplayer.startTickerToUpdateLastSyncText()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopTickerToCheckIfSyncIsRequired()
+        syncCardDisplayer.stopTickerToUpdateLastSyncText()
+    }
+
+    private fun stopTickerToCheckIfSyncIsRequired() {
+        syncAgainTicker?.cancel()
     }
 
     private fun openSettings() {
