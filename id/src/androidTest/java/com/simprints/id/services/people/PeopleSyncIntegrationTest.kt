@@ -145,30 +145,62 @@ class PeopleSyncIntegrationTest {
     }
 
     @Test
-    fun uploadFails_shouldSyncFail() {
+    fun uploadFailsBecauseANotCloudIssue_shouldSyncRetry() {
         runSyncTest { continuation, activity ->
             mockResponsesForSync(projectSyncScope)
-            mockDispatcher.uploadResponseResult = false
+            mockUploadPeople()
+            mockDispatcher.uploadResponse = 300 to ""
 
             runAndVerifySyncRetries(activity, continuation)
         }
     }
 
     @Test
-    fun downloadFails_shouldSyncFail() {
+    fun uploadFailsBecauseACloudIssue_shouldSyncFail() {
         runSyncTest { continuation, activity ->
             mockResponsesForSync(projectSyncScope)
-            mockDispatcher.downResponse = null
+            mockUploadPeople()
+            mockDispatcher.uploadResponse = 505 to ""
+
+            runAndVerifySyncFails(activity, continuation)
+        }
+    }
+
+    @Test
+    fun downloadFailsBecauseACloudIssue_shouldSyncRetry() {
+        runSyncTest { continuation, activity ->
+            mockResponsesForSync(projectSyncScope)
+            mockDispatcher.downResponse = 300 to listOf()
 
             runAndVerifySyncRetries(activity, continuation)
         }
     }
 
     @Test
-    fun downCountFails_shouldSyncFail() {
+    fun downloadFailsBecauseACloudIssue_shouldSyncFail() {
         runSyncTest { continuation, activity ->
             mockResponsesForSync(projectSyncScope)
-            mockDispatcher.countResponse = null
+            mockDispatcher.downResponse = 505 to listOf()
+
+            runAndVerifySyncFails(activity, continuation)
+        }
+    }
+
+    @Test
+    fun downCountFailsBecauseANotCloudIssue_shouldSyncSucceed() {
+        runSyncTest { continuation, activity ->
+            val total = mockResponsesForSync(projectSyncScope)
+            mockDispatcher.countResponse = 300 to null
+
+            runAndVerifySyncRetries(activity, continuation)
+        }
+    }
+
+    @Test
+    fun downCountFailsBecauseANotCloudIssue_shouldSyncRetry() {
+        runSyncTest { continuation, activity ->
+            mockResponsesForSync(projectSyncScope)
+            mockDispatcher.countResponse = 300 to null
 
             runAndVerifySyncRetries(activity, continuation)
         }
@@ -177,8 +209,19 @@ class PeopleSyncIntegrationTest {
 
     private fun runAndVerifySyncSucceeds(act: Activity, total: Int, cor: CancellableContinuation<Boolean>) {
         peopleSyncManager.getLastSyncState().observe(act as LifecycleOwner, Observer {
-            if (!it.anySyncWorkersStillRunning()) {
+            if (!(it.anySyncWorkersStillRunning() || it.anySyncWorkersEnqueued())) {
                 it.assertSyncSucceeds(total)
+                cor.resumeSafely(true)
+            }
+        })
+
+        peopleSyncManager.sync()
+    }
+
+    private fun runAndVerifySyncFails(act: Activity, cor: CancellableContinuation<Boolean>) {
+        peopleSyncManager.getLastSyncState().observe(act as LifecycleOwner, Observer {
+            if (!(it.anySyncWorkersStillRunning() || it.anySyncWorkersEnqueued())) {
+                it.assertSyncFails()
                 cor.resumeSafely(true)
             }
         })
@@ -221,8 +264,8 @@ class PeopleSyncIntegrationTest {
             ApiPeopleOperationGroupResponse(ApiPeopleOperationCounts(it.created, it.deleted, it.updated))
         })
 
-        mockDispatcher.downResponse = apiPeopleToDownload
-        mockDispatcher.countResponse = countResponse
+        mockDispatcher.downResponse = 200 to apiPeopleToDownload
+        mockDispatcher.countResponse = 200 to countResponse
 
         return apiPeopleToDownload.size
     }
@@ -236,31 +279,44 @@ class PeopleSyncIntegrationTest {
 
 class MockDispatcher : Dispatcher() {
 
-    var countResponse: ApiPeopleOperationsResponse? = null
-    var downResponse: List<ApiGetPerson>? = null
-    var uploadResponseResult: Boolean = true
+    var countResponse: Pair<Int, ApiPeopleOperationsResponse?>? = null
+    var downResponse: Pair<Int, List<ApiGetPerson>?>? = null
+    var uploadResponse: Pair<Int, String>? = null
 
     override fun dispatch(request: RecordedRequest): MockResponse {
         val lastPart = request.requestUrl?.pathSegments?.last()
 
         return if (lastPart == "patients" && request.method == "POST") {
-            MockResponse().setResponseCode(if (uploadResponseResult) 200 else 404)
+            val code = uploadResponse?.first ?: 200
+            MockResponse().setResponseCode(code)
         } else if (lastPart == "count") {
-            MockResponse().setResponseCode(200).setBody(JsonHelper.gson.toJson(countResponse))
+            val code = countResponse?.first ?: 200
+            val response = JsonHelper.gson.toJson(countResponse?.second ?: "")
+            MockResponse().setResponseCode(code).setBody(response)
         } else if (lastPart == "patients" && request.method == "GET") {
-            MockResponse().setResponseCode(200).setBody(JsonHelper.gson.toJson(downResponse))
+            val code = downResponse?.first ?: 200
+            val response = JsonHelper.gson.toJson(downResponse?.second ?: "")
+            MockResponse().setResponseCode(code).setBody(response)
         } else {
             MockResponse().setResponseCode(404)
         }
     }
 }
 
+private fun PeopleSyncState.anySyncWorkersEnqueued(): Boolean =
+    downSyncWorkersInfo.plus(upSyncWorkersInfo).any { it.state is Enqueued }
+
 private fun PeopleSyncState.anySyncWorkersStillRunning(): Boolean =
-    downSyncWorkersInfo.plus(upSyncWorkersInfo).any { it.state is Running || it.state is Enqueued }
+    downSyncWorkersInfo.plus(upSyncWorkersInfo).any { it.state is Running }
 
 private fun PeopleSyncState.assertSyncRetries() {
     assertThat((downSyncWorkersInfo.plus(upSyncWorkersInfo)).any { it.state is Enqueued }).isTrue()
 }
+
+private fun PeopleSyncState.assertSyncFails() {
+    assertThat((downSyncWorkersInfo.plus(upSyncWorkersInfo)).any { it.state is Failed }).isTrue()
+}
+
 
 private fun PeopleSyncState.assertSyncSucceeds(total: Int) {
     assertThat(total).isEqualTo(total)
