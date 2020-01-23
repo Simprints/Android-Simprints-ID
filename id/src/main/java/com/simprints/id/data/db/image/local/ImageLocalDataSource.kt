@@ -4,6 +4,9 @@ import com.simprints.core.images.Path
 import com.simprints.core.images.SecuredImageRef
 import java.io.FileInputStream
 
+/**
+ * Interface for local image file operations
+ */
 interface ImageLocalDataSource {
 
     /**
@@ -15,7 +18,7 @@ interface ImageLocalDataSource {
      *        the sub-directories where the image will be stored, within the root images folder.
      *        e.g.: for [root images folder]/fingerprints/bad_scans [subDirs] should be
      *        @sample [Path(arrayOf("fingerprints", "bad_scans"))]
-     *        @see [com.simprints.core.images.Path]
+     * @see [Path]
      * @param fileName
      *        the file name
      * @return
