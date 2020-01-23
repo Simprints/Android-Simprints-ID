@@ -20,15 +20,13 @@ import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.commands.*
 import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprintscanner.v2.domain.root.responses.*
+import com.simprints.fingerprintscanner.v2.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
-import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Observer
-import io.reactivex.Single
+import io.reactivex.*
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import java.io.InputStream
@@ -307,6 +305,11 @@ class Scanner(
                 GetImageQualityCommand()
             ))
             .map { it.imageQualityScore }
+
+    fun startStmOta(firmwareHexFile: String): Observable<Float> =
+        assertMode(STM_OTA).andThen(
+            StmOtaController(this)
+                .program(firmwareHexFile))
 
     companion object {
         val DEFAULT_DPI = Dpi(500)
