@@ -130,6 +130,7 @@ class PeopleSyncMasterWorkerTest {
         wm.enqueue(OneTimeWorkRequestBuilder<PeopleDownSyncDownloaderWorker>()
             .setConstraints(constraintsForWorkers())
             .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
+            .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
             .addTag("${TAG_MASTER_SYNC_ID}$existingSyncId")
             .build())
     }

@@ -4,7 +4,10 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.work.*
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.services.scheduledSync.people.common.*
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
@@ -13,7 +16,10 @@ import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncM
 import java.util.concurrent.TimeUnit
 
 class PeopleSyncManagerImpl(private val ctx: Context,
-                            private val peopleSyncStateProcessor: PeopleSyncStateProcessor) : PeopleSyncManager {
+                            private val peopleSyncStateProcessor: PeopleSyncStateProcessor,
+                            private val peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
+                            private val peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
+                            private val peopleSyncCache: PeopleSyncCache) : PeopleSyncManager {
 
     companion object {
         const val SYNC_WORKER_REPEAT_INTERVAL = 15L
@@ -79,4 +85,11 @@ class PeopleSyncManagerImpl(private val ctx: Context,
         Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
+
+    override suspend fun deleteSyncInfo() {
+        peopleUpSyncScopeRepository.deleteAll()
+        peopleDownSyncScopeRepository.deleteAll()
+        peopleSyncCache.clearProgresses()
+        peopleSyncCache.storeLastSuccessfulSyncTime(null)
+    }
 }

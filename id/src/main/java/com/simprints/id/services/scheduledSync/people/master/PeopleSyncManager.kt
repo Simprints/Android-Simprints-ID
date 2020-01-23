@@ -13,4 +13,5 @@ interface PeopleSyncManager {
     fun scheduleSync()
     fun cancelScheduledSync()
     fun cancelAndRescheduleSync()
+    suspend fun deleteSyncInfo()
 }

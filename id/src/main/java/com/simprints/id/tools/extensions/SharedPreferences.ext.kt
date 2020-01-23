@@ -26,6 +26,6 @@ fun SharedPreferences.getMap(key: String, default: Map<String, String> = emptyMa
 fun SharedPreferences.save(transaction: (SharedPreferences.Editor) -> Unit) {
     with(this.edit()) {
         transaction(this)
-        this.apply()
+        this.commit()
     }
 }

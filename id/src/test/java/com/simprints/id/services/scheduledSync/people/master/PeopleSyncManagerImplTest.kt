@@ -7,18 +7,23 @@ import androidx.work.*
 import androidx.work.WorkInfo.State.CANCELLED
 import androidx.work.WorkInfo.State.ENQUEUED
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.services.scheduledSync.people.common.TAG_PEOPLE_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.people.common.TAG_SCHEDULED_AT
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.id.testtools.UnitTestConfig
 import io.mockk.MockKAnnotations
-import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.coVerify
+import io.mockk.impl.annotations.MockK
 import io.mockk.spyk
 import io.mockk.verify
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +32,10 @@ import org.junit.runner.RunWith
 class PeopleSyncManagerImplTest {
 
     private lateinit var peopleSyncManager: PeopleSyncManagerImpl
-    @RelaxedMockK lateinit var peopleSyncStateProcessor: PeopleSyncStateProcessor
+    @MockK lateinit var peopleSyncStateProcessor: PeopleSyncStateProcessor
+    @MockK lateinit var peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository
+    @MockK lateinit var peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository
+    @MockK lateinit var peopleSyncCache: PeopleSyncCache
 
     private val ctx: Context = ApplicationProvider.getApplicationContext()
     private val wm: WorkManager
@@ -46,8 +54,8 @@ class PeopleSyncManagerImplTest {
             .setupFirebase()
             .setupCrashlytics()
 
-        MockKAnnotations.init(this, relaxUnitFun = true)
-        peopleSyncManager = PeopleSyncManagerImpl(ctx, peopleSyncStateProcessor)
+        MockKAnnotations.init(this, relaxed = true)
+        peopleSyncManager = PeopleSyncManagerImpl(ctx, peopleSyncStateProcessor, peopleUpSyncScopeRepository, peopleDownSyncScopeRepository, peopleSyncCache)
     }
 
     @Test
@@ -96,13 +104,24 @@ class PeopleSyncManagerImplTest {
 
     @Test
     fun cancelAndRescheduleSync_shouldRescheduleMasterWorkers() {
-        peopleSyncManager = spyk(PeopleSyncManagerImpl(ctx, peopleSyncStateProcessor))
+        peopleSyncManager = spyk(PeopleSyncManagerImpl(ctx, peopleSyncStateProcessor, peopleUpSyncScopeRepository, peopleDownSyncScopeRepository, peopleSyncCache))
 
         peopleSyncManager.cancelAndRescheduleSync()
 
         verify { peopleSyncManager.cancelScheduledSync() }
         verify { peopleSyncManager.stop() }
         verify { peopleSyncManager.scheduleSync() }
+    }
+
+    @Test
+    fun deleteSyncInfo_shouldDeleteAnyInfoRelatedToSync() = runBlockingTest {
+
+        peopleSyncManager.deleteSyncInfo()
+
+        coVerify { peopleUpSyncScopeRepository.deleteAll() }
+        coVerify { peopleDownSyncScopeRepository.deleteAll() }
+        verify { peopleSyncCache.clearProgresses() }
+        verify { peopleSyncCache.storeLastSuccessfulSyncTime(null) }
     }
 
     private fun enqueueDownSyncWorkers() {
