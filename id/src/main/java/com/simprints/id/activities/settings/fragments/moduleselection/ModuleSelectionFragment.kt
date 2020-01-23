@@ -78,6 +78,7 @@ class ModuleSelectionFragment(
 
     private fun refreshSyncWorkers(){
         peopleSyncManager.cancelAndRescheduleSync()
+        peopleSyncManager.sync()
     }
     override fun onChipClick(module: Module) {
         updateSelectionIfPossible(module)
