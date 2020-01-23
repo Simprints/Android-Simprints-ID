@@ -31,7 +31,7 @@ class ImageLocalDataSourceImplTest {
     @Test
     fun givenAByteArray_storeIt_shouldCreateAFile() {
         val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
-        val securedImageRef = imageLocalDataSource.storeImage(byteArray, subDirs, FILE_NAME)
+        val securedImageRef = imageLocalDataSource.encryptAndStoreImage(byteArray, subDirs, FILE_NAME)
         require(securedImageRef != null)
 
         val file = File(securedImageRef.path)
@@ -44,16 +44,16 @@ class ImageLocalDataSourceImplTest {
     @Test
     fun givenAnEncryptedFile_decryptIt_shouldReturnTheRightContent() {
         val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
-        val securedImageRef = imageLocalDataSource.storeImage(byteArray, subDirs, FILE_NAME)
+        val securedImageRef = imageLocalDataSource.encryptAndStoreImage(byteArray, subDirs, FILE_NAME)
         require(securedImageRef != null)
 
-        val encryptedInputStream = imageLocalDataSource.readImage(securedImageRef)
+        val encryptedInputStream = imageLocalDataSource.decryptImage(securedImageRef)
         assertThat(encryptedInputStream?.readBytes()).isEqualTo(byteArray)
     }
 
     @Test
     fun encryptThrowsAnException_shouldBeHandled() {
-        val securedImageRef = imageLocalDataSource.storeImage(
+        val securedImageRef = imageLocalDataSource.encryptAndStoreImage(
             emptyArray<Byte>().toByteArray(),
             subDirs,
             ""
@@ -73,8 +73,8 @@ class ImageLocalDataSourceImplTest {
     fun shouldListImageFilesStoredAtDifferentSubDirs() {
         val bytes = Random.nextBytes(SIZE_IMAGE)
         with(imageLocalDataSource) {
-            storeImage(bytes, Path("dir1"), FILE_NAME)
-            storeImage(bytes, Path("dir2"), FILE_NAME)
+            encryptAndStoreImage(bytes, Path("dir1"), FILE_NAME)
+            encryptAndStoreImage(bytes, Path("dir2"), FILE_NAME)
         }
 
         val images = imageLocalDataSource.listImages()
@@ -106,7 +106,7 @@ class ImageLocalDataSourceImplTest {
 
         for (i in 0 until count) {
             val byteArray = Random.nextBytes(SIZE_IMAGE)
-            imageLocalDataSource.storeImage(
+            imageLocalDataSource.encryptAndStoreImage(
                 byteArray,
                 subDirs,
                 randomUUID()

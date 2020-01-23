@@ -28,7 +28,7 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
 
     private val masterKeyAlias = MasterKeys.getOrCreate(AES256_GCM_SPEC)
 
-    override fun storeImage(
+    override fun encryptAndStoreImage(
         imageBytes: ByteArray,
         subDirs: Path,
         fileName: String
@@ -53,7 +53,7 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
         }
     }
 
-    override fun readImage(image: SecuredImageRef): FileInputStream? {
+    override fun decryptImage(image: SecuredImageRef): FileInputStream? {
         val file = File(image.path)
         val encryptedFile = getEncryptedFile(file)
         return try {
