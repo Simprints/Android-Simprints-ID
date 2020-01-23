@@ -5,11 +5,12 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.images.Path
 import com.simprints.core.images.SecuredImageRef
+import com.simprints.id.tools.utils.StringsUtils.Companion.randomUUID
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
-import java.util.*
 import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
@@ -17,58 +18,77 @@ import kotlin.random.Random
 class ImageLocalDataSourceImplTest {
 
     companion object {
-        private const val FILENAME = "test"
+        private const val FILE_NAME = "test.png"
         private const val SIZE_IMAGE = 500 * 1024 //500kB
         private const val IMAGES_FOLDER = "images"
     }
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val imagesFolder = "${app.filesDir}/$IMAGES_FOLDER"
-    private val securedImageManager = ImageLocalDataSourceImpl(app)
+    private val subDirs = Path("test")
+    private val imageLocalDataSource = ImageLocalDataSourceImpl(app)
 
     @Test
     fun givenAByteArray_storeIt_shouldCreateAFile() {
         val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
-        val securedImageRef = securedImageManager.storeImage(byteArray, FILENAME)
+        val securedImageRef = imageLocalDataSource.storeImage(byteArray, subDirs, FILE_NAME)
         require(securedImageRef != null)
 
         val file = File(securedImageRef.path)
 
-        assertThat(file.absolutePath).isEqualTo("$imagesFolder/$FILENAME")
-        assertThat(securedImageRef.path).contains(FILENAME)
+        assertThat(file.absolutePath).isEqualTo("$imagesFolder/test/$FILE_NAME")
+        assertThat(securedImageRef.path).contains(FILE_NAME)
         assertThat(file.readBytes()).isNotEqualTo(byteArray)
     }
 
     @Test
     fun givenAnEncryptedFile_decryptIt_shouldReturnTheRightContent() {
         val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
-        val securedImageRef = securedImageManager.storeImage(byteArray, FILENAME)
+        val securedImageRef = imageLocalDataSource.storeImage(byteArray, subDirs, FILE_NAME)
         require(securedImageRef != null)
 
-        val encryptedInputStream = securedImageManager.readImage(securedImageRef)
+        val encryptedInputStream = imageLocalDataSource.readImage(securedImageRef)
         assertThat(encryptedInputStream?.readBytes()).isEqualTo(byteArray)
     }
 
     @Test
     fun encryptThrowsAnException_shouldBeHandled() {
-        val securedImageRef = securedImageManager.storeImage(emptyArray<Byte>().toByteArray(), "")
+        val securedImageRef = imageLocalDataSource.storeImage(
+            emptyArray<Byte>().toByteArray(),
+            subDirs,
+            ""
+        )
         assertThat(securedImageRef).isNull()
     }
 
     @Test
     fun shouldListImageFiles() {
         val expectedFileCount = createImageFiles(10).size
-        val actualFileCount = securedImageManager.listImages().size
+        val actualFileCount = imageLocalDataSource.listImages().size
 
         assertThat(actualFileCount).isEqualTo(expectedFileCount)
+    }
+
+    @Test
+    fun shouldListImageFilesStoredAtDifferentSubDirs() {
+        val bytes = Random.nextBytes(SIZE_IMAGE)
+        with(imageLocalDataSource) {
+            storeImage(bytes, Path("dir1"), FILE_NAME)
+            storeImage(bytes, Path("dir2"), FILE_NAME)
+        }
+
+        val images = imageLocalDataSource.listImages()
+        val actualFileCount = images.size
+
+        assertThat(actualFileCount).isEqualTo(2)
     }
 
     @Test
     fun shouldDeleteImageFiles() {
         val files = createImageFiles(3)
         val fileToDelete = files.first()
-        securedImageManager.deleteImage(fileToDelete)
-        val remainingFiles = securedImageManager.listImages()
+        imageLocalDataSource.deleteImage(fileToDelete)
+        val remainingFiles = imageLocalDataSource.listImages()
 
         assertThat(remainingFiles.none { it.path == fileToDelete.path }).isTrue()
         assertThat(remainingFiles.size).isEqualTo(2)
@@ -78,7 +98,7 @@ class ImageLocalDataSourceImplTest {
     fun shouldHandleDeletionOfNonExistentImageFiles() {
         val file = SecuredImageRef("non/existent/path")
 
-        assertThat(securedImageManager.deleteImage(file)).isFalse()
+        assertThat(imageLocalDataSource.deleteImage(file)).isFalse()
     }
 
     private fun createImageFiles(count: Int): List<SecuredImageRef> {
@@ -86,7 +106,11 @@ class ImageLocalDataSourceImplTest {
 
         for (i in 0 until count) {
             val byteArray = Random.nextBytes(SIZE_IMAGE)
-            securedImageManager.storeImage(byteArray, UUID.randomUUID().toString())?.let(createdFiles::add)
+            imageLocalDataSource.storeImage(
+                byteArray,
+                subDirs,
+                randomUUID()
+            )?.let(createdFiles::add)
         }
 
         return createdFiles
