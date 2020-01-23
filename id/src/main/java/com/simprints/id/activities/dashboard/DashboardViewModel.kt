@@ -80,10 +80,10 @@ class DashboardViewModel(peopleSyncManager: PeopleSyncManager,
     }
 
     private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<SyncWorkerInfo>) =
-        allSyncStates.all { it.state is Failed && it.state.failedBecauseCloudIntegration }
+        allSyncStates.any { it.state is Failed && it.state.failedBecauseCloudIntegration }
 
     private fun isSyncFailed(allSyncStates: List<SyncWorkerInfo>) =
-        allSyncStates.all { it.state is Failed || it.state is Blocked || it.state is Cancelled }
+        allSyncStates.any { it.state is Failed || it.state is Blocked || it.state is Cancelled }
 
     private fun isSyncConnecting(allSyncStates: List<SyncWorkerInfo>) =
         allSyncStates.any { it.state is Enqueued }
