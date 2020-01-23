@@ -25,7 +25,7 @@ class DashboardViewModel(val peopleSyncManager: PeopleSyncManager,
                          private val timeHelper: TimeHelper) : ViewModel() {
 
     var syncCardState = MediatorLiveData<DashboardSyncCardState>()
-    private var hasSyncEverRun: Boolean = false
+    var hasSyncEverRun: Boolean = false
     private var lastSyncRun: Date? = null
 
     private var syncStateLiveData = peopleSyncManager.getLastSyncState()
@@ -150,7 +150,6 @@ class DashboardViewModel(val peopleSyncManager: PeopleSyncManager,
     private fun hasSyncRunLongTimeAgo(lastRun: Date?) =
         timeHelper.msBetweenNowAndTime(lastRun?.time ?: Date().time) > TIME_BETWEEN_TWO_SYNCS
 
-
     private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<SyncWorkerInfo>) =
         allSyncStates.any { it.state is Failed && it.state.failedBecauseCloudIntegration }
 
@@ -169,6 +168,6 @@ class DashboardViewModel(val peopleSyncManager: PeopleSyncManager,
 
     companion object {
         private const val ONE_MINUTE = 1000 * 60L
-        private const val TIME_BETWEEN_TWO_SYNCS = 5 * ONE_MINUTE
+        const val TIME_BETWEEN_TWO_SYNCS = 5 * ONE_MINUTE
     }
 }

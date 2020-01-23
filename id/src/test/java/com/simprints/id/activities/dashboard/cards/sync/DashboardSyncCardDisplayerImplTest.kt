@@ -170,12 +170,12 @@ class DashboardSyncCardDisplayerImplTest {
         val card = this.children.first() as CardView
         val cardContent = card.children.first() as ConstraintLayout
         with(cardContent) {
+            val percentage = (100 * (progressState.progress.toFloat() / (progressState.total ?: 0))).toInt()
             assertThat(cardTitle()).isEqualTo(SYNC_CARD_TITLE)
-            assertThat(progressMessage()).isEqualTo("$SYNC_CARD_PROGRESS_STATE_STATE_MESSAGE ${progressState.progress}/${progressState.total}")
+            assertThat(progressMessage()).isEqualTo("$SYNC_CARD_PROGRESS_STATE_STATE_MESSAGE ${percentage}%")
             assertThat(progressConnectingProgressBar().visibility).isEqualTo(GONE)
             assertThat(progressSyncProgressBar().visibility).isEqualTo(VISIBLE)
-            assertThat(progressSyncProgressBar().progress).isEqualTo((100 * (progressState.progress.toFloat() / (progressState.total
-                ?: 0))).toInt())
+            assertThat(progressSyncProgressBar().progress).isEqualTo(percentage)
             assessLastSyncTime()
             assertThat(cardContent.childCount).isEqualTo(5)
         }
@@ -246,7 +246,7 @@ class DashboardSyncCardDisplayerImplTest {
         const val SYNC_CARD_NO_MODULES_STATE_BUTTON = "MODULES"
         const val SYNC_CARD_NO_MODULES_STATE_MESSAGE = "Please select modules to sync"
         const val SYNC_CARD_OFFLINE_STATE_MESSAGE = "Please turn on internet connection in settings"
-        const val SYNC_CARD_CONNECTING_STATE_STATE_MESSAGE = "Connecting…"
+        const val SYNC_CARD_CONNECTING_STATE_STATE_MESSAGE = "Connecting"
         const val SYNC_CARD_PROGRESS_STATE_STATE_MESSAGE = "Syncing…"
         const val SYNC_CARD_COMPLETE_STATE_STATE_MESSAGE = "Sync complete"
     }

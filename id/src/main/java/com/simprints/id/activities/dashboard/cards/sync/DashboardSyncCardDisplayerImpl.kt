@@ -28,7 +28,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
                                      val timeHelper: TimeHelper,
                                      val ctx: Context) : DashboardSyncCardDisplayer {
 
-    private var tickerToUpdateLastSyncTimeText: ReceiveChannel<Unit>? = null
+    var tickerToUpdateLastSyncTimeText: ReceiveChannel<Unit>? = null
     private var lastSyncTimeTextView: TextView? = null
     private var cachedLastSyncTime: Date? = null
 
