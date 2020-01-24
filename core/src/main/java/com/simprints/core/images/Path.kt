@@ -27,7 +27,17 @@ data class Path(private val dirs: Array<String>) {
     override fun hashCode(): Int = dirs.contentHashCode() * 2 + 27
 
     companion object {
-        fun join(first: String, subDirs: Path): Path {
+        /**
+         * Joins a path to a subset of paths
+         *
+         * @param first
+         *        the first part. Can be either one or multiple directories separated by a /
+         * @param subDirs
+         *        the latter part. Can also be either one or multiple directories as a Path
+         *        object.
+         * @return a Path object combining both parts
+         */
+        fun combine(first: String, subDirs: Path): Path {
             val dirs = arrayOf(first, *subDirs.dirs)
             return Path(dirs)
         }
