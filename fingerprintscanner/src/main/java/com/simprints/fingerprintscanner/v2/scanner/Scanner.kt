@@ -24,6 +24,7 @@ import com.simprints.fingerprintscanner.v2.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
 import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
+import com.simprints.fingerprintscanner.v2.tools.hexparser.IntelHexParser
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
@@ -36,7 +37,8 @@ import java.io.OutputStream
 class Scanner(
     private val mainMessageStream: MainMessageStream,
     private val rootMessageStream: RootMessageStream,
-    private val stmOtaMessageStream: StmOtaMessageStream
+    private val stmOtaMessageStream: StmOtaMessageStream,
+    private val intelHexParser: IntelHexParser = IntelHexParser()
 ) {
 
     private lateinit var inputStream: InputStream
@@ -316,8 +318,8 @@ class Scanner(
 
     fun startStmOta(firmwareHexFile: String): Observable<Float> =
         assertMode(STM_OTA).andThen(
-            StmOtaController(stmOtaMessageStream)
-                .program(firmwareHexFile))
+            StmOtaController(intelHexParser)
+                .program(stmOtaMessageStream, firmwareHexFile))
 
     companion object {
         val DEFAULT_DPI = Dpi(500)
