@@ -4,17 +4,8 @@
 
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- Activity Titles -->
-    <string name="register_title">নিয়োগ</string>
-    <string name="identify_title">সনাক্ত করুন</string>
-    <string name="update_title">হালনাগাদ</string>
-    <string name="verify_title">যাচাই করুন</string>
-    <string name="help_title">সাহায্য</string>
     <string name="settings_title">সেটিংস</string>
-    <string name="about_title">সম্বন্ধে</string>
     <string name="alert_title">সতর্ক</string>
-    <string name="tutorial_title">টিউটোরিয়াল</string>
-    <string name="refusal_label">প্রত্যাখ্যান ফর্ম</string>
-    <string name="privacy_label">গোপনীয়তা</string>
 
 
     <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
@@ -22,27 +13,11 @@
 
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
-    <string name="short_consent">আমি আপনার আঙুলের ছাপ এবং অবস্থান ব্যবহার করতে চাই যেন সিমপ্রিন্টস আপনার স্বাস্থ্য তথ্য সমূহ খুঁজে পায়। যদি আপনি এতে রাজী থাকেন অথবা আপনার কোন প্রশ্ন থেকে থাকে তবে আমাকে জানান অন্যথায় আপনার বামহাতের তর্জনী সেন্সরে সমানভাবে রাখুন"</string>
-    <string name="confirm_consent">সম্মতি নিশ্চিত করতে এখানে ট্যাপ করুন</string>
     <!-- Loading Messages-->
-    <string name="connect_scanner_loading">লোড হচ্ছে</string>
-    <string name="updating_database">সিঙ্ক করা হচ্ছেপ্রজক্টে ডাটাবসে আপডটে করা হচ্ছ…</string>
-    <string name="launch_checking_permissions">অনুমতি পরীক্ষা করা হচ্ছে…</string>
-    <string name="connect_scanner_bt_connect">Vero সংযুক্ত হচ্ছে…</string>
-    <string name="connect_scanner_wake_un20">UN20 নিদ্রাভঙ্গ আপ…</string>
-    <string name="connect_scanner_setup">सेट अप Vero</string>
-    <string name="launch_checking_person_in_db">চেক করা ব্যক্তি ডাটাবেসে আছে…</string>
 
 
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
-    <string name="good_scan_direction">দয়া করে পরবর্তী আঙুল স্ক্যান করুন</string>
-    <string name="please_scan">অনুগ্রহ করে স্ক্যান করুন</string>
-    <string name="poor_scan_direction">পুনরায় স্ক্যান</string>
-    <string name="scanning">স্ক্যানিং…</string>
-    <string name="good_scan_message">ভাল ছবি</string>
-    <string name="poor_scan_message">খারাপ ছবি</string>
-    <string name="reconnecting_message">পুনঃসংযোগ</string>
     <!-- Button Labels -->
     <string name="ok">ঠিক আছে</string>
     <string name="cancel_button">বাতিল করুন</string>
@@ -50,12 +25,7 @@
 
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
     <!-- Sync Button Text -->
-    <string name="sync_data">সঙ্কি ডাটা</string>
-    <string name="syncing_calculating">সিঙ্ক করা হচ্ছে… গণনাকারী</string>
-    <string name="syncing_with_progress">সিঙ্ক করা হচ্ছে… %1$d/%2$d</string>
-    <string name="not_signed_in">সাইন ইন করনেনি</string>
     <!-- Toast Messages -->
-    <string name="coming_soon">শীঘ্রই আসছে…</string>
     <!-- Finger Names -->
     <string name="r_1_finger_name">ডান বুড়ো আঙুল</string>
     <string name="r_2_finger_name">ডান তর্জনী</string>
@@ -72,29 +42,16 @@
 
     <!-- MatchingActivity : the waiting screen after an identification -->
     <!-- Screen Text -->
-    <string name="please_wait">সনাক্তকরণ করার সময় অনুগ্রহ করে অপেক্ষা করুন</string>
 
 
     <!-- AlertActivity : the Simprints ID error message screen -->
     <!-- Error Message Titles -->
-    <string name="bluetooth_error_title">Bluetooth ত্রুটি</string>
     <string name="configuration_error_title">কনফিগারেশন সমস্যা</string>
     <string name="verify_guid_not_found_title">ব্যক্তি খুঁজে পাওয়া যায়নি</string>
     <string name="error_occurred_title">ত্রুটি ঘটেছে</string>
     <!-- Error Message Text -->
-    <string name="invalid_intentAction_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ এন্ট্রি),আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
-    <string name="invalid_metadata_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ মেটাডাটা),আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
-    <string name="missing_userId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (ইউজার আইডি নই)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
-    <string name="missing_moduleId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no module ID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
-    <string name="missing_updateId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no update GUID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
-    <string name="missing_verifyId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no verify GUID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
     <string name="verify_guid_not_found_online_message">যাচাইয়ের জন্য নির্বাচিত ব্যক্তি ডাটাবেসে নেই</string>
     <string name="verify_guid_not_found_offline_message">ব্যক্তি খুঁজে পাওয়া যায়নি, দয়া করে নিশ্চিত করুন যে আপনি ইন্টারনেটে সংযুক্ত আছেন এবং আবার চেষ্টা করুন</string>
-    <string name="bluetooth_not_supported_message">Bluetooth এই ডিভাইসের জন্য উপযোগী নয়, অনুগ্রহ করে আপনার সিসটেম অ্যাডমিনিস্ট্রেটর এর সাথে যোগাযোগ করুন</string>
-    <string name="bluetooth_not_enabled_message">Bluetooth সক্রিয় করা নেই, এটি সেটিংস এ সক্রিয় হয়েছে কিনা তা নিশ্চিত করুন এবং আবার চেষ্টা করুন</string>
-    <string name="unbonded_scanner_message">স্ক্যানার  যুক্ত করা নেই, নিশ্চিত করুন এটা সেটিংসে যুক্ত  করা এবং আবার চেষ্টা করুন</string>
-    <string name="multiple_scanners_found_message">এর মধ্যে একটি স্ক্যানার ফোনের সাথে জোড়া করুন, দয়া করে অপ্রয়োজনীয় স্ক্যানার জোড়া বাতিল করুন।</string>
-    <string name="disconnected_message">স্ক্যানারটি পাওয়া যাচ্ছে না, দয়া করে নিশ্চিত করুন যে  এটি চালু এবং ফোনেরি</string>
     <string name="unforeseen_error_message">আবাার চেষ্টা করুন এবং সিমপ্রিন্টস কাজ না করলে আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন।</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">বন্ধ করুন</string>
@@ -104,30 +61,12 @@
 
     <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
-    <string name="database_information">ডাটাবেস তথ্য</string>
-    <string name="user_count">ব্যবহারকারি সংখ্যা:</string>
-    <string name="module_count">মডিউল সংখ্যা:</string>
-    <string name="project_count">প্রকল্প সংখ্যা:</string>
     <string name="preference_app_version_title">অ্যাপ সংস্করণ</string>
-    <string name="about_libsimprints_version">সিমপ্রিন্টস সংস্করণ</string>
     <string name="preference_scanner_version_title">স্ক্যানার সংস্করণ</string>
 
 
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
-    <string name="nudge_mode_checkbox_name">Nudge মোড</string>
-    <string name="vibrate">কাম্পান</string>
-    <string name="quality_threshold_empty">কোয়ালিটি থ্রেশহোল্ড:</string>
-    <string name="quality_threshold_value">কোয়ালিটি থ্রেশহোল্ড: %1$d</string>
-    <string name="nb_of_ids_empty">ফিরে এসে সনাক্তকরণ:</string>
-    <string name="nb_of_ids_value">ফিরে এসে সনাক্তকরণ: %1$d</string>
-    <string name="timeout_empty">সময়সীমা (সকেন্দে):</string>
-    <string name="timeout_value">সময়সীমা (সকেন্দে): %1$d</string>
-    <string name="sync_settings_label">সিঙ্ক সেটিংস</string>
-    <string name="search_settings_label">অনুসন্ধান সেটিংস</string>
-    <string name="user_label">ব্যবহারকারি</string>
-    <string name="module_label">মডিউল</string>
-    <string name="project_label">প্রকল্প</string>
 
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
@@ -143,47 +82,6 @@
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
-    <string name="developmentworker_consent_checkbox">একটি কনফিগারেশন ত্রুটি ঘটেছে (ভিন্ন প্রজেক্ট আই ডি), সাইন আউট করুন এবং আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
-    <string name="long_consent">
-        <b><u>গোপনীয়তা এবং কনসেন্ট</u></b>\n\n
-        আপনি যদি আপনার আঙুল স্ক্যানারে রাখেন তবে তা আপনার আঙুলের ছাপ সংগ্রহ করবে এটি আরো আপনার সম্ভাব্য অবস্থান, যেখানে ছাপ গ্রহন করা হয়েছে এবং সময় ও তারিখও নথিবদ্ধ করবে \n \n
-        একটি বৃটিশ বেসরকারী প্রতিষ্ঠান সিমপ্রিন্টস টেকনোলজি লিমিটেড আপনার এ তথ্য গুলো যাচাই করবে \n\n
-        ভবিষ্যতে আপনাকে চিহ্নিত করে আপনার স্বাস্থ্য বিষয়ক তথ্যের সাথে সমন্বয় সাধনের জন্য সিমপ্রিন্টস ব্র্যাককে সহায়তা করবে। এরই অংশ হিসাবে সিমপ্রিন্টস আপনার তথ্য সমূহের জন্য ব্র্যাকের সাথে অংশীদারি হবে \n\n
-        সিমপ্রিন্টস আপনার তথ্য আরো ব্যবহার করতে পারে তাদের সেবা প্রদানের উন্নয়নের জন্য এবং তার একই উদ্দেশ্য অন্যান্য বিশেষজ্ঞদের সাথেও আপনার তথ্য পর্যালোচনা করতে পারে \n\n
-        বাংলাদেশের স্বাস্থ্যব্যবস্থার উন্নততর প্রয়োগের জন্যও সিমপ্রিন্টস আপনার তথ্য ব্যবহার করতে পারে \n\n
-        ভবিষ্যতে আপনাকে চিহ্নিত করার জন্য এবং আপনার তথ্য সমূহ অন্যান্য অংশীদার উন্নয়ন প্রতিষ্ঠানের সাথে পর্যালোচনার জন্যও সিমপ্রিন্টস আপনার তথ্য ব্যবহার করতে পারে \n\n
-        সিমপ্রিন্টস আশা করে যে বাংলাদেশে এই কার্যক্রম ২০২০ সাল পর্যন্ত স্থায়ী হবে এই সময় কালের জন্য সিমপ্রিন্টস তাদের কাজের জন্য আপনার  তথ্য সমূহ সংরক্ষণ করবে এবং দুই বছর পর এই কাজ শেষ হয়ে গেলে সিমপ্রিন্টস আপনার তথ্য সমূহ মুছে দেবে \n\n
-        সিমপ্রিন্টস কোন আঙুলের ছাপ সংরক্ষণ করবে না \n\n
-        সিমপ্রিন্টস কোন অবস্থাতেই আপনার তথ্য অন্য কাউকে প্রদান করবে না যদি না কোন আইন দ্বারা তা করার প্রয়োজন পড়ে \n\n
-        স্বাস্থ্য সেবা পাওয়ার জন্য সিমপ্রিন্টকে  কোন তথ্য দেয়ার ব্যাপারে আপনার বাধ্য হতে হবে না। কিন্তু আপনি যদি রাজী না হন তবে হয়তো আপনার স্বাস্থ্য তথ্যসমূহ খুঁজে পেতে সেবা প্রদান কারী প্রতিষ্ঠানের সমস্যা হতেও পারে \n\n
-        যদি আপনি পূর্বে এ ব্যাপারে সম্মত থাকেন যে সিমপ্রিন্ট আপনার তথ্য সংরক্ষণ করবে এবং ব্যবহার করবে কিন্তু আপনি এখন মত পরিবর্তন করেছেন যে এ ব্যপারে আপনি আর সম্মত নন তবে অনুগ্রহ করে আমার সাথে কথা বলুন \n\n
-
-        <b><u>Frequently asked Questions</u></b> \n\n
-        <b>সিমপ্রিন্টস আমার তথ্য সংরক্ষণ এবং ব্যবহার করবে এ ব্যাপারে আমি আর সম্মত নই। আমার কি করা উচিৎ?</b>\n\n
-        আপনি যেকোন মুহুর্তে আপনার তথ্য মুছে ফেলতে সিমপ্রিন্টকে বলতে পারেন। এটি করার জন্য স্বাস্থ্যকর্মীর কাছে আপনাকে শেষবারের মত আঙুলের ছাপ দিতে হবে যাতে সিমপ্রিন্টস আপনাকে চিহ্নিত করতে পারে। আপনি যখনই তা সম্পন্ন করবেন সিমপ্রিন্টস আপনার সম্পর্কিত সকল তথ্য মুছে দিবে। \n\n
-        তবে আপনার মনে রাখা উচিৎ যে যদি সিমপ্রিন্টস আপনার তথ্য মুছে ফেলে তবে হয়তো আপনার স্বাস্থ্য তথ্যসমূহ খুঁজে পেতে সেবা প্রদান কারী প্রতিষ্ঠানের সমস্যা হতেও পারে \n\n
-        <b>সিমপ্রিন্টস কে/ কারা?</b>\n\n
-        সিমপ্রিন্টস টেকনোলজি লিমিটেড একটি বৃটিশ বে-সরকারী সংস্থা যারা আপনার মত রোগীর সাথে তাদের স্বাস্থ্য তথ্যসমূহের সমন্বয় সাধনের জন্য ব্র্যাককে সহায়তা প্রদান করছে \n\n
-        <b>সিমপ্রিন্টস আমার ব্যাপারে কোন তথ্য সংরক্ষণ করবে?</b>\n\n
-        সিমপ্রিন্টস আপনার স্ক্যানকৃত আঙুলের ছাপ সংরক্ষণ করবে এটি আরো সংরক্ষণ করবে আপনার সম্ভাব্য অবস্থান যেখানে আপনার আঙুলের ছাপ গ্রহন করা হয়েছে এবং একই রকম যেকোন স্ক্যানের সময় এবং তারিখ \n\n
-        সিমপ্রিন্টস আপনার অন্য কোন চিহ্নিতকারক তথ্য যেমন নাম, জন্মতারিখ সংরক্ষণ করবে না। সিমপ্রিন্টস আপনার কোন স্বাস্থ্যগত তথ্য সংরক্ষণ করবে না। সিমপ্রিন্টস আপনার কোন আঙুলের ছাপও সংরক্ষণ করবে না। \n\n
-        <b>সিমপ্রিন্টস আমার তথ্য দিয়ে কি করবে?</b>\n\n
-        ভবিষ্যতে আপনাকে চিহ্নিত করে আপনার স্বাস্থ্য বিষয়ক তথ্যের সাথে সমন্বয় সাধনের জন্য সিমপ্রিন্টস ব্র্যাককে সহায়তা করবে। এরই অংশ হিসাবে সিমপ্রিন্টস আপনার তথ্য সমূহের জন্য ব্র্যাকের সাথে অংশীদারি হবে \n\n
-        সিমপ্রিন্টস আপনার তথ্য আরো ব্যবহার করতে পারে তাদের সেবা প্রদানের উন্নয়নের জন্য এবং তারা একই উদ্দেশ্য অন্যান্য বিশেষজ্ঞদের সাথেও আপনার তথ্য পর্যালোচনা করতে পারে \n\n
-        বাংলাদেশের স্বাস্থ্যব্যবস্থার উন্নততর প্রয়োগের জন্যও সিমপ্রিন্টস আপনার তথ্য ব্যবহার করতে পারে \n\n
-        ভবিষ্যতে আপনাকে চিহ্নিত করার জন্য এবং আপনার তথ্য সমূহ অন্যান্য অংশীদার উন্নয়ন প্রতিষ্ঠানের সাথে পর্যালোচনার জন্যও সিমপ্রিন্টস আপনার তথ্য ব্যবহার করতে পারে \n\n
-        <b>সিমপ্রিন্টস কত সময়ের জন্য আমার তথ্য সংরক্ষণ করবে?</b>\n\n
-        সিমপ্রিন্টস আশা করে যে বাংলাদেশে এই কার্যক্রম ২০২০ সাল পর্যন্ত স্থায়ী হবে এই সময় কালের জন্য সিমপ্রিন্টস তাদের কাজের জন্য আপনার  তথ্য সমূহ সংরক্ষণ করবে এবং দুই বছর পর এই কাজ শেষ হয়ে গেলে সিমপ্রিন্টস আপনার তথ্য সমূহ মুছে দেবে \n\n
-        <b>সিমপ্রিন্টস কি কোন আঙুলের ছাপ সংরক্ষণ করবে?</b>\n\n
-        সিমপ্রিন্টস কোন আঙুলের ছাপ সংরক্ষণ করবে না \n\n
-        <b>সিমপ্রিন্টস কি বাংলাদেশ সরকারকে কোন তথ্য দেবে?</b>\n\n
-        সিমপ্রিন্টস কোন অবস্থাতেই আপনার তথ্য অন্য কাউকে প্রদান করবে না যদি না কোন আইন দ্বারা তা করার প্রয়োজন পড়ে \n\n
-        <b>আঙুলের ছাপ দেয়ার ব্যাপারে আমি কি বাধ্য?</b>\n\n
-        স্বাস্থ্য সেবা পাওয়ার জন্য সিমপ্রিন্টকে  কোন তথ্য দেয়ার ব্যাপারে আপনার বাধ্য হতে হবে না। কিন্তু আপনি যদি রাজী না হন তবে হয়তো আপনার স্বাস্থ্য তথ্যসমূহ খুঁজে পেতে সেবা প্রদান কারী প্রতিষ্ঠানের সমস্যা হতেও পারে \n\n
-
-        <b><u>Development Worker Consent</u></b>\n\n
-        Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other development workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to beneficiaries.
-    </string>
     <string name="alert_try_again">আবার চেষ্টা করা</string>
     <string name="confirmation_logout_cancel">বাতিল করুন</string>
     <string name="confirmation_logout_message">আপনি কি লগআউট করতে চান?</string>
@@ -201,17 +99,8 @@
     <string name="dashboard_card_enrolment_info">নিবন্ধন তথ্য</string>
     <string name="dashboard_card_identification_title">সর্বশেষ সনাক্তকরন</string>
     <string name="dashboard_card_lastscanner_title">স্ক্যানার ব্যবহার করা হয়েছে</string>
-    <string name="dashboard_card_localdb_sync_module_title">নির্বাচিত মডিউলে নিবন্ধন করা ব্যক্তিবর্গ</string>
-    <string name="dashboard_card_localdb_sync_project_title">প্রজেক্ট এ নিবন্ধন করা ব্যক্তিবর্গ</string>
-    <string name="dashboard_card_localdb_sync_user_title">ব্যবহারকারী দ্বারা নিবন্ধন করা ব্যক্তিবর্গ</string>
-    <string name="dashboard_card_project_title">প্রজেক্ট</string>
-    <string name="dashboard_card_remotedb_title">সার্ভার এ সেভ করা ব্যক্তিবর্গ</string>
-    <string name="dashboard_card_sync_action">সিঙ্ক</string>
-    <string name="dashboard_card_sync_failed">সিঙ্ক ব্যর্থ</string>
     <string name="dashboard_card_sync_last_sync">সর্বশেষ সিঙ্ক: %1$s</string>
-    <string name="dashboard_card_sync_needed">আপনাকে সিঙ্ক করতে হতে পারে</string>
     <string name="dashboard_card_sync_now">সিঙ্ক করুন</string>
-    <string name="dashboard_card_sync_title">তথ্য সিঙ্ক করুন</string>
     <string name="dashboard_card_syncing">সিঙ্ক করা হচ্ছে</string>
     <string name="dashboard_card_to_download">ডাউনলোড করতে</string>
     <string name="dashboard_card_to_upload">আপলোড করতে</string>
@@ -219,14 +108,7 @@
     <string name="dashboard_label">ড্যাশবোর্ড</string>
     <string name="different_projectId_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (ভিন্ন প্রজেক্ট আই ডি), সাইন আউট করুন এবং আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
     <string name="different_userId_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (ভিন্ন ব্যবহারকারী আই ডি), সাইন আউট করুন এবং আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
-    <string name="invalid_moduleId_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ মডিউল আইডি),আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
-    <string name="invalid_projectId_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ প্রোজেক্ট আই ডি), আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
-    <string name="invalid_selectedId_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ সিলেক্টেড আই ডি), আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
-    <string name="invalid_sessionId_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ সেশন আই ডি), আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
-    <string name="invalid_userId_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ ব্যবহারকারী আইডি),আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
-    <string name="invalid_verifyId_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ জি ইউ আইডি যাচাই),আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
     <string name="login">লগইন করুন</string>
-    <string name="login_enter_project_secret_id">আপনার প্রজেক্ট আইডি এবং কী প্রদান করুন</string>
     <string name="login_id_hint">প্রজেক্ট আইডি</string>
     <string name="login_invalid_credentials">তথ্য সঠিক নয়। প্রজেক্ট আইডি এবং কী চেক করুন।</string>
     <string name="login_invalid_qr_code">স্ক্যান করা কিউআর কোডটি সঠিক নয়</string>
@@ -237,12 +119,10 @@
     <string name="login_secret_hint">প্রজেক্ট কী</string>
     <string name="login_server_error">সার্ভার এর সাথে সংযোগ স্থাপনে সমস্যা হয়েছে। পরবর্তীতে আবার চেষ্টা করুন।</string>
     <string name="login_title">প্রজেক্টের তথ্য অনুরোধ করুন</string>
-    <string name="login_type_project_details">টাইপ করুন</string>
     <string name="login_user_id_hint">ব্যবহারকারী আইডি</string>
     <string name="logout">লগআউট করুন</string>
     <string name="long_consent_download_button_text">গোপনীয়তা নোটিশ ডাউনলোড করুন</string>
     <string name="long_consent_failed_to_download">গোপনীয়তা নোটিশ ডাউনলোড অসফল হয়েছে</string>
-    <string name="long_consent_no_privacy_notice_found_text">গোপনীয়তা নোটিশ এখনও এই ভাষায় ডাউনলোড করা হয়নি</string>
     <string name="menu_privacy_notice">গোপনীয়তা নোটিশ</string>
     <string name="menu_settings">সেটিংস</string>
     <string name="preference_app_details_title">সম্বন্ধে</string>
@@ -251,7 +131,6 @@
     <string name="preference_select_fingers_title">নির্ধারিত আঙ্গুল গুলো সমূহ নির্বাচন করুন</string>
     <string name="preference_select_language_title">ভাষা</string>
     <string name="preference_select_modules_title">মডিউল নির্বাচন করুন</string>
-    <string name="preference_summary_modules">যে মডিউল গুলো সিঙ্ক করবেন সেগুলো সিলেক্ট করুন</string>
     <string name="preference_summary_settings_fingers">যে আঙ্গুল গুলো স্ক্যান করবেন সেগুলো সিলেক্ট করুন</string>
     <string name="preference_sync_and_search_title">সিঙ্ক করুন এবং কনফিগারেশন খুজুন</string>
     <string name="records_up_to_date">সকল তথ্য আপডেটেড আছে</string>
@@ -260,11 +139,9 @@
     <string name="safetynet_down_alert_message">৫-১০ মিনিট পর চেষ্টা করুন</string>
     <string name="scan_qr">কিউআর স্ক্যান করুন</string>
     <string name="settings_app_details">অ্যাপ বিবরন</string>
-    <string name="settings_app_version">অ্যাপ সংস্করন</string>
     <string name="settings_general">সাধারণ</string>
     <string name="settings_invalid_selection">অবৈধ নির্বাচন</string>
     <string name="settings_no_modules_toast">অবৈধ নির্বাচন। অন্তত একটি মডিউল নির্বাচন করুন।</string>
-    <string name="settings_scanner_version">স্ক্যানার সংস্করন</string>
     <string name="settings_too_many_modules_toast">অবৈধ নির্বাচন। %1$d এর বেশি মডিউল নির্বাচন করবেন না।</string>
     <string name="simprints_logo">সিমপ্রিন্টস লোগো</string>
     <string name="title_activity_settings">সেটিংস</string>

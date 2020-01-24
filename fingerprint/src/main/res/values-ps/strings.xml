@@ -6,15 +6,8 @@
     <!-- Activity Titles -->
     <string name="register_title">شاملیدل</string>
     <string name="identify_title">مشخص کول</string>
-    <string name="update_title">تجدیدول (اپدیټ)</string>
     <string name="verify_title">پیدا کول</string>
-    <string name="help_title">مرسته</string>
-    <string name="settings_title">تنظیمات</string>
-    <string name="about_title">د برنامې په اړه</string>
-    <string name="alert_title">پاملرنه</string>
-    <string name="tutorial_title">ځانګړي تمرین</string>
     <string name="refusal_label">د انکار فورم</string>
-    <string name="privacy_label">محرمیت</string>
 
 
     <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
@@ -23,8 +16,6 @@
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
     <!-- Loading Messages-->
-    <string name="connect_scanner_loading">د آماده کیدو پر حال</string>
-    <string name="updating_database">ډیټابیس د تجدید یا اپدیټ په حال کی ده…</string>
     <string name="connect_scanner_bt_connect">له Veroسره د اړیکې په حال کې</string>
     <string name="connect_scanner_wake_un20">د .... برابرول</string>
     <string name="connect_scanner_setup">د .... آماده کول</string>
@@ -44,19 +35,13 @@
     <string name="rescan_label_question">بیا ځلې سکن یعنی څه؟</string>
     <string name="scan_label">سکن</string>
     <string name="cancel_button" tools:ignore="ButtonCase">لغو کول</string>
-    <string name="ok">اوکی</string>
     <string name="scan">سکن</string>
     <!-- Content Descriptions -->
 
 
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
     <!-- Sync Button Text -->
-    <string name="sync_data">د معلوماتو همګامول</string>
-    <string name="syncing_calculating">همګامول… شمېرنه</string>
-    <string name="syncing_with_progress">همګامول… %1$d/%2$d </string>
-    <string name="not_signed_in">سیسټم کې دننه شوی نه یاست</string>
     <!-- Toast Messages -->
-    <string name="coming_soon">ډیر ژر…</string>
     <!-- Finger Names -->
     <string name="l_5_finger_name">د چپ لاس پنځمه ګوته</string>
     <string name="l_4_finger_name">د چپ لاس څلورمه ګوته</string>
@@ -75,45 +60,17 @@
     <string name="please_wait">صبر وکړئ څو مو تشخیص ته ادامه ورکړو</string>
     <!-- Loading text -->
     <string name="loading_candidates">د ګډونوالو د آماده کولو په حال</string>
-    <string name="loaded_candidates_one"> ..... فیصده کسان د آماده کیدو پر حال %d</string>
-    <string name="loaded_candidates_other">.... کسان آمده شوی دی %d</string>
     <string name="matching_fingerprints">د ګوتو د نښانو د مطابقت په حال کی</string>
-    <string name="returning_results">پایله د لاسته راتلو په حال کی</string>
-    <string name="returned_results_one"> فیصده پایله لاسته راغله %d</string>
-    <string name="returned_results_other"> فیصده پایله لاسته راغله %d</string>
-    <string name="tier1or2_matches_zero">دومره ښه مطابقت نه</string>
-    <string name="tier1or2_matches_one"> فیصده ډیر ښه مطابقت %d</string>
-    <string name="tier1or2_matches_other">ډیر ښه مطابقت %d</string>
-    <string name="tier3_matches_zero">ښه مطابقت نه</string>
-    <string name="tier3_matches_one"> ښه مطابقت %d</string>
-    <string name="tier3_matches_other"> ښه مطابقتونه %d</string>
-    <string name="tier4_matches_zero">ورته والی یا مطابقت نلری</string>
-    <string name="tier4_matches_one"> مطابقت لری %d</string>
-    <string name="tier4_matches_other">سره ورته دي %d</string>
 
 
     <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->
-    <string name="bluetooth_error_title">په بلوتوت کې تیروتنه</string>
-    <string name="configuration_error_title">به تنظماتو کې تیروتنه</string>
-    <string name="disconnected_title">سکینر ونه موندل شو</string>
-    <string name="verify_guid_not_found_title">کس پیدا نشو</string>
     <string name="error_occurred_title">تیروتنه رامنځته شوه</string>
     <string name="low_battery_title">د بطرۍ چارج لږ دی</string>
     <!-- Error Message Text -->
-    <string name="invalid_intentAction_message">د (invalid Intent Action)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
-    <string name="invalid_metadata_message">د (invalid metadata)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
-    <string name="missing_userId_message">د no user ID په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
-    <string name="missing_moduleId_message">د no module ID په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
-    <string name="missing_updateId_message">د no update GUID په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
-    <string name="missing_verifyId_message">د no verify GUID په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
-    <string name="verify_guid_not_found_online_message">هغه کس چي د تشخیص لپاره انتخاب شوی په ډیټابیس کې شتون نلری</string>
-    <string name="verify_guid_not_found_offline_message">کس پیدا نشو، په مهربانۍ سره ځان ډاډه کړئ چې انټرنټ سره وصل یاست او بیا له سر نه کوښښ وکړئ</string>
     <string name="bluetooth_not_supported_message">په دغه دستګاه کې بلوتوت کار نه ورکوي، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
     <string name="bluetooth_not_enabled_message">بلوتوت فعاله نه ده، په مهربانۍ سره ځان ډاده کړئ چې بلوتوت په تنظیماتو کې فعال شوي دی او بیا کوښښ وکړئ.</string>
-    <string name="unbonded_scanner_message">دغه سکینر د لاسرسۍ وړ نه ده. په مهربانۍ سره ځان ډاډه کړئ چې سکینر لږیدلې او موبایل ته نژدې ایښودل شوی دی</string>
     <string name="multiple_scanners_found_message">له یوه څخه ډیر سکینر له موبایل سره وصل شوی، په مهربانۍ سره د هغه سکینر ارتباط چې تاسو ورته اړتیا نه لرئ له موبایل سره قطع کړئ.</string>
-    <string name="disconnected_message">دغه سکینر د لاسرسۍ وړ نه ده. په مهربانۍ سره ځان ډاډه کړئ چې سکینر لږیدلې او موبایل ته نژدې ایښودل شوی دی</string>
     <string name="low_battery_message">د سکینر بطري په ختمیدو ده. په مهربانۍ سره د خپل سکینر بطري چارج کړئ.</string>
     <string name="unforeseen_error_message">بښنه غواړو، غیر مترقبه تیروتنه ترسره شوی، د دوام لپاره پروګرام بند کړئ</string>
     <!-- Button Labels For Error Messages -->
@@ -124,37 +81,12 @@
 
     <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
-    <string name="database_information">د ډیټابیس په اړه معلومات</string>
-    <string name="user_count">د ګټه اخیستونکو شمیر:</string>
-    <string name="module_count">د مادیول شمیره :</string>
-    <string name="project_count">د پروژو شمیر :</string>
-    <string name="preference_app_version_title">د اپلیکيشن نسخه :</string>
-    <string name="about_libsimprints_version">د ګوتې د نښان اخستلو د ماشین مودل :</string>
-    <string name="preference_scanner_version_title">د سکینر نسخه یا ډول :</string>
     <!-- Button Labels -->
     <!-- Recovery dialogs -->
-    <string name="recovering_db">د معلوماتو بیا لاسته راوړل.... لږ څه وخت نیسې</string>
-    <string name="error">تیروتنه</string>
-    <string name="error_recovery_message">د ریکوري شوي فایل په رالیږلو کې ستونزه</string>
-    <string name="success_recovery_message">د دوباره لټون فایل په بریالیتوب سره اپلوډ شو</string>
-    <string name="dismiss">راوتل</string>
 
 
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
-    <string name="nudge_mode_checkbox_name">Nudge Mode</string>
-    <string name="vibrate">لرزه کول</string>
-    <string name="quality_threshold_empty">د کیفیت کچه:</string>
-    <string name="quality_threshold_value">د کیفیت کچه: %1$d</string>
-    <string name="nb_of_ids_empty">د راغوښتل شویو معلوماتو تشخیص :</string>
-    <string name="nb_of_ids_value">د راغوښتل شویو معلوماتو تشخیص:%1$d</string>
-    <string name="timeout_empty">وخت پوره شو (په سانیو):</string>
-    <string name="timeout_value">وخت پوره شو (په سانیو): %d</string>
-    <string name="sync_settings_label">د همګامولو تنظیمات</string>
-    <string name="search_settings_label">د تنظیماتو د پیدا کولو په حال کی</string>
-    <string name="user_label">ګټه اخیستونکی</string>
-    <string name="module_label">مادیول</string>
-    <string name="project_label">پروژه</string>
 
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
@@ -164,8 +96,6 @@
     <string name="button_submit">سپارل</string>
     <string name="button_scan_prints">اوکی</string>
     <!-- Refusal Selection Points -->
-    <string name="scanner_not_working">سکنر کار نه ورکوي</string>
-    <string name="beneficiary_refused">ګټه اخیستونکی انکار وکړ</string>
     <string name="refusal_other">نور</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">لا ډير معلومات</string>
@@ -173,7 +103,6 @@
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
-    <string name="developmentworker_consent_checkbox">له دیټا څخه د Simprints په توګه کار اخیستنې په اړه رضایت لرم</string>
 
 
 </resources>
