@@ -25,22 +25,33 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.Opera
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.SmileLedState
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.SetSmileLedStateResponse
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.SetUn20OnResponse
+import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
 import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
+import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterCypressOtaModeCommand
 import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterMainModeCommand
+import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterStmOtaModeCommand
+import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterCypressOtaModeResponse
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
+import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterStmOtaModeResponse
 import com.simprints.fingerprintscanner.v2.incoming.main.MainMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.root.RootMessageInputStream
+import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
+import com.simprints.fingerprintscanner.v2.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
+import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageOutputStream
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
+import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
+import io.reactivex.rxkotlin.toObservable
 import io.reactivex.subjects.PublishSubject
 import org.junit.Test
 import java.io.InputStream
@@ -50,7 +61,7 @@ class ScannerTest {
 
     @Test
     fun scanner_callEnterModeBeforeConnect_throwsException() {
-        val scanner = Scanner(mock(), mock(), mock())
+        val scanner = Scanner(mock(), mock(), mock(), mock())
         scanner.enterMainMode().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
     }
 
@@ -61,7 +72,7 @@ class ScannerTest {
         val mockInputStream = mock<InputStream>()
         val mockOutputStream = mock<OutputStream>()
 
-        val scanner = Scanner(mock(), RootMessageStream(mockMessageInputStream, mockMessageOutputStream), mock())
+        val scanner = Scanner(mock(), RootMessageStream(mockMessageInputStream, mockMessageOutputStream), mock(), mock())
         scanner.connect(mockInputStream, mockOutputStream).blockingAwait()
 
         verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
@@ -71,7 +82,7 @@ class ScannerTest {
     @Test
     fun scanner_connect_stateIsInRootMode() {
 
-        val scanner = Scanner(mock(), mock(), mock())
+        val scanner = Scanner(mock(), mock(), mock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
 
         assertThat(scanner.state.mode).isEqualTo(Mode.ROOT)
@@ -87,7 +98,7 @@ class ScannerTest {
         val mockInputStream = mock<InputStream>()
         val mockOutputStream = mock<OutputStream>()
 
-        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock(), mock())
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock(), mock(), mock())
         scanner.connect(mockInputStream, mockOutputStream).blockingAwait()
 
         scanner.enterMainMode().blockingAwait()
@@ -102,7 +113,7 @@ class ScannerTest {
             whenThis { veroEvents } thenReturn Flowable.empty()
         }
 
-        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mock()), setupRootMessageStreamMock(), mock())
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mock()), setupRootMessageStreamMock(), mock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
 
         scanner.enterMainMode().blockingAwait()
@@ -111,8 +122,65 @@ class ScannerTest {
     }
 
     @Test
+    fun scanner_connectThenEnterStmOtaMode_callsConnectOnStmOtaMessageStreams() {
+
+        val mockMessageInputStream = setupMock<StmOtaMessageInputStream> {
+            whenThis { stmOtaResponseStream } thenReturn Flowable.empty()
+        }
+        val mockMessageOutputStream = mock<StmOtaMessageOutputStream>()
+        val mockInputStream = mock<InputStream>()
+        val mockOutputStream = mock<OutputStream>()
+
+        val scanner = Scanner(mock(), setupRootMessageStreamMock(), StmOtaMessageStream(mockMessageInputStream, mockMessageOutputStream), mock())
+        scanner.connect(mockInputStream, mockOutputStream).blockingAwait()
+
+        scanner.enterStmOtaMode().blockingAwait()
+
+        verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
+        verifyOnce(mockMessageOutputStream) { connect(mockOutputStream) }
+    }
+
+    @Test
+    fun scanner_connectThenEnterStmOtaMode_stateIsInStmOtaMode() {
+        val mockMessageInputStream = setupMock<StmOtaMessageInputStream> {
+            whenThis { stmOtaResponseStream } thenReturn Flowable.empty()
+        }
+
+        val scanner = Scanner(mock(), setupRootMessageStreamMock(), StmOtaMessageStream(mockMessageInputStream, mock()), mock())
+        scanner.connect(mock(), mock()).blockingAwait()
+
+        scanner.enterStmOtaMode().blockingAwait()
+
+        assertThat(scanner.state.mode).isEqualTo(Mode.STM_OTA)
+    }
+
+    @Test
+    fun scanner_connectThenEnterStmOtaModeThenStartStmOta_receivesProgressCorrectly() {
+        val progressValues = listOf(0.25f, 0.50f, 0.75f, 1.00f)
+
+        val mockStmOtaController = setupMock<StmOtaController> {
+            whenThis { program(anyNotNull(), anyNotNull()) } thenReturn Observable.defer { progressValues.toObservable() }
+        }
+
+        val mockMessageInputStream = setupMock<StmOtaMessageInputStream> {
+            whenThis { stmOtaResponseStream } thenReturn Flowable.empty()
+        }
+
+        val scanner = Scanner(mock(), setupRootMessageStreamMock(), StmOtaMessageStream(mockMessageInputStream, mock()), mockStmOtaController)
+        scanner.connect(mock(), mock()).blockingAwait()
+        scanner.enterStmOtaMode().blockingAwait()
+
+        val testObserver = scanner.startStmOta("").testSubscribe()
+
+        testObserver.awaitAndAssertSuccess()
+
+        assertThat(testObserver.values()).containsExactlyElementsIn(progressValues).inOrder()
+        testObserver.assertComplete()
+    }
+
+    @Test
     fun scanner_connectThenTurnUn20On_throwsException() {
-        val scanner = Scanner(mock(), setupRootMessageStreamMock(), mock())
+        val scanner = Scanner(mock(), setupRootMessageStreamMock(), mock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
 
         scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
@@ -127,7 +195,7 @@ class ScannerTest {
         }
         val mockMessageOutputStream = mock<MainMessageOutputStream>()
 
-        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock(), mock())
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock(), mock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
         scanner.enterMainMode().blockingAwait()
 
@@ -160,7 +228,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock())
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
         scanner.enterMainMode().blockingAwait()
 
@@ -188,7 +256,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock())
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
         scanner.enterMainMode().blockingAwait()
 
@@ -221,7 +289,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock()).apply {
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock(), mock()).apply {
             connect(mock(), mock()).blockingAwait()
             enterMainMode().blockingAwait()
             state.un20On = true
@@ -247,7 +315,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock()).apply {
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock(), mock()).apply {
             connect(mock(), mock()).blockingAwait()
             enterMainMode().blockingAwait()
             state.un20On = null
@@ -276,7 +344,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock()).apply {
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock(), mock()).apply {
             connect(mock(), mock()).blockingAwait()
             enterMainMode().blockingAwait()
             state.un20On = true
@@ -311,7 +379,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock()).apply {
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock(), mock()).apply {
             connect(mock(), mock()).blockingAwait()
             enterMainMode().blockingAwait()
             state.un20On = true
@@ -325,7 +393,7 @@ class ScannerTest {
 
     @Test
     fun scanner_connectThenDisconnect_resetsToDisconnectedState() {
-        val scanner = Scanner(mock(), setupRootMessageStreamMock(), mock())
+        val scanner = Scanner(mock(), setupRootMessageStreamMock(), mock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
         scanner.disconnect().blockingAwait()
 
@@ -342,9 +410,16 @@ class ScannerTest {
             rootResponseStream = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
         }
         val mockRootMessageOutputStream = setupMock<RootMessageOutputStream> {
-            whenThis { sendMessage(isA<EnterMainModeCommand>()) } then {
+            whenThis { sendMessage(anyNotNull()) } then {
                 Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(EnterMainModeResponse())
+                    responseSubject.onNext(
+                        when (it.arguments[0] as RootCommand){
+                            is EnterMainModeCommand -> EnterMainModeResponse()
+                            is EnterStmOtaModeCommand -> EnterStmOtaModeResponse()
+                            is EnterCypressOtaModeCommand -> EnterCypressOtaModeResponse()
+                            else -> throw IllegalArgumentException()
+                        }
+                    )
                 }
             }
         }
