@@ -50,7 +50,7 @@ class ScannerTest {
 
     @Test
     fun scanner_callEnterModeBeforeConnect_throwsException() {
-        val scanner = Scanner(mock(), mock())
+        val scanner = Scanner(mock(), mock(), mock())
         scanner.enterMainMode().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
     }
 
@@ -61,7 +61,7 @@ class ScannerTest {
         val mockInputStream = mock<InputStream>()
         val mockOutputStream = mock<OutputStream>()
 
-        val scanner = Scanner(mock(), RootMessageStream(mockMessageInputStream, mockMessageOutputStream))
+        val scanner = Scanner(mock(), RootMessageStream(mockMessageInputStream, mockMessageOutputStream), mock())
         scanner.connect(mockInputStream, mockOutputStream).blockingAwait()
 
         verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
@@ -71,7 +71,7 @@ class ScannerTest {
     @Test
     fun scanner_connect_stateIsInRootMode() {
 
-        val scanner = Scanner(mock(), mock())
+        val scanner = Scanner(mock(), mock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
 
         assertThat(scanner.state.mode).isEqualTo(Mode.ROOT)
@@ -87,7 +87,7 @@ class ScannerTest {
         val mockInputStream = mock<InputStream>()
         val mockOutputStream = mock<OutputStream>()
 
-        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock())
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock(), mock())
         scanner.connect(mockInputStream, mockOutputStream).blockingAwait()
 
         scanner.enterMainMode().blockingAwait()
@@ -102,7 +102,7 @@ class ScannerTest {
             whenThis { veroEvents } thenReturn Flowable.empty()
         }
 
-        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mock()), setupRootMessageStreamMock())
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mock()), setupRootMessageStreamMock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
 
         scanner.enterMainMode().blockingAwait()
@@ -112,7 +112,7 @@ class ScannerTest {
 
     @Test
     fun scanner_connectThenTurnUn20On_throwsException() {
-        val scanner = Scanner(mock(), setupRootMessageStreamMock())
+        val scanner = Scanner(mock(), setupRootMessageStreamMock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
 
         scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
@@ -127,7 +127,7 @@ class ScannerTest {
         }
         val mockMessageOutputStream = mock<MainMessageOutputStream>()
 
-        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock())
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
         scanner.enterMainMode().blockingAwait()
 
@@ -160,7 +160,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock())
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
         scanner.enterMainMode().blockingAwait()
 
@@ -188,7 +188,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock())
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
         scanner.enterMainMode().blockingAwait()
 
@@ -221,7 +221,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock()).apply {
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock()).apply {
             connect(mock(), mock()).blockingAwait()
             enterMainMode().blockingAwait()
             state.un20On = true
@@ -247,7 +247,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock()).apply {
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock()).apply {
             connect(mock(), mock()).blockingAwait()
             enterMainMode().blockingAwait()
             state.un20On = null
@@ -276,7 +276,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock()).apply {
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock()).apply {
             connect(mock(), mock()).blockingAwait()
             enterMainMode().blockingAwait()
             state.un20On = true
@@ -311,7 +311,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock()).apply {
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock(), mock()).apply {
             connect(mock(), mock()).blockingAwait()
             enterMainMode().blockingAwait()
             state.un20On = true
@@ -325,7 +325,7 @@ class ScannerTest {
 
     @Test
     fun scanner_connectThenDisconnect_resetsToDisconnectedState() {
-        val scanner = Scanner(mock(), setupRootMessageStreamMock())
+        val scanner = Scanner(mock(), setupRootMessageStreamMock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
         scanner.disconnect().blockingAwait()
 

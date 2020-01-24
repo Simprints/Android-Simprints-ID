@@ -2,6 +2,8 @@ package com.simprints.fingerprintscanner.v2.tools.primitives
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import kotlin.experimental.inv
+import kotlin.experimental.xor
 
 fun byteArrayOf(vararg elements: Any): ByteArray {
     val bytes = mutableListOf<Byte>()
@@ -35,3 +37,6 @@ fun <T> ByteArray.extract(getType: ByteBuffer.() -> T, position: IntRange? = nul
     ).apply { order(byteOrder) }.getType()
 
 fun ByteArray.chunked(size: Int) = toList().chunked(size).map { it.toByteArray() }
+
+fun ByteArray.xorAll() = reduce { acc, byte -> acc xor byte }
+fun ByteArray.nxorAll() = xorAll().inv()
