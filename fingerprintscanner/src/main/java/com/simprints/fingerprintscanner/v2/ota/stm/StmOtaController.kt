@@ -15,37 +15,37 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
-class StmOtaController(private val stmOtaMessageStream: StmOtaMessageStream) {
+class StmOtaController(private val intelHexParser: IntelHexParser) {
 
-    private inline fun <reified R : StmOtaResponse> sendStmOtaModeCommandAndReceiveResponse(command: StmOtaCommand): Single<R> =
+    private inline fun <reified R : StmOtaResponse> sendStmOtaModeCommandAndReceiveResponse(stmOtaMessageStream: StmOtaMessageStream, command: StmOtaCommand): Single<R> =
         Single.defer {
             stmOtaMessageStream.outgoing.sendMessage(command)
                 .andThen(stmOtaMessageStream.incoming.receiveResponse<R>())
         }
 
-    fun program(firmwareHexFile: String): Observable<Float> =
+    fun program(stmOtaMessageStream: StmOtaMessageStream, firmwareHexFile: String): Observable<Float> =
         single {
-            IntelHexParser().parse(firmwareHexFile)
+            intelHexParser.parse(firmwareHexFile)
         }.map { chunkList ->
             chunkList.mapIndexed { index, chunk ->
-                Pair(chunk, index.toFloat() / chunkList.size.toFloat())
+                Pair(chunk, (index + 1).toFloat() / chunkList.size.toFloat())
             }
         }.flattenAsObservable {
             it
         }.concatMap { (chunk, progress) ->
-            sendStmPacket(chunk)
+            sendStmPacket(stmOtaMessageStream, chunk)
                 .andThen(Observable.just(progress))
         }
 
-    private fun sendStmPacket(firmwareByteChunk: FirmwareByteChunk): Completable =
-        sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(
+    private fun sendStmPacket(stmOtaMessageStream: StmOtaMessageStream, firmwareByteChunk: FirmwareByteChunk): Completable =
+        sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageStream,
             WriteMemoryStartCommand()
         ).verifyResponseIsAck().andThen(
-            sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(
+            sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageStream,
                 WriteMemoryAddressCommand(firmwareByteChunk.address)
             )
         ).verifyResponseIsAck().andThen(
-            sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(
+            sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageStream,
                 WriteMemoryDataCommand(firmwareByteChunk.data)
             )
         ).verifyResponseIsAck()
