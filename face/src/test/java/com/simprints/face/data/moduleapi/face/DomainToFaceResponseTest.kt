@@ -29,7 +29,7 @@ class DomainToFaceResponseTest {
             assertThat(first.index).isEqualTo(0)
 
             val sample = first.sample
-            assertThat(sample?.imageRef?.path).isEqualTo("file://someFile")
+            assertThat(sample?.imageRef?.fullPath).isEqualTo("file://someFile")
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.simprints.core.images
 
-import android.os.Parcelable
+import com.simprints.moduleapi.common.IPath
 import kotlinx.android.parcel.Parcelize
 import java.io.File
 
@@ -12,7 +12,7 @@ import java.io.File
  *           e.g.: for dir1/dir2/dir3 [dirs] should be @sample [arrayOf("dir1", "dir2", "dir3")]
  */
 @Parcelize
-data class Path(private val dirs: Array<String>) : Parcelable {
+data class Path(override val dirs: Array<String>) : IPath {
 
     /**
      * Constructor with a single directory
@@ -23,7 +23,7 @@ data class Path(private val dirs: Array<String>) : Parcelable {
     /**
      * Composes the path, separating the directories by a /
      */
-    fun compose() = dirs.joinToString("/")
+    override fun compose(): String = dirs.joinToString("/")
 
     /**
      * Removes a directory. e.g.: if the current path is dir1/dir2/dir3/dir4 and
@@ -32,7 +32,16 @@ data class Path(private val dirs: Array<String>) : Parcelable {
      * @param dir the directory to be removed
      * @return the path without the directory
      */
-    fun remove(dir: String): Path = remove(arrayOf(dir))
+    override fun remove(dir: String): IPath = remove(arrayOf(dir))
+
+    /**
+     * Removes a sub-path. e.g.: if the current path is dir1/dir2/dir3/dir4 and
+     * the sub-path to be removed is dir1/dir2, then the output will be dir3/dir4.
+     *
+     * @param subPath the sub-path to be removed
+     * @return the path without the sub-path
+     */
+    override fun remove(subPath: IPath): IPath = remove(subPath.dirs)
 
     /**
      * Removes a subset of directories. e.g.: if the current path is dir1/dir2/dir3/dir4 and
@@ -41,7 +50,7 @@ data class Path(private val dirs: Array<String>) : Parcelable {
      * @param subset the subset to be removed
      * @return the path without the subset
      */
-    fun remove(subset: Array<String>): Path {
+    override fun remove(subset: Array<String>): IPath {
         val resultDirs = dirs.toMutableList().apply {
             removeAll(subset)
         }.toTypedArray()
@@ -88,6 +97,17 @@ data class Path(private val dirs: Array<String>) : Parcelable {
 
             val dirs = pathString.split('/').filter { it.isNotEmpty() }.toTypedArray()
             return Path(dirs)
+        }
+
+        /**
+         * Parses a path string into a Path object, excluding the file name
+         *
+         * @param pathString the path string to be parsed
+         * @return the path, excluding the file name
+         */
+        fun parse(pathString: String): Path {
+            val file = File(pathString)
+            return parse(file)
         }
     }
 

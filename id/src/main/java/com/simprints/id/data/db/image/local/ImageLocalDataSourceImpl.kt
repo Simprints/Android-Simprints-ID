@@ -43,7 +43,7 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
         return try {
             getEncryptedFile(file).openFileOutput().use { stream ->
                 stream.write(imageBytes)
-                SecuredImageRef(file.absolutePath)
+                SecuredImageRef(subDirs, file.absolutePath)
             }
         } catch (t: Throwable) {
             t.printStackTrace()
@@ -52,7 +52,7 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
     }
 
     override fun decryptImage(image: SecuredImageRef): FileInputStream? {
-        val file = File(image.path)
+        val file = File(image.fullPath)
         val encryptedFile = getEncryptedFile(file)
         return try {
             encryptedFile.openFileInput()
@@ -66,12 +66,16 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
         val imageRoot = File(imageRootPath)
         return imageRoot.walk()
             .filterNot { it.isDirectory }
-            .map { SecuredImageRef(it.absolutePath) }
+            .map {
+                val subsetToRemove = Path.parse(imageRootPath)
+                val relativePath = Path.parse(it).remove(subsetToRemove)
+                SecuredImageRef(relativePath, it.absolutePath)
+            }
             .toList()
     }
 
     override fun deleteImage(image: SecuredImageRef): Boolean {
-        val file = File(image.path)
+        val file = File(image.fullPath)
         return file.delete()
     }
 
