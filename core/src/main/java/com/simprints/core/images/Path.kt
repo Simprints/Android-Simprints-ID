@@ -26,15 +26,24 @@ data class Path(private val dirs: Array<String>) : Parcelable {
     fun compose() = dirs.joinToString("/")
 
     /**
+     * Removes a directory. e.g.: if the current path is dir1/dir2/dir3/dir4 and
+     * the directory to be removed is dir1, then the output will be dir2/dir3/dir4.
+     *
+     * @param dir the directory to be removed
+     * @return the path without the directory
+     */
+    fun remove(dir: String): Path = remove(arrayOf(dir))
+
+    /**
      * Removes a subset of directories. e.g.: if the current path is dir1/dir2/dir3/dir4 and
      * the subset to be removed is dir1/dir2, then the output will be dir3/dir4.
      *
      * @param subset the subset to be removed
      * @return the path without the subset
      */
-    fun remove(subset: Path): Path {
+    fun remove(subset: Array<String>): Path {
         val resultDirs = dirs.toMutableList().apply {
-            removeAll(subset.dirs)
+            removeAll(subset)
         }.toTypedArray()
 
         return Path(resultDirs)

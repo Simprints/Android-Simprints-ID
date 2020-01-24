@@ -53,7 +53,7 @@ class PathTest {
     fun shouldRemoveSubsetFromPath() {
         val originalPath = Path(arrayOf("dir1", "dir2", "dir3", "dir4"))
 
-        val subset = Path(arrayOf("dir1", "dir2"))
+        val subset = arrayOf("dir1", "dir2")
         val actual = originalPath.remove(subset).compose()
 
         assertThat(actual).isEqualTo("dir3/dir4")
@@ -63,8 +63,7 @@ class PathTest {
     fun whenSubsetToRemoveIsNotContainedInPath_shouldNotRemoveAnything() {
         val originalPath = Path(arrayOf("dir1", "dir2", "dir3", "dir4"))
 
-        val subset = Path("dir700")
-        val actual = originalPath.remove(subset).compose()
+        val actual = originalPath.remove("dir700").compose()
 
         assertThat(actual).isEqualTo("dir1/dir2/dir3/dir4")
     }
