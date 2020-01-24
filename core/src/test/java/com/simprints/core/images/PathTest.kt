@@ -2,6 +2,7 @@ package com.simprints.core.images
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
+import java.io.File
 
 class PathTest {
 
@@ -28,6 +29,44 @@ class PathTest {
         val result = Path.combine(first, subDirs)
 
         assertThat(result.compose()).isEqualTo("/home/test/dir1/dir2/dir3")
+    }
+
+    @Test
+    fun shouldParseFileExcludingFileName() {
+        val file = File("my/test/file.txt")
+
+        val actual = Path.parse(file).compose()
+
+        assertThat(actual).isEqualTo("my/test")
+    }
+
+    @Test
+    fun shouldParseFileWhenSourceIsDirectory() {
+        val file = File("my/test/directory").apply { mkdirs() }
+
+        val actual = Path.parse(file).compose()
+
+        assertThat(actual).isEqualTo("my/test/directory")
+    }
+
+    @Test
+    fun shouldRemoveSubsetFromPath() {
+        val originalPath = Path(arrayOf("dir1", "dir2", "dir3", "dir4"))
+
+        val subset = Path(arrayOf("dir1", "dir2"))
+        val actual = originalPath.remove(subset).compose()
+
+        assertThat(actual).isEqualTo("dir3/dir4")
+    }
+
+    @Test
+    fun whenSubsetToRemoveIsNotContainedInPath_shouldNotRemoveAnything() {
+        val originalPath = Path(arrayOf("dir1", "dir2", "dir3", "dir4"))
+
+        val subset = Path("dir700")
+        val actual = originalPath.remove(subset).compose()
+
+        assertThat(actual).isEqualTo("dir1/dir2/dir3/dir4")
     }
 
 }

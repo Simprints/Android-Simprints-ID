@@ -2,6 +2,7 @@ package com.simprints.core.images
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
+import java.io.File
 
 /**
  * An abstraction of a directory structure
@@ -17,9 +18,27 @@ data class Path(private val dirs: Array<String>) : Parcelable {
      * Constructor with a single directory
      * @param dir the directory
      */
-    constructor(dir: String): this(arrayOf(dir))
+    constructor(dir: String) : this(arrayOf(dir))
 
+    /**
+     * Composes the path, separating the directories by a /
+     */
     fun compose() = dirs.joinToString("/")
+
+    /**
+     * Removes a subset of directories. e.g.: if the current path is dir1/dir2/dir3/dir4 and
+     * the subset to be removed is dir1/dir2, then the output will be dir3/dir4.
+     *
+     * @param subset the subset to be removed
+     * @return the path without the subset
+     */
+    fun remove(subset: Path): Path {
+        val resultDirs = dirs.toMutableList().apply {
+            removeAll(subset.dirs)
+        }.toTypedArray()
+
+        return Path(resultDirs)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (other == null || other !is Path)
@@ -43,6 +62,22 @@ data class Path(private val dirs: Array<String>) : Parcelable {
          */
         fun combine(first: String, subDirs: Path): Path {
             val dirs = arrayOf(first, *subDirs.dirs)
+            return Path(dirs)
+        }
+
+        /**
+         * Parses a file path into a Path object, excluding the file name
+         *
+         * @param file the file to be parsed
+         * @return the path, excluding the file name
+         */
+        fun parse(file: File): Path {
+            val pathString = if (file.isDirectory)
+                file.path
+            else
+                file.path.replace(file.name, "")
+
+            val dirs = pathString.split('/').filter { it.isNotEmpty() }.toTypedArray()
             return Path(dirs)
         }
     }
