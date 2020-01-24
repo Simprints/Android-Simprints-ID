@@ -2,6 +2,7 @@ package com.simprints.face.activities.orchestrator
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.simprints.core.images.Path
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -57,7 +58,10 @@ class FaceOrchestratorViewModel : ViewModel() {
     }
 
     private fun generateFakeCaptureResponse(): FaceCaptureResponse {
-        val securedImageRef = SecuredImageRef("file://someFile")
+        val securedImageRef = SecuredImageRef(
+            relativePath = Path(""),
+            fullPath = "file://someFile"
+        )
         val sample = FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef)
         val result = FaceCaptureResult(0, sample)
         val captureResults = listOf(result)
@@ -65,7 +69,6 @@ class FaceOrchestratorViewModel : ViewModel() {
     }
 
     private fun generateFaceMatchResponse(): FaceMatchResponse {
-
         val faceMatchResults = listOf(
             FaceMatchResult(UUID.randomUUID().toString(), 75f),
             FaceMatchResult(UUID.randomUUID().toString(), 50f),
@@ -74,4 +77,5 @@ class FaceOrchestratorViewModel : ViewModel() {
 
         return FaceMatchResponse(faceMatchResults)
     }
+
 }

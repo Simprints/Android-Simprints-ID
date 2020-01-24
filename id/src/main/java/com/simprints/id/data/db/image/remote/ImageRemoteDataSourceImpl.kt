@@ -10,7 +10,7 @@ class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
 
     override suspend fun uploadImage(image: SecuredImageRef): UploadResult {
         val rootRef = FirebaseStorage.getInstance().reference
-        val file = File(image.path)
+        val file = File(image.fullPath)
         val uri = Uri.fromFile(file)
 
         val fileRef = rootRef.child("images").child(file.name)

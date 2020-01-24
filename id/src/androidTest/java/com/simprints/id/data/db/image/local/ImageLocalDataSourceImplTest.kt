@@ -34,10 +34,10 @@ class ImageLocalDataSourceImplTest {
         val securedImageRef = imageLocalDataSource.encryptAndStoreImage(byteArray, subDirs, FILE_NAME)
         require(securedImageRef != null)
 
-        val file = File(securedImageRef.path)
+        val file = File(securedImageRef.fullPath)
 
         assertThat(file.absolutePath).isEqualTo("$imagesFolder/test/$FILE_NAME")
-        assertThat(securedImageRef.path).contains(FILE_NAME)
+        assertThat(securedImageRef.fullPath).contains(FILE_NAME)
         assertThat(file.readBytes()).isNotEqualTo(byteArray)
     }
 
@@ -90,13 +90,13 @@ class ImageLocalDataSourceImplTest {
         imageLocalDataSource.deleteImage(fileToDelete)
         val remainingFiles = imageLocalDataSource.listImages()
 
-        assertThat(remainingFiles.none { it.path == fileToDelete.path }).isTrue()
+        assertThat(remainingFiles.none { it.fullPath == fileToDelete.fullPath }).isTrue()
         assertThat(remainingFiles.size).isEqualTo(2)
     }
 
     @Test
     fun shouldHandleDeletionOfNonExistentImageFiles() {
-        val file = SecuredImageRef("non/existent/path")
+        val file = SecuredImageRef(Path("path"), "non/existent/path")
 
         assertThat(imageLocalDataSource.deleteImage(file)).isFalse()
     }

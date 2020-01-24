@@ -50,6 +50,25 @@ class PathTest {
     }
 
     @Test
+    fun shouldParsePathStringExcludingFileName() {
+        val pathString = "my/test/file.txt"
+
+        val actual = Path.parse(pathString).compose()
+
+        assertThat(actual).isEqualTo("my/test")
+    }
+
+    @Test
+    fun shouldParsePathStringWhenSourceIsDirectory() {
+        val file = File("my/test/directory").apply { mkdirs() }
+        val pathString = file.path
+
+        val actual = Path.parse(pathString).compose()
+
+        assertThat(actual).isEqualTo("my/test/directory")
+    }
+
+    @Test
     fun shouldRemoveSubsetFromPath() {
         val originalPath = Path(arrayOf("dir1", "dir2", "dir3", "dir4"))
 
@@ -64,6 +83,26 @@ class PathTest {
         val originalPath = Path(arrayOf("dir1", "dir2", "dir3", "dir4"))
 
         val actual = originalPath.remove("dir700").compose()
+
+        assertThat(actual).isEqualTo("dir1/dir2/dir3/dir4")
+    }
+
+    @Test
+    fun shouldRemoveSubPathFromPath() {
+        val originalPath = Path(arrayOf("dir1", "dir2", "dir3", "dir4"))
+
+        val subPath = Path(arrayOf("dir1", "dir2"))
+        val actual = originalPath.remove(subPath).compose()
+
+        assertThat(actual).isEqualTo("dir3/dir4")
+    }
+
+    @Test
+    fun whenSubPathToRemoveIsNotContainedInPath_shouldNotRemoveAnything() {
+        val originalPath = Path(arrayOf("dir1", "dir2", "dir3", "dir4"))
+
+        val subPath = Path("dir700")
+        val actual = originalPath.remove(subPath).compose()
 
         assertThat(actual).isEqualTo("dir1/dir2/dir3/dir4")
     }
