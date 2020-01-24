@@ -87,7 +87,14 @@ class DashboardViewModel(val peopleSyncManager: PeopleSyncManager,
         // and the state is on fail
         // - sync has never been triggered from the dashboard (e.g. user opens SPID)
         // and successfully finished long time ago
-        return if (isSyncOnNotSucceedAndNeverRunBefore(newState) || isSyncOnCompleteAnRunInBackgroundLongTimeAgo(newState)) {
+        // - sync has never been triggered from the dashboard (e.g. user opens SPID)
+        // and there no sync history
+        val launchSync =
+            isSyncOnNotSucceedAndNeverRunBefore(newState) ||
+            isSyncOnCompleteAnRunInBackgroundLongTimeAgo(newState) ||
+            !hasSyncRunRecentlyOrIsRunning
+
+        return if (launchSync) {
             peopleSyncManager.sync()
             null
         } else {
@@ -102,12 +109,14 @@ class DashboardViewModel(val peopleSyncManager: PeopleSyncManager,
         val allSyncStates = downSyncStates + upSyncStates
         return when {
             isSyncCompleted(allSyncStates) -> handleSyncComplete(lastTimeSyncSucceed)
+            isSyncProcess(allSyncStates) -> handleSyncProgress(lastTimeSyncSucceed, syncState.progress, syncState.total)
             isSyncConnecting(allSyncStates) -> handleSyncConnecting(lastTimeSyncSucceed, syncState.progress, syncState.total)
             isSyncFailedBecauseCloudIntegration(allSyncStates) -> handleSyncFailed(lastTimeSyncSucceed)
             isSyncFailed(allSyncStates) -> handleSyncTryAgain(lastTimeSyncSucceed)
             else -> handleSyncProgress(lastTimeSyncSucceed, syncState.progress, syncState.total)
         }
     }
+
 
     private fun handleSyncConnecting(lastSyncData: Date?, progress: Int, total: Int?) =
         SyncConnecting(lastSyncData, progress, total).also {
@@ -150,8 +159,12 @@ class DashboardViewModel(val peopleSyncManager: PeopleSyncManager,
     private fun hasSyncRunLongTimeAgo(lastRun: Date?) =
         timeHelper.msBetweenNowAndTime(lastRun?.time ?: Date().time) > TIME_BETWEEN_TWO_SYNCS
 
+
     private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<SyncWorkerInfo>) =
         allSyncStates.any { it.state is Failed && it.state.failedBecauseCloudIntegration }
+
+    private fun isSyncProcess(allSyncStates: List<SyncWorkerInfo>) =
+        allSyncStates.any { it.state is Running }
 
     private fun isSyncFailed(allSyncStates: List<SyncWorkerInfo>) =
         allSyncStates.any { it.state is Failed || it.state is Blocked || it.state is Cancelled }
