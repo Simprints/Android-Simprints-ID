@@ -30,10 +30,10 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
 
     override fun encryptAndStoreImage(
         imageBytes: ByteArray,
-        subDirs: Path,
+        relativePath: Path,
         fileName: String
     ): SecuredImageRef? {
-        val path = Path.combine(imageRootPath, subDirs).compose()
+        val path = Path.combine(imageRootPath, relativePath).compose()
 
         createDirectoryIfNonExistent(path)
 
@@ -43,7 +43,7 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
         return try {
             getEncryptedFile(file).openFileOutput().use { stream ->
                 stream.write(imageBytes)
-                SecuredImageRef(subDirs, file.absolutePath)
+                SecuredImageRef(relativePath, file.absolutePath)
             }
         } catch (t: Throwable) {
             t.printStackTrace()
