@@ -8,7 +8,7 @@ import org.junit.Test
 class RootResponseParserTest {
 
     @Test
-    fun parseVeroResponse_buildsMessageCorrectlyFromProtocol() {
+    fun parseRootResponse_buildsMessageCorrectlyFromProtocol() {
         val messageParser = RootResponseParser()
 
         val rawBytes = "F0 10 00 00".hexToByteArray()
