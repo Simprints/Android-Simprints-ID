@@ -1,5 +1,8 @@
 package com.simprints.core.images
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
 /**
  * An abstraction of a directory structure
  *
@@ -7,7 +10,8 @@ package com.simprints.core.images
  *           the directories within the structure.
  *           e.g.: for dir1/dir2/dir3 [dirs] should be @sample [arrayOf("dir1", "dir2", "dir3")]
  */
-data class Path(private val dirs: Array<String>) {
+@Parcelize
+data class Path(private val dirs: Array<String>) : Parcelable {
 
     /**
      * Constructor with a single directory
