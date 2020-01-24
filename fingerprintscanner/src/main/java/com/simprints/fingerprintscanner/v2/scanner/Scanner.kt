@@ -23,6 +23,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.responses.*
 import com.simprints.fingerprintscanner.v2.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
+import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
@@ -34,7 +35,8 @@ import java.io.OutputStream
 
 class Scanner(
     private val mainMessageStream: MainMessageStream,
-    private val rootMessageStream: RootMessageStream
+    private val rootMessageStream: RootMessageStream,
+    private val stmOtaMessageStream: StmOtaMessageStream
 ) {
 
     private lateinit var inputStream: InputStream
@@ -63,7 +65,7 @@ class Scanner(
                 scannerTriggerListenerDisposable?.dispose()
             }
             CYPRESS_OTA -> TODO()
-            STM_OTA -> TODO()
+            STM_OTA -> stmOtaMessageStream.disconnect()
             null -> {/* Do nothing */
             }
         }
@@ -143,7 +145,7 @@ class Scanner(
                 EnterStmOtaModeCommand()
             ))
             .completeOnceReceived()
-            .doOnComplete { state.mode = STM_OTA } // TODO : handle STM OTA mode entered
+            .andThen(handleStmOtaModeEntered())
 
     private fun handleMainModeEntered() = completable {
         rootMessageStream.disconnect()
@@ -159,6 +161,12 @@ class Scanner(
             .subscribeBy(onNext = {
                 triggerButtonListeners.forEach { it.onNext(Unit) }
             })
+
+    private fun handleStmOtaModeEntered() = completable {
+        rootMessageStream.disconnect()
+        stmOtaMessageStream.connect(inputStream, outputStream)
+        state.mode = STM_OTA
+    }
 
     fun getStmFirmwareVersion(): Single<StmFirmwareVersion> =
         assertMode(MAIN).andThen(
@@ -308,7 +316,7 @@ class Scanner(
 
     fun startStmOta(firmwareHexFile: String): Observable<Float> =
         assertMode(STM_OTA).andThen(
-            StmOtaController(this)
+            StmOtaController(stmOtaMessageStream)
                 .program(firmwareHexFile))
 
     companion object {

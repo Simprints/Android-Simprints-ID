@@ -19,14 +19,18 @@ import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketRouter
 import com.simprints.fingerprintscanner.v2.incoming.root.RootMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.root.RootResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.root.RootResponseParser
+import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
+import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaResponseParser
 import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.main.message.MainMessageSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.main.packet.PacketDispatcher
 import com.simprints.fingerprintscanner.v2.outgoing.main.packet.PacketSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageSerializer
+import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageOutputStream
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
+import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
 import com.simprints.fingerprintscanner.v2.tools.lang.objects
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
@@ -70,6 +74,10 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                     RootMessageOutputStream(
                         RootMessageSerializer()
                     )
+                ),
+                StmOtaMessageStream(
+                    StmOtaMessageInputStream(StmOtaResponseParser()),
+                    StmOtaMessageOutputStream()
                 )
             ),
             scannerUiHelper,
