@@ -21,17 +21,6 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 protected val crashReportManager: ClientApiCrashReportManager)
     : RequestContract.Presenter {
 
-    protected abstract suspend fun processRequest()
-
-    override suspend fun start() {
-        try {
-            deviceManager.checkIfDeviceIsRooted()
-            processRequest()
-        } catch (exception: RootedDeviceException) {
-            handleRootedDevice(exception)
-        }
-    }
-
     override fun processEnrollRequest() = validateAndSendRequest(
         EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))
     )
@@ -66,6 +55,20 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         handleInvalidRequest(exception)
     }
 
+    protected fun runIfDeviceIsNotRooted(block: () -> Unit) {
+        try {
+            deviceManager.checkIfDeviceIsRooted()
+            block()
+        } catch (ex: RootedDeviceException) {
+            handleRootedDevice(ex)
+        }
+    }
+
+    private fun handleRootedDevice(exception: RootedDeviceException) {
+        crashReportManager.logExceptionOrSafeException(exception)
+        view.handleClientRequestError(ROOTED_DEVICE)
+    }
+
     private fun handleInvalidRequest(exception: InvalidRequestException) {
         when (exception) {
             is InvalidClientRequestException -> INVALID_CLIENT_REQUEST
@@ -79,11 +82,6 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         }.also {
             view.handleClientRequestError(it)
         }
-    }
-
-    private fun handleRootedDevice(exception: RootedDeviceException) {
-        crashReportManager.logExceptionOrSafeException(exception)
-        view.handleClientRequestError(ROOTED_DEVICE)
     }
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {

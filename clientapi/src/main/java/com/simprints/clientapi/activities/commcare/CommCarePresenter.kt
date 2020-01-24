@@ -39,18 +39,20 @@ class CommCarePresenter(
         const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
     }
 
-    override suspend fun processRequest() {
+    override suspend fun start() {
         if (action != ACTION_CONFIRM_IDENTITY) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
 
-        when (action) {
-            ACTION_REGISTER -> processEnrollRequest()
-            ACTION_IDENTIFY -> processIdentifyRequest()
-            ACTION_VERIFY -> processVerifyRequest()
-            ACTION_CONFIRM_IDENTITY -> checkAndProcessSessionId()
-            else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+        runIfDeviceIsNotRooted {
+            when (action) {
+                ACTION_REGISTER -> processEnrollRequest()
+                ACTION_IDENTIFY -> processIdentifyRequest()
+                ACTION_VERIFY -> processVerifyRequest()
+                ACTION_CONFIRM_IDENTITY -> checkAndProcessSessionId()
+                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+            }
         }
     }
 
