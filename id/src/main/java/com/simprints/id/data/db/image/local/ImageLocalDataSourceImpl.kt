@@ -48,8 +48,6 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
         } catch (t: Throwable) {
             t.printStackTrace()
             null
-        } finally {
-            file.delete()
         }
     }
 
