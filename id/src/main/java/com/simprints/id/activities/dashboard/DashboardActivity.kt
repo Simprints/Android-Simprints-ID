@@ -53,25 +53,19 @@ class DashboardActivity : AppCompatActivity() {
         component.inject(this)
         title = androidResourcesHelper.getString(R.string.dashboard_label)
 
-        setupCards()
-        setupViewModel()
         setupActionBar()
+        setupViewModel()
+        setupCards()
 
         observeForProjectDetails()
         observeForSyncCardState()
-    }
-
-    private fun observeForSyncCardState() {
-        viewModel.syncCardState.observe(this, Observer<DashboardSyncCardState> {
-            syncCardDisplayer.displayState(it)
-        })
-        viewModel.emit()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         val potentialAlertScreenResponse =
             AlertActivityHelper.extractPotentialAlertScreenResponse(data)
+
         if (potentialAlertScreenResponse != null) {
             finish()
         }
@@ -79,14 +73,6 @@ class DashboardActivity : AppCompatActivity() {
         if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
             startCheckLoginActivityAndFinish()
         }
-    }
-
-    private fun setupActionBar() {
-        dashboardToolbar.title = androidResourcesHelper.getString(R.string.dashboard_label)
-        setSupportActionBar(dashboardToolbar)
-        supportActionBar?.elevation = 4F
-
-        setMenuItemClickListener()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -98,6 +84,14 @@ class DashboardActivity : AppCompatActivity() {
             androidResourcesHelper.getString(R.string.menu_privacy_notice)
 
         return true
+    }
+
+    private fun setupActionBar() {
+        dashboardToolbar.title = androidResourcesHelper.getString(R.string.dashboard_label)
+        setSupportActionBar(dashboardToolbar)
+        supportActionBar?.elevation = 4F
+
+        setMenuItemClickListener()
     }
 
     private fun setupCards() {
@@ -113,6 +107,24 @@ class DashboardActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this, viewModelFactory).get(
             DashboardViewModel::class.java
         )
+    }
+
+    private fun observeForProjectDetails() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val projectDetails = viewModel.getProjectDetails()
+            CoroutineScope(Dispatchers.Main).launch {
+                projectDetails.observe(this@DashboardActivity, Observer {
+                    projectDetailsCardDisplayer.displayProjectDetails(it)
+                })
+            }
+        }
+    }
+
+    private fun observeForSyncCardState() {
+        viewModel.syncCardState.observe(this, Observer<DashboardSyncCardState> {
+            syncCardDisplayer.displayState(it)
+        })
+        viewModel.emit()
     }
 
     private fun setMenuItemClickListener() {
@@ -134,17 +146,6 @@ class DashboardActivity : AppCompatActivity() {
                 R.id.debug -> startActivity(Intent(this, DebugActivity::class.java))
             }
             true
-        }
-    }
-
-    private fun observeForProjectDetails() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val projectDetails = viewModel.getProjectDetails()
-            CoroutineScope(Dispatchers.Main).launch {
-                projectDetails.observe(this@DashboardActivity, Observer {
-                    projectDetailsCardDisplayer.displayProjectDetails(it)
-                })
-            }
         }
     }
 
