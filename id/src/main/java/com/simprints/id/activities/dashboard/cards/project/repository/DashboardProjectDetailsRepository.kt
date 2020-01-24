@@ -2,7 +2,7 @@ package com.simprints.id.activities.dashboard.cards.project.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectWrapper
+import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -13,9 +13,9 @@ class DashboardProjectDetailsRepository(
     private val preferencesManager: PreferencesManager
 ) {
 
-    private val projectDetailsLiveData = MutableLiveData<DashboardProjectWrapper>()
+    private val projectDetailsLiveData = MutableLiveData<DashboardProjectState>()
 
-    suspend fun getProjectDetails(): LiveData<DashboardProjectWrapper> {
+    suspend fun getProjectDetails(): LiveData<DashboardProjectState> {
         val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
         val cachedProject = projectRepository.loadFromCache(projectId)
 
@@ -26,7 +26,7 @@ class DashboardProjectDetailsRepository(
         val lastScanner = preferencesManager.lastScannerUsed
 
         return projectDetailsLiveData.apply {
-            postValue(DashboardProjectWrapper(projectName, lastUser, lastScanner))
+            postValue(DashboardProjectState(projectName, lastUser, lastScanner))
         }
     }
 
