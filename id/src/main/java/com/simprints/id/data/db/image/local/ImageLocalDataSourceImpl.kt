@@ -33,7 +33,7 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
         subDirs: Path,
         fileName: String
     ): SecuredImageRef? {
-        val path = Path.join(imageRootPath, subDirs).compose()
+        val path = Path.combine(imageRootPath, subDirs).compose()
 
         createDirectoryIfNonExistent(path)
 

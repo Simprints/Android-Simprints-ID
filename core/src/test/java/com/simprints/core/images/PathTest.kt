@@ -21,11 +21,11 @@ class PathTest {
     }
 
     @Test
-    fun shouldJoinPaths() {
+    fun shouldCombinePaths() {
         val first = "/home/test"
         val subDirs = Path(arrayOf("dir1", "dir2", "dir3"))
 
-        val result = Path.join(first, subDirs)
+        val result = Path.combine(first, subDirs)
 
         assertThat(result.compose()).isEqualTo("/home/test/dir1/dir2/dir3")
     }
