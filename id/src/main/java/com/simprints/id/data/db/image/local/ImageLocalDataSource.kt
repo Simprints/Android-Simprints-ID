@@ -14,19 +14,19 @@ interface ImageLocalDataSource {
      *
      * @param imageBytes
      *        the image, as a byte array
-     * @param subDirs
-     *        the sub-directories where the image will be stored, within the root images folder.
-     *        e.g.: for [root images folder]/fingerprints/bad_scans [subDirs] should be
+     * @param relativePath
+     *        the relative path where the image will be stored, within the root images folder.
+     *        e.g.: for [root images folder]/fingerprints/bad_scans [relativePath] should be
      *        @sample [Path(arrayOf("fingerprints", "bad_scans"))]
      * @see [Path]
      * @param fileName
      *        the file name
      * @return
-     *        a reference to the path of the newly stored image, if successful, otherwise null
+     *        a reference to the newly stored image, if successful, otherwise null
      */
     fun encryptAndStoreImage(
         imageBytes: ByteArray,
-        subDirs: Path,
+        relativePath: Path,
         fileName: String
     ): SecuredImageRef?
 
