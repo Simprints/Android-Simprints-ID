@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectWrapper
+import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
 import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -32,7 +32,7 @@ class DashboardViewModel(
         DashboardSyncCardState.SyncProgress(Date(), 10, 100)
     }
 
-    suspend fun getProjectDetails(): LiveData<DashboardProjectWrapper> {
+    suspend fun getProjectDetails(): LiveData<DashboardProjectState> {
         return repository.getProjectDetails()
     }
 

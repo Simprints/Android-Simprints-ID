@@ -4,8 +4,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.simprints.id.R
-import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
-import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectWrapper
+import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
 import com.simprints.id.tools.AndroidResourcesHelper
 
 class DashboardProjectDetailsCardDisplayerImpl(
@@ -18,7 +17,7 @@ class DashboardProjectDetailsCardDisplayerImpl(
         root = rootLayout
     }
 
-    override fun displayProjectDetails(projectDetails: DashboardProjectWrapper) {
+    override fun displayProjectDetails(projectDetails: DashboardProjectState) {
         with(root) {
             setTitle(projectDetails.title)
             setCurrentUser(projectDetails.lastUser)
