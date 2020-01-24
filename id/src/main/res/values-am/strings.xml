@@ -32,7 +32,7 @@
     <string name="dashboard_card_sync_action">ማገናኘት</string>
     <string name="dashboard_card_sync_failed">ግንኙነቱ ተሰናክሏል</string>
     <string name="dashboard_card_sync_needed">ከሰርቨር ጋር ግንኙነት እንዲፈጠር ይፈልጋሉ</string>
-    <string name="dashboard_card_sync_now">አሁን ግንኙነት ፍጠር</string>
+    <string name="dashboard_sync_card_sync_button">አሁን ግንኙነት ፍጠር</string>
     <string name="dashboard_card_syncing">በግንኙነት ላይ</string>
     <string name="dashboard_card_to_download">ለ ማውረድ</string>
     <string name="dashboard_card_to_upload">ለ መጫን</string>

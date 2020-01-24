@@ -10,6 +10,8 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -17,6 +19,7 @@ import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.activity_dashboard_card_project_details.*
@@ -32,9 +35,10 @@ class DashboardActivity : AppCompatActivity() {
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var projectDetailsCardDisplayer: DashboardProjectDetailsCardDisplayer
+    @Inject lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
+    @Inject lateinit var peopleSyncManager: PeopleSyncManager
 
-    lateinit var viewModel: DashboardViewModel
-
+    private lateinit var viewModel: DashboardViewModel
     private lateinit var viewModelFactory: DashboardViewModelFactory
 
     companion object {
@@ -52,14 +56,22 @@ class DashboardActivity : AppCompatActivity() {
         setupCards()
         setupViewModel()
         setupActionBar()
-        setMenuItemClickListener()
 
         observeForProjectDetails()
+        observeForSyncCardState()
+    }
+
+    private fun observeForSyncCardState() {
+        viewModel.syncCardState.observe(this, Observer<DashboardSyncCardState> {
+            syncCardDisplayer.displayState(it)
+        })
+        viewModel.emit()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(data)
+        val potentialAlertScreenResponse =
+            AlertActivityHelper.extractPotentialAlertScreenResponse(data)
         if (potentialAlertScreenResponse != null) {
             finish()
         }
@@ -69,22 +81,33 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupActionBar() {
+        dashboardToolbar.title = androidResourcesHelper.getString(R.string.dashboard_label)
+        setSupportActionBar(dashboardToolbar)
+        supportActionBar?.elevation = 4F
+
+        setMenuItemClickListener()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.app_menu, menu)
 
-        menu?.findItem(R.id.menuSettings)?.title = androidResourcesHelper.getString(R.string.menu_settings)
-        menu?.findItem(R.id.menuPrivacyNotice)?.title = androidResourcesHelper.getString(R.string.menu_privacy_notice)
+        menu?.findItem(R.id.menuSettings)?.title =
+            androidResourcesHelper.getString(R.string.menu_settings)
+        menu?.findItem(R.id.menuPrivacyNotice)?.title =
+            androidResourcesHelper.getString(R.string.menu_privacy_notice)
 
         return true
     }
 
     private fun setupCards() {
         projectDetailsCardDisplayer.initRoot(dashboard_project_details_card)
+        syncCardDisplayer.initRoot(dashboard_sync_card)
     }
 
     private fun setupViewModel() {
         viewModelFactory = DashboardViewModelFactory(
-            projectRepository, loginInfoManager, preferencesManager
+            projectRepository, loginInfoManager, preferencesManager, peopleSyncManager
         )
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(
@@ -92,17 +115,22 @@ class DashboardActivity : AppCompatActivity() {
         )
     }
 
-    private fun setupActionBar() {
-        dashboardToolbar.title = androidResourcesHelper.getString(R.string.dashboard_label)
-        setSupportActionBar(dashboardToolbar)
-    }
-
     private fun setMenuItemClickListener() {
         dashboardToolbar.setOnMenuItemClickListener { menuItem ->
 
             when (menuItem.itemId) {
-                R.id.menuPrivacyNotice -> startActivity(Intent(this, PrivacyNoticeActivity::class.java))
-                R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
+                R.id.menuPrivacyNotice -> startActivity(
+                    Intent(
+                        this,
+                        PrivacyNoticeActivity::class.java
+                    )
+                )
+                R.id.menuSettings -> startActivityForResult(
+                    Intent(
+                        this,
+                        SettingsActivity::class.java
+                    ), SETTINGS_ACTIVITY_REQUEST_CODE
+                )
                 R.id.debug -> startActivity(Intent(this, DebugActivity::class.java))
             }
             true
