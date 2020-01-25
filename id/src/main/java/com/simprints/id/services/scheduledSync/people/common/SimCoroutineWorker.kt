@@ -10,6 +10,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
+import java.io.IOException
 
 abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -27,6 +28,8 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
     protected fun retry(t: Throwable? = null, message: String = t?.message ?: ""): Result {
         t?.printStackTrace()
         crashlyticsLog("[Retry] $message")
+        logExceptionIfRequired(t)
+
         return resultSetter.retry()
     }
 
@@ -37,7 +40,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
         t.printStackTrace()
         crashlyticsLog("[Failed] $message")
 
-        crashReportManager.logExceptionOrSafeException(t)
+        logExceptionIfRequired(t)
         return resultSetter.failure(outputData)
     }
 
@@ -47,6 +50,14 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
         return resultSetter.success(outputData)
     }
 
+    private fun logExceptionIfRequired(t: Throwable?) {
+        t?.let {
+            // IOExceptions are about network issues, so they are not worth to report
+            if (it !is IOException) {
+                crashReportManager.logExceptionOrSafeException(it)
+            }
+        }
+    }
     protected fun crashlyticsLog(message: String) {
         crashReportManager.logMessageForCrashReport(
             CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = "$tag - $message")
