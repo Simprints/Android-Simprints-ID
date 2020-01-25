@@ -80,6 +80,7 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
                     lastResult?.lastPatientId,
                     lastResult?.lastPatientUpdatedAt,
                     PipeSeparatorWrapperForURLListParam(*modes.map { it.fromDomainToApi() }.toTypedArray()))
+
             }
         }, "downSync")
 

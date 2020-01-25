@@ -21,11 +21,15 @@ class PeopleSyncCacheImpl(private val sharedForProgresses: SharedPreferences,
 
     override fun readProgress(workerId: String): Int =
         (sharedForProgresses.getInt(workerId, 0)).also {
+
+            //TODO: Remove after tests
             Timber.d("I/SYNC - Cache - ${workerId.take(4)} $it")
         }
 
     override fun saveProgress(workerId: String, progress: Int) {
         sharedForProgresses.edit().putInt(workerId, progress).commit()
+
+        //TODO: Remove after tests
         Timber.d("I/SYNC - Cache - ${workerId.take(4)} $progress")
     }
 
@@ -35,7 +39,6 @@ class PeopleSyncCacheImpl(private val sharedForProgresses: SharedPreferences,
 
 
     companion object {
-        const val PEOPLE_SYNC_CACHE_PROGRESSES_KEY = "PEOPLE_SYNC_CACHE_PROGRESSES_KEY"
         const val PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY = "PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY"
     }
 }
