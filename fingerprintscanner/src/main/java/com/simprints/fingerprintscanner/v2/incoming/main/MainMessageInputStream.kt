@@ -24,30 +24,31 @@ class MainMessageInputStream(
     private val un20ResponseAccumulator: Un20ResponseAccumulator
 ) : IncomingConnectable {
 
-    lateinit var veroResponses: Flowable<VeroResponse>
-    lateinit var veroEvents: Flowable<VeroEvent>
-    lateinit var un20Responses: Flowable<Un20Response>
+    var veroResponses: Flowable<VeroResponse>? = null
+    var veroEvents: Flowable<VeroEvent>? = null
+    var un20Responses: Flowable<Un20Response>? = null
 
     override fun connect(inputStream: InputStream) {
         packetRouter.connect(inputStream)
-        veroResponses = packetRouter.incomingPacketChannels[Channel.Remote.VeroServer]?.toMainMessageStream(veroResponseAccumulator)
-            ?: throw TODO("exception handling")
-        veroEvents = packetRouter.incomingPacketChannels[Channel.Remote.VeroEvent]?.toMainMessageStream(veroEventAccumulator)
-            ?: throw TODO("exception handling")
-        un20Responses = packetRouter.incomingPacketChannels[Channel.Remote.Un20Server]?.toMainMessageStream(un20ResponseAccumulator)
-            ?: throw TODO("exception handling")
+        veroResponses = packetRouter.incomingPacketChannels.getValue(Channel.Remote.VeroServer).toMainMessageStream(veroResponseAccumulator)
+        veroEvents = packetRouter.incomingPacketChannels.getValue(Channel.Remote.VeroEvent).toMainMessageStream(veroEventAccumulator)
+        un20Responses = packetRouter.incomingPacketChannels.getValue(Channel.Remote.Un20Server).toMainMessageStream(un20ResponseAccumulator)
     }
 
     override fun disconnect() {
         packetRouter.disconnect()
     }
 
-    inline fun <reified R : IncomingMainMessage> receiveResponse(): Single<R> =
-        when {
-            isSubclass<R, VeroResponse>() -> veroResponses
-            isSubclass<R, Un20Response>() -> un20Responses
-            else -> TODO("exception handling")
+    inline fun <reified R : IncomingMainMessage> receiveResponse(crossinline withPredicate: (R) -> Boolean = { true }): Single<R> =
+        Single.defer {
+            when {
+                isSubclass<R, VeroResponse>() -> veroResponses
+                isSubclass<R, VeroEvent>() -> veroEvents
+                isSubclass<R, Un20Response>() -> un20Responses
+                else -> Flowable.error(IllegalArgumentException("Trying to receive invalid response"))
+            }
+                ?.filterCast(withPredicate)
+                ?.firstOrError()
+                ?: Single.error(IllegalStateException("Trying to receive response before connecting stream"))
         }
-            .filterCast<R>()
-            .firstOrError()
 }

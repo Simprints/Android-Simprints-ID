@@ -95,7 +95,7 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val testSubscriber = messageInputStream.veroEvents.test()
+        val testSubscriber = messageInputStream.veroEvents!!.test()
 
         channels[Channel.Remote.VeroEvent]?.connect()
 
@@ -174,7 +174,7 @@ class MainMessageInputStreamTest {
         messageInputStream.connect(mock())
 
         val veroResponseTestSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().test()
-        val veroEventTestSubscriber = messageInputStream.veroEvents.test()
+        val veroEventTestSubscriber = messageInputStream.veroEvents!!.test()
         val un20ResponseTestSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().test()
 
         channels.values.forEach { it.connect() }

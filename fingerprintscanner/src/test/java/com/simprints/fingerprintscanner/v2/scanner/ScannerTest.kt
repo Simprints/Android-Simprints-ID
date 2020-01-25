@@ -180,7 +180,15 @@ class ScannerTest {
 
     @Test
     fun scanner_connectThenTurnUn20On_throwsException() {
-        val scanner = Scanner(mock(), setupRootMessageStreamMock(), mock(), mock())
+        val mockMessageInputStream = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
+            whenThis { veroResponses } thenReturn Flowable.empty()
+            whenThis { veroEvents } thenReturn Flowable.empty()
+        }
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
+            whenThis { sendMessage(anyNotNull()) } thenReturn Completable.complete()
+        }
+
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock(), mock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
 
         scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
