@@ -27,7 +27,10 @@ import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
-import io.reactivex.*
+import io.reactivex.Completable
+import io.reactivex.Observable
+import io.reactivex.Observer
+import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import java.io.InputStream
@@ -105,10 +108,8 @@ class Scanner(
         }
 
     private inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
-        Single.defer {
-            mainMessageStream.outgoing.sendMessage(command)
-                .andThen(mainMessageStream.incoming.receiveResponse<R>())
-        }
+        mainMessageStream.outgoing.sendMessage(command)
+            .andThen(mainMessageStream.incoming.receiveResponse<R>())
 
     fun getVersionInformation(): Single<UnifiedVersionInformation> =
         assertMode(ROOT).andThen(
@@ -158,8 +159,8 @@ class Scanner(
 
     private fun subscribeTriggerButtonListeners() =
         mainMessageStream.incoming.veroEvents
-            .filterCast<TriggerButtonPressedEvent>()
-            .subscribeBy(onNext = {
+            ?.filterCast<TriggerButtonPressedEvent>()
+            ?.subscribeBy(onNext = {
                 triggerButtonListeners.forEach { it.onNext(Unit) }
             })
 
@@ -188,8 +189,9 @@ class Scanner(
                 SetUn20OnCommand(DigitalValue.TRUE)
             ))
             .completeOnceReceived()
-            .andThen(Flowable.defer { mainMessageStream.incoming.veroEvents })
-            .filterCast<Un20StateChangeEvent> { it.value == DigitalValue.TRUE }
+            .andThen(mainMessageStream.incoming.receiveResponse<Un20StateChangeEvent>(
+                withPredicate = { it.value == DigitalValue.TRUE })
+            )
             .completeOnceReceived()
             .doOnComplete { state.un20On = true }
 
@@ -199,8 +201,9 @@ class Scanner(
                 SetUn20OnCommand(DigitalValue.FALSE)
             ))
             .completeOnceReceived()
-            .andThen(Flowable.defer { mainMessageStream.incoming.veroEvents })
-            .filterCast<Un20StateChangeEvent> { it.value == DigitalValue.FALSE }
+            .andThen(mainMessageStream.incoming.receiveResponse<Un20StateChangeEvent>(
+                withPredicate = { it.value == DigitalValue.FALSE })
+            )
             .completeOnceReceived()
             .doOnComplete { state.un20On = false }
 
