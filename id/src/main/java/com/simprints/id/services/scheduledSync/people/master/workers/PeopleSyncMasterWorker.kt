@@ -57,7 +57,9 @@ class PeopleSyncMasterWorker(private val appContext: Context,
             crashlyticsLog("Start")
 
             return if (!isSyncRunning()) {
-                val chain = upSyncWorkersChain(uniqueSyncId) + downSyncWorkersChain(uniqueSyncId)
+                val upSyncWorkers = upSyncWorkersChain(uniqueSyncId)
+                val downSyncWorkers =  downSyncWorkersChain(uniqueSyncId)
+                val chain = upSyncWorkers + downSyncWorkers
                 wm.beginWith(chain).then(lastSyncWorker(uniqueSyncId)).enqueue()
 
                 peopleSyncCache.clearProgresses()
