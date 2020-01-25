@@ -61,7 +61,7 @@ class ScannerTest {
 
     @Test
     fun scanner_callEnterModeBeforeConnect_throwsException() {
-        val scanner = Scanner(mock(), mock(), mock(), mock())
+        val scanner = Scanner(mock(), setupRootMessageStreamMock(), mock(), mock())
         scanner.enterMainMode().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
     }
 

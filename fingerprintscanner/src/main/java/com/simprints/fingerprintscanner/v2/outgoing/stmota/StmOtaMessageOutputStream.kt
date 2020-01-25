@@ -1,27 +1,20 @@
 package com.simprints.fingerprintscanner.v2.outgoing.stmota
 
 import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaCommand
+import com.simprints.fingerprintscanner.v2.outgoing.OutputStreamDispatcher
 import com.simprints.fingerprintscanner.v2.outgoing.OutgoingConnectable
-import com.simprints.fingerprintscanner.v2.tools.reactive.completable
+import com.simprints.fingerprintscanner.v2.tools.reactive.single
 import io.reactivex.Completable
-import java.io.OutputStream
 
-class StmOtaMessageOutputStream : OutgoingConnectable {
-
-    private lateinit var outputStream: OutputStream
-
-    override fun connect(outputStream: OutputStream) {
-        this.outputStream = outputStream
-    }
-
-    override fun disconnect() {
-    }
+class StmOtaMessageOutputStream(
+    private val stmOtaMessageSerializer: StmOtaMessageSerializer,
+    private val outputStreamDispatcher: OutputStreamDispatcher
+) : OutgoingConnectable by outputStreamDispatcher {
 
     fun sendMessage(message: StmOtaCommand): Completable =
-        dispatch(message.getBytes())
-
-    private fun dispatch(packet: ByteArray): Completable = completable {
-        outputStream.write(packet)
-        outputStream.flush()
-    }
+        single {
+            stmOtaMessageSerializer.serialize(message)
+        }.flatMapCompletable {
+            outputStreamDispatcher.dispatch(it)
+        }
 }

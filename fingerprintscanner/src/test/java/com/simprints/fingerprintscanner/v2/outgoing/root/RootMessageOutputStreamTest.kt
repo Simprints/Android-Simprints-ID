@@ -3,6 +3,7 @@ package com.simprints.fingerprintscanner.v2.outgoing.root
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.eq
 import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterMainModeCommand
+import com.simprints.fingerprintscanner.v2.outgoing.OutputStreamDispatcher
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
 import com.simprints.testtools.common.syntax.mock
@@ -19,11 +20,10 @@ class RootMessageOutputStreamTest {
     @Test
     fun messageOutputStream_sendMessage_serializesAndDispatchesMessageCorrectly() {
         val message = EnterMainModeCommand()
-        val packets = listOf(byteArrayOf(0x10, 0x20, 0x30), byteArrayOf(0x40, 0x50))
+        val expectedBytes = listOf(byteArrayOf(0x10, 0x20, 0x30), byteArrayOf(0x40, 0x50))
+        whenever(rootMessageSerializerMock) { serialize(eq(message)) } thenReturn expectedBytes
 
-        whenever(rootMessageSerializerMock) { serialize(eq(message)) } thenReturn packets
-
-        val messageOutputStream = RootMessageOutputStream(rootMessageSerializerMock)
+        val messageOutputStream = RootMessageOutputStream(rootMessageSerializerMock, OutputStreamDispatcher())
 
         val outputStream = PipedOutputStream()
         val inputStream = PipedInputStream()
@@ -39,6 +39,6 @@ class RootMessageOutputStreamTest {
         testSubscriber.awaitCompletionWithNoErrors()
 
         assertThat(testSubscriber.values().reduce { acc, bytes -> acc + bytes })
-            .isEqualTo(packets.reduce { acc, bytes -> acc + bytes })
+            .isEqualTo(expectedBytes.reduce { acc, bytes -> acc + bytes })
     }
 }

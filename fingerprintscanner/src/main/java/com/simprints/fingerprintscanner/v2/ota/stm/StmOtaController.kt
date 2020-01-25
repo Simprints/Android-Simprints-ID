@@ -18,10 +18,8 @@ import io.reactivex.Single
 class StmOtaController(private val intelHexParser: IntelHexParser) {
 
     private inline fun <reified R : StmOtaResponse> sendStmOtaModeCommandAndReceiveResponse(stmOtaMessageStream: StmOtaMessageStream, command: StmOtaCommand): Single<R> =
-        Single.defer {
-            stmOtaMessageStream.outgoing.sendMessage(command)
-                .andThen(stmOtaMessageStream.incoming.receiveResponse<R>())
-        }
+        stmOtaMessageStream.outgoing.sendMessage(command)
+            .andThen(stmOtaMessageStream.incoming.receiveResponse<R>())
 
     fun program(stmOtaMessageStream: StmOtaMessageStream, firmwareHexFile: String): Observable<Float> =
         single {

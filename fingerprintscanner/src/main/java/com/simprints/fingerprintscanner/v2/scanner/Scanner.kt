@@ -102,10 +102,8 @@ class Scanner(
     }
 
     private inline fun <reified R : RootResponse> sendRootModeCommandAndReceiveResponse(command: RootCommand): Single<R> =
-        Single.defer {
-            rootMessageStream.outgoing.sendMessage(command)
-                .andThen(rootMessageStream.incoming.receiveResponse<R>())
-        }
+        rootMessageStream.outgoing.sendMessage(command)
+            .andThen(rootMessageStream.incoming.receiveResponse<R>())
 
     private inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
         mainMessageStream.outgoing.sendMessage(command)
