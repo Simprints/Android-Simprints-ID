@@ -12,15 +12,11 @@ import java.io.InputStream
 
 class RootMessageInputStream(private val rootResponseAccumulator: RootResponseAccumulator) : IncomingConnectable {
 
-    private lateinit var inputStream: InputStream
-
-    lateinit var rootResponseStream: Flowable<RootResponse>
+    var rootResponseStream: Flowable<RootResponse>? = null
 
     private lateinit var rootResponseStreamDisposable: Disposable
 
     override fun connect(inputStream: InputStream) {
-        this.inputStream = inputStream
-
         rootResponseStream = transformToRootResponseStream(inputStream)
             .subscribeAndPublish()
             .also {
@@ -41,7 +37,10 @@ class RootMessageInputStream(private val rootResponseAccumulator: RootResponseAc
         this.subscribeOn(Schedulers.io()).publish()
 
     inline fun <reified R : RootResponse> receiveResponse(): Single<R> =
-        rootResponseStream
-            .filterCast<R>()
-            .firstOrError()
+        Single.defer {
+            rootResponseStream
+                ?.filterCast<R>()
+                ?.firstOrError()
+                ?: Single.error(IllegalStateException("Trying to receive response before connecting stream"))
+        }
 }

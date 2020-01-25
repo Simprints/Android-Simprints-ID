@@ -48,7 +48,7 @@ class RootMessageInputStreamTest {
         rootMessageInputStream.connect(inputStream)
 
         val testResponseSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>().testSubscribe()
-        val testStreamSubscriber = rootMessageInputStream.rootResponseStream.testSubscribe()
+        val testStreamSubscriber = rootMessageInputStream.rootResponseStream!!.testSubscribe()
 
         packets.forEach { outputStream.write(it) }
 
@@ -71,7 +71,7 @@ class RootMessageInputStreamTest {
         rootMessageInputStream.connect(inputStream)
 
         val testResponseSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>().testSubscribe()
-        val testStreamSubscriber = rootMessageInputStream.rootResponseStream.testSubscribe()
+        val testStreamSubscriber = rootMessageInputStream.rootResponseStream!!.testSubscribe()
 
         packets.forEach { outputStream.write(it) }
 

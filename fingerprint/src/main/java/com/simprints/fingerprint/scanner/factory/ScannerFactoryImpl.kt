@@ -22,13 +22,13 @@ import com.simprints.fingerprintscanner.v2.incoming.root.RootResponseParser
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaResponseParser
 import com.simprints.fingerprintscanner.v2.ota.stm.StmOtaController
+import com.simprints.fingerprintscanner.v2.outgoing.OutputStreamDispatcher
 import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
-import com.simprints.fingerprintscanner.v2.outgoing.main.message.MainMessageSerializer
-import com.simprints.fingerprintscanner.v2.outgoing.main.packet.PacketDispatcher
-import com.simprints.fingerprintscanner.v2.outgoing.main.packet.PacketSerializer
+import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageOutputStream
+import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageSerializer
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
 import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
@@ -65,8 +65,8 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                         Un20ResponseAccumulator(Un20ResponseParser())
                     ),
                     MainMessageOutputStream(
-                        MainMessageSerializer(PacketParser()),
-                        PacketDispatcher(PacketSerializer())
+                        MainMessageSerializer(),
+                        OutputStreamDispatcher()
                     )
                 ),
                 RootMessageStream(
@@ -74,12 +74,18 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                         RootResponseAccumulator(RootResponseParser())
                     ),
                     RootMessageOutputStream(
-                        RootMessageSerializer()
+                        RootMessageSerializer(),
+                        OutputStreamDispatcher()
                     )
                 ),
                 StmOtaMessageStream(
-                    StmOtaMessageInputStream(StmOtaResponseParser()),
-                    StmOtaMessageOutputStream()
+                    StmOtaMessageInputStream(
+                        StmOtaResponseParser()
+                    ),
+                    StmOtaMessageOutputStream(
+                        StmOtaMessageSerializer(),
+                        OutputStreamDispatcher()
+                    )
                 ),
                 StmOtaController(IntelHexParser())
             ),

@@ -12,15 +12,11 @@ import java.io.InputStream
 
 class StmOtaMessageInputStream(private val stmOtaResponseParser: StmOtaResponseParser) : IncomingConnectable {
 
-    private lateinit var inputStream: InputStream
-
-    lateinit var stmOtaResponseStream: Flowable<StmOtaResponse>
+    var stmOtaResponseStream: Flowable<StmOtaResponse>? = null
 
     private lateinit var stmOtaResponseStreamDisposable: Disposable
 
     override fun connect(inputStream: InputStream) {
-        this.inputStream = inputStream
-
         stmOtaResponseStream = transformToRootResponseStream(inputStream)
             .subscribeAndPublish()
             .also {
@@ -31,9 +27,7 @@ class StmOtaMessageInputStream(private val stmOtaResponseParser: StmOtaResponseP
     private fun transformToRootResponseStream(inputStream: InputStream) =
         inputStream
             .toFlowable()
-            .map {
-                stmOtaResponseParser.parse(it)
-            }
+            .map { stmOtaResponseParser.parse(it) }
 
     override fun disconnect() {
         stmOtaResponseStreamDisposable.dispose()
@@ -43,7 +37,10 @@ class StmOtaMessageInputStream(private val stmOtaResponseParser: StmOtaResponseP
         this.subscribeOn(Schedulers.io()).publish()
 
     inline fun <reified R : StmOtaResponse> receiveResponse(): Single<R> =
-        stmOtaResponseStream
-            .filterCast<R>()
-            .firstOrError()
+        Single.defer {
+            stmOtaResponseStream
+                ?.filterCast<R>()
+                ?.firstOrError()
+                ?: Single.error(IllegalStateException("Trying to receive response before connecting stream"))
+        }
 }

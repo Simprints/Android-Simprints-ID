@@ -10,11 +10,11 @@ class RootMessageSerializerTest {
     @Test
     fun rootCommand_serialized_producesCorrectPackets() {
         val message = EnterMainModeCommand()
-        val expectedPackets = listOf("F4 10 00 00")
+        val expectedBytes = listOf("F4 10 00 00")
 
         val rootMessageSerializer = RootMessageSerializer()
-        val actualPackets = rootMessageSerializer.serialize(message).map { it.toHexString() }
+        val actualBytes = rootMessageSerializer.serialize(message).map { it.toHexString() }
 
-        assertHexStringsEqual(expectedPackets, actualPackets)
+        assertHexStringsEqual(expectedBytes, actualBytes)
     }
 }
