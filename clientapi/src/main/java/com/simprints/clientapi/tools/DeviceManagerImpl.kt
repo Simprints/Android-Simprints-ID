@@ -1,8 +1,8 @@
-package com.simprints.id.tools
+package com.simprints.clientapi.tools
 
 import android.content.Context
 import com.scottyab.rootbeer.RootBeer
-import com.simprints.id.exceptions.unexpected.RootedDeviceException
+import com.simprints.clientapi.exceptions.RootedDeviceException
 
 class DeviceManagerImpl(private val context: Context) : DeviceManager {
 
