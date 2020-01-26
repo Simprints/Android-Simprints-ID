@@ -162,7 +162,7 @@ class Scanner(
             ?.filterCast<TriggerButtonPressedEvent>()
             ?.subscribeBy(onNext = {
                 triggerButtonListeners.forEach { it.onNext(Unit) }
-            })
+            }, onError = { it.printStackTrace() })
 
     private fun handleStmOtaModeEntered() = completable {
         rootMessageStream.disconnect()
