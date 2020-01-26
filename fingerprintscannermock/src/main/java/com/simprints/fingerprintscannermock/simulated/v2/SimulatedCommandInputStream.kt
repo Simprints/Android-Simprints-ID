@@ -15,7 +15,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
 import com.simprints.fingerprintscanner.v2.domain.root.RootMessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.root.RootMessageType.*
 import com.simprints.fingerprintscanner.v2.domain.root.commands.*
-import com.simprints.fingerprintscanner.v2.incoming.MessageParser
+import com.simprints.fingerprintscanner.v2.incoming.common.MessageParser
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.PacketToMainMessageAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.toMainMessageStream
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.ByteArrayToPacketAccumulator

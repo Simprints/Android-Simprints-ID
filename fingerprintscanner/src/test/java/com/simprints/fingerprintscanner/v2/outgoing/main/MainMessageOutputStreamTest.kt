@@ -3,7 +3,7 @@ package com.simprints.fingerprintscanner.v2.outgoing.main
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.eq
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.GetUn20OnCommand
-import com.simprints.fingerprintscanner.v2.outgoing.OutputStreamDispatcher
+import com.simprints.fingerprintscanner.v2.outgoing.common.OutputStreamDispatcher
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.testSubscribe

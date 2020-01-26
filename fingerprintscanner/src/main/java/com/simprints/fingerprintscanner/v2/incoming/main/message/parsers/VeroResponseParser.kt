@@ -5,7 +5,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroResponse
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.VeroMessageType.*
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.*
 import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidMessageException
-import com.simprints.fingerprintscanner.v2.incoming.MessageParser
+import com.simprints.fingerprintscanner.v2.incoming.common.MessageParser
 
 class VeroResponseParser : MessageParser<VeroResponse> {
 

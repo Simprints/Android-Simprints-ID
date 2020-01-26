@@ -22,7 +22,7 @@ import com.simprints.fingerprintscanner.v2.incoming.root.RootResponseParser
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaResponseParser
 import com.simprints.fingerprintscanner.v2.ota.stm.StmOtaController
-import com.simprints.fingerprintscanner.v2.outgoing.OutputStreamDispatcher
+import com.simprints.fingerprintscanner.v2.outgoing.common.OutputStreamDispatcher
 import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream

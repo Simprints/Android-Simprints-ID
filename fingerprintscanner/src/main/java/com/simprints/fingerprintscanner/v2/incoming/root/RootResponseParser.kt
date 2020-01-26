@@ -4,7 +4,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.RootMessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.root.RootMessageType.*
 import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.responses.*
-import com.simprints.fingerprintscanner.v2.incoming.MessageParser
+import com.simprints.fingerprintscanner.v2.incoming.common.MessageParser
 
 class RootResponseParser : MessageParser<RootResponse> {
 

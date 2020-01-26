@@ -1,7 +1,7 @@
 package com.simprints.fingerprintscanner.v2.incoming.stmota
 
 import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaResponse
-import com.simprints.fingerprintscanner.v2.incoming.IncomingConnectable
+import com.simprints.fingerprintscanner.v2.incoming.common.MessageInputStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import io.reactivex.Flowable
@@ -10,7 +10,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.io.InputStream
 
-class StmOtaMessageInputStream(private val stmOtaResponseParser: StmOtaResponseParser) : IncomingConnectable {
+class StmOtaMessageInputStream(private val stmOtaResponseParser: StmOtaResponseParser) : MessageInputStream {
 
     var stmOtaResponseStream: Flowable<StmOtaResponse>? = null
 

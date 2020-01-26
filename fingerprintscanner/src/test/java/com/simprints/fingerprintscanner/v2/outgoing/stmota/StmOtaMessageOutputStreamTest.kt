@@ -3,7 +3,7 @@ package com.simprints.fingerprintscanner.v2.outgoing.stmota
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.eq
 import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryStartCommand
-import com.simprints.fingerprintscanner.v2.outgoing.OutputStreamDispatcher
+import com.simprints.fingerprintscanner.v2.outgoing.common.OutputStreamDispatcher
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
 import com.simprints.testtools.common.syntax.mock
