@@ -43,6 +43,7 @@
             android:layout_gravity="center"
             android:indeterminate="true"
             android:indeterminateTint="@android:color/darker_gray"
+            android:layout_marginStart="3dp"
             app:layout_constraintBottom_toBottomOf="@+id/dashboard_sync_card_progress_message"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/dashboard_sync_card_progress_message"
