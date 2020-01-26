@@ -52,10 +52,8 @@ class SimulatedCommandInputStream {
             .publish()
             .also { it.connect() }
 
-    val veroCommands: Flowable<VeroCommand> = router.incomingPacketChannels[Channel.Remote.VeroServer]?.toMainMessageStream(VeroCommandAccumulator(VeroCommandParser()))
-        ?: throw IllegalStateException()
-    val un20Commands: Flowable<Un20Command> = router.incomingPacketChannels[Channel.Remote.Un20Server]?.toMainMessageStream(Un20CommandAccumulator(Un20CommandParser()))
-        ?: throw IllegalStateException()
+    val veroCommands: Flowable<VeroCommand> = router.incomingPacketChannels.getValue(Channel.Remote.VeroServer).toMainMessageStream(VeroCommandAccumulator(VeroCommandParser()))
+    val un20Commands: Flowable<Un20Command> = router.incomingPacketChannels.getValue(Channel.Remote.Un20Server).toMainMessageStream(Un20CommandAccumulator(Un20CommandParser()))
 
     fun updateWithNewBytes(bytes: ByteArray, mode: Mode) {
         when (mode) {

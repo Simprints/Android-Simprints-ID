@@ -23,9 +23,5 @@ inline fun <reified R> Flowable<*>.filterCast(
     this.filter { it is R && predicate(it) }
         .map { it as R }
 
-fun Flowable<*>.completeOnceReceived(): Completable =
-    this.firstOrError()
-        .ignoreElement()
-
 fun Single<*>.completeOnceReceived(): Completable =
     this.ignoreElement()
