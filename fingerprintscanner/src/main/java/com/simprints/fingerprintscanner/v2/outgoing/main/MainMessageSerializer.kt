@@ -5,7 +5,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Command
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroCommand
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
 import com.simprints.fingerprintscanner.v2.domain.main.packet.PacketProtocol
-import com.simprints.fingerprintscanner.v2.outgoing.MessageSerializer
+import com.simprints.fingerprintscanner.v2.outgoing.common.MessageSerializer
 import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 
 class MainMessageSerializer : MessageSerializer<OutgoingMainMessage> {
