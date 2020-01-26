@@ -97,7 +97,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
         }
     }
 
-    override fun stopTickerToUpdateLastSyncText(){
+    override fun stopTickerToUpdateLastSyncText() {
         tickerToUpdateLastSyncTimeText?.cancel()
     }
 
@@ -258,10 +258,12 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     private fun View.lastSyncText() = this.findViewById<TextView>(R.id.dashboard_sync_card_last_sync)
     private fun ProgressBar.setSyncProgress(progressValue: Int, totalValue: Int?) {
         if (totalValue != null) {
-            isIndeterminate = false
             progress = calculatePercentage(progressValue, totalValue)
         } else {
-            isIndeterminate = true
+            // Setting it only when required otherwise it creates glitches
+            if (!isIndeterminate) {
+                isIndeterminate = true
+            }
         }
 
         val blue = androidResourcesHelper.getColorStateList(R.color.colorPrimaryDark)

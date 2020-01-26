@@ -105,7 +105,7 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
              * Sync never run before.
              * use case: after the login
              */
-                hasSyncEverRun ||
+                !hasSyncEverRun ||
                 /**
                  * Sync has never been observed running in the dashboard and last sync (in background) failed.
                  * use case: user opens the dashboard and the sync failed before in background
