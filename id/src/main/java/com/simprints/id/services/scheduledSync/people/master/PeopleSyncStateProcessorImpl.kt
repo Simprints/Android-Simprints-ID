@@ -9,6 +9,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.models.fromDownSync
 import com.simprints.id.data.db.common.models.totalCount
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
 import com.simprints.id.services.scheduledSync.people.common.filterByTags
 import com.simprints.id.services.scheduledSync.people.down.workers.extractDownSyncProgress
 import com.simprints.id.services.scheduledSync.people.down.workers.getDownCountsFromOutput
@@ -44,7 +45,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
 
                         val syncState = PeopleSyncState(lastSyncId, progress, total, upSyncStates, downSyncStates)
                         this@apply.postValue(syncState)
-                        Timber.d("I/SYNC Emitting ${JsonHelper.toJson(syncState)}")
+                        Timber.tag(SYNC_LOG_TAG).d("Emitting ${JsonHelper.toJson(syncState)}")
                     }
                 }
             }
@@ -53,14 +54,14 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
 
     private fun observerForLastSyncId(): LiveData<String> {
         return syncWorkersLiveDataProvider.getMasterWorkersLiveData().switchMap { masterWorkers ->
-            Timber.d("I/SYNC Update from MASTER_SYNC_SCHEDULERS")
+            Timber.tag(SYNC_LOG_TAG).d("Update from MASTER_SYNC_SCHEDULERS")
 
             val completedSyncMaster = masterWorkers.completedWorkers()
             MutableLiveData<String>().apply {
                 if (completedSyncMaster.isNotEmpty()) {
                     val lastSyncId = completedSyncMaster.mapNotNull { it.outputData.getString(OUTPUT_LAST_SYNC_ID) }.firstOrNull()
                     if (!lastSyncId.isNullOrBlank()) {
-                        Timber.d("I/SYNC Last sync id $lastSyncId}")
+                        Timber.tag(SYNC_LOG_TAG).d("Last sync id $lastSyncId}")
                         this.postValue(lastSyncId)
                     }
                 }

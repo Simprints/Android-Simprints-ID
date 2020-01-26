@@ -13,8 +13,8 @@ import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyn
 import java.util.*
 import javax.inject.Inject
 
-class PeopleSyncMasterWorker(private val appContext: Context,
-                             params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
+open class PeopleSyncMasterWorker(private val appContext: Context,
+                                  params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
 
     companion object {
         const val MIN_BACKOFF_SECS = 15L
@@ -56,7 +56,7 @@ class PeopleSyncMasterWorker(private val appContext: Context,
             getComponent<PeopleSyncMasterWorker> { it.inject(this) }
             crashlyticsLog("Start")
 
-            return if (!isSyncRunning()) {
+            if (!isSyncRunning()) {
                 val upSyncWorkers = upSyncWorkersChain(uniqueSyncId)
                 val downSyncWorkers =  downSyncWorkersChain(uniqueSyncId)
                 val chain = upSyncWorkers + downSyncWorkers

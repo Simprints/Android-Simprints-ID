@@ -21,6 +21,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
 import org.jetbrains.anko.layoutInflater
 import org.jetbrains.anko.textColor
+import java.lang.Integer.min
 import java.util.*
 
 
@@ -270,7 +271,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     }
 
     private fun calculatePercentage(progressValue: Int, totalValue: Int) =
-        (100 * (progressValue.toFloat() / totalValue.toFloat())).toInt()
+        min((100 * (progressValue.toFloat() / totalValue.toFloat())).toInt(), 100)
 
     companion object {
         private const val ONE_MINUTE = 1000L * 60

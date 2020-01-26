@@ -10,8 +10,10 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
+import timber.log.Timber
 import java.io.IOException
 
+const val SYNC_LOG_TAG = "SYNC"
 abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     abstract val tag: String
@@ -26,10 +28,11 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
     }
 
     protected fun retry(t: Throwable? = null, message: String = t?.message ?: ""): Result {
-        t?.printStackTrace()
-        crashlyticsLog("[Retry] $message")
-        logExceptionIfRequired(t)
+        val finalMessage = "$tag - Retry] $message"
+        crashlyticsLog(finalMessage)
+        Timber.tag(SYNC_LOG_TAG).d(finalMessage)
 
+        logExceptionIfRequired(t)
         return resultSetter.retry()
     }
 
@@ -37,8 +40,9 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
                        message: String? = t.message ?: "",
                        outputData: Data? = null): Result {
 
-        t.printStackTrace()
-        crashlyticsLog("[Failed] $message")
+        val finalMessage = "$tag - Failed] $message"
+        crashlyticsLog(finalMessage)
+        Timber.tag(SYNC_LOG_TAG).d(finalMessage)
 
         logExceptionIfRequired(t)
         return resultSetter.failure(outputData)
@@ -46,20 +50,26 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
 
     protected fun success(outputData: Data? = null,
                           message: String = ""): Result {
-        crashlyticsLog("[Success] $message")
+
+        val finalMessage = "$tag - Success] $message"
+        crashlyticsLog(finalMessage)
+        Timber.tag(SYNC_LOG_TAG).d(finalMessage)
+
         return resultSetter.success(outputData)
+    }
+
+    protected fun crashlyticsLog(message: String) {
+        crashReportManager.logMessageForCrashReport(
+            CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = "$tag - $message")
     }
 
     private fun logExceptionIfRequired(t: Throwable?) {
         t?.let {
+            it.printStackTrace()
             // IOExceptions are about network issues, so they are not worth to report
             if (it !is IOException) {
                 crashReportManager.logExceptionOrSafeException(it)
             }
         }
-    }
-    protected fun crashlyticsLog(message: String) {
-        crashReportManager.logMessageForCrashReport(
-            CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = "$tag - $message")
     }
 }
