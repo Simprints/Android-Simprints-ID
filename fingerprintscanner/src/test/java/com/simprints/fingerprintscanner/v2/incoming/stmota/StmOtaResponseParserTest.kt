@@ -2,7 +2,9 @@ package com.simprints.fingerprintscanner.v2.incoming.stmota
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprintscanner.v2.domain.stmota.responses.CommandAcknowledgement
+import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidMessageException
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
+import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class StmOtaResponseParserTest {
@@ -17,5 +19,13 @@ class StmOtaResponseParserTest {
 
         assertThat(actualResponse).isInstanceOf(expectedResponse::class.java)
         assertThat((actualResponse as CommandAcknowledgement).kind).isEqualTo(expectedResponse.kind)
+    }
+
+    @Test
+    fun parseStmOtaResponse_receivesInvalidMessage_throwsException() {
+        val messageParser = StmOtaResponseParser()
+
+        val rawBytes = "F4".hexToByteArray()
+        assertThrows<InvalidMessageException> { messageParser.parse(rawBytes) }
     }
 }
