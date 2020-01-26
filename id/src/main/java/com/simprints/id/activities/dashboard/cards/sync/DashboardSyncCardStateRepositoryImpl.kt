@@ -117,6 +117,8 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
                  */
                 (hasSyncFinished(it) && hasSyncRunLongTimeAgo())) {
 
+                syncCardStateLiveData.value = SyncConnecting(null, 0, null)
+                lastSyncTimeObservedRunning = Date()
                 peopleSyncManager.sync()
             }
         }
