@@ -13,6 +13,7 @@ import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncM
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class PeopleSyncManagerImpl(private val ctx: Context,
@@ -33,6 +34,7 @@ class PeopleSyncManagerImpl(private val ctx: Context,
         peopleSyncStateProcessor.getLastSyncState()
 
     override fun sync() {
+        Timber.tag(SYNC_LOG_TAG).d("Sync one time people master worker")
         wm.beginUniqueWork(
             MASTER_SYNC_SCHEDULER_ONE_TIME,
             ExistingWorkPolicy.KEEP,
@@ -41,10 +43,12 @@ class PeopleSyncManagerImpl(private val ctx: Context,
     }
 
     override fun scheduleSync() {
+        Timber.tag(SYNC_LOG_TAG).d("Sync periodic people master worker")
         wm.enqueueUniquePeriodicWork(
             MASTER_SYNC_SCHEDULER_PERIODIC_TIME,
             ExistingPeriodicWorkPolicy.KEEP,
             buildPeriodicRequest())
+
     }
 
     override fun cancelScheduledSync() {
@@ -74,7 +78,9 @@ class PeopleSyncManagerImpl(private val ctx: Context,
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun buildPeriodicRequest(): PeriodicWorkRequest =
-        PeriodicWorkRequest.Builder(PeopleSyncMasterWorker::class.java, SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
+        PeriodicWorkRequest.Builder(
+            PeopleSyncMasterWorker::class.java,
+            SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTagForSyncMasterWorkers()
             .addTagForBackgroundSyncMasterWorker()
