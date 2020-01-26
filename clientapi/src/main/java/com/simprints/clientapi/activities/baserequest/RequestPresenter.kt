@@ -6,15 +6,19 @@ import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidato
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
+import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.ClientBase
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.extensions.doInBackground
+import com.simprints.clientapi.tools.DeviceManager
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
-                                private var eventsManager: ClientApiSessionEventsManager)
+                                private val eventsManager: ClientApiSessionEventsManager,
+                                private val deviceManager: DeviceManager,
+                                protected val crashReportManager: ClientApiCrashReportManager)
     : RequestContract.Presenter {
 
     override fun processEnrollRequest() = validateAndSendRequest(
@@ -51,6 +55,20 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         handleInvalidRequest(exception)
     }
 
+    protected fun runIfDeviceIsNotRooted(block: () -> Unit) {
+        try {
+            deviceManager.checkIfDeviceIsRooted()
+            block()
+        } catch (ex: RootedDeviceException) {
+            handleRootedDevice(ex)
+        }
+    }
+
+    private fun handleRootedDevice(exception: RootedDeviceException) {
+        crashReportManager.logExceptionOrSafeException(exception)
+        view.handleClientRequestError(ROOTED_DEVICE)
+    }
+
     private fun handleInvalidRequest(exception: InvalidRequestException) {
         when (exception) {
             is InvalidClientRequestException -> INVALID_CLIENT_REQUEST
@@ -76,4 +94,5 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         eventsManager.addInvalidIntentEvent(view.action ?: "", view.extras ?: emptyMap())
             .doInBackground()
     }
+
 }

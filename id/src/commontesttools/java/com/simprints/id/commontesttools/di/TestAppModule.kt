@@ -50,8 +50,8 @@ class TestAppModule(
     var secureApiInterfaceRule: DependencyRule = RealRule,
     var longConsentManagerRule: DependencyRule = RealRule,
     var syncStatusDatabaseRule: DependencyRule = RealRule,
-    private var encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) },
-    var deviceManagerRule: DependencyRule = RealRule
+    var deviceManagerRule: DependencyRule = RealRule,
+    private var encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) }
 ) : AppModule() {
 
     override fun provideCrashManager(): CrashReportManager =
@@ -142,7 +142,6 @@ class TestAppModule(
     override fun provideEncryptedSharedPreferences(builder: EncryptedSharedPreferencesBuilder): SharedPreferences =
         encryptedSharedPreferencesRule.resolveDependency { super.provideEncryptedSharedPreferences(builder) }
 
-    override fun provideDeviceManager(context: Context): DeviceManager =
-
-        deviceManagerRule.resolveDependency { super.provideDeviceManager(context) }
+    override fun provideDeviceManager(ctx: Context): DeviceManager =
+        deviceManagerRule.resolveDependency { super.provideDeviceManager(ctx) }
 }

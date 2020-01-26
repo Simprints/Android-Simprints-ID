@@ -8,15 +8,8 @@
     <!-- Activity Titles -->
     <string name="register_title">شامل شدن</string>
     <string name="identify_title">مشخص کردن</string>
-    <string name="update_title">تجدید کردن (اپدیت)</string>
     <string name="verify_title">تشخیص</string>
-    <string name="help_title">کمک</string>
-    <string name="settings_title">تنظیمات</string>
-    <string name="about_title">در مورد برنامه</string>
-    <string name="alert_title">هشدار</string>
-    <string name="tutorial_title">تمرین ویژه</string>
     <string name="refusal_label">فورم انکار</string>
-    <string name="privacy_label">محرمیت</string>
 
 
     <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
@@ -25,8 +18,6 @@
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
     <!-- Loading Messages-->
-    <string name="connect_scanner_loading">در حال آماده شدن</string>
-    <string name="updating_database">دیتابیس در حال اپدیت است…</string>
     <string name="connect_scanner_bt_connect">در حال تماس با Vero..</string>
     <string name="connect_scanner_wake_un20">بر حال کردن UN20..</string>
     <string name="connect_scanner_setup">آماده ساختن Vero..</string>
@@ -46,19 +37,13 @@
     <string name="rescan_label_question">اسکن دوباره ؟</string>
     <string name="scan_label">اسکن</string>
     <string name="cancel_button" tools:ignore="ButtonCase">لغو کردن</string>
-    <string name="ok">اوکی</string>
     <string name="scan">اسکن</string>
     <!-- Content Descriptions -->
 
 
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
     <!-- Sync Button Text -->
-    <string name="sync_data">همگام کردن معلومات</string>
-    <string name="syncing_calculating">همگام کردن… محاسبه کردن</string>
-    <string name="syncing_with_progress">همگام کردن… %1$d/%2$d</string>
-    <string name="not_signed_in">در سیستم داخل نشدید</string>
     <!-- Toast Messages -->
-    <string name="coming_soon">بزودی…</string>
     <!-- Finger Names -->
     <string name="l_5_finger_name">انگشت پنجم دست چپ</string>
     <string name="l_4_finger_name">انگشت چهارم دست چپ</string>
@@ -77,45 +62,17 @@
     <string name="please_wait">صبر کنید تا ما به شناسایی ادامه دهیم</string>
     <!-- Loading text -->
     <string name="loading_candidates">در حال آماده سازی اشتراک کنندگان</string>
-    <string name="loaded_candidates_one"> فرد یا اشتراک کننده آماده است %d</string>
-    <string name="loaded_candidates_other"> افراد یا اشتراک کنندگان آماده شدند %d</string>
     <string name="matching_fingerprints">در حال مطابقت نشان انگشتان</string>
-    <string name="returning_results">نتیجه در حال بدست آمدن</string>
-    <string name="returned_results_one"> نتیجه بدست آمد %d</string>
-    <string name="returned_results_other"> نتیجه بدست آمد %d</string>
-    <string name="tier1or2_matches_zero">آنقدر مطابقت خوب نه</string>
-    <string name="tier1or2_matches_one"> فیصد بسیار خوب مطابقت داشت %d</string>
-    <string name="tier1or2_matches_other"> مطابقت بسیار خوب %d</string>
-    <string name="tier3_matches_zero">مطابقت خوب نه</string>
-    <string name="tier3_matches_one"> مطابقت خوب %d</string>
-    <string name="tier3_matches_other"> مطابقت های خوب %d</string>
-    <string name="tier4_matches_zero">مطابقت ندارد</string>
-    <string name="tier4_matches_one"> مطابقت دارد %d</string>
-    <string name="tier4_matches_other"> در مطابقت است %d</string>
 
 
     <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->
-    <string name="bluetooth_error_title">خطا در بلوتوت</string>
-    <string name="configuration_error_title">خطا در تنظیمات</string>
-    <string name="disconnected_title">اسکنر دریافت نشد</string>
-    <string name="verify_guid_not_found_title">شخص دریافت نشد</string>
     <string name="error_occurred_title">اشتباه رخ داد</string>
     <string name="low_battery_title">چارچ بطری کم است</string>
     <!-- Error Message Text -->
-    <string name="invalid_intentAction_message">در تنظیمات (invalid Intent Action) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
-    <string name="invalid_metadata_message">در تنظیمات (invalid metadata) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
-    <string name="missing_userId_message">در تنظیمات no user ID اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
-    <string name="missing_moduleId_message">در تنظیمات no module ID اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
-    <string name="missing_updateId_message">در تنظیمات no update GUID اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
-    <string name="missing_verifyId_message">در تنظیمات no verify GUID اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
-    <string name="verify_guid_not_found_online_message">شخص که برای تشخیص انتخاب شده در دیتابیس موجود نمیباشد</string>
-    <string name="verify_guid_not_found_offline_message">معلومات شخص را نتوانستیم پیدا کنیم، لطفاً خود را مطمئن سازید که با انترنت وصل هستید و دوباره کوشش کنید</string>
     <string name="bluetooth_not_supported_message">در این دستگاه بلوتوت کار نمیدهد، لطفاً با ادمین تماس بگیرید</string>
     <string name="bluetooth_not_enabled_message">بلوتوت فعال نیست، لطفاْ مطمین شوید که بلوتوت در تنظیمات فعال گردیده و دوباره کوشش نمایید</string>
-    <string name="unbonded_scanner_message">اسکنر وصل نیست، لطفاْ خود را مطمین نمایید که اسکنر از طریق تنظیمات وصل است و دوباره تلاش کنید</string>
     <string name="multiple_scanners_found_message">بیشتر از یک اسکنر با این موبایل وصل گردید، لطفا اسکنر را که نیاز ندارید ارتباط اش را با موبایل قطع کنید</string>
-    <string name="disconnected_message">این اسکنر غیرقابل دسترس است، لطفا خود را مطمین سازید که اسکنر مذکور روشن است و نزدیک موبایل قرار دارد.</string>
     <string name="low_battery_message">بطری اسکنر ضعیف است. لطفاً اسکنر را چارچ کنید</string>
     <string name="unforeseen_error_message">معذرت میخواهیم، خطای غیر مترقبه رخ داده، برای دوام برنامه را بند کنید</string>
     <!-- Button Labels For Error Messages -->
@@ -127,37 +84,12 @@
 
     <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
-    <string name="database_information">معلومات در مورد دیتابیس</string>
-    <string name="user_count">تعداد استفاده کننده:</string>
-    <string name="module_count">تعداد مادیول:</string>
-    <string name="project_count">تعداد پروژه ها :</string>
-    <string name="preference_app_version_title">نسخه اپلیکیشن:</string>
-    <string name="about_libsimprints_version">مودل ماشین گرفتن نشان انگشت :</string>
-    <string name="preference_scanner_version_title">نسخه یا نوع اسکنر :</string>
     <!-- Button Labels -->
     <!-- Recovery dialogs -->
-    <string name="recovering_db">دوباره بدست آوردن دیتا .... لحظه را دربری میگیرد</string>
-    <string name="error">اشتباه</string>
-    <string name="error_recovery_message">اشتباه در هنگام فرستادن فایل بازیابی شده</string>
-    <string name="success_recovery_message">فایل بازیابی شده موفقانه اپلود گردید</string>
-    <string name="dismiss">اخراج شدن</string>
 
 
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
-    <string name="vibrate">لرزیدن</string>
-    <string name="nudge_mode_checkbox_name">Nudge Mode</string>
-    <string name="quality_threshold_empty">آستانه کیفیت:</string>
-    <string name="quality_threshold_value">آستانه کیفیت: %1$d</string>
-    <string name="nb_of_ids_empty">:تشخیص معلومات درخواست شده</string>
-    <string name="nb_of_ids_value">تشخیص معلومات درخواست شده: %1$d</string>
-    <string name="timeout_empty">وقت پوره شد (به ثانیه های):</string>
-    <string name="timeout_value">وقت پوره شد (به ثانیه ها): %1$d</string>
-    <string name="sync_settings_label">تنظیمات همگام کردن</string>
-    <string name="search_settings_label">در حال دریافت تنظیمات</string>
-    <string name="user_label">استفاده کننده</string>
-    <string name="module_label">مادیول</string>
-    <string name="project_label">پروژه</string>
 
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
@@ -167,8 +99,6 @@
     <string name="button_submit">سپردن</string>
     <string name="button_scan_prints">اسکن نمودن نشان انگشتان</string>
     <!-- Refusal Selection Points -->
-    <string name="scanner_not_working">اسکنر کار نمیدهد</string>
-    <string name="beneficiary_refused">مستفید شونده انکار نمود</string>
     <string name="refusal_other">دیگر</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">معلومات بیشتر</string>
@@ -176,7 +106,6 @@
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
-    <string name="developmentworker_consent_checkbox">من با استفاده دیتای Simprints با این شیوه موافقم</string>
 
 
 </resources>
