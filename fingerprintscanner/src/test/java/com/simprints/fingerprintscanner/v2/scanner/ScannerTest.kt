@@ -36,7 +36,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterStmOtaMode
 import com.simprints.fingerprintscanner.v2.incoming.main.MainMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.root.RootMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
-import com.simprints.fingerprintscanner.v2.ota.stm.StmOtaController
+import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageOutputStream

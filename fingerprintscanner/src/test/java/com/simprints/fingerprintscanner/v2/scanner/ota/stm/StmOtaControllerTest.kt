@@ -1,8 +1,10 @@
-package com.simprints.fingerprintscanner.v2.ota.stm
+package com.simprints.fingerprintscanner.v2.scanner.ota.stm
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaResponse
 import com.simprints.fingerprintscanner.v2.domain.stmota.responses.CommandAcknowledgement
+import com.simprints.fingerprintscanner.v2.exceptions.ota.InvalidFirmwareException
+import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
 import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
 import com.simprints.fingerprintscanner.v2.tools.hexparser.FirmwareByteChunk
@@ -68,7 +70,7 @@ class StmOtaControllerTest {
             configureMessageStreamMock(nackPositions = listOf(0)), "").testSubscribe()
 
         testObserver.awaitTerminalEvent()
-        testObserver.assertError(NotImplementedError::class.java) // TODO : Exception handling
+        testObserver.assertError(OtaFailedException::class.java)
     }
 
     @Test
@@ -80,7 +82,21 @@ class StmOtaControllerTest {
 
         testObserver.awaitTerminalEvent()
         assertThat(testObserver.values()).containsExactlyElementsIn(PROGRESS_VALUES.slice(0..1)).inOrder()
-        testObserver.assertError(NotImplementedError::class.java) // TODO : Exception handling
+        testObserver.assertError(OtaFailedException::class.java)
+    }
+
+    @Test
+    fun program_withInvalidFirmwareFile_throwsException() {
+        val intelHexParserMock = setupMock<IntelHexParser> {
+            whenThis { parse(anyNotNull()) } thenThrow IllegalArgumentException()
+        }
+        val stmOtaController = StmOtaController(intelHexParserMock)
+
+        val testObserver = stmOtaController.program(
+            configureMessageStreamMock(nackPositions = listOf(0)), "").testSubscribe()
+
+        testObserver.awaitTerminalEvent()
+        testObserver.assertError(InvalidFirmwareException::class.java)
     }
 
     private fun configureIntelHexParserMock() = setupMock<IntelHexParser> {
