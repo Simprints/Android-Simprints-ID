@@ -7,5 +7,9 @@ import com.simprints.fingerprintscanner.v2.incoming.common.MessageParser
 class StmOtaResponseParser : MessageParser<StmOtaResponse> {
 
     override fun parse(messageBytes: ByteArray): StmOtaResponse =
-        CommandAcknowledgement.fromBytes(messageBytes)
+        try {
+            CommandAcknowledgement.fromBytes(messageBytes)
+        } catch (e: Exception) {
+            handleExceptionDuringParsing(e)
+        }
 }

@@ -27,7 +27,7 @@ class VeroResponseParser : MessageParser<VeroResponse> {
                         throw InvalidMessageException("Illegal message $type received in Vero events channel")
                 }
             }
-        } catch (e: IndexOutOfBoundsException) {
-            throw InvalidMessageException("Incorrect number of bytes received parsing Vero response", e)
+        } catch (e: Exception) {
+            handleExceptionDuringParsing(e)
         }
 }
