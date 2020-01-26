@@ -13,6 +13,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncConnecting
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -82,11 +83,9 @@ class DashboardActivity : AppCompatActivity() {
         })
 
         syncCardDisplayer.userWantsToSync.observe(this@DashboardActivity, Observer {
+            syncCardDisplayer.displayState(SyncConnecting(null, 0, null))
             peopleSyncManager.sync()
         })
-
-        lifecycleScope.launchWhenResumed {
-        }
     }
 
     override fun onResume() {

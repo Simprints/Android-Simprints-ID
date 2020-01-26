@@ -21,8 +21,8 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
 import org.jetbrains.anko.layoutInflater
 import org.jetbrains.anko.textColor
-import java.lang.Integer.min
 import java.util.*
+import kotlin.math.min
 
 
 class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResourcesHelper,
