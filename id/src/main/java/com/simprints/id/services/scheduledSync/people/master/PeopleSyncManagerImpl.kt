@@ -23,8 +23,8 @@ class PeopleSyncManagerImpl(private val ctx: Context,
                             private val peopleSyncCache: PeopleSyncCache) : PeopleSyncManager {
 
     companion object {
-        const val SYNC_WORKER_REPEAT_INTERVAL = 15L
-        val SYNC_WORKER_REPEAT_UNIT = TimeUnit.MINUTES
+        const val SYNC_WORKER_REPEAT_INTERVAL = 1L
+        val SYNC_WORKER_REPEAT_UNIT = TimeUnit.HOURS
     }
 
     private val wm: WorkManager
@@ -35,7 +35,7 @@ class PeopleSyncManagerImpl(private val ctx: Context,
 
     override fun hasSyncEverRunBefore(): Boolean =
         wm.getAllPeopleSyncWorkersInfo().get().size > 0
-    
+
     override fun sync() {
         Timber.tag(SYNC_LOG_TAG).d("Sync one time people master worker")
         wm.beginUniqueWork(
