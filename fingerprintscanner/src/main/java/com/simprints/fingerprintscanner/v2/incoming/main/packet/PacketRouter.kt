@@ -14,8 +14,6 @@ class PacketRouter(private val channels: List<Channel>,
                    private inline val packetChannelDesignator: Packet.() -> Byte,
                    private val byteArrayToPacketAccumulator: ByteArrayToPacketAccumulator) : IncomingConnectable {
 
-    private lateinit var inputStream: InputStream
-
     private lateinit var incomingPackets: ConnectableFlowable<Packet>
     lateinit var incomingPacketChannels: Map<Channel, ConnectableFlowable<Packet>>
 
@@ -23,8 +21,7 @@ class PacketRouter(private val channels: List<Channel>,
     private lateinit var incomingPacketChannelsDisposable: Map<Channel, Disposable>
 
     override fun connect(inputStream: InputStream) {
-        this.inputStream = inputStream
-        configureIncomingPacketStream(transformToPacketStream(this.inputStream))
+        configureIncomingPacketStream(transformToPacketStream(inputStream))
         incomingPacketsDisposable = incomingPackets.connect()
         incomingPacketChannelsDisposable = incomingPacketChannels.mapValues { it.value.connect() }
     }

@@ -33,4 +33,6 @@ abstract class SimulatedScanner(val scannerManager: SimulatedScannerManager) {
                 returnStream.flush()
             }
     }
+
+    abstract fun disconnect()
 }
