@@ -35,6 +35,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeRe
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterStmOtaModeResponse
 import com.simprints.fingerprintscanner.v2.exceptions.state.IllegalUn20StateException
 import com.simprints.fingerprintscanner.v2.exceptions.state.IncorrectModeException
+import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedException
 import com.simprints.fingerprintscanner.v2.incoming.main.MainMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.root.RootMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
@@ -64,7 +65,15 @@ class ScannerTest {
     @Test
     fun scanner_callEnterModeBeforeConnect_throwsException() {
         val scanner = Scanner(mock(), setupRootMessageStreamMock(), mock(), mock())
-        scanner.enterMainMode().testSubscribe().await().assertError(IncorrectModeException::class.java)
+        scanner.enterMainMode().testSubscribe().await().assertError(NotConnectedException::class.java)
+    }
+
+    @Test
+    fun scanner_connectThenDisconnectThenEnterMainMode_throwsException() {
+        val scanner = Scanner(mock(), setupRootMessageStreamMock(), mock(), mock())
+        scanner.connect(mock(), mock()).blockingAwait()
+        scanner.disconnect().blockingAwait()
+        scanner.enterMainMode().testSubscribe().await().assertError(NotConnectedException::class.java)
     }
 
     @Test
@@ -83,7 +92,6 @@ class ScannerTest {
 
     @Test
     fun scanner_connect_stateIsInRootMode() {
-
         val scanner = Scanner(mock(), mock(), mock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
 
