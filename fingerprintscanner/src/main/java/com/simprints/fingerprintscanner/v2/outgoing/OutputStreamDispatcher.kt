@@ -14,6 +14,7 @@ class OutputStreamDispatcher : OutgoingConnectable {
     }
 
     override fun disconnect() {
+        outputStream = null
     }
 
     /**
