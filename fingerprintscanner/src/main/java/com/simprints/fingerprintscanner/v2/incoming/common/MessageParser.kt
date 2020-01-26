@@ -6,7 +6,7 @@ import java.nio.BufferUnderflowException
 
 interface MessageParser<out R : Message> {
 
-    /** @throws InvalidMessageException */
+    /** @throws InvalidMessageException if message could not be successfully parsed */
     fun parse(messageBytes: ByteArray): R
 
     fun handleExceptionDuringParsing(e: Throwable): Nothing =

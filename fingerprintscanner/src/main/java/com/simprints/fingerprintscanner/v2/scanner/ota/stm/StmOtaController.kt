@@ -23,22 +23,30 @@ class StmOtaController(private val intelHexParser: IntelHexParser) {
         stmOtaMessageStream.outgoing.sendMessage(command)
             .andThen(stmOtaMessageStream.incoming.receiveResponse<R>())
 
+    /**
+     * @throws InvalidFirmwareException if firmware file could not be successfully parsed
+     * @throws OtaFailedException if received a NACK when communicating with STM
+     */
     fun program(stmOtaMessageStream: StmOtaMessageStream, firmwareHexFile: String): Observable<Float> =
+        parseFirmwareFile(firmwareHexFile)
+            .map { chunkList ->
+                chunkList.mapIndexed { index, chunk ->
+                    Pair(chunk, (index + 1).toFloat() / chunkList.size.toFloat())
+                }
+            }.flattenAsObservable {
+                it
+            }.concatMap { (chunk, progress) ->
+                sendStmPacket(stmOtaMessageStream, chunk)
+                    .andThen(Observable.just(progress))
+            }
+
+    private fun parseFirmwareFile(firmwareHexFile: String): Single<List<FirmwareByteChunk>> =
         single {
             try {
                 intelHexParser.parse(firmwareHexFile)
             } catch (e: Exception) {
                 throw InvalidFirmwareException("Parsing firmware file failed", e)
             }
-        }.map { chunkList ->
-            chunkList.mapIndexed { index, chunk ->
-                Pair(chunk, (index + 1).toFloat() / chunkList.size.toFloat())
-            }
-        }.flattenAsObservable {
-            it
-        }.concatMap { (chunk, progress) ->
-            sendStmPacket(stmOtaMessageStream, chunk)
-                .andThen(Observable.just(progress))
         }
 
     private fun sendStmPacket(stmOtaMessageStream: StmOtaMessageStream, firmwareByteChunk: FirmwareByteChunk): Completable =

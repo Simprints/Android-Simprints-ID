@@ -33,13 +33,15 @@ import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterStmOtaModeC
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterCypressOtaModeResponse
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterStmOtaModeResponse
+import com.simprints.fingerprintscanner.v2.exceptions.state.IllegalUn20StateException
+import com.simprints.fingerprintscanner.v2.exceptions.state.IncorrectModeException
 import com.simprints.fingerprintscanner.v2.incoming.main.MainMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.root.RootMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
-import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageOutputStream
+import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
 import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
@@ -62,7 +64,7 @@ class ScannerTest {
     @Test
     fun scanner_callEnterModeBeforeConnect_throwsException() {
         val scanner = Scanner(mock(), setupRootMessageStreamMock(), mock(), mock())
-        scanner.enterMainMode().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
+        scanner.enterMainMode().testSubscribe().await().assertError(IncorrectModeException::class.java)
     }
 
     @Test
@@ -191,7 +193,7 @@ class ScannerTest {
         val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock(), mock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
 
-        scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
+        scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().await().assertError(IncorrectModeException::class.java)
     }
 
     @Test
@@ -329,7 +331,7 @@ class ScannerTest {
             state.un20On = null
         }
 
-        scanner.captureFingerprint().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
+        scanner.captureFingerprint().testSubscribe().await().assertError(IllegalUn20StateException::class.java)
     }
 
     @Test
@@ -421,7 +423,7 @@ class ScannerTest {
             whenThis { sendMessage(anyNotNull()) } then {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(
-                        when (it.arguments[0] as RootCommand){
+                        when (it.arguments[0] as RootCommand) {
                             is EnterMainModeCommand -> EnterMainModeResponse()
                             is EnterStmOtaModeCommand -> EnterStmOtaModeResponse()
                             is EnterCypressOtaModeCommand -> EnterCypressOtaModeResponse()
