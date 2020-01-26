@@ -1,6 +1,8 @@
 package com.simprints.fingerprintscanner.v2.domain.main.message.un20.models
 
+import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidMessageException
 import com.simprints.fingerprintscanner.v2.tools.lang.objects
+import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
 
 sealed class Un20MessageType(val majorByte: Byte, val minorByte: Byte) {
 
@@ -37,7 +39,7 @@ sealed class Un20MessageType(val majorByte: Byte, val minorByte: Byte) {
                     ?: when (receivedMajorByte) {
                         Un20MessageMajorType.GET_TEMPLATE.majorByte -> GetTemplate(receivedMinorByte)
                         Un20MessageMajorType.GET_IMAGE.majorByte -> GetImage(receivedMinorByte)
-                        else -> TODO("exception handling")
+                        else -> throw InvalidMessageException("Invalid Un20MessageType received with bytes: ${bytes.toHexString()}")
                     }
             }
     }

@@ -3,6 +3,7 @@ package com.simprints.fingerprintscanner.v2.incoming.main.packet
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprintscanner.v2.domain.main.packet.PacketProtocol
 import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidPacketException
+import java.nio.BufferUnderflowException
 
 class PacketParser {
 
@@ -19,7 +20,17 @@ class PacketParser {
                     payloadLength = PacketProtocol.getPayloadLengthFromHeader(header)
                 )
             }
-        } catch (e: IndexOutOfBoundsException) {
-            throw InvalidPacketException("Incorrect number of bytes received parsing main mode packet", e)
+        } catch (e: Exception) {
+            handleExceptionDuringParsing(e)
+        }
+
+    private fun handleExceptionDuringParsing(e: Throwable): Nothing =
+        when (e) {
+            is InvalidPacketException ->
+                throw e
+            is IndexOutOfBoundsException, is BufferUnderflowException ->
+                throw InvalidPacketException("Incorrect number of bytes received parsing response in ${this::class.java.simpleName}", e)
+            else ->
+                throw InvalidPacketException("Unknown issue during parsing in ${this::class.java.simpleName}", e)
         }
 }

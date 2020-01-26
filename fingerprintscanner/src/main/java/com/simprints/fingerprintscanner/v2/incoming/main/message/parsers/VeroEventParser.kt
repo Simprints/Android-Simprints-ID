@@ -29,7 +29,7 @@ class VeroEventParser : MessageParser<VeroEvent> {
                         throw InvalidMessageException("Illegal message $type received in Vero events channel")
                 }
             }
-        } catch (e: IndexOutOfBoundsException) {
-            throw InvalidMessageException("Incorrect number of bytes received parsing Vero event", e)
+        } catch (e: Exception) {
+            handleExceptionDuringParsing(e)
         }
 }

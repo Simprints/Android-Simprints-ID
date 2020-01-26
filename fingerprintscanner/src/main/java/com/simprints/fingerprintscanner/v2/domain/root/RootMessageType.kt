@@ -1,5 +1,7 @@
 package com.simprints.fingerprintscanner.v2.domain.root
 
+import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidMessageException
+
 enum class RootMessageType(val byte: Byte) {
     ENTER_MAIN_MODE(0x10),
     ENTER_CYPRESS_OTA_MODE(0x20),
@@ -9,6 +11,6 @@ enum class RootMessageType(val byte: Byte) {
 
     companion object {
         fun fromByte(byte: Byte) = values().find { it.byte == byte }
-            ?: TODO("Exception handling - Unrecognised RootMessageType byte: $byte")
+            ?: throw InvalidMessageException("Invalid RootMessageType received with bytes: $byte")
     }
 }

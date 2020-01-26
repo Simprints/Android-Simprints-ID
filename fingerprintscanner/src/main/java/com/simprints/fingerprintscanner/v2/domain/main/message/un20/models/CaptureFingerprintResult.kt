@@ -1,5 +1,8 @@
 package com.simprints.fingerprintscanner.v2.domain.main.message.un20.models
 
+import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidMessageException
+import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
+
 enum class CaptureFingerprintResult(val byte: Byte) {
     OK(0x00),
     FINGERPRINT_NOT_FOUND(0x20),
@@ -8,6 +11,6 @@ enum class CaptureFingerprintResult(val byte: Byte) {
 
     companion object {
         fun fromBytes(bytes: ByteArray) = values().find { it.byte == bytes[0] }
-            ?: TODO("exception handling")
+            ?: throw InvalidMessageException("Invalid CaptureFingerprintResult received with bytes: ${bytes.toHexString()}")
     }
 }

@@ -4,7 +4,6 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20MessageP
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Response
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20MessageType
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.*
-import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidMessageException
 import com.simprints.fingerprintscanner.v2.incoming.common.MessageParser
 
 class Un20ResponseParser : MessageParser<Un20Response> {
@@ -25,7 +24,7 @@ class Un20ResponseParser : MessageParser<Un20Response> {
                     Un20MessageType.GetImageQuality -> GetImageQualityResponse.fromBytes(data)
                 }
             }
-        } catch (e: IndexOutOfBoundsException) {
-            throw InvalidMessageException("Incorrect number of bytes received parsing UN20 response", e)
+        } catch (e: Exception) {
+            handleExceptionDuringParsing(e)
         }
 }
