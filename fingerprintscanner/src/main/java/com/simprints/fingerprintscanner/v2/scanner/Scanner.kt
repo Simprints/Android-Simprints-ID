@@ -20,6 +20,8 @@ import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.commands.*
 import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprintscanner.v2.domain.root.responses.*
+import com.simprints.fingerprintscanner.v2.exceptions.state.IllegalUn20StateException
+import com.simprints.fingerprintscanner.v2.exceptions.state.IncorrectModeException
 import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
@@ -91,13 +93,13 @@ class Scanner(
 
     private fun assertMode(mode: Mode) = Completable.fromAction {
         if (state.mode != mode) {
-            TODO("exception handling - Currently in incorrect mode")
+            throw IncorrectModeException("Attempting to access $mode functionality when current mode is ${state.mode}")
         }
     }
 
     private fun assertUn20On() = Completable.fromAction {
         if (state.un20On != true) {
-            TODO("exception handling")
+            throw IllegalUn20StateException("Attempting to access UN20 functionality when UN20 is off")
         }
     }
 
