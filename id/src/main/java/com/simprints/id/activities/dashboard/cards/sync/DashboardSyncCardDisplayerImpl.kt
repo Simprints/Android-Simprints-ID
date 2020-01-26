@@ -258,17 +258,23 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     private fun View.lastSyncText() = this.findViewById<TextView>(R.id.dashboard_sync_card_last_sync)
     private fun ProgressBar.setSyncProgress(progressValue: Int, totalValue: Int?) {
         if (totalValue != null) {
+            setProgressBarIndeterminate(this, false)
             progress = calculatePercentage(progressValue, totalValue)
         } else {
             // Setting it only when required otherwise it creates glitches
-            if (!isIndeterminate) {
-                isIndeterminate = true
-            }
+            setProgressBarIndeterminate(this, true)
         }
 
         val blue = androidResourcesHelper.getColorStateList(R.color.colorPrimaryDark)
         blue?.let {
             progressDrawable.setColorFilter(it.defaultColor, PorterDuff.Mode.SRC_IN)
+        }
+    }
+
+    private fun setProgressBarIndeterminate(progressBar: ProgressBar, value: Boolean) {
+        // Setting it only when required otherwise it creates glitches
+        if (progressBar.isIndeterminate != value) {
+            progressBar.isIndeterminate = value
         }
     }
 
