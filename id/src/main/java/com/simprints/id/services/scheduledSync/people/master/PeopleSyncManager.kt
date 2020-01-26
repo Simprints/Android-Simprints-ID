@@ -6,6 +6,7 @@ import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncSt
 interface PeopleSyncManager {
 
     fun getLastSyncState(): LiveData<PeopleSyncState>
+    fun hasSyncEverRunBefore(): Boolean
 
     fun sync()
     fun stop()

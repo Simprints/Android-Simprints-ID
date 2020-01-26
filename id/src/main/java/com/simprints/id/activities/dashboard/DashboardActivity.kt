@@ -51,7 +51,7 @@ class DashboardActivity : AppCompatActivity() {
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
         private const val LOGOUT_RESULT_CODE = 1
-        private const val ONE_MINUTE = 1000 * 60L
+        private const val TIME_FOR_CHECK_IF_SYNC_REQUIRED = 1000 * 30L
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,7 +69,7 @@ class DashboardActivity : AppCompatActivity() {
 
     private fun observeForSyncCardState() {
         syncCardDisplayer.initRoot(dashboard_sync_card)
-        viewModel.syncCardState.observe(this@DashboardActivity, Observer<DashboardSyncCardState> {
+        viewModel.syncCardStateLiveData.observe(this@DashboardActivity, Observer<DashboardSyncCardState> {
             syncCardDisplayer.displayState(it)
         })
 
@@ -93,7 +93,7 @@ class DashboardActivity : AppCompatActivity() {
         super.onResume()
         lifecycleScope.launch {
             stopTickerToCheckIfSyncIsRequired()
-            syncAgainTicker = ticker(delayMillis = ONE_MINUTE, initialDelayMillis = 100)
+            syncAgainTicker = ticker(delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED, initialDelayMillis = 100)
             syncAgainTicker?.let {
                 for (event in it) {
                     Timber.d("Launch sync if required")

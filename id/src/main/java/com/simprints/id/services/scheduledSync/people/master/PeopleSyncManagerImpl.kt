@@ -33,6 +33,9 @@ class PeopleSyncManagerImpl(private val ctx: Context,
     override fun getLastSyncState(): LiveData<PeopleSyncState> =
         peopleSyncStateProcessor.getLastSyncState()
 
+    override fun hasSyncEverRunBefore(): Boolean =
+        wm.getAllPeopleSyncWorkersInfo().get().size > 0
+    
     override fun sync() {
         Timber.tag(SYNC_LOG_TAG).d("Sync one time people master worker")
         wm.beginUniqueWork(

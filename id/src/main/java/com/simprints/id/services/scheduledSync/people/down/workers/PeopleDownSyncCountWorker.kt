@@ -53,6 +53,7 @@ class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) 
 
     private suspend fun execute(downSyncScope: PeopleDownSyncScope): Result {
         return try {
+
             val downCount = getDownCount(downSyncScope)
             val output = JsonHelper.gson.toJson(downCount)
 
