@@ -3,9 +3,6 @@
     <color name="colorPrimary">#00B3D1</color>
     <color name="colorPrimaryDark">#009CB6</color>
     <color name="colorAccent">#FF7C00</color>
-    <color name="colorAccentDark">#CC6300</color>
-    <color name="transparent">#00000000</color>
-    <color name="translucent">#80000000</color>
 
     <color name="simprints_blue">#00B3D1</color>
     <color name="simprints_white">#ffffff</color>
@@ -14,6 +11,5 @@
     <color name="simprints_green_dark">#347046</color>
     <color name="simprints_red">#CE4141</color>
     <color name="simprints_light_grey">#FFC0C0C0</color>
-    <color name="simprints_off_white">#FFEEEEEE</color>
     <color name="simprints_yellow">#ffcc00</color>
 </resources>

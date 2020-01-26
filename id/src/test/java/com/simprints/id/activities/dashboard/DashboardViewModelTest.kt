@@ -146,14 +146,14 @@ class DashboardViewModelTest {
         verify { peopleSyncManager.sync() }
     }
 
-    @Test
-    fun syncFailedAndNeverRunInTheDashboard_shouldNotEmitStateAndLaunchTheSync() {
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(), listOf())
-
-        val tester = dashboardViewModel.syncCardState.testObserver()
-
-        assertThat(tester.observedValues.last()).isEqualTo(SyncDefault(lastSyncTime))
-    }
+//    @Test
+//    fun syncFailedAndNeverRunInTheDashboard_shouldNotEmitStateAndLaunchTheSync() {
+//        syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(), listOf())
+//
+//        val tester = dashboardViewModel.syncCardState.testObserver()
+//
+//        assertThat(tester.observedValues.last()).isEqualTo(SyncDefault(lastSyncTime))
+//    }
 
     @Test
     fun syncCompletedButLongTimeAgo_shouldNotEmitAStateAndLaunchTheSync() {

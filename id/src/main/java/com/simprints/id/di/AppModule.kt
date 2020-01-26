@@ -293,6 +293,6 @@ open class AppModule {
         DashboardSyncCardDisplayerImpl(androidResourcesHelper, timeHelper, ctx)
 
     @Provides
-    open fun provideDeviceManager(context: Context): DeviceManager = DeviceManagerImpl(context)
+    open fun provideDeviceManager(ctx: Context): DeviceManager = DeviceManagerImpl(ctx)
 }
 

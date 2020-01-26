@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="alert_title">ማንቂያ</string>
-    <string name="about_title">ስለ</string>
     <string name="configuration_error_title">የተግበቦት ስህተት</string>
     <string name="error_occurred_title">ስህተት አጋጥሟል</string>
-    <string name="invalid_projectId_message">የተሳሳተ የፕሮጀክት መለያ ስለተተቀሙ የተግባቦት ስህተት አጋጥሟል  ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="invalid_selectedId_message">የተሳሳተ የመለያ ምርጫ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="invalid_sessionId_message">የተሳሳተ የቆይታ መለያ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
     <string name="different_projectId_message">የተለየ የፕሮጀክት መለያ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>
     <string name="different_userId_message">የተለየ የተጠቃሚ መለያ ቁጥር ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="invalid_intentAction_message">በሲስተሙ ያልተፈቀደ ፍላጎት ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="invalid_metadata_message">ልተፈቀደ ሜታዳታ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="about_libsimprints_version">ሊብ ስምፕሪንት ስሪት</string>
     <string name="alert_try_again">ትንሽ ቆይተው ይሞክሩ</string>
     <string name="close">ይዝጉ</string>
     <string name="confirmation_logout_cancel">ሰርዝ</string>
@@ -24,25 +17,13 @@
     <string name="dashboard_card_identification_title">የመጨረሻው መለያ</string>
     <string name="dashboard_card_lastscanner_title">እስካነር ይጠቀሙ</string>
     <string name="dashboard_card_enrol_title">"የመጨረሻ ምዝገባ "</string>
-    <string name="dashboard_card_localdb_sync_module_title">ህዝቡ በተወሰነ ምዕራፍ ውስጥ ይመዘገባል</string>
-    <string name="dashboard_card_localdb_sync_project_title">ህዝቡ በፕሮጀከት ውስጥ ይመዘገባል</string>
-    <string name="dashboard_card_localdb_sync_user_title">ህዝብ በተጠቃሚው ተመዝግቧልዋል</string>
-    <string name="dashboard_card_project_title">ፕሮጀክት</string>
-    <string name="dashboard_card_remotedb_title">ሰዎችን ሰርቨር ላይ ጨምር</string>
-    <string name="dashboard_card_sync_action">ማገናኘት</string>
-    <string name="dashboard_card_sync_failed">ግንኙነቱ ተሰናክሏል</string>
-    <string name="dashboard_card_sync_needed">ከሰርቨር ጋር ግንኙነት እንዲፈጠር ይፈልጋሉ</string>
-    <string name="dashboard_sync_card_sync_button">አሁን ግንኙነት ፍጠር</string>
+    <string name="dashboard_card_sync_now">አሁን ግንኙነት ፍጠር</string>
     <string name="dashboard_card_syncing">በግንኙነት ላይ</string>
     <string name="dashboard_card_to_download">ለ ማውረድ</string>
     <string name="dashboard_card_to_upload">ለ መጫን</string>
     <string name="dashboard_card_verification_title">የመጨረሻው ማጣሪያ</string>
     <string name="dashboard_label">"የሁነቶች ማሳያ "</string>
-    <string name="invalid_moduleId_message">የተሳሳተ የምዕራፍ መለያ ቁጥር ስላላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="invalid_userId_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ስላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="invalid_verifyId_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ማጣሪያ ስላደረጉ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
     <string name="login">መግባት</string>
-    <string name="login_enter_project_secret_id">የፕሮጀክት መለያ ቁጥሩን እና ቁልፉን ያስገቡ</string>
     <string name="login_id_hint">የፕሮጀክት መለያ ቁጥር</string>
     <string name="login_invalid_credentials">ትክክል ያልሆነ ተጠቃሚ ነው ፡ እባክዎ የፕሮጀክት ቁጥር እና ቁልፍ ያረጋግጡ፡፡</string>
     <string name="login_invalid_qr_code">እስካን የተደረገው የፈጣን ምላሽ ሚስጥር ቁጥር ትክክል አይደለም</string>
@@ -53,12 +34,10 @@
     <string name="login_secret_hint">የፕሮጀክት ቁልፍ</string>
     <string name="login_server_error">ሰርቨሩን ለማግኘት ሲሞክሩ ስህተት አጋጥሞታል ፡ እባክዎት ተንሽ ቆይተው ይሞክሩት፡፡</string>
     <string name="login_title">የፕሮጀክቱ ተጠቃሚዎችን መጠየቅ</string>
-    <string name="login_type_project_details">በወረቀት መጻፍ</string>
     <string name="login_user_id_hint">የተጠቀሚ መለያ ቁጥር</string>
     <string name="logout">መውጣት</string>
     <string name="long_consent_download_button_text">የደህንነት ጽሁፍን ያውርዱ</string>
     <string name="long_consent_failed_to_download">የደህንነት ጽሁፍን ማውረዱ ተቋርጧል</string>
-    <string name="long_consent_no_privacy_notice_found_text">በዚህ ቋንቋ የደህንነት ጽሁፍን ማውረድ አይቻልም</string>
     <string name="menu_privacy_notice">የደህንነት ማሳታወቂያ</string>
     <string name="menu_settings">ማስተካከያ</string>
     <string name="preference_app_details_title">የበለጠ</string>
@@ -69,7 +48,6 @@
     <string name="preference_select_fingers_title">ለአሻራ የሚሆን ቋሚ እጣት ይምረጡ</string>
     <string name="preference_select_language_title">ቋንቋ</string>
     <string name="preference_select_modules_title">ምዕራፍ ይመረጡ</string>
-    <string name="preference_summary_modules">ሲንክ እንዲደረግ የሚፈልጉትን ምዕራፍይምረጡ</string>
     <string name="preference_summary_settings_fingers">እስካን እንዲደረግ የሚፈልጉተን የጣት አሻራ ይምረጡ</string>
     <string name="preference_sync_and_search_title">የሲንክ እና የፍለጋ ተግባቦት</string>
     <string name="records_up_to_date">ሁሉም መረጃዎች ወቅታዊ ሆነዋል</string>
@@ -78,11 +56,9 @@
     <string name="safetynet_down_alert_message">1. እባክዎ ከ5 እስከ 10 ደቂቃ ቆይተው ይሞክሩ</string>
     <string name="scan_qr">የፈጣን ምላሽ መለያ እስካን ያድርጉ</string>
     <string name="settings_app_details">ስለ አፕልኬሽኑ የበለጠ</string>
-    <string name="settings_app_version">የአፕልኬሽን ስሪት</string>
     <string name="settings_general">አጠቃላይ</string>
     <string name="settings_invalid_selection">የተሳሳተ ምርጫ</string>
     <string name="settings_no_modules_toast">የተሳሳተ ምርጫ፡ እባክዎት ካለው የምዕራፍ አማራጭ ውስጥ ቢያንስ አንድ ይምረጡ</string>
-    <string name="settings_scanner_version">የእስካነር  ስሪት</string>
     <string name="simprints_logo">የስምፕሪንት አርማ</string>
     <string name="title_activity_settings">ማስተካከያ</string>
     <string name="title_activity_settings_about">የበለጠ</string>

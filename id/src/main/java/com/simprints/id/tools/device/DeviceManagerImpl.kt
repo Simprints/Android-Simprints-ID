@@ -3,10 +3,6 @@ package com.simprints.id.tools.device
 import android.content.Context
 import android.net.ConnectivityManager
 import androidx.lifecycle.LiveData
-import com.scottyab.rootbeer.RootBeer
-import com.simprints.id.exceptions.unexpected.RootedDeviceException
-
-
 
 class DeviceManagerImpl(private val context: Context) : DeviceManager {
 
@@ -19,10 +15,4 @@ class DeviceManagerImpl(private val context: Context) : DeviceManager {
     }
 
     override suspend fun isConnected() = ConnectionCoroutine(connectivityService).isConnected()
-
-    override fun checkIfDeviceIsRooted() {
-        val isDeviceRooted = RootBeer(context).isRootedWithoutBusyBoxCheck
-        if (isDeviceRooted)
-            throw RootedDeviceException()
-    }
 }

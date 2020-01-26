@@ -1,6 +1,5 @@
 package com.simprints.id.di
 
-import android.content.Context
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
@@ -52,7 +51,6 @@ import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUpl
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.utils.SimNetworkUtils
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -126,9 +124,7 @@ interface AppComponent {
     fun getFingerprintRecordLocalDataSource(): FingerprintIdentityLocalDataSource
     fun getPreferencesManager(): PreferencesManager
     fun getAnalyticsManager(): AnalyticsManager
-    fun getSimNetworkUtils(): SimNetworkUtils
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
-    fun getContext(): Context
     fun getAndroidResourcesHelper(): AndroidResourcesHelper
 }

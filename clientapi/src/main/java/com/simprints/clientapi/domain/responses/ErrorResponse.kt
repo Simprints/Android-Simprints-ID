@@ -55,6 +55,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
                     ClientApiAlert.INVALID_SESSION_ID -> INVALID_SESSION_ID
                     ClientApiAlert.INVALID_USER_ID -> INVALID_USER_ID
                     ClientApiAlert.INVALID_VERIFY_ID -> INVALID_VERIFY_ID
+                    ClientApiAlert.ROOTED_DEVICE -> ROOTED_DEVICE
                 }
         }
     }
