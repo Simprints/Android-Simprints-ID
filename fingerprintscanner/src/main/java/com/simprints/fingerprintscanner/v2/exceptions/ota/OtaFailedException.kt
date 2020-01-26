@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.exceptions.ota
 
-class InvalidFirmwareException(
+class OtaFailedException(
     message: String? = null,
     cause: Throwable? = null
-) : IllegalArgumentException(message, cause)
+) : RuntimeException(message, cause)

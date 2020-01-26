@@ -1,4 +1,4 @@
-package com.simprints.fingerprintscanner.v2.ota.stm
+package com.simprints.fingerprintscanner.v2.scanner.ota.stm
 
 import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaCommand
 import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaResponse
@@ -6,6 +6,8 @@ import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryAdd
 import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryDataCommand
 import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryStartCommand
 import com.simprints.fingerprintscanner.v2.domain.stmota.responses.CommandAcknowledgement
+import com.simprints.fingerprintscanner.v2.exceptions.ota.InvalidFirmwareException
+import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
 import com.simprints.fingerprintscanner.v2.tools.hexparser.FirmwareByteChunk
 import com.simprints.fingerprintscanner.v2.tools.hexparser.IntelHexParser
@@ -23,7 +25,11 @@ class StmOtaController(private val intelHexParser: IntelHexParser) {
 
     fun program(stmOtaMessageStream: StmOtaMessageStream, firmwareHexFile: String): Observable<Float> =
         single {
-            intelHexParser.parse(firmwareHexFile)
+            try {
+                intelHexParser.parse(firmwareHexFile)
+            } catch (e: Exception) {
+                throw InvalidFirmwareException("Parsing firmware file failed", e)
+            }
         }.map { chunkList ->
             chunkList.mapIndexed { index, chunk ->
                 Pair(chunk, (index + 1).toFloat() / chunkList.size.toFloat())
@@ -52,7 +58,7 @@ class StmOtaController(private val intelHexParser: IntelHexParser) {
         flatMapCompletable {
             completable {
                 if (it.kind != CommandAcknowledgement.Kind.ACK) {
-                    throw TODO("Received NACK response during STM OTA")
+                    throw OtaFailedException("Received NACK response during STM OTA")
                 }
             }
         }
