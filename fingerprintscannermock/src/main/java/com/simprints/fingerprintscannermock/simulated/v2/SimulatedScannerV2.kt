@@ -69,4 +69,8 @@ class SimulatedScannerV2(simulatedScannerManager: SimulatedScannerManager,
         val bytes = simulatedResponseOutputStream.serialize(event)
         bytes.forEach { writeResponseToStream(it, returnStream) }
     }
+
+    override fun disconnect() {
+        simulatedCommandInputStream.disconnect()
+    }
 }
