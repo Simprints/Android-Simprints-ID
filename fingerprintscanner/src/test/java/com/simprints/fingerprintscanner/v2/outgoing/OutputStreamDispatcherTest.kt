@@ -1,6 +1,7 @@
 package com.simprints.fingerprintscanner.v2.outgoing
 
 import com.google.common.truth.Truth
+import com.simprints.fingerprintscanner.v2.outgoing.common.OutputStreamDispatcher
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors

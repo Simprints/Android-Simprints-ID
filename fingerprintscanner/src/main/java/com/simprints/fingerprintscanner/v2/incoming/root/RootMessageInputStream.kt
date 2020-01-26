@@ -1,7 +1,7 @@
 package com.simprints.fingerprintscanner.v2.incoming.root
 
 import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
-import com.simprints.fingerprintscanner.v2.incoming.IncomingConnectable
+import com.simprints.fingerprintscanner.v2.incoming.common.MessageInputStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import io.reactivex.Flowable
@@ -10,7 +10,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.io.InputStream
 
-class RootMessageInputStream(private val rootResponseAccumulator: RootResponseAccumulator) : IncomingConnectable {
+class RootMessageInputStream(private val rootResponseAccumulator: RootResponseAccumulator) : MessageInputStream {
 
     var rootResponseStream: Flowable<RootResponse>? = null
 

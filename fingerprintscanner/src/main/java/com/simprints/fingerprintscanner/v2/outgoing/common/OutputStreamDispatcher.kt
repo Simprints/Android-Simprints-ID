@@ -1,5 +1,6 @@
-package com.simprints.fingerprintscanner.v2.outgoing
+package com.simprints.fingerprintscanner.v2.outgoing.common
 
+import com.simprints.fingerprintscanner.v2.outgoing.OutgoingConnectable
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import io.reactivex.Completable
 import java.io.IOException

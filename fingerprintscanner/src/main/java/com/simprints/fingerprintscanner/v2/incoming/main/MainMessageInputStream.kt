@@ -5,7 +5,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Response
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroEvent
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroResponse
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
-import com.simprints.fingerprintscanner.v2.incoming.IncomingConnectable
+import com.simprints.fingerprintscanner.v2.incoming.common.MessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.Un20ResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroEventAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroResponseAccumulator
@@ -22,7 +22,7 @@ class MainMessageInputStream(
     private val veroResponseAccumulator: VeroResponseAccumulator,
     private val veroEventAccumulator: VeroEventAccumulator,
     private val un20ResponseAccumulator: Un20ResponseAccumulator
-) : IncomingConnectable {
+) : MessageInputStream {
 
     var veroResponses: Flowable<VeroResponse>? = null
     var veroEvents: Flowable<VeroEvent>? = null

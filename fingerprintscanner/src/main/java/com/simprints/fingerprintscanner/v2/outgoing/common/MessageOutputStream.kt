@@ -2,7 +2,6 @@ package com.simprints.fingerprintscanner.v2.outgoing.common
 
 import com.simprints.fingerprintscanner.v2.domain.Message
 import com.simprints.fingerprintscanner.v2.outgoing.OutgoingConnectable
-import com.simprints.fingerprintscanner.v2.outgoing.OutputStreamDispatcher
 import com.simprints.fingerprintscanner.v2.tools.reactive.single
 import io.reactivex.Completable
 
