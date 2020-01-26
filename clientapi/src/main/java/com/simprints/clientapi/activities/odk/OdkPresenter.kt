@@ -8,15 +8,23 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
+import com.simprints.clientapi.tools.DeviceManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class OdkPresenter(private val view: OdkContract.View,
-                   private val action: String?,
-                   private val sessionEventsManager: ClientApiSessionEventsManager,
-                   private val crashReportManager: ClientApiCrashReportManager)
-    : RequestPresenter(view, sessionEventsManager), OdkContract.Presenter {
+class OdkPresenter(
+    private val view: OdkContract.View,
+    private val action: String?,
+    private val sessionEventsManager: ClientApiSessionEventsManager,
+    deviceManager: DeviceManager,
+    crashReportManager: ClientApiCrashReportManager
+) : RequestPresenter(
+    view,
+    sessionEventsManager,
+    deviceManager,
+    crashReportManager
+), OdkContract.Presenter {
 
     companion object {
         private const val PACKAGE_NAME = "com.simprints.simodkadapter"
@@ -32,12 +40,14 @@ class OdkPresenter(private val view: OdkContract.View,
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
 
-        when (action) {
-            ACTION_REGISTER -> processEnrollRequest()
-            ACTION_IDENTIFY -> processIdentifyRequest()
-            ACTION_VERIFY -> processVerifyRequest()
-            ACTION_CONFIRM_IDENTITY -> processConfirmIdentityRequest()
-            else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+        runIfDeviceIsNotRooted {
+            when (action) {
+                ACTION_REGISTER -> processEnrollRequest()
+                ACTION_IDENTIFY -> processIdentifyRequest()
+                ACTION_VERIFY -> processVerifyRequest()
+                ACTION_CONFIRM_IDENTITY -> processConfirmIdentityRequest()
+                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+            }
         }
     }
 
