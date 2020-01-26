@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="configuration_error_title">خطا در تنظیمات</string>
-    <string name="configuration_error_message">در تنظیمات (%1$s) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
+
+    <string name="invalid_intentAction_message">در تنظیمات (invalid Intent Action) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
+    <string name="invalid_metadata_message">در تنظیمات (invalid metadata) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
+
 </resources>
