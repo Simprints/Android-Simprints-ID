@@ -1,6 +1,6 @@
-package com.simprints.id.tools
+package com.simprints.clientapi.tools
 
-import com.simprints.id.exceptions.unexpected.RootedDeviceException
+import com.simprints.clientapi.exceptions.RootedDeviceException
 
 interface DeviceManager {
     @Throws(RootedDeviceException::class)

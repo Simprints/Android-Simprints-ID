@@ -8,6 +8,7 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
+import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -17,11 +18,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
-                            private val action: String?,
-                            private val sessionEventsManager: ClientApiSessionEventsManager,
-                            private val crashReportManager: ClientApiCrashReportManager) :
-    RequestPresenter(view, sessionEventsManager), LibSimprintsContract.Presenter {
+class LibSimprintsPresenter(
+    private val view: LibSimprintsContract.View,
+    private val action: String?,
+    private val sessionEventsManager: ClientApiSessionEventsManager,
+    deviceManager: DeviceManager,
+    crashReportManager: ClientApiCrashReportManager
+) : RequestPresenter(
+    view,
+    sessionEventsManager,
+    deviceManager,
+    crashReportManager
+), LibSimprintsContract.Presenter {
 
     override suspend fun start() {
         if (action != SIMPRINTS_SELECT_GUID_INTENT) {
@@ -29,12 +37,14 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
 
-        when (action) {
-            SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
-            SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
-            SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
-            SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentityRequest()
-            else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+        runIfDeviceIsNotRooted {
+            when (action) {
+                SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
+                SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
+                SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
+                SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentityRequest()
+                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+            }
         }
     }
 

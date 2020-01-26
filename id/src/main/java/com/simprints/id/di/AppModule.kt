@@ -283,16 +283,11 @@ open class AppModule {
                                                timeHelper: TimeHelper,
                                                ctx: Context): DashboardSyncCardDisplayer =
         DashboardSyncCardDisplayerImpl(androidResourcesHelper, timeHelper, ctx)
-
-    @Provides
-    open fun provideDeviceManager(context: Context): DeviceManager = DeviceManagerImpl(context)
-
     @Provides
     open fun provideDashboardProjectDetailsCardDisplayer(
         androidResourcesHelper: AndroidResourcesHelper
     ): DashboardProjectDetailsCardDisplayer = DashboardProjectDetailsCardDisplayerImpl(
         androidResourcesHelper
     )
-
 }
 

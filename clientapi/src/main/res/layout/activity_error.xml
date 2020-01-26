@@ -4,7 +4,7 @@
     android:id="@+id/alertLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/simprints_yellow"
+    android:background="@color/alert_yellow"
     android:orientation="vertical"
     android:weightSum="1"
     tools:context=".activities.errors.ErrorActivity">
