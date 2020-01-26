@@ -1,13 +1,11 @@
-package com.simprints.id.activities.dashboard
+package com.simprints.id.activities.dashboard.cards.sync
 
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.activities.dashboard.DashboardViewModel.Companion.TIME_BETWEEN_TWO_SYNCS
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.moduleSyncScope
-import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl.Companion.MAX_TIME_BEFORE_SYNC_AGAIN
+import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
@@ -30,9 +28,12 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class DashboardViewModelTest {
+class DashboardSyncCardStateRepositoryImplTest {
 
-    private lateinit var dashboardViewModel: DashboardViewModel
+    private lateinit var dashboardSyncCardStateRepository: DashboardSyncCardStateRepository
+    private val syncCardTestLiveData
+        get() = dashboardSyncCardStateRepository.syncCardStateLiveData
+    
     @MockK lateinit var peopleSyncManager: PeopleSyncManager
     @MockK lateinit var deviceManager: DeviceManager
     @MockK lateinit var preferencesManager: PreferencesManager
@@ -49,22 +50,24 @@ class DashboardViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         isConnectedUpdates = MutableLiveData()
+        isConnectedUpdates.value = true
         syncStateLiveData = MutableLiveData()
         every { deviceManager.isConnectedUpdates } returns isConnectedUpdates
         every { peopleSyncManager.getLastSyncState() } returns syncStateLiveData
-        every { syncScopeRepository.getDownSyncScope() } returns projectSyncScope
+        every { syncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.projectSyncScope
         every { preferencesManager.selectedModules } returns emptySet()
         every { cacheSync.readLastSuccessfulSyncTime() } returns lastSyncTime
+        every { peopleSyncManager.hasSyncEverRunBefore() } returns true
 
         isConnectedUpdates.value = true
-        dashboardViewModel = createViewModel()
+        dashboardSyncCardStateRepository = createRepository()
     }
 
     @Test
     fun deviceIsOffline_syncStateShouldBeSyncOffline() {
         isConnectedUpdates.value = false
 
-        val tester = dashboardViewModel.syncCardState.testObserver()
+        val tester = syncCardTestLiveData.testObserver()
 
         assertThat(tester.observedValues.last()).isEqualTo(SyncOffline(lastSyncTime))
     }
@@ -73,7 +76,7 @@ class DashboardViewModelTest {
     fun deviceIsOnline_syncStateShouldBeDefault() {
         isConnectedUpdates.value = true
 
-        val tester = dashboardViewModel.syncCardState.testObserver()
+        val tester = syncCardTestLiveData.testObserver()
 
         assertThat(tester.observedValues.last()).isEqualTo(SyncDefault(lastSyncTime))
     }
@@ -81,19 +84,19 @@ class DashboardViewModelTest {
     @Test
     fun noModulesSelectedWithSyncByModule_syncStateShouldBeSelectModules() {
         every { preferencesManager.selectedModules } returns emptySet()
-        every { syncScopeRepository.getDownSyncScope() } returns moduleSyncScope
+        every { syncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.moduleSyncScope
 
-        val tester = dashboardViewModel.syncCardState.testObserver()
+        val tester = syncCardTestLiveData.testObserver()
 
         assertThat(tester.observedValues.last()).isEqualTo(SyncNoModules(lastSyncTime))
     }
 
     @Test
     fun modulesSelectedWithSyncByModule_syncStateShouldBeDefault() {
-        every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID)
-        every { syncScopeRepository.getDownSyncScope() } returns moduleSyncScope
+        every { preferencesManager.selectedModules } returns setOf(DefaultTestConstants.DEFAULT_MODULE_ID)
+        every { syncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.moduleSyncScope
 
-        val tester = dashboardViewModel.syncCardState.testObserver()
+        val tester = syncCardTestLiveData.testObserver()
 
         assertThat(tester.observedValues.last()).isEqualTo(SyncDefault(lastSyncTime))
     }
@@ -101,77 +104,79 @@ class DashboardViewModelTest {
     @Test
     fun noModulesSelectedWithSyncByProject_syncStateShouldBeDefault() {
         every { preferencesManager.selectedModules } returns emptySet()
-        every { syncScopeRepository.getDownSyncScope() } returns projectSyncScope
+        every { syncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.projectSyncScope
 
-        val tester = dashboardViewModel.syncCardState.testObserver()
+        val tester = syncCardTestLiveData.testObserver()
 
         assertThat(tester.observedValues.last()).isEqualTo(SyncDefault(lastSyncTime))
     }
 
     @Test
     fun syncWorkersCompleted_syncStateShouldBeCompleted() {
-        syncStateLiveData.value = PeopleSyncState(syncId, 10, 10, listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
+        syncStateLiveData.value = PeopleSyncState(syncId, 10, 10,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
-        val tester = dashboardViewModel.syncCardState.testObserver()
+        val tester = syncCardTestLiveData.testObserver()
 
         assertThat(tester.observedValues.last()).isEqualTo(SyncComplete(lastSyncTime))
     }
 
     @Test
     fun syncWorkersEnqueued_syncStateShouldBeConnecting() {
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(SyncWorkerInfo(DOWN_COUNTER, Enqueued)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
+        syncStateLiveData.value = PeopleSyncState(syncId, 0, null,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Enqueued)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
-        val tester = dashboardViewModel.syncCardState.testObserver()
+        val tester = syncCardTestLiveData.testObserver()
 
         assertThat(tester.observedValues.last()).isEqualTo(SyncConnecting(lastSyncTime, 0, null))
     }
 
     @Test
     fun syncWorkersFailedBecauseCloudIntegration_syncStateShouldBeTryAgain() {
-        dashboardViewModel.hasSyncEverRun = true
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(false))), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
+        syncStateLiveData.value = PeopleSyncState(syncId, 0, null,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(false))), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
-        val tester = dashboardViewModel.syncCardState.testObserver()
+        val tester = syncCardTestLiveData.testObserver()
 
         assertThat(tester.observedValues.last()).isEqualTo(SyncTryAgain(lastSyncTime))
     }
 
     @Test
     fun noHistoryAboutSync_syncStateShouldBeDefault() {
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(false))), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
+        syncStateLiveData.value =
+            PeopleSyncState(syncId, 0, null, emptyList(), emptyList())
 
-        val tester = dashboardViewModel.syncCardState.testObserver()
+        val tester = syncCardTestLiveData.testObserver()
 
-        assertThat(tester.observedValues).isEmpty()
+        assertThat(tester.observedValues.last()).isEqualTo(SyncDefault(lastSyncTime))
         verify { peopleSyncManager.sync() }
     }
 
-//    @Test
-//    fun syncFailedAndNeverRunInTheDashboard_shouldNotEmitStateAndLaunchTheSync() {
-//        syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(), listOf())
-//
-//        val tester = dashboardViewModel.syncCardState.testObserver()
-//
-//        assertThat(tester.observedValues.last()).isEqualTo(SyncDefault(lastSyncTime))
-//    }
+    @Test
+    fun syncFailedAndNeverRunInTheDashboard_shouldNotEmitStateAndLaunchTheSync() {
+        syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(), listOf())
+
+        val tester = syncCardTestLiveData.testObserver()
+
+        assertThat(tester.observedValues.last()).isEqualTo(SyncDefault(lastSyncTime))
+    }
 
     @Test
-    fun syncCompletedButLongTimeAgo_shouldNotEmitAStateAndLaunchTheSync() {
-        every { timeHelper.msBetweenNowAndTime(any()) } returns TIME_BETWEEN_TWO_SYNCS + 1
+    fun syncCompletedButLongTimeAgo_shouldLaunchTheSync() {
+        every { timeHelper.msBetweenNowAndTime(any()) } returns MAX_TIME_BEFORE_SYNC_AGAIN + 1
         syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
-        val tester = dashboardViewModel.syncCardState.testObserver()
+        syncCardTestLiveData.testObserver()
 
-        assertThat(tester.observedValues).isEmpty()
         verify { peopleSyncManager.sync() }
     }
 
     @Test
     fun syncFinishedButLongTimeAgo_syncIfRequired_shouldLaunchTheSync() {
-        every { timeHelper.msBetweenNowAndTime(any()) } returns TIME_BETWEEN_TWO_SYNCS + 1
+        every { timeHelper.msBetweenNowAndTime(any()) } returns MAX_TIME_BEFORE_SYNC_AGAIN + 1
         syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
-        dashboardViewModel.syncIfRequired()
+        dashboardSyncCardStateRepository.syncIfRequired()
 
         verify(exactly = 0) { peopleSyncManager.sync() }
     }
@@ -179,27 +184,28 @@ class DashboardViewModelTest {
 
     @Test
     fun syncFinishedButOnlyRecently_syncIfRequired_shouldNotLaunchTheSync() {
-        every { timeHelper.msBetweenNowAndTime(any()) } returns TIME_BETWEEN_TWO_SYNCS - 1
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
+        every { timeHelper.msBetweenNowAndTime(any()) } returns MAX_TIME_BEFORE_SYNC_AGAIN - 1
+        syncStateLiveData.value = PeopleSyncState(syncId, 0, null,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
-        dashboardViewModel.syncIfRequired()
+        dashboardSyncCardStateRepository.syncIfRequired()
 
         verify(exactly = 0) { peopleSyncManager.sync() }
     }
 
     @Test
     fun noHistoryAboutSync_syncIfRequired_shouldNotLaunchTheSync() {
-        dashboardViewModel.syncIfRequired()
+        dashboardSyncCardStateRepository.syncIfRequired()
 
         verify(exactly = 0) { peopleSyncManager.sync() }
     }
 
     @Test
     fun syncWorkersFailedDueToTimeout_syncStateShouldBeFailed() {
-        dashboardViewModel.hasSyncEverRun = true
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(true))), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
+        syncStateLiveData.value = PeopleSyncState(syncId, 0, null,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(true))), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
-        val tester = dashboardViewModel.syncCardState.testObserver()
+        val tester = syncCardTestLiveData.testObserver()
 
         assertThat(tester.observedValues.last()).isEqualTo(SyncFailed(lastSyncTime))
     }
@@ -208,15 +214,17 @@ class DashboardViewModelTest {
     fun syncWorkersAreRunning_syncStateShouldBeInProgress() {
         val progress = 10
         val total = 100
-        syncStateLiveData.value = PeopleSyncState(syncId, progress, total, listOf(SyncWorkerInfo(DOWN_COUNTER, Running)), listOf(SyncWorkerInfo(UP_COUNTER, Running)))
+        syncStateLiveData.value = PeopleSyncState(syncId, progress, total,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Running)), listOf(SyncWorkerInfo(UP_COUNTER, Running)))
 
-        val tester = dashboardViewModel.syncCardState.testObserver()
+        val tester = syncCardTestLiveData.testObserver()
 
-        assertThat(tester.observedValues.last()).isEqualTo(SyncProgress(lastSyncTime, progress, total))
+        assertThat(tester.observedValues.last()).isEqualTo(DashboardSyncCardState.SyncProgress(lastSyncTime, progress, total))
     }
 
 
-    private fun createViewModel() =
-        DashboardViewModel(peopleSyncManager, deviceManager, preferencesManager, syncScopeRepository, cacheSync, timeHelper)
+    private fun createRepository() =
+        DashboardSyncCardStateRepositoryImpl(peopleSyncManager, deviceManager, preferencesManager, syncScopeRepository, cacheSync, timeHelper)
 
 }
+

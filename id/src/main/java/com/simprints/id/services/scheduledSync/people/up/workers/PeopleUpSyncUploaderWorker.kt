@@ -12,6 +12,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
+import com.simprints.id.services.scheduledSync.people.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
@@ -65,10 +66,9 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
     }
 
     companion object {
-        const val PATIENT_UPLOAD_BATCH_SIZE = 80
+        private const val PATIENT_UPLOAD_BATCH_SIZE = 80
         const val PROGRESS_UP_SYNC = "PROGRESS_UP_SYNC"
         const val OUTPUT_UP_SYNC = "OUTPUT_UP_SYNC"
-        const val OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION = "OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION"
     }
 }
 

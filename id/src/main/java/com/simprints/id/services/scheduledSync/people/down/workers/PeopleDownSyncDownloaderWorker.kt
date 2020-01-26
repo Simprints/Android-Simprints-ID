@@ -13,6 +13,7 @@ import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
+import com.simprints.id.services.scheduledSync.people.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import javax.inject.Inject
 
@@ -22,7 +23,6 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
         const val INPUT_DOWN_SYNC_OPS = "INPUT_DOWN_SYNC_OPS"
         const val PROGRESS_DOWN_SYNC = "PROGRESS_DOWN_SYNC"
         const val OUTPUT_DOWN_SYNC = "OUTPUT_DOWN_SYNC"
-        const val OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION = "FAILED_BECAUSE_CLOUD_INTEGRATION"
     }
 
     override val tag: String = PeopleDownSyncDownloaderWorker::class.java.simpleName

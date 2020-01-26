@@ -134,7 +134,7 @@
 //        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
 //        val lastState = vm.observedValues.last()
 //
-//        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_ENABLED)
+//        Truth.assert_().that(lastState?.syncCardStateLiveData).isEqualTo(SyncCardState.SYNC_ENABLED)
 //    }
 //
 //    @Test
@@ -161,7 +161,7 @@
 //        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
 //        val lastState = vm.observedValues.last()
 //
-//        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_RUNNING)
+//        Truth.assert_().that(lastState?.syncCardStateLiveData).isEqualTo(SyncCardState.SYNC_RUNNING)
 //    }
 //
 //
@@ -247,7 +247,7 @@
 //
 //        val lastState = vm.observedValues.last()
 //
-//        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_DISABLED)
+//        Truth.assert_().that(lastState?.syncCardStateLiveData).isEqualTo(SyncCardState.SYNC_DISABLED)
 //    }
 //
 //    @Test
@@ -261,7 +261,7 @@
 //
 //        val lastState = vm.observedValues.last()
 //
-//        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_RUNNING)
+//        Truth.assert_().that(lastState?.syncCardStateLiveData).isEqualTo(SyncCardState.SYNC_RUNNING)
 //    }
 //
 //    private fun mockCounters(peopleInDb: List<PeopleCount>? = null, peopleToUpload: Int? = null, peopleToDownload: List<PeopleCount>? = null) {
