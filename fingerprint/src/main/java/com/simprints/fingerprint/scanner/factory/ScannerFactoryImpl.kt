@@ -29,6 +29,8 @@ import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageSerializer
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
 import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
@@ -87,7 +89,8 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                         OutputStreamDispatcher()
                     )
                 ),
-                StmOtaController(IntelHexParser())
+                StmOtaController(IntelHexParser()),
+                ResponseErrorHandler(ResponseErrorHandlingStrategy.Default)
             ),
             scannerUiHelper,
             macAddress,

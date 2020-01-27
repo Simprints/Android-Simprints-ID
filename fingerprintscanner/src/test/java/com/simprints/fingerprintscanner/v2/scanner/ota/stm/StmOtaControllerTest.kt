@@ -6,6 +6,8 @@ import com.simprints.fingerprintscanner.v2.domain.stmota.responses.CommandAcknow
 import com.simprints.fingerprintscanner.v2.exceptions.ota.InvalidFirmwareException
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
 import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
 import com.simprints.fingerprintscanner.v2.tools.hexparser.FirmwareByteChunk
 import com.simprints.fingerprintscanner.v2.tools.hexparser.IntelHexParser
@@ -20,12 +22,13 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class StmOtaControllerTest {
 
+    private val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.None)
 
     @Test
     fun program_correctlyEmitsProgressValuesAndCompletes() {
         val stmOtaController = StmOtaController(configureIntelHexParserMock())
 
-        val testObserver = stmOtaController.program(configureMessageStreamMock(), "").testSubscribe()
+        val testObserver = stmOtaController.program(configureMessageStreamMock(), responseErrorHandler, "").testSubscribe()
 
         testObserver.awaitAndAssertSuccess()
 
@@ -41,7 +44,7 @@ class StmOtaControllerTest {
         val messageStreamMock = configureMessageStreamMock()
         val stmOtaController = StmOtaController(intelHexParserMock)
 
-        val testObserver = stmOtaController.program(messageStreamMock, "").testSubscribe()
+        val testObserver = stmOtaController.program(messageStreamMock, responseErrorHandler, "").testSubscribe()
 
         testObserver.awaitAndAssertSuccess()
 
@@ -56,7 +59,7 @@ class StmOtaControllerTest {
         }
         val stmOtaController = StmOtaController(intelHexParserMock)
 
-        val testObserver = stmOtaController.program(configureMessageStreamMock(), "").testSubscribe()
+        val testObserver = stmOtaController.program(configureMessageStreamMock(), responseErrorHandler, "").testSubscribe()
 
         testObserver.awaitTerminalEvent()
         testObserver.assertError(IllegalArgumentException::class.java)
@@ -67,7 +70,7 @@ class StmOtaControllerTest {
         val stmOtaController = StmOtaController(configureIntelHexParserMock())
 
         val testObserver = stmOtaController.program(
-            configureMessageStreamMock(nackPositions = listOf(0)), "").testSubscribe()
+            configureMessageStreamMock(nackPositions = listOf(0)), responseErrorHandler, "").testSubscribe()
 
         testObserver.awaitTerminalEvent()
         testObserver.assertError(OtaFailedException::class.java)
@@ -78,7 +81,7 @@ class StmOtaControllerTest {
         val stmOtaController = StmOtaController(configureIntelHexParserMock())
 
         val testObserver = stmOtaController.program(
-            configureMessageStreamMock(nackPositions = listOf(7)), "").testSubscribe()
+            configureMessageStreamMock(nackPositions = listOf(7)), responseErrorHandler, "").testSubscribe()
 
         testObserver.awaitTerminalEvent()
         assertThat(testObserver.values()).containsExactlyElementsIn(PROGRESS_VALUES.slice(0..1)).inOrder()
@@ -93,7 +96,7 @@ class StmOtaControllerTest {
         val stmOtaController = StmOtaController(intelHexParserMock)
 
         val testObserver = stmOtaController.program(
-            configureMessageStreamMock(nackPositions = listOf(0)), "").testSubscribe()
+            configureMessageStreamMock(nackPositions = listOf(0)), responseErrorHandler, "").testSubscribe()
 
         testObserver.awaitTerminalEvent()
         testObserver.assertError(InvalidFirmwareException::class.java)

@@ -8,6 +8,8 @@ import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemorySta
 import com.simprints.fingerprintscanner.v2.domain.stmota.responses.CommandAcknowledgement
 import com.simprints.fingerprintscanner.v2.exceptions.ota.InvalidFirmwareException
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.handleErrorsWith
 import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
 import com.simprints.fingerprintscanner.v2.tools.hexparser.FirmwareByteChunk
 import com.simprints.fingerprintscanner.v2.tools.hexparser.IntelHexParser
@@ -19,15 +21,20 @@ import io.reactivex.Single
 
 class StmOtaController(private val intelHexParser: IntelHexParser) {
 
-    private inline fun <reified R : StmOtaResponse> sendStmOtaModeCommandAndReceiveResponse(stmOtaMessageStream: StmOtaMessageStream, command: StmOtaCommand): Single<R> =
+    private inline fun <reified R : StmOtaResponse> sendStmOtaModeCommandAndReceiveResponse(
+        stmOtaMessageStream: StmOtaMessageStream,
+        errorHandler: ResponseErrorHandler,
+        command: StmOtaCommand
+    ): Single<R> =
         stmOtaMessageStream.outgoing.sendMessage(command)
             .andThen(stmOtaMessageStream.incoming.receiveResponse<R>())
+            .handleErrorsWith(errorHandler)
 
     /**
      * @throws InvalidFirmwareException if firmware file could not be successfully parsed
      * @throws OtaFailedException if received a NACK when communicating with STM
      */
-    fun program(stmOtaMessageStream: StmOtaMessageStream, firmwareHexFile: String): Observable<Float> =
+    fun program(stmOtaMessageStream: StmOtaMessageStream, errorHandler: ResponseErrorHandler, firmwareHexFile: String): Observable<Float> =
         parseFirmwareFile(firmwareHexFile)
             .map { chunkList ->
                 chunkList.mapIndexed { index, chunk ->
@@ -36,7 +43,7 @@ class StmOtaController(private val intelHexParser: IntelHexParser) {
             }.flattenAsObservable {
                 it
             }.concatMap { (chunk, progress) ->
-                sendStmPacket(stmOtaMessageStream, chunk)
+                sendStmPacket(stmOtaMessageStream, errorHandler, chunk)
                     .andThen(Observable.just(progress))
             }
 
@@ -49,15 +56,15 @@ class StmOtaController(private val intelHexParser: IntelHexParser) {
             }
         }
 
-    private fun sendStmPacket(stmOtaMessageStream: StmOtaMessageStream, firmwareByteChunk: FirmwareByteChunk): Completable =
-        sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageStream,
+    private fun sendStmPacket(stmOtaMessageStream: StmOtaMessageStream, errorHandler: ResponseErrorHandler, firmwareByteChunk: FirmwareByteChunk): Completable =
+        sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageStream, errorHandler,
             WriteMemoryStartCommand()
         ).verifyResponseIsAck().andThen(
-            sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageStream,
+            sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageStream, errorHandler,
                 WriteMemoryAddressCommand(firmwareByteChunk.address)
             )
         ).verifyResponseIsAck().andThen(
-            sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageStream,
+            sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageStream, errorHandler,
                 WriteMemoryDataCommand(firmwareByteChunk.data)
             )
         ).verifyResponseIsAck()
