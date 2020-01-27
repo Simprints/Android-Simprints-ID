@@ -6,12 +6,14 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
 import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class DashboardViewModel(
@@ -32,8 +34,8 @@ class DashboardViewModel(
         DashboardSyncCardState.SyncProgress(Date(), 10, 100)
     }
 
-    suspend fun getProjectDetails(): LiveData<DashboardProjectState> {
-        return repository.getProjectDetails()
+    suspend fun getProjectDetails(): LiveData<DashboardProjectState> = withContext(Dispatchers.IO) {
+        repository.getProjectDetails()
     }
 
     //StopShip: use only for debug - it will be gone when the business logic is wired up to the UI
