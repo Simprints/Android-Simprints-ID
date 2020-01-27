@@ -26,8 +26,8 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
 
     private var syncStateLiveData = peopleSyncManager.getLastSyncState()
     private var isConnectedLiveData = deviceManager.isConnectedUpdates
-    private var lastSyncTimeObservedRunning: Date? = null
-    private var lastSyncTimeObservedFinishing: Date? = null
+    var lastSyncTimeObservedRunning: Date? = null
+    var lastSyncTimeObservedFinishing: Date? = null
 
     private val lastTimeSyncSucceed
         get() = cacheSync.readLastSuccessfulSyncTime()
@@ -68,9 +68,8 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
                 lastSyncTimeObservedFinishing = Date()
             }
 
-            syncCardStateLiveData.value = it.also {
-                syncIfRequired()
-            }
+            syncCardStateLiveData.value = it
+            syncIfRequired()
         }
     }
 

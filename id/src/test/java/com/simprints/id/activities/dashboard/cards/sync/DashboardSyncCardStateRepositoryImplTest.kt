@@ -16,6 +16,7 @@ import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWo
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.DOWN_COUNTER
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.UP_COUNTER
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.MockKAnnotations
@@ -30,10 +31,10 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class DashboardSyncCardStateRepositoryImplTest {
 
-    private lateinit var dashboardSyncCardStateRepository: DashboardSyncCardStateRepository
+    private lateinit var dashboardSyncCardStateRepository: DashboardSyncCardStateRepositoryImpl
     private val syncCardTestLiveData
         get() = dashboardSyncCardStateRepository.syncCardStateLiveData
-    
+
     @MockK lateinit var peopleSyncManager: PeopleSyncManager
     @MockK lateinit var deviceManager: DeviceManager
     @MockK lateinit var preferencesManager: PreferencesManager
@@ -132,13 +133,23 @@ class DashboardSyncCardStateRepositoryImplTest {
     }
 
     @Test
-    fun syncWorkersFailedBecauseCloudIntegration_syncStateShouldBeTryAgain() {
+    fun syncWorkersFailedForNetworkIssues_syncStateShouldBeTryAgain() {
         syncStateLiveData.value = PeopleSyncState(syncId, 0, null,
             listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(false))), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
         val tester = syncCardTestLiveData.testObserver()
 
         assertThat(tester.observedValues.last()).isEqualTo(SyncTryAgain(lastSyncTime))
+    }
+
+    @Test
+    fun syncWorkersFailedBecauseCloudIntegration_syncStateShouldBeFailed() {
+        syncStateLiveData.value = PeopleSyncState(syncId, 0, null,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(true))), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
+
+        val tester = syncCardTestLiveData.testObserver()
+
+        assertThat(tester.observedValues.last()).isEqualTo(SyncFailed(lastSyncTime))
     }
 
     @Test
@@ -149,22 +160,11 @@ class DashboardSyncCardStateRepositoryImplTest {
         val tester = syncCardTestLiveData.testObserver()
 
         assertThat(tester.observedValues.last()).isEqualTo(SyncDefault(lastSyncTime))
-        verify { peopleSyncManager.sync() }
     }
 
     @Test
-    fun syncFailedAndNeverRunInTheDashboard_shouldNotEmitStateAndLaunchTheSync() {
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(), listOf())
-
-        val tester = syncCardTestLiveData.testObserver()
-
-        assertThat(tester.observedValues.last()).isEqualTo(SyncDefault(lastSyncTime))
-    }
-
-    @Test
-    fun syncCompletedButLongTimeAgo_shouldLaunchTheSync() {
-        every { timeHelper.msBetweenNowAndTime(any()) } returns MAX_TIME_BEFORE_SYNC_AGAIN + 1
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
+    fun syncHasNeverRun_syncShouldBeTriggered() {
+        every { peopleSyncManager.hasSyncEverRunBefore() } returns false
 
         syncCardTestLiveData.testObserver()
 
@@ -172,15 +172,39 @@ class DashboardSyncCardStateRepositoryImplTest {
     }
 
     @Test
-    fun syncFinishedButLongTimeAgo_syncIfRequired_shouldLaunchTheSync() {
-        every { timeHelper.msBetweenNowAndTime(any()) } returns MAX_TIME_BEFORE_SYNC_AGAIN + 1
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null, listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
+    fun syncSucceedInBackgroundLongTimeAgo_syncShouldBeTriggered() {
+        dashboardSyncCardStateRepository = createRepository(TimeHelperImpl())
+        syncStateLiveData.value = PeopleSyncState(syncId, 10, 10,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
+        every { cacheSync.readLastSuccessfulSyncTime() } returns Date(System.currentTimeMillis() - MAX_TIME_BEFORE_SYNC_AGAIN - 1)
 
-        dashboardSyncCardStateRepository.syncIfRequired()
+        syncCardTestLiveData.testObserver()
+
+        verify { peopleSyncManager.sync() }
+    }
+
+    @Test
+    fun syncSucceedInBackgroundNotTooLongAgo_syncShouldNotBeTriggered() {
+        dashboardSyncCardStateRepository = createRepository(TimeHelperImpl())
+        syncStateLiveData.value = PeopleSyncState(syncId, 10, 10,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
+        every { cacheSync.readLastSuccessfulSyncTime() } returns Date()
+
+        syncCardTestLiveData.testObserver()
 
         verify(exactly = 0) { peopleSyncManager.sync() }
     }
 
+    @Test
+    fun syncFailedInBackgroundBefore_syncShouldBeTriggered() {
+        dashboardSyncCardStateRepository = createRepository(TimeHelperImpl())
+        syncStateLiveData.value = PeopleSyncState(syncId, 10, 10,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(false))), emptyList())
+
+        syncCardTestLiveData.testObserver()
+
+        verify { peopleSyncManager.sync() }
+    }
 
     @Test
     fun syncFinishedButOnlyRecently_syncIfRequired_shouldNotLaunchTheSync() {
@@ -219,12 +243,12 @@ class DashboardSyncCardStateRepositoryImplTest {
 
         val tester = syncCardTestLiveData.testObserver()
 
-        assertThat(tester.observedValues.last()).isEqualTo(DashboardSyncCardState.SyncProgress(lastSyncTime, progress, total))
+        assertThat(tester.observedValues.last()).isEqualTo(SyncProgress(lastSyncTime, progress, total))
     }
 
 
-    private fun createRepository() =
-        DashboardSyncCardStateRepositoryImpl(peopleSyncManager, deviceManager, preferencesManager, syncScopeRepository, cacheSync, timeHelper)
+    private fun createRepository(specificTimeHelper: TimeHelper = timeHelper) =
+        DashboardSyncCardStateRepositoryImpl(peopleSyncManager, deviceManager, preferencesManager, syncScopeRepository, cacheSync, specificTimeHelper)
 
 }
 
