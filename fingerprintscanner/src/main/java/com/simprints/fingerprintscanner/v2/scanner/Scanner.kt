@@ -23,6 +23,8 @@ import com.simprints.fingerprintscanner.v2.domain.root.responses.*
 import com.simprints.fingerprintscanner.v2.exceptions.state.IllegalUn20StateException
 import com.simprints.fingerprintscanner.v2.exceptions.state.IncorrectModeException
 import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedException
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.handleErrorsWith
 import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
 import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
@@ -39,11 +41,13 @@ import io.reactivex.rxkotlin.subscribeBy
 import java.io.InputStream
 import java.io.OutputStream
 
+@Suppress("unused")
 class Scanner(
     private val mainMessageStream: MainMessageStream,
     private val rootMessageStream: RootMessageStream,
     private val stmOtaMessageStream: StmOtaMessageStream,
-    private val stmOtaController: StmOtaController
+    private val stmOtaController: StmOtaController,
+    private val responseErrorHandler: ResponseErrorHandler
 ) {
 
     private lateinit var inputStream: InputStream
@@ -76,10 +80,6 @@ class Scanner(
             null -> {/* Do nothing */
             }
         }
-        resetStateToDisconnected()
-    }
-
-    private fun resetStateToDisconnected() {
         state = disconnectedScannerState()
     }
 
@@ -104,10 +104,12 @@ class Scanner(
     private inline fun <reified R : RootResponse> sendRootModeCommandAndReceiveResponse(command: RootCommand): Single<R> =
         rootMessageStream.outgoing.sendMessage(command)
             .andThen(rootMessageStream.incoming.receiveResponse<R>())
+            .handleErrorsWith(responseErrorHandler)
 
     private inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
         mainMessageStream.outgoing.sendMessage(command)
             .andThen(mainMessageStream.incoming.receiveResponse<R>())
+            .handleErrorsWith(responseErrorHandler)
 
     fun getVersionInformation(): Single<UnifiedVersionInformation> =
         assertConnected().andThen(assertMode(ROOT)).andThen(
@@ -171,13 +173,15 @@ class Scanner(
     fun getStmFirmwareVersion(): Single<StmFirmwareVersion> =
         assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<GetStmFirmwareVersionResponse>(
-                GetStmFirmwareVersionCommand()))
+                GetStmFirmwareVersionCommand()
+            ))
             .map { it.stmFirmwareVersion }
 
     fun getUn20Status(): Single<Boolean> =
         assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<GetUn20OnResponse>(
-                GetUn20OnCommand()))
+                GetUn20OnCommand()
+            ))
             .map { it.value == DigitalValue.TRUE }
             .doOnSuccess { state.un20On = it }
 
@@ -188,8 +192,8 @@ class Scanner(
             ))
             .completeOnceReceived()
             .andThen(mainMessageStream.incoming.receiveResponse<Un20StateChangeEvent>(
-                withPredicate = { it.value == DigitalValue.TRUE })
-            )
+                withPredicate = { it.value == DigitalValue.TRUE }
+            ))
             .completeOnceReceived()
             .doOnComplete { state.un20On = true }
 
@@ -200,8 +204,8 @@ class Scanner(
             ))
             .completeOnceReceived()
             .andThen(mainMessageStream.incoming.receiveResponse<Un20StateChangeEvent>(
-                withPredicate = { it.value == DigitalValue.FALSE })
-            )
+                withPredicate = { it.value == DigitalValue.FALSE }
+            ))
             .completeOnceReceived()
             .doOnComplete { state.un20On = false }
 
@@ -318,7 +322,7 @@ class Scanner(
 
     fun startStmOta(firmwareHexFile: String): Observable<Float> =
         assertConnected().andThen(assertMode(STM_OTA)).andThen(
-            stmOtaController.program(stmOtaMessageStream, firmwareHexFile))
+            stmOtaController.program(stmOtaMessageStream, responseErrorHandler, firmwareHexFile))
 
     companion object {
         val DEFAULT_DPI = Dpi(500)
