@@ -1,13 +1,17 @@
 package com.simprints.fingerprintscannermock.simulated.v2
 
 import android.annotation.SuppressLint
-import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
-import com.simprints.fingerprintscanner.v2.domain.message.OutgoingMessage
-import com.simprints.fingerprintscanner.v2.domain.message.vero.events.TriggerButtonPressedEvent
-import com.simprints.fingerprintscanner.v2.domain.message.vero.events.Un20StateChangeEvent
-import com.simprints.fingerprintscanner.v2.domain.message.vero.models.DigitalValue
+import com.simprints.fingerprintscanner.v2.domain.IncomingMessage
+import com.simprints.fingerprintscanner.v2.domain.OutgoingMessage
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.TriggerButtonPressedEvent
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedScanner
+import com.simprints.fingerprintscannermock.simulated.v2.response.SimulatedResponseHelperV2
+import com.simprints.fingerprintscannermock.simulated.v2.response.SimulatedRootResponseHelper
+import com.simprints.fingerprintscannermock.simulated.v2.response.SimulatedUn20ResponseHelper
+import com.simprints.fingerprintscannermock.simulated.v2.response.SimulatedVeroResponseHelper
 import io.reactivex.Flowable
 import io.reactivex.rxkotlin.subscribeBy
 import java.io.OutputStream
@@ -22,6 +26,10 @@ class SimulatedScannerV2(simulatedScannerManager: SimulatedScannerManager,
     private val simulatedResponseOutputStream = SimulatedResponseOutputStream()
 
     @Suppress("unused")
+    private val simulatedRootResponseHelper = SimulatedRootResponseHelper(simulatedScannerManager, this)
+        .apply { respondToCommands(simulatedCommandInputStream.rootCommands) }
+
+    @Suppress("unused")
     private val simulatedVeroResponseHelper = SimulatedVeroResponseHelper(simulatedScannerManager, this)
         .apply { respondToCommands(simulatedCommandInputStream.veroCommands) }
 
@@ -31,7 +39,7 @@ class SimulatedScannerV2(simulatedScannerManager: SimulatedScannerManager,
 
     override fun handleAppToScannerEvent(bytes: ByteArray, returnStream: OutputStream) {
         this.returnStream = returnStream
-        simulatedCommandInputStream.updateWithNewBytes(bytes)
+        simulatedCommandInputStream.updateWithNewBytes(bytes, scannerState.mode)
     }
 
     @SuppressLint("CheckResult")

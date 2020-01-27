@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.scanner.ui
 
-import com.simprints.fingerprintscanner.v2.domain.message.vero.models.DigitalValue
-import com.simprints.fingerprintscanner.v2.domain.message.vero.models.LedState
-import com.simprints.fingerprintscanner.v2.domain.message.vero.models.SmileLedState
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.LedState
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.SmileLedState
 
 class ScannerUiHelper {
 
