@@ -2,6 +2,7 @@ package com.simprints.id.services.scheduledSync.people.master.models
 
 import androidx.work.WorkInfo
 
+// val state: String is used for logs purpose only - otherwise any state.toString() would print the same output.
 sealed class PeopleSyncWorkerState(val state: String) {
 
     object Enqueued : PeopleSyncWorkerState("Enqueued")

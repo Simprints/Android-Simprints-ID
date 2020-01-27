@@ -34,7 +34,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
         const val SYNC_INFO_MODULE_ID: String = "moduleId"
         const val SYNC_INFO_LAST_UPDATE: String = "lastKnownPatientUpdatedAt"
         const val SYNC_INFO_LAST_PATIENT_ID: String = "lastKnownPatientId"
-        const val SYNC_INFO_SYNC_TIME: String = "lastTimeSyncSucceed"
+        const val SYNC_INFO_SYNC_TIME: String = "lastSyncTime"
 
         const val PROJECT_ID = "id"
         const val PROJECT_LEGACY_ID = "legacyId"
