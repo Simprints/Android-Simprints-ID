@@ -1,6 +1,7 @@
 package com.simprints.face.data.moduleapi.face
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.images.Path
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
@@ -29,13 +30,13 @@ class DomainToFaceResponseTest {
             assertThat(first.index).isEqualTo(0)
 
             val sample = first.sample
-            assertThat(sample?.imageRef?.fullPath).isEqualTo("file://someFile")
+            assertThat(sample?.imageRef?.fullPath).isEqualTo("file://images/someFile")
         }
     }
 }
 
 private fun generateCaptureResult(): FaceCaptureResult {
-    val securedImageRef = SecuredImageRef("file://someFile")
+    val securedImageRef = SecuredImageRef(Path("images"), "file://images/someFile")
     val sample = FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef)
     return FaceCaptureResult(0, sample)
 }

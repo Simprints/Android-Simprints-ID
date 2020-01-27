@@ -21,7 +21,19 @@ class ImageRepositoryImpl(
 
     override suspend fun uploadStoredImagesAndDelete(): Boolean {
         val uploads = uploadImages()
+        return getOperationResult(uploads)
+    }
 
+    private suspend fun uploadImages(): List<UploadResult> {
+        val images = localDataSource.listImages()
+        return images.map { imageRef ->
+            localDataSource.decryptImage(imageRef)?.let { stream ->
+                remoteDataSource.uploadImage(stream, imageRef)
+            } ?: UploadResult(imageRef, UploadResult.Status.FAILED)
+        }
+    }
+
+    private fun getOperationResult(uploads: List<UploadResult>): Boolean {
         if (uploads.isEmpty())
             return true
 
@@ -35,13 +47,6 @@ class ImageRepositoryImpl(
         }
 
         return allUploadsSuccessful
-    }
-
-    private suspend fun uploadImages(): List<UploadResult> {
-        val images = localDataSource.listImages()
-        return images.map {
-            remoteDataSource.uploadImage(it)
-        }
     }
 
 }
