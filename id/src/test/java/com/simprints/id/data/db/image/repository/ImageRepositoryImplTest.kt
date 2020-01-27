@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.image.repository
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.images.Path
 import com.simprints.core.images.SecuredImageRef
 import com.simprints.id.data.db.image.local.ImageLocalDataSource
 import com.simprints.id.data.db.image.remote.ImageRemoteDataSource
@@ -9,10 +10,12 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
+import java.io.FileInputStream
 
 @ExperimentalCoroutinesApi
 class ImageRepositoryImplTest {
@@ -57,39 +60,57 @@ class ImageRepositoryImplTest {
     }
 
     private fun initialiseMocks() {
+        val validImage = mockValidImage()
+        val invalidImage = mockInvalidImage()
+        val mockStream = mockk<FileInputStream>()
+
         every {
-            localDataSource.deleteImage(SecuredImageRef(VALID_PATH))
+            localDataSource.deleteImage(validImage)
         } returns true
 
         every {
-            localDataSource.deleteImage(SecuredImageRef(INVALID_PATH))
+            localDataSource.deleteImage(invalidImage)
         } returns false
 
-        coEvery {
-            remoteDataSource.uploadImage(SecuredImageRef(VALID_PATH))
-        } returns UploadResult(SecuredImageRef(VALID_PATH), UploadResult.Status.SUCCESSFUL)
+        every {
+            localDataSource.decryptImage(validImage)
+        } returns mockStream
+
+        every {
+            localDataSource.decryptImage(invalidImage)
+        } returns null
 
         coEvery {
-            remoteDataSource.uploadImage(SecuredImageRef(INVALID_PATH))
-        } returns UploadResult(SecuredImageRef(INVALID_PATH), UploadResult.Status.FAILED)
+            remoteDataSource.uploadImage(mockStream, validImage)
+        } returns UploadResult(validImage, UploadResult.Status.SUCCESSFUL)
+
+        coEvery {
+            remoteDataSource.uploadImage(mockStream, invalidImage)
+        } returns UploadResult(invalidImage, UploadResult.Status.FAILED)
     }
 
     private fun configureLocalImageFiles(includeInvalidFile: Boolean) {
         val files = mutableListOf(
-            SecuredImageRef(VALID_PATH),
-            SecuredImageRef(VALID_PATH),
-            SecuredImageRef(VALID_PATH)
+            mockValidImage(),
+            mockValidImage(),
+            mockValidImage()
         ).apply {
             if (includeInvalidFile)
-                add(SecuredImageRef(INVALID_PATH))
+                add(mockInvalidImage())
         }
 
         every { localDataSource.listImages() } returns files
     }
 
+    private fun mockValidImage() = SecuredImageRef(Path(VALID_RELATIVE_PATH), VALID_FULL_PATH)
+
+    private fun mockInvalidImage() = SecuredImageRef(Path(INVALID_RELATIVE_PATH), INVALID_FULL_PATH)
+
     companion object {
-        private const val VALID_PATH = "valid/path"
-        private const val INVALID_PATH = "invalid/path"
+        private const val VALID_FULL_PATH = "full/path/valid"
+        private const val INVALID_FULL_PATH = "full/path/invalid"
+        private const val VALID_RELATIVE_PATH = "valid"
+        private const val INVALID_RELATIVE_PATH = "invalid"
     }
 
 }

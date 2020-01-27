@@ -1,28 +1,33 @@
 package com.simprints.id.data.db.image.remote
 
-import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.core.images.SecuredImageRef
 import kotlinx.coroutines.tasks.await
-import java.io.File
+import java.io.FileInputStream
 
 class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
 
-    override suspend fun uploadImage(image: SecuredImageRef): UploadResult {
-        val rootRef = FirebaseStorage.getInstance().reference
-        val file = File(image.fullPath)
-        val uri = Uri.fromFile(file)
+    override suspend fun uploadImage(
+        imageStream: FileInputStream,
+        imageRef: SecuredImageRef
+    ): UploadResult {
+        val rootRef = FirebaseStorage.getInstance().reference.child("images")
 
-        val fileRef = rootRef.child("images").child(file.name)
-        val uploadTask = fileRef.putFile(uri).await()
+        var fileRef = rootRef
+        imageRef.relativePath.dirs.forEach { dir ->
+            fileRef = rootRef.child(dir)
+        }
+        fileRef = fileRef.child(imageRef.getFileName())
 
-        val status = if (uploadTask.bytesTransferred == file.length()) {
+        val uploadTask = fileRef.putStream(imageStream).await()
+
+        val status = if (uploadTask.task.isSuccessful) {
             UploadResult.Status.SUCCESSFUL
         } else {
             UploadResult.Status.FAILED
         }
 
-        return UploadResult(image, status)
+        return UploadResult(imageRef, status)
     }
 
 }
