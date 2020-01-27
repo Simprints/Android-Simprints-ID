@@ -131,8 +131,10 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
         val timeSinceLastObservedSyncCompleted = timeHelper.msBetweenNowAndTime(lastSyncTimeObservedFinishing?.time ?: Date().time)
         val timeSinceLastSuccess = timeHelper.msBetweenNowAndTime(lastTimeSyncSucceed?.time ?: Date().time)
 
+        // if sync has never been observed running (e.g. user opens SPID), then we fall back using
+        // the last time when sync completed 
         return timeSinceLastObservedSyncCompleted > MAX_TIME_BEFORE_SYNC_AGAIN ||
-            (timeSinceLastSuccess > MAX_TIME_BEFORE_SYNC_AGAIN && lastSyncTimeObservedFinishing == null)
+            (timeSinceLastSuccess > MAX_TIME_BEFORE_SYNC_AGAIN && lastSyncTimeObservedRunning == null)
     }
 
     private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<PeopleSyncState.SyncWorkerInfo>) =

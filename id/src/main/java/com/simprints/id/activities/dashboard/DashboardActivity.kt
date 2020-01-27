@@ -52,7 +52,7 @@ class DashboardActivity : AppCompatActivity() {
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
         private const val LOGOUT_RESULT_CODE = 1
-        private const val TIME_FOR_CHECK_IF_SYNC_REQUIRED = 1000 * 30L
+        private const val TIME_FOR_CHECK_IF_SYNC_REQUIRED = 1000 * 60L * 1
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
