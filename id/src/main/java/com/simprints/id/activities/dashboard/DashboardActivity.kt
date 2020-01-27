@@ -21,6 +21,7 @@ import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.tools.AndroidResourcesHelper
@@ -95,7 +96,7 @@ class DashboardActivity : AppCompatActivity() {
             syncAgainTicker = ticker(delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED, initialDelayMillis = 100)
             syncAgainTicker?.let {
                 for (event in it) {
-                    Timber.d("Launch sync if required")
+                    Timber.tag(SYNC_LOG_TAG).d("Launch sync if required")
                     viewModel.syncIfRequired()
                 }
             }
