@@ -101,7 +101,6 @@
                     android:paddingTop="10dp"
                     android:paddingRight="10dp"
                     android:scrollbars="vertical"
-                    android:text="@string/short_consent"
                     android:textColor="@color/simprints_white"
                     android:textSize="20sp"
                     app:autoSizeMaxTextSize="25sp" />
