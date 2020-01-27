@@ -88,4 +88,5 @@ class AndroidResourcesHelperImpl(val context: Context) : AndroidResourcesHelper 
     override fun getDrawable(res: Int): Drawable? = ContextCompat.getDrawable(context, res)
     override fun getColorStateList(color: Int): ColorStateList? = ContextCompat.getColorStateList(context, color)
 
+    override fun getColour(colourId: Int): Int = ContextCompat.getColor(context, colourId)
 }

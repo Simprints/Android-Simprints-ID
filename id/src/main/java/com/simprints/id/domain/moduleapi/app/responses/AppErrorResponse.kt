@@ -15,8 +15,7 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         UNEXPECTED_ERROR,
         LOGIN_NOT_COMPLETE,
         BLUETOOTH_NOT_SUPPORTED,
-        GUID_NOT_FOUND_ONLINE,
-        ROOTED_DEVICE;
+        GUID_NOT_FOUND_ONLINE;
 
         companion object {
             fun fromDomainAlertTypeToAppErrorType(alertType: AlertType) =
@@ -26,7 +25,6 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                     AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
                     AlertType.SAFETYNET_ERROR -> UNEXPECTED_ERROR
                     AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
-                    AlertType.ROOTED_DEVICE -> ROOTED_DEVICE
                     AlertType.GUID_NOT_FOUND_OFFLINE ->
                         throw Throwable("No ErrorType associated. GUID_NOT_FOUND_OFFLINE should return a ExitForm, not a Error Response.")
                 }

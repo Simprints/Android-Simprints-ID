@@ -21,7 +21,7 @@ class AndroidResourcesHelperTest {
     @Test
     fun getStringPlural(){
         val androidResourcesHelper = AndroidResourcesHelperImpl(ctx)
-        val translated = androidResourcesHelper.getStringPlural(R.string.loaded_candidates_quantity_key, 1, arrayOf(1))
+        val translated = androidResourcesHelper.getStringPlural(R.string.test_loaded_candidates_quantity_key, 1, arrayOf(1))
         Truth.assertThat(translated).isEqualTo("Loaded 1 candidate.")
     }
 
@@ -29,7 +29,7 @@ class AndroidResourcesHelperTest {
     fun getStringPluralMissingTranslation(){
         val localCtx = LanguageHelper.contextWithSpecificLanguage(ctx, "bn")
         val androidResourcesHelper = AndroidResourcesHelperImpl(localCtx)
-        val translated = androidResourcesHelper.getStringPlural(R.string.loaded_candidates_quantity_key, 1, arrayOf(1))
+        val translated = androidResourcesHelper.getStringPlural(R.string.test_loaded_candidates_quantity_key, 1, arrayOf(1))
         Truth.assertThat(translated).isEqualTo("Loaded 1 candidate.")
     }
 
@@ -38,7 +38,7 @@ class AndroidResourcesHelperTest {
         val ctx = ApplicationProvider.getApplicationContext<Application>()
         val localCtx = LanguageHelper.contextWithSpecificLanguage(ctx, "fa")
         val androidResourcesHelper = AndroidResourcesHelperImpl(localCtx)
-        val translated = androidResourcesHelper.getStringPlural(R.string.loaded_candidates_quantity_key, 1, arrayOf(1))
+        val translated = androidResourcesHelper.getStringPlural(R.string.test_loaded_candidates_quantity_key, 1, arrayOf(1))
         Truth.assertThat(translated).isEqualTo("فرد یا اشتراک کننده آماده است 1")
     }
 }
