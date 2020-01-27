@@ -5,12 +5,14 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.ModuleSyncScope
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
+import timber.log.Timber
 import java.util.*
 
 class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncManager,
@@ -117,6 +119,7 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
                  */
                 (hasSyncFinished(it) && hasSyncRunLongTimeAgo())) {
 
+                Timber.tag(SYNC_LOG_TAG).d("Re-launching one time sync")
                 syncCardStateLiveData.value = SyncConnecting(null, 0, null)
                 lastSyncTimeObservedRunning = Date()
                 peopleSyncManager.sync()
@@ -132,7 +135,7 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
         val timeSinceLastSuccess = timeHelper.msBetweenNowAndTime(lastTimeSyncSucceed?.time ?: Date().time)
 
         // if sync has never been observed running (e.g. user opens SPID), then we fall back using
-        // the last time when sync completed 
+        // the last time when sync completed
         return timeSinceLastObservedSyncCompleted > MAX_TIME_BEFORE_SYNC_AGAIN ||
             (timeSinceLastSuccess > MAX_TIME_BEFORE_SYNC_AGAIN && lastSyncTimeObservedRunning == null)
     }
