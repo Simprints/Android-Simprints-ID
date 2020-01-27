@@ -110,13 +110,11 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     private fun observeForProjectDetails() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main).launch {
             val projectDetails = viewModel.getProjectDetails()
-            CoroutineScope(Dispatchers.Main).launch {
-                projectDetails.observe(this@DashboardActivity, Observer {
-                    projectDetailsCardDisplayer.displayProjectDetails(it)
-                })
-            }
+            projectDetails.observe(this@DashboardActivity, Observer {
+                projectDetailsCardDisplayer.displayProjectDetails(it)
+            })
         }
     }
 
