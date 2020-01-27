@@ -2,27 +2,38 @@ package com.simprints.fingerprintscanner.v2.scanner
 
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.isA
-import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Response
-import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.CaptureFingerprintCommand
-import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetImageCommand
-import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetTemplateCommand
-import com.simprints.fingerprintscanner.v2.domain.message.un20.models.CaptureFingerprintResult
-import com.simprints.fingerprintscanner.v2.domain.message.un20.models.ImageData
-import com.simprints.fingerprintscanner.v2.domain.message.un20.models.TemplateData
-import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.CaptureFingerprintResponse
-import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetImageResponse
-import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetTemplateResponse
-import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroEvent
-import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroResponse
-import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.SetSmileLedStateCommand
-import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.SetUn20OnCommand
-import com.simprints.fingerprintscanner.v2.domain.message.vero.events.TriggerButtonPressedEvent
-import com.simprints.fingerprintscanner.v2.domain.message.vero.events.Un20StateChangeEvent
-import com.simprints.fingerprintscanner.v2.domain.message.vero.models.*
-import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.SetSmileLedStateResponse
-import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.SetUn20OnResponse
-import com.simprints.fingerprintscanner.v2.incoming.MessageInputStream
-import com.simprints.fingerprintscanner.v2.outgoing.MessageOutputStream
+import com.simprints.fingerprintscanner.v2.domain.Mode
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Response
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.commands.CaptureFingerprintCommand
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.commands.GetImageCommand
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.commands.GetTemplateCommand
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageData
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.TemplateData
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.CaptureFingerprintResponse
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.GetImageResponse
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.GetTemplateResponse
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroEvent
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroResponse
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.SetSmileLedStateCommand
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.SetUn20OnCommand
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.TriggerButtonPressedEvent
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.LedState
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.OperationResultCode
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.SmileLedState
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.SetSmileLedStateResponse
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.SetUn20OnResponse
+import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
+import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterMainModeCommand
+import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
+import com.simprints.fingerprintscanner.v2.incoming.main.MainMessageInputStream
+import com.simprints.fingerprintscanner.v2.incoming.root.RootMessageInputStream
+import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
+import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
+import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
+import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.testSubscribe
@@ -38,32 +49,87 @@ import java.io.OutputStream
 class ScannerTest {
 
     @Test
-    fun scannerConnect_callsConnectOnMessageStreams() {
-        val mockMessageInputStream = setupMock<MessageInputStream> {
-            whenThis { veroEvents } thenReturn Flowable.empty()
-        }
-        val mockMessageOutputStream = mock<MessageOutputStream>()
+    fun scanner_callEnterModeBeforeConnect_throwsException() {
+        val scanner = Scanner(mock(), mock())
+        scanner.enterMainMode().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
+    }
+
+    @Test
+    fun scanner_connect_callsConnectOnRootMessageStreams() {
+        val mockMessageInputStream = mock<RootMessageInputStream>()
+        val mockMessageOutputStream = mock<RootMessageOutputStream>()
         val mockInputStream = mock<InputStream>()
         val mockOutputStream = mock<OutputStream>()
 
-        val scanner = Scanner(mockMessageInputStream, mockMessageOutputStream)
-        scanner.connect(mockInputStream, mockOutputStream)
+        val scanner = Scanner(mock(), RootMessageStream(mockMessageInputStream, mockMessageOutputStream))
+        scanner.connect(mockInputStream, mockOutputStream).blockingAwait()
 
         verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
         verifyOnce(mockMessageOutputStream) { connect(mockOutputStream) }
     }
 
     @Test
+    fun scanner_connect_stateIsInRootMode() {
+
+        val scanner = Scanner(mock(), mock())
+        scanner.connect(mock(), mock()).blockingAwait()
+
+        assertThat(scanner.state.mode).isEqualTo(Mode.ROOT)
+    }
+
+    @Test
+    fun scanner_connectThenEnterMainMode_callsConnectOnMainMessageStreams() {
+
+        val mockMessageInputStream = setupMock<MainMessageInputStream> {
+            whenThis { veroEvents } thenReturn Flowable.empty()
+        }
+        val mockMessageOutputStream = mock<MainMessageOutputStream>()
+        val mockInputStream = mock<InputStream>()
+        val mockOutputStream = mock<OutputStream>()
+
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock())
+        scanner.connect(mockInputStream, mockOutputStream).blockingAwait()
+
+        scanner.enterMainMode().blockingAwait()
+
+        verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
+        verifyOnce(mockMessageOutputStream) { connect(mockOutputStream) }
+    }
+
+    @Test
+    fun scanner_connectThenEnterMainMode_stateIsInMainMode() {
+        val mockMessageInputStream = setupMock<MainMessageInputStream> {
+            whenThis { veroEvents } thenReturn Flowable.empty()
+        }
+
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mock()), setupRootMessageStreamMock())
+        scanner.connect(mock(), mock()).blockingAwait()
+
+        scanner.enterMainMode().blockingAwait()
+
+        assertThat(scanner.state.mode).isEqualTo(Mode.MAIN)
+    }
+
+    @Test
+    fun scanner_connectThenTurnUn20On_throwsException() {
+        val scanner = Scanner(mock(), setupRootMessageStreamMock())
+        scanner.connect(mock(), mock()).blockingAwait()
+
+        scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
+    }
+
+    @Test
     fun scannerVeroEvents_differentKindsOfEventsCreated_forwardsOnlyTriggerEventsToObservers() {
         val eventsSubject = PublishSubject.create<VeroEvent>()
 
-        val mockMessageInputStream = setupMock<MessageInputStream> {
+        val mockMessageInputStream = setupMock<MainMessageInputStream> {
             whenThis { veroEvents } thenReturn eventsSubject.toFlowable(BackpressureStrategy.BUFFER)
         }
-        val mockMessageOutputStream = mock<MessageOutputStream>()
+        val mockMessageOutputStream = mock<MainMessageOutputStream>()
 
-        val scanner = Scanner(mockMessageInputStream, mockMessageOutputStream)
-        scanner.connect(mock(), mock())
+        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock())
+        scanner.connect(mock(), mock()).blockingAwait()
+        scanner.enterMainMode().blockingAwait()
 
         val testObserver = TestObserver<Unit>()
         scanner.triggerButtonListeners.add(testObserver)
@@ -80,12 +146,12 @@ class ScannerTest {
         val eventsSubject = PublishSubject.create<VeroEvent>()
         val responseSubject = PublishSubject.create<VeroResponse>()
 
-        val messageInputStreamSpy = spy(MessageInputStream(mock(), mock(), mock(), mock())).apply {
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
             whenThis { connect(anyNotNull()) } thenDoNothing {}
             veroResponses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             veroEvents = eventsSubject.toFlowable(BackpressureStrategy.BUFFER)
         }
-        val mockMessageOutputStream = setupMock<MessageOutputStream> {
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<SetUn20OnCommand>()) } then {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(SetUn20OnResponse(OperationResultCode.OK))
@@ -94,8 +160,9 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream)
-        scanner.connect(mock(), mock())
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock())
+        scanner.connect(mock(), mock()).blockingAwait()
+        scanner.enterMainMode().blockingAwait()
 
         scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().awaitAndAssertSuccess()
         assertThat(scanner.state.un20On).isTrue()
@@ -108,12 +175,12 @@ class ScannerTest {
     fun scanner_setSmileLedState_changesStateCorrectly() {
         val responseSubject = PublishSubject.create<VeroResponse>()
 
-        val messageInputStreamSpy = spy(MessageInputStream(mock(), mock(), mock(), mock())).apply {
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
             whenThis { connect(anyNotNull()) } thenDoNothing {}
             veroResponses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             veroEvents = Flowable.empty()
         }
-        val mockMessageOutputStream = setupMock<MessageOutputStream> {
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<SetSmileLedStateCommand>()) } then {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(SetSmileLedStateResponse(OperationResultCode.OK))
@@ -121,15 +188,16 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream)
-        scanner.connect(mock(), mock())
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock())
+        scanner.connect(mock(), mock()).blockingAwait()
+        scanner.enterMainMode().blockingAwait()
 
         val smileLedState = SmileLedState(
-            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
-            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
-            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
-            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
-            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04)
+            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04)
         )
 
         scanner.setSmileLedState(smileLedState).testSubscribe().awaitAndAssertSuccess()
@@ -140,12 +208,12 @@ class ScannerTest {
     fun scanner_captureFingerprintWithUn20On_receivesFingerprint() {
         val responseSubject = PublishSubject.create<Un20Response>()
 
-        val messageInputStreamSpy = spy(MessageInputStream(mock(), mock(), mock(), mock())).apply {
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
             whenThis { connect(anyNotNull()) } thenDoNothing {}
             un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             veroEvents = Flowable.empty()
         }
-        val mockMessageOutputStream = setupMock<MessageOutputStream> {
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<CaptureFingerprintCommand>()) } then {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResult.OK))
@@ -153,8 +221,9 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream).apply {
-            connect(mock(), mock())
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock()).apply {
+            connect(mock(), mock()).blockingAwait()
+            enterMainMode().blockingAwait()
             state.un20On = true
         }
 
@@ -165,12 +234,12 @@ class ScannerTest {
     fun scanner_captureFingerprintWithUn20Off_throwsException() {
         val responseSubject = PublishSubject.create<Un20Response>()
 
-        val messageInputStreamSpy = spy(MessageInputStream(mock(), mock(), mock(), mock())).apply {
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
             whenThis { connect(anyNotNull()) } thenDoNothing {}
             un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             veroEvents = Flowable.empty()
         }
-        val mockMessageOutputStream = setupMock<MessageOutputStream> {
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<CaptureFingerprintCommand>()) } then {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResult.OK))
@@ -178,8 +247,9 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream).apply {
-            connect(mock(), mock())
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock()).apply {
+            connect(mock(), mock()).blockingAwait()
+            enterMainMode().blockingAwait()
             state.un20On = null
         }
 
@@ -193,12 +263,12 @@ class ScannerTest {
 
         val responseSubject = PublishSubject.create<Un20Response>()
 
-        val messageInputStreamSpy = spy(MessageInputStream(mock(), mock(), mock(), mock())).apply {
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
             whenThis { connect(anyNotNull()) } thenDoNothing {}
             un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             veroEvents = Flowable.empty()
         }
-        val mockMessageOutputStream = setupMock<MessageOutputStream> {
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<GetTemplateCommand>()) } then {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(GetTemplateResponse(TemplateData(Scanner.DEFAULT_TEMPLATE_TYPE, template)))
@@ -206,8 +276,9 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream).apply {
-            connect(mock(), mock())
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock()).apply {
+            connect(mock(), mock()).blockingAwait()
+            enterMainMode().blockingAwait()
             state.un20On = true
         }
 
@@ -227,12 +298,12 @@ class ScannerTest {
 
         val responseSubject = PublishSubject.create<Un20Response>()
 
-        val messageInputStreamSpy = spy(MessageInputStream(mock(), mock(), mock(), mock())).apply {
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
             whenThis { connect(anyNotNull()) } thenDoNothing {}
             un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             veroEvents = Flowable.empty()
         }
-        val mockMessageOutputStream = setupMock<MessageOutputStream> {
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<GetImageCommand>()) } then {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(GetImageResponse(ImageData(Scanner.DEFAULT_IMAGE_FORMAT, image, crcCheck)))
@@ -240,8 +311,9 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream).apply {
-            connect(mock(), mock())
+        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock()).apply {
+            connect(mock(), mock()).blockingAwait()
+            enterMainMode().blockingAwait()
             state.un20On = true
         }
 
@@ -249,5 +321,34 @@ class ScannerTest {
         testObserver.awaitAndAssertSuccess()
         testObserver.assertValueCount(1)
         assertThat(testObserver.values().first().image).isEqualTo(image)
+    }
+
+    @Test
+    fun scanner_connectThenDisconnect_resetsToDisconnectedState() {
+        val scanner = Scanner(mock(), setupRootMessageStreamMock())
+        scanner.connect(mock(), mock()).blockingAwait()
+        scanner.disconnect().blockingAwait()
+
+        assertThat(scanner.state).isEqualTo(disconnectedScannerState())
+    }
+
+    private fun setupRootMessageStreamMock(): RootMessageStream {
+
+        val responseSubject = PublishSubject.create<RootResponse>()
+
+        val spyRootMessageInputStream = spy(RootMessageInputStream(mock())).apply {
+            whenThis { connect(anyNotNull()) } thenDoNothing {}
+            whenThis { disconnect() } thenDoNothing {}
+            rootResponseStream = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
+        }
+        val mockRootMessageOutputStream = setupMock<RootMessageOutputStream> {
+            whenThis { sendMessage(isA<EnterMainModeCommand>()) } then {
+                Completable.complete().doAfterTerminate {
+                    responseSubject.onNext(EnterMainModeResponse())
+                }
+            }
+        }
+
+        return RootMessageStream(spyRootMessageInputStream, mockRootMessageOutputStream)
     }
 }

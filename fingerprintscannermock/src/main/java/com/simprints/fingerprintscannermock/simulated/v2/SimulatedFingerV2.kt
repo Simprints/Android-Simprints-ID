@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscannermock.simulated.v2
 
-import com.simprints.fingerprintscanner.v2.domain.message.un20.models.CaptureFingerprintResult
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedFinger
 import com.simprints.fingerprintscannermock.simulated.tools.byteArrayFromHexString
 

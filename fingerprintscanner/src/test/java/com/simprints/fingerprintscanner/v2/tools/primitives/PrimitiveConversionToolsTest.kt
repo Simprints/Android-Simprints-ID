@@ -55,6 +55,18 @@ class PrimitiveConversionToolsTest {
     }
 
     @Test
+    fun longToByteArray_littleEndian_worksForWholeRange() {
+        val byteOrder = ByteOrder.LITTLE_ENDIAN
+        assertHexStringsEqual("57 00 00 00 00 00 00 00", 87L.toByteArray(byteOrder).toHexString())
+        assertHexStringsEqual("00 00 00 00 00 00 00 00", 0L.toByteArray(byteOrder).toHexString())
+        assertHexStringsEqual("FF FF FF 7F 00 00 00 00", (Int.MAX_VALUE).toLong().toByteArray(byteOrder).toHexString())
+        assertHexStringsEqual("00 00 00 80 FF FF FF FF", (Int.MIN_VALUE).toLong().toByteArray(byteOrder).toHexString())
+        assertHexStringsEqual("FF FF FF FF FF FF FF 7F", (Long.MAX_VALUE).toByteArray(byteOrder).toHexString())
+        assertHexStringsEqual("00 00 00 00 00 00 00 80", (Long.MIN_VALUE).toByteArray(byteOrder).toHexString())
+        assertHexStringsEqual("BB 5A 69 36 00 00 00 00", 912874171L.toByteArray(byteOrder).toHexString())
+    }
+
+    @Test
     fun shortToByteArray_bigEndian_worksForWholeRange() {
         val byteOrder = ByteOrder.BIG_ENDIAN
         assertHexStringsEqual("00 57", 87.toShort().toByteArray(byteOrder).toHexString())
@@ -73,6 +85,18 @@ class PrimitiveConversionToolsTest {
         assertHexStringsEqual("7F FF FF FF", (Int.MAX_VALUE).toByteArray(byteOrder).toHexString())
         assertHexStringsEqual("80 00 00 00", (Int.MIN_VALUE).toByteArray(byteOrder).toHexString())
         assertHexStringsEqual("36 69 5A BB", 912874171.toByteArray(byteOrder).toHexString())
+    }
+
+    @Test
+    fun longToByteArray_bigEndian_worksForWholeRange() {
+        val byteOrder = ByteOrder.BIG_ENDIAN
+        assertHexStringsEqual("00 00 00 00 00 00 00 57", 87L.toByteArray(byteOrder).toHexString())
+        assertHexStringsEqual("00 00 00 00 00 00 00 00", 0L.toByteArray(byteOrder).toHexString())
+        assertHexStringsEqual("00 00 00 00 7F FF FF FF", (Int.MAX_VALUE).toLong().toByteArray(byteOrder).toHexString())
+        assertHexStringsEqual("FF FF FF FF 80 00 00 00", (Int.MIN_VALUE).toLong().toByteArray(byteOrder).toHexString())
+        assertHexStringsEqual("7F FF FF FF FF FF FF FF", (Long.MAX_VALUE).toByteArray(byteOrder).toHexString())
+        assertHexStringsEqual("80 00 00 00 00 00 00 00", (Long.MIN_VALUE).toByteArray(byteOrder).toHexString())
+        assertHexStringsEqual("00 00 00 00 36 69 5A BB", 912874171L.toByteArray(byteOrder).toHexString())
     }
 
     @Test

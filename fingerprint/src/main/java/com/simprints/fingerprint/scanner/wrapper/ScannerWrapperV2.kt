@@ -30,7 +30,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
         ScannerVersionInformation(2, 7, 2) // TODO : Implement version fetching
     }
 
-    override fun connect(): Completable = Completable.fromAction {
+    override fun connect(): Completable {
         if (bluetoothAdapter.isNull()) throw BluetoothNotSupportedException()
         if (!bluetoothAdapter.isEnabled()) throw BluetoothNotEnabledException()
 
@@ -38,13 +38,14 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
         if (!device.isBonded()) throw ScannerNotPairedException()
 
-        try {
+        return try {
             socket = device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
             bluetoothAdapter.cancelDiscovery()
             socket.connect()
             scannerV2.connect(socket.getInputStream(), socket.getOutputStream())
+                .andThen(scannerV2.enterMainMode())
         } catch (e: IOException) {
-            throw ScannerDisconnectedException()
+            Completable.error(ScannerDisconnectedException())
         }
     }
 

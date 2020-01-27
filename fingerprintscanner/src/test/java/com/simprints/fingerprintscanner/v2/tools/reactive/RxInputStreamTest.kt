@@ -2,8 +2,8 @@ package com.simprints.fingerprintscanner.v2.tools.reactive
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprintscanner.testtools.calculateNumberOfElements
-import com.simprints.fingerprintscanner.testtools.chunked
 import com.simprints.fingerprintscanner.testtools.toHexStrings
+import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
 import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
 import com.simprints.testtools.unit.reactive.testSubscribe
