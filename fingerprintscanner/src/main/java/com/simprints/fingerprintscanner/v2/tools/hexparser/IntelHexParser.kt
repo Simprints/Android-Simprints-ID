@@ -48,13 +48,23 @@ class IntelHexParser {
         }
     }
 
+    /**
+     * A "stanza" here refers to a group of records that start with a [RecordType.EXTENDED_LINEAR_ADDRESS]
+     * record, and all the following [RecordType.DATA] records that are relative to this address.
+     * A stanza ends at the next [RecordType.EXTENDED_LINEAR_ADDRESS] record, or until the
+     * [RecordType.END_OF_FILE]
+     */
     fun computeStanzasFromRecords(records: List<Record>): Map<Record, List<Record>> {
+        // Find all address records and pair with index
         val addressRecordsIndexed = records.withIndex().filter { it.value.type == RecordType.EXTENDED_LINEAR_ADDRESS }
-        val addressRecordRanges = addressRecordsIndexed
-            .zipWithNext { a, b -> Pair(a.value, a.index + 1 until b.index) } +
-            listOf(Pair(addressRecordsIndexed.last().value, addressRecordsIndexed.last().index + 1 until records.size - 1))
 
-        return addressRecordRanges.map { (addressRecord, range) ->
+        // Find stanza ranges, i.e. the address record paired with the IntRange of data records in the records list
+        val allStanzaRangesExceptLast = addressRecordsIndexed.zipWithNext { a, b -> Pair(a.value, a.index + 1 until b.index) }
+        val lastStanzaRange = listOf(Pair(addressRecordsIndexed.last().value, addressRecordsIndexed.last().index + 1 until records.size - 1))
+
+        val stanzaRanges = allStanzaRangesExceptLast + lastStanzaRange
+
+        return stanzaRanges.map { (addressRecord, range) ->
             Pair(addressRecord, records.slice(range))
         }.toMap()
     }

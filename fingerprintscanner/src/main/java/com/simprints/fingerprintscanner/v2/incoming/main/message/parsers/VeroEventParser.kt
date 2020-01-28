@@ -26,7 +26,7 @@ class VeroEventParser : MessageParser<VeroEvent> {
                     VeroMessageType.GET_POWER_LED_STATE,
                     VeroMessageType.SET_SMILE_LED_STATE,
                     VeroMessageType.GET_BATTERY_PERCENT_CHARGE ->
-                        throw InvalidMessageException("Illegal message $type received in Vero events channel")
+                        throw InvalidMessageException("Illegal message $type received in Vero events route")
                 }
             }
         } catch (e: Exception) {

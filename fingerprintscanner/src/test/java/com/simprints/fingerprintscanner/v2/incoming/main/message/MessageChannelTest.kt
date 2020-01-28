@@ -8,7 +8,7 @@ import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.rxkotlin.toFlowable
 import org.junit.Test
 
-class MessageStreamTest {
+class MessageChannelTest {
 
     @Test
     fun packetToMessageAccumulation_messageSpreadOutOverMultiplePackets_succeeds() {

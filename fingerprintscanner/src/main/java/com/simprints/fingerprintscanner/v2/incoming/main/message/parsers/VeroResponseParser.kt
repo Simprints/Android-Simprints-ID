@@ -24,7 +24,7 @@ class VeroResponseParser : MessageParser<VeroResponse> {
                     SET_SMILE_LED_STATE -> SetSmileLedStateResponse.fromBytes(data)
                     GET_BATTERY_PERCENT_CHARGE -> GetBatteryPercentChargeResponse.fromBytes(data)
                     UN20_STATE_CHANGE, TRIGGER_BUTTON_PRESSED ->
-                        throw InvalidMessageException("Illegal message $type received in Vero events channel")
+                        throw InvalidMessageException("Illegal message $type received in Vero events route")
                 }
             }
         } catch (e: Exception) {

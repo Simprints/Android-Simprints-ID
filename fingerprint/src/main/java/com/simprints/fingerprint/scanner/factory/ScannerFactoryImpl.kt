@@ -5,7 +5,7 @@ import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV2
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
-import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
+import com.simprints.fingerprintscanner.v2.domain.main.packet.Route
 import com.simprints.fingerprintscanner.v2.incoming.main.MainMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.Un20ResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroEventAccumulator
@@ -31,9 +31,9 @@ import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageOutputSt
 import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageSerializer
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
-import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
-import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
-import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
+import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.tools.hexparser.IntelHexParser
 import com.simprints.fingerprintscanner.v2.tools.lang.objects
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
@@ -55,10 +55,10 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
     fun createScannerV2(macAddress: String): ScannerWrapper =
         ScannerWrapperV2(
             ScannerV2(
-                MainMessageStream(
+                MainMessageChannel(
                     MainMessageInputStream(
                         PacketRouter(
-                            Channel.Remote::class.objects(),
+                            Route.Remote::class.objects(),
                             { source },
                             ByteArrayToPacketAccumulator(PacketParser())
                         ),
@@ -71,7 +71,7 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                         OutputStreamDispatcher()
                     )
                 ),
-                RootMessageStream(
+                RootMessageChannel(
                     RootMessageInputStream(
                         RootResponseAccumulator(RootResponseParser())
                     ),
@@ -80,7 +80,7 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                         OutputStreamDispatcher()
                     )
                 ),
-                StmOtaMessageStream(
+                StmOtaMessageChannel(
                     StmOtaMessageInputStream(
                         StmOtaResponseParser()
                     ),

@@ -4,7 +4,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.IncomingMainMessa
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Response
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroEvent
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroResponse
-import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
+import com.simprints.fingerprintscanner.v2.domain.main.packet.Route
 import com.simprints.fingerprintscanner.v2.incoming.common.MessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.Un20ResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroEventAccumulator
@@ -30,9 +30,11 @@ class MainMessageInputStream(
 
     override fun connect(inputStream: InputStream) {
         packetRouter.connect(inputStream)
-        veroResponses = packetRouter.incomingPacketChannels.getValue(Channel.Remote.VeroServer).toMainMessageStream(veroResponseAccumulator)
-        veroEvents = packetRouter.incomingPacketChannels.getValue(Channel.Remote.VeroEvent).toMainMessageStream(veroEventAccumulator)
-        un20Responses = packetRouter.incomingPacketChannels.getValue(Channel.Remote.Un20Server).toMainMessageStream(un20ResponseAccumulator)
+        with(packetRouter.incomingPacketRoutes) {
+            veroResponses = getValue(Route.Remote.VeroServer).toMainMessageStream(veroResponseAccumulator)
+            veroEvents = getValue(Route.Remote.VeroEvent).toMainMessageStream(veroEventAccumulator)
+            un20Responses = getValue(Route.Remote.Un20Server).toMainMessageStream(un20ResponseAccumulator)
+        }
     }
 
     override fun disconnect() {
