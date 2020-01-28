@@ -19,9 +19,6 @@ import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.activity_dashboard_card_project_details.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DashboardActivity : AppCompatActivity() {
@@ -98,12 +95,9 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     private fun observeForProjectDetails() {
-        CoroutineScope(Dispatchers.Main).launch {
-            val projectDetails = viewModel.getProjectDetails()
-            projectDetails.observe(this@DashboardActivity, Observer {
-                projectDetailsCardDisplayer.displayProjectDetails(it)
-            })
-        }
+        viewModel.getProjectDetails().observe(this@DashboardActivity, Observer {
+            projectDetailsCardDisplayer.displayProjectDetails(it)
+        })
     }
 
     private fun observeForSyncCardState() {
