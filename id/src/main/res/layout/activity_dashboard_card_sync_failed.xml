@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/activity_dashboard_card_space_below_title"
-            android:src="@drawable/sync_no_connection"
+            android:src="@drawable/sync_failed_icon"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dashboard_sync_card_title" />
 
@@ -39,6 +39,7 @@
             android:layout_height="wrap_content"
             android:text="Placeholder - failed message"
             android:textSize="16sp"
+            android:textColor="@color/simprints_red_dark"
             app:layout_constraintBottom_toBottomOf="@+id/dashboard_sync_card_failed_icon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/dashboard_sync_card_failed_icon"
