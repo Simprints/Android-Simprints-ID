@@ -1,9 +1,9 @@
-package com.simprints.fingerprintscanner.v2.stream
+package com.simprints.fingerprintscanner.v2.channel
 
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
 import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageOutputStream
 
-class StmOtaMessageStream(
+class StmOtaMessageChannel(
     incoming: StmOtaMessageInputStream,
     outgoing: StmOtaMessageOutputStream
-) : MessageStream<StmOtaMessageInputStream, StmOtaMessageOutputStream>(incoming, outgoing)
+) : MessageChannel<StmOtaMessageInputStream, StmOtaMessageOutputStream>(incoming, outgoing)

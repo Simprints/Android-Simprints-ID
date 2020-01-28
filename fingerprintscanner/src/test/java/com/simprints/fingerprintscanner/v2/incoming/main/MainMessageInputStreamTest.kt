@@ -7,7 +7,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.Ge
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.TriggerButtonPressedEvent
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.GetUn20OnResponse
-import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
+import com.simprints.fingerprintscanner.v2.domain.main.packet.Route
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.Un20ResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroEventAccumulator
@@ -36,21 +36,21 @@ class MainMessageInputStreamTest {
     @Test
     fun messageInputStream_receiveVeroResponse_correctlyForwardsResponse() {
         val messageBytes = "20 10 01 00 FF".hexToByteArray()
-        val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Channel.Remote.VeroServer, it) }
+        val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
         val expectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
 
-        val channels = mapOf(
-            Channel.Remote.VeroServer as Channel to packets.toFlowable().publish(),
-            Channel.Remote.VeroEvent as Channel to Flowable.empty<Packet>().publish(),
-            Channel.Remote.Un20Server as Channel to Flowable.empty<Packet>().publish())
+        val routes = mapOf(
+            Route.Remote.VeroServer as Route to packets.toFlowable().publish(),
+            Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().publish(),
+            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().publish())
 
-        whenever(packetRouter) { incomingPacketChannels } thenReturn channels
+        whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
         messageInputStream.connect(mock())
 
         val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().test()
 
-        channels[Channel.Remote.VeroServer]?.connect()
+        routes[Route.Remote.VeroServer]?.connect()
 
         testSubscriber.awaitAndAssertSuccess()
         testSubscriber.assertValue { expectedResponse.value == it.value }
@@ -59,21 +59,21 @@ class MainMessageInputStreamTest {
     @Test
     fun messageInputStream_receiveUn20Response_correctlyForwardsResponse() {
         val messageBytes = "30 00 01 00 00 00 10".hexToByteArray()
-        val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Channel.Remote.Un20Server, it) }
+        val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.Un20Server, it) }
         val expectedResponse = GetSupportedTemplateTypesResponse(setOf(TemplateType.ISO_19794_2_2011))
 
-        val channels = mapOf(
-            Channel.Remote.VeroServer as Channel to Flowable.empty<Packet>().publish(),
-            Channel.Remote.VeroEvent as Channel to Flowable.empty<Packet>().publish(),
-            Channel.Remote.Un20Server as Channel to packets.toFlowable().publish())
+        val routes = mapOf(
+            Route.Remote.VeroServer as Route to Flowable.empty<Packet>().publish(),
+            Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().publish(),
+            Route.Remote.Un20Server as Route to packets.toFlowable().publish())
 
-        whenever(packetRouter) { incomingPacketChannels } thenReturn channels
+        whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
         messageInputStream.connect(mock())
 
         val testSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().test()
 
-        channels[Channel.Remote.Un20Server]?.connect()
+        routes[Route.Remote.Un20Server]?.connect()
 
         testSubscriber.awaitAndAssertSuccess()
         testSubscriber.assertValue { expectedResponse.supportedTemplateTypes == it.supportedTemplateTypes }
@@ -83,21 +83,21 @@ class MainMessageInputStreamTest {
     fun messageInputStream_subscribeToVeroEvents_correctlyForwardsEvents() {
         val numberOfEvents = 5
         val messageBytes = "3A 00 00 00".repeat(numberOfEvents).hexToByteArray()
-        val packets = messageBytes.chunked(3).map { packetWithSourceAndPayload(Channel.Remote.VeroEvent, it) }
+        val packets = messageBytes.chunked(3).map { packetWithSourceAndPayload(Route.Remote.VeroEvent, it) }
         val expectedEvent = TriggerButtonPressedEvent()
 
-        val channels = mapOf(
-            Channel.Remote.VeroServer as Channel to Flowable.empty<Packet>().publish(),
-            Channel.Remote.VeroEvent as Channel to packets.toFlowable().publish(),
-            Channel.Remote.Un20Server as Channel to Flowable.empty<Packet>().publish())
+        val routes = mapOf(
+            Route.Remote.VeroServer as Route to Flowable.empty<Packet>().publish(),
+            Route.Remote.VeroEvent as Route to packets.toFlowable().publish(),
+            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().publish())
 
-        whenever(packetRouter) { incomingPacketChannels } thenReturn channels
+        whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
         messageInputStream.connect(mock())
 
         val testSubscriber = messageInputStream.veroEvents!!.test()
 
-        channels[Channel.Remote.VeroEvent]?.connect()
+        routes[Route.Remote.VeroEvent]?.connect()
 
         testSubscriber.awaitCount(numberOfEvents)
         testSubscriber.assertValueCount(numberOfEvents)
@@ -107,21 +107,21 @@ class MainMessageInputStreamTest {
     @Test
     fun messageInputStream_receiveMultipleOfSameResponses_forwardsOnlyFirstAsResponse() {
         val messageBytes = "20 10 01 00 FF 20 10 01 00 00".hexToByteArray()
-        val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Channel.Remote.VeroServer, it) }
+        val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
         val firstExpectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
 
-        val channels = mapOf(
-            Channel.Remote.VeroServer as Channel to packets.toFlowable().publish(),
-            Channel.Remote.VeroEvent as Channel to Flowable.empty<Packet>().publish(),
-            Channel.Remote.Un20Server as Channel to Flowable.empty<Packet>().publish())
+        val routes = mapOf(
+            Route.Remote.VeroServer as Route to packets.toFlowable().publish(),
+            Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().publish(),
+            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().publish())
 
-        whenever(packetRouter) { incomingPacketChannels } thenReturn channels
+        whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
         messageInputStream.connect(mock())
 
         val responseSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().test()
 
-        channels[Channel.Remote.VeroServer]?.connect()
+        routes[Route.Remote.VeroServer]?.connect()
 
         responseSubscriber.awaitAndAssertSuccess()
         responseSubscriber.assertValue { firstExpectedResponse.value == it.value }
@@ -130,28 +130,28 @@ class MainMessageInputStreamTest {
     @Test
     fun messageInputStream_receiveDifferentResponses_forwardsOnlyCorrectResponse() {
         val messageBytes = "20 20 01 00 00 30 10 01 00 FF 20 10 01 00 FF".hexToByteArray()
-        val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Channel.Remote.VeroServer, it) }
+        val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
         val expectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
 
-        val channels = mapOf(
-            Channel.Remote.VeroServer as Channel to packets.toFlowable().publish(),
-            Channel.Remote.VeroEvent as Channel to Flowable.empty<Packet>().publish(),
-            Channel.Remote.Un20Server as Channel to Flowable.empty<Packet>().publish())
+        val routes = mapOf(
+            Route.Remote.VeroServer as Route to packets.toFlowable().publish(),
+            Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().publish(),
+            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().publish())
 
-        whenever(packetRouter) { incomingPacketChannels } thenReturn channels
+        whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
         messageInputStream.connect(mock())
 
         val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().test()
 
-        channels[Channel.Remote.VeroServer]?.connect()
+        routes[Route.Remote.VeroServer]?.connect()
 
         testSubscriber.awaitAndAssertSuccess()
         testSubscriber.assertValue { expectedResponse.value == it.value }
     }
 
     @Test
-    fun messageInputStream_receiveResponsesAndEventsFromMultipleChannelsSimultaneously_correctlyForwardsResponsesAndEvents() {
+    fun messageInputStream_receiveResponsesAndEventsFromMultipleRoutesSimultaneously_correctlyForwardsResponsesAndEvents() {
         val veroResponseBytes = "20 10 01 00 FF".hexToByteArray()
         val expectedVeroResponse = GetUn20OnResponse(DigitalValue.TRUE)
         val numberOfEvents = 5
@@ -160,16 +160,16 @@ class MainMessageInputStreamTest {
         val un20ResponseBytes = "30 00 01 00 00 00 10".hexToByteArray()
         val expectedUn20Response = GetSupportedTemplateTypesResponse(setOf(TemplateType.ISO_19794_2_2011))
 
-        val veroResponsePackets = veroResponseBytes.chunked(2).map { packetWithSourceAndPayload(Channel.Remote.VeroServer, it) }
-        val veroEventPackets = veroEventBytes.chunked(3).map { packetWithSourceAndPayload(Channel.Remote.VeroEvent, it) }
-        val un20ResponsePackets = un20ResponseBytes.chunked(2).map { packetWithSourceAndPayload(Channel.Remote.Un20Server, it) }
+        val veroResponsePackets = veroResponseBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
+        val veroEventPackets = veroEventBytes.chunked(3).map { packetWithSourceAndPayload(Route.Remote.VeroEvent, it) }
+        val un20ResponsePackets = un20ResponseBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.Un20Server, it) }
 
-        val channels = mapOf(
-            Channel.Remote.VeroServer as Channel to veroResponsePackets.toFlowable().publish(),
-            Channel.Remote.VeroEvent as Channel to veroEventPackets.toFlowable().publish(),
-            Channel.Remote.Un20Server as Channel to un20ResponsePackets.toFlowable().publish())
+        val routes = mapOf(
+            Route.Remote.VeroServer as Route to veroResponsePackets.toFlowable().publish(),
+            Route.Remote.VeroEvent as Route to veroEventPackets.toFlowable().publish(),
+            Route.Remote.Un20Server as Route to un20ResponsePackets.toFlowable().publish())
 
-        whenever(packetRouter) { incomingPacketChannels } thenReturn channels
+        whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
         messageInputStream.connect(mock())
 
@@ -177,7 +177,7 @@ class MainMessageInputStreamTest {
         val veroEventTestSubscriber = messageInputStream.veroEvents!!.test()
         val un20ResponseTestSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().test()
 
-        channels.values.forEach { it.connect() }
+        routes.values.forEach { it.connect() }
 
         veroResponseTestSubscriber.awaitAndAssertSuccess()
         veroResponseTestSubscriber.assertValue { expectedVeroResponse.value == it.value }

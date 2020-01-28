@@ -8,7 +8,7 @@ import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
-import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
+import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.tools.hexparser.FirmwareByteChunk
 import com.simprints.fingerprintscanner.v2.tools.hexparser.IntelHexParser
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
@@ -106,11 +106,11 @@ class StmOtaControllerTest {
         whenThis { parse(anyNotNull()) } thenReturn FIRMWARE_BYTE_CHUNKS
     }
 
-    private fun configureMessageStreamMock(nackPositions: List<Int> = listOf()): StmOtaMessageStream {
+    private fun configureMessageStreamMock(nackPositions: List<Int> = listOf()): StmOtaMessageChannel {
         val responseSubject = PublishSubject.create<StmOtaResponse>()
         val messageIndex = AtomicInteger(0)
 
-        return StmOtaMessageStream(
+        return StmOtaMessageChannel(
             spy(StmOtaMessageInputStream(mock())).apply {
                 whenThis { connect(anyNotNull()) } thenDoNothing {}
                 stmOtaResponseStream = responseSubject.toFlowable(BackpressureStrategy.BUFFER)

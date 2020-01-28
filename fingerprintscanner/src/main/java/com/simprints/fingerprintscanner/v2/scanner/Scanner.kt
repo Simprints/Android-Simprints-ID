@@ -26,9 +26,9 @@ import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedExceptio
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.handleErrorsWith
 import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
-import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
-import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
-import com.simprints.fingerprintscanner.v2.stream.StmOtaMessageStream
+import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
@@ -43,9 +43,9 @@ import java.io.OutputStream
 
 @Suppress("unused")
 class Scanner(
-    private val mainMessageStream: MainMessageStream,
-    private val rootMessageStream: RootMessageStream,
-    private val stmOtaMessageStream: StmOtaMessageStream,
+    private val mainMessageChannel: MainMessageChannel,
+    private val rootMessageChannel: RootMessageChannel,
+    private val stmOtaMessageChannel: StmOtaMessageChannel,
     private val stmOtaController: StmOtaController,
     private val responseErrorHandler: ResponseErrorHandler
 ) {
@@ -65,18 +65,18 @@ class Scanner(
         state.connected = true
         state.mode = ROOT
 
-        rootMessageStream.connect(inputStream, outputStream)
+        rootMessageChannel.connect(inputStream, outputStream)
     }
 
     fun disconnect(): Completable = completable {
         when (state.mode) {
-            ROOT -> rootMessageStream.disconnect()
+            ROOT -> rootMessageChannel.disconnect()
             MAIN -> {
-                mainMessageStream.disconnect()
+                mainMessageChannel.disconnect()
                 scannerTriggerListenerDisposable?.dispose()
             }
             CYPRESS_OTA -> TODO()
-            STM_OTA -> stmOtaMessageStream.disconnect()
+            STM_OTA -> stmOtaMessageChannel.disconnect()
             null -> {/* Do nothing */
             }
         }
@@ -102,13 +102,13 @@ class Scanner(
     }
 
     private inline fun <reified R : RootResponse> sendRootModeCommandAndReceiveResponse(command: RootCommand): Single<R> =
-        rootMessageStream.outgoing.sendMessage(command)
-            .andThen(rootMessageStream.incoming.receiveResponse<R>())
+        rootMessageChannel.outgoing.sendMessage(command)
+            .andThen(rootMessageChannel.incoming.receiveResponse<R>())
             .handleErrorsWith(responseErrorHandler)
 
     private inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
-        mainMessageStream.outgoing.sendMessage(command)
-            .andThen(mainMessageStream.incoming.receiveResponse<R>())
+        mainMessageChannel.outgoing.sendMessage(command)
+            .andThen(mainMessageChannel.incoming.receiveResponse<R>())
             .handleErrorsWith(responseErrorHandler)
 
     fun getVersionInformation(): Single<UnifiedVersionInformation> =
@@ -150,23 +150,23 @@ class Scanner(
             .andThen(handleStmOtaModeEntered())
 
     private fun handleMainModeEntered() = completable {
-        rootMessageStream.disconnect()
-        mainMessageStream.connect(inputStream, outputStream)
+        rootMessageChannel.disconnect()
+        mainMessageChannel.connect(inputStream, outputStream)
         state.triggerButtonActive = true
         state.mode = MAIN
         scannerTriggerListenerDisposable = subscribeTriggerButtonListeners()
     }
 
     private fun subscribeTriggerButtonListeners() =
-        mainMessageStream.incoming.veroEvents
+        mainMessageChannel.incoming.veroEvents
             ?.filterCast<TriggerButtonPressedEvent>()
             ?.subscribeBy(onNext = {
                 triggerButtonListeners.forEach { it.onNext(Unit) }
             }, onError = { it.printStackTrace() })
 
     private fun handleStmOtaModeEntered() = completable {
-        rootMessageStream.disconnect()
-        stmOtaMessageStream.connect(inputStream, outputStream)
+        rootMessageChannel.disconnect()
+        stmOtaMessageChannel.connect(inputStream, outputStream)
         state.mode = STM_OTA
     }
 
@@ -191,7 +191,7 @@ class Scanner(
                 SetUn20OnCommand(DigitalValue.TRUE)
             ))
             .completeOnceReceived()
-            .andThen(mainMessageStream.incoming.receiveResponse<Un20StateChangeEvent>(
+            .andThen(mainMessageChannel.incoming.receiveResponse<Un20StateChangeEvent>(
                 withPredicate = { it.value == DigitalValue.TRUE }
             ))
             .completeOnceReceived()
@@ -203,7 +203,7 @@ class Scanner(
                 SetUn20OnCommand(DigitalValue.FALSE)
             ))
             .completeOnceReceived()
-            .andThen(mainMessageStream.incoming.receiveResponse<Un20StateChangeEvent>(
+            .andThen(mainMessageChannel.incoming.receiveResponse<Un20StateChangeEvent>(
                 withPredicate = { it.value == DigitalValue.FALSE }
             ))
             .completeOnceReceived()
@@ -322,7 +322,7 @@ class Scanner(
 
     fun startStmOta(firmwareHexFile: String): Observable<Float> =
         assertConnected().andThen(assertMode(STM_OTA)).andThen(
-            stmOtaController.program(stmOtaMessageStream, responseErrorHandler, firmwareHexFile))
+            stmOtaController.program(stmOtaMessageChannel, responseErrorHandler, firmwareHexFile))
 
     companion object {
         val DEFAULT_DPI = Dpi(500)

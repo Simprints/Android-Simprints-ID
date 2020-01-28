@@ -1,9 +1,9 @@
-package com.simprints.fingerprintscanner.v2.stream
+package com.simprints.fingerprintscanner.v2.channel
 
 import com.simprints.fingerprintscanner.v2.incoming.main.MainMessageInputStream
 import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
 
-class MainMessageStream(
+class MainMessageChannel(
     incoming: MainMessageInputStream,
     outgoing: MainMessageOutputStream
-) : MessageStream<MainMessageInputStream, MainMessageOutputStream>(incoming, outgoing)
+) : MessageChannel<MainMessageInputStream, MainMessageOutputStream>(incoming, outgoing)
