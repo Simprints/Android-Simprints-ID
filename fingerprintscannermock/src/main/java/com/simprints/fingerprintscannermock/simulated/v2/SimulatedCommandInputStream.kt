@@ -10,12 +10,12 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroCommand
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroMessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.*
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.VeroMessageType.*
-import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
+import com.simprints.fingerprintscanner.v2.domain.main.packet.Route
 import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
 import com.simprints.fingerprintscanner.v2.domain.root.RootMessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.root.RootMessageType.*
 import com.simprints.fingerprintscanner.v2.domain.root.commands.*
-import com.simprints.fingerprintscanner.v2.incoming.MessageParser
+import com.simprints.fingerprintscanner.v2.incoming.common.MessageParser
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.PacketToMainMessageAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.toMainMessageStream
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.ByteArrayToPacketAccumulator
@@ -25,11 +25,14 @@ import com.simprints.fingerprintscanner.v2.tools.accumulator.ByteArrayAccumulato
 import com.simprints.fingerprintscanner.v2.tools.accumulator.accumulateAndTakeElements
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import io.reactivex.Flowable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class SimulatedCommandInputStream {
+
+    private val streamDisposables = mutableListOf<Disposable>()
 
     private val rootOutputStream = PipedOutputStream()
     private val rootInputStream = PipedInputStream().also { it.connect(rootOutputStream) }
@@ -39,7 +42,7 @@ class SimulatedCommandInputStream {
 
     private val router =
         PacketRouter(
-            listOf(Channel.Remote.VeroServer, Channel.Remote.Un20Server),
+            listOf(Route.Remote.VeroServer, Route.Remote.Un20Server),
             { destination },
             ByteArrayToPacketAccumulator(PacketParser())
         ).also { it.connect(mainInputStream) }
@@ -50,19 +53,22 @@ class SimulatedCommandInputStream {
             .accumulateAndTakeElements(RootCommandAccumulator(RootCommandParser()))
             .subscribeOn(Schedulers.io())
             .publish()
-            .also { it.connect() }
+            .also { streamDisposables.add(it.connect()) }
 
-    val veroCommands: Flowable<VeroCommand> = router.incomingPacketChannels[Channel.Remote.VeroServer]?.toMainMessageStream(VeroCommandAccumulator(VeroCommandParser()))
-        ?: throw IllegalStateException()
-    val un20Commands: Flowable<Un20Command> = router.incomingPacketChannels[Channel.Remote.Un20Server]?.toMainMessageStream(Un20CommandAccumulator(Un20CommandParser()))
-        ?: throw IllegalStateException()
+    val veroCommands: Flowable<VeroCommand> = router.incomingPacketRoutes.getValue(Route.Remote.VeroServer).toMainMessageStream(VeroCommandAccumulator(VeroCommandParser()))
+    val un20Commands: Flowable<Un20Command> = router.incomingPacketRoutes.getValue(Route.Remote.Un20Server).toMainMessageStream(Un20CommandAccumulator(Un20CommandParser()))
+
+    fun disconnect() {
+        router.disconnect()
+        streamDisposables.forEach { it.dispose() }
+    }
 
     fun updateWithNewBytes(bytes: ByteArray, mode: Mode) {
         when (mode) {
             ROOT -> rootOutputStream
             MAIN -> mainOutputStream
-            CYPRESS_OTA -> throw IllegalStateException()
-            STM_OTA -> throw IllegalStateException()
+            CYPRESS_OTA -> throw UnsupportedOperationException("Simulated Scanner does not support Cypress OTA")
+            STM_OTA -> throw UnsupportedOperationException("Simulated Scanner does not support STM OTA")
         }.apply {
             write(bytes)
             flush()

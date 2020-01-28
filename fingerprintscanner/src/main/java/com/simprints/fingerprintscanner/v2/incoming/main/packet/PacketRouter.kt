@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.incoming.main.packet
 
-import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
+import com.simprints.fingerprintscanner.v2.domain.main.packet.Route
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprintscanner.v2.incoming.IncomingConnectable
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
@@ -10,29 +10,26 @@ import io.reactivex.flowables.ConnectableFlowable
 import io.reactivex.schedulers.Schedulers
 import java.io.InputStream
 
-class PacketRouter(private val channels: List<Channel>,
-                   private inline val packetChannelDesignator: Packet.() -> Byte,
+class PacketRouter(private val routes: List<Route>,
+                   private inline val packetRouteDesignator: Packet.() -> Byte,
                    private val byteArrayToPacketAccumulator: ByteArrayToPacketAccumulator) : IncomingConnectable {
 
-    private lateinit var inputStream: InputStream
-
     private lateinit var incomingPackets: ConnectableFlowable<Packet>
-    lateinit var incomingPacketChannels: Map<Channel, ConnectableFlowable<Packet>>
+    lateinit var incomingPacketRoutes: Map<Route, ConnectableFlowable<Packet>>
 
     private lateinit var incomingPacketsDisposable: Disposable
-    private lateinit var incomingPacketChannelsDisposable: Map<Channel, Disposable>
+    private lateinit var incomingPacketRoutesDisposable: Map<Route, Disposable>
 
     override fun connect(inputStream: InputStream) {
-        this.inputStream = inputStream
-        configureIncomingPacketStream(transformToPacketStream(this.inputStream))
+        configureIncomingPacketStream(transformToPacketStream(inputStream))
         incomingPacketsDisposable = incomingPackets.connect()
-        incomingPacketChannelsDisposable = incomingPacketChannels.mapValues { it.value.connect() }
+        incomingPacketRoutesDisposable = incomingPacketRoutes.mapValues { it.value.connect() }
     }
 
     private fun configureIncomingPacketStream(rawPacketStream: Flowable<Packet>) {
         incomingPackets = rawPacketStream.subscribeAndPublish()
-        incomingPacketChannels = channels.associateWith {
-            incomingPackets.filterChannel(it).subscribeAndPublish()
+        incomingPacketRoutes = routes.associateWith {
+            incomingPackets.filterRoute(it).subscribeAndPublish()
         }
     }
 
@@ -43,11 +40,11 @@ class PacketRouter(private val channels: List<Channel>,
 
     override fun disconnect() {
         incomingPacketsDisposable.dispose()
-        incomingPacketChannelsDisposable.forEach { it.value.dispose() }
+        incomingPacketRoutesDisposable.forEach { it.value.dispose() }
     }
 
-    private fun ConnectableFlowable<Packet>.filterChannel(channel: Channel) =
-        filter { packet -> packet.packetChannelDesignator() == channel.id.value }
+    private fun ConnectableFlowable<Packet>.filterRoute(route: Route) =
+        filter { packet -> packet.packetRouteDesignator() == route.id.value }
 
     private fun Flowable<Packet>.subscribeAndPublish() =
         this.subscribeOn(Schedulers.io()).publish()

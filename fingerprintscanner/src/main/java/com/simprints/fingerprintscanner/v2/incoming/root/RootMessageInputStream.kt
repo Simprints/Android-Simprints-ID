@@ -1,7 +1,7 @@
 package com.simprints.fingerprintscanner.v2.incoming.root
 
 import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
-import com.simprints.fingerprintscanner.v2.incoming.IncomingConnectable
+import com.simprints.fingerprintscanner.v2.incoming.common.MessageInputStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import io.reactivex.Flowable
@@ -10,17 +10,13 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.io.InputStream
 
-class RootMessageInputStream(private val rootResponseAccumulator: RootResponseAccumulator) : IncomingConnectable {
+class RootMessageInputStream(private val rootResponseAccumulator: RootResponseAccumulator) : MessageInputStream {
 
-    private lateinit var inputStream: InputStream
-
-    lateinit var rootResponseStream: Flowable<RootResponse>
+    var rootResponseStream: Flowable<RootResponse>? = null
 
     private lateinit var rootResponseStreamDisposable: Disposable
 
     override fun connect(inputStream: InputStream) {
-        this.inputStream = inputStream
-
         rootResponseStream = transformToRootResponseStream(inputStream)
             .subscribeAndPublish()
             .also {
@@ -41,7 +37,10 @@ class RootMessageInputStream(private val rootResponseAccumulator: RootResponseAc
         this.subscribeOn(Schedulers.io()).publish()
 
     inline fun <reified R : RootResponse> receiveResponse(): Single<R> =
-        rootResponseStream
-            .filterCast<R>()
-            .firstOrError()
+        Single.defer {
+            rootResponseStream
+                ?.filterCast<R>()
+                ?.firstOrError()
+                ?: Single.error(IllegalStateException("Trying to receive response before connecting stream"))
+        }
 }

@@ -25,22 +25,38 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.Opera
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.SmileLedState
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.SetSmileLedStateResponse
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.SetUn20OnResponse
+import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
 import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
+import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterCypressOtaModeCommand
 import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterMainModeCommand
+import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterStmOtaModeCommand
+import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterCypressOtaModeResponse
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
+import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterStmOtaModeResponse
+import com.simprints.fingerprintscanner.v2.exceptions.state.IllegalUn20StateException
+import com.simprints.fingerprintscanner.v2.exceptions.state.IncorrectModeException
+import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedException
 import com.simprints.fingerprintscanner.v2.incoming.main.MainMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.root.RootMessageInputStream
+import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
 import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
-import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
-import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
+import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageOutputStream
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
+import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
+import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
+import io.reactivex.rxkotlin.toObservable
 import io.reactivex.subjects.PublishSubject
 import org.junit.Test
 import java.io.InputStream
@@ -48,10 +64,20 @@ import java.io.OutputStream
 
 class ScannerTest {
 
+    private val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.None)
+
     @Test
     fun scanner_callEnterModeBeforeConnect_throwsException() {
-        val scanner = Scanner(mock(), mock())
-        scanner.enterMainMode().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
+        val scanner = Scanner(mock(), setupRootMessageChannelMock(), mock(), mock(), responseErrorHandler)
+        scanner.enterMainMode().testSubscribe().await().assertError(NotConnectedException::class.java)
+    }
+
+    @Test
+    fun scanner_connectThenDisconnectThenEnterMainMode_throwsException() {
+        val scanner = Scanner(mock(), setupRootMessageChannelMock(), mock(), mock(), responseErrorHandler)
+        scanner.connect(mock(), mock()).blockingAwait()
+        scanner.disconnect().blockingAwait()
+        scanner.enterMainMode().testSubscribe().await().assertError(NotConnectedException::class.java)
     }
 
     @Test
@@ -61,7 +87,7 @@ class ScannerTest {
         val mockInputStream = mock<InputStream>()
         val mockOutputStream = mock<OutputStream>()
 
-        val scanner = Scanner(mock(), RootMessageStream(mockMessageInputStream, mockMessageOutputStream))
+        val scanner = Scanner(mock(), RootMessageChannel(mockMessageInputStream, mockMessageOutputStream), mock(), mock(), responseErrorHandler)
         scanner.connect(mockInputStream, mockOutputStream).blockingAwait()
 
         verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
@@ -70,8 +96,7 @@ class ScannerTest {
 
     @Test
     fun scanner_connect_stateIsInRootMode() {
-
-        val scanner = Scanner(mock(), mock())
+        val scanner = Scanner(mock(), mock(), mock(), mock(), mock())
         scanner.connect(mock(), mock()).blockingAwait()
 
         assertThat(scanner.state.mode).isEqualTo(Mode.ROOT)
@@ -87,7 +112,7 @@ class ScannerTest {
         val mockInputStream = mock<InputStream>()
         val mockOutputStream = mock<OutputStream>()
 
-        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock())
+        val scanner = Scanner(MainMessageChannel(mockMessageInputStream, mockMessageOutputStream), setupRootMessageChannelMock(), mock(), mock(), responseErrorHandler)
         scanner.connect(mockInputStream, mockOutputStream).blockingAwait()
 
         scanner.enterMainMode().blockingAwait()
@@ -102,7 +127,7 @@ class ScannerTest {
             whenThis { veroEvents } thenReturn Flowable.empty()
         }
 
-        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mock()), setupRootMessageStreamMock())
+        val scanner = Scanner(MainMessageChannel(mockMessageInputStream, mock()), setupRootMessageChannelMock(), mock(), mock(), responseErrorHandler)
         scanner.connect(mock(), mock()).blockingAwait()
 
         scanner.enterMainMode().blockingAwait()
@@ -111,11 +136,76 @@ class ScannerTest {
     }
 
     @Test
-    fun scanner_connectThenTurnUn20On_throwsException() {
-        val scanner = Scanner(mock(), setupRootMessageStreamMock())
+    fun scanner_connectThenEnterStmOtaMode_callsConnectOnStmOtaMessageStreams() {
+
+        val mockMessageInputStream = setupMock<StmOtaMessageInputStream> {
+            whenThis { stmOtaResponseStream } thenReturn Flowable.empty()
+        }
+        val mockMessageOutputStream = mock<StmOtaMessageOutputStream>()
+        val mockInputStream = mock<InputStream>()
+        val mockOutputStream = mock<OutputStream>()
+
+        val scanner = Scanner(mock(), setupRootMessageChannelMock(), StmOtaMessageChannel(mockMessageInputStream, mockMessageOutputStream), mock(), responseErrorHandler)
+        scanner.connect(mockInputStream, mockOutputStream).blockingAwait()
+
+        scanner.enterStmOtaMode().blockingAwait()
+
+        verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
+        verifyOnce(mockMessageOutputStream) { connect(mockOutputStream) }
+    }
+
+    @Test
+    fun scanner_connectThenEnterStmOtaMode_stateIsInStmOtaMode() {
+        val mockMessageInputStream = setupMock<StmOtaMessageInputStream> {
+            whenThis { stmOtaResponseStream } thenReturn Flowable.empty()
+        }
+
+        val scanner = Scanner(mock(), setupRootMessageChannelMock(), StmOtaMessageChannel(mockMessageInputStream, mock()), mock(), responseErrorHandler)
         scanner.connect(mock(), mock()).blockingAwait()
 
-        scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
+        scanner.enterStmOtaMode().blockingAwait()
+
+        assertThat(scanner.state.mode).isEqualTo(Mode.STM_OTA)
+    }
+
+    @Test
+    fun scanner_connectThenEnterStmOtaModeThenStartStmOta_receivesProgressCorrectly() {
+        val progressValues = listOf(0.25f, 0.50f, 0.75f, 1.00f)
+
+        val mockStmOtaController = setupMock<StmOtaController> {
+            whenThis { program(anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn Observable.defer { progressValues.toObservable() }
+        }
+
+        val mockMessageInputStream = setupMock<StmOtaMessageInputStream> {
+            whenThis { stmOtaResponseStream } thenReturn Flowable.empty()
+        }
+
+        val scanner = Scanner(mock(), setupRootMessageChannelMock(), StmOtaMessageChannel(mockMessageInputStream, mock()), mockStmOtaController, responseErrorHandler)
+        scanner.connect(mock(), mock()).blockingAwait()
+        scanner.enterStmOtaMode().blockingAwait()
+
+        val testObserver = scanner.startStmOta("").testSubscribe()
+
+        testObserver.awaitAndAssertSuccess()
+
+        assertThat(testObserver.values()).containsExactlyElementsIn(progressValues).inOrder()
+        testObserver.assertComplete()
+    }
+
+    @Test
+    fun scanner_connectThenTurnUn20On_throwsException() {
+        val mockMessageInputStream = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
+            whenThis { veroResponses } thenReturn Flowable.empty()
+            whenThis { veroEvents } thenReturn Flowable.empty()
+        }
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
+            whenThis { sendMessage(anyNotNull()) } thenReturn Completable.complete()
+        }
+
+        val scanner = Scanner(MainMessageChannel(mockMessageInputStream, mockMessageOutputStream), setupRootMessageChannelMock(), mock(), mock(), responseErrorHandler)
+        scanner.connect(mock(), mock()).blockingAwait()
+
+        scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().await().assertError(IncorrectModeException::class.java)
     }
 
     @Test
@@ -127,7 +217,7 @@ class ScannerTest {
         }
         val mockMessageOutputStream = mock<MainMessageOutputStream>()
 
-        val scanner = Scanner(MainMessageStream(mockMessageInputStream, mockMessageOutputStream), setupRootMessageStreamMock())
+        val scanner = Scanner(MainMessageChannel(mockMessageInputStream, mockMessageOutputStream), setupRootMessageChannelMock(), mock(), mock(), responseErrorHandler)
         scanner.connect(mock(), mock()).blockingAwait()
         scanner.enterMainMode().blockingAwait()
 
@@ -160,7 +250,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock())
+        val scanner = Scanner(MainMessageChannel(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageChannelMock(), mock(), mock(), responseErrorHandler)
         scanner.connect(mock(), mock()).blockingAwait()
         scanner.enterMainMode().blockingAwait()
 
@@ -188,7 +278,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock())
+        val scanner = Scanner(MainMessageChannel(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageChannelMock(), mock(), mock(), responseErrorHandler)
         scanner.connect(mock(), mock()).blockingAwait()
         scanner.enterMainMode().blockingAwait()
 
@@ -221,7 +311,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock()).apply {
+        val scanner = Scanner(MainMessageChannel(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageChannelMock(), mock(), mock(), responseErrorHandler).apply {
             connect(mock(), mock()).blockingAwait()
             enterMainMode().blockingAwait()
             state.un20On = true
@@ -247,13 +337,13 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock()).apply {
+        val scanner = Scanner(MainMessageChannel(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageChannelMock(), mock(), mock(), responseErrorHandler).apply {
             connect(mock(), mock()).blockingAwait()
             enterMainMode().blockingAwait()
             state.un20On = null
         }
 
-        scanner.captureFingerprint().testSubscribe().await().assertError(NotImplementedError::class.java) // TODO : Exception handling
+        scanner.captureFingerprint().testSubscribe().await().assertError(IllegalUn20StateException::class.java)
     }
 
     @Test
@@ -276,7 +366,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock()).apply {
+        val scanner = Scanner(MainMessageChannel(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageChannelMock(), mock(), mock(), responseErrorHandler).apply {
             connect(mock(), mock()).blockingAwait()
             enterMainMode().blockingAwait()
             state.un20On = true
@@ -311,7 +401,7 @@ class ScannerTest {
             }
         }
 
-        val scanner = Scanner(MainMessageStream(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageStreamMock()).apply {
+        val scanner = Scanner(MainMessageChannel(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageChannelMock(), mock(), mock(), responseErrorHandler).apply {
             connect(mock(), mock()).blockingAwait()
             enterMainMode().blockingAwait()
             state.un20On = true
@@ -325,14 +415,14 @@ class ScannerTest {
 
     @Test
     fun scanner_connectThenDisconnect_resetsToDisconnectedState() {
-        val scanner = Scanner(mock(), setupRootMessageStreamMock())
+        val scanner = Scanner(mock(), setupRootMessageChannelMock(), mock(), mock(), responseErrorHandler)
         scanner.connect(mock(), mock()).blockingAwait()
         scanner.disconnect().blockingAwait()
 
         assertThat(scanner.state).isEqualTo(disconnectedScannerState())
     }
 
-    private fun setupRootMessageStreamMock(): RootMessageStream {
+    private fun setupRootMessageChannelMock(): RootMessageChannel {
 
         val responseSubject = PublishSubject.create<RootResponse>()
 
@@ -342,13 +432,20 @@ class ScannerTest {
             rootResponseStream = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
         }
         val mockRootMessageOutputStream = setupMock<RootMessageOutputStream> {
-            whenThis { sendMessage(isA<EnterMainModeCommand>()) } then {
+            whenThis { sendMessage(anyNotNull()) } then {
                 Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(EnterMainModeResponse())
+                    responseSubject.onNext(
+                        when (it.arguments[0] as RootCommand) {
+                            is EnterMainModeCommand -> EnterMainModeResponse()
+                            is EnterStmOtaModeCommand -> EnterStmOtaModeResponse()
+                            is EnterCypressOtaModeCommand -> EnterCypressOtaModeResponse()
+                            else -> throw IllegalArgumentException()
+                        }
+                    )
                 }
             }
         }
 
-        return RootMessageStream(spyRootMessageInputStream, mockRootMessageOutputStream)
+        return RootMessageChannel(spyRootMessageInputStream, mockRootMessageOutputStream)
     }
 }
