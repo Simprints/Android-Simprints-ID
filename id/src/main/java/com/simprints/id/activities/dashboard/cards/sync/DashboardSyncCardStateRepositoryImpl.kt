@@ -136,7 +136,7 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
         // if sync has never been observed running (e.g. user opens SPID), then we fall back using
         // the last time when sync completed
         return timeSinceLastObservedSyncCompleted > MAX_TIME_BEFORE_SYNC_AGAIN ||
-            (timeSinceLastSuccess > MAX_TIME_BEFORE_SYNC_AGAIN && lastSyncTimeObservedRunning == null)
+            (timeSinceLastSuccess > MAX_TIME_BEFORE_SYNC_AGAIN)
     }
 
     private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<PeopleSyncState.SyncWorkerInfo>) =
