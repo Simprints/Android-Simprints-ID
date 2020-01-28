@@ -6,11 +6,8 @@ import com.simprints.core.images.SecuredImageRef
 import com.simprints.id.data.db.image.local.ImageLocalDataSource
 import com.simprints.id.data.db.image.remote.ImageRemoteDataSource
 import com.simprints.id.data.db.image.remote.UploadResult
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
@@ -59,6 +56,15 @@ class ImageRepositoryImplTest {
         assertThat(successful).isFalse()
     }
 
+    @Test
+    fun shouldDecryptImageBeforeUploading() = runBlockingTest {
+        configureLocalImageFiles(numberOfValidFiles = 5, includeInvalidFile = false)
+
+        repository.uploadStoredImagesAndDelete()
+
+        verify(exactly = 5) { localDataSource.decryptImage(any()) }
+    }
+
     private fun initialiseMocks() {
         val validImage = mockValidImage()
         val invalidImage = mockInvalidImage()
@@ -89,12 +95,12 @@ class ImageRepositoryImplTest {
         } returns UploadResult(invalidImage, UploadResult.Status.FAILED)
     }
 
-    private fun configureLocalImageFiles(includeInvalidFile: Boolean) {
-        val files = mutableListOf(
-            mockValidImage(),
-            mockValidImage(),
-            mockValidImage()
-        ).apply {
+    private fun configureLocalImageFiles(numberOfValidFiles: Int = 3, includeInvalidFile: Boolean) {
+        val files = mutableListOf<SecuredImageRef>().apply {
+            repeat(numberOfValidFiles) {
+                add(mockValidImage())
+            }
+
             if (includeInvalidFile)
                 add(mockInvalidImage())
         }
