@@ -93,7 +93,7 @@ class SignerManagerTest {
 
         signIn()
 
-        coVerify { projectRepository.loadAndRefreshCache(DEFAULT_PROJECT_ID) }
+        coVerify { projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID) }
     }
 
     @Test
@@ -176,7 +176,7 @@ class SignerManagerTest {
         }
 
     private fun mockFetchingProjectInto(error: Boolean = false) =
-        coEvery { projectRepository.loadAndRefreshCache(any()) }.apply {
+        coEvery { projectRepository.loadFromRemoteAndRefreshCache(any()) }.apply {
             if (!error) {
                 this.returns(Project())
             } else {

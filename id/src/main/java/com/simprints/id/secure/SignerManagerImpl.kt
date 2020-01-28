@@ -22,7 +22,7 @@ open class SignerManagerImpl(
         remote.signIn(token.value)
             .andThen(storeCredentials(userId, projectId))
             .andThen(completableWithSuspend {
-                projectRepository.loadAndRefreshCache(projectId)
+                projectRepository.loadFromRemoteAndRefreshCache(projectId)
                     ?: throw Exception("project not found")
             })
             .andThen(scheduleSyncs(projectId, userId))

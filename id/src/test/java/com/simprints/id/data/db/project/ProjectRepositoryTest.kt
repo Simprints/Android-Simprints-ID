@@ -38,7 +38,7 @@ class ProjectRepositoryTest {
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns localProject
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.just(remoteProject)
 
-        val project = projectRepository.loadAndRefreshCache(DEFAULT_PROJECT_ID)
+        val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
 
         assertThat(project).isEqualTo(localProject)
         coVerify { projectLocalDataSourceMock.save(remoteProject) }
@@ -53,7 +53,7 @@ class ProjectRepositoryTest {
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns localProject
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.error(NetworkErrorException(""))
 
-        val project = projectRepository.loadAndRefreshCache(DEFAULT_PROJECT_ID)
+        val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
 
         assertThat(project).isEqualTo(localProject)
         coVerify(exactly = 0) { projectLocalDataSourceMock.save(remoteProject) }
@@ -67,7 +67,7 @@ class ProjectRepositoryTest {
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns null
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.just(remoteProject)
 
-        val project = projectRepository.loadAndRefreshCache(DEFAULT_PROJECT_ID)
+        val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
 
         assertThat(project).isEqualTo(remoteProject)
         coVerify { projectLocalDataSourceMock.save(remoteProject) }
@@ -81,7 +81,7 @@ class ProjectRepositoryTest {
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns null
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.error(NetworkErrorException(""))
 
-        val project = projectRepository.loadAndRefreshCache(DEFAULT_PROJECT_ID)
+        val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
 
         assertThat(project).isNull()
         coVerify(exactly = 0) { projectLocalDataSourceMock.save(remoteProject) }
