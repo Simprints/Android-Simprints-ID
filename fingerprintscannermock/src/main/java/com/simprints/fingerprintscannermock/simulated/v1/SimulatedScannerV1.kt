@@ -17,4 +17,7 @@ class SimulatedScannerV1(simulatedScannerManager: SimulatedScannerManager,
         val response: ByteArray = responseHelper.createMockResponse(message)
         writeResponseToStream(response, returnStream)
     }
+
+    override fun disconnect() {
+    }
 }

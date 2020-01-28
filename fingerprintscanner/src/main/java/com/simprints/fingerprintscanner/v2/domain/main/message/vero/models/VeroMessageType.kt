@@ -1,5 +1,8 @@
 package com.simprints.fingerprintscanner.v2.domain.main.message.vero.models
 
+import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidMessageException
+import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
+
 enum class VeroMessageType(val majorByte: Byte, val minorByte: Byte) {
 
     // 0x1_ : Versioning
@@ -30,6 +33,7 @@ enum class VeroMessageType(val majorByte: Byte, val minorByte: Byte) {
     companion object {
         fun fromBytes(bytes: ByteArray) = values().find {
             it.majorByte == bytes[0] && it.minorByte == bytes[1]
-        } ?: TODO("exception handling")
+        }
+            ?: throw InvalidMessageException("Invalid VeroMessageType received with bytes: ${bytes.toHexString()}")
     }
 }

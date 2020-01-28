@@ -20,13 +20,20 @@ import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.commands.*
 import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprintscanner.v2.domain.root.responses.*
-import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
-import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
+import com.simprints.fingerprintscanner.v2.exceptions.state.IllegalUn20StateException
+import com.simprints.fingerprintscanner.v2.exceptions.state.IncorrectModeException
+import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedException
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.handleErrorsWith
+import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
+import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import io.reactivex.Completable
-import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
@@ -34,15 +41,19 @@ import io.reactivex.rxkotlin.subscribeBy
 import java.io.InputStream
 import java.io.OutputStream
 
+@Suppress("unused")
 class Scanner(
-    private val mainMessageStream: MainMessageStream,
-    private val rootMessageStream: RootMessageStream
+    private val mainMessageChannel: MainMessageChannel,
+    private val rootMessageChannel: RootMessageChannel,
+    private val stmOtaMessageChannel: StmOtaMessageChannel,
+    private val stmOtaController: StmOtaController,
+    private val responseErrorHandler: ResponseErrorHandler
 ) {
 
     private lateinit var inputStream: InputStream
     private lateinit var outputStream: OutputStream
 
-    val state = disconnectedScannerState()
+    var state = disconnectedScannerState()
 
     val triggerButtonListeners = mutableSetOf<Observer<Unit>>()
 
@@ -54,77 +65,68 @@ class Scanner(
         state.connected = true
         state.mode = ROOT
 
-        rootMessageStream.connect(inputStream, outputStream)
+        rootMessageChannel.connect(inputStream, outputStream)
     }
 
     fun disconnect(): Completable = completable {
         when (state.mode) {
-            ROOT -> rootMessageStream.disconnect()
+            ROOT -> rootMessageChannel.disconnect()
             MAIN -> {
-                mainMessageStream.disconnect()
+                mainMessageChannel.disconnect()
                 scannerTriggerListenerDisposable?.dispose()
             }
             CYPRESS_OTA -> TODO()
-            STM_OTA -> TODO()
+            STM_OTA -> stmOtaMessageChannel.disconnect()
             null -> {/* Do nothing */
             }
         }
-        resetStateToDisconnected()
+        state = disconnectedScannerState()
     }
 
-    private fun resetStateToDisconnected() {
-        with(state) {
-            disconnectedScannerState().let {
-                connected = it.connected
-                mode = it.mode
-                un20On = it.un20On
-                triggerButtonActive = it.triggerButtonActive
-                smileLedState = it.smileLedState
-                batteryPercentCharge = it.batteryPercentCharge
-            }
+    private fun assertConnected() = Completable.fromAction {
+        if (state.connected != true) {
+            throw NotConnectedException("Attempting to access functionality before calling Scanner::connect()")
         }
     }
 
     private fun assertMode(mode: Mode) = Completable.fromAction {
         if (state.mode != mode) {
-            TODO("exception handling - Currently in incorrect mode")
+            throw IncorrectModeException("Attempting to access $mode functionality when current mode is ${state.mode}")
         }
     }
 
     private fun assertUn20On() = Completable.fromAction {
         if (state.un20On != true) {
-            TODO("exception handling")
+            throw IllegalUn20StateException("Attempting to access UN20 functionality when UN20 is off")
         }
     }
 
     private inline fun <reified R : RootResponse> sendRootModeCommandAndReceiveResponse(command: RootCommand): Single<R> =
-        Single.defer {
-            rootMessageStream.outgoing.sendMessage(command)
-                .andThen(rootMessageStream.incoming.receiveResponse<R>())
-        }
+        rootMessageChannel.outgoing.sendMessage(command)
+            .andThen(rootMessageChannel.incoming.receiveResponse<R>())
+            .handleErrorsWith(responseErrorHandler)
 
     private inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
-        Single.defer {
-            mainMessageStream.outgoing.sendMessage(command)
-                .andThen(mainMessageStream.incoming.receiveResponse<R>())
-        }
+        mainMessageChannel.outgoing.sendMessage(command)
+            .andThen(mainMessageChannel.incoming.receiveResponse<R>())
+            .handleErrorsWith(responseErrorHandler)
 
     fun getVersionInformation(): Single<UnifiedVersionInformation> =
-        assertMode(ROOT).andThen(
+        assertConnected().andThen(assertMode(ROOT)).andThen(
             sendRootModeCommandAndReceiveResponse<GetVersionResponse>(
                 GetVersionCommand()
             ))
             .map { it.version }
 
     fun setVersionInformation(versionInformation: UnifiedVersionInformation): Completable =
-        assertMode(ROOT).andThen(
+        assertConnected().andThen(assertMode(ROOT)).andThen(
             sendRootModeCommandAndReceiveResponse<SetVersionResponse>(
                 SetVersionCommand(versionInformation)
             ))
             .completeOnceReceived()
 
     fun enterMainMode(): Completable =
-        assertMode(ROOT).andThen(
+        assertConnected().andThen(assertMode(ROOT)).andThen(
             sendRootModeCommandAndReceiveResponse<EnterMainModeResponse>(
                 EnterMainModeCommand()
             ))
@@ -132,7 +134,7 @@ class Scanner(
             .andThen(handleMainModeEntered())
 
     fun enterCypressOtaMode(): Completable =
-        assertMode(ROOT).andThen(
+        assertConnected().andThen(assertMode(ROOT)).andThen(
             sendRootModeCommandAndReceiveResponse<EnterCypressOtaModeResponse>(
                 EnterCypressOtaModeCommand()
             ))
@@ -140,65 +142,75 @@ class Scanner(
             .doOnComplete { state.mode = CYPRESS_OTA } // TODO : handle Cypress OTA mode entered
 
     fun enterStmOtaMode(): Completable =
-        assertMode(ROOT).andThen(
+        assertConnected().andThen(assertMode(ROOT)).andThen(
             sendRootModeCommandAndReceiveResponse<EnterStmOtaModeResponse>(
                 EnterStmOtaModeCommand()
             ))
             .completeOnceReceived()
-            .doOnComplete { state.mode = STM_OTA } // TODO : handle STM OTA mode entered
+            .andThen(handleStmOtaModeEntered())
 
     private fun handleMainModeEntered() = completable {
-        rootMessageStream.disconnect()
-        mainMessageStream.connect(inputStream, outputStream)
+        rootMessageChannel.disconnect()
+        mainMessageChannel.connect(inputStream, outputStream)
         state.triggerButtonActive = true
         state.mode = MAIN
         scannerTriggerListenerDisposable = subscribeTriggerButtonListeners()
     }
 
     private fun subscribeTriggerButtonListeners() =
-        mainMessageStream.incoming.veroEvents
-            .filterCast<TriggerButtonPressedEvent>()
-            .subscribeBy(onNext = {
+        mainMessageChannel.incoming.veroEvents
+            ?.filterCast<TriggerButtonPressedEvent>()
+            ?.subscribeBy(onNext = {
                 triggerButtonListeners.forEach { it.onNext(Unit) }
-            })
+            }, onError = { it.printStackTrace() })
+
+    private fun handleStmOtaModeEntered() = completable {
+        rootMessageChannel.disconnect()
+        stmOtaMessageChannel.connect(inputStream, outputStream)
+        state.mode = STM_OTA
+    }
 
     fun getStmFirmwareVersion(): Single<StmFirmwareVersion> =
-        assertMode(MAIN).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<GetStmFirmwareVersionResponse>(
-                GetStmFirmwareVersionCommand()))
+                GetStmFirmwareVersionCommand()
+            ))
             .map { it.stmFirmwareVersion }
 
     fun getUn20Status(): Single<Boolean> =
-        assertMode(MAIN).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<GetUn20OnResponse>(
-                GetUn20OnCommand()))
+                GetUn20OnCommand()
+            ))
             .map { it.value == DigitalValue.TRUE }
             .doOnSuccess { state.un20On = it }
 
     fun turnUn20OnAndAwaitStateChangeEvent(): Completable =
-        assertMode(MAIN).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<SetUn20OnResponse>(
                 SetUn20OnCommand(DigitalValue.TRUE)
             ))
             .completeOnceReceived()
-            .andThen(Flowable.defer { mainMessageStream.incoming.veroEvents })
-            .filterCast<Un20StateChangeEvent> { it.value == DigitalValue.TRUE }
+            .andThen(mainMessageChannel.incoming.receiveResponse<Un20StateChangeEvent>(
+                withPredicate = { it.value == DigitalValue.TRUE }
+            ))
             .completeOnceReceived()
             .doOnComplete { state.un20On = true }
 
     fun turnUn20OffAndAwaitStateChangeEvent(): Completable =
-        assertMode(MAIN).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<SetUn20OnResponse>(
                 SetUn20OnCommand(DigitalValue.FALSE)
             ))
             .completeOnceReceived()
-            .andThen(Flowable.defer { mainMessageStream.incoming.veroEvents })
-            .filterCast<Un20StateChangeEvent> { it.value == DigitalValue.FALSE }
+            .andThen(mainMessageChannel.incoming.receiveResponse<Un20StateChangeEvent>(
+                withPredicate = { it.value == DigitalValue.FALSE }
+            ))
             .completeOnceReceived()
             .doOnComplete { state.un20On = false }
 
     fun getTriggerButtonStatus(): Single<Boolean> =
-        assertMode(MAIN).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<GetTriggerButtonActiveResponse>(
                 GetTriggerButtonActiveCommand()
             ))
@@ -206,7 +218,7 @@ class Scanner(
             .doOnSuccess { state.triggerButtonActive = it }
 
     fun activateTriggerButton(): Completable =
-        assertMode(MAIN).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<SetTriggerButtonActiveResponse>(
                 SetTriggerButtonActiveCommand(DigitalValue.TRUE)
             ))
@@ -214,7 +226,7 @@ class Scanner(
             .doOnComplete { state.triggerButtonActive = true }
 
     fun deactivateTriggerButton(): Completable =
-        assertMode(MAIN).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<SetTriggerButtonActiveResponse>(
                 SetTriggerButtonActiveCommand(DigitalValue.FALSE)
             ))
@@ -222,7 +234,7 @@ class Scanner(
             .doOnComplete { state.triggerButtonActive = false }
 
     fun getSmileLedState(): Single<SmileLedState> =
-        assertMode(MAIN).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<GetSmileLedStateResponse>(
                 GetSmileLedStateCommand()
             ))
@@ -230,21 +242,21 @@ class Scanner(
             .doOnSuccess { state.smileLedState = it }
 
     fun getPowerLedState(): Single<LedState> =
-        assertMode(MAIN).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<GetPowerLedStateResponse>(
                 GetPowerLedStateCommand()
             ))
             .map { it.ledState }
 
     fun getBluetoothLedState(): Single<LedState> =
-        assertMode(MAIN).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<GetBluetoothLedStateResponse>(
                 GetBluetoothLedStateCommand()
             ))
             .map { it.ledState }
 
     fun setSmileLedState(smileLedState: SmileLedState): Completable =
-        assertMode(MAIN).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<SetSmileLedStateResponse>(
                 SetSmileLedStateCommand(smileLedState)
             ))
@@ -252,7 +264,7 @@ class Scanner(
             .doOnComplete { state.smileLedState = smileLedState }
 
     fun getBatteryPercentCharge(): Single<Int> =
-        assertMode(MAIN).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<GetBatteryPercentChargeResponse>(
                 GetBatteryPercentChargeCommand()
             ))
@@ -260,53 +272,57 @@ class Scanner(
             .doOnSuccess { state.batteryPercentCharge = it }
 
     fun getUn20AppVersion(): Single<Un20AppVersion> =
-        assertMode(MAIN).andThen(assertUn20On()).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetUn20AppVersionResponse>(
                 GetUn20AppVersionCommand()
             ))
             .map { it.un20AppVersion }
 
     fun captureFingerprint(dpi: Dpi = DEFAULT_DPI): Single<CaptureFingerprintResult> =
-        assertMode(MAIN).andThen(assertUn20On()).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<CaptureFingerprintResponse>(
                 CaptureFingerprintCommand(dpi)
             ))
             .map { it.captureFingerprintResult }
 
     fun getSupportedTemplateTypes(): Single<Set<TemplateType>> =
-        assertMode(MAIN).andThen(assertUn20On()).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetSupportedTemplateTypesResponse>(
                 GetSupportedTemplateTypesCommand()
             ))
             .map { it.supportedTemplateTypes }
 
     fun acquireTemplate(templateType: TemplateType = DEFAULT_TEMPLATE_TYPE): Single<TemplateData> =
-        assertMode(MAIN).andThen(assertUn20On()).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetTemplateResponse>(
                 GetTemplateCommand(templateType)
             ))
             .map { it.templateData }
 
     fun getSupportedImageFormats(): Single<Set<ImageFormat>> =
-        assertMode(MAIN).andThen(assertUn20On()).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetSupportedImageFormatsResponse>(
                 GetSupportedImageFormatsCommand()
             ))
             .map { it.supportedImageFormats }
 
     fun acquireImage(imageFormat: ImageFormat = DEFAULT_IMAGE_FORMAT): Single<ImageData> =
-        assertMode(MAIN).andThen(assertUn20On()).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetImageResponse>(
                 GetImageCommand(imageFormat)
             ))
             .map { it.imageData }
 
     fun getImageQualityScore(): Single<Int> =
-        assertMode(MAIN).andThen(assertUn20On()).andThen(
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetImageQualityResponse>(
                 GetImageQualityCommand()
             ))
             .map { it.imageQualityScore }
+
+    fun startStmOta(firmwareHexFile: String): Observable<Float> =
+        assertConnected().andThen(assertMode(STM_OTA)).andThen(
+            stmOtaController.program(stmOtaMessageChannel, responseErrorHandler, firmwareHexFile))
 
     companion object {
         val DEFAULT_DPI = Dpi(500)

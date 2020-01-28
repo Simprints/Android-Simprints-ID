@@ -31,7 +31,10 @@ class SimulatedUn20ResponseHelper(private val simulatedScannerManager: Simulated
             )
                 .also { simulatedScannerManager.cycleToNextFinger() })
             is GetSupportedImageFormatsCommand -> GetSupportedImageFormatsResponse(setOf(ImageFormat.RAW))
-            is GetImageCommand -> GetImageResponse(ImageData(command.imageFormat, Random.nextBytes(120000), Random.nextBytes(2))) // TODO
+            is GetImageCommand -> GetImageResponse(ImageData(
+                command.imageFormat,
+                Random.nextBytes((120000 * (((simulatedScannerV2.scannerState.lastFingerCapturedDpi.value / 100) * 100) / 500f)).toInt()),
+                Random.nextBytes(2)))
             is GetImageQualityCommand -> GetImageQualityResponse(simulatedScannerManager.currentMockFinger().toV2().imageQuality)
             else -> throw UnsupportedOperationException("Unmocked response to $command in SimulatedUn20ResponseHelper")
         }

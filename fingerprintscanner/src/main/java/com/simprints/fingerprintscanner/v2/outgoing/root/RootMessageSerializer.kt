@@ -2,10 +2,11 @@ package com.simprints.fingerprintscanner.v2.outgoing.root
 
 import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
 import com.simprints.fingerprintscanner.v2.domain.root.RootMessageProtocol
+import com.simprints.fingerprintscanner.v2.outgoing.common.MessageSerializer
 import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 
-class RootMessageSerializer {
+class RootMessageSerializer : MessageSerializer<RootCommand> {
 
-    fun serialize(message: RootCommand): List<ByteArray> =
+    override fun serialize(message: RootCommand): List<ByteArray> =
         message.getBytes().chunked(RootMessageProtocol.MAX_PAYLOAD_SIZE)
 }

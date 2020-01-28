@@ -5,7 +5,7 @@ import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV2
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
-import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
+import com.simprints.fingerprintscanner.v2.domain.main.packet.Route
 import com.simprints.fingerprintscanner.v2.incoming.main.MainMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.Un20ResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroEventAccumulator
@@ -19,14 +19,22 @@ import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketRouter
 import com.simprints.fingerprintscanner.v2.incoming.root.RootMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.root.RootResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.root.RootResponseParser
+import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
+import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaResponseParser
+import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
+import com.simprints.fingerprintscanner.v2.outgoing.common.OutputStreamDispatcher
 import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
-import com.simprints.fingerprintscanner.v2.outgoing.main.message.MainMessageSerializer
-import com.simprints.fingerprintscanner.v2.outgoing.main.packet.PacketDispatcher
-import com.simprints.fingerprintscanner.v2.outgoing.main.packet.PacketSerializer
+import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageSerializer
-import com.simprints.fingerprintscanner.v2.stream.MainMessageStream
-import com.simprints.fingerprintscanner.v2.stream.RootMessageStream
+import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageOutputStream
+import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageSerializer
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
+import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
+import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
+import com.simprints.fingerprintscanner.v2.tools.hexparser.IntelHexParser
 import com.simprints.fingerprintscanner.v2.tools.lang.objects
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
@@ -47,10 +55,10 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
     fun createScannerV2(macAddress: String): ScannerWrapper =
         ScannerWrapperV2(
             ScannerV2(
-                MainMessageStream(
+                MainMessageChannel(
                     MainMessageInputStream(
                         PacketRouter(
-                            Channel.Remote::class.objects(),
+                            Route.Remote::class.objects(),
                             { source },
                             ByteArrayToPacketAccumulator(PacketParser())
                         ),
@@ -59,18 +67,30 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                         Un20ResponseAccumulator(Un20ResponseParser())
                     ),
                     MainMessageOutputStream(
-                        MainMessageSerializer(PacketParser()),
-                        PacketDispatcher(PacketSerializer())
+                        MainMessageSerializer(),
+                        OutputStreamDispatcher()
                     )
                 ),
-                RootMessageStream(
+                RootMessageChannel(
                     RootMessageInputStream(
                         RootResponseAccumulator(RootResponseParser())
                     ),
                     RootMessageOutputStream(
-                        RootMessageSerializer()
+                        RootMessageSerializer(),
+                        OutputStreamDispatcher()
                     )
-                )
+                ),
+                StmOtaMessageChannel(
+                    StmOtaMessageInputStream(
+                        StmOtaResponseParser()
+                    ),
+                    StmOtaMessageOutputStream(
+                        StmOtaMessageSerializer(),
+                        OutputStreamDispatcher()
+                    )
+                ),
+                StmOtaController(IntelHexParser()),
+                ResponseErrorHandler(ResponseErrorHandlingStrategy.Default)
             ),
             scannerUiHelper,
             macAddress,

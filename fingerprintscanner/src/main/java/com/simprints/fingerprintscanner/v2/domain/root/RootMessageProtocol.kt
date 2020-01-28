@@ -14,7 +14,7 @@ object RootMessageProtocol : Protocol {
     const val HEADER_SIZE: Int = 4
     val HEADER_INDICES: IntRange = 0..3
     val LENGTH_INDICES_IN_HEADER: IntRange = 2..3
-    val MESSAGE_TYPE_INDEX_IN_HEADER: Int = 1
+    const val MESSAGE_TYPE_INDEX_IN_HEADER: Int = 1
 
     const val START_BYTE = 0xF4.toByte()
 

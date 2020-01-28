@@ -50,7 +50,7 @@ class SimulatedScannerV2(simulatedScannerManager: SimulatedScannerManager,
             val bytes = simulatedResponseOutputStream.serialize(response)
             bytes.forEach { writeResponseToStream(it, returnStream) }
             resolveEventQueue()
-        })
+        }, onError = { it.printStackTrace() })
     }
 
     private fun resolveEventQueue() {
@@ -68,5 +68,9 @@ class SimulatedScannerV2(simulatedScannerManager: SimulatedScannerManager,
         val event = TriggerButtonPressedEvent()
         val bytes = simulatedResponseOutputStream.serialize(event)
         bytes.forEach { writeResponseToStream(it, returnStream) }
+    }
+
+    override fun disconnect() {
+        simulatedCommandInputStream.disconnect()
     }
 }

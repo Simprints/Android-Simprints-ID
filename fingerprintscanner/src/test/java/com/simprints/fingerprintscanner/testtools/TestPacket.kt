@@ -1,7 +1,7 @@
 package com.simprints.fingerprintscanner.testtools
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprintscanner.v2.domain.main.packet.Channel
+import com.simprints.fingerprintscanner.v2.domain.main.packet.Route
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprintscanner.v2.domain.main.packet.PacketProtocol
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketParser
@@ -13,22 +13,22 @@ fun hollowPacketWithRawBytes(bytes: ByteArray) =
 fun hollowPacketWithPayload(payload: ByteArray) =
     Packet(byteArrayOf(), byteArrayOf(), payload, 0x00, 0x00, 0x00)
 
-fun packetWithSourceAndPayload(source: Channel, payload: ByteArray) =
+fun packetWithSourceAndPayload(source: Route, payload: ByteArray) =
     PacketProtocol
-        .buildPacketBytes(source, Channel.Local.AndroidDevice, payload).let {
+        .buildPacketBytes(source, Route.Local.AndroidDevice, payload).let {
             PacketParser().parse(it)
         }
 
-fun randomPacketWithSource(source: Channel): Packet =
+fun randomPacketWithSource(source: Route): Packet =
     PacketProtocol
-        .buildPacketBytes(source, Channel.Local.AndroidDevice, randomPayload()).let {
+        .buildPacketBytes(source, Route.Local.AndroidDevice, randomPayload()).let {
             PacketParser().parse(it)
         }
 
 fun randomHollowPacketWithRawBytes(maxSize: Int = 20) =
     hollowPacketWithRawBytes(Random.nextBytes(Random.nextInt(1, maxSize)))
 
-fun randomPacketsWithSource(source: Channel, maxSize: Int = 20): List<Packet> =
+fun randomPacketsWithSource(source: Route, maxSize: Int = 20): List<Packet> =
     List(Random.nextInt(1, maxSize)) { randomPacketWithSource(source) }
 
 fun randomPayload(maxSize: Int = 20) = Random.nextBytes(Random.nextInt(maxSize))

@@ -2,7 +2,9 @@ package com.simprints.fingerprintscanner.v2.incoming.main.packet
 
 import com.simprints.fingerprintscanner.testtools.assertPacketsEqual
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Packet
+import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidPacketException
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
+import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class PacketParserTest {
@@ -23,5 +25,14 @@ class PacketParserTest {
         val actualPacket = packetParser.parse(rawBytes)
 
         assertPacketsEqual(expectedPacket, actualPacket)
+    }
+
+    @Test
+    fun parsePacket_givenPacketTooShortForHeader_throwsException() {
+        val packetParser = PacketParser()
+
+        val rawBytes = "10 A0 08".hexToByteArray()
+
+        assertThrows<InvalidPacketException> { packetParser.parse(rawBytes) }
     }
 }

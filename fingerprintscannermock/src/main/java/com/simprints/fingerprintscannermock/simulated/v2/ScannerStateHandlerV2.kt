@@ -3,6 +3,7 @@ package com.simprints.fingerprintscannermock.simulated.v2
 import com.simprints.fingerprintscanner.v2.domain.Mode
 import com.simprints.fingerprintscanner.v2.domain.OutgoingMessage
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Command
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.commands.CaptureFingerprintCommand
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroCommand
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.SetSmileLedStateCommand
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.SetTriggerButtonActiveCommand
@@ -59,7 +60,11 @@ fun SimulatedScannerStateV2.updateStateAccordingToOutgoingMessage(command: Outgo
             }
         }
         is Un20Command -> {
-            /* do nothing */
+            when (command) {
+                is CaptureFingerprintCommand -> {
+                    lastFingerCapturedDpi = command.dpi
+                }
+            }
         }
         else -> {
             /* do nothing */
