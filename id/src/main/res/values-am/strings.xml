@@ -12,10 +12,10 @@
     <string name="confirmation_logout_title">መውጣት</string>
     <string name="dashboard_card_available_on_phone">ከስልከዎ ላይ ይገኛል</string>
     <string name="dashboard_card_calculating">በማስላት ላይ</string>
-    <string name="dashboard_card_currentuser_title">አሁን ያለ ተጠቃሚ</string>
+    <string name="dashboard_card_current_user">አሁን ያለ ተጠቃሚ: %1$s</string>
     <string name="dashboard_card_enrolment_info">የምዝገባ መረጃ</string>
     <string name="dashboard_card_identification_title">የመጨረሻው መለያ</string>
-    <string name="dashboard_card_lastscanner_title">እስካነር ይጠቀሙ</string>
+    <string name="dashboard_card_scanner_used">እስካነር ይጠቀሙ: %1$s</string>
     <string name="dashboard_card_enrol_title">"የመጨረሻ ምዝገባ "</string>
     <string name="dashboard_card_sync_now">አሁን ግንኙነት ፍጠር</string>
     <string name="dashboard_card_syncing">በግንኙነት ላይ</string>
