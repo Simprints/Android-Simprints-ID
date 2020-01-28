@@ -16,10 +16,6 @@ import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.activity_dashboard_card_project_details.*
@@ -31,15 +27,11 @@ import javax.inject.Inject
 class DashboardActivity : AppCompatActivity() {
 
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
-    @Inject lateinit var projectRepository: ProjectRepository
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var projectDetailsCardDisplayer: DashboardProjectDetailsCardDisplayer
     @Inject lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
-    @Inject lateinit var peopleSyncManager: PeopleSyncManager
+    @Inject lateinit var viewModelFactory: DashboardViewModelFactory
 
     private lateinit var viewModel: DashboardViewModel
-    private lateinit var viewModelFactory: DashboardViewModelFactory
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -94,19 +86,15 @@ class DashboardActivity : AppCompatActivity() {
         setMenuItemClickListener()
     }
 
-    private fun setupCards() {
-        projectDetailsCardDisplayer.initRoot(dashboard_project_details_card)
-        syncCardDisplayer.initRoot(dashboard_sync_card)
-    }
-
     private fun setupViewModel() {
-        viewModelFactory = DashboardViewModelFactory(
-            projectRepository, loginInfoManager, preferencesManager, peopleSyncManager
-        )
-
         viewModel = ViewModelProvider(this, viewModelFactory).get(
             DashboardViewModel::class.java
         )
+    }
+
+    private fun setupCards() {
+        projectDetailsCardDisplayer.initRoot(dashboard_project_details_card)
+        syncCardDisplayer.initRoot(dashboard_sync_card)
     }
 
     private fun observeForProjectDetails() {
