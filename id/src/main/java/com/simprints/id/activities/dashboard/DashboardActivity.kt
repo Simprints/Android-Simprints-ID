@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.activity_dashboard_card_project_details.*
 import javax.inject.Inject
 
-class DashboardActivity : AppCompatActivity() {
+class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
 
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var projectDetailsCardDisplayer: DashboardProjectDetailsCardDisplayer
@@ -37,7 +37,6 @@ class DashboardActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_dashboard)
         val component = (application as Application).component
         component.inject(this)
         title = androidResourcesHelper.getString(R.string.dashboard_label)
