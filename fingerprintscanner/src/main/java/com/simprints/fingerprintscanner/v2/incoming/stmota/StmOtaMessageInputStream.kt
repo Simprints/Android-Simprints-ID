@@ -17,14 +17,14 @@ class StmOtaMessageInputStream(private val stmOtaResponseParser: StmOtaResponseP
     private lateinit var stmOtaResponseStreamDisposable: Disposable
 
     override fun connect(inputStream: InputStream) {
-        stmOtaResponseStream = transformToRootResponseStream(inputStream)
+        stmOtaResponseStream = transformToStmOtaResponseStream(inputStream)
             .subscribeAndPublish()
             .also {
                 stmOtaResponseStreamDisposable = it.connect()
             }
     }
 
-    private fun transformToRootResponseStream(inputStream: InputStream) =
+    private fun transformToStmOtaResponseStream(inputStream: InputStream) =
         inputStream
             .toFlowable()
             .map { stmOtaResponseParser.parse(it) }

@@ -1,5 +1,9 @@
 package com.simprints.fingerprintscanner.v2.scanner
 
+import com.simprints.fingerprintscanner.v2.channel.CypressOtaMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.domain.Mode
 import com.simprints.fingerprintscanner.v2.domain.Mode.*
 import com.simprints.fingerprintscanner.v2.domain.main.message.IncomingMainMessage
@@ -25,10 +29,8 @@ import com.simprints.fingerprintscanner.v2.exceptions.state.IncorrectModeExcepti
 import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedException
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.handleErrorsWith
+import com.simprints.fingerprintscanner.v2.scanner.ota.cypress.CypressOtaController
 import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
-import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
-import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
-import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
@@ -45,7 +47,9 @@ import java.io.OutputStream
 class Scanner(
     private val mainMessageChannel: MainMessageChannel,
     private val rootMessageChannel: RootMessageChannel,
+    private val cypressOtaMessageChannel: CypressOtaMessageChannel,
     private val stmOtaMessageChannel: StmOtaMessageChannel,
+    private val cypressOtaController: CypressOtaController,
     private val stmOtaController: StmOtaController,
     private val responseErrorHandler: ResponseErrorHandler
 ) {
@@ -139,7 +143,7 @@ class Scanner(
                 EnterCypressOtaModeCommand()
             ))
             .completeOnceReceived()
-            .doOnComplete { state.mode = CYPRESS_OTA } // TODO : handle Cypress OTA mode entered
+            .andThen(handleCypressOtaModeEntered())
 
     fun enterStmOtaMode(): Completable =
         assertConnected().andThen(assertMode(ROOT)).andThen(
@@ -163,6 +167,12 @@ class Scanner(
             ?.subscribeBy(onNext = {
                 triggerButtonListeners.forEach { it.onNext(Unit) }
             }, onError = { it.printStackTrace() })
+
+    private fun handleCypressOtaModeEntered() = completable {
+        rootMessageChannel.disconnect()
+        cypressOtaMessageChannel.connect(inputStream, outputStream)
+        state.mode = CYPRESS_OTA
+    }
 
     private fun handleStmOtaModeEntered() = completable {
         rootMessageChannel.disconnect()
@@ -319,6 +329,10 @@ class Scanner(
                 GetImageQualityCommand()
             ))
             .map { it.imageQualityScore }
+
+    fun startCypressOta(firmwareBinFile: ByteArray): Observable<Float> =
+        assertConnected().andThen(assertMode(CYPRESS_OTA)).andThen(
+            cypressOtaController.program(cypressOtaMessageChannel, responseErrorHandler, firmwareBinFile))
 
     fun startStmOta(firmwareHexFile: String): Observable<Float> =
         assertConnected().andThen(assertMode(STM_OTA)).andThen(
