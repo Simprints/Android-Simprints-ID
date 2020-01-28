@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
+import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncConnecting
@@ -19,36 +20,28 @@ import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.tools.AndroidResourcesHelper
-import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.device.DeviceManager
 import kotlinx.android.synthetic.main.activity_dashboard.*
+import kotlinx.android.synthetic.main.activity_dashboard_card_project_details.*
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-class DashboardActivity : AppCompatActivity() {
+class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
 
     private var syncAgainTicker: ReceiveChannel<Unit>? = null
 
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var projectDetailsCardDisplayer: DashboardProjectDetailsCardDisplayer
     @Inject lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
+    @Inject lateinit var viewModelFactory: DashboardViewModelFactory
     @Inject lateinit var peopleSyncManager: PeopleSyncManager
-    @Inject lateinit var deviceManager: DeviceManager
-    @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository
-    @Inject lateinit var peopleSyncCache: PeopleSyncCache
-    @Inject lateinit var timeHelper: TimeHelper
 
     private lateinit var viewModel: DashboardViewModel
-    private lateinit var viewModelFactory: DashboardViewModelFactory
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -58,15 +51,74 @@ class DashboardActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_dashboard)
         val component = (application as Application).component
         component.inject(this)
         title = androidResourcesHelper.getString(R.string.dashboard_label)
-        viewModelFactory = DashboardViewModelFactory(peopleSyncManager, deviceManager, preferencesManager, peopleDownSyncScopeRepository, peopleSyncCache, timeHelper)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(DashboardViewModel::class.java)
-        setupActionBar()
 
+        setupActionBar()
+        setupViewModel()
+        setupCards()
+
+        observeForProjectDetails()
         observeForSyncCardState()
+    }
+
+    private fun setupActionBar() {
+        dashboardToolbar.title = androidResourcesHelper.getString(R.string.dashboard_label)
+        setSupportActionBar(dashboardToolbar)
+        supportActionBar?.elevation = 4F
+
+        setMenuItemClickListener()
+    }
+
+    private fun setMenuItemClickListener() {
+        dashboardToolbar.setOnMenuItemClickListener { menuItem ->
+
+            when (menuItem.itemId) {
+                R.id.menuPrivacyNotice -> startActivity(
+                    Intent(
+                        this,
+                        PrivacyNoticeActivity::class.java
+                    )
+                )
+                R.id.menuSettings -> startActivityForResult(
+                    Intent(
+                        this,
+                        SettingsActivity::class.java
+                    ), SETTINGS_ACTIVITY_REQUEST_CODE
+                )
+                R.id.debug -> startActivity(Intent(this, DebugActivity::class.java))
+            }
+            true
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.app_menu, menu)
+
+        menu?.findItem(R.id.menuSettings)?.title =
+            androidResourcesHelper.getString(R.string.menu_settings)
+        menu?.findItem(R.id.menuPrivacyNotice)?.title =
+            androidResourcesHelper.getString(R.string.menu_privacy_notice)
+
+        return true
+    }
+
+    private fun setupViewModel() {
+        viewModel = ViewModelProvider(this, viewModelFactory).get(
+            DashboardViewModel::class.java
+        )
+    }
+
+    private fun setupCards() {
+        projectDetailsCardDisplayer.initRoot(dashboard_project_details_card)
+        syncCardDisplayer.initRoot(dashboard_sync_card)
+    }
+
+    private fun observeForProjectDetails() {
+        viewModel.getProjectDetails().observe(this@DashboardActivity, Observer {
+            projectDetailsCardDisplayer.displayProjectDetails(it)
+        })
     }
 
     private fun observeForSyncCardState() {
@@ -87,6 +139,14 @@ class DashboardActivity : AppCompatActivity() {
             syncCardDisplayer.displayState(SyncConnecting(null, 0, null))
             peopleSyncManager.sync()
         })
+    }
+
+    private fun openSettings() {
+        startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS))
+    }
+
+    private fun openSelectModules() {
+        startActivity(Intent(this, ModuleSelectionActivity::class.java))
     }
 
     override fun onResume() {
@@ -117,46 +177,11 @@ class DashboardActivity : AppCompatActivity() {
         syncAgainTicker?.cancel()
     }
 
-    private fun openSettings() {
-        startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS))
-    }
-
-    private fun openSelectModules() {
-        startActivity(Intent(this, ModuleSelectionActivity::class.java))
-    }
-
-    private fun setupActionBar() {
-        dashboardToolbar.title = androidResourcesHelper.getString(R.string.dashboard_label)
-        setSupportActionBar(dashboardToolbar)
-        supportActionBar?.elevation = 4F
-
-        setMenuItemClickListener()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.app_menu, menu)
-
-        menu?.findItem(R.id.menuSettings)?.title = androidResourcesHelper.getString(R.string.menu_settings)
-        menu?.findItem(R.id.menuPrivacyNotice)?.title = androidResourcesHelper.getString(R.string.menu_privacy_notice)
-
-        return true
-    }
-
-    private fun setMenuItemClickListener() {
-        dashboardToolbar.setOnMenuItemClickListener { menuItem ->
-
-            when (menuItem.itemId) {
-                R.id.menuPrivacyNotice -> startActivity(Intent(this, PrivacyNoticeActivity::class.java))
-                R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
-                R.id.debug -> startActivity(Intent(this, DebugActivity::class.java))
-            }
-            true
-        }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(data)
+        val potentialAlertScreenResponse =
+            AlertActivityHelper.extractPotentialAlertScreenResponse(data)
+
         if (potentialAlertScreenResponse != null) {
             finish()
         }
@@ -165,6 +190,7 @@ class DashboardActivity : AppCompatActivity() {
             startCheckLoginActivityAndFinish()
         }
     }
+
 
     private fun startCheckLoginActivityAndFinish() {
         startActivity(Intent(this, RequestLoginActivity::class.java))

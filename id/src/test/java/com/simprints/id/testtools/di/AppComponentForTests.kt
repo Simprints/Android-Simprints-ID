@@ -22,7 +22,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class, DataModule::class, SyncModule::class])
+@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class, DataModule::class, SyncModule::class, DashboardActivityModule::class])
 interface AppComponentForTests : AppComponent {
     @Component.Builder
     interface Builder {
@@ -54,5 +54,6 @@ interface AppComponentForTests : AppComponent {
     fun inject(checkLoginFromIntentPresenterTest: CheckLoginFromIntentPresenterTest)
 
 
-    @ExperimentalCoroutinesApi fun inject(imageUpSyncWorkerTest: ImageUpSyncWorkerTest)
+    @ExperimentalCoroutinesApi
+    fun inject(imageUpSyncWorkerTest: ImageUpSyncWorkerTest)
 }
