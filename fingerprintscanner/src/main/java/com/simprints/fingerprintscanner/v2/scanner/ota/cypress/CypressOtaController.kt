@@ -1,7 +1,10 @@
 package com.simprints.fingerprintscanner.v2.scanner.ota.cypress
 
 import com.simprints.fingerprintscanner.v2.channel.CypressOtaMessageChannel
-import com.simprints.fingerprintscanner.v2.domain.cypressota.*
+import com.simprints.fingerprintscanner.v2.domain.cypressota.CypressOtaCommand
+import com.simprints.fingerprintscanner.v2.domain.cypressota.CypressOtaMessageProtocol
+import com.simprints.fingerprintscanner.v2.domain.cypressota.CypressOtaResponse
+import com.simprints.fingerprintscanner.v2.domain.cypressota.CypressOtaResponseType
 import com.simprints.fingerprintscanner.v2.domain.cypressota.commands.DownloadCommand
 import com.simprints.fingerprintscanner.v2.domain.cypressota.commands.PrepareDownloadCommand
 import com.simprints.fingerprintscanner.v2.domain.cypressota.commands.SendImageChunk
@@ -47,7 +50,7 @@ class CypressOtaController(private val crc32Computer: Crc32Computer) {
                     .andThen(Observable.just(progress))
             }
             .concatWith(
-                sendVerifyImageCommand(cypressOtaMessageChannel, errorHandler, crc32Computer.computeCrc32(firmwareBinFile, CYPRESS_CRC_32_TABLE))
+                sendVerifyImageCommand(cypressOtaMessageChannel, errorHandler, crc32Computer.computeCrc32(firmwareBinFile))
             )
 
     private fun sendPrepareDownloadCommand(cypressOtaMessageChannel: CypressOtaMessageChannel, errorHandler: ResponseErrorHandler): Completable =
@@ -72,8 +75,9 @@ class CypressOtaController(private val crc32Computer: Crc32Computer) {
 
     private fun createFirmwareChunks(firmwareBinFile: ByteArray): List<ByteArray> {
         // For some unknown reason, the first payload can only be 16 bytes
+        if (firmwareBinFile.size < 16) return listOf(firmwareBinFile)
         val firstPayload = firmwareBinFile.toList().subList(0, 16).toByteArray()
-        val rest = firmwareBinFile.toList().subList(0, 16).toByteArray()
+        val rest = firmwareBinFile.toList().subList(16, firmwareBinFile.size).toByteArray()
         return listOf(firstPayload) + rest.chunked(CypressOtaMessageProtocol.MAX_PAYLOAD_SIZE)
     }
 

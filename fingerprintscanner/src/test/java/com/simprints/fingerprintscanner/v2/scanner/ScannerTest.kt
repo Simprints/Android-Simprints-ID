@@ -2,6 +2,7 @@ package com.simprints.fingerprintscanner.v2.scanner
 
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.isA
+import com.simprints.fingerprintscanner.v2.channel.CypressOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
 import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
 import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
@@ -39,14 +40,17 @@ import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterStmOtaMode
 import com.simprints.fingerprintscanner.v2.exceptions.state.IllegalUn20StateException
 import com.simprints.fingerprintscanner.v2.exceptions.state.IncorrectModeException
 import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedException
+import com.simprints.fingerprintscanner.v2.incoming.cypressota.CypressOtaMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.main.MainMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.root.RootMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
+import com.simprints.fingerprintscanner.v2.outgoing.cypressota.CypressOtaMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageOutputStream
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
+import com.simprints.fingerprintscanner.v2.scanner.ota.cypress.CypressOtaController
 import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
 import com.simprints.testtools.common.syntax.*
@@ -133,6 +137,63 @@ class ScannerTest {
         scanner.enterMainMode().blockingAwait()
 
         assertThat(scanner.state.mode).isEqualTo(Mode.MAIN)
+    }
+
+    @Test
+    fun scanner_connectThenEnterCypressOtaMode_callsConnectOnCypressOtaMessageStreams() {
+
+        val mockMessageInputStream = setupMock<CypressOtaMessageInputStream> {
+            whenThis { cypressOtaResponseStream } thenReturn Flowable.empty()
+        }
+        val mockMessageOutputStream = mock<CypressOtaMessageOutputStream>()
+        val mockInputStream = mock<InputStream>()
+        val mockOutputStream = mock<OutputStream>()
+
+        val scanner = Scanner(mock(), setupRootMessageChannelMock(), CypressOtaMessageChannel(mockMessageInputStream, mockMessageOutputStream), mock(), mock(), mock(), responseErrorHandler)
+        scanner.connect(mockInputStream, mockOutputStream).blockingAwait()
+
+        scanner.enterCypressOtaMode().blockingAwait()
+
+        verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
+        verifyOnce(mockMessageOutputStream) { connect(mockOutputStream) }
+    }
+
+    @Test
+    fun scanner_connectThenEnterCypressOtaMode_stateIsInCypressOtaMode() {
+        val mockMessageInputStream = setupMock<CypressOtaMessageInputStream> {
+            whenThis { cypressOtaResponseStream } thenReturn Flowable.empty()
+        }
+
+        val scanner = Scanner(mock(), setupRootMessageChannelMock(), CypressOtaMessageChannel(mockMessageInputStream, mock()), mock(), mock(), mock(), responseErrorHandler)
+        scanner.connect(mock(), mock()).blockingAwait()
+
+        scanner.enterCypressOtaMode().blockingAwait()
+
+        assertThat(scanner.state.mode).isEqualTo(Mode.CYPRESS_OTA)
+    }
+
+    @Test
+    fun scanner_connectThenEnterCypressOtaModeThenStartCypressOta_receivesProgressCorrectly() {
+        val progressValues = listOf(0.25f, 0.50f, 0.75f, 1.00f)
+
+        val mockCypressOtaController = setupMock<CypressOtaController> {
+            whenThis { program(anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn Observable.defer { progressValues.toObservable() }
+        }
+
+        val mockMessageInputStream = setupMock<CypressOtaMessageInputStream> {
+            whenThis { cypressOtaResponseStream } thenReturn Flowable.empty()
+        }
+
+        val scanner = Scanner(mock(), setupRootMessageChannelMock(), CypressOtaMessageChannel(mockMessageInputStream, mock()), mock(), mockCypressOtaController, mock(), responseErrorHandler)
+        scanner.connect(mock(), mock()).blockingAwait()
+        scanner.enterCypressOtaMode().blockingAwait()
+
+        val testObserver = scanner.startCypressOta(byteArrayOf()).testSubscribe()
+
+        testObserver.awaitAndAssertSuccess()
+
+        assertThat(testObserver.values()).containsExactlyElementsIn(progressValues).inOrder()
+        testObserver.assertComplete()
     }
 
     @Test
