@@ -114,7 +114,6 @@ class MainMessageInputStreamTest {
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
         testSubscriber.awaitCount(numberOfEvents)
-        testSubscriber.assertValueCount(numberOfEvents)
         testSubscriber.values().forEach { assertThat(it).isInstanceOf(expectedEvent::class.java) }
     }
 
@@ -209,7 +208,7 @@ class MainMessageInputStreamTest {
         veroResponseTestSubscriber.assertValue { expectedVeroResponse.value == it.value }
 
         veroEventTestSubscriber.awaitCount(numberOfEvents)
-        veroEventTestSubscriber.assertValueCount(numberOfEvents)
+        assertThat(veroEventTestSubscriber.values().size).isEqualTo(numberOfEvents)
         veroEventTestSubscriber.values().forEach { assertThat(it).isInstanceOf(expectedVeroEvent::class.java) }
 
         un20ResponseTestSubscriber.awaitAndAssertSuccess()

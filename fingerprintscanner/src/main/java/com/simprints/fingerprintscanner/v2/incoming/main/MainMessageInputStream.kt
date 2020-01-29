@@ -17,7 +17,6 @@ import com.simprints.fingerprintscanner.v2.tools.reactive.subscribeOnIoAndPublis
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import java.io.InputStream
 
 class MainMessageInputStream(

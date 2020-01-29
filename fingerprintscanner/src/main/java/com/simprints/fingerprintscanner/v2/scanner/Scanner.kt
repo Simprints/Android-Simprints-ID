@@ -200,11 +200,11 @@ class Scanner(
         assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<SetUn20OnResponse>(
                 SetUn20OnCommand(DigitalValue.TRUE)
-            ))
-            .completeOnceReceived()
-            .andThen(mainMessageChannel.incoming.receiveResponse<Un20StateChangeEvent>(
-                withPredicate = { it.value == DigitalValue.TRUE }
-            ))
+            ).completeOnceReceived()
+                .doSimultaneously(
+                    mainMessageChannel.incoming.receiveResponse<Un20StateChangeEvent>(
+                        withPredicate = { it.value == DigitalValue.TRUE }
+                    )))
             .completeOnceReceived()
             .doOnComplete { state.un20On = true }
 
@@ -212,11 +212,10 @@ class Scanner(
         assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<SetUn20OnResponse>(
                 SetUn20OnCommand(DigitalValue.FALSE)
-            ))
-            .completeOnceReceived()
-            .andThen(mainMessageChannel.incoming.receiveResponse<Un20StateChangeEvent>(
-                withPredicate = { it.value == DigitalValue.FALSE }
-            ))
+            ).completeOnceReceived()
+                .doSimultaneously(mainMessageChannel.incoming.receiveResponse<Un20StateChangeEvent>(
+                    withPredicate = { it.value == DigitalValue.FALSE }
+                )))
             .completeOnceReceived()
             .doOnComplete { state.un20On = false }
 
