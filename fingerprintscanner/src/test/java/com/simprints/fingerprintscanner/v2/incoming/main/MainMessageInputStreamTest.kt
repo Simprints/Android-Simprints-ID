@@ -23,7 +23,9 @@ import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Flowable
 import io.reactivex.rxkotlin.toFlowable
+import io.reactivex.schedulers.TestScheduler
 import org.junit.Test
+import java.util.concurrent.TimeUnit
 
 class MainMessageInputStreamTest {
 
@@ -35,12 +37,14 @@ class MainMessageInputStreamTest {
 
     @Test
     fun messageInputStream_receiveVeroResponse_correctlyForwardsResponse() {
+        val testScheduler = TestScheduler()
+
         val messageBytes = "20 10 01 00 FF".hexToByteArray()
         val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
         val expectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
 
         val routes = mapOf(
-            Route.Remote.VeroServer as Route to packets.toFlowable().publish(),
+            Route.Remote.VeroServer as Route to packets.toFlowable().observeOn(testScheduler).publish(),
             Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().publish(),
             Route.Remote.Un20Server as Route to Flowable.empty<Packet>().publish())
 
@@ -52,12 +56,16 @@ class MainMessageInputStreamTest {
 
         routes[Route.Remote.VeroServer]?.connect()
 
+        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+
         testSubscriber.awaitAndAssertSuccess()
         testSubscriber.assertValue { expectedResponse.value == it.value }
     }
 
     @Test
     fun messageInputStream_receiveUn20Response_correctlyForwardsResponse() {
+        val testScheduler = TestScheduler()
+
         val messageBytes = "30 00 01 00 00 00 10".hexToByteArray()
         val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.Un20Server, it) }
         val expectedResponse = GetSupportedTemplateTypesResponse(setOf(TemplateType.ISO_19794_2_2011))
@@ -65,7 +73,7 @@ class MainMessageInputStreamTest {
         val routes = mapOf(
             Route.Remote.VeroServer as Route to Flowable.empty<Packet>().publish(),
             Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().publish(),
-            Route.Remote.Un20Server as Route to packets.toFlowable().publish())
+            Route.Remote.Un20Server as Route to packets.toFlowable().observeOn(testScheduler).publish())
 
         whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
@@ -75,12 +83,16 @@ class MainMessageInputStreamTest {
 
         routes[Route.Remote.Un20Server]?.connect()
 
+        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+
         testSubscriber.awaitAndAssertSuccess()
         testSubscriber.assertValue { expectedResponse.supportedTemplateTypes == it.supportedTemplateTypes }
     }
 
     @Test
     fun messageInputStream_subscribeToVeroEvents_correctlyForwardsEvents() {
+        val testScheduler = TestScheduler()
+
         val numberOfEvents = 5
         val messageBytes = "3A 00 00 00".repeat(numberOfEvents).hexToByteArray()
         val packets = messageBytes.chunked(3).map { packetWithSourceAndPayload(Route.Remote.VeroEvent, it) }
@@ -88,7 +100,7 @@ class MainMessageInputStreamTest {
 
         val routes = mapOf(
             Route.Remote.VeroServer as Route to Flowable.empty<Packet>().publish(),
-            Route.Remote.VeroEvent as Route to packets.toFlowable().publish(),
+            Route.Remote.VeroEvent as Route to packets.toFlowable().observeOn(testScheduler).publish(),
             Route.Remote.Un20Server as Route to Flowable.empty<Packet>().publish())
 
         whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
@@ -99,6 +111,8 @@ class MainMessageInputStreamTest {
 
         routes[Route.Remote.VeroEvent]?.connect()
 
+        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+
         testSubscriber.awaitCount(numberOfEvents)
         testSubscriber.assertValueCount(numberOfEvents)
         testSubscriber.values().forEach { assertThat(it).isInstanceOf(expectedEvent::class.java) }
@@ -106,12 +120,14 @@ class MainMessageInputStreamTest {
 
     @Test
     fun messageInputStream_receiveMultipleOfSameResponses_forwardsOnlyFirstAsResponse() {
+        val testScheduler = TestScheduler()
+
         val messageBytes = "20 10 01 00 FF 20 10 01 00 00".hexToByteArray()
         val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
         val firstExpectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
 
         val routes = mapOf(
-            Route.Remote.VeroServer as Route to packets.toFlowable().publish(),
+            Route.Remote.VeroServer as Route to packets.toFlowable().observeOn(testScheduler).publish(),
             Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().publish(),
             Route.Remote.Un20Server as Route to Flowable.empty<Packet>().publish())
 
@@ -123,18 +139,22 @@ class MainMessageInputStreamTest {
 
         routes[Route.Remote.VeroServer]?.connect()
 
+        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+
         responseSubscriber.awaitAndAssertSuccess()
         responseSubscriber.assertValue { firstExpectedResponse.value == it.value }
     }
 
     @Test
     fun messageInputStream_receiveDifferentResponses_forwardsOnlyCorrectResponse() {
+        val testScheduler = TestScheduler()
+
         val messageBytes = "20 20 01 00 00 30 10 01 00 FF 20 10 01 00 FF".hexToByteArray()
         val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
         val expectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
 
         val routes = mapOf(
-            Route.Remote.VeroServer as Route to packets.toFlowable().publish(),
+            Route.Remote.VeroServer as Route to packets.toFlowable().observeOn(testScheduler).publish(),
             Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().publish(),
             Route.Remote.Un20Server as Route to Flowable.empty<Packet>().publish())
 
@@ -146,12 +166,16 @@ class MainMessageInputStreamTest {
 
         routes[Route.Remote.VeroServer]?.connect()
 
+        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+
         testSubscriber.awaitAndAssertSuccess()
         testSubscriber.assertValue { expectedResponse.value == it.value }
     }
 
     @Test
     fun messageInputStream_receiveResponsesAndEventsFromMultipleRoutesSimultaneously_correctlyForwardsResponsesAndEvents() {
+        val testScheduler = TestScheduler()
+
         val veroResponseBytes = "20 10 01 00 FF".hexToByteArray()
         val expectedVeroResponse = GetUn20OnResponse(DigitalValue.TRUE)
         val numberOfEvents = 5
@@ -165,9 +189,9 @@ class MainMessageInputStreamTest {
         val un20ResponsePackets = un20ResponseBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.Un20Server, it) }
 
         val routes = mapOf(
-            Route.Remote.VeroServer as Route to veroResponsePackets.toFlowable().publish(),
-            Route.Remote.VeroEvent as Route to veroEventPackets.toFlowable().publish(),
-            Route.Remote.Un20Server as Route to un20ResponsePackets.toFlowable().publish())
+            Route.Remote.VeroServer as Route to veroResponsePackets.toFlowable().observeOn(testScheduler).publish(),
+            Route.Remote.VeroEvent as Route to veroEventPackets.toFlowable().observeOn(testScheduler).publish(),
+            Route.Remote.Un20Server as Route to un20ResponsePackets.toFlowable().observeOn(testScheduler).publish())
 
         whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
@@ -178,6 +202,8 @@ class MainMessageInputStreamTest {
         val un20ResponseTestSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().test()
 
         routes.values.forEach { it.connect() }
+
+        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
         veroResponseTestSubscriber.awaitAndAssertSuccess()
         veroResponseTestSubscriber.assertValue { expectedVeroResponse.value == it.value }

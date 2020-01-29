@@ -33,6 +33,7 @@ import com.simprints.fingerprintscanner.v2.scanner.ota.cypress.CypressOtaControl
 import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
+import com.simprints.fingerprintscanner.v2.tools.reactive.doSimultaneously
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -107,12 +108,12 @@ class Scanner(
 
     private inline fun <reified R : RootResponse> sendRootModeCommandAndReceiveResponse(command: RootCommand): Single<R> =
         rootMessageChannel.outgoing.sendMessage(command)
-            .andThen(rootMessageChannel.incoming.receiveResponse<R>())
+            .doSimultaneously(rootMessageChannel.incoming.receiveResponse<R>())
             .handleErrorsWith(responseErrorHandler)
 
     private inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
         mainMessageChannel.outgoing.sendMessage(command)
-            .andThen(mainMessageChannel.incoming.receiveResponse<R>())
+            .doSimultaneously(mainMessageChannel.incoming.receiveResponse<R>())
             .handleErrorsWith(responseErrorHandler)
 
     fun getVersionInformation(): Single<UnifiedVersionInformation> =
