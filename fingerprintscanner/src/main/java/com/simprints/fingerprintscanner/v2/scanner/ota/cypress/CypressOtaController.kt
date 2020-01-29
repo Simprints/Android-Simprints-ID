@@ -15,6 +15,7 @@ import com.simprints.fingerprintscanner.v2.scanner.errorhandler.handleErrorsWith
 import com.simprints.fingerprintscanner.v2.tools.crc.Crc32Computer
 import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
+import com.simprints.fingerprintscanner.v2.tools.reactive.doSimultaneously
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -28,7 +29,7 @@ class CypressOtaController(private val crc32Computer: Crc32Computer) {
         command: CypressOtaCommand
     ): Single<R> =
         stmOtaMessageStream.outgoing.sendMessage(command)
-            .andThen(stmOtaMessageStream.incoming.receiveResponse<R>())
+            .doSimultaneously(stmOtaMessageStream.incoming.receiveResponse<R>())
             .handleErrorsWith(errorHandler)
 
     fun program(

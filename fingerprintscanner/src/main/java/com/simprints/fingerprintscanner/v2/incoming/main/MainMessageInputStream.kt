@@ -13,8 +13,11 @@ import com.simprints.fingerprintscanner.v2.incoming.main.message.toMainMessageSt
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketRouter
 import com.simprints.fingerprintscanner.v2.tools.lang.isSubclass
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
+import com.simprints.fingerprintscanner.v2.tools.reactive.subscribeOnIoAndPublish
 import io.reactivex.Flowable
 import io.reactivex.Single
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import java.io.InputStream
 
 class MainMessageInputStream(
@@ -28,16 +31,26 @@ class MainMessageInputStream(
     var veroEvents: Flowable<VeroEvent>? = null
     var un20Responses: Flowable<Un20Response>? = null
 
+    private var veroResponsesDisposable: Disposable? = null
+    private var veroEventsDisposable: Disposable? = null
+    private var un20ResponsesDisposable: Disposable? = null
+
     override fun connect(inputStream: InputStream) {
         packetRouter.connect(inputStream)
         with(packetRouter.incomingPacketRoutes) {
             veroResponses = getValue(Route.Remote.VeroServer).toMainMessageStream(veroResponseAccumulator)
+                .subscribeOnIoAndPublish().also { veroResponsesDisposable = it.connect() }
             veroEvents = getValue(Route.Remote.VeroEvent).toMainMessageStream(veroEventAccumulator)
+                .subscribeOnIoAndPublish().also { veroEventsDisposable = it.connect() }
             un20Responses = getValue(Route.Remote.Un20Server).toMainMessageStream(un20ResponseAccumulator)
+                .subscribeOnIoAndPublish().also { un20ResponsesDisposable = it.connect() }
         }
     }
 
     override fun disconnect() {
+        veroResponsesDisposable?.dispose()
+        veroEventsDisposable?.dispose()
+        un20ResponsesDisposable?.dispose()
         packetRouter.disconnect()
     }
 

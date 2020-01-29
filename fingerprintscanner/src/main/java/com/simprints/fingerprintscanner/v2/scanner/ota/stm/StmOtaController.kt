@@ -14,6 +14,7 @@ import com.simprints.fingerprintscanner.v2.scanner.errorhandler.handleErrorsWith
 import com.simprints.fingerprintscanner.v2.tools.hexparser.FirmwareByteChunk
 import com.simprints.fingerprintscanner.v2.tools.hexparser.IntelHexParser
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
+import com.simprints.fingerprintscanner.v2.tools.reactive.doSimultaneously
 import com.simprints.fingerprintscanner.v2.tools.reactive.single
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -27,7 +28,7 @@ class StmOtaController(private val intelHexParser: IntelHexParser) {
         command: StmOtaCommand
     ): Single<R> =
         stmOtaMessageChannel.outgoing.sendMessage(command)
-            .andThen(stmOtaMessageChannel.incoming.receiveResponse<R>())
+            .doSimultaneously(stmOtaMessageChannel.incoming.receiveResponse<R>())
             .handleErrorsWith(errorHandler)
 
     /**
