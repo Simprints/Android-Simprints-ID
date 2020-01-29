@@ -3,22 +3,22 @@ package com.simprints.fingerprintscanner.v2.incoming.stmota
 import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaResponse
 import com.simprints.fingerprintscanner.v2.incoming.common.MessageInputStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
+import com.simprints.fingerprintscanner.v2.tools.reactive.subscribeOnIoAndPublish
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import java.io.InputStream
 
 class StmOtaMessageInputStream(private val stmOtaResponseParser: StmOtaResponseParser) : MessageInputStream {
 
     var stmOtaResponseStream: Flowable<StmOtaResponse>? = null
 
-    private lateinit var stmOtaResponseStreamDisposable: Disposable
+    private var stmOtaResponseStreamDisposable: Disposable? = null
 
     override fun connect(inputStream: InputStream) {
         stmOtaResponseStream = transformToStmOtaResponseStream(inputStream)
-            .subscribeAndPublish()
+            .subscribeOnIoAndPublish()
             .also {
                 stmOtaResponseStreamDisposable = it.connect()
             }
@@ -30,11 +30,8 @@ class StmOtaMessageInputStream(private val stmOtaResponseParser: StmOtaResponseP
             .map { stmOtaResponseParser.parse(it) }
 
     override fun disconnect() {
-        stmOtaResponseStreamDisposable.dispose()
+        stmOtaResponseStreamDisposable?.dispose()
     }
-
-    private fun Flowable<StmOtaResponse>.subscribeAndPublish() =
-        this.subscribeOn(Schedulers.io()).publish()
 
     inline fun <reified R : StmOtaResponse> receiveResponse(): Single<R> =
         Single.defer {

@@ -3,22 +3,22 @@ package com.simprints.fingerprintscanner.v2.incoming.cypressota
 import com.simprints.fingerprintscanner.v2.domain.cypressota.CypressOtaResponse
 import com.simprints.fingerprintscanner.v2.incoming.common.MessageInputStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
+import com.simprints.fingerprintscanner.v2.tools.reactive.subscribeOnIoAndPublish
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import java.io.InputStream
 
 class CypressOtaMessageInputStream(private val cypressOtaResponseParser: CypressOtaResponseParser) : MessageInputStream {
 
     var cypressOtaResponseStream: Flowable<CypressOtaResponse>? = null
 
-    private lateinit var cypressOtaResponseStreamDisposable: Disposable
+    private var cypressOtaResponseStreamDisposable: Disposable? = null
 
     override fun connect(inputStream: InputStream) {
         cypressOtaResponseStream = transformToCypressOtaResponseStream(inputStream)
-            .subscribeAndPublish()
+            .subscribeOnIoAndPublish()
             .also {
                 cypressOtaResponseStreamDisposable = it.connect()
             }
@@ -30,11 +30,8 @@ class CypressOtaMessageInputStream(private val cypressOtaResponseParser: Cypress
             .map { cypressOtaResponseParser.parse(it) }
 
     override fun disconnect() {
-        cypressOtaResponseStreamDisposable.dispose()
+        cypressOtaResponseStreamDisposable?.dispose()
     }
-
-    private fun Flowable<CypressOtaResponse>.subscribeAndPublish() =
-        this.subscribeOn(Schedulers.io()).publish()
 
     inline fun <reified R : CypressOtaResponse> receiveResponse(): Single<R> =
         Single.defer {
