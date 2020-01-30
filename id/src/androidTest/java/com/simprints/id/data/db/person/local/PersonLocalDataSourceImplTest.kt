@@ -160,7 +160,6 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
     }
 
     @Test
-    @SmallTest
     fun givenInvalidSerializableQuery_aThrowableIsThrown() {
         runBlocking {
             assertThrows<InvalidQueryToLoadRecordsException> {
