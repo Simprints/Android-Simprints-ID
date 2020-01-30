@@ -31,6 +31,7 @@ import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHan
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.handleErrorsWith
 import com.simprints.fingerprintscanner.v2.scanner.ota.cypress.CypressOtaController
 import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
+import com.simprints.fingerprintscanner.v2.tools.primitives.unsignedToInt
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
 import com.simprints.fingerprintscanner.v2.tools.reactive.doSimultaneously
@@ -278,7 +279,7 @@ class Scanner(
             sendMainModeCommandAndReceiveResponse<GetBatteryPercentChargeResponse>(
                 GetBatteryPercentChargeCommand()
             ))
-            .map { it.batteryPercentCharge.percentCharge.toInt() }
+            .map { it.batteryPercentCharge.percentCharge.unsignedToInt() }
             .doOnSuccess { state.batteryPercentCharge = it }
 
     fun getUn20AppVersion(): Single<Un20AppVersion> =
