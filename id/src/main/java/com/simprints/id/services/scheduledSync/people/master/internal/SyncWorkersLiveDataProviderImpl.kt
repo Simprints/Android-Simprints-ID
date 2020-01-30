@@ -9,8 +9,7 @@ import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncM
 
 class SyncWorkersLiveDataProviderImpl(val ctx: Context) : SyncWorkersLiveDataProvider {
 
-    private val wm: WorkManager
-        get() = WorkManager.getInstance(ctx)
+    private val wm = WorkManager.getInstance(ctx)
 
 
     override fun getMasterWorkersLiveData(): LiveData<List<WorkInfo>> =

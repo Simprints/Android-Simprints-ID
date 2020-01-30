@@ -26,8 +26,8 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
 
     private var syncStateLiveData = peopleSyncManager.getLastSyncState()
     private var isConnectedLiveData = deviceManager.isConnectedUpdates
-    var lastSyncTimeObservedRunning: Date? = null
-    var lastSyncTimeObservedFinishing: Date? = null
+    private var lastSyncTimeObservedRunning: Date? = null
+    private var lastSyncTimeObservedFinishing: Date? = null
 
     private val lastTimeSyncSucceed
         get() = cacheSync.readLastSuccessfulSyncTime()
@@ -98,25 +98,9 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
     override fun syncIfRequired() {
         val lastSyncState = syncCardStateLiveData.value
         lastSyncState?.let {
-            val hasSyncEverBeenObservedRunning = lastSyncTimeObservedRunning != null
 
             // Cases when we want to force a one time sync
-            if (
-            /**
-             * Sync never run before.
-             * use case: after the login
-             */
-                !hasSyncEverRun ||
-                /**
-                 * Sync has never been observed running in the dashboard and last sync (in background) failed.
-                 * use case: user opens the dashboard and the sync failed before in background
-                 */
-                (!hasSyncEverBeenObservedRunning && hasLastSyncFailed(it)) ||
-                /**
-                 * Sync has finished and last time it run quite long time ago.
-                 * use case: user does sync in the dashboard and then it leaves the dashboard open
-                 */
-                (hasSyncFinished(it) && hasSyncRunLongTimeAgo())) {
+            if (shouldForceOneTimeSync(it)) {
 
                 Timber.tag(SYNC_LOG_TAG).d("Re-launching one time sync")
                 syncCardStateLiveData.value = SyncConnecting(null, 0, null)
@@ -124,6 +108,26 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
                 peopleSyncManager.sync()
             }
         }
+    }
+
+    private fun shouldForceOneTimeSync(lastSyncState: DashboardSyncCardState): Boolean {
+        val hasSyncEverBeenObservedRunning = lastSyncTimeObservedRunning != null
+        /**
+         * Sync never run before.
+         * use case: after the login
+         */
+        return !hasSyncEverRun ||
+            /**
+             * Sync has never been observed running in the dashboard and last sync (in background) failed.
+             * use case: user opens the dashboard and the sync failed before in background
+             */
+            (!hasSyncEverBeenObservedRunning && hasLastSyncFailed(lastSyncState)) ||
+            /**
+             * Sync has finished and last time it run quite long time ago.
+             * use case: user does sync in the dashboard and then it leaves the dashboard open
+             */
+            (hasSyncFinished(lastSyncState) && hasSyncRunLongTimeAgo())
+
     }
 
     private fun hasLastSyncFailed(state: DashboardSyncCardState): Boolean =
