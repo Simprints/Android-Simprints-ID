@@ -59,8 +59,7 @@ class FaceOrchestratorViewModel : ViewModel() {
 
     private fun generateFakeCaptureResponse(): FaceCaptureResponse {
         val securedImageRef = SecuredImageRef(
-            relativePath = Path(""),
-            fullPath = "file://someFile"
+            path = Path("file://someFile")
         )
         val sample = FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef)
         val result = FaceCaptureResult(0, sample)

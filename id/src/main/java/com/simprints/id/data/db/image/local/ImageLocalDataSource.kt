@@ -14,27 +14,24 @@ interface ImageLocalDataSource {
      *
      * @param imageBytes
      *        the image, as a byte array
-     * @param relativePath
-     *        the relative path where the image will be stored, within the root images folder.
-     *        e.g.: for [root images folder]/fingerprints/bad_scans [relativePath] should be
-     *        @sample [Path(arrayOf("fingerprints", "bad_scans"))]
+     * @param path
+     *        the path within the root images folder where the image will be stored,
+     *        including file name.
+     *        e.g.: for [root images folder]/fingerprints/bad_scans/image1.png [path] should be
+     *        @sample [Path(arrayOf("fingerprints", "bad_scans", "image1.png"))]
      * @see [Path]
-     * @param fileName
-     *        the file name
      * @return
      *        a reference to the newly stored image, if successful, otherwise null
      */
     fun encryptAndStoreImage(
         imageBytes: ByteArray,
-        relativePath: Path,
-        fileName: String
+        path: Path
     ): SecuredImageRef?
 
     /**
      * Decrypts an image
      *
-     * @param image
-     *        a reference to the path of the encrypted image
+     * @param image a reference to the path of the encrypted image
      * @return a stream for the decrypted image, if the operation was successful, otherwise null
      */
     fun decryptImage(image: SecuredImageRef): FileInputStream?
@@ -49,8 +46,7 @@ interface ImageLocalDataSource {
     /**
      * Deletes an image
      *
-     * @param image
-     *        the image to be deleted
+     * @param image the image to be deleted
      * @return true if the operation was successful
      */
     fun deleteImage(image: SecuredImageRef): Boolean

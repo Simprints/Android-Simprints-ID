@@ -11,13 +11,12 @@ class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
         imageStream: FileInputStream,
         imageRef: SecuredImageRef
     ): UploadResult {
-        val rootRef = FirebaseStorage.getInstance().reference.child("images")
+        val rootRef = FirebaseStorage.getInstance().reference.child(IMAGES_ROOT)
 
         var fileRef = rootRef
-        imageRef.relativePath.dirs.forEach { dir ->
-            fileRef = rootRef.child(dir)
+        imageRef.path.parts.forEach { pathPart ->
+            fileRef = rootRef.child(pathPart)
         }
-        fileRef = fileRef.child(imageRef.getFileName())
 
         val uploadTask = fileRef.putStream(imageStream).await()
 
@@ -28,6 +27,10 @@ class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
         }
 
         return UploadResult(imageRef, status)
+    }
+
+    private companion object {
+        const val IMAGES_ROOT = "images"
     }
 
 }

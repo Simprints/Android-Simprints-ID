@@ -10,12 +10,9 @@ import com.simprints.core.images.SecuredImageRef
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 
 class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource {
-
-    companion object {
-        private const val IMAGES_FOLDER = "images"
-    }
 
     private val imageRootPath = "${ctx.filesDir}/$IMAGES_FOLDER"
 
@@ -27,20 +24,22 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
 
     override fun encryptAndStoreImage(
         imageBytes: ByteArray,
-        relativePath: Path,
-        fileName: String
+        path: Path
     ): SecuredImageRef? {
-        val path = Path.combine(imageRootPath, relativePath).compose()
+        val fullPath = Path.combine(imageRootPath, path).compose()
 
-        createDirectoryIfNonExistent(path)
+        createDirectoryIfNonExistent(fullPath)
 
-        val file = File(path, fileName)
+        val file = File(fullPath)
         Timber.d(file.absoluteFile.toString())
 
         return try {
+            if (path.compose().isEmpty())
+                throw FileNotFoundException()
+
             getEncryptedFile(file).openFileOutput().use { stream ->
                 stream.write(imageBytes)
-                SecuredImageRef(relativePath, file.absolutePath)
+                SecuredImageRef(Path.parse(file.absolutePath))
             }
         } catch (t: Throwable) {
             t.printStackTrace()
@@ -49,7 +48,7 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
     }
 
     override fun decryptImage(image: SecuredImageRef): FileInputStream? {
-        val file = File(image.fullPath)
+        val file = File(image.path.compose())
         val encryptedFile = getEncryptedFile(file)
         return try {
             encryptedFile.openFileInput()
@@ -63,21 +62,23 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
         val imageRoot = File(imageRootPath)
         return imageRoot.walk()
             .filterNot { it.isDirectory }
-            .map {
+            .map { file ->
                 val subsetToRemove = Path.parse(imageRootPath)
-                val relativePath = Path.parse(it).remove(subsetToRemove)
-                SecuredImageRef(relativePath, it.absolutePath)
+                val path = Path.parse(file.path).remove(subsetToRemove)
+                SecuredImageRef(path)
             }
             .toList()
     }
 
     override fun deleteImage(image: SecuredImageRef): Boolean {
-        val file = File(image.fullPath)
+        val file = File(image.path.compose())
         return file.delete()
     }
 
     private fun createDirectoryIfNonExistent(path: String) {
-        val directory = File(path)
+        val file = File(path)
+        val fileName = file.name
+        val directory = File(path.replace(fileName, ""))
 
         if (!directory.exists())
             directory.mkdirs()
@@ -90,5 +91,9 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
             masterKeyAlias,
             AES256_GCM_HKDF_4KB
         ).build()
+
+    private companion object {
+        const val IMAGES_FOLDER = "images"
+    }
 
 }
