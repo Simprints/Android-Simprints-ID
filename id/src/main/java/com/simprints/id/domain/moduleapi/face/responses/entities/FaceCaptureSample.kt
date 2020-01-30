@@ -20,7 +20,7 @@ fun FaceCaptureSample.fromDomainToModuleApi(): IFaceSample =
 fun IFaceSample.fromModuleApiToDomain() =
     FaceCaptureSample(faceId, template, imageRef?.fromModuleApiToDomain())
 
-fun ISecuredImageRef.fromModuleApiToDomain() = SecuredImageRef(relativePath, fullPath)
+fun ISecuredImageRef.fromModuleApiToDomain() = SecuredImageRef(path)
 
 @Parcelize
 private class IFaceSampleImpl(

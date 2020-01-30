@@ -18,7 +18,6 @@ class DomainToFaceResponseTest {
         val captureResults = listOf(generateCaptureResult())
         val response = FaceCaptureResponse(captureResults)
 
-
         val iFaceResponse: IFaceResponse = DomainToFaceResponse.fromDomainToFaceResponse(response)
 
         assertThat(iFaceResponse).isInstanceOf(IFaceCaptureResponse::class.java)
@@ -30,13 +29,13 @@ class DomainToFaceResponseTest {
             assertThat(first.index).isEqualTo(0)
 
             val sample = first.sample
-            assertThat(sample?.imageRef?.fullPath).isEqualTo("file://images/someFile")
+            assertThat(sample?.imageRef?.path).isEqualTo("file://images/someFile")
         }
     }
 }
 
 private fun generateCaptureResult(): FaceCaptureResult {
-    val securedImageRef = SecuredImageRef(Path("images"), "file://images/someFile")
+    val securedImageRef = SecuredImageRef(Path("file://images/someFile"))
     val sample = FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef)
     return FaceCaptureResult(0, sample)
 }

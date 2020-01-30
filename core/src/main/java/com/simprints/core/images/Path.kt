@@ -2,112 +2,93 @@ package com.simprints.core.images
 
 import com.simprints.moduleapi.common.IPath
 import kotlinx.android.parcel.Parcelize
-import java.io.File
 
 /**
- * An abstraction of a directory structure
+ * An abstraction of a file path
  *
- * @property dirs
- *           the directories within the structure.
- *           e.g.: for dir1/dir2/dir3 [dirs] should be @sample [arrayOf("dir1", "dir2", "dir3")]
+ * @property parts
+ *           the parts of the path, including file name.
+ *           e.g.: for dir1/dir2/file.txt [parts] should be
+ *           @sample [arrayOf("dir1", "dir2", "file.txt")]
  */
 @Parcelize
-data class Path(override val dirs: Array<String>) : IPath {
+data class Path(override val parts: Array<String>) : IPath {
 
     /**
-     * Constructor with a single directory
-     * @param dir the directory
+     * Constructor with a string path
+     * @param pathString the path as a string
      */
-    constructor(dir: String) : this(arrayOf(dir))
+    constructor(pathString: String) : this(parse(pathString).parts)
 
     /**
-     * Composes the path, separating the directories by a /
+     * Composes the path, separating the parts by a /
      */
-    override fun compose(): String = dirs.joinToString("/")
+    override fun compose(): String = parts.joinToString("/")
 
     /**
-     * Removes a directory. e.g.: if the current path is dir1/dir2/dir3/dir4 and
-     * the directory to be removed is dir1, then the output will be dir2/dir3/dir4.
+     * Removes a directory. e.g.: if the current path is dir1/dir2/dir3/file.txt and
+     * the directory to be removed is dir1, then the output will be dir2/dir3/file.txt.
      *
-     * @param dir the directory to be removed
-     * @return the path without the directory
+     * @param subPathString the sub-path to be removed, as a string
+     * @return the path without sub-path
      */
-    override fun remove(dir: String): IPath = remove(arrayOf(dir))
+    override fun remove(subPathString: String): Path = remove(parse(subPathString))
 
     /**
-     * Removes a sub-path. e.g.: if the current path is dir1/dir2/dir3/dir4 and
-     * the sub-path to be removed is dir1/dir2, then the output will be dir3/dir4.
+     * Removes a sub-path. e.g.: if the current path is dir1/dir2/dir3/file.txt and
+     * the sub-path to be removed is dir1/dir2, then the output will be dir3/file.txt.
      *
      * @param subPath the sub-path to be removed
      * @return the path without the sub-path
      */
-    override fun remove(subPath: IPath): IPath = remove(subPath.dirs)
+    override fun remove(subPath: IPath): Path = remove(subPath.parts)
 
     /**
-     * Removes a subset of directories. e.g.: if the current path is dir1/dir2/dir3/dir4 and
-     * the subset to be removed is dir1/dir2, then the output will be dir3/dir4.
+     * Removes a subset of the path. e.g.: if the current path is dir1/dir2/dir3/file.txt and
+     * the subset to be removed is dir1/dir2, then the output will be dir3/file.txt.
      *
      * @param subset the subset to be removed
      * @return the path without the subset
      */
-    override fun remove(subset: Array<String>): IPath {
-        val resultDirs = dirs.toMutableList().apply {
+    override fun remove(subset: Array<String>): Path {
+        val resultParts = parts.toMutableList().apply {
             removeAll(subset)
         }.toTypedArray()
 
-        return Path(resultDirs)
+        return Path(resultParts)
     }
 
     override fun equals(other: Any?): Boolean {
         if (other == null || other !is Path)
             return false
 
-        return dirs.contentEquals(other.dirs)
+        return parts.contentEquals(other.parts)
     }
 
-    override fun hashCode(): Int = dirs.contentHashCode() * 2 + 27
+    override fun hashCode(): Int = parts.contentHashCode() * 2 + 27
 
     companion object {
         /**
-         * Joins a path to a subset of paths
+         * Joins two paths
          *
-         * @param first
-         *        the first part. Can be either one or multiple directories separated by a /
-         * @param subDirs
-         *        the latter part. Can also be either one or multiple directories as a Path
-         *        object.
+         * @param first the first part.
+         * @param last the last part.
          * @return a Path object combining both parts
          */
-        fun combine(first: String, subDirs: Path): Path {
-            val dirs = arrayOf(first, *subDirs.dirs)
+        fun combine(first: String, last: Path): Path {
+            val dirs = arrayOf(first, *last.parts)
             return Path(dirs)
         }
 
         /**
-         * Parses a file path into a Path object, excluding the file name
-         *
-         * @param file the file to be parsed
-         * @return the path, excluding the file name
-         */
-        fun parse(file: File): Path {
-            val pathString = if (file.isDirectory)
-                file.path
-            else
-                file.path.replace(file.name, "")
-
-            val dirs = pathString.split('/').filter { it.isNotEmpty() }.toTypedArray()
-            return Path(dirs)
-        }
-
-        /**
-         * Parses a path string into a Path object, excluding the file name
+         * Parses a path string into a Path object
          *
          * @param pathString the path string to be parsed
-         * @return the path, excluding the file name
+         * @return the path
          */
         fun parse(pathString: String): Path {
-            val file = File(pathString)
-            return parse(file)
+            val parts = pathString.split('/').filter { it.isNotEmpty() }.toTypedArray()
+            return Path(parts)
         }
     }
 

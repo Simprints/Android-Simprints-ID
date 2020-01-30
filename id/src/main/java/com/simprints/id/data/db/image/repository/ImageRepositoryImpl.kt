@@ -13,10 +13,9 @@ class ImageRepositoryImpl(
 
     override fun storeImageSecurely(
         imageBytes: ByteArray,
-        relativePath: Path,
-        fileName: String
+        path: Path
     ): SecuredImageRef? {
-        return localDataSource.encryptAndStoreImage(imageBytes, relativePath, fileName)
+        return localDataSource.encryptAndStoreImage(imageBytes, path)
     }
 
     override suspend fun uploadStoredImagesAndDelete(): Boolean {

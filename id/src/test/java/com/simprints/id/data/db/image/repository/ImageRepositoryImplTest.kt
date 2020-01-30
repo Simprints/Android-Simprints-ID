@@ -108,15 +108,13 @@ class ImageRepositoryImplTest {
         every { localDataSource.listImages() } returns files
     }
 
-    private fun mockValidImage() = SecuredImageRef(Path(VALID_RELATIVE_PATH), VALID_FULL_PATH)
+    private fun mockValidImage() = SecuredImageRef(Path(VALID_PATH))
 
-    private fun mockInvalidImage() = SecuredImageRef(Path(INVALID_RELATIVE_PATH), INVALID_FULL_PATH)
+    private fun mockInvalidImage() = SecuredImageRef(Path(INVALID_PATH))
 
     companion object {
-        private const val VALID_FULL_PATH = "full/path/valid"
-        private const val INVALID_FULL_PATH = "full/path/invalid"
-        private const val VALID_RELATIVE_PATH = "valid"
-        private const val INVALID_RELATIVE_PATH = "invalid"
+        private const val VALID_PATH = "valid.txt"
+        private const val INVALID_PATH = "invalid"
     }
 
 }

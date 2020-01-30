@@ -13,17 +13,14 @@ interface ImageRepository {
      *
      * @param imageBytes
      *        the image, in bytes
-     * @param relativePath
-     *        the relative path of the image within the images root folder
-     * @param fileName
-     *        the file name
+     * @param path
+     *        the path of the image within the images root folder, including file name
      * @return a reference to the newly stored image, if successful, otherwise null
      * @see [com.simprints.id.data.db.image.local.ImageLocalDataSource.encryptAndStoreImage]
      */
     fun storeImageSecurely(
         imageBytes: ByteArray,
-        relativePath: Path,
-        fileName: String
+        path: Path
     ): SecuredImageRef?
 
     /**
