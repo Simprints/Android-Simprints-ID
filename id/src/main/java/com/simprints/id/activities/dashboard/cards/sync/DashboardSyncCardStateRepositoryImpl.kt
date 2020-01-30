@@ -25,7 +25,7 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
     override val syncCardStateLiveData = MediatorLiveData<DashboardSyncCardState>()
 
     private var syncStateLiveData = peopleSyncManager.getLastSyncState()
-    private var isConnectedLiveData = deviceManager.isConnectedUpdates
+    private var isConnectedLiveData = deviceManager.isConnectedLiveData
     private var lastSyncTimeObservedRunning: Date? = null
     private var lastSyncTimeObservedFinishing: Date? = null
 
@@ -55,20 +55,19 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
                                  isModuleSelectionRequired: Boolean,
                                  syncState: PeopleSyncState?) {
 
-        val newState = when {
+        when {
             isModuleSelectionRequired -> SyncNoModules(lastTimeSyncSucceed)
             !isConnected -> SyncOffline(lastTimeSyncSucceed)
             else -> processRecentSyncState(syncState)
-        }
+        }.let { newState ->
 
-        newState.let {
             if (isSyncRunning(newState)) {
                 lastSyncTimeObservedRunning = Date()
             } else if (hasSyncFinished(newState)) {
                 lastSyncTimeObservedFinishing = Date()
             }
 
-            syncCardStateLiveData.value = it
+            syncCardStateLiveData.value = newState
             syncIfRequired()
         }
     }

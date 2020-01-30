@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
@@ -46,7 +47,8 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
         private const val LOGOUT_RESULT_CODE = 1
-        private const val TIME_FOR_CHECK_IF_SYNC_REQUIRED = 1000 * 60L * 1
+        private const val ONE_MINUTE = 1000 * 60L
+        private const val TIME_FOR_CHECK_IF_SYNC_REQUIRED = 1 * ONE_MINUTE
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -127,15 +129,15 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
             syncCardDisplayer.displayState(it)
         })
 
-        syncCardDisplayer.userWantsToOpenSettings.observe(this@DashboardActivity, Observer {
+        syncCardDisplayer.userWantsToOpenSettings.observe(this@DashboardActivity, LiveDataEventObserver {
             openSettings()
         })
 
-        syncCardDisplayer.userWantsToSelectAModule.observe(this@DashboardActivity, Observer {
+        syncCardDisplayer.userWantsToSelectAModule.observe(this@DashboardActivity, LiveDataEventObserver {
             openSelectModules()
         })
 
-        syncCardDisplayer.userWantsToSync.observe(this@DashboardActivity, Observer {
+        syncCardDisplayer.userWantsToSync.observe(this@DashboardActivity, LiveDataEventObserver {
             syncCardDisplayer.displayState(SyncConnecting(null, 0, null))
             peopleSyncManager.sync()
         })
@@ -153,8 +155,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
         super.onResume()
         lifecycleScope.launch {
             stopTickerToCheckIfSyncIsRequired()
-            syncAgainTicker = ticker(delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED, initialDelayMillis = 100)
-            syncAgainTicker?.let {
+            syncAgainTicker = ticker(delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED, initialDelayMillis = 100).also {
                 for (event in it) {
                     Timber.tag(SYNC_LOG_TAG).d("Launch sync if required")
                     viewModel.syncIfRequired()
@@ -170,7 +171,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     override fun onPause() {
         super.onPause()
         stopTickerToCheckIfSyncIsRequired()
-        syncCardDisplayer.stopTickerToUpdateLastSyncText()
+        syncCardDisplayer.stopOngoingTickerToUpdateLastSyncText()
     }
 
     private fun stopTickerToCheckIfSyncIsRequired() {

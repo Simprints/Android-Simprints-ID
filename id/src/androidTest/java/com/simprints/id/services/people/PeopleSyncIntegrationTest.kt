@@ -189,7 +189,7 @@ class PeopleSyncIntegrationTest {
     @Test
     fun downCountFailsBecauseANotCloudIssue_shouldSyncSucceed() {
         runSyncTest { continuation, activity ->
-            val total = mockResponsesForSync(projectSyncScope)
+            mockResponsesForSync(projectSyncScope)
             mockDispatcher.countResponse = 300 to null
 
             runAndVerifySyncRetries(activity, continuation)

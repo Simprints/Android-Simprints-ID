@@ -13,5 +13,5 @@ interface DashboardSyncCardDisplayer {
     fun initRoot(syncCardsRootLayout: LinearLayout)
     fun displayState(syncCardState: DashboardSyncCardState)
     suspend fun startTickerToUpdateLastSyncText()
-    fun stopTickerToUpdateLastSyncText()
+    fun stopOngoingTickerToUpdateLastSyncText()
 }
