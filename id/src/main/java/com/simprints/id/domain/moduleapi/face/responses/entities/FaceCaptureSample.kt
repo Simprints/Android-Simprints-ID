@@ -1,8 +1,8 @@
 package com.simprints.id.domain.moduleapi.face.responses.entities
 
 import android.os.Parcelable
-import com.simprints.core.images.SecuredImageRef
-import com.simprints.core.images.fromDomainToModuleApi
+import com.simprints.core.images.model.SecuredImageRef
+import com.simprints.core.images.model.fromDomainToModuleApi
 import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.face.responses.entities.IFaceSample
 import kotlinx.android.parcel.Parcelize
@@ -20,7 +20,8 @@ fun FaceCaptureSample.fromDomainToModuleApi(): IFaceSample =
 fun IFaceSample.fromModuleApiToDomain() =
     FaceCaptureSample(faceId, template, imageRef?.fromModuleApiToDomain())
 
-fun ISecuredImageRef.fromModuleApiToDomain() = SecuredImageRef(path)
+fun ISecuredImageRef.fromModuleApiToDomain() =
+    SecuredImageRef(path)
 
 @Parcelize
 private class IFaceSampleImpl(

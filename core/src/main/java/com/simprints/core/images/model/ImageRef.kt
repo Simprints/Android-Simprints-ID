@@ -1,4 +1,4 @@
-package com.simprints.core.images
+package com.simprints.core.images.model
 
 import android.os.Parcelable
 import com.simprints.moduleapi.common.IPath

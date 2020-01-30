@@ -1,19 +1,17 @@
-package com.simprints.id.data.db.image.local
+package com.simprints.core.images.local
 
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.images.Path
-import com.simprints.core.images.SecuredImageRef
-import com.simprints.id.tools.utils.StringsUtils.Companion.randomUUID
+import com.simprints.core.images.model.Path
+import com.simprints.core.images.model.SecuredImageRef
+import com.simprints.core.tools.utils.randomUUID
+import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import java.io.File
 import kotlin.random.Random
 
-@RunWith(AndroidJUnit4::class)
 @SmallTest
 class ImageLocalDataSourceImplTest {
 
@@ -27,6 +25,11 @@ class ImageLocalDataSourceImplTest {
     private val imagesFolder = "${app.filesDir}/$IMAGES_FOLDER"
     private val path = Path("test/$FILE_NAME")
     private val imageLocalDataSource = ImageLocalDataSourceImpl(app)
+
+    @Before
+    fun setUp() {
+        File(imagesFolder).deleteRecursively()
+    }
 
     @Test
     fun givenAByteArray_storeIt_shouldCreateAFile() {

@@ -1,11 +1,11 @@
-package com.simprints.id.data.db.image.repository
+package com.simprints.core.images.repository
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.images.Path
-import com.simprints.core.images.SecuredImageRef
-import com.simprints.id.data.db.image.local.ImageLocalDataSource
-import com.simprints.id.data.db.image.remote.ImageRemoteDataSource
-import com.simprints.id.data.db.image.remote.UploadResult
+import com.simprints.core.images.local.ImageLocalDataSource
+import com.simprints.core.images.model.Path
+import com.simprints.core.images.model.SecuredImageRef
+import com.simprints.core.images.remote.ImageRemoteDataSource
+import com.simprints.core.images.remote.UploadResult
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,7 +15,7 @@ import org.junit.Test
 import java.io.FileInputStream
 
 @ExperimentalCoroutinesApi
-class ImageRepositoryImplTest {
+internal class ImageRepositoryTest {
 
     @MockK lateinit var localDataSource: ImageLocalDataSource
     @MockK lateinit var remoteDataSource: ImageRemoteDataSource
@@ -88,11 +88,17 @@ class ImageRepositoryImplTest {
 
         coEvery {
             remoteDataSource.uploadImage(mockStream, validImage)
-        } returns UploadResult(validImage, UploadResult.Status.SUCCESSFUL)
+        } returns UploadResult(
+            validImage,
+            UploadResult.Status.SUCCESSFUL
+        )
 
         coEvery {
             remoteDataSource.uploadImage(mockStream, invalidImage)
-        } returns UploadResult(invalidImage, UploadResult.Status.FAILED)
+        } returns UploadResult(
+            invalidImage,
+            UploadResult.Status.FAILED
+        )
     }
 
     private fun configureLocalImageFiles(numberOfValidFiles: Int = 3, includeInvalidFile: Boolean) {
@@ -108,9 +114,19 @@ class ImageRepositoryImplTest {
         every { localDataSource.listImages() } returns files
     }
 
-    private fun mockValidImage() = SecuredImageRef(Path(VALID_PATH))
+    private fun mockValidImage() =
+        SecuredImageRef(
+            Path(
+                VALID_PATH
+            )
+        )
 
-    private fun mockInvalidImage() = SecuredImageRef(Path(INVALID_PATH))
+    private fun mockInvalidImage() =
+        SecuredImageRef(
+            Path(
+                INVALID_PATH
+            )
+        )
 
     companion object {
         private const val VALID_PATH = "valid.txt"
