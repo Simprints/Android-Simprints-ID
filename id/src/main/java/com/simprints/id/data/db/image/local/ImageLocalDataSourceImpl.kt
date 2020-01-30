@@ -20,10 +20,7 @@ class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource 
     private val imageRootPath = "${ctx.filesDir}/$IMAGES_FOLDER"
 
     init {
-        val imageFolder = File(imageRootPath)
-        if (!imageFolder.exists()) {
-            imageFolder.mkdir()
-        }
+        createDirectoryIfNonExistent(imageRootPath)
     }
 
     private val masterKeyAlias = MasterKeys.getOrCreate(AES256_GCM_SPEC)
