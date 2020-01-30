@@ -1,11 +1,11 @@
-package com.simprints.id.data.db.image.remote
+package com.simprints.core.images.remote
 
 import com.google.firebase.storage.FirebaseStorage
-import com.simprints.core.images.SecuredImageRef
+import com.simprints.core.images.model.SecuredImageRef
 import kotlinx.coroutines.tasks.await
 import java.io.FileInputStream
 
-class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
+internal class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
 
     override suspend fun uploadImage(
         imageStream: FileInputStream,

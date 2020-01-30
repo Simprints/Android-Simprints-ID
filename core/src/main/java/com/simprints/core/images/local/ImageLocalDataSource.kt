@@ -1,13 +1,13 @@
-package com.simprints.id.data.db.image.local
+package com.simprints.core.images.local
 
-import com.simprints.core.images.Path
-import com.simprints.core.images.SecuredImageRef
+import com.simprints.core.images.model.Path
+import com.simprints.core.images.model.SecuredImageRef
 import java.io.FileInputStream
 
 /**
  * Interface for local image file operations
  */
-interface ImageLocalDataSource {
+internal interface ImageLocalDataSource {
 
     /**
      * Encrypts and stores an image
@@ -20,13 +20,9 @@ interface ImageLocalDataSource {
      *        e.g.: for [root images folder]/fingerprints/bad_scans/image1.png [path] should be
      *        @sample [Path(arrayOf("fingerprints", "bad_scans", "image1.png"))]
      * @see [Path]
-     * @return
-     *        a reference to the newly stored image, if successful, otherwise null
+     * @return a reference to the newly stored image, if successful, otherwise null
      */
-    fun encryptAndStoreImage(
-        imageBytes: ByteArray,
-        path: Path
-    ): SecuredImageRef?
+    fun encryptAndStoreImage(imageBytes: ByteArray, path: Path): SecuredImageRef?
 
     /**
      * Decrypts an image
