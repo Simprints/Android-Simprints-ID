@@ -12,9 +12,6 @@ import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFro
 import com.simprints.id.activities.consent.ConsentActivity
 import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.dashboard.DashboardActivity
-import com.simprints.id.activities.dashboard.DashboardCardsFactory
-import com.simprints.id.activities.dashboard.DashboardPresenter
-import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fetchguid.FetchGuidActivity
@@ -90,12 +87,9 @@ interface AppComponent {
     fun inject(checkLoginPresenter: CheckLoginPresenter)
     fun inject(checkLoginFromIntentPresenter: CheckLoginFromIntentPresenter)
     fun inject(checkLoginFromMainLauncherPresenter: CheckLoginFromMainLauncherPresenter)
-    fun inject(dashboardCardsFactory: DashboardCardsFactory)
-    fun inject(dashboardSyncCardViewModel: DashboardSyncCardViewModel)
     fun inject(loginPresenter: LoginPresenter)
     fun inject(requestLoginActivity: RequestLoginActivity)
     fun inject(projectAuthenticator: ProjectAuthenticator)
-    fun inject(dashboardPresenter: DashboardPresenter)
     fun inject(alertPresenter: AlertPresenter)
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(privacyNoticePresenter: PrivacyNoticePresenter)
