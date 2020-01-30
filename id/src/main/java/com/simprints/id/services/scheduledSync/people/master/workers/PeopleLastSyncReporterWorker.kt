@@ -22,7 +22,7 @@ class PeopleLastSyncReporterWorker(appContext: Context,
             val syncId = inputData.getString(SYNC_ID_TO_MARK_AS_COMPLETED)
             crashlyticsLog("Start - Params: $syncId")
 
-            if (syncId != null && syncId.isNotEmpty()) {
+            if (!syncId.isNullOrEmpty()) {
                 syncCache.storeLastSuccessfulSyncTime(Date())
                 success()
             } else {
