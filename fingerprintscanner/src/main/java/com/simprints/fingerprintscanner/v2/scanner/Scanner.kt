@@ -80,7 +80,7 @@ class Scanner(
                 mainMessageChannel.disconnect()
                 scannerTriggerListenerDisposable?.dispose()
             }
-            CYPRESS_OTA -> TODO()
+            CYPRESS_OTA -> cypressOtaMessageChannel.disconnect()
             STM_OTA -> stmOtaMessageChannel.disconnect()
             null -> {/* Do nothing */
             }

@@ -3,7 +3,7 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
-project.version = "2020.1.0-dev13"
+project.version = "2020.1.0-dev14"
 
 android {
     compileSdkVersion 28
