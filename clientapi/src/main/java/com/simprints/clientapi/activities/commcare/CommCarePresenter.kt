@@ -9,6 +9,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
+import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
@@ -16,12 +17,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CommCarePresenter(private val view: CommCareContract.View,
-                        private val action: String?,
-                        private val sessionEventsManager: ClientApiSessionEventsManager,
-                        private val crashReportManager: ClientApiCrashReportManager,
-                        private val sharedPreferencesManager: SharedPreferencesManager)
-    : RequestPresenter(view, sessionEventsManager), CommCareContract.Presenter {
+class CommCarePresenter(
+    private val view: CommCareContract.View,
+    private val action: String?,
+    private val sessionEventsManager: ClientApiSessionEventsManager,
+    private val sharedPreferencesManager: SharedPreferencesManager,
+    deviceManager: DeviceManager,
+    crashReportManager: ClientApiCrashReportManager
+) : RequestPresenter(
+    view,
+    sessionEventsManager,
+    deviceManager,
+    crashReportManager
+), CommCareContract.Presenter {
 
     companion object {
         private const val PACKAGE_NAME = "com.simprints.commcare"
@@ -37,12 +45,14 @@ class CommCarePresenter(private val view: CommCareContract.View,
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
 
-        when (action) {
-            ACTION_REGISTER -> processEnrollRequest()
-            ACTION_IDENTIFY -> processIdentifyRequest()
-            ACTION_VERIFY -> processVerifyRequest()
-            ACTION_CONFIRM_IDENTITY -> checkAndProcessSessionId()
-            else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+        runIfDeviceIsNotRooted {
+            when (action) {
+                ACTION_REGISTER -> processEnrollRequest()
+                ACTION_IDENTIFY -> processIdentifyRequest()
+                ACTION_VERIFY -> processVerifyRequest()
+                ACTION_CONFIRM_IDENTITY -> checkAndProcessSessionId()
+                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+            }
         }
     }
 

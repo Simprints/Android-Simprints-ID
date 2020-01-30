@@ -11,9 +11,7 @@ import com.simprints.id.domain.alert.AlertType.*
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
-import com.simprints.id.exceptions.unexpected.RootedDeviceException
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.tools.DeviceManager
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
@@ -29,7 +27,6 @@ abstract class CheckLoginPresenter(
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider
-    @Inject lateinit var deviceManager: DeviceManager
     @Inject lateinit var syncManager: SyncManager
 
     init {
@@ -38,17 +35,12 @@ abstract class CheckLoginPresenter(
 
     protected fun checkSignedInStateAndMoveOn() {
         try {
-            deviceManager.checkIfDeviceIsRooted()
             checkSignedInOrThrow()
             handleSignedInUser()
         } catch (t: Throwable) {
             Timber.e(t)
 
             when (t) {
-                is RootedDeviceException -> {
-                    crashReportManager.logExceptionOrSafeException(t)
-                    view.openAlertActivityForError(ROOTED_DEVICE)
-                }
                 is DifferentProjectIdSignedInException -> view.openAlertActivityForError(DIFFERENT_PROJECT_ID_SIGNED_IN)
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(DIFFERENT_USER_ID_SIGNED_IN)
                 is NotSignedInException -> handleNotSignedInUser().also {

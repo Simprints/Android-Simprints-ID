@@ -51,7 +51,6 @@
 
         <activity
             android:name="com.simprints.fingerprint.activities.refusal.RefusalActivity"
-            android:label="@string/refusal_label"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />

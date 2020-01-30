@@ -8,6 +8,12 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
+import com.simprints.id.activities.dashboard.DashboardViewModelFactory
+import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
+import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayerImpl
+import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayerImpl
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
@@ -58,6 +64,7 @@ import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.*
 import com.simprints.id.tools.extensions.deviceId
@@ -78,7 +85,8 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager = FirebaseManagerImpl(loginInfoManager)
+    open fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager =
+        FirebaseManagerImpl(loginInfoManager)
 
     @Provides
     @Singleton
@@ -110,13 +118,16 @@ open class AppModule {
 
     @Provides
     @Singleton
-    fun provideRecentEventsPreferencesManager(prefs: ImprovedSharedPreferences): RecentEventsPreferencesManager = RecentEventsPreferencesManagerImpl(prefs)
+    fun provideRecentEventsPreferencesManager(prefs: ImprovedSharedPreferences): RecentEventsPreferencesManager =
+        RecentEventsPreferencesManagerImpl(prefs)
 
     @Provides
     @Singleton
-    open fun provideAnalyticsManager(loginInfoManager: LoginInfoManager,
-                                     preferencesManager: PreferencesManager,
-                                     firebaseAnalytics: FirebaseAnalytics): AnalyticsManager = AnalyticsManagerImpl(loginInfoManager, firebaseAnalytics)
+    open fun provideAnalyticsManager(
+        loginInfoManager: LoginInfoManager,
+        preferencesManager: PreferencesManager,
+        firebaseAnalytics: FirebaseAnalytics
+    ): AnalyticsManager = AnalyticsManagerImpl(loginInfoManager, firebaseAnalytics)
 
     @Provides
     @Singleton
@@ -124,7 +135,8 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideCoreCrashReportManager(crashReportManager: CrashReportManager): CoreCrashReportManager = crashReportManager
+    open fun provideCoreCrashReportManager(crashReportManager: CrashReportManager): CoreCrashReportManager =
+        crashReportManager
 
     @Provides
     @Singleton
@@ -136,55 +148,83 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSecureLocalDbKeyProvider(@Named("EncryptedSharedPreferences") encryptedSharedPrefs: SharedPreferences,
-                                             randomGenerator: RandomGenerator,
-                                             unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
+    open fun provideSecureLocalDbKeyProvider(
+        @Named("EncryptedSharedPreferences") encryptedSharedPrefs: SharedPreferences,
+        randomGenerator: RandomGenerator,
+        unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider
+    ): SecureLocalDbKeyProvider =
         SecureLocalDbKeyProviderImpl(
             encryptedSharedPrefs,
             randomGenerator,
-            unsecuredLocalDbKeyProvider)
+            unsecuredLocalDbKeyProvider
+        )
 
     @Provides
     @Singleton
-    open fun provideLegacyLocalDbKeyProvider(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager): LegacyLocalDbKeyProvider =
+    open fun provideLegacyLocalDbKeyProvider(
+        preferencesManager: PreferencesManager,
+        keystoreManager: KeystoreManager
+    ): LegacyLocalDbKeyProvider =
         LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager)
 
     @Provides
-    open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager):
-        LongConsentManager = LongConsentManagerImpl(ctx.filesDir.absolutePath, loginInfoManager, crashReportManager)
+    open fun provideLongConsentManager(
+        ctx: Context,
+        loginInfoManager: LoginInfoManager,
+        crashReportManager: CrashReportManager
+    ):
+        LongConsentManager =
+        LongConsentManagerImpl(ctx.filesDir.absolutePath, loginInfoManager, crashReportManager)
 
     @Provides
     @Singleton
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
-    open fun provideSecureApiInterface(): SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api
+    open fun provideSecureApiInterface(): SecureApiInterface =
+        SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api
 
     @Provides
     @Singleton
     fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
 
     @Provides
-    fun provideAndroidResourcesHelper(ctx: Context, preferencesManager: PreferencesManager): AndroidResourcesHelper {
-        val contextWithSpecificLanguage = LanguageHelper.contextWithSpecificLanguage(ctx, preferencesManager.language)
+    fun provideAndroidResourcesHelper(
+        ctx: Context,
+        preferencesManager: PreferencesManager
+    ): AndroidResourcesHelper {
+        val contextWithSpecificLanguage =
+            LanguageHelper.contextWithSpecificLanguage(ctx, preferencesManager.language)
         return AndroidResourcesHelperImpl(contextWithSpecificLanguage)
     }
 
     @Provides
     @Singleton
-    open fun provideSessionEventsLocalDbManager(ctx: Context,
-                                                secureDataManager: SecureLocalDbKeyProvider): SessionEventsLocalDbManager =
+    open fun provideSessionEventsLocalDbManager(
+        ctx: Context,
+        secureDataManager: SecureLocalDbKeyProvider
+    ): SessionEventsLocalDbManager =
         RealmSessionEventsDbManagerImpl(ctx, secureDataManager)
 
     @Provides
     @Singleton
-    open fun provideSessionEventsManager(ctx: Context,
-                                         sessionEventsSyncManager: SessionEventsSyncManager,
-                                         sessionEventsLocalDbManager: SessionEventsLocalDbManager,
-                                         preferencesManager: PreferencesManager,
-                                         timeHelper: TimeHelper,
-                                         crashReportManager: CrashReportManager): SessionEventsManager =
-        SessionEventsManagerImpl(ctx.deviceId, ctx.packageVersionName, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, crashReportManager)
+    open fun provideSessionEventsManager(
+        ctx: Context,
+        sessionEventsSyncManager: SessionEventsSyncManager,
+        sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+        preferencesManager: PreferencesManager,
+        timeHelper: TimeHelper,
+        crashReportManager: CrashReportManager
+    ): SessionEventsManager =
+        SessionEventsManagerImpl(
+            ctx.deviceId,
+            ctx.packageVersionName,
+            sessionEventsSyncManager,
+            sessionEventsLocalDbManager,
+            preferencesManager,
+            timeHelper,
+            crashReportManager
+        )
 
 
     @Provides
@@ -194,7 +234,8 @@ open class AppModule {
 
 
     @Provides
-    fun provideModuleViewModelFactory(repository: ModuleRepository) = ModuleViewModelFactory(repository)
+    fun provideModuleViewModelFactory(repository: ModuleRepository) =
+        ModuleViewModelFactory(repository)
 
     @Provides
     fun provideModuleRepository(
@@ -204,17 +245,26 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
+    open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager =
+        RemoteSessionsManagerImpl(remoteDbManager)
 
     @Provides
-    open fun provideGuidSelectionManager(context: Context,
-                                         loginInfoManager: LoginInfoManager,
-                                         analyticsManager: AnalyticsManager,
-                                         crashReportManager: CrashReportManager,
-                                         timeHelper: TimeHelper,
-                                         sessionEventsManager: SessionEventsManager): GuidSelectionManager =
+    open fun provideGuidSelectionManager(
+        context: Context,
+        loginInfoManager: LoginInfoManager,
+        analyticsManager: AnalyticsManager,
+        crashReportManager: CrashReportManager,
+        timeHelper: TimeHelper,
+        sessionEventsManager: SessionEventsManager
+    ): GuidSelectionManager =
         GuidSelectionManagerImpl(
-            context.deviceId, loginInfoManager, analyticsManager, crashReportManager, timeHelper, sessionEventsManager)
+            context.deviceId,
+            loginInfoManager,
+            analyticsManager,
+            crashReportManager,
+            timeHelper,
+            sessionEventsManager
+        )
 
     @Provides
     @Singleton
@@ -223,23 +273,32 @@ open class AppModule {
     ): ImageUpSyncScheduler = ImageUpSyncSchedulerImpl(context)
 
     @Provides
-    open fun getConsentDataManager(prefs: ImprovedSharedPreferences, remoteConfigWrapper: RemoteConfigWrapper): ConsentLocalDataSource =
+    open fun getConsentDataManager(
+        prefs: ImprovedSharedPreferences,
+        remoteConfigWrapper: RemoteConfigWrapper
+    ): ConsentLocalDataSource =
         ConsentLocalDataSourceImpl(prefs, remoteConfigWrapper)
 
     @Provides
-    open fun provideConsentTextManager(context: Context,
-                                       consentLocalDataSource: ConsentLocalDataSource,
-                                       crashReportManager: CrashReportManager,
-                                       preferencesManager: PreferencesManager,
-                                       androidResourcesHelper: AndroidResourcesHelper): ConsentRepository =
-        ConsentRepositoryImpl(consentLocalDataSource, crashReportManager, preferencesManager.programName,
+    open fun provideConsentTextManager(
+        context: Context,
+        consentLocalDataSource: ConsentLocalDataSource,
+        crashReportManager: CrashReportManager,
+        preferencesManager: PreferencesManager,
+        androidResourcesHelper: AndroidResourcesHelper
+    ): ConsentRepository =
+        ConsentRepositoryImpl(
+            consentLocalDataSource, crashReportManager, preferencesManager.programName,
             preferencesManager.organizationName, androidResourcesHelper,
-            preferencesManager.modalities)
+            preferencesManager.modalities
+        )
 
     @Provides
-    open fun provideConsentViewModelFactory(consentTextManager: ConsentRepository,
-                                            sessionEventsManager: SessionEventsManager,
-                                            timeHelper: TimeHelper) =
+    open fun provideConsentViewModelFactory(
+        consentTextManager: ConsentRepository,
+        sessionEventsManager: SessionEventsManager,
+        timeHelper: TimeHelper
+    ) =
         ConsentViewModelFactory(consentTextManager, sessionEventsManager)
 
     @Provides
@@ -254,20 +313,31 @@ open class AppModule {
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
 
     @Provides
-    open fun provideFetchGuidViewModelFactory(personRepository: PersonRepository,
-                                              simNetworkUtils: SimNetworkUtils,
-                                              sessionEventsManager: SessionEventsManager,
-                                              timeHelper: TimeHelper) =
-        FetchGuidViewModelFactory(personRepository, simNetworkUtils, sessionEventsManager, timeHelper)
+    open fun provideFetchGuidViewModelFactory(
+        personRepository: PersonRepository,
+        simNetworkUtils: SimNetworkUtils,
+        sessionEventsManager: SessionEventsManager,
+        timeHelper: TimeHelper
+    ) =
+        FetchGuidViewModelFactory(
+            personRepository,
+            simNetworkUtils,
+            sessionEventsManager,
+            timeHelper
+        )
 
     @Provides
-    open fun provideSyncInformationViewModelFactory(personRepository: PersonRepository,
-                                                    personLocalDataSource: PersonLocalDataSource,
-                                                    preferencesManager: PreferencesManager,
-                                                    loginInfoManager: LoginInfoManager,
-                                                    peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository) =
-        SyncInformationViewModelFactory(personRepository, personLocalDataSource, preferencesManager,
-            loginInfoManager.getSignedInProjectIdOrEmpty(), peopleDownSyncScopeRepository)
+    open fun provideSyncInformationViewModelFactory(
+        personRepository: PersonRepository,
+        personLocalDataSource: PersonLocalDataSource,
+        preferencesManager: PreferencesManager,
+        loginInfoManager: LoginInfoManager,
+        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository
+    ) =
+        SyncInformationViewModelFactory(
+            personRepository, personLocalDataSource, preferencesManager,
+            loginInfoManager.getSignedInProjectIdOrEmpty(), peopleDownSyncScopeRepository
+        )
 
     @Provides
     @Named("EncryptedSharedPreferences")
@@ -275,6 +345,41 @@ open class AppModule {
         EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
 
     @Provides
-    open fun provideDeviceManager(context: Context): DeviceManager = DeviceManagerImpl(context)
+    open fun provideDashboardSyncCardDisplayer(
+        androidResourcesHelper: AndroidResourcesHelper,
+        timeHelper: TimeHelper,
+        ctx: Context
+    ): DashboardSyncCardDisplayer =
+        DashboardSyncCardDisplayerImpl(androidResourcesHelper, timeHelper, ctx)
+
+    @Provides
+    open fun provideDashboardProjectDetailsCardDisplayer(
+        androidResourcesHelper: AndroidResourcesHelper
+    ): DashboardProjectDetailsCardDisplayer = DashboardProjectDetailsCardDisplayerImpl(
+        androidResourcesHelper
+    )
+
+    @Provides
+    open fun provideProjectDetailsRepository(
+        projectRepository: ProjectRepository,
+        loginInfoManager: LoginInfoManager,
+        preferencesManager: PreferencesManager
+    ): DashboardProjectDetailsRepository = DashboardProjectDetailsRepository(
+        projectRepository,
+        loginInfoManager,
+        preferencesManager
+    )
+
+    @Provides
+    open fun provideDashboardViewModelFactory(
+        peopleSyncManager: PeopleSyncManager,
+        projectDetailsRepository: DashboardProjectDetailsRepository
+    ): DashboardViewModelFactory {
+        return DashboardViewModelFactory(
+            peopleSyncManager,
+            projectDetailsRepository
+        )
+    }
+
 }
 
