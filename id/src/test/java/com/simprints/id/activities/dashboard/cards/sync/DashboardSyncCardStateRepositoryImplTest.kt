@@ -53,7 +53,7 @@ class DashboardSyncCardStateRepositoryImplTest {
         isConnectedUpdates = MutableLiveData()
         isConnectedUpdates.value = true
         syncStateLiveData = MutableLiveData()
-        every { deviceManager.isConnectedUpdates } returns isConnectedUpdates
+        every { deviceManager.isConnectedLiveData } returns isConnectedUpdates
         every { peopleSyncManager.getLastSyncState() } returns syncStateLiveData
         every { syncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.projectSyncScope
         every { preferencesManager.selectedModules } returns emptySet()

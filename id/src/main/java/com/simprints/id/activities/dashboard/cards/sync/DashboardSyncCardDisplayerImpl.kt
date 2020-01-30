@@ -83,7 +83,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     }
 
     override suspend fun startTickerToUpdateLastSyncText() {
-        stopTickerToUpdateLastSyncText()
+        stopOngoingTickerToUpdateLastSyncText()
         tickerToUpdateLastSyncTimeText = ticker(delayMillis = ONE_MINUTE, initialDelayMillis = 0)
 
         tickerToUpdateLastSyncTimeText?.let {
@@ -97,7 +97,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
         }
     }
 
-    override fun stopTickerToUpdateLastSyncText() {
+    override fun stopOngoingTickerToUpdateLastSyncText() {
         tickerToUpdateLastSyncTimeText?.cancel()
     }
 

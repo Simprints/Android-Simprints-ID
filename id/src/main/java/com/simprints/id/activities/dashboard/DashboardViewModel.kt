@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
 import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepository
 import kotlinx.coroutines.launch
 

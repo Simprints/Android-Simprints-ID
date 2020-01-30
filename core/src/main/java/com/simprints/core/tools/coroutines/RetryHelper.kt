@@ -20,8 +20,6 @@ suspend fun <T> retryIO(
             if (!retryIf(t)) {
                 throw t
             }
-            // you can log an error here and/or make a more finer-grained
-            // analysis of the cause to see if retry is needed
         }
         delay(currentDelay)
         currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)

@@ -10,7 +10,7 @@ class DeviceManagerImpl(private val context: Context) : DeviceManager {
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }
 
-    override val isConnectedUpdates: LiveData<Boolean> by lazy {
+    override val isConnectedLiveData: LiveData<Boolean> by lazy {
         ConnectivityLiveData(connectivityService)
     }
 
