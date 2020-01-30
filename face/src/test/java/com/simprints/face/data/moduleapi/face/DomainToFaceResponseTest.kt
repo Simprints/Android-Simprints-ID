@@ -1,10 +1,10 @@
 package com.simprints.face.data.moduleapi.face
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.images.model.Path
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
+import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
 import com.simprints.moduleapi.face.responses.IFaceResponse
@@ -12,6 +12,8 @@ import org.junit.Test
 import java.util.*
 
 class DomainToFaceResponseTest {
+
+    private val path = Path(arrayOf("file://images/someFile"))
 
     @Test
     fun fromDomainToFaceResponse() {
@@ -29,13 +31,14 @@ class DomainToFaceResponseTest {
             assertThat(first.index).isEqualTo(0)
 
             val sample = first.sample
-            assertThat(sample?.imageRef?.path).isEqualTo("file://images/someFile")
+            assertThat(sample?.imageRef?.path).isEqualTo(path)
         }
     }
-}
 
-private fun generateCaptureResult(): FaceCaptureResult {
-    val securedImageRef = SecuredImageRef(Path("file://images/someFile"))
-    val sample = FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef)
-    return FaceCaptureResult(0, sample)
+    private fun generateCaptureResult(): FaceCaptureResult {
+        val securedImageRef = SecuredImageRef(path)
+        val sample = FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef)
+        return FaceCaptureResult(0, sample)
+    }
+
 }
