@@ -2,6 +2,6 @@ package com.simprints.moduleapi.common
 
 import android.os.Parcelable
 
-interface ISecuredImageRef : Parcelable {
-    val path: IPath
+interface IPath : Parcelable {
+    val parts: Array<String>
 }

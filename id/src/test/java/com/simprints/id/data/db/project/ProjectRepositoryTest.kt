@@ -14,6 +14,12 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
+/*
+ * runBlockingTest will make these tests fail by throwing an IllegalStateException:
+ * This job has not completed yet. Replacing it with runBlocking has fixed the issue.
+ * Source: https://github.com/Kotlin/kotlinx.coroutines/issues/1204
+ */
+@ExperimentalCoroutinesApi
 class ProjectRepositoryTest {
 
     private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mockk()

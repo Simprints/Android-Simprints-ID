@@ -116,6 +116,7 @@ open class Application : MultiDexApplication() {
         factory { component.getAndroidResourcesHelper() }
         factory { orchestratorComponent.getFlowManager() }
         factory { component.getPersonRepository() }
+        factory { component.getImageRepository() }
     }
 
     override fun onTerminate() {
