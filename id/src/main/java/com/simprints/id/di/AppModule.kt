@@ -8,12 +8,6 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
-import com.simprints.id.activities.dashboard.DashboardViewModelFactory
-import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
-import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayerImpl
-import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayerImpl
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
@@ -68,6 +62,8 @@ import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerI
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.*
+import com.simprints.id.tools.device.ConnectivityHelper
+import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
@@ -345,6 +341,10 @@ open class AppModule {
         builder.buildEncryptedSharedPreferences()
 
     @Provides
-    open fun provideDeviceManager(ctx: Context): DeviceManager = DeviceManagerImpl(ctx)
+    open fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager = DeviceManagerImpl(connectivityHelper)
+
+    @Provides
+    open fun provideConnectivityHelper(ctx: Context): ConnectivityHelper = ConnectivityHelperImpl(ctx)
+
 }
 

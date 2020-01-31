@@ -11,7 +11,6 @@ import com.simprints.id.tools.device.DeviceManager
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class PrivacyNoticePresenter(val view: PrivacyNoticeContract.View,
@@ -37,8 +36,7 @@ class PrivacyNoticePresenter(val view: PrivacyNoticeContract.View,
     }
 
     override fun downloadLongConsent() {
-        val isConnected = runBlocking { deviceManager.isConnected() }
-        if (isConnected) {
+        if (deviceManager.isConnected() ) {
             logMessageForCrashReportWithNetworkTrigger("Starting download for long consent")
             view.setDownloadInProgress(true)
             startDownloadingLongConsent()

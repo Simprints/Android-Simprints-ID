@@ -61,15 +61,15 @@ open class DataModule {
 
     @Provides
     open fun providePersonRepository(
-        personLocalDataSource: PersonLocalDataSource,
         personRemoteDataSource: PersonRemoteDataSource,
-                                     peopleUpSyncExecutor: PeopleUpSyncExecutor,
-        downSyncScopeRepository: PeopleDownSyncScopeRepository
+        personLocalDataSource: PersonLocalDataSource,
+        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
+        peopleUpSyncExecutor: PeopleUpSyncExecutor
     ): PersonRepository = PersonRepositoryImpl(
         personRemoteDataSource,
         personLocalDataSource,
-        peopleUpSyncExecutor,
-        peopleUpSyncManager
+        peopleDownSyncScopeRepository,
+        peopleUpSyncExecutor
     )
 
     @Provides
