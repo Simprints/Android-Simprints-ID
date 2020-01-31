@@ -108,13 +108,11 @@ class Scanner(
     }
 
     private inline fun <reified R : RootResponse> sendRootModeCommandAndReceiveResponse(command: RootCommand): Single<R> =
-        rootMessageChannel.outgoing.sendMessage(command)
-            .doSimultaneously(rootMessageChannel.incoming.receiveResponse<R>())
+        rootMessageChannel.sendRootModeCommandAndReceiveResponse<R>(command)
             .handleErrorsWith(responseErrorHandler)
 
     private inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
-        mainMessageChannel.outgoing.sendMessage(command)
-            .doSimultaneously(mainMessageChannel.incoming.receiveResponse<R>())
+        mainMessageChannel.sendMainModeCommandAndReceiveResponse<R>(command)
             .handleErrorsWith(responseErrorHandler)
 
     fun getVersionInformation(): Single<UnifiedVersionInformation> =
