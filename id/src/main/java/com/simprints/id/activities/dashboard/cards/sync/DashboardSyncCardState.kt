@@ -2,18 +2,18 @@ package com.simprints.id.activities.dashboard.cards.sync
 
 import java.util.*
 
-sealed class DashboardSyncCardState(open val lastSyncTime: Date) {
+sealed class DashboardSyncCardState(open val lastTimeSyncSucceed: Date?) {
 
-    data class SyncDefault(override val lastSyncTime: Date) : DashboardSyncCardState(lastSyncTime)
+    data class SyncDefault(override val lastTimeSyncSucceed: Date?) : DashboardSyncCardState(lastTimeSyncSucceed)
 
-    data class SyncFailed(override val lastSyncTime: Date) : DashboardSyncCardState(lastSyncTime)
-    data class SyncTryAgain(override val lastSyncTime: Date) : DashboardSyncCardState(lastSyncTime)
-    data class SyncNoModules(override val lastSyncTime: Date) : DashboardSyncCardState(lastSyncTime)
-    data class SyncOffline(override val lastSyncTime: Date) : DashboardSyncCardState(lastSyncTime)
+    data class SyncProgress(override val lastTimeSyncSucceed: Date?, val progress: Int, val total: Int?) : DashboardSyncCardState(lastTimeSyncSucceed)
+    data class SyncConnecting(override val lastTimeSyncSucceed: Date?, val progress: Int, val total: Int?) : DashboardSyncCardState(lastTimeSyncSucceed)
 
-    data class SyncProgress(override val lastSyncTime: Date, val progress: Int, val total: Int) : DashboardSyncCardState(lastSyncTime)
-    data class SyncConnecting(override val lastSyncTime: Date, val progress: Int, val total: Int) : DashboardSyncCardState(lastSyncTime)
+    data class SyncFailed(override val lastTimeSyncSucceed: Date?) : DashboardSyncCardState(lastTimeSyncSucceed)
+    data class SyncTryAgain(override val lastTimeSyncSucceed: Date?) : DashboardSyncCardState(lastTimeSyncSucceed)
+    data class SyncComplete(override val lastTimeSyncSucceed: Date?) : DashboardSyncCardState(lastTimeSyncSucceed)
 
-    data class SyncComplete(override val lastSyncTime: Date) : DashboardSyncCardState(lastSyncTime)
+    data class SyncNoModules(override val lastTimeSyncSucceed: Date?) : DashboardSyncCardState(lastTimeSyncSucceed)
+    data class SyncOffline(override val lastTimeSyncSucceed: Date?) : DashboardSyncCardState(lastTimeSyncSucceed)
 }
 

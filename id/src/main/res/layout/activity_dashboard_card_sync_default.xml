@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     style="@style/DashboardCardStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -16,7 +17,8 @@
             style="@style/DashboardCardStyleTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/dashboard_card_sync_title" />
+            android:text="Placeholder - Card Title"
+            tools:ignore="HardcodedText" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/dashboard_sync_card_default_state_sync_button"
@@ -25,7 +27,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="12dp"
             android:layout_marginBottom="@dimen/activity_dashboard_card_sync_space_above_last_sync"
-            android:text="@string/dashboard_sync_card_sync_button" />
+            android:text="Placeholder - Card Title"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/dashboard_sync_card_last_sync"

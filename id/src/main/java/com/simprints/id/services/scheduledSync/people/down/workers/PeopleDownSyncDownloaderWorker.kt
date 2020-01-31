@@ -8,11 +8,13 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
+import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
+import com.simprints.id.services.scheduledSync.people.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import javax.inject.Inject
 
 class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
@@ -22,6 +24,8 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
         const val PROGRESS_DOWN_SYNC = "PROGRESS_DOWN_SYNC"
         const val OUTPUT_DOWN_SYNC = "OUTPUT_DOWN_SYNC"
     }
+
+    override val tag: String = PeopleDownSyncDownloaderWorker::class.java.simpleName
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var peopleDownSyncDownloaderTask: PeopleDownSyncDownloaderTask
@@ -36,13 +40,11 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
         return try {
             getComponent<PeopleDownSyncDownloaderWorker> { it.inject(this) }
             val downSyncOperation = extractSubSyncScopeFromInput()
-            crashlyticsLog("Preparing downSync request for $downSyncOperation")
+            crashlyticsLog("Start - Params: $downSyncOperation")
 
             execute(downSyncOperation)
         } catch (t: Throwable) {
-            logFailure(t)
-
-            resultSetter.failure()
+            fail(t)
         }
     }
 
@@ -53,13 +55,17 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
                 id.toString(),
                 this)
 
-            logSuccess("DownSync done for $downSyncOperation $totalDownloaded")
-
-            resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to totalDownloaded))
+            success(workDataOf(OUTPUT_DOWN_SYNC to totalDownloaded), "Total downloaded: $totalDownloaded for $downSyncOperation")
         } catch (t: Throwable) {
-            logFailure(t)
+            retryOrFailIfCloudIntegrationError(t)
+        }
+    }
 
-            resultSetter.retry()
+    private fun retryOrFailIfCloudIntegrationError(t: Throwable): Result {
+        return if (t is SyncCloudIntegrationException) {
+            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
+        } else {
+            retry(t)
         }
     }
 
@@ -73,22 +79,13 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
             workDataOf(PROGRESS_DOWN_SYNC to count)
         )
     }
-
-    private fun logFailure(t: Throwable) =
-        logFailure<PeopleDownSyncDownloaderWorker>(t)
-
-    private fun logSuccess(message: String) =
-        logSuccess<PeopleDownSyncDownloaderWorker>(message)
-
-    private fun crashlyticsLog(message: String) =
-        crashReportLog<PeopleDownSyncDownloaderWorker>(message)
 }
 
-fun WorkInfo.extractDownSyncProgress(progressCache: PeopleSyncProgressCache): Int? {
+fun WorkInfo.extractDownSyncProgress(peopleSyncCache: PeopleSyncCache): Int? {
     val progress = this.progress.getInt(PROGRESS_DOWN_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_DOWN_SYNC, -1)
 
     //When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
-    val cached = progressCache.getProgress(id.toString())
+    val cached = peopleSyncCache.readProgress(id.toString())
     return maxOf(progress, output, cached)
 }

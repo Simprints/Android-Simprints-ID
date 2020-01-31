@@ -177,7 +177,7 @@
 
     <string name="dashboard_sync_card_complete">Sync complete</string>
     <string name="dashboard_sync_card_incomplete">Sync incomplete</string>
-    <string name="dashboard_sync_card_connecting">Connecting…</string>
+    <string name="dashboard_sync_card_connecting">Connecting</string>
     <string name="dashboard_sync_card_progress">Syncing… %1$s</string>
     <string name="dashboard_sync_card_sync_button">SYNC NOW</string>
     <string name="dashboard_sync_card_failed_message">Sync failed. Please contact your supervisor</string>
@@ -268,6 +268,7 @@
     <string name="confirm_module_selection_title">Modules selected</string>
     <string name="confirm_module_selection_yes">Confirm</string>
     <string name="confirm_module_selection_cancel">Cancel</string>
+    <string name="dashboard_sync_card_try_again_button">TRY AGAIN</string>
     <!-- endregion -->
 
 </resources>
