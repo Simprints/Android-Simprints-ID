@@ -18,27 +18,18 @@ object LanguageHelper {
      * Languages are usually two  or three characters, except if they also contain a region.
      * If they contain a region they follow the format [language]-r[REGION] e.g. fa-rAF
      */
-    private fun localeFor(languageString: String): Locale =
+    private fun localeFor(languageString: String): Locale {
+        val localeParts = languageString.split("-r")
+        val language = localeParts[0]
+        return if (localeParts.size > 1) {
+            Locale.Builder()
+                .setLanguage(language)
+                .setRegion(localeParts[1]).build()
 
-        with(languageString) {
-            if (contains("-r") && length > 2) {
-
-                var indexOfFlag = -1
-                for (i in 0 until length - 1) {
-                    if (substring(i, i + 2) == "-r") {
-                        indexOfFlag = i
-                    }
-                }
-
-                val language = substring(0, indexOfFlag)
-                val country = substring(indexOfFlag + 1, length)
-
-                Locale(language, country)
-
-            } else {
-                Locale(languageString)
-            }
+        } else {
+            Locale(localeParts[0])
         }
+    }
 
     fun contextWithSpecificLanguage(context: Context, languageString: String): Context =
         context.createConfigurationContext(configurationWithSpecificLocale(languageString))
