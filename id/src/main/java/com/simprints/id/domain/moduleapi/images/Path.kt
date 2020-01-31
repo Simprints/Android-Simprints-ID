@@ -1,10 +1,9 @@
-package com.simprints.id.data.db.images.domain
+package com.simprints.id.domain.moduleapi.images
 
 import com.simprints.core.images.model.Path
 import com.simprints.moduleapi.common.IPath
 import kotlinx.android.parcel.Parcelize
 
-// STOPSHIP TODO: confirm package
 fun Path.fromDomainToModuleApi(): IPath = IPathImpl(parts)
 
 fun IPath.fromModuleApiToDomain() = Path(parts)
