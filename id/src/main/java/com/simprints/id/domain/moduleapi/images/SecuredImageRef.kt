@@ -1,11 +1,10 @@
-package com.simprints.id.data.db.images.domain
+package com.simprints.id.domain.moduleapi.images
 
 import com.simprints.core.images.model.SecuredImageRef
 import com.simprints.moduleapi.common.IPath
 import com.simprints.moduleapi.common.ISecuredImageRef
 import kotlinx.android.parcel.Parcelize
 
-// STOPSHIP TODO: confirm package
 fun SecuredImageRef.fromDomainToModuleApi(): ISecuredImageRef = ISecuredImageRefImpl(
     path.fromDomainToModuleApi()
 )
