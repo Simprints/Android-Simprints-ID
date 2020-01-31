@@ -28,6 +28,7 @@ class ImageUpSyncWorkerTest {
     fun setUp() {
         imageUpSyncWorker = TestListenableWorkerBuilder<ImageUpSyncWorker>(app).build().apply {
             imageRepository = mockk()
+            crashReportManager = mockk(relaxed = true)
         }
         app.component = mockk(relaxed = true)
     }

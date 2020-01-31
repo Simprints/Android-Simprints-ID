@@ -47,16 +47,16 @@ class TestDataModule(
     }
 
     override fun providePersonRepository(
-        personLocalDataSource: PersonLocalDataSource,
         personRemoteDataSource: PersonRemoteDataSource,
-        peopleUpSyncExecutor: PeopleUpSyncExecutor,
-        downSyncScopeRepository: PeopleDownSyncScopeRepository
+        personLocalDataSource: PersonLocalDataSource,
+        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
+        peopleUpSyncExecutor: PeopleUpSyncExecutor
     ): PersonRepository = personRepositoryRule.resolveDependency {
         super.providePersonRepository(
-            personLocalDataSource,
             personRemoteDataSource,
-            peopleUpSyncExecutor,
-            downSyncScopeRepository
+            personLocalDataSource,
+            peopleDownSyncScopeRepository,
+            peopleUpSyncExecutor
         )
     }
 
