@@ -1,4 +1,4 @@
-package com.simprints.id.activities.dashboard.cards.activity.displayer
+package com.simprints.id.activities.dashboard.cards.daily_activity.displayer
 
 interface DailyActivityDisplayer {
     fun initRoot()

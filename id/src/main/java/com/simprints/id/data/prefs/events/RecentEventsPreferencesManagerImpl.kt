@@ -26,6 +26,15 @@ class RecentEventsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
 
         private const val LAST_IDENTIFICATION_EVENT_KEY = "LastIdentificationEvent"
         private val LAST_IDENTIFICATION_EVENT_DEFAULT = null
+
+        private const val ENROLMENTS_KEY = "Enrolments"
+        private const val ENROLMENTS_DEFAULT = 0
+
+        private const val IDENTIFICATIONS_KEY = "Identifications"
+        private const val IDENTIFICATIONS_DEFAULT = 0
+
+        private const val VERIFICATIONS_KEY = "Verifications"
+        private const val VERIFICATIONS_DEFAULT = 0
     }
 
     override var lastScannerUsed: String
@@ -45,4 +54,13 @@ class RecentEventsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
 
     override var lastVerificationDate: Date?
         by DatePreference(prefs, LAST_IDENTIFICATION_EVENT_KEY, LAST_IDENTIFICATION_EVENT_DEFAULT)
+
+    override var enrolmentsToday: Int by PrimitivePreference(prefs, ENROLMENTS_KEY, ENROLMENTS_DEFAULT)
+
+    override var identificationsToday: Int
+        by PrimitivePreference(prefs, IDENTIFICATIONS_KEY, IDENTIFICATIONS_DEFAULT)
+
+    override var verificationsToday: Int
+        by PrimitivePreference(prefs, VERIFICATIONS_KEY, VERIFICATIONS_DEFAULT)
+
 }
