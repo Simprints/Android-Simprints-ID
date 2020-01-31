@@ -27,6 +27,7 @@ import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.testtools.common.di.DependencyRule
@@ -142,6 +143,6 @@ class TestAppModule(
     override fun provideEncryptedSharedPreferences(builder: EncryptedSharedPreferencesBuilder): SharedPreferences =
         encryptedSharedPreferencesRule.resolveDependency { super.provideEncryptedSharedPreferences(builder) }
 
-    override fun provideDeviceManager(ctx: Context): DeviceManager =
-        deviceManagerRule.resolveDependency { super.provideDeviceManager(ctx) }
+    override fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager =
+        deviceManagerRule.resolveDependency { super.provideDeviceManager(connectivityHelper) }
 }
