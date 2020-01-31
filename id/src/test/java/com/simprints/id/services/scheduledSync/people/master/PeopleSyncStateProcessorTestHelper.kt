@@ -1,0 +1,178 @@
+package com.simprints.id.services.scheduledSync.people.master
+
+import androidx.work.Data
+import androidx.work.WorkInfo
+import androidx.work.WorkInfo.State.*
+import androidx.work.workDataOf
+import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.id.data.db.common.models.PeopleCount
+import com.simprints.id.services.scheduledSync.people.common.*
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.DOWNLOADED
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.TO_DOWNLOAD
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.TO_UPLOAD
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.UNIQUE_DOWN_SYNC_ID
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.UNIQUE_SYNC_ID
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.UNIQUE_UP_SYNC_ID
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.UPLOADED
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.*
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.*
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncCountWorker
+import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker
+import java.util.*
+
+fun PeopleSyncState.assertConnectingSyncState() {
+    assertProgressAndTotal(syncId, total, progress)
+    assertThat(downSyncWorkersInfo.count { it.state is Enqueued }).isEqualTo(1)
+    upSyncWorkersInfo.all { it.state is Succeeded }
+}
+
+fun PeopleSyncState.assertFailingSyncState() {
+    assertProgressAndTotal(syncId, total, progress)
+    assertThat(downSyncWorkersInfo.count { it.state is Failed }).isEqualTo(1)
+    upSyncWorkersInfo.all { it.state is Succeeded }
+}
+
+fun PeopleSyncState.assertSuccessfulSyncState() {
+    assertProgressAndTotal(syncId, total, progress)
+    downSyncWorkersInfo.all { it.state is Succeeded }
+    upSyncWorkersInfo.all { it.state is Succeeded }
+}
+
+fun PeopleSyncState.assertRunningSyncState() {
+    assertProgressAndTotal(syncId, total, progress)
+    assertThat(downSyncWorkersInfo.count { it.state is Running }).isEqualTo(1)
+    upSyncWorkersInfo.all { it.state is Succeeded }
+}
+
+private fun assertProgressAndTotal(syncId: String, total: Int?, progress: Int) {
+    assertThat(syncId).isEqualTo(UNIQUE_SYNC_ID)
+    assertThat(total).isEqualTo(TO_DOWNLOAD + TO_UPLOAD)
+    assertThat(progress).isEqualTo(DOWNLOADED + UPLOADED)
+}
+
+fun createWorkInfosHistoryForSuccessfulSyncInMultiAttempts(): List<WorkInfo> {
+    val successedWorkInfo = createWorkInfosHistoryForSuccessfulSync()
+    return listOf(
+        createDownSyncDownloaderWorker(FAILED, UNIQUE_SYNC_ID, ""),
+        createDownSyncCounterWorker(FAILED, UNIQUE_SYNC_ID, ""),
+        createUpSyncUploaderWorker(FAILED, UNIQUE_SYNC_ID, ""),
+        createUpSyncCounterWorker(FAILED, UNIQUE_SYNC_ID, "")
+    ) + successedWorkInfo
+}
+
+fun createWorkInfosHistoryForSuccessfulSync(): List<WorkInfo> =
+    listOf(
+        createDownSyncDownloaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+        createDownSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+        createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+        createUpSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID)
+    )
+
+fun createWorkInfosHistoryForRunningSync(): List<WorkInfo> =
+    listOf(
+        createDownSyncDownloaderWorker(RUNNING, UNIQUE_SYNC_ID),
+        createDownSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+        createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+        createUpSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID)
+    )
+
+fun createWorkInfosHistoryForFailingSync(): List<WorkInfo> =
+    listOf(
+        createDownSyncDownloaderWorker(FAILED, UNIQUE_SYNC_ID),
+        createDownSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+        createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+        createUpSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID)
+    )
+
+fun createWorkInfosHistoryForConnectingSync(): List<WorkInfo> =
+    listOf(
+        createDownSyncDownloaderWorker(ENQUEUED, UNIQUE_SYNC_ID),
+        createDownSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+        createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+        createUpSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID)
+    )
+
+private fun createDownSyncDownloaderWorker(state: WorkInfo.State,
+                                           uniqueMasterSyncId: String?,
+                                           uniqueSyncId: String? = UNIQUE_DOWN_SYNC_ID,
+                                           id: UUID = UUID.randomUUID()) =
+    createWorkInfo(
+        state,
+        workDataOf(PeopleDownSyncDownloaderWorker.OUTPUT_DOWN_SYNC to DOWNLOADED),
+        createCommonDownSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(DOWNLOADER)),
+        workDataOf(PeopleDownSyncDownloaderWorker.PROGRESS_DOWN_SYNC to DOWNLOADED),
+        id
+    )
+
+private fun createDownSyncCounterWorker(state: WorkInfo.State,
+                                        uniqueMasterSyncId: String?,
+                                        uniqueSyncId: String? = UNIQUE_DOWN_SYNC_ID,
+                                        id: UUID = UUID.randomUUID()) =
+    createWorkInfo(
+        state,
+        workDataOf(PeopleDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN to JsonHelper.gson.toJson(listOf(PeopleCount(TO_DOWNLOAD, 0, 0)))),
+        createCommonDownSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(DOWN_COUNTER)),
+        workDataOf(),
+        id
+    )
+
+private fun createUpSyncUploaderWorker(state: WorkInfo.State,
+                                       uniqueMasterSyncId: String?,
+                                       uniqueSyncId: String? = UNIQUE_UP_SYNC_ID,
+                                       id: UUID = UUID.randomUUID()) =
+    createWorkInfo(
+        state,
+        workDataOf(PeopleUpSyncUploaderWorker.OUTPUT_UP_SYNC to UPLOADED),
+        createCommonUpSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(UPLOADER)),
+        workDataOf(PeopleUpSyncUploaderWorker.PROGRESS_UP_SYNC to UPLOADED),
+        id
+    )
+
+private fun createUpSyncCounterWorker(state: WorkInfo.State,
+                                      uniqueMasterSyncId: String?,
+                                      uniqueSyncId: String? = UNIQUE_UP_SYNC_ID,
+                                      id: UUID = UUID.randomUUID()) =
+    createWorkInfo(
+        state,
+        workDataOf(PeopleUpSyncCountWorker.OUTPUT_COUNT_WORKER_UP to JsonHelper.gson.toJson(PeopleCount(TO_UPLOAD, 0, 0))),
+        createCommonUpSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(UP_COUNTER)),
+        workDataOf(),
+        id
+    )
+
+fun createCommonDownSyncTags(uniqueMasterSyncId: String?,
+                             uniqueSyncId: String?) = listOf(
+    "${TAG_DOWN_MASTER_SYNC_ID}${uniqueSyncId}",
+    "${TAG_SCHEDULED_AT}${Date().time}",
+    TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS,
+    TAG_PEOPLE_SYNC_ALL_WORKERS,
+    "${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
+)
+
+private fun createCommonUpSyncTags(uniqueMasterSyncId: String?,
+                                   uniqueSyncId: String?) = listOf(
+    "${TAG_UP_MASTER_SYNC_ID}${uniqueSyncId}",
+    "${TAG_SCHEDULED_AT}${Date().time}",
+    TAG_PEOPLE_UP_SYNC_ALL_WORKERS,
+    TAG_PEOPLE_SYNC_ALL_WORKERS,
+    "${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
+)
+
+fun createWorkInfo(state: WorkInfo.State,
+                   output: Data = workDataOf(),
+                   tags: List<String> = emptyList(),
+                   progress: Data = workDataOf(),
+                   id: UUID = UUID.randomUUID()) =
+    WorkInfo(
+        id,
+        state,
+        output,
+        tags,
+        progress,
+        0
+    )

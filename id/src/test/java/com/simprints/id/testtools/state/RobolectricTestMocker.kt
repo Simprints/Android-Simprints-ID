@@ -2,9 +2,9 @@ package com.simprints.id.testtools.state
 
 import android.content.SharedPreferences
 import com.google.gson.JsonObject
+import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.common.RemoteDbManager
@@ -79,7 +79,7 @@ object RobolectricTestMocker {
         PeopleRemoteInterface.baseUrl = mockServer?.url("/").toString()
         wheneverOnSuspend(personRepository) { insertOrUpdate(anyNotNull()) } thenOnBlockingReturn Unit
         wheneverOnSuspend(personRepository) { load(anyNotNull()) } thenOnBlockingThrow IllegalStateException::class.java
-        wheneverOnSuspend(personRepository) { localCountForSyncScope(anyNotNull()) } thenOnBlockingReturn Single.error(IllegalStateException())
+        wheneverOnSuspend(personRepository) { count(anyNotNull()) } thenOnBlockingThrow  IllegalStateException::class.java
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock)
 

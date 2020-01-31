@@ -4,7 +4,7 @@ import com.google.gson.JsonSyntaxException
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.Serializer
 
 

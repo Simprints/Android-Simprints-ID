@@ -75,6 +75,7 @@ dependencies {
     implementation deps.firebase.core
     implementation deps.testing.work
     implementation deps.testing.coroutines_test
+    implementation deps.testing.mockk.core
 
     implementation deps.realm.annotations
     implementation(deps.realm.kotlin) {

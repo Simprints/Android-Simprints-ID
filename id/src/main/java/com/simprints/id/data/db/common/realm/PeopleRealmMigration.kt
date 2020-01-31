@@ -7,7 +7,6 @@ import com.simprints.id.data.db.person.local.models.DbFaceSample
 import com.simprints.id.data.db.person.local.models.DbFingerprintSample
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.project.local.models.DbProject
-import com.simprints.id.data.db.syncinfo.local.models.DbSyncInfo
 import com.simprints.id.domain.Constants
 import io.realm.*
 import io.realm.FieldAttribute.REQUIRED
@@ -16,7 +15,7 @@ import java.util.*
 
 internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
 
-    @RealmModule(classes = [DbFingerprintSample::class, DbFaceSample::class, DbPerson::class, DbProject::class, DbSyncInfo::class])
+    @RealmModule(classes = [DbFingerprintSample::class, DbFaceSample::class, DbPerson::class, DbProject::class])
     class PeopleModule
 
     companion object {

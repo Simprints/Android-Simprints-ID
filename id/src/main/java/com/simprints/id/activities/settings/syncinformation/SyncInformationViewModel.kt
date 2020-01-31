@@ -2,20 +2,19 @@ package com.simprints.id.activities.settings.syncinformation
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.launch
 
 class SyncInformationViewModel(private val personRepository: PersonRepository,
                                private val personLocalDataSource: PersonLocalDataSource,
                                private val preferencesManager: PreferencesManager,
                                private val projectId: String,
-                               private val syncScopesBuilder: SyncScopesBuilder) : ViewModel() {
+                               private val peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository) : ViewModel() {
 
     val localRecordCount = MutableLiveData<Int>()
     val recordsToUpSyncCount = MutableLiveData<Int>()
@@ -40,20 +39,22 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
         recordsToUpSyncCount.value = personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true))
     }
 
-    internal fun fetchAndUpdateRecordsToDownSyncAndDeleteCount() =
-        syncScopesBuilder.buildSyncScope()?.let { syncScope ->
-            personRepository.countToDownSync(syncScope)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribeBy { peopleCounts ->
-                    recordsToDownSyncCount.postValue(peopleCounts.sumBy {
-                        it.downloadCount
-                    })
-                    recordsToDeleteCount.postValue(peopleCounts.sumBy {
-                        it.deleteCount
-                    })
-                }
+    internal fun fetchAndUpdateRecordsToDownSyncAndDeleteCount() {
+        viewModelScope.launch {
+            try {
+                val downSyncScope = peopleDownSyncScopeRepository.getDownSyncScope()
+                val counts = personRepository.countToDownSync(downSyncScope)
+                recordsToDownSyncCount.postValue(counts.sumBy {
+                    it.created
+                })
+                recordsToDeleteCount.postValue(counts.sumBy {
+                    it.deleted
+                })
+            } catch (t: Throwable) {
+                t.printStackTrace()
+            }
         }
+    }
 
     internal fun fetchAndUpdateSelectedModulesCount() {
         selectedModulesCount.value = preferencesManager.selectedModules.map {
@@ -67,7 +68,8 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
         val unselectedModulesWithCount = unselectedModules.map {
             ModuleCount(it, personLocalDataSource.count(PersonLocalDataSource.Query(
                 projectId = projectId,
-                moduleId = it))) }
+                moduleId = it)))
+        }
 
         unselectedModulesCount.value = unselectedModulesWithCount.filter { it.count > 0 }
     }

@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:background="@drawable/button_rounded_corners"
+        android:background="@drawable/button_rounded_corners_orange"
         android:fontFamily="@font/muli"
         android:padding="8sp"
         android:textColor="@color/simprints_white"

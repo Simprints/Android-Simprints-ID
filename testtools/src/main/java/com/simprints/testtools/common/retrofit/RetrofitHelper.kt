@@ -1,6 +1,10 @@
 package com.simprints.testtools.common.retrofit
 
-import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.Protocol
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import retrofit2.mock.BehaviorDelegate
 import retrofit2.mock.MockRetrofit
@@ -26,7 +30,7 @@ fun getBuilderResponse(statusCode: Int, body: String = "", contentType: String =
         .code(statusCode)
         .message(body)
         .protocol(Protocol.HTTP_1_0)
-        .body(ResponseBody.create(MediaType.parse(contentType), body.toByteArray()))
+        .body(ResponseBody.create(contentType.toMediaTypeOrNull(), body.toByteArray()))
         .addHeader("content-type", contentType)
         .request(Request.Builder().url("http://localhost").build())
 }

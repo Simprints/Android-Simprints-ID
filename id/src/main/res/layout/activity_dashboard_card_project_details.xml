@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/DashboardCardStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/dashboard_project_details_card"
+        style="@style/DashboardCardStyleRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/dashboard_project_details_card_title"
+            style="@style/DashboardCardStyleTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Cohesu Project" />
+
+        <TextView
+            android:id="@+id/dashboard_project_details_card_current_user"
+            style="@style/SimprintsStyle.TextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Current User: Some User" />
+
+        <TextView
+            android:id="@+id/dashboard_project_details_card_scanner_used"
+            style="@style/SimprintsStyle.TextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Scanner Used: SP1234" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
