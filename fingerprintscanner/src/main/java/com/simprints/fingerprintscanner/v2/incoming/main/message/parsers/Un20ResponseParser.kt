@@ -22,6 +22,9 @@ class Un20ResponseParser : MessageParser<Un20Response> {
                     Un20MessageType.GetSupportedImageFormats -> GetSupportedImageFormatsResponse.fromBytes(data)
                     is Un20MessageType.GetImage -> GetImageResponse.fromBytes(minorTypeByte, data)
                     Un20MessageType.GetImageQuality -> GetImageQualityResponse.fromBytes(data)
+                    Un20MessageType.StartOta -> StartOtaResponse.fromBytes(data)
+                    Un20MessageType.WriteOtaChunk -> WriteOtaChunkResponse.fromBytes(data)
+                    Un20MessageType.VerifyOta -> VerifyOtaResponse.fromBytes(data)
                 }
             }
         } catch (e: Exception) {
