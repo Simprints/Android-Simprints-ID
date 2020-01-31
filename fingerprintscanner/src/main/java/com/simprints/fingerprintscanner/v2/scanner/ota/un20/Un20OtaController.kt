@@ -80,6 +80,6 @@ class Un20OtaController(private val crc32Calculator: Crc32Calculator) {
         }
 
     companion object {
-        const val MAX_OTA_CHUNK_SIZE = 1000
+        const val MAX_OTA_CHUNK_SIZE = 990
     }
 }

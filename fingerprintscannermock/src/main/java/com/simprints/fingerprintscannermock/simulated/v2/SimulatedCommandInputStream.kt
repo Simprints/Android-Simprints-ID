@@ -135,6 +135,9 @@ class SimulatedCommandInputStream {
                     Un20MessageType.GetSupportedImageFormats -> GetSupportedImageFormatsCommand.fromBytes(data)
                     is Un20MessageType.GetImage -> GetImageCommand.fromBytes(minorTypeByte, data)
                     Un20MessageType.GetImageQuality -> GetImageQualityCommand.fromBytes(data)
+                    Un20MessageType.StartOta,
+                    Un20MessageType.WriteOtaChunk,
+                    Un20MessageType.VerifyOta -> throw UnsupportedOperationException("Simulated Scanner does not support UN20 OTA")
                 }
             }
     }

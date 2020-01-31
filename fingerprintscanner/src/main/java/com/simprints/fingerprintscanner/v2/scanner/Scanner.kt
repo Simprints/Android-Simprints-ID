@@ -31,6 +31,7 @@ import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHan
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.handleErrorsWith
 import com.simprints.fingerprintscanner.v2.scanner.ota.cypress.CypressOtaController
 import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
+import com.simprints.fingerprintscanner.v2.scanner.ota.un20.Un20OtaController
 import com.simprints.fingerprintscanner.v2.tools.primitives.unsignedToInt
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
@@ -53,6 +54,7 @@ class Scanner(
     private val stmOtaMessageChannel: StmOtaMessageChannel,
     private val cypressOtaController: CypressOtaController,
     private val stmOtaController: StmOtaController,
+    private val un20OtaController: Un20OtaController,
     private val responseErrorHandler: ResponseErrorHandler
 ) {
 
@@ -336,6 +338,10 @@ class Scanner(
     fun startStmOta(firmwareHexFile: String): Observable<Float> =
         assertConnected().andThen(assertMode(STM_OTA)).andThen(
             stmOtaController.program(stmOtaMessageChannel, responseErrorHandler, firmwareHexFile))
+
+    fun startUn20Ota(firmwareBinFile: ByteArray): Observable<Float> =
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
+            un20OtaController.program(mainMessageChannel, responseErrorHandler, firmwareBinFile))
 
     companion object {
         val DEFAULT_DPI = Dpi(500)
