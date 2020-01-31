@@ -77,7 +77,7 @@ class StmOtaControllerTest {
     }
 
     @Test
-    fun program_receivesNackDuringProcess_emitsValueUntilNackThenthrowsException() {
+    fun program_receivesNackDuringProcess_emitsValueUntilNackThenThrowsException() {
         val stmOtaController = StmOtaController(configureIntelHexParserMock())
 
         val testObserver = stmOtaController.program(

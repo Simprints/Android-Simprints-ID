@@ -8,7 +8,7 @@ import org.junit.Test
 class StmOtaMessageSerializerTest {
 
     @Test
-    fun rootCommand_serialized_producesCorrectPackets() {
+    fun stmOtaCommand_serialized_producesCorrectPackets() {
         val message = WriteMemoryStartCommand()
         val expectedBytes = listOf("31 CE")
 
