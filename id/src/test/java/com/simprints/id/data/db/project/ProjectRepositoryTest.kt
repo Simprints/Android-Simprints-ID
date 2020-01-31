@@ -38,6 +38,7 @@ class ProjectRepositoryTest {
 
     @Test
     fun givenAProjectStoredLocally_shouldBeLoadedAndCacheRefreshed() = runBlocking {
+
         val localProject = Project()
         val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns localProject
@@ -52,6 +53,7 @@ class ProjectRepositoryTest {
 
     @Test
     fun givenAProjectStoredLocallyAndNotRemotely_shouldBeLoadedAndCacheNoRefreshed() = runBlocking {
+
         val localProject = Project()
         val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns localProject
@@ -66,6 +68,7 @@ class ProjectRepositoryTest {
 
     @Test
     fun givenProjectStoredOnlyRemotely_shouldBeFetchedAndCacheRefreshed() = runBlocking {
+
         val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns null
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.just(remoteProject)
@@ -79,6 +82,7 @@ class ProjectRepositoryTest {
 
     @Test
     fun givenNoProjectStored_noErrorShouldBeThrown() = runBlocking {
+
         val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns null
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.error(NetworkErrorException(""))

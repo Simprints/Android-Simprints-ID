@@ -8,12 +8,6 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
-import com.simprints.id.activities.dashboard.DashboardViewModelFactory
-import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
-import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayerImpl
-import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayerImpl
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
@@ -50,6 +44,7 @@ import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.secure.*
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
@@ -67,6 +62,10 @@ import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerI
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.*
+import com.simprints.id.tools.device.ConnectivityHelper
+import com.simprints.id.tools.device.ConnectivityHelperImpl
+import com.simprints.id.tools.device.DeviceManager
+import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -100,12 +99,14 @@ open class AppModule {
         remoteDbManager: RemoteDbManager,
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
+        peopleSyncManager: PeopleSyncManager,
         syncManager: SyncManager
     ): SignerManager = SignerManagerImpl(
         projectRepository,
         remoteDbManager,
         loginInfoManager,
         preferencesManager,
+        peopleSyncManager,
         syncManager
     )
 
@@ -148,13 +149,11 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSecureLocalDbKeyProvider(
-        @Named("EncryptedSharedPreferences") encryptedSharedPrefs: SharedPreferences,
-        randomGenerator: RandomGenerator,
-        unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider
-    ): SecureLocalDbKeyProvider =
+    open fun provideSecureLocalDbKeyProvider(builder: EncryptedSharedPreferencesBuilder,
+                                             randomGenerator: RandomGenerator,
+                                             unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
         SecureLocalDbKeyProviderImpl(
-            encryptedSharedPrefs,
+            builder.buildEncryptedSharedPreferences(FILENAME_FOR_REALM_KEY_SHARED_PREFS),
             randomGenerator,
             unsecuredLocalDbKeyProvider
         )
@@ -313,18 +312,11 @@ open class AppModule {
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
 
     @Provides
-    open fun provideFetchGuidViewModelFactory(
-        personRepository: PersonRepository,
-        simNetworkUtils: SimNetworkUtils,
-        sessionEventsManager: SessionEventsManager,
-        timeHelper: TimeHelper
-    ) =
-        FetchGuidViewModelFactory(
-            personRepository,
-            simNetworkUtils,
-            sessionEventsManager,
-            timeHelper
-        )
+    open fun provideFetchGuidViewModelFactory(personRepository: PersonRepository,
+                                              deviceManager: DeviceManager,
+                                              sessionEventsManager: SessionEventsManager,
+                                              timeHelper: TimeHelper) =
+        FetchGuidViewModelFactory(personRepository, deviceManager, sessionEventsManager, timeHelper)
 
     @Provides
     open fun provideSyncInformationViewModelFactory(
@@ -340,46 +332,19 @@ open class AppModule {
         )
 
     @Provides
+    open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =
+        EncryptedSharedPreferencesBuilderImpl(app)
+
+    @Provides
     @Named("EncryptedSharedPreferences")
-    open fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
-        EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
+    open fun provideEncryptedSharedPreferences(builder: EncryptedSharedPreferencesBuilder): SharedPreferences =
+        builder.buildEncryptedSharedPreferences()
 
     @Provides
-    open fun provideDashboardSyncCardDisplayer(
-        androidResourcesHelper: AndroidResourcesHelper,
-        timeHelper: TimeHelper,
-        ctx: Context
-    ): DashboardSyncCardDisplayer =
-        DashboardSyncCardDisplayerImpl(androidResourcesHelper, timeHelper, ctx)
+    open fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager = DeviceManagerImpl(connectivityHelper)
 
     @Provides
-    open fun provideDashboardProjectDetailsCardDisplayer(
-        androidResourcesHelper: AndroidResourcesHelper
-    ): DashboardProjectDetailsCardDisplayer = DashboardProjectDetailsCardDisplayerImpl(
-        androidResourcesHelper
-    )
-
-    @Provides
-    open fun provideProjectDetailsRepository(
-        projectRepository: ProjectRepository,
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager
-    ): DashboardProjectDetailsRepository = DashboardProjectDetailsRepository(
-        projectRepository,
-        loginInfoManager,
-        preferencesManager
-    )
-
-    @Provides
-    open fun provideDashboardViewModelFactory(
-        peopleSyncManager: PeopleSyncManager,
-        projectDetailsRepository: DashboardProjectDetailsRepository
-    ): DashboardViewModelFactory {
-        return DashboardViewModelFactory(
-            peopleSyncManager,
-            projectDetailsRepository
-        )
-    }
+    open fun provideConnectivityHelper(ctx: Context): ConnectivityHelper = ConnectivityHelperImpl(ctx)
 
 }
 
