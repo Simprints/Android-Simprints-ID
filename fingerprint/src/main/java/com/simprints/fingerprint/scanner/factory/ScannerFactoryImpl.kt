@@ -5,7 +5,13 @@ import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV2
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.v2.channel.CypressOtaMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
+import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Route
+import com.simprints.fingerprintscanner.v2.incoming.cypressota.CypressOtaMessageInputStream
+import com.simprints.fingerprintscanner.v2.incoming.cypressota.CypressOtaResponseParser
 import com.simprints.fingerprintscanner.v2.incoming.main.MainMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.Un20ResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroEventAccumulator
@@ -21,8 +27,9 @@ import com.simprints.fingerprintscanner.v2.incoming.root.RootResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.root.RootResponseParser
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaMessageInputStream
 import com.simprints.fingerprintscanner.v2.incoming.stmota.StmOtaResponseParser
-import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.outgoing.common.OutputStreamDispatcher
+import com.simprints.fingerprintscanner.v2.outgoing.cypressota.CypressOtaMessageOutputStream
+import com.simprints.fingerprintscanner.v2.outgoing.cypressota.CypressOtaMessageSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageOutputStream
 import com.simprints.fingerprintscanner.v2.outgoing.main.MainMessageSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.root.RootMessageOutputStream
@@ -31,9 +38,9 @@ import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageOutputSt
 import com.simprints.fingerprintscanner.v2.outgoing.stmota.StmOtaMessageSerializer
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
-import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
-import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
-import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
+import com.simprints.fingerprintscanner.v2.scanner.ota.cypress.CypressOtaController
+import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
+import com.simprints.fingerprintscanner.v2.tools.crc.Crc32Computer
 import com.simprints.fingerprintscanner.v2.tools.hexparser.IntelHexParser
 import com.simprints.fingerprintscanner.v2.tools.lang.objects
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
@@ -80,6 +87,15 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                         OutputStreamDispatcher()
                     )
                 ),
+                CypressOtaMessageChannel(
+                    CypressOtaMessageInputStream(
+                        CypressOtaResponseParser()
+                    ),
+                    CypressOtaMessageOutputStream(
+                        CypressOtaMessageSerializer(),
+                        OutputStreamDispatcher()
+                    )
+                ),
                 StmOtaMessageChannel(
                     StmOtaMessageInputStream(
                         StmOtaResponseParser()
@@ -89,6 +105,7 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                         OutputStreamDispatcher()
                     )
                 ),
+                CypressOtaController(Crc32Computer()),
                 StmOtaController(IntelHexParser()),
                 ResponseErrorHandler(ResponseErrorHandlingStrategy.Default)
             ),
