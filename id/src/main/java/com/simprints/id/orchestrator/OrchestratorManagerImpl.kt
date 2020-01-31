@@ -92,6 +92,7 @@ open class OrchestratorManagerImpl(
         val appResponseToReturn = appResponseFactory.buildAppResponse(
             modalities, appRequest, steps, sessionId
         )
+        // TODO: update daily activity based on response type
         ongoingStep.value = null
         appResponse.value = appResponseToReturn
     }
