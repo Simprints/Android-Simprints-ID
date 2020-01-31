@@ -7,7 +7,7 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.models.PeopleCount
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory
+import com.simprints.id.services.scheduledSync.people.common.*
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.DOWNLOADED
@@ -17,35 +17,36 @@ import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProc
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.UNIQUE_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.UNIQUE_UP_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImplTest.Companion.UPLOADED
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.*
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.*
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.*
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker
 import java.util.*
 
 fun PeopleSyncState.assertConnectingSyncState() {
     assertProgressAndTotal(syncId, total, progress)
-    assertThat(downSyncStates.count { it.state == ENQUEUED }).isEqualTo(1)
-    upSyncStates.all { it.state == SUCCEEDED }
+    assertThat(downSyncWorkersInfo.count { it.state is Enqueued }).isEqualTo(1)
+    upSyncWorkersInfo.all { it.state is Succeeded }
 }
 
 fun PeopleSyncState.assertFailingSyncState() {
     assertProgressAndTotal(syncId, total, progress)
-    assertThat(downSyncStates.count { it.state == FAILED }).isEqualTo(1)
-    upSyncStates.all { it.state == SUCCEEDED }
+    assertThat(downSyncWorkersInfo.count { it.state is Failed }).isEqualTo(1)
+    upSyncWorkersInfo.all { it.state is Succeeded }
 }
 
 fun PeopleSyncState.assertSuccessfulSyncState() {
     assertProgressAndTotal(syncId, total, progress)
-    downSyncStates.all { it.state == SUCCEEDED }
-    upSyncStates.all { it.state == SUCCEEDED }
+    downSyncWorkersInfo.all { it.state is Succeeded }
+    upSyncWorkersInfo.all { it.state is Succeeded }
 }
 
 fun PeopleSyncState.assertRunningSyncState() {
     assertProgressAndTotal(syncId, total, progress)
-    assertThat(downSyncStates.count { it.state == RUNNING }).isEqualTo(1)
-    upSyncStates.all { it.state == SUCCEEDED }
+    assertThat(downSyncWorkersInfo.count { it.state is Running }).isEqualTo(1)
+    upSyncWorkersInfo.all { it.state is Succeeded }
 }
 
 private fun assertProgressAndTotal(syncId: String, total: Int?, progress: Int) {
@@ -146,20 +147,20 @@ private fun createUpSyncCounterWorker(state: WorkInfo.State,
 
 fun createCommonDownSyncTags(uniqueMasterSyncId: String?,
                              uniqueSyncId: String?) = listOf(
-    "${PeopleDownSyncWorkersFactory.TAG_DOWN_MASTER_SYNC_ID}${uniqueSyncId}",
-    "${PeopleSyncMasterWorker.TAG_SCHEDULED_AT}${Date().time}",
-    PeopleDownSyncWorkersFactory.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS,
-    PeopleSyncMasterWorker.TAG_PEOPLE_SYNC_ALL_WORKERS,
-    "${PeopleSyncMasterWorker.TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
+    "${TAG_DOWN_MASTER_SYNC_ID}${uniqueSyncId}",
+    "${TAG_SCHEDULED_AT}${Date().time}",
+    TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS,
+    TAG_PEOPLE_SYNC_ALL_WORKERS,
+    "${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
 )
 
 private fun createCommonUpSyncTags(uniqueMasterSyncId: String?,
                                    uniqueSyncId: String?) = listOf(
-    "${PeopleUpSyncWorkersBuilder.TAG_UP_MASTER_SYNC_ID}${uniqueSyncId}",
-    "${PeopleSyncMasterWorker.TAG_SCHEDULED_AT}${Date().time}",
-    PeopleUpSyncWorkersBuilder.TAG_PEOPLE_UP_SYNC_ALL_WORKERS,
-    PeopleSyncMasterWorker.TAG_PEOPLE_SYNC_ALL_WORKERS,
-    "${PeopleSyncMasterWorker.TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
+    "${TAG_UP_MASTER_SYNC_ID}${uniqueSyncId}",
+    "${TAG_SCHEDULED_AT}${Date().time}",
+    TAG_PEOPLE_UP_SYNC_ALL_WORKERS,
+    TAG_PEOPLE_SYNC_ALL_WORKERS,
+    "${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
 )
 
 fun createWorkInfo(state: WorkInfo.State,

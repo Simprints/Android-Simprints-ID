@@ -134,7 +134,7 @@
 //        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
 //        val lastState = vm.observedValues.last()
 //
-//        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_ENABLED)
+//        Truth.assert_().that(lastState?.syncCardStateLiveData).isEqualTo(SyncCardState.SYNC_ENABLED)
 //    }
 //
 //    @Test
@@ -161,7 +161,7 @@
 //        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
 //        val lastState = vm.observedValues.last()
 //
-//        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_RUNNING)
+//        Truth.assert_().that(lastState?.syncCardStateLiveData).isEqualTo(SyncCardState.SYNC_RUNNING)
 //    }
 //
 //
@@ -170,15 +170,15 @@
 //        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
 //        insertASyncWorkInfoEvent(SyncState.RUNNING)
 //        val latestSyncTime = timeHelper.now()
-//        insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastSyncTime = timeHelper.nowMinus(2, TimeUnit.MINUTES)))
+//        insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastTimeSyncSucceed = timeHelper.nowMinus(2, TimeUnit.MINUTES)))
 //        insertAnUpSyncStatusInDb(UpSyncStatus(lastUpSyncTime = latestSyncTime))
-//        insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastSyncTime = timeHelper.nowMinus(1, TimeUnit.MINUTES)))
+//        insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastTimeSyncSucceed = timeHelper.nowMinus(1, TimeUnit.MINUTES)))
 //
 //        dashboardCardViewModel = createViewModelDashboardToTest()
 //        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
 //        val lastState = vm.observedValues.last()
 //
-//        Truth.assert_().that(lastState?.lastSyncTime).isEqualTo(dashboardCardViewModel.helper?.dateFormat?.format(latestSyncTime))
+//        Truth.assert_().that(lastState?.lastTimeSyncSucceed).isEqualTo(dashboardCardViewModel.helper?.dateFormat?.format(latestSyncTime))
 //    }
 //
 //    @Test
@@ -186,15 +186,15 @@
 //        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
 //        insertASyncWorkInfoEvent(SyncState.RUNNING)
 //        val latestSyncTime = timeHelper.now()
-//        insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastSyncTime = timeHelper.nowMinus(2, TimeUnit.MINUTES)))
-//        insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastSyncTime = latestSyncTime))
+//        insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastTimeSyncSucceed = timeHelper.nowMinus(2, TimeUnit.MINUTES)))
+//        insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastTimeSyncSucceed = latestSyncTime))
 //        insertAnUpSyncStatusInDb(UpSyncStatus(lastUpSyncTime = timeHelper.nowMinus(1, TimeUnit.MINUTES)))
 //
 //        dashboardCardViewModel = createViewModelDashboardToTest()
 //        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
 //        val lastState = vm.observedValues.last()
 //
-//        Truth.assert_().that(lastState?.lastSyncTime).isEqualTo(dashboardCardViewModel.helper?.dateFormat?.format(latestSyncTime))
+//        Truth.assert_().that(lastState?.lastTimeSyncSucceed).isEqualTo(dashboardCardViewModel.helper?.dateFormat?.format(latestSyncTime))
 //    }
 //
 //    @Test
@@ -247,7 +247,7 @@
 //
 //        val lastState = vm.observedValues.last()
 //
-//        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_DISABLED)
+//        Truth.assert_().that(lastState?.syncCardStateLiveData).isEqualTo(SyncCardState.SYNC_DISABLED)
 //    }
 //
 //    @Test
@@ -261,7 +261,7 @@
 //
 //        val lastState = vm.observedValues.last()
 //
-//        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_RUNNING)
+//        Truth.assert_().that(lastState?.syncCardStateLiveData).isEqualTo(SyncCardState.SYNC_RUNNING)
 //    }
 //
 //    private fun mockCounters(peopleInDb: List<PeopleCount>? = null, peopleToUpload: Int? = null, peopleToDownload: List<PeopleCount>? = null) {

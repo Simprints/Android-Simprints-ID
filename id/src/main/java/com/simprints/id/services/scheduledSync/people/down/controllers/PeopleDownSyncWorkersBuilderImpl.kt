@@ -5,27 +5,20 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory.Companion.TAG_DOWN_MASTER_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.people.common.*
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.MIN_BACKOFF_SECS
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_SCHEDULED_AT
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.DOWNLOADER
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.DOWN_COUNTER
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MIN_BACKOFF_SECS
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class PeopleDownSyncWorkersFactoryImpl(val downSyncScopeRepository: PeopleDownSyncScopeRepository) : PeopleDownSyncWorkersFactory {
+class PeopleDownSyncWorkersBuilderImpl(val downSyncScopeRepository: PeopleDownSyncScopeRepository) : PeopleDownSyncWorkersBuilder {
 
     private val downSyncScope: PeopleDownSyncScope
         get() = downSyncScopeRepository.getDownSyncScope()
 
-    override suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<WorkRequest> {
+    override suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest> {
         val downSyncOps = downSyncScopeRepository.getDownSyncOperations(downSyncScope)
         val uniqueDownSyncId = UUID.randomUUID().toString()
         return downSyncOps.map { buildDownSyncWorkers(uniqueSyncId, uniqueDownSyncId, it) } + buildCountWorker(uniqueSyncId, uniqueDownSyncId)
@@ -33,19 +26,19 @@ class PeopleDownSyncWorkersFactoryImpl(val downSyncScopeRepository: PeopleDownSy
 
     private fun buildDownSyncWorkers(uniqueSyncID: String?,
                                      uniqueDownSyncID: String,
-                                     downSyncOperation: PeopleDownSyncOperation): WorkRequest =
+                                     downSyncOperation: PeopleDownSyncOperation): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(PeopleDownSyncDownloaderWorker::class.java)
             .setInputData(workDataOf(INPUT_DOWN_SYNC_OPS to JsonHelper.gson.toJson(downSyncOperation)))
             .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
-            .addTag(tagForType(DOWNLOADER))
-            .build()
+            .addCommonTagForDownloaders()
+            .build() as OneTimeWorkRequest
 
     private fun buildCountWorker(uniqueSyncID: String?,
-                                 uniqueDownSyncID: String): WorkRequest =
+                                 uniqueDownSyncID: String): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(PeopleDownSyncCountWorker::class.java)
             .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
-            .addTag(tagForType(DOWN_COUNTER))
-            .build()
+            .addCommonTagForDownCounters()
+            .build() as OneTimeWorkRequest
 
     private fun getDownSyncWorkerConstraints() =
         Constraints.Builder()
@@ -56,15 +49,10 @@ class PeopleDownSyncWorkersFactoryImpl(val downSyncScopeRepository: PeopleDownSy
                                                             uniqueDownMasterSyncId: String,
                                                             constraints: Constraints) =
         this.setConstraints(constraints)
-            .addTag("${TAG_DOWN_MASTER_SYNC_ID}${uniqueDownMasterSyncId}")
-            .addTag("${TAG_SCHEDULED_AT}${Date().time}")
-            .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
-            .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
-            .also { builder ->
-                uniqueMasterSyncId?.let {
-                    builder.setBackoffCriteria(BackoffPolicy.LINEAR, MIN_BACKOFF_SECS, TimeUnit.SECONDS)
-                    builder.addTag("${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}")
-                }
-            }
-
+            .addTagForMasterSyncId(uniqueMasterSyncId)
+            .addTagForDownSyncId(uniqueDownMasterSyncId)
+            .addTagForScheduledAtNow()
+            .addCommonTagForDownWorkers()
+            .addCommonTagForAllSyncWorkers()
+            .setBackoffCriteria(BackoffPolicy.LINEAR, MIN_BACKOFF_SECS, TimeUnit.SECONDS)
 }
