@@ -126,6 +126,8 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
              * use case: user does sync in the dashboard and then it leaves the dashboard open
              */
             (hasSyncFinished(lastSyncState) && hasSyncRunLongTimeAgo())
+            
+            && isConnected() && !isModuleSelectionRequired()
 
     }
 

@@ -5,6 +5,5 @@ import androidx.lifecycle.LiveData
 interface DeviceManager {
 
     val isConnectedLiveData: LiveData<Boolean>
-    suspend fun isConnected(): Boolean
-
+    fun isConnected(): Boolean
 }

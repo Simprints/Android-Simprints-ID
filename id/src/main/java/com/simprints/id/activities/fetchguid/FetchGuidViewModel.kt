@@ -34,7 +34,7 @@ class FetchGuidViewModel(private val personRepository: PersonRepository,
         getPersonFetchResultForError()
     }
 
-    private suspend fun getPersonFetchResultForError() =
+    private fun getPersonFetchResultForError() =
         if (deviceManager.isConnected()) {
             PersonFetchResult(null, PersonSource.NOT_FOUND_IN_LOCAL_AND_REMOTE)
         } else {
