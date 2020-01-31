@@ -1,13 +1,9 @@
 package com.simprints.id.di
 
 import android.content.Context
+import com.simprints.core.images.repository.ImageRepository
+import com.simprints.core.images.repository.ImageRepositoryImpl
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.image.local.ImageLocalDataSource
-import com.simprints.id.data.db.image.local.ImageLocalDataSourceImpl
-import com.simprints.id.data.db.image.remote.ImageRemoteDataSource
-import com.simprints.id.data.db.image.remote.ImageRemoteDataSourceImpl
-import com.simprints.id.data.db.image.repository.ImageRepository
-import com.simprints.id.data.db.image.repository.ImageRepositoryImpl
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.PersonRepositoryImpl
@@ -27,6 +23,7 @@ import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.FlowPreview
 import javax.inject.Singleton
 
 @Module
@@ -34,56 +31,68 @@ open class DataModule {
 
     @Provides
     @Singleton
-    open fun providePersonRemoteDataSource(remoteDbManager: RemoteDbManager): PersonRemoteDataSource = PersonRemoteDataSourceImpl(remoteDbManager)
+    open fun providePersonRemoteDataSource(
+        remoteDbManager: RemoteDbManager
+    ): PersonRemoteDataSource = PersonRemoteDataSourceImpl(remoteDbManager)
 
     @Provides
-    open fun provideProjectLocalDataSource(ctx: Context,
-                                           secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-                                           loginInfoManager: LoginInfoManager): ProjectLocalDataSource =
-        ProjectLocalDataSourceImpl(ctx, secureLocalDbKeyProvider, loginInfoManager)
+    @FlowPreview
+    open fun provideProjectLocalDataSource(
+        ctx: Context,
+        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
+        loginInfoManager: LoginInfoManager
+    ): ProjectLocalDataSource = ProjectLocalDataSourceImpl(
+        ctx,
+        secureLocalDbKeyProvider,
+        loginInfoManager
+    )
 
     @Provides
     @Singleton
-    open fun provideProjectRemoteDataSource(remoteDbManager: RemoteDbManager): ProjectRemoteDataSource =
-        ProjectRemoteDataSourceImpl(remoteDbManager)
+    open fun provideProjectRemoteDataSource(
+        remoteDbManager: RemoteDbManager
+    ): ProjectRemoteDataSource = ProjectRemoteDataSourceImpl(remoteDbManager)
 
     @Provides
-    open fun provideProjectRepository(projectLocalDataSource: ProjectLocalDataSource,
-                                      projectRemoteDataSource: ProjectRemoteDataSource): ProjectRepository =
-        ProjectRepositoryImpl(projectLocalDataSource, projectRemoteDataSource)
+    open fun provideProjectRepository(
+        projectLocalDataSource: ProjectLocalDataSource,
+        projectRemoteDataSource: ProjectRemoteDataSource
+    ): ProjectRepository = ProjectRepositoryImpl(projectLocalDataSource, projectRemoteDataSource)
 
     @Provides
-    open fun providePersonRepository(personLocalDataSource: PersonLocalDataSource,
-                                     personRemoteDataSource: PersonRemoteDataSource,
+    open fun providePersonRepository(
+        personLocalDataSource: PersonLocalDataSource,
+        personRemoteDataSource: PersonRemoteDataSource,
                                      peopleUpSyncExecutor: PeopleUpSyncExecutor,
-                                     downSyncScopeRepository: PeopleDownSyncScopeRepository): PersonRepository =
-        PersonRepositoryImpl(personRemoteDataSource, personLocalDataSource, downSyncScopeRepository, peopleUpSyncExecutor)
-
-
-    @Provides
-    @Singleton
-    open fun providePersonLocalDataSource(ctx: Context,
-                                          secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-                                          loginInfoManager: LoginInfoManager): PersonLocalDataSource =
-        PersonLocalDataSourceImpl(ctx, secureLocalDbKeyProvider, loginInfoManager)
-
-    @Provides
-    open fun provideFingerprintRecordLocalDataSource(personLocalDataSource: PersonLocalDataSource): FingerprintIdentityLocalDataSource =
-        personLocalDataSource
-
-    @Provides
-    open fun provideImageLocalDataSource(
-        context: Context
-    ): ImageLocalDataSource = ImageLocalDataSourceImpl(context)
-
-    @Provides
-    open fun provideImageRemoteDataSource(): ImageRemoteDataSource = ImageRemoteDataSourceImpl()
+        downSyncScopeRepository: PeopleDownSyncScopeRepository
+    ): PersonRepository = PersonRepositoryImpl(
+        personRemoteDataSource,
+        personLocalDataSource,
+        peopleUpSyncExecutor,
+        peopleUpSyncManager
+    )
 
     @Provides
     @Singleton
+    @FlowPreview
+    open fun providePersonLocalDataSource(
+        ctx: Context,
+        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
+        loginInfoManager: LoginInfoManager
+    ): PersonLocalDataSource = PersonLocalDataSourceImpl(
+        ctx,
+        secureLocalDbKeyProvider,
+        loginInfoManager
+    )
+
+    @Provides
+    open fun provideFingerprintRecordLocalDataSource(
+        personLocalDataSource: PersonLocalDataSource
+    ): FingerprintIdentityLocalDataSource = personLocalDataSource
+
+    @Provides
     open fun provideImageRepository(
-        localDataSource: ImageLocalDataSource,
-        remoteDataSource: ImageRemoteDataSource
-    ): ImageRepository = ImageRepositoryImpl(localDataSource, remoteDataSource)
+        context: Context
+    ): ImageRepository = ImageRepositoryImpl(context)
 
 }
