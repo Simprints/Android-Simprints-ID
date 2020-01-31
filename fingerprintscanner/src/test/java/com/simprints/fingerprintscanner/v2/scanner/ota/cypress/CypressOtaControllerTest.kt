@@ -12,7 +12,7 @@ import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprintscanner.v2.incoming.cypressota.CypressOtaMessageInputStream
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
-import com.simprints.fingerprintscanner.v2.tools.crc.Crc32Computer
+import com.simprints.fingerprintscanner.v2.tools.crc.Crc32Calculator
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.BackpressureStrategy
@@ -30,7 +30,7 @@ class CypressOtaControllerTest {
 
     @Test
     fun program_correctlyEmitsProgressValuesAndCompletes() {
-        val cypressOtaController = CypressOtaController(configureCrcComputerMock())
+        val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
 
         val binFile = generateRandomBinFile()
         val testObserver = cypressOtaController.program(configureMessageStreamMock(), responseErrorHandler, binFile).testSubscribe()
@@ -46,21 +46,21 @@ class CypressOtaControllerTest {
         val binFile = generateRandomBinFile()
         val expectedNumberOfCalls = expectedNumberOfChunks(binFile) + 3
 
-        val crcComputer = configureCrcComputerMock()
+        val crc32Calculator = configureCrcCalculatorMock()
         val messageStreamMock = configureMessageStreamMock()
-        val cypressOtaController = CypressOtaController(crcComputer)
+        val cypressOtaController = CypressOtaController(crc32Calculator)
 
         val testObserver = cypressOtaController.program(messageStreamMock, responseErrorHandler, binFile).testSubscribe()
 
         testObserver.awaitAndAssertSuccess()
 
-        verifyOnce(crcComputer) { computeCrc32(anyNotNull()) }
+        verifyOnce(crc32Calculator) { calculateCrc32(anyNotNull()) }
         verifyExactly(expectedNumberOfCalls, messageStreamMock.outgoing) { sendMessage(anyNotNull()) }
     }
 
     @Test
     fun program_receivesErrorAtPrepareDownload_throwsException() {
-        val cypressOtaController = CypressOtaController(configureCrcComputerMock())
+        val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
 
         val testObserver = cypressOtaController.program(
             configureMessageStreamMock(errorPositions = listOf(0)), responseErrorHandler, generateRandomBinFile()).testSubscribe()
@@ -71,7 +71,7 @@ class CypressOtaControllerTest {
 
     @Test
     fun program_receivesErrorAtDownload_throwsException() {
-        val cypressOtaController = CypressOtaController(configureCrcComputerMock())
+        val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
 
         val testObserver = cypressOtaController.program(
             configureMessageStreamMock(errorPositions = listOf(1)), responseErrorHandler, generateRandomBinFile()).testSubscribe()
@@ -82,7 +82,7 @@ class CypressOtaControllerTest {
 
     @Test
     fun program_receivesErrorDuringSendImageProcess_emitsValueUntilErrorThenThrowsException() {
-        val cypressOtaController = CypressOtaController(configureCrcComputerMock())
+        val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
 
         val binFile = generateRandomBinFile()
         val progressValues = generateExpectedProgressValues(binFile)
@@ -96,7 +96,7 @@ class CypressOtaControllerTest {
 
     @Test
     fun program_receivesErrorAtVerify_throwsException() {
-        val cypressOtaController = CypressOtaController(configureCrcComputerMock())
+        val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
 
         val binFile = generateRandomBinFile()
         val indexOfVerifyResponse = expectedNumberOfChunks(binFile) + 2
@@ -107,8 +107,8 @@ class CypressOtaControllerTest {
         testObserver.assertError(OtaFailedException::class.java)
     }
 
-    private fun configureCrcComputerMock() = setupMock<Crc32Computer> {
-        whenThis { computeCrc32(anyNotNull()) } thenReturn 42
+    private fun configureCrcCalculatorMock() = setupMock<Crc32Calculator> {
+        whenThis { calculateCrc32(anyNotNull()) } thenReturn 42
     }
 
     private fun configureMessageStreamMock(errorPositions: List<Int> = listOf()): CypressOtaMessageChannel {

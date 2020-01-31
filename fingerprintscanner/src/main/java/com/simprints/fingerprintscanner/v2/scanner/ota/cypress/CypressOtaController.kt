@@ -12,7 +12,7 @@ import com.simprints.fingerprintscanner.v2.domain.cypressota.commands.VerifyImag
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.handleErrorsWith
-import com.simprints.fingerprintscanner.v2.tools.crc.Crc32Computer
+import com.simprints.fingerprintscanner.v2.tools.crc.Crc32Calculator
 import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import io.reactivex.Completable
@@ -20,14 +20,14 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toObservable
 
-class CypressOtaController(private val crc32Computer: Crc32Computer) {
+class CypressOtaController(private val crc32Calculator: Crc32Calculator) {
 
     private inline fun <reified R : CypressOtaResponse> sendCypressOtaModeCommandAndReceiveResponse(
-        stmOtaMessageStream: CypressOtaMessageChannel,
+        cypressOtaMessageChannel: CypressOtaMessageChannel,
         errorHandler: ResponseErrorHandler,
         command: CypressOtaCommand
     ): Single<R> =
-        stmOtaMessageStream.sendCypressOtaModeCommandAndReceiveResponse<R>(command)
+        cypressOtaMessageChannel.sendCypressOtaModeCommandAndReceiveResponse<R>(command)
             .handleErrorsWith(errorHandler)
 
     fun program(
@@ -49,7 +49,7 @@ class CypressOtaController(private val crc32Computer: Crc32Computer) {
                     .andThen(Observable.just(progress))
             }
             .concatWith(
-                sendVerifyImageCommand(cypressOtaMessageChannel, errorHandler, crc32Computer.computeCrc32(firmwareBinFile))
+                sendVerifyImageCommand(cypressOtaMessageChannel, errorHandler, crc32Calculator.calculateCrc32(firmwareBinFile))
             )
 
     private fun sendPrepareDownloadCommand(cypressOtaMessageChannel: CypressOtaMessageChannel, errorHandler: ResponseErrorHandler): Completable =
