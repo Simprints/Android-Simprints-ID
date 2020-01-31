@@ -1,8 +1,8 @@
 package com.simprints.fingerprintscanner.v2.tools.crc
 
-class Crc32Computer {
+class Crc32Calculator {
 
-    fun computeCrc32(bytes: ByteArray): Int {
+    fun calculateCrc32(bytes: ByteArray): Int {
 
         var crcValue = -0x1
         for (b in bytes) {

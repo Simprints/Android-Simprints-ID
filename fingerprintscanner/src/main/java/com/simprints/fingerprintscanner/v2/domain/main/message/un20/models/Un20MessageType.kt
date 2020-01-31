@@ -6,8 +6,14 @@ import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
 
 sealed class Un20MessageType(val majorByte: Byte, val minorByte: Byte) {
 
-    // 0x1_ : Versioning
+    // 0x1_ : Versioning & OTA
     object GetUn20AppVersion : Un20MessageType(Un20MessageMajorType.GET_UN20_APP_VERSION.majorByte, IGNORED)
+
+    object StartOta : Un20MessageType(Un20MessageMajorType.START_OTA.majorByte, IGNORED)
+
+    object WriteOtaChunk : Un20MessageType(Un20MessageMajorType.WRITE_OTA_CHUNK.majorByte, IGNORED)
+
+    object VerifyOta : Un20MessageType(Un20MessageMajorType.VERIFY_OTA.majorByte, IGNORED)
 
     // 0x2_ : Sensor commands
     object CaptureFingerprint : Un20MessageType(Un20MessageMajorType.CAPTURE_FINGERPRINT.majorByte, IGNORED)
