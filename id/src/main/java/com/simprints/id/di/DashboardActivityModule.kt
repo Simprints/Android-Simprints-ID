@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import com.simprints.id.activities.dashboard.DashboardViewModelFactory
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
+import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepositoryImpl
 import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
 import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayerImpl
 import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
@@ -63,7 +64,7 @@ open class DashboardActivityModule {
     @Provides
     open fun provideDailyActivityRepository(
         preferencesManager: PreferencesManager
-    ): DashboardDailyActivityRepository = DashboardDailyActivityRepository(preferencesManager)
+    ): DashboardDailyActivityRepository = DashboardDailyActivityRepositoryImpl(preferencesManager)
 
     @Provides
     open fun provideDashboardViewModelFactory(
