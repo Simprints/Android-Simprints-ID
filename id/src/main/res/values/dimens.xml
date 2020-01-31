@@ -21,5 +21,6 @@
 
     <!-- region Text size -->
     <dimen name="text_size_large">16sp</dimen>
+    <dimen name="activity_dashboard_card_sync_space_above_last_sync">16dp</dimen>
     <!-- endregion -->
 </resources>

@@ -25,7 +25,7 @@ import com.simprints.id.activities.settings.fragments.moduleselection.tools.Chip
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.hideKeyboard
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
@@ -39,10 +39,10 @@ class ModuleSelectionFragment(
     private val application: Application
 ) : Fragment(), ModuleSelectionListener, ChipClickListener {
 
-    @Inject lateinit var viewModelFactory: ModuleViewModelFactory
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
-    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var viewModelFactory: ModuleViewModelFactory
+    @Inject lateinit var peopleSyncManager: PeopleSyncManager
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
@@ -77,10 +77,9 @@ class ModuleSelectionFragment(
     }
 
     private fun refreshSyncWorkers(){
-        syncSchedulerHelper.cancelDownSyncWorkers()
-        syncSchedulerHelper.scheduleBackgroundSyncs()
+        peopleSyncManager.cancelAndRescheduleSync()
+        peopleSyncManager.sync()
     }
-
     override fun onChipClick(module: Module) {
         updateSelectionIfPossible(module)
     }

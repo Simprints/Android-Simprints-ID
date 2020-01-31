@@ -9,11 +9,11 @@ import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.id.tools.device.DeviceManager
 import kotlinx.coroutines.launch
 
 class FetchGuidViewModel(private val personRepository: PersonRepository,
-                         private val simNetworkUtils: SimNetworkUtils,
+                         private val deviceManager: DeviceManager,
                          private val sessionEventsManager: SessionEventsManager,
                          private val timeHelper: TimeHelper) : ViewModel() {
 
@@ -35,7 +35,7 @@ class FetchGuidViewModel(private val personRepository: PersonRepository,
     }
 
     private fun getPersonFetchResultForError() =
-        if (simNetworkUtils.isConnected()) {
+        if (deviceManager.isConnected()) {
             PersonFetchResult(null, PersonSource.NOT_FOUND_IN_LOCAL_AND_REMOTE)
         } else {
             PersonFetchResult(null, PersonSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR)
