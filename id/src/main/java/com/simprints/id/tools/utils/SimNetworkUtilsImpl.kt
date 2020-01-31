@@ -2,42 +2,25 @@ package com.simprints.id.tools.utils
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
-import android.os.Build
 import android.telephony.TelephonyManager
 import com.simprints.id.tools.utils.SimNetworkUtils.Connection
 
-open class SimNetworkUtilsImpl(ctx: Context) : SimNetworkUtils {
+open class SimNetworkUtilsImpl(val ctx: Context) : SimNetworkUtils {
 
     private val connectivityManager = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val telephonyManager = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
-    override fun isConnected(): Boolean = try {
-        connectivityManager.activeNetworkInfo.detailedState == NetworkInfo.DetailedState.CONNECTED
-    } catch (e: IllegalStateException) {
-        false
-    }
-
-
     override var connectionsStates: List<Connection> =
         arrayListOf<Connection>().apply {
             try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    connectivityManager.allNetworks?.map { network ->
-                        connectivityManager.getNetworkInfo(network).let {
-                            if(it.typeName != null && it.detailedState != null) {
-                                add(Connection(it.typeName, it.detailedState))
-                            }
-                        }
-                    }
-                } else {
-                    connectivityManager.allNetworkInfo.map {
-                        if(it.typeName != null && it.detailedState != null) {
-                            add(Connection(it.typeName, it.detailedState))
-                        }
+                connectivityManager.allNetworkInfo.map {
+                    if (it.typeName != null && it.detailedState != null) {
+                        add(Connection(it.typeName, it.detailedState))
                     }
                 }
-            } catch (e: Exception) { }
+
+            } catch (e: Exception) {
+            }
         }
 
     override var mobileNetworkType: String? =
@@ -59,7 +42,7 @@ open class SimNetworkUtilsImpl(ctx: Context) : SimNetworkUtils {
                 TelephonyManager.NETWORK_TYPE_LTE -> "LTE"
                 TelephonyManager.NETWORK_TYPE_UMTS -> "UMTS"
                 TelephonyManager.NETWORK_TYPE_UNKNOWN -> "Unknown"
-                else ->  "Unknown"
+                else -> "Unknown"
             }
         }
 }

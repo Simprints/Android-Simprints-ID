@@ -1,6 +1,5 @@
 package com.simprints.id.tools
 
-import android.content.Context
 import android.text.format.DateUtils.*
 import java.util.*
 import java.util.concurrent.TimeUnit

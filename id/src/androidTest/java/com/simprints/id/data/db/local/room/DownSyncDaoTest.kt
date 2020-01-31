@@ -59,12 +59,12 @@
 //    @Test
 //    @Throws(Exception::class)
 //    fun updateLastSyncTimeForId_shouldUpdateLastSyncTime() {
-//        val lastSyncTime = 12345L
+//        val lastTimeSyncSucceed = 12345L
 //        val downSyncStatus = DownSyncStatus(projectId, userId, moduleId, lastPatientId, 0, 0, 0)
 //        downSyncDao?.insertOrReplaceDownSyncStatus(downSyncStatus)
-//        downSyncDao?.updateLastSyncTime(downSyncDao!!.getStatusId(projectId, userId, moduleId), lastSyncTime)
+//        downSyncDao?.updateLastSyncTime(downSyncDao!!.getStatusId(projectId, userId, moduleId), lastTimeSyncSucceed)
 //        val byId = downSyncDao?.getDownSyncStatusForId(downSyncDao?.getStatusId(projectId, userId, moduleId) ?: "")
-//        assertThat(byId?.lastSyncTime).isEqualTo(lastSyncTime)
+//        assertThat(byId?.lastTimeSyncSucceed).isEqualTo(lastTimeSyncSucceed)
 //    }
 //
 //    @Test

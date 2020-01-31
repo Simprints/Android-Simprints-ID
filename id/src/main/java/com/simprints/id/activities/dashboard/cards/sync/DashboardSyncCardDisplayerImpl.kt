@@ -1,26 +1,37 @@
 package com.simprints.id.activities.dashboard.cards.sync
 
 import android.content.Context
+import android.graphics.PorterDuff
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.lifecycle.MutableLiveData
+import com.simprints.core.livedata.LiveDataEvent
+import com.simprints.core.livedata.send
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.extensions.getColorResCompat
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.ticker
 import org.jetbrains.anko.layoutInflater
 import org.jetbrains.anko.textColor
 import java.util.*
+import kotlin.math.min
 
 
 class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResourcesHelper,
                                      val timeHelper: TimeHelper,
                                      val ctx: Context) : DashboardSyncCardDisplayer {
+
+    var tickerToUpdateLastSyncTimeText: ReceiveChannel<Unit>? = null
+    private var lastSyncTimeTextView: TextView? = null
+    private var cachedLastSyncTime: Date? = null
 
     private lateinit var root: LinearLayout
     private lateinit var viewForDefaultState: View
@@ -32,6 +43,10 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     private lateinit var viewForConnectingState: View
     private lateinit var viewForCompleteState: View
 
+    override val userWantsToSelectAModule = MutableLiveData<LiveDataEvent>()
+    override val userWantsToOpenSettings = MutableLiveData<LiveDataEvent>()
+    override val userWantsToSync = MutableLiveData<LiveDataEvent>()
+
     override fun initRoot(syncCardsRootLayout: LinearLayout) {
         root = syncCardsRootLayout
         viewForDefaultState = createViewForSyncState(R.layout.activity_dashboard_card_sync_default, root)
@@ -42,12 +57,12 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
         viewForProgressState = createViewForSyncState(R.layout.activity_dashboard_card_sync_progress, root)
         viewForConnectingState = viewForProgressState
         viewForCompleteState = viewForProgressState
-
     }
 
     private fun createViewForSyncState(layout: Int, root: ViewGroup) =
         ctx.layoutInflater.inflate(layout, root, false).also {
-            it.textViewCardTitle().text = androidResourcesHelper.getString(R.string.dashboard_card_sync_title)
+            it.visibility = GONE
+            it.textViewCardTitle().text = getString(R.string.dashboard_card_sync_title)
         }
 
     override fun displayState(syncCardState: DashboardSyncCardState) {
@@ -67,71 +82,143 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
         }
     }
 
+    override suspend fun startTickerToUpdateLastSyncText() {
+        stopOngoingTickerToUpdateLastSyncText()
+        tickerToUpdateLastSyncTimeText = ticker(delayMillis = ONE_MINUTE, initialDelayMillis = 0)
+
+        tickerToUpdateLastSyncTimeText?.let {
+            for (event in it) {
+                lastSyncTimeTextView?.let {
+                    if (cachedLastSyncTime != null) {
+                        updateLastSyncUI(cachedLastSyncTime, it)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun stopOngoingTickerToUpdateLastSyncText() {
+        tickerToUpdateLastSyncTimeText?.cancel()
+    }
+
     private fun prepareSyncCompleteView(syncCardState: SyncComplete): View =
         withVisible(viewForCompleteState) {
             progressCardConnectingProgress().visibility = GONE
-            withVisible(progressCardSyncProgress()) {
-                progress = 100
-            }
             withVisible(progressCardStateText()) {
-                setTextColor(androidResourcesHelper.getColorStateList(R.color.simprints_green))
+                setTextColor(androidResourcesHelper.getColorStateList(R.color.simprints_green_dark))
                 text = androidResourcesHelper.getString(R.string.dashboard_sync_card_complete)
             }
-            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
+            withVisible(progressCardSyncProgress()) {
+                setSyncProgress(100, 100)
+                val green = androidResourcesHelper.getColorStateList(R.color.simprints_green_dark)
+                green?.let {
+                    progressDrawable.setColorFilter(it.defaultColor, PorterDuff.Mode.SRC_IN)
+                }
+            }
+            displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
 
 
     private fun prepareSyncConnectingView(syncCardState: SyncConnecting): View =
         withVisible(viewForConnectingState) {
-            progressCardConnectingProgress().visibility = VISIBLE
-            setPercentageInProgressBar(progressCardSyncProgress(), syncCardState.progress, syncCardState.total)
             withVisible(progressCardStateText()) {
-                text = androidResourcesHelper.getString(R.string.dashboard_sync_card_connecting)
-                textColor = context.getColorResCompat(android.R.attr.textColorPrimary)
+                textColor = getDefaultGrayTextColor(viewForConnectingState)
+                text = getString(R.string.dashboard_sync_card_connecting)
+            }
+            withVisible(progressCardSyncProgress()) {
+                setSyncProgress(syncCardState.progress, syncCardState.total)
             }
 
-            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
+            displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
+
 
     private fun prepareProgressView(syncCardState: SyncProgress): View =
         withVisible(viewForProgressState) {
             progressCardConnectingProgress().visibility = GONE
-            setPercentageInProgressBar(progressCardSyncProgress(), syncCardState.progress, syncCardState.total)
-
             withVisible(progressCardStateText()) {
-                text = androidResourcesHelper.getString(R.string.dashboard_sync_card_progress, arrayOf("${syncCardState.progress}/${syncCardState.total}"))
-                textColor = context.getColorResCompat(android.R.attr.textColorPrimary)
+                val percentageText = if (syncCardState.total != null) {
+                    "${calculatePercentage(syncCardState.progress, syncCardState.total)}%"
+                } else {
+                    ""
+                }
+                text = androidResourcesHelper.getString(R.string.dashboard_sync_card_progress, arrayOf(percentageText))
+                textColor = getDefaultGrayTextColor(viewForConnectingState)
             }
-            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
+            withVisible(progressCardSyncProgress()) {
+                setSyncProgress(syncCardState.progress, syncCardState.total)
+            }
+            displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
 
     private fun prepareSyncOfflineView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForOfflineState) {
-            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
+            with(titleCardOffline()) {
+                text = getString(R.string.dashboard_sync_card_offline_message)
+            }
+            with(buttonOpenSettings()) {
+                text = getString(R.string.dashboard_sync_card_offline_button)
+                setOnClickListener {
+                    userWantsToOpenSettings.send()
+                }
+            }
+            displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
 
     private fun prepareNoModulesStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForNoModulesState) {
-            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
+            with(titleCardSelectModule()) {
+                text = getString(R.string.dashboard_sync_card_no_modules_message)
+            }
+            with(buttonSelectModule()) {
+                text = getString(R.string.dashboard_sync_card_no_modules_button)
+                setOnClickListener {
+                    userWantsToSelectAModule.send()
+                }
+            }
+            displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
+
 
     private fun prepareTryAgainStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForTryAgainState) {
-            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
+            with(titleCardTryAgain()) {
+                text = getString(R.string.dashboard_sync_card_incomplete)
+            }
+            with(buttonProgressSync()) {
+                text = getString(R.string.dashboard_sync_card_try_again_button)
+                setOnClickListener {
+                    userWantsToSync.send()
+                }
+            }
+            displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
 
     private fun prepareSyncDefaultStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForDefaultState) {
-            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
+            withVisible(buttonDefaultSync()) {
+                text = getString(R.string.dashboard_sync_card_sync_button)
+                setOnClickListener {
+                    userWantsToSync.send()
+                }
+            }
+            displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
 
     private fun prepareSyncFailedStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForSyncFailedState) {
-            displayLastSyncTime(syncCardState.lastSyncTime, lastSyncText())
+            titleCardFailed().text = getString(R.string.dashboard_sync_card_failed_message)
+            displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
 
-    private fun displayLastSyncTime(lastSyncTime: Date, textView: TextView) {
-        val lastSyncTimeText = timeHelper.readableBetweenNowAndTime(lastSyncTime)
+    private fun displayLastSyncTime(lastSyncTime: Date?, textView: TextView) {
+        cachedLastSyncTime = lastSyncTime
+        lastSyncTimeTextView = textView
+        updateLastSyncUI(cachedLastSyncTime, textView)
+    }
+
+    private fun updateLastSyncUI(lastSyncTime: Date?, textView: TextView) {
+        val lastSyncTimeText = lastSyncTime?.let { timeHelper.readableBetweenNowAndTime(lastSyncTime) } ?: ""
         textView.text = androidResourcesHelper.getString(R.string.dashboard_card_sync_last_sync, arrayOf(lastSyncTimeText))
     }
 
@@ -145,21 +232,57 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
             visibility = VISIBLE
         }
 
-    private fun setPercentageInProgressBar(progressBar: ProgressBar,
-                                           progressValue: Int,
-                                           totalValue: Int) {
-        withVisible(progressBar) {
-            progress = getPercentageForProgress(progressValue, totalValue)
-        }
-    }
+    // I couldn't find a way to get from Android SDK the default text color (in line with the theme).
+    // So I change a color for a TextView, then I can't set back to the default.
+    // The card's title has always the same color - the default one.
+    // Hacky way to extract the color from the title and use for the other TextViews
+    private fun getDefaultGrayTextColor(view: View): Int = view.textViewCardTitle().textColors.defaultColor
 
-    private fun getPercentageForProgress(progress: Int, total: Int) =
-        (100 * (progress.toFloat() / total.toFloat())).toInt()
 
+    private fun getString(res: Int) = androidResourcesHelper.getString(res)
 
     private fun View.textViewCardTitle() = this.findViewById<TextView>(R.id.dashboard_sync_card_title)
     private fun View.progressCardConnectingProgress() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)
     private fun View.progressCardSyncProgress() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_sync_progress_bar)
     private fun View.progressCardStateText() = this.findViewById<TextView>(R.id.dashboard_sync_card_progress_message)
+
+    private fun View.titleCardOffline() = this.findViewById<TextView>(R.id.dashboard_sync_card_offline_message)
+    private fun View.titleCardTryAgain() = this.findViewById<TextView>(R.id.dashboard_sync_card_try_again_message)
+    private fun View.titleCardFailed() = this.findViewById<TextView>(R.id.dashboard_sync_card_failed_message)
+    private fun View.titleCardSelectModule() = this.findViewById<TextView>(R.id.dashboard_sync_card_select_no_modules_message)
+    private fun View.buttonSelectModule() = this.findViewById<Button>(R.id.dashboard_sync_card_select_no_modules_button)
+    private fun View.buttonOpenSettings() = this.findViewById<Button>(R.id.dashboard_sync_card_offline_button)
+    private fun View.buttonDefaultSync() = this.findViewById<Button>(R.id.dashboard_sync_card_default_state_sync_button)
+    private fun View.buttonProgressSync() = this.findViewById<Button>(R.id.dashboard_sync_card_try_again_sync_button)
+
     private fun View.lastSyncText() = this.findViewById<TextView>(R.id.dashboard_sync_card_last_sync)
+    private fun ProgressBar.setSyncProgress(progressValue: Int, totalValue: Int?) {
+        if (totalValue != null) {
+            setProgressBarIndeterminate(this, false)
+            progress = calculatePercentage(progressValue, totalValue)
+        } else {
+            // Setting it only when required otherwise it creates glitches
+            setProgressBarIndeterminate(this, true)
+        }
+
+        val blue = androidResourcesHelper.getColorStateList(R.color.colorPrimaryDark)
+        blue?.let {
+            progressDrawable.setColorFilter(it.defaultColor, PorterDuff.Mode.SRC_IN)
+        }
+    }
+
+    private fun setProgressBarIndeterminate(progressBar: ProgressBar, value: Boolean) {
+        // Setting it only when required otherwise it creates glitches
+        if (progressBar.isIndeterminate != value) {
+            progressBar.isIndeterminate = value
+        }
+    }
+
+    private fun calculatePercentage(progressValue: Int, totalValue: Int) =
+        min((100 * (progressValue.toFloat() / totalValue.toFloat())).toInt(), 100)
+
+    companion object {
+        private const val ONE_MINUTE = 1000L * 60
+
+    }
 }

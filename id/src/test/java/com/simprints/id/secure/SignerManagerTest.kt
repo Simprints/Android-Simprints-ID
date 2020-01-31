@@ -10,6 +10,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.SyncManager
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.tools.extensions.trace
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.*
@@ -27,6 +28,8 @@ class SignerManagerTest {
     @MockK lateinit var loginInfoManager: LoginInfoManager
     @MockK lateinit var preferencesManager: PreferencesManager
     @MockK lateinit var syncManager: SyncManager
+    @MockK lateinit var peopleSyncManager: PeopleSyncManager
+
     private lateinit var signerManager: SignerManagerImpl
 
     private val token = Token("some_token")
@@ -40,6 +43,7 @@ class SignerManagerTest {
             remoteDbManager,
             loginInfoManager,
             preferencesManager,
+            peopleSyncManager,
             syncManager
         )
 
@@ -196,7 +200,7 @@ class SignerManagerTest {
     private fun verifyUpSyncGotPaused() = verify { syncManager.cancelBackgroundSyncs() }
     private fun verifyStoredCredentialsGotCleaned() = verify { loginInfoManager.cleanCredentials() }
     private fun verifyRemoteManagerGotSignedOut() = verify { remoteDbManager.signOut() }
-    private fun verifyLastSyncInfoGotDeleted() = coVerify { syncManager.deleteLastSyncInfo() }
+    private fun verifyLastSyncInfoGotDeleted() = coVerify { peopleSyncManager.deleteSyncInfo() }
     private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() = verify { preferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
 
     private fun verifySignedInFailed(it: TestObserver<Void>) {

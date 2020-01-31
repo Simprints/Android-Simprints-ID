@@ -3,19 +3,23 @@ package com.simprints.id.services.scheduledSync.people.master
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.*
+import androidx.work.WorkInfo.State.BLOCKED
 import androidx.work.WorkInfo.State.ENQUEUED
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.people.common.*
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
-import com.simprints.id.services.scheduledSync.people.master.PeopleDownSyncTrigger.PERIODIC_BACKGROUND
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder.Companion.TAG_PEOPLE_UP_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger.PERIODIC_BACKGROUND
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.*
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
+import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -59,9 +63,9 @@ class PeopleSyncMasterWorkerTest {
         with(masterWorker) {
             crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
-            downSyncWorkerFactory = mockk(relaxed = true)
+            downSyncWorkerBuilder = mockk(relaxed = true)
             upSyncWorkerBuilder = mockk(relaxed = true)
-            peopleSyncProgressCache = mockk(relaxed = true)
+            peopleSyncCache = mockk(relaxed = true)
         }
         mockBackgroundTrigger(true)
     }
@@ -75,11 +79,11 @@ class PeopleSyncMasterWorkerTest {
 
         assertWorkerOutput(uniqueSyncId)
         assertSyncChainWasBuilt()
-        assertSyncWorkersAreEnqueued(uniqueSyncId)
+        assertAllWorkersAreEnqueued(uniqueSyncId)
     }
 
     @Test
-    fun masterPeriodicSyncWorker_syncNotGoingAndBackgroundOff_shouldEnqueueOnyUpWorkers() = runBlockingTest {
+    fun doWork_syncNotGoingAndBackgroundOff_shouldEnqueueOnlyUpSyncWorkers() = runBlockingTest {
         with(masterWorker) {
             val uniqueSyncId = masterWorker.uniqueSyncId
             prepareSyncWorkers(uniqueSyncId)
@@ -88,14 +92,29 @@ class PeopleSyncMasterWorkerTest {
             masterWorker.doWork()
 
             assertWorkerOutput(uniqueSyncId)
-            coVerify(exactly = 0) { downSyncWorkerFactory.buildDownSyncWorkerChain(any()) }
+            coVerify(exactly = 0) { downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) }
             coVerify(exactly = 1) { upSyncWorkerBuilder.buildUpSyncWorkerChain(any()) }
-            assertOnlyUpSyncWorkersAreEnqueued(uniqueSyncId)
+            assertUpSyncWorkersAreEnqueued(uniqueSyncId)
+            assertLastSyncTimeWorkerIsEnqueued(uniqueSyncId)
+            assertTotalNumberOfWorkers(uniqueSyncId, 3)
         }
     }
 
     @Test
-    fun masterOneTimeSyncWorker_syncNotGoingAndBackgroundOff_shouldEnqueueAllWorkers() = runBlockingTest {
+    fun doWork_syncNotGoingAndBackgroundOn_shouldEnqueueAllWorkers() = runBlockingTest {
+        val uniqueSyncId = masterWorker.uniqueSyncId
+        prepareSyncWorkers(uniqueSyncId)
+        mockBackgroundTrigger(true)
+
+        masterWorker.doWork()
+
+        assertWorkerOutput(uniqueSyncId)
+        assertSyncChainWasBuilt()
+        assertAllWorkersAreEnqueued(uniqueSyncId)
+    }
+
+    @Test
+    fun doWorkAsOneTimeSync_syncBackgroundOff_shouldEnqueueAllWorkers() = runBlockingTest {
         buildOneTimeMasterWorker()
         val uniqueSyncId = masterWorker.uniqueSyncId
         prepareSyncWorkers(uniqueSyncId)
@@ -105,49 +124,73 @@ class PeopleSyncMasterWorkerTest {
 
         assertWorkerOutput(uniqueSyncId)
         assertSyncChainWasBuilt()
-        assertSyncWorkersAreEnqueued(uniqueSyncId)
+        assertAllWorkersAreEnqueued(uniqueSyncId)
     }
 
     @Test
     fun doWork_syncGoing_shouldReturnTheExistingUniqueSync() = runBlockingTest {
-        enqueueASyncWorker(UNIQUE_SYNC_ID)
+        val existingSyncId = enqueueASyncWorker()
 
         masterWorker.doWork()
 
-        assertWorkerOutput(UNIQUE_SYNC_ID)
-        assertSyncChainWasBuilt(0)
-        assertSyncWorkersAreEnqueued(UNIQUE_SYNC_ID)
+        assertWorkerOutput(existingSyncId)
+        assertSyncChainWasNotBuild()
     }
 
     @Test
     fun doWork_errorOccurs_shouldWorkerFail() = runBlockingTest {
-        coEvery { masterWorker.downSyncWorkerFactory.buildDownSyncWorkerChain(any()) } throws Throwable("IO Error")
+        coEvery { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } throws Throwable("IO Error")
 
         masterWorker.doWork()
 
         verify { masterWorker.resultSetter.failure(any()) }
     }
 
-    private fun enqueueASyncWorker(existingSyncId: String) {
+    private fun enqueueASyncWorker(): String {
         wm.enqueue(OneTimeWorkRequestBuilder<PeopleDownSyncDownloaderWorker>()
             .setConstraints(constraintsForWorkers())
             .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
-            .addTag("${TAG_MASTER_SYNC_ID}$existingSyncId")
+            .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
+            .addTag("${TAG_MASTER_SYNC_ID}$UNIQUE_SYNC_ID")
             .build())
+        return UNIQUE_SYNC_ID
     }
 
-    private fun assertSyncWorkersAreEnqueued(uniqueSyncId: String) {
-        val downWorkers = wm.getWorkInfosByTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId").get()
-        assertThat(downWorkers).isNotEmpty()
-        assertThat(downWorkers.first().state).isEqualTo(ENQUEUED)
+    private fun assertAllWorkersAreEnqueued(uniqueSyncId: String) {
+        assertDownSyncWorkersAreEnqueued(uniqueSyncId)
+        assertUpSyncWorkersAreEnqueued(uniqueSyncId)
+        assertLastSyncTimeWorkerIsEnqueued(uniqueSyncId)
+        assertTotalNumberOfWorkers(uniqueSyncId, 5)
     }
 
-    private fun assertOnlyUpSyncWorkersAreEnqueued(uniqueSyncId: String) {
-        val syncWorkers = wm.getWorkInfosByTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId").get()
-        assertThat(syncWorkers).hasSize(1)
+    private fun assertDownSyncWorkersAreEnqueued(uniqueSyncId: String) {
+        assertSyncWorkersState(uniqueSyncId, ENQUEUED, DOWNLOADER)
+        assertSyncWorkersState(uniqueSyncId, ENQUEUED, DOWN_COUNTER)
+    }
 
-        val downWorkers = wm.getWorkInfosByTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS).get()
-        assertThat(downWorkers).hasSize(0)
+    private fun assertUpSyncWorkersAreEnqueued(uniqueSyncId: String) {
+        assertSyncWorkersState(uniqueSyncId, ENQUEUED, UPLOADER)
+        assertSyncWorkersState(uniqueSyncId, ENQUEUED, UP_COUNTER)
+    }
+
+    private fun assertLastSyncTimeWorkerIsEnqueued(uniqueSyncId: String) {
+        assertSyncWorkersState(uniqueSyncId, BLOCKED, LAST_SYNC_REPORTER)
+    }
+
+    private fun assertTotalNumberOfWorkers(uniqueSyncId: String, total: Int) {
+        val allWorkers = wm.getWorkInfosByTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId").get()
+        assertThat(allWorkers.size).isEqualTo(total)
+    }
+
+    private fun assertSyncWorkersState(uniqueSyncId: String,
+                                       state: WorkInfo.State,
+                                       specificType: PeopleSyncWorkerType? = null) {
+
+        val allWorkers = wm.getWorkInfosByTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId").get()
+        val specificWorkers = specificType?.let { allWorkers.filterByTags(tagForType(specificType)) } ?: allWorkers
+
+        assertThat(specificWorkers.size).isEqualTo(1)
+        assertThat(specificWorkers.all { it.state == state }).isTrue()
     }
 
     private fun constraintsForWorkers() =
@@ -155,31 +198,52 @@ class PeopleSyncMasterWorkerTest {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
+    private fun assertSyncChainWasNotBuild() = assertSyncChainWasBuilt(0)
     private fun assertSyncChainWasBuilt(nTimes: Int = 1) {
-        coVerify(exactly = nTimes) { masterWorker.downSyncWorkerFactory.buildDownSyncWorkerChain(any()) }
-        coVerify(exactly = nTimes) { masterWorker.downSyncWorkerFactory.buildDownSyncWorkerChain(any()) }
+        coVerify(exactly = nTimes) { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) }
+        coVerify(exactly = nTimes) { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) }
     }
 
     private fun prepareSyncWorkers(uniqueSyncId: String) {
-        coEvery { masterWorker.downSyncWorkerFactory.buildDownSyncWorkerChain(any()) } returns buildDownSyncWorkers(uniqueSyncId)
+        coEvery { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } returns buildDownSyncWorkers(uniqueSyncId)
         coEvery { masterWorker.upSyncWorkerBuilder.buildUpSyncWorkerChain(any()) } returns buildUpSyncWorkers(uniqueSyncId)
     }
 
-    private fun buildDownSyncWorkers(uniqueSyncId: String): List<WorkRequest> =
-        listOf(OneTimeWorkRequestBuilder<PeopleDownSyncDownloaderWorker>()
-            .setConstraints(constraintsForWorkers())
-            .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
-            .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
-            .addTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId")
-            .build())
+    private fun buildDownSyncWorkers(uniqueSyncId: String): List<OneTimeWorkRequest> =
+        listOf(
+            OneTimeWorkRequestBuilder<PeopleDownSyncDownloaderWorker>()
+                .setConstraints(constraintsForWorkers())
+                .addTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId")
+                .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
+                .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
+                .addTag(tagForType(DOWNLOADER))
+                .build(),
+            OneTimeWorkRequestBuilder<PeopleDownSyncCountWorker>()
+                .setConstraints(constraintsForWorkers())
+                .addTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId")
+                .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
+                .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
+                .addTag(tagForType(DOWN_COUNTER))
+                .build()
+        )
 
-    private fun buildUpSyncWorkers(uniqueSyncId: String): List<WorkRequest> =
-        listOf(OneTimeWorkRequestBuilder<PeopleUpSyncUploaderWorker>()
-            .setConstraints(constraintsForWorkers())
-            .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
-            .addTag(TAG_PEOPLE_UP_SYNC_ALL_WORKERS)
-            .addTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId")
-            .build())
+    private fun buildUpSyncWorkers(uniqueSyncId: String): List<OneTimeWorkRequest> =
+        listOf(
+            OneTimeWorkRequestBuilder<PeopleUpSyncUploaderWorker>()
+                .setConstraints(constraintsForWorkers())
+                .addTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId")
+                .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
+                .addTag(TAG_PEOPLE_UP_SYNC_ALL_WORKERS)
+                .addTag(tagForType(UPLOADER))
+                .build(),
+            OneTimeWorkRequestBuilder<PeopleUpSyncCountWorker>()
+                .setConstraints(constraintsForWorkers())
+                .addTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId")
+                .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
+                .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
+                .addTag(tagForType(UP_COUNTER))
+                .build()
+        )
 
     private fun assertWorkerOutput(uniqueSyncId: String) {
         verify { masterWorker.resultSetter.success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId)) }
