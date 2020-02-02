@@ -13,6 +13,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.commands.Get
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.commands.GetTemplateCommand
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageData
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormat
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.TemplateData
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.CaptureFingerprintResponse
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.GetImageResponse
@@ -457,7 +458,7 @@ class ScannerTest {
         val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<GetImageCommand>()) } then {
                 Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(GetImageResponse(ImageData(Scanner.DEFAULT_IMAGE_FORMAT, image, crcCheck)))
+                    responseSubject.onNext(GetImageResponse(ImageData(ImageFormat.RAW, image, crcCheck)))
                 }
             }
         }
