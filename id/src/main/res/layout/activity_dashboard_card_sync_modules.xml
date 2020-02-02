@@ -23,6 +23,7 @@
 
         <TextView
             android:id="@+id/dashboard_sync_card_select_no_modules_message"
+            style="@style/SimprintsStyle.TextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:singleLine="false"
