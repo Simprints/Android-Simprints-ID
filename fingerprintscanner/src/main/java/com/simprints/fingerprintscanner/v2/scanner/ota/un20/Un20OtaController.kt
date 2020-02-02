@@ -20,6 +20,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toObservable
+import java.util.*
 
 class Un20OtaController(private val crc32Calculator: Crc32Calculator) {
 
@@ -52,7 +53,7 @@ class Un20OtaController(private val crc32Calculator: Crc32Calculator) {
 
     private fun startOta(mainMessageChannel: MainMessageChannel, errorHandler: ResponseErrorHandler): Completable =
         sendUn20CommandAndReceiveResponse<StartOtaResponse>(mainMessageChannel, errorHandler,
-            StartOtaCommand()
+            StartOtaCommand(UUID.randomUUID().toString())
         ).verifyResultOk { operationResultCode }
 
     private fun writeOtaChunk(mainMessageChannel: MainMessageChannel, errorHandler: ResponseErrorHandler, chunk: ByteArray): Completable =
