@@ -1,6 +1,7 @@
 package com.simprints.fingerprintscanner.v2.domain.stmota
 
 import com.simprints.fingerprintscanner.v2.domain.Protocol
+import com.simprints.fingerprintscanner.v2.domain.stmota.commands.InitBootloaderCommand
 import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryAddressCommand
 import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryDataCommand
 import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryStartCommand
@@ -17,6 +18,7 @@ object StmOtaMessageProtocol : Protocol {
             is WriteMemoryStartCommand -> appendComplement(message.getDataBytes())
             is WriteMemoryAddressCommand -> appendCheckSum(message.getDataBytes())
             is WriteMemoryDataCommand -> appendCheckSum(message.getDataBytes())
+            is InitBootloaderCommand -> message.getDataBytes()
             else -> message.getDataBytes()
         }
 

@@ -3,6 +3,7 @@ package com.simprints.fingerprintscanner.v2.scanner.ota.stm
 import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaCommand
 import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaResponse
+import com.simprints.fingerprintscanner.v2.domain.stmota.commands.InitBootloaderCommand
 import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryAddressCommand
 import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryDataCommand
 import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryStartCommand
@@ -34,13 +35,19 @@ class StmOtaController(private val intelHexParser: IntelHexParser) {
      * @throws OtaFailedException if received a NACK when communicating with STM
      */
     fun program(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler, firmwareHexFile: String): Observable<Float> =
-        parseFirmwareFile(firmwareHexFile)
+        sendInitBootloaderCommand(stmOtaMessageChannel, errorHandler)
+            .andThen(parseFirmwareFile(firmwareHexFile))
             .pairWithProgress()
             .flattenAsObservable { it }
             .concatMap { (chunk, progress) ->
                 sendOtaPacket(stmOtaMessageChannel, errorHandler, chunk)
                     .andThen(Observable.just(progress))
             }
+
+    private fun sendInitBootloaderCommand(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler): Completable =
+        sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
+            InitBootloaderCommand()
+        ).verifyResponseIsAck()
 
     private fun parseFirmwareFile(firmwareHexFile: String): Single<List<FirmwareByteChunk>> =
         single {

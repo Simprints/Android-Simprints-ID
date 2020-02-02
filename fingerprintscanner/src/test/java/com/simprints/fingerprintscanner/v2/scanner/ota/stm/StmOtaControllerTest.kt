@@ -38,7 +38,7 @@ class StmOtaControllerTest {
 
     @Test
     fun program_correctlyCallsParseAndSendCorrectNumberOfTimes() {
-        val expectedNumberOfCalls = FIRMWARE_BYTE_CHUNKS.size * 3
+        val expectedNumberOfCalls = FIRMWARE_BYTE_CHUNKS.size * 3 + 1
 
         val intelHexParserMock = configureIntelHexParserMock()
         val messageStreamMock = configureMessageStreamMock()
@@ -81,7 +81,7 @@ class StmOtaControllerTest {
         val stmOtaController = StmOtaController(configureIntelHexParserMock())
 
         val testObserver = stmOtaController.program(
-            configureMessageStreamMock(nackPositions = listOf(7)), responseErrorHandler, "").testSubscribe()
+            configureMessageStreamMock(nackPositions = listOf(8)), responseErrorHandler, "").testSubscribe()
 
         testObserver.awaitTerminalEvent()
         assertThat(testObserver.values()).containsExactlyElementsIn(PROGRESS_VALUES.slice(0..1)).inOrder()
@@ -96,7 +96,7 @@ class StmOtaControllerTest {
         val stmOtaController = StmOtaController(intelHexParserMock)
 
         val testObserver = stmOtaController.program(
-            configureMessageStreamMock(nackPositions = listOf(0)), responseErrorHandler, "").testSubscribe()
+            configureMessageStreamMock(), responseErrorHandler, "").testSubscribe()
 
         testObserver.awaitTerminalEvent()
         testObserver.assertError(InvalidFirmwareException::class.java)
