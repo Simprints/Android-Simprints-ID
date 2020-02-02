@@ -25,6 +25,7 @@
 
         <TextView
             android:id="@+id/dashboard_sync_card_progress_message"
+            style="@style/SimprintsStyle.TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/activity_dashboard_card_space_below_title"
@@ -41,9 +42,9 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:layout_gravity="center"
+            android:layout_marginStart="3dp"
             android:indeterminate="true"
             android:indeterminateTint="@android:color/darker_gray"
-            android:layout_marginStart="3dp"
             app:layout_constraintBottom_toBottomOf="@+id/dashboard_sync_card_progress_message"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/dashboard_sync_card_progress_message"
