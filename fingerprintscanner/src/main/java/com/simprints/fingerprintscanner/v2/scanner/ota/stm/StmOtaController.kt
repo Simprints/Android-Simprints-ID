@@ -3,10 +3,7 @@ package com.simprints.fingerprintscanner.v2.scanner.ota.stm
 import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaCommand
 import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaResponse
-import com.simprints.fingerprintscanner.v2.domain.stmota.commands.InitBootloaderCommand
-import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryAddressCommand
-import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryDataCommand
-import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryStartCommand
+import com.simprints.fingerprintscanner.v2.domain.stmota.commands.*
 import com.simprints.fingerprintscanner.v2.domain.stmota.responses.CommandAcknowledgement
 import com.simprints.fingerprintscanner.v2.exceptions.ota.InvalidFirmwareException
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
@@ -14,6 +11,7 @@ import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHan
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.handleErrorsWith
 import com.simprints.fingerprintscanner.v2.tools.hexparser.FirmwareByteChunk
 import com.simprints.fingerprintscanner.v2.tools.hexparser.IntelHexParser
+import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.single
 import io.reactivex.Completable
@@ -36,6 +34,7 @@ class StmOtaController(private val intelHexParser: IntelHexParser) {
      */
     fun program(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler, firmwareHexFile: String): Observable<Float> =
         sendInitBootloaderCommand(stmOtaMessageChannel, errorHandler)
+            .andThen(eraseMemory(stmOtaMessageChannel, errorHandler))
             .andThen(parseFirmwareFile(firmwareHexFile))
             .pairWithProgress()
             .flattenAsObservable { it }
@@ -47,6 +46,15 @@ class StmOtaController(private val intelHexParser: IntelHexParser) {
     private fun sendInitBootloaderCommand(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler): Completable =
         sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
             InitBootloaderCommand()
+        ).verifyResponseIsAck()
+
+    private fun eraseMemory(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler): Completable =
+        sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
+            EraseMemoryStartCommand()
+        ).verifyResponseIsAck().andThen(
+            sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
+                EraseMemoryAddressCommand(ERASE_ALL_ADDRESS)
+            )
         ).verifyResponseIsAck()
 
     private fun parseFirmwareFile(firmwareHexFile: String): Single<List<FirmwareByteChunk>> =
@@ -86,4 +94,8 @@ class StmOtaController(private val intelHexParser: IntelHexParser) {
                 }
             }
         }
+
+    companion object {
+        val ERASE_ALL_ADDRESS = byteArrayOf(0xFF, 0xFF)
+    }
 }
