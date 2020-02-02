@@ -5,5 +5,5 @@ import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
 
 class WriteMemoryDataCommand(val data: ByteArray) : StmOtaCommand() {
 
-    override fun getDataBytes(): ByteArray = byteArrayOf(data.size.toByte(), data)
+    override fun getDataBytes(): ByteArray = byteArrayOf(data.size.toByte() - 1, data)
 }

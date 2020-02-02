@@ -1,10 +1,7 @@
 package com.simprints.fingerprintscanner.v2.domain.stmota
 
 import com.simprints.fingerprintscanner.v2.domain.Protocol
-import com.simprints.fingerprintscanner.v2.domain.stmota.commands.InitBootloaderCommand
-import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryAddressCommand
-import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryDataCommand
-import com.simprints.fingerprintscanner.v2.domain.stmota.commands.WriteMemoryStartCommand
+import com.simprints.fingerprintscanner.v2.domain.stmota.commands.*
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
 import com.simprints.fingerprintscanner.v2.tools.primitives.nxorAll
 import com.simprints.fingerprintscanner.v2.tools.primitives.xorAll
@@ -15,10 +12,12 @@ object StmOtaMessageProtocol : Protocol {
 
     fun buildMessageBytes(message: StmOtaMessage) =
         when (message) {
+            is InitBootloaderCommand -> message.getDataBytes()
+            is EraseMemoryStartCommand -> appendComplement(message.getDataBytes())
+            is EraseMemoryAddressCommand -> appendCheckSum(message.getDataBytes())
             is WriteMemoryStartCommand -> appendComplement(message.getDataBytes())
             is WriteMemoryAddressCommand -> appendCheckSum(message.getDataBytes())
             is WriteMemoryDataCommand -> appendCheckSum(message.getDataBytes())
-            is InitBootloaderCommand -> message.getDataBytes()
             else -> message.getDataBytes()
         }
 
