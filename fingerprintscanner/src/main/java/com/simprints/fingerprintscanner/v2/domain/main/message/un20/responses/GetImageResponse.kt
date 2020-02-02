@@ -15,7 +15,7 @@ class GetImageResponse(val imageData: ImageData) : Un20Response(Un20MessageType.
         fun fromBytes(minorTypeByte: Byte, data: ByteArray) =
             GetImageResponse(
                 ImageData(
-                    ImageFormat.fromBytes(byteArrayOf(minorTypeByte)),
+                    ImageFormat.fromByte(minorTypeByte),
                     data.sliceArray(0 until data.size - 4),
                     with(Un20MessageProtocol) {
                         data.sliceArray(data.size - 4 until data.size).extract({ int })

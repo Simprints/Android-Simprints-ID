@@ -317,10 +317,10 @@ class Scanner(
             ))
             .map { it.supportedImageFormats }
 
-    fun acquireImage(imageFormat: ImageFormat = DEFAULT_IMAGE_FORMAT): Single<ImageData> =
+    fun acquireImage(imageFormatData: ImageFormatData = DEFAULT_IMAGE_FORMAT_DATA): Single<ImageData> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetImageResponse>(
-                GetImageCommand(imageFormat)
+                GetImageCommand(imageFormatData)
             ))
             .map { it.imageData }
 
@@ -346,6 +346,6 @@ class Scanner(
     companion object {
         val DEFAULT_DPI = Dpi(500)
         val DEFAULT_TEMPLATE_TYPE = TemplateType.ISO_19794_2_2011
-        val DEFAULT_IMAGE_FORMAT = ImageFormat.RAW
+        val DEFAULT_IMAGE_FORMAT_DATA = ImageFormatData.RAW
     }
 }

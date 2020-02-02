@@ -35,7 +35,7 @@ class SimulatedUn20ResponseHelper(private val simulatedScannerManager: Simulated
             is GetImageCommand -> {
                 val imageBytes = Random.nextBytes((120000 * (((simulatedScannerV2.scannerState.lastFingerCapturedDpi.value / 100) * 100) / 500f)).toInt())
                 GetImageResponse(ImageData(
-                    command.imageFormat,
+                    command.imageFormatData.imageFormat,
                     imageBytes,
                     Crc32Calculator().calculateCrc32(imageBytes)))
             }

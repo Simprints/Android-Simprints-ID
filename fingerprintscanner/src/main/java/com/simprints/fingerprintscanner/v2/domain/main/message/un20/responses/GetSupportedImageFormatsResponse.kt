@@ -12,7 +12,7 @@ class GetSupportedImageFormatsResponse(val supportedImageFormats: Set<ImageForma
         fun fromBytes(data: ByteArray) =
             GetSupportedImageFormatsResponse(
                 data.toList()
-                    .map { ImageFormat.fromBytes(byteArrayOf(it)) }
+                    .map { ImageFormat.fromByte(it) }
                     .toSet()
             )
     }
