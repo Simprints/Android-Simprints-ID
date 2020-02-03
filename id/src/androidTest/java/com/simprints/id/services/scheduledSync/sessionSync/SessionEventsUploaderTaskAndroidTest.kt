@@ -8,7 +8,7 @@ import com.google.common.truth.Truth
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.commontesttools.DefaultTestConstants
+import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
@@ -94,7 +94,7 @@ class SessionEventsUploaderTaskAndroidTest {
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, module, preferencesModule).fullSetup()
+        AndroidTestConfig(this, module, preferencesModule = preferencesModule).fullSetup()
 
         whenever(settingsPreferencesManagerSpy.fingerStatus).thenReturn(hashMapOf(
             FingerIdentifier.LEFT_THUMB to true,
@@ -321,7 +321,7 @@ class SessionEventsUploaderTaskAndroidTest {
             testProject.secret,
             LocalDbKey(
                 testProject.id,
-                DefaultTestConstants.DEFAULT_REALM_KEY),
+                DEFAULT_REALM_KEY),
             token.token)
     }
 }

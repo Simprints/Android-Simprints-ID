@@ -2,8 +2,6 @@ package com.simprints.id.data.loginInfo
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.safe.CredentialMissingException
-import com.simprints.id.exceptions.safe.secure.NotSignedInException
-import io.reactivex.Single
 
 open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) : LoginInfoManager {
 
@@ -75,15 +73,6 @@ open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) :
             signedInUserId
         } catch (e: CredentialMissingException) {
             ""
-        }
-
-    override fun getSignedInProjectId(): Single<String> =
-        Single.create<String> {
-            try {
-                it.onSuccess(signedInProjectId)
-            } catch (e: CredentialMissingException) {
-                it.onError(NotSignedInException())
-            }
         }
 
     override var projectIdTokenClaim: String? = DEFAULT_VALUE

@@ -10,18 +10,24 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.*
 import io.reactivex.Single
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
+/*
+ * runBlockingTest will make these tests fail by throwing an IllegalStateException:
+ * This job has not completed yet. Replacing it with runBlocking has fixed the issue.
+ * Source: https://github.com/Kotlin/kotlinx.coroutines/issues/1204
+ */
+@ExperimentalCoroutinesApi
 class ProjectRepositoryTest {
 
     private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mockk()
     private val projectLocalDataSourceMock: ProjectLocalDataSource = mockk(relaxUnitFun = true)
     private val firebasePerformanceMock: FirebasePerformance = mockk()
 
-    private val projectRepository = ProjectRepositoryImpl(projectLocalDataSourceMock, projectRemoteDataSourceMock, firebasePerformanceMock, Dispatchers.Main)
+    private val projectRepository = ProjectRepositoryImpl(projectLocalDataSourceMock, projectRemoteDataSourceMock, firebasePerformanceMock)
 
     @Before
     fun setup() {
@@ -31,14 +37,14 @@ class ProjectRepositoryTest {
     }
 
     @Test
-    fun givenAProjectStoredLocally_shouldBeLoadedAndCacheRefreshed() = runBlockingTest {
+    fun givenAProjectStoredLocally_shouldBeLoadedAndCacheRefreshed() = runBlocking {
 
         val localProject = Project()
         val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns localProject
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.just(remoteProject)
 
-        val project = projectRepository.loadAndRefreshCache(DEFAULT_PROJECT_ID)
+        val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
 
         assertThat(project).isEqualTo(localProject)
         coVerify { projectLocalDataSourceMock.save(remoteProject) }
@@ -46,14 +52,14 @@ class ProjectRepositoryTest {
     }
 
     @Test
-    fun givenAProjectStoredLocallyAndNotRemotely_shouldBeLoadedAndCacheNoRefreshed() = runBlockingTest {
+    fun givenAProjectStoredLocallyAndNotRemotely_shouldBeLoadedAndCacheNoRefreshed() = runBlocking {
 
         val localProject = Project()
         val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns localProject
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.error(NetworkErrorException(""))
 
-        val project = projectRepository.loadAndRefreshCache(DEFAULT_PROJECT_ID)
+        val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
 
         assertThat(project).isEqualTo(localProject)
         coVerify(exactly = 0) { projectLocalDataSourceMock.save(remoteProject) }
@@ -61,13 +67,13 @@ class ProjectRepositoryTest {
     }
 
     @Test
-    fun givenProjectStoredOnlyRemotely_shouldBeFetchedAndCacheRefreshed() = runBlockingTest {
+    fun givenProjectStoredOnlyRemotely_shouldBeFetchedAndCacheRefreshed() = runBlocking {
 
         val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns null
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.just(remoteProject)
 
-        val project = projectRepository.loadAndRefreshCache(DEFAULT_PROJECT_ID)
+        val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
 
         assertThat(project).isEqualTo(remoteProject)
         coVerify { projectLocalDataSourceMock.save(remoteProject) }
@@ -75,13 +81,13 @@ class ProjectRepositoryTest {
     }
 
     @Test
-    fun givenNoProjectStored_noErrorShouldBeThrown() = runBlockingTest {
+    fun givenNoProjectStored_noErrorShouldBeThrown() = runBlocking {
 
         val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns null
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.error(NetworkErrorException(""))
 
-        val project = projectRepository.loadAndRefreshCache(DEFAULT_PROJECT_ID)
+        val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
 
         assertThat(project).isNull()
         coVerify(exactly = 0) { projectLocalDataSourceMock.save(remoteProject) }

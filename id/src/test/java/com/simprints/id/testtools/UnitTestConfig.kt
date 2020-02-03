@@ -1,5 +1,6 @@
 package com.simprints.id.testtools
 
+import android.content.Context
 import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
@@ -8,6 +9,7 @@ import com.google.firebase.FirebaseApp
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
+import com.simprints.id.commontesttools.di.TestSyncModule
 import com.simprints.id.testtools.di.AppComponentForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
 import com.simprints.testtools.common.di.DependencyRule
@@ -19,8 +21,9 @@ class UnitTestConfig<T : Any>(
     private val test: T,
     private val appModule: TestAppModule? = null,
     private val preferencesModule: TestPreferencesModule? = null,
-    private val dataModule: TestDataModule? = null
-): BaseUnitTestConfig() {
+    private val dataModule: TestDataModule? = null,
+    private val syncModule: TestSyncModule? = null
+    ): BaseUnitTestConfig() {
 
     private val defaultAppModuleWithoutRealm by lazy {
         TestAppModule(app,
@@ -29,6 +32,10 @@ class UnitTestConfig<T : Any>(
 
     private val app by lazy {
         ApplicationProvider.getApplicationContext() as TestApplication
+    }
+
+    private val ctx by lazy {
+        ApplicationProvider.getApplicationContext() as Context
     }
 
     private lateinit var testAppComponent: AppComponentForTests
@@ -50,19 +57,19 @@ class UnitTestConfig<T : Any>(
     }
 
     fun setupFirebase() = also {
-        FirebaseApp.initializeApp(app)
+        FirebaseApp.initializeApp(ctx)
     }
 
     fun setupWorkManager() = also {
         try {
-            WorkManagerTestInitHelper.initializeTestWorkManager(app, Configuration.Builder().build())
+            WorkManagerTestInitHelper.initializeTestWorkManager(ctx, Configuration.Builder().build())
         } catch (e: IllegalStateException) {
             Log.d("TestConfig", "WorkManager already initialized")
         }
     }
 
     fun setupCrashlytics() = also {
-        Fabric.with(app)
+        Fabric.with(ctx)
     }
 
     fun initAndInjectComponent() =
@@ -75,6 +82,7 @@ class UnitTestConfig<T : Any>(
             .appModule(appModule ?: defaultAppModuleWithoutRealm)
             .preferencesModule(preferencesModule ?: TestPreferencesModule())
             .dataModule(dataModule ?: TestDataModule())
+            .syncModule(syncModule ?: TestSyncModule())
             .build()
 
         app.component = testAppComponent
