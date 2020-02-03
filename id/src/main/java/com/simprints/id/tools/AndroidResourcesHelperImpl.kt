@@ -83,6 +83,7 @@ class AndroidResourcesHelperImpl(val context: Context) : AndroidResourcesHelper 
         getStringPlural(context, stringQuantityKey, quantity, params)
 
     override fun getString(res: Int): String = context.getString(res)
+    override fun getString(resId: Int, param: Any): String = getString(resId, arrayOf(param))
     override fun getString(resId: Int, params: Array<Any>): String = context.getString(resId, *params)
     override fun getStringArray(res: Int): Array<String> = context.resources.getStringArray(res)
     override fun getDrawable(res: Int): Drawable? = ContextCompat.getDrawable(context, res)

@@ -17,9 +17,10 @@ class DashboardViewModel(
     private val dailyActivityRepository: DashboardDailyActivityRepository
 ) : ViewModel() {
 
+    var syncCardStateLiveData = syncCardStateRepository.syncCardStateLiveData
+
     private val projectCardStateLiveData = MutableLiveData<DashboardProjectState>()
     private val dailyActivityCardStateLiveData = MutableLiveData<DashboardDailyActivityState>()
-    var syncCardStateLiveData = syncCardStateRepository.syncCardStateLiveData
 
     fun syncIfRequired() = syncCardStateRepository.syncIfRequired()
 
@@ -29,6 +30,8 @@ class DashboardViewModel(
     }
 
     fun getProjectDetails(): LiveData<DashboardProjectState> = projectCardStateLiveData
+
+    fun getDailyActivity(): LiveData<DashboardDailyActivityState> = dailyActivityCardStateLiveData
 
     private fun loadProjectDetails() {
         viewModelScope.launch {

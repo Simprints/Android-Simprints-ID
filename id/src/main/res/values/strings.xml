@@ -203,6 +203,10 @@
     <string name="dashboard_card_to_download">To Download</string>
     <string name="dashboard_card_syncing">Syncing…</string>
     <string name="dashboard_card_calculating">Calculating…</string>
+    <string name="dashboard_card_activity">Activity: %1$s</string>
+    <string name="dashboard_card_enrolments">Enrolments</string>
+    <string name="dashboard_card_identifications">Identifications</string>
+    <string name="dashboard_card_verifications">Verifications</string>
 
     <string name="menu_privacy_notice">Privacy Notice</string>
     <string name="privacy_notice_title">Privacy Notice</string>
