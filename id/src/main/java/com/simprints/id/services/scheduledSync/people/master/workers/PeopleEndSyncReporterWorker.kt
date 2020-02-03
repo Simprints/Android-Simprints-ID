@@ -8,10 +8,10 @@ import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSync
 import java.util.*
 import javax.inject.Inject
 
-class PeopleLastSyncReporterWorker(appContext: Context,
-                                   params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
+class PeopleEndSyncReporterWorker(appContext: Context,
+                                  params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
 
-    override val tag: String = PeopleLastSyncReporterWorker::class.java.simpleName
+    override val tag: String = PeopleEndSyncReporterWorker::class.java.simpleName
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var syncCache: PeopleSyncCache

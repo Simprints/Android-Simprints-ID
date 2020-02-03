@@ -135,7 +135,7 @@ class PeopleSyncStateProcessorImplTest {
         )
 
     private fun mockDependencies() {
-        every { syncWorkersLiveDataProvider.getMasterWorkersLiveData() } returns masterWorkersLiveData
+        every { syncWorkersLiveDataProvider.getStartSyncReportersLiveData() } returns masterWorkersLiveData
         every { syncWorkersLiveDataProvider.getSyncWorkersLiveData(any()) } returns syncWorkersLiveData
         every { peopleSyncCache.readProgress(any()) } returns 0
     }
