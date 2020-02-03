@@ -39,7 +39,7 @@ class Un20OtaController(private val crc32Calculator: Crc32Calculator) {
     ): Observable<Float> =
         startOta(mainMessageChannel, errorHandler)
             .andThen(
-                firmwareBinFile.chunked(MAX_OTA_CHUNK_SIZE)
+                firmwareBinFile.chunked(MAX_UN20_OTA_CHUNK_SIZE)
                     .pairWithProgress()
                     .toObservable()
             )
@@ -81,6 +81,6 @@ class Un20OtaController(private val crc32Calculator: Crc32Calculator) {
         }
 
     companion object {
-        const val MAX_OTA_CHUNK_SIZE = 100000
+        const val MAX_UN20_OTA_CHUNK_SIZE = 100000
     }
 }

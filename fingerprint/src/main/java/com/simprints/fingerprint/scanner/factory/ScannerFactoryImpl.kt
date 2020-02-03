@@ -42,7 +42,6 @@ import com.simprints.fingerprintscanner.v2.scanner.ota.cypress.CypressOtaControl
 import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.scanner.ota.un20.Un20OtaController
 import com.simprints.fingerprintscanner.v2.tools.crc.Crc32Calculator
-import com.simprints.fingerprintscanner.v2.tools.hexparser.IntelHexParser
 import com.simprints.fingerprintscanner.v2.tools.lang.objects
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
@@ -107,7 +106,7 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                     )
                 ),
                 CypressOtaController(Crc32Calculator()),
-                StmOtaController(IntelHexParser()),
+                StmOtaController(),
                 Un20OtaController(Crc32Calculator()),
                 ResponseErrorHandler(ResponseErrorHandlingStrategy.Default)
             ),

@@ -1,4 +1,4 @@
-package com.simprints.fingerprintscanner.v2.tools.hexparser
+package com.simprints.fingerprintscanner.v2.scanner.ota.stm
 
 data class FirmwareByteChunk(val address: ByteArray,
                              val data: ByteArray) {
