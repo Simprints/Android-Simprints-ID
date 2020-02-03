@@ -162,6 +162,6 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
         }
 
     companion object {
-        const val BATCH_SIZE_FOR_DOWNLOADING = 200
+        const val BATCH_SIZE_FOR_DOWNLOADING = 50
     }
 }
