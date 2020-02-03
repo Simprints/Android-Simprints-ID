@@ -22,6 +22,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.data.domain.fingerprint.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
@@ -83,10 +84,13 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun initTimeoutBar(): ScanningTimeoutBar =
-        if (fingerprintPreferencesManager.saveFingerprintImages) {
-            ScanningWithImageTransferTimeoutBar(context, view.progressBar, scanningTimeoutMs, imageTransferTimeoutMs)
-        } else {
-            ScanningOnlyTimeoutBar(context, view.progressBar, scanningTimeoutMs)
+        when (fingerprintPreferencesManager.saveFingerprintImages) {
+            SaveFingerprintImagesStrategy.ALWAYS -> {
+                ScanningWithImageTransferTimeoutBar(context, view.progressBar, scanningTimeoutMs, imageTransferTimeoutMs)
+            }
+            SaveFingerprintImagesStrategy.NEVER -> {
+                ScanningOnlyTimeoutBar(context, view.progressBar, scanningTimeoutMs)
+            }
         }
 
     // Creates a progress dialog when the scan gets disconnected
@@ -234,7 +238,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun shouldProceedToImageTransfer(quality: Int) =
-        fingerprintPreferencesManager.saveFingerprintImages &&
+        fingerprintPreferencesManager.saveFingerprintImages == SaveFingerprintImagesStrategy.ALWAYS &&
             (quality >= qualityThreshold || presenter.tooManyBadScans(presenter.currentFinger()))
 
     private fun proceedToImageTransfer() {

@@ -1,9 +1,11 @@
 package com.simprints.fingerprint.controllers.core.preferencesManager
 
+import com.simprints.fingerprint.data.domain.fingerprint.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.PreferencesManager
 import java.util.*
+import com.simprints.id.data.prefs.settings.SaveFingerprintImagesStrategy as IdSaveFingerprintImagesStrategy
 
-class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager): FingerprintPreferencesManager {
+class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager) : FingerprintPreferencesManager {
 
     override var lastVerificationDate: Date? = prefs.lastVerificationDate
         set(value) {
@@ -32,6 +34,9 @@ class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager): 
     override val fingerImagesExist: Boolean
         get() = prefs.fingerImagesExist
 
-    override val saveFingerprintImages: Boolean
-        get() = false // TODO : Delegate to core preferences manager
+    override val saveFingerprintImages: SaveFingerprintImagesStrategy
+        get() = when (prefs.saveFingerprintImages) {
+            IdSaveFingerprintImagesStrategy.NEVER -> SaveFingerprintImagesStrategy.NEVER
+            IdSaveFingerprintImagesStrategy.ALWAYS -> SaveFingerprintImagesStrategy.ALWAYS
+        }
 }
