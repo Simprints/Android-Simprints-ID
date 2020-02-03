@@ -4,6 +4,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.settings.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.PreferencesModule
 import com.simprints.id.domain.GROUP
@@ -30,7 +31,8 @@ class TestPreferencesModule(
         languagesStringArraySerializer: Serializer<Array<String>>,
         moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
         peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>,
-        modalitiesSerializer: Serializer<List<Modality>>
+        modalitiesSerializer: Serializer<List<Modality>>,
+        saveFingerprintImagesSerializer: Serializer<SaveFingerprintImagesStrategy>
     ): SettingsPreferencesManager = settingsPreferencesManagerRule.resolveDependency {
         super.provideSettingsPreferencesManager(
             prefs,
@@ -40,7 +42,8 @@ class TestPreferencesModule(
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
             peopleDownSyncTriggerToBooleanSerializer,
-            modalitiesSerializer
+            modalitiesSerializer,
+            saveFingerprintImagesSerializer
         )
     }
 

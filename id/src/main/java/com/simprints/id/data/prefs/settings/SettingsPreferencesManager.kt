@@ -31,6 +31,7 @@ interface SettingsPreferencesManager {
     var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
 
     var fingerImagesExist: Boolean
+    var saveFingerprintImages: SaveFingerprintImagesStrategy
 
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
