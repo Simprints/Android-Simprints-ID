@@ -14,6 +14,7 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManager
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SaveFingerprintImagesStrategy
+import com.simprints.id.data.prefs.settings.ScannerGeneration
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.GROUP
@@ -74,7 +75,8 @@ open class PreferencesModule {
         @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
         @Named("PeopleDownSyncTriggerToBooleanSerializer") peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>,
         @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
-        @Named("SaveFingerprintImagesSerializer") saveFingerprintImagesSerializer: Serializer<SaveFingerprintImagesStrategy>
+        @Named("SaveFingerprintImagesSerializer") saveFingerprintImagesSerializer: Serializer<SaveFingerprintImagesStrategy>,
+        @Named("ScannerGenerationsSerializer") scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
     ): SettingsPreferencesManager =
         SettingsPreferencesManagerImpl(prefs,
             remoteConfigWrapper,
@@ -84,7 +86,8 @@ open class PreferencesModule {
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
             peopleDownSyncTriggerToBooleanSerializer,
-            saveFingerprintImagesSerializer)
+            saveFingerprintImagesSerializer,
+            scannerGenerationsSerializer)
 
     @Provides
     @Singleton

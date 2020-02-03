@@ -24,7 +24,8 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           languagesStringArraySerializer: Serializer<Array<String>>,
                                           moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
                                           peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>,
-                                          saveFingerprintImagesSerializer: Serializer<SaveFingerprintImagesStrategy>)
+                                          saveFingerprintImagesSerializer: Serializer<SaveFingerprintImagesStrategy>,
+                                          scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>)
     : SettingsPreferencesManager {
 
     companion object {
@@ -94,6 +95,10 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         val SAVE_FINGERPRINT_IMAGES_DEFAULT = SaveFingerprintImagesStrategy.NEVER
         const val SAVE_FINGERPRINT_IMAGES_KEY = "SaveFingerprintImages"
+
+        val SCANNER_GENERATIONS_DEFAULT = listOf(ScannerGeneration.VERO_1, ScannerGeneration.VERO_2)
+        const val SCANNER_GENERATIONS_KEY = "ScannerGenerations"
+
     }
 
     // Number of GUIDs to be returned to the calling app as the result of an identification
@@ -158,6 +163,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     override var saveFingerprintImages: SaveFingerprintImagesStrategy
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SAVE_FINGERPRINT_IMAGES_KEY, SAVE_FINGERPRINT_IMAGES_DEFAULT, saveFingerprintImagesSerializer)
+
+    override var scannerGenerations: List<ScannerGeneration>
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SCANNER_GENERATIONS_KEY, SCANNER_GENERATIONS_DEFAULT, scannerGenerationsSerializer)
 
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()
