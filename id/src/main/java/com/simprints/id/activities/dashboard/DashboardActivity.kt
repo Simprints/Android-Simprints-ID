@@ -127,26 +127,25 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     }
 
     private fun observeForProjectDetails() {
-        viewModel.getProjectDetails().observe(this@DashboardActivity, Observer {
+        viewModel.getProjectDetails().observe(this, Observer {
             projectDetailsCardDisplayer.displayProjectDetails(it)
         })
     }
 
     private fun observeForSyncCardState() {
-        syncCardDisplayer.initRoot(dashboard_sync_card)
-        viewModel.syncCardStateLiveData.observe(this@DashboardActivity, Observer<DashboardSyncCardState> {
+        viewModel.syncCardStateLiveData.observe(this, Observer<DashboardSyncCardState> {
             syncCardDisplayer.displayState(it)
         })
 
-        syncCardDisplayer.userWantsToOpenSettings.observe(this@DashboardActivity, LiveDataEventObserver {
+        syncCardDisplayer.userWantsToOpenSettings.observe(this, LiveDataEventObserver {
             openSettings()
         })
 
-        syncCardDisplayer.userWantsToSelectAModule.observe(this@DashboardActivity, LiveDataEventObserver {
+        syncCardDisplayer.userWantsToSelectAModule.observe(this, LiveDataEventObserver {
             openSelectModules()
         })
 
-        syncCardDisplayer.userWantsToSync.observe(this@DashboardActivity, LiveDataEventObserver {
+        syncCardDisplayer.userWantsToSync.observe(this, LiveDataEventObserver {
             syncCardDisplayer.displayState(SyncConnecting(null, 0, null))
             peopleSyncManager.sync()
         })
