@@ -23,8 +23,8 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionName "2019.4.0"
-        versionCode 197
+        versionName "2020.1.0"
+        versionCode 198
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -94,6 +94,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
     }
 
     dynamicFeatures = [":fingerprint", ":face", ":clientapi"]
@@ -133,15 +136,18 @@ dependencies {
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
     api deps.kotlin.coroutines_android
+    api deps.kotlin.coroutines_play_services
     implementation deps.androidx.core
     api deps.androidx.multidex
     implementation deps.androidx.appcompat
     implementation deps.androidx.legacy
     implementation deps.androidx.room.core
+    implementation deps.androidx.room.coroutines
     implementation deps.androidx.lifecycle.ktx
     implementation deps.androidx.lifecycle.ext
     implementation deps.androidx.lifecycle.livedata
     implementation deps.androidx.lifecycle.viewmodel
+    implementation deps.androidx.lifecycle.scope
     implementation deps.androidx.ui.constraintlayout
     implementation deps.androidx.ui.cardview
     implementation deps.androidx.ui.preference
@@ -214,11 +220,13 @@ dependencies {
     testImplementation deps.testing.espresso.intents
     testImplementation deps.testing.espresso.contrib
     testImplementation deps.testing.truth
+    testImplementation deps.testing.kotlin
+
     testImplementation deps.testing.mockito.core
     testImplementation deps.testing.mockito.inline
     testImplementation deps.testing.mockito.kotlin
-    testImplementation deps.testing.mockk
-    testImplementation deps.testing.koin
+    testImplementation deps.testing.mockk.core
+    testImplementation(deps.testing.koin)
 
     testImplementation deps.testing.mockwebserver
     testImplementation deps.testing.work
@@ -250,6 +258,14 @@ dependencies {
     androidTestImplementation deps.testing.espresso.intents
     androidTestImplementation deps.testing.truth
     androidTestImplementation deps.testing.rx2_idler
+    androidTestImplementation deps.testing.mockk.core
+    androidTestImplementation deps.testing.mockk.android
+    androidTestImplementation deps.testing.mockwebserver
+    androidTestImplementation deps.testing.coroutines_test
+    androidTestImplementation(deps.testing.awaitility) {
+        exclude group: "org.hamcrest"
+    }
+
     androidTestImplementation(deps.testing.espresso.barista) {
         exclude group: "com.android.support"
         exclude group: "com.google.code.findbugs"

@@ -4,4 +4,6 @@ import com.simprints.moduleapi.common.ISecuredImageRef
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class SecuredImageRef(override val uri: String) : ISecuredImageRef
+data class SecuredImageRef(override val path: Path) : ISecuredImageRef
+
+fun ISecuredImageRef.fromModuleApiToDomain() = SecuredImageRef(path.fromModuleApiToDomain())

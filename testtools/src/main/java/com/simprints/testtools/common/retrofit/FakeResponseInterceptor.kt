@@ -11,8 +11,8 @@ class FakeResponseInterceptor(private val statusCode: Int,
                               private val validateUrl: (url: String) -> Unit = {}) : Interceptor {
 
     @Throws(IOException::class)
-    override fun intercept(chain: Interceptor.Chain): Response? {
-        validateUrl(chain.request().url().toString())
+    override fun intercept(chain: Interceptor.Chain): Response {
+        validateUrl(chain.request().url.toString())
         return getBuilderResponse(statusCode, body, contentType).request(chain.request()).build()
     }
 }

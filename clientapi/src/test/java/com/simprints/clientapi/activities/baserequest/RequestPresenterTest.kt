@@ -1,14 +1,19 @@
 package com.simprints.clientapi.activities.baserequest
 
 import com.google.common.truth.Truth
+import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
+import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.requests.EnrollRequest
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.exceptions.RootedDeviceException
+import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.reactivex.Completable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 
@@ -37,7 +42,7 @@ class RequestPresenterTest {
             whenever(this) { build() } thenReturn EnrollRequest(projectIdField, moduleIdField, userIdField, metadataField, extraField)
         }
 
-        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock)
+        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock, mock(), mock())
         presenter.validateAndSendRequest(requestBuilder)
 
         verifyOnce(clientApiSessionEventsManagerMock) {
@@ -54,20 +59,58 @@ class RequestPresenterTest {
             whenever(this) { build() } thenReturn EnrollRequest(projectIdField, moduleIdField, userIdField, metadataField, emptyMap())
         }
 
-        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock)
+        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock, mock(), mock())
         presenter.validateAndSendRequest(requestBuilder)
 
         verifyNever(clientApiSessionEventsManagerMock) { addSuspiciousIntentEvent(anyNotNull()) }
+    }
+
+    @Test
+    fun withRootedDevice_shouldLogException() = runBlockingTest {
+        val mockDeviceManager = mock<DeviceManager>()
+        val exception = RootedDeviceException()
+        whenever(mockDeviceManager) { checkIfDeviceIsRooted() } thenThrow exception
+        val mockCrashReportManager = mock<ClientApiCrashReportManager>()
+        val presenter = ImplRequestPresenter(
+            mock(),
+            mock(),
+            mockDeviceManager,
+            mockCrashReportManager
+        )
+
+        presenter.start()
+
+        verifyOnce(mockCrashReportManager) {
+            logExceptionOrSafeException(exception)
+        }
+    }
+
+    @Test
+    fun withRootedDevice_shouldShowAlertScreen() = runBlockingTest {
+        val mockDeviceManager = mock<DeviceManager>()
+        whenever(mockDeviceManager) { checkIfDeviceIsRooted() } thenThrow RootedDeviceException()
+        val mockView = mock<RequestContract.RequestView>()
+        val presenter = ImplRequestPresenter(mockView, mock(), mockDeviceManager, mock())
+
+        presenter.start()
+
+        verifyOnce(mockView) {
+            handleClientRequestError(ClientApiAlert.ROOTED_DEVICE)
+        }
     }
 
 }
 
 class ImplRequestPresenter(
     view: RequestContract.RequestView,
-    clientApiSessionEventsManager: ClientApiSessionEventsManager
-) : RequestPresenter(view, clientApiSessionEventsManager) {
+    clientApiSessionEventsManager: ClientApiSessionEventsManager,
+    deviceManager: DeviceManager,
+    crashReportManager: ClientApiCrashReportManager
+) : RequestPresenter(view, clientApiSessionEventsManager, deviceManager, crashReportManager) {
 
-    override suspend fun start() {}
+    override suspend fun start() {
+        runIfDeviceIsNotRooted {}
+    }
     override fun handleEnrollResponse(enroll: EnrollResponse) {}
     override fun handleIdentifyResponse(identify: IdentifyResponse) {}
     override fun handleVerifyResponse(verify: VerifyResponse) {}

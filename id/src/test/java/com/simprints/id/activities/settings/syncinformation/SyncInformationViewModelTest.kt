@@ -3,17 +3,18 @@ package com.simprints.id.activities.settings.syncinformation
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
+import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
+import com.simprints.id.data.db.common.models.PeopleCount
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.reactivex.Single
+import io.mockk.coEvery
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,9 +28,9 @@ import org.robolectric.annotation.Config
 class SyncInformationViewModelTest {
 
     @Mock lateinit var personLocalDataSourceMock: PersonLocalDataSource
-    @Mock lateinit var personRepositoryMock: PersonRepository
     @Mock lateinit var preferencesManagerMock: PreferencesManager
-    @Mock lateinit var syncScopesBuilderMock: SyncScopesBuilder
+    @Mock lateinit var peopleDownSyncScopeRepositoryMock: PeopleDownSyncScopeRepository
+    private lateinit var personRepositoryMock: PersonRepository
 
     private val projectId = "projectId"
     private lateinit var viewModel: SyncInformationViewModel
@@ -37,8 +38,9 @@ class SyncInformationViewModelTest {
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
+        personRepositoryMock = mockk()
         UnitTestConfig(this).rescheduleRxMainThread()
-        viewModel = SyncInformationViewModel(personRepositoryMock, personLocalDataSourceMock, preferencesManagerMock, projectId, syncScopesBuilderMock)
+        viewModel = SyncInformationViewModel(personRepositoryMock, personLocalDataSourceMock, preferencesManagerMock, projectId, peopleDownSyncScopeRepositoryMock)
     }
 
     @Test
@@ -56,9 +58,9 @@ class SyncInformationViewModelTest {
         val countInRemoteForCreate = 123
         val countInRemoteForUpdate = 0
         val countInRemoteForDelete = 22
-        val peopleCount = PeopleCount(projectId, null, null, null, countInRemoteForCreate, countInRemoteForDelete, countInRemoteForUpdate)
-        whenever(syncScopesBuilderMock) { buildSyncScope() } thenReturn SyncScope(projectId, null, null)
-        whenever(personRepositoryMock) { countToDownSync(any()) } thenReturn Single.just(listOf(peopleCount))
+        val peopleCount = PeopleCount(countInRemoteForCreate, countInRemoteForDelete, countInRemoteForUpdate)
+        whenever(peopleDownSyncScopeRepositoryMock) { getDownSyncScope() } thenReturn projectSyncScope
+        coEvery { personRepositoryMock.countToDownSync(any()) } returns listOf(peopleCount)
 
         viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount()
 
