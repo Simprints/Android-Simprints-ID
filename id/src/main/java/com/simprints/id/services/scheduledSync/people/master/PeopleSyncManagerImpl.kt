@@ -69,7 +69,7 @@ class PeopleSyncManagerImpl(private val ctx: Context,
         wm.cancelAllPeopleSyncWorkers()
     }
 
-    fun buildOneTimeRequest(): OneTimeWorkRequest =
+    private fun buildOneTimeRequest(): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(PeopleSyncMasterWorker::class.java)
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTagForSyncMasterWorkers()
@@ -77,7 +77,7 @@ class PeopleSyncManagerImpl(private val ctx: Context,
             .addTagForScheduledAtNow()
             .build() as OneTimeWorkRequest
 
-    fun buildPeriodicRequest(): PeriodicWorkRequest =
+    private fun buildPeriodicRequest(): PeriodicWorkRequest =
         PeriodicWorkRequest.Builder(PeopleSyncMasterWorker::class.java, SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTagForSyncMasterWorkers()
