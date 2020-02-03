@@ -27,18 +27,11 @@ open class SignerManagerImpl(
                 projectRepository.loadFromRemoteAndRefreshCache(projectId)
                     ?: throw Exception("project not found")
             })
-            .andThen(scheduleSyncs(projectId, userId))
             .trace("signIn")
 
     private fun storeCredentials(userId: String, projectId: String) =
         Completable.fromAction {
             loginInfoManager.storeCredentials(projectId, userId)
-        }
-
-    @Suppress("UNUSED_PARAMETER")
-    private fun scheduleSyncs(projectId: String, userId: String): Completable =
-        Completable.fromAction {
-            syncManager.scheduleBackgroundSyncs()
         }
 
     override suspend fun signOut() {
