@@ -335,9 +335,9 @@ class Scanner(
         assertConnected().andThen(assertMode(CYPRESS_OTA)).andThen(
             cypressOtaController.program(cypressOtaMessageChannel, responseErrorHandler, firmwareBinFile))
 
-    fun startStmOta(firmwareHexFile: String): Observable<Float> =
+    fun startStmOta(firmwareBinFile: ByteArray): Observable<Float> =
         assertConnected().andThen(assertMode(STM_OTA)).andThen(
-            stmOtaController.program(stmOtaMessageChannel, responseErrorHandler, firmwareHexFile))
+            stmOtaController.program(stmOtaMessageChannel, responseErrorHandler, firmwareBinFile))
 
     fun startUn20Ota(firmwareBinFile: ByteArray): Observable<Float> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(

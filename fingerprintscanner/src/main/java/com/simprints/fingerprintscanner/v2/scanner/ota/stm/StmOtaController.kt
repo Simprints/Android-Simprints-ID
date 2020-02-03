@@ -2,23 +2,23 @@ package com.simprints.fingerprintscanner.v2.scanner.ota.stm
 
 import com.simprints.fingerprintscanner.v2.channel.StmOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaCommand
+import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaMessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaResponse
 import com.simprints.fingerprintscanner.v2.domain.stmota.commands.*
 import com.simprints.fingerprintscanner.v2.domain.stmota.responses.CommandAcknowledgement
-import com.simprints.fingerprintscanner.v2.exceptions.ota.InvalidFirmwareException
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.handleErrorsWith
-import com.simprints.fingerprintscanner.v2.tools.hexparser.FirmwareByteChunk
-import com.simprints.fingerprintscanner.v2.tools.hexparser.IntelHexParser
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
+import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
+import com.simprints.fingerprintscanner.v2.tools.primitives.toByteArray
 import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import com.simprints.fingerprintscanner.v2.tools.reactive.single
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
-class StmOtaController(private val intelHexParser: IntelHexParser) {
+class StmOtaController {
 
     private inline fun <reified R : StmOtaResponse> sendStmOtaModeCommandAndReceiveResponse(
         stmOtaMessageChannel: StmOtaMessageChannel,
@@ -29,13 +29,12 @@ class StmOtaController(private val intelHexParser: IntelHexParser) {
             .handleErrorsWith(errorHandler)
 
     /**
-     * @throws InvalidFirmwareException if firmware file could not be successfully parsed
      * @throws OtaFailedException if received a NACK when communicating with STM
      */
-    fun program(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler, firmwareHexFile: String): Observable<Float> =
+    fun program(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler, firmwareBinFile: ByteArray): Observable<Float> =
         sendInitBootloaderCommand(stmOtaMessageChannel, errorHandler)
             .andThen(eraseMemory(stmOtaMessageChannel, errorHandler))
-            .andThen(parseFirmwareFile(firmwareHexFile))
+            .andThen(calculateFirmwareFileChunks(firmwareBinFile))
             .pairWithProgress()
             .flattenAsObservable { it }
             .concatMap { (chunk, progress) ->
@@ -57,13 +56,14 @@ class StmOtaController(private val intelHexParser: IntelHexParser) {
             )
         ).verifyResponseIsAck()
 
-    private fun parseFirmwareFile(firmwareHexFile: String): Single<List<FirmwareByteChunk>> =
+    private fun calculateFirmwareFileChunks(firmwareBinFile: ByteArray): Single<List<FirmwareByteChunk>> =
         single {
-            try {
-                intelHexParser.parse(firmwareHexFile)
-            } catch (e: Exception) {
-                throw InvalidFirmwareException("Parsing firmware file failed", e)
-            }
+            firmwareBinFile.chunked(MAX_STM_OTA_CHUNK_SIZE)
+                .mapIndexed { idx, chunk ->
+                    val addressInt = START_ADDRESS + idx * MAX_STM_OTA_CHUNK_SIZE
+                    val address = addressInt.toByteArray(StmOtaMessageProtocol.byteOrder)
+                    FirmwareByteChunk(address, chunk)
+                }
         }
 
     private fun Single<out List<FirmwareByteChunk>>.pairWithProgress() =
@@ -97,5 +97,7 @@ class StmOtaController(private val intelHexParser: IntelHexParser) {
 
     companion object {
         val ERASE_ALL_ADDRESS = byteArrayOf(0xFF, 0xFF)
+        const val START_ADDRESS = 0
+        const val MAX_STM_OTA_CHUNK_SIZE = 256
     }
 }

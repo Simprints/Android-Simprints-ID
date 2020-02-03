@@ -148,10 +148,10 @@ class Un20OtaControllerTest {
     }
 
     companion object {
-        private fun generateRandomBinFile() = Random.nextBytes(3500 + Random.nextInt(2000))
+        private fun generateRandomBinFile() = Random.nextBytes(350000 + Random.nextInt(200000))
 
         private fun expectedNumberOfChunks(binFile: ByteArray): Int =
-            ceil(binFile.size.toFloat() / Un20OtaController.MAX_OTA_CHUNK_SIZE).roundToInt()
+            ceil(binFile.size.toFloat() / Un20OtaController.MAX_UN20_OTA_CHUNK_SIZE).roundToInt()
 
         private fun generateExpectedProgressValues(binFile: ByteArray): List<Float> {
             val numberOfChunks = expectedNumberOfChunks(binFile)

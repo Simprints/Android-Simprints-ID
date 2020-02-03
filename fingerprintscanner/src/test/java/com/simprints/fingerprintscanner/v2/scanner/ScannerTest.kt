@@ -246,7 +246,7 @@ class ScannerTest {
         scanner.connect(mock(), mock()).blockingAwait()
         scanner.enterStmOtaMode().blockingAwait()
 
-        val testObserver = scanner.startStmOta("").testSubscribe()
+        val testObserver = scanner.startStmOta(byteArrayOf()).testSubscribe()
 
         testObserver.awaitAndAssertSuccess()
 
