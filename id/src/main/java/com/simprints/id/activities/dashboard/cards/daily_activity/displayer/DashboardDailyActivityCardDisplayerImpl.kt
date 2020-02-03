@@ -27,7 +27,7 @@ class DashboardDailyActivityCardDisplayerImpl(
 
     private fun View.setTitle() {
         val date = timeHelper.getCurrentDateAsString()
-        val text = androidResourcesHelper.getString(R.string.dashboard_card_activity, date)
+        val text = androidResourcesHelper.getString(R.string.dashboard_card_activity, arrayOf(date))
         findViewById<TextView>(R.id.dashboard_daily_activity_card_title).text = text
     }
 
