@@ -8,10 +8,6 @@ import io.realm.annotations.Required
 
 open class DbProject : RealmObject() {
 
-    companion object {
-        const val PROJECT_ID_FIELD = "id"
-    }
-
     @PrimaryKey
     @Required var id: String = ""
     @Required var name: String = ""

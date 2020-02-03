@@ -9,7 +9,7 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRe
 class DashboardViewModelFactory(
     private val projectDetailsRepository: DashboardProjectDetailsRepository,
     private val syncCardStateRepository: DashboardSyncCardStateRepository,
-   private val dailyActivityRepository: DashboardDailyActivityRepository
+    private val dailyActivityRepository: DashboardDailyActivityRepository
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -21,7 +21,8 @@ class DashboardViewModelFactory(
                 dailyActivityRepository
             ) as T
         } else {
-            throw IllegalArgumentException("ViewModel Not Found")
+            throw IllegalArgumentException("ViewModel not found")
         }
     }
+
 }
