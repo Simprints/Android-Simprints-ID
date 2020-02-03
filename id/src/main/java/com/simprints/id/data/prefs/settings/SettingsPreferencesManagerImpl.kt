@@ -23,7 +23,8 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           modalitySerializer: Serializer<List<Modality>>,
                                           languagesStringArraySerializer: Serializer<Array<String>>,
                                           moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-                                          peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>)
+                                          peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>,
+                                          saveFingerprintImagesSerializer: Serializer<SaveFingerprintImagesStrategy>)
     : SettingsPreferencesManager {
 
     companion object {
@@ -90,6 +91,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         const val FINGER_IMAGES_EXIST_KEY = "FingerImagesExist"
         const val FINGER_IMAGES_EXIST_DEFAULT = true
+
+        val SAVE_FINGERPRINT_IMAGES_DEFAULT = SaveFingerprintImagesStrategy.NEVER
+        const val SAVE_FINGERPRINT_IMAGES_KEY = "SaveFingerprintImages"
     }
 
     // Number of GUIDs to be returned to the calling app as the result of an identification
@@ -151,6 +155,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     override var fingerImagesExist: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, FINGER_IMAGES_EXIST_KEY, FINGER_IMAGES_EXIST_DEFAULT)
+
+    override var saveFingerprintImages: SaveFingerprintImagesStrategy
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SAVE_FINGERPRINT_IMAGES_KEY, SAVE_FINGERPRINT_IMAGES_DEFAULT, saveFingerprintImagesSerializer)
 
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()
