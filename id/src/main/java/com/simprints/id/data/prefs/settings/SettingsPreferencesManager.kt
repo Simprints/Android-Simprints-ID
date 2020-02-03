@@ -32,6 +32,7 @@ interface SettingsPreferencesManager {
 
     var fingerImagesExist: Boolean
     var saveFingerprintImages: SaveFingerprintImagesStrategy
+    var scannerGenerations: List<ScannerGeneration>
 
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T

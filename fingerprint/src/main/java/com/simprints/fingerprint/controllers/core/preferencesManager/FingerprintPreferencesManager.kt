@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.controllers.core.preferencesManager
 
 import com.simprints.fingerprint.data.domain.fingerprint.SaveFingerprintImagesStrategy
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import java.util.*
 
 interface FingerprintPreferencesManager {
@@ -11,4 +12,5 @@ interface FingerprintPreferencesManager {
 
     val fingerImagesExist: Boolean
     val saveFingerprintImages: SaveFingerprintImagesStrategy
+    val scannerGenerations: List<ScannerGeneration>
 }

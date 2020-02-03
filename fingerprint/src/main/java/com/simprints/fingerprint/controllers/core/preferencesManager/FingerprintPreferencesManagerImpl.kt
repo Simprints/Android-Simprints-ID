@@ -1,7 +1,9 @@
 package com.simprints.fingerprint.controllers.core.preferencesManager
 
 import com.simprints.fingerprint.data.domain.fingerprint.SaveFingerprintImagesStrategy
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.settings.ScannerGeneration as IdScannerGeneration
 import java.util.*
 import com.simprints.id.data.prefs.settings.SaveFingerprintImagesStrategy as IdSaveFingerprintImagesStrategy
 
@@ -38,5 +40,13 @@ class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager) :
         get() = when (prefs.saveFingerprintImages) {
             IdSaveFingerprintImagesStrategy.NEVER -> SaveFingerprintImagesStrategy.NEVER
             IdSaveFingerprintImagesStrategy.ALWAYS -> SaveFingerprintImagesStrategy.ALWAYS
+        }
+
+    override val scannerGenerations: List<ScannerGeneration>
+        get() = prefs.scannerGenerations.map {
+            when (it) {
+                IdScannerGeneration.VERO_1 -> ScannerGeneration.VERO_1
+                IdScannerGeneration.VERO_2 -> ScannerGeneration.VERO_2
+            }
         }
 }

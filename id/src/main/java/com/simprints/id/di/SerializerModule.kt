@@ -3,6 +3,8 @@ package com.simprints.id.di
 import com.google.gson.Gson
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.SaveFingerprintImagesStrategy
+import com.simprints.id.data.prefs.settings.ScannerGeneration
+import com.simprints.id.data.prefs.settings.ScannerGenerationsSerializer
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
@@ -35,4 +37,5 @@ class SerializerModule {
     @Provides @Singleton @Named("LanguagesStringArraySerializer") fun provideLanguagesStringArraySerializer(): Serializer<Array<String>> = LanguagesStringArraySerializer()
     @Provides @Singleton @Named("ModuleIdOptionsStringSetSerializer") fun provideModuleIdOptionsStringSetSerializer(): Serializer<Set<String>> = ModuleIdOptionsStringSetSerializer()
     @Provides @Singleton @Named("SaveFingerprintImagesSerializer") fun provideSaveFingerprintImagesSerializer(): Serializer<SaveFingerprintImagesStrategy> = EnumSerializer(SaveFingerprintImagesStrategy::class.java)
+    @Provides @Singleton @Named("ScannerGenerationsSerializer") fun provideScannerGenerationsSerializer(): Serializer<List<ScannerGeneration>> = ScannerGenerationsSerializer()
 }
