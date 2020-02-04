@@ -134,7 +134,7 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                 CypressOtaController(Crc32Calculator()),
                 StmOtaController(),
                 Un20OtaController(Crc32Calculator()),
-                ResponseErrorHandler(ResponseErrorHandlingStrategy.Default)
+                ResponseErrorHandler(ResponseErrorHandlingStrategy.None)
             ),
             scannerUiHelper,
             macAddress,

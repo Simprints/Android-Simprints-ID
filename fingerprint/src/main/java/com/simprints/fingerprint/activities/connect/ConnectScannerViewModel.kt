@@ -19,6 +19,7 @@ import com.simprints.fingerprintscanner.v1.ScannerUtils.convertAddressToSerial
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 
 class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashReportManager,
                               private val scannerManager: ScannerManager,
@@ -51,6 +52,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
             .andThen(connectToVero())
             .andThen(resetVeroUI())
             .andThen(wakeUpVero())
+            .subscribeOn(Schedulers.io())
             .subscribeBy(onError = { it.printStackTrace() }, onComplete = {
                 handleSetupFinished()
             })

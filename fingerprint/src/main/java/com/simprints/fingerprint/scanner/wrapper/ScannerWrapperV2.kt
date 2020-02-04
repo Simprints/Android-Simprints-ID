@@ -38,19 +38,25 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             ScannerVersionInformation(2, it.masterFirmwareVersion.toInt(), it.un20AppVersion.firmwareMajorVersion.toInt())
         } ?: ScannerVersionInformation(2, -1, -1)
 
-    override fun connect(): Completable =
-        run {
-            if (bluetoothAdapter.isNull()) throw BluetoothNotSupportedException()
-            if (!bluetoothAdapter.isEnabled()) throw BluetoothNotEnabledException()
+    override fun connect(): Completable {
+        if (bluetoothAdapter.isNull()) throw BluetoothNotSupportedException()
+        if (!bluetoothAdapter.isEnabled()) throw BluetoothNotEnabledException()
 
-            val device = bluetoothAdapter.getRemoteDevice(macAddress)
+        val device = bluetoothAdapter.getRemoteDevice(macAddress)
 
-            if (!device.isBonded()) throw ScannerNotPairedException()
+        if (!device.isBonded()) throw ScannerNotPairedException()
 
+        return Single.fromCallable {
             try {
                 socket = device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
                 bluetoothAdapter.cancelDiscovery()
                 socket.connect()
+                socket
+            } catch (e: IOException) {
+                throw ScannerDisconnectedException()
+            }
+        }.retry(CONNECT_MAX_RETRIES)
+            .flatMapCompletable { socket ->
                 scannerV2.connect(socket.getInputStream(), socket.getOutputStream())
                     .andThen(scannerV2.getVersionInformation())
                     .map {
@@ -58,15 +64,12 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                     }
                     .ignoreElement()
                     .andThen(scannerV2.enterMainMode())
-            } catch (e: IOException) {
-                Completable.error(ScannerDisconnectedException())
             }
-        }.retry(CONNECT_MAX_RETRIES)
-
-    override fun disconnect(): Completable = Completable.fromAction {
-        scannerV2.disconnect()
-        socket.close()
     }
+
+    override fun disconnect(): Completable =
+        scannerV2.disconnect()
+            .doOnComplete { socket.close() }
 
     override fun sensorWakeUp(): Completable = scannerV2.turnUn20OnAndAwaitStateChangeEvent()
 
@@ -120,6 +123,6 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     companion object {
         private val DEFAULT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
-        private const val CONNECT_MAX_RETRIES = 1L
+        private const val CONNECT_MAX_RETRIES = 3L
     }
 }
