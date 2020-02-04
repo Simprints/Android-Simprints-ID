@@ -6,6 +6,8 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20M
 
 class GetImageCommand(val imageFormatData: ImageFormatData) : Un20Command(Un20MessageType.GetImage(imageFormatData.imageFormat.byte)) {
 
+    override fun getDataBytes(): ByteArray = imageFormatData.getDataBytes()
+
     companion object {
         fun fromBytes(minorResponseByte: Byte, data: ByteArray) =
             GetImageCommand(ImageFormatData.fromBytes(minorResponseByte, data))
