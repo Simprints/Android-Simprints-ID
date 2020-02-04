@@ -19,8 +19,8 @@ import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 
 class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
 
-    override val versionInformation: ScannerVersionInformation
-        get() = ScannerVersionInformation(
+    override fun versionInformation(): ScannerVersionInformation =
+        ScannerVersionInformation(
             veroVersion = 1,
             firmwareVersion = scannerV1.ucVersion.toInt(),
             un20Version = scannerV1.unVersion.toInt()

@@ -1,5 +1,7 @@
 package com.simprints.fingerprint.scanner.factory
 
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
@@ -43,15 +45,39 @@ import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.scanner.ota.un20.Un20OtaController
 import com.simprints.fingerprintscanner.v2.tools.crc.Crc32Calculator
 import com.simprints.fingerprintscanner.v2.tools.lang.objects
+import timber.log.Timber
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
 class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter,
+                         private val preferencesManager: FingerprintPreferencesManager,
                          private val scannerUiHelper: ScannerUiHelper) : ScannerFactory {
 
     override fun create(macAddress: String): ScannerWrapper {
-        // TODO : Determine whether to create a ScannerV1 or a ScannerV2
-        return createScannerV1(macAddress)
+        val availableScannerGenerations = preferencesManager.scannerGenerations
+
+        val scannerGenerationToUse = when {
+            availableScannerGenerations.isEmpty() -> {
+                ScannerGeneration.VERO_1.also {
+                    Timber.w("No scanner generations found: Defaulting to $it")
+                }
+            }
+            availableScannerGenerations.size == 1 -> {
+                availableScannerGenerations.single().also {
+                    Timber.i("Using scanner generation $it")
+                }
+            }
+            else -> {
+                ScannerGeneration.VERO_1.also { // TODO : Better scanner generation determination in case a project has multiple generations of Vero
+                    Timber.w("Multiple scanner generations found: $availableScannerGenerations. Defaulting to $it")
+                }
+            }
+        }
+
+        return when (scannerGenerationToUse) {
+            ScannerGeneration.VERO_1 -> createScannerV1(macAddress)
+            ScannerGeneration.VERO_2 -> createScannerV2(macAddress)
+        }
     }
 
     fun createScannerV1(macAddress: String): ScannerWrapper =
