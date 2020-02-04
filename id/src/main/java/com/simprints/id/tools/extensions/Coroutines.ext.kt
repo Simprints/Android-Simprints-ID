@@ -14,7 +14,7 @@ import kotlin.coroutines.coroutineContext
 
 @InternalCoroutinesApi
 @ExperimentalCoroutinesApi
-suspend fun <T> Flow<T>.bufferedChunks(maxChunkSize: Int): Flow<List<T>> = channelFlow<List<T>> {
+suspend fun <T> Flow<T>.bufferedChunks(maxChunkSize: Int): Flow<List<T>> = channelFlow {
     require(maxChunkSize >= 1) {
         "Max chunk size should be greater than 0 but was $maxChunkSize"
     }
@@ -28,10 +28,18 @@ suspend fun <T> Flow<T>.bufferedChunks(maxChunkSize: Int): Flow<List<T>> = chann
                 buffer.clear()
             }
         }
-    } finally {
+    } catch (t: Throwable) {
         send(buffer.toList())
         buffer.clear()
+
+        // Post-pone the propagation of Throwable to let consumer receiving the
+        // remaining elements
+        throw t
     }
+
+    send(buffer.toList())
+    buffer.clear()
+
 }.buffer(1)
 
 suspend fun <E : Any> Channel<E>.consumeEachBlock(maxBlockSize: Int, consumer: (List<E>) -> Unit) {
