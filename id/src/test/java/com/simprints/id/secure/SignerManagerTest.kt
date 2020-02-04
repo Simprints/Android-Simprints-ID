@@ -112,28 +112,6 @@ class SignerManagerTest {
     }
 
     @Test
-    fun signIn_shouldResumePeopleSync() {
-        mockRemoteSignedIn()
-        mockStoreCredentialsLocally()
-        mockFetchingProjectInto()
-        mockResumePeopleSync()
-        signIn()
-        coVerify { syncManager.scheduleBackgroundSyncs() }
-    }
-
-    @Test
-    fun resumeProjectSyncFails_signInShouldFail() {
-        mockRemoteSignedIn()
-        mockStoreCredentialsLocally()
-        mockFetchingProjectInto()
-        mockResumePeopleSync(true)
-
-        val tester = signIn()
-
-        verifySignedInFailed(tester)
-    }
-
-    @Test
     fun signIn_shouldSucceed() {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()

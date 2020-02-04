@@ -35,6 +35,7 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
     @Inject lateinit var upSyncWorkerBuilder: PeopleUpSyncWorkersBuilder
     @Inject lateinit var preferenceManager: PreferencesManager
     @Inject lateinit var peopleSyncCache: PeopleSyncCache
+    @Inject lateinit var peopleSyncSubMasterWorkersBuilder: PeopleSyncSubMasterWorkersBuilder
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(appContext)
@@ -59,11 +60,12 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
             crashlyticsLog("Start")
 
             if (!isSyncRunning()) {
-                val startSyncReporterWorker = buildStartSyncReporterWorker(uniqueSyncId)
+                val startSyncReporterWorker = peopleSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
                 val upSyncWorkers = upSyncWorkersChain(uniqueSyncId)
                 val downSyncWorkers = downSyncWorkersChain(uniqueSyncId)
                 val chain = upSyncWorkers + downSyncWorkers
-                wm.beginWith(startSyncReporterWorker).then(chain).then(buildEndSyncReporterWorker(uniqueSyncId)).enqueue()
+                val endSyncReporterWorker = peopleSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
+                wm.beginWith(startSyncReporterWorker).then(chain).then(endSyncReporterWorker).enqueue()
 
                 peopleSyncCache.clearProgresses()
                 clearWorkerHistory(uniqueSyncId)
