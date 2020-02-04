@@ -22,6 +22,7 @@ import com.simprints.id.tools.utils.retrySimNetworkCalls
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import timber.log.Timber
 import java.io.InputStreamReader
@@ -41,44 +42,45 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
     override suspend fun execute(downSyncOperation: PeopleDownSyncOperation,
                                  workerId: String,
                                  downSyncWorkerProgressReporter: WorkerProgressCountReporter): Int {
+        return withContext(Dispatchers.IO) {
+            this@PeopleDownSyncDownloaderTaskImpl.downSyncOperation = downSyncOperation
+            this@PeopleDownSyncDownloaderTaskImpl.downSyncWorkerProgressReporter = downSyncWorkerProgressReporter
 
-        this.downSyncOperation = downSyncOperation
-        this.downSyncWorkerProgressReporter = downSyncWorkerProgressReporter
+            count = cache.readProgress(workerId)
+            downSyncWorkerProgressReporter.reportCount(count)
 
-        count = cache.readProgress(workerId)
-        downSyncWorkerProgressReporter.reportCount(count)
+            var reader: JsonReader? = null
+            val bufferToSave = mutableListOf<ApiGetPerson>()
 
-        var reader: JsonReader? = null
-        val bufferToSave = mutableListOf<ApiGetPerson>()
+            try {
+                val client = personRemoteDataSource.getPeopleApiClient()
+                val response = makeDownSyncApiCallAndGetResponse(client)
+                reader = setupJsonReaderFromResponse(response)
 
-        try {
-            val client = personRemoteDataSource.getPeopleApiClient()
-            val response = makeDownSyncApiCallAndGetResponse(client)
-            reader = setupJsonReaderFromResponse(response)
-
-            val channelFromNetwork = CoroutineScope(Dispatchers.IO).createPeopleChannelFromJsonReader(reader)
-            while (!channelFromNetwork.isClosedForReceive) {
-                channelFromNetwork.poll()?.let {
-                    bufferToSave.add(it)
-                    if (bufferToSave.size > BATCH_SIZE_FOR_DOWNLOADING) {
-                        saveBatch(workerId, bufferToSave)
+                val channelFromNetwork = createPeopleChannelFromJsonReader(reader)
+                while (!channelFromNetwork.isClosedForReceive) {
+                    channelFromNetwork.poll()?.let {
+                        bufferToSave.add(it)
+                        if (bufferToSave.size > BATCH_SIZE_FOR_DOWNLOADING) {
+                            saveBatch(workerId, bufferToSave)
+                        }
                     }
                 }
+
+                saveBatch(workerId, bufferToSave)
+                updateDownSyncInfo(COMPLETE)
+
+            } catch (t: Throwable) {
+                t.printStackTrace()
+                saveBatch(workerId, bufferToSave)
+                finishDownload(reader)
+                updateDownSyncInfo(FAILED)
+                throw t
             }
 
-            saveBatch(workerId, bufferToSave)
-            updateDownSyncInfo(COMPLETE)
-
-        } catch (t: Throwable) {
-            t.printStackTrace()
-            saveBatch(workerId, bufferToSave)
             finishDownload(reader)
-            updateDownSyncInfo(FAILED)
-            throw t
+            count
         }
-
-        finishDownload(reader)
-        return count
     }
 
     private suspend fun saveBatch(workerId: String, batch: MutableList<ApiGetPerson>) {
@@ -113,13 +115,8 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
 
 
     private fun CoroutineScope.createPeopleChannelFromJsonReader(reader: JsonReader) = produce<ApiGetPerson>(capacity = 5 * BATCH_SIZE_FOR_DOWNLOADING) {
-        try {
-            while (reader.hasNext()) {
-                this.send(JsonHelper.gson.fromJson(reader, ApiGetPerson::class.java))
-            }
-            this.close()
-        } catch (t: Throwable) {
-            this.close(t)
+        while (reader.hasNext()) {
+            this.send(JsonHelper.gson.fromJson(reader, ApiGetPerson::class.java))
         }
     }
 
