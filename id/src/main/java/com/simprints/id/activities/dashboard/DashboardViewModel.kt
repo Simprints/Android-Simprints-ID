@@ -40,9 +40,6 @@ class DashboardViewModel(
         }
     }
 
-    private fun loadDailyActivity() {
-        val dailyActivity = dailyActivityRepository.getDailyActivity()
-        dailyActivityCardStateLiveData.value = dailyActivity
-    }
+    private fun loadDailyActivity() = dailyActivityRepository.getDailyActivity()
 
 }

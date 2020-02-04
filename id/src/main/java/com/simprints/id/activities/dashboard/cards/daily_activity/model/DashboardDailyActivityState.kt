@@ -1,7 +1,7 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.model
 
 data class DashboardDailyActivityState(
-    val enrolments: Int,
-    val identifications: Int,
-    val verifications: Int
+    var enrolments: Int = 0,
+    var identifications: Int = 0,
+    var verifications: Int = 0
 )

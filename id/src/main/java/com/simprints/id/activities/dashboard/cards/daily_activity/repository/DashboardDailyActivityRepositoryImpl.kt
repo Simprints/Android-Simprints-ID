@@ -1,5 +1,7 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
@@ -9,12 +11,19 @@ class DashboardDailyActivityRepositoryImpl(
     private val preferencesManager: PreferencesManager
 ) : DashboardDailyActivityRepository {
 
-    override fun getDailyActivity(): DashboardDailyActivityState {
-        val enrolments = preferencesManager.enrolmentsToday
-        val identifications = preferencesManager.identificationsToday
-        val verifications = preferencesManager.verificationsToday
+    private val dailyActivityState = DashboardDailyActivityState()
+    private val liveData = MutableLiveData<DashboardDailyActivityState>()
 
-        return DashboardDailyActivityState(enrolments, identifications, verifications)
+    override fun getDailyActivity(): LiveData<DashboardDailyActivityState> {
+        with(dailyActivityState) {
+            enrolments = preferencesManager.enrolmentsToday
+            identifications = preferencesManager.identificationsToday
+            verifications = preferencesManager.verificationsToday
+        }
+
+        return liveData.apply {
+            value = dailyActivityState
+        }
     }
 
     @Suppress("NON_EXHAUSTIVE_WHEN")
@@ -35,15 +44,18 @@ class DashboardDailyActivityRepositoryImpl(
     }
 
     private fun computeNewEnrolment() {
-        preferencesManager.enrolmentsToday++
+        dailyActivityState.enrolments = ++preferencesManager.enrolmentsToday
+        liveData.value = dailyActivityState
     }
 
     private fun computeNewIdentification() {
-        preferencesManager.identificationsToday++
+        dailyActivityState.identifications = ++preferencesManager.identificationsToday
+        liveData.value = dailyActivityState
     }
 
     private fun computeNewVerification() {
-        preferencesManager.verificationsToday++
+        dailyActivityState.verifications = ++preferencesManager.verificationsToday
+        liveData.value = dailyActivityState
     }
 
 }
