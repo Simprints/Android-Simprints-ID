@@ -28,18 +28,10 @@ suspend fun <T> Flow<T>.bufferedChunks(maxChunkSize: Int): Flow<List<T>> = chann
                 buffer.clear()
             }
         }
-    } catch (t: Throwable) {
+    } finally {
         send(buffer.toList())
         buffer.clear()
-
-        // Post-pone the propagation of Throwable to let consumer receiving the
-        // remaining elements
-        throw t
     }
-
-    send(buffer.toList())
-    buffer.clear()
-
 }.buffer(1)
 
 suspend fun <E : Any> Channel<E>.consumeEachBlock(maxBlockSize: Int, consumer: (List<E>) -> Unit) {
