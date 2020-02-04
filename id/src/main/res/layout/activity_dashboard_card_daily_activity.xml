@@ -116,6 +116,7 @@
             android:id="@+id/group_enrolments"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:constraint_referenced_ids="dashboard_daily_activity_card_enrolments_count,enrolments_label,divider_enrolments"
             tools:visibility="visible"/>
 
@@ -123,6 +124,7 @@
             android:id="@+id/group_identifications"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:constraint_referenced_ids="dashboard_daily_activity_card_identifications_count,identifications_label,divider_identifications"
             tools:visibility="visible"/>
 
@@ -130,6 +132,7 @@
             android:id="@+id/group_verifications"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:constraint_referenced_ids="dashboard_daily_activity_card_verifications_count,verifications_label"
             tools:visibility="visible"/>
 
