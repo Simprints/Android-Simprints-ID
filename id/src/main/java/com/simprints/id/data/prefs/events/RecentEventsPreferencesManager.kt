@@ -10,4 +10,6 @@ interface RecentEventsPreferencesManager {
     var identificationsToday: Int
     var verificationsToday: Int
 
+    var lastActivityTime: Long
+
 }

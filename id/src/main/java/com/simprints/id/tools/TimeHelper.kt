@@ -11,6 +11,7 @@ interface TimeHelper {
     fun msBetweenNowAndTime(time: Long): Long
     fun readableBetweenNowAndTime(date: Date): String
     fun getCurrentDateAsString(): String
+    fun todayInMillis(): Long
 
     companion object {
         fun build(app: Application): TimeHelper =

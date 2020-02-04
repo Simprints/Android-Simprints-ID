@@ -7,5 +7,4 @@ import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 interface DashboardDailyActivityRepository {
     fun getDailyActivity(): LiveData<DashboardDailyActivityState>
     fun updateDailyActivity(appResponse: AppResponse)
-    fun resetDailyActivity()
 }

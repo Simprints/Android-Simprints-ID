@@ -2,13 +2,13 @@ package com.simprints.id.activities.dashboard.cards.daily_activity.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSource
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponseType
 
 class DashboardDailyActivityRepositoryImpl(
-    private val preferencesManager: PreferencesManager
+    private val localDataSource: DailyActivityLocalDataSource
 ) : DashboardDailyActivityRepository {
 
     private val dailyActivityState = DashboardDailyActivityState()
@@ -16,9 +16,9 @@ class DashboardDailyActivityRepositoryImpl(
 
     override fun getDailyActivity(): LiveData<DashboardDailyActivityState> {
         with(dailyActivityState) {
-            enrolments = preferencesManager.enrolmentsToday
-            identifications = preferencesManager.identificationsToday
-            verifications = preferencesManager.verificationsToday
+            enrolments = localDataSource.getEnrolmentsMadeToday()
+            identifications = localDataSource.getIdentificationsMadeToday()
+            verifications = localDataSource.getVerificationsMadeToday()
         }
 
         return liveData.apply {
@@ -35,26 +35,18 @@ class DashboardDailyActivityRepositoryImpl(
         }
     }
 
-    override fun resetDailyActivity() {
-        with(preferencesManager) {
-            enrolmentsToday = 0
-            identificationsToday = 0
-            verificationsToday = 0
-        }
-    }
-
     private fun computeNewEnrolment() {
-        dailyActivityState.enrolments = ++preferencesManager.enrolmentsToday
+        dailyActivityState.enrolments = localDataSource.computeNewEnrolmentAndGet()
         liveData.value = dailyActivityState
     }
 
     private fun computeNewIdentification() {
-        dailyActivityState.identifications = ++preferencesManager.identificationsToday
+        dailyActivityState.identifications = localDataSource.computeNewIdentificationAndGet()
         liveData.value = dailyActivityState
     }
 
     private fun computeNewVerification() {
-        dailyActivityState.verifications = ++preferencesManager.verificationsToday
+        dailyActivityState.verifications = localDataSource.computeNewVerificationAndGet()
         liveData.value = dailyActivityState
     }
 
