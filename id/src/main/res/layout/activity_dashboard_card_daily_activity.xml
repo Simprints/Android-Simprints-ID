@@ -22,6 +22,117 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:text="Activity: 31/01/2020"/>
 
+        <TextView
+            android:id="@+id/dashboard_daily_activity_card_enrolments_count"
+            style="@style/SimprintsStyle.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_title"
+            app:layout_constraintStart_toStartOf="@+id/enrolments_label"
+            app:layout_constraintEnd_toEndOf="@+id/enrolments_label"
+            android:textSize="20sp"
+            tools:text="250"/>
+
+        <TextView
+            android:id="@+id/dashboard_daily_activity_card_identifications_count"
+            style="@style/SimprintsStyle.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_title"
+            app:layout_constraintStart_toStartOf="@id/identifications_label"
+            app:layout_constraintEnd_toEndOf="@id/identifications_label"
+            android:textSize="20sp"
+            tools:text="200"/>
+
+        <TextView
+            android:id="@+id/dashboard_daily_activity_card_verifications_count"
+            style="@style/SimprintsStyle.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_title"
+            app:layout_constraintStart_toStartOf="@+id/verifications_label"
+            app:layout_constraintEnd_toEndOf="@+id/verifications_label"
+            android:textSize="20sp"
+            tools:text="150"/>
+
+        <TextView
+            android:id="@+id/enrolments_label"
+            style="@style/SimprintsStyle.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dashboard_card_enrolments"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_enrolments_count"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/divider_enrolments"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <View
+            android:id="@+id/divider_enrolments"
+            android:layout_width="3dp"
+            android:layout_height="0dp"
+            android:background="@color/simprints_grey"
+            app:layout_constraintTop_toTopOf="@id/dashboard_daily_activity_card_enrolments_count"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/enrolments_label"
+            app:layout_constraintEnd_toStartOf="@+id/identifications_label"/>
+
+        <TextView
+            android:id="@+id/identifications_label"
+            style="@style/SimprintsStyle.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dashboard_card_identifications"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_identifications_count"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/divider_enrolments"
+            app:layout_constraintEnd_toStartOf="@+id/divider_identifications"/>
+
+        <View
+            android:id="@+id/divider_identifications"
+            android:layout_width="3dp"
+            android:layout_height="0dp"
+            android:background="@color/simprints_grey"
+            app:layout_constraintTop_toTopOf="@id/dashboard_daily_activity_card_identifications_count"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/identifications_label"
+            app:layout_constraintEnd_toStartOf="@+id/verifications_label"/>
+
+        <TextView
+            android:id="@+id/verifications_label"
+            style="@style/SimprintsStyle.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dashboard_card_verifications"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_verifications_count"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/divider_identifications"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_enrolments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="dashboard_daily_activity_card_enrolments_count,enrolments_label,divider_enrolments"
+            tools:visibility="visible"/>
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_identifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="dashboard_daily_activity_card_identifications_count,identifications_label,divider_identifications"
+            tools:visibility="visible"/>
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_verifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="dashboard_daily_activity_card_verifications_count,verifications_label"
+            tools:visibility="visible"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>
