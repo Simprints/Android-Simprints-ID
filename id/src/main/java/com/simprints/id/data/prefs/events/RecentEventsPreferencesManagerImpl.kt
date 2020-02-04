@@ -24,6 +24,9 @@ class RecentEventsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
 
         private const val VERIFICATIONS_KEY = "Verifications"
         private const val VERIFICATIONS_DEFAULT = 0
+
+        private const val LAST_ACTIVITY_DATE_KEY = "LastActivityDate"
+        private const val LAST_ACTIVITY_DATE_DEFAULT: Long = 0
     }
 
     override var lastScannerUsed: String
@@ -43,4 +46,6 @@ class RecentEventsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
     override var verificationsToday: Int
         by PrimitivePreference(prefs, VERIFICATIONS_KEY, VERIFICATIONS_DEFAULT)
 
+    override var lastActivityTime: Long
+        by PrimitivePreference(prefs, LAST_ACTIVITY_DATE_KEY, LAST_ACTIVITY_DATE_DEFAULT)
 }
