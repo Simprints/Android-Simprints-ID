@@ -7,19 +7,19 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.Smile
 class ScannerUiHelper {
 
     fun goodScanLedState() = SmileLedState(
-        LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
-        LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
-        LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
-        LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
-        LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04)
+        LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x08),
+        LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x08),
+        LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x08),
+        LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x08),
+        LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x08)
     )
 
     fun badScanLedState() = SmileLedState(
-        LedState(DigitalValue.FALSE, 0x04, 0x00 ,0x00),
-        LedState(DigitalValue.FALSE, 0x04, 0x00 ,0x00),
-        LedState(DigitalValue.FALSE, 0x04, 0x00 ,0x00),
-        LedState(DigitalValue.FALSE, 0x04, 0x00 ,0x00),
-        LedState(DigitalValue.FALSE, 0x04, 0x00 ,0x00)
+        LedState(DigitalValue.FALSE, 0x08, 0x00 ,0x00),
+        LedState(DigitalValue.FALSE, 0x08, 0x00 ,0x00),
+        LedState(DigitalValue.FALSE, 0x08, 0x00 ,0x00),
+        LedState(DigitalValue.FALSE, 0x08, 0x00 ,0x00),
+        LedState(DigitalValue.FALSE, 0x08, 0x00 ,0x00)
     )
 
     fun idleLedState() = SmileLedState(

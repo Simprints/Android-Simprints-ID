@@ -94,7 +94,7 @@ object KoinInjector {
     private fun Module.defineBuildersForDomainClasses() {
         single<BluetoothComponentAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
-        single<ScannerFactory> { ScannerFactoryImpl(get(), get()) }
+        single<ScannerFactory> { ScannerFactoryImpl(get(), get(), get()) }
         single<ScannerManager> { ScannerManagerImpl(get(), get()) }
 
         factory { FinalResultBuilder() }

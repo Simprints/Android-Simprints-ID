@@ -22,5 +22,5 @@ interface ScannerWrapper {
 
     fun registerTriggerListener(triggerListener: ScannerTriggerListener)
     fun unregisterTriggerListener(triggerListener: ScannerTriggerListener)
-    val versionInformation: ScannerVersionInformation
+    fun versionInformation(): ScannerVersionInformation
 }

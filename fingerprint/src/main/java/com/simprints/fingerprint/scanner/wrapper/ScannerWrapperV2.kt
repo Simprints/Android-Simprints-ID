@@ -5,12 +5,17 @@ import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ScannerVersionInformation
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
+import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
+import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import io.reactivex.Completable
 import io.reactivex.Observer
 import io.reactivex.Single
@@ -26,28 +31,37 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     private lateinit var socket: BluetoothComponentSocket
 
-    override val versionInformation: ScannerVersionInformation by lazy {
-        ScannerVersionInformation(2, 7, 2) // TODO : Implement version fetching
-    }
+    private var unifiedVersionInformation: UnifiedVersionInformation? = null
 
-    override fun connect(): Completable {
-        if (bluetoothAdapter.isNull()) throw BluetoothNotSupportedException()
-        if (!bluetoothAdapter.isEnabled()) throw BluetoothNotEnabledException()
+    override fun versionInformation(): ScannerVersionInformation =
+        unifiedVersionInformation?.let {
+            ScannerVersionInformation(2, it.masterFirmwareVersion.toInt(), it.un20AppVersion.firmwareMajorVersion.toInt())
+        } ?: ScannerVersionInformation(2, -1, -1)
 
-        val device = bluetoothAdapter.getRemoteDevice(macAddress)
+    override fun connect(): Completable =
+        run {
+            if (bluetoothAdapter.isNull()) throw BluetoothNotSupportedException()
+            if (!bluetoothAdapter.isEnabled()) throw BluetoothNotEnabledException()
 
-        if (!device.isBonded()) throw ScannerNotPairedException()
+            val device = bluetoothAdapter.getRemoteDevice(macAddress)
 
-        return try {
-            socket = device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
-            bluetoothAdapter.cancelDiscovery()
-            socket.connect()
-            scannerV2.connect(socket.getInputStream(), socket.getOutputStream())
-                .andThen(scannerV2.enterMainMode())
-        } catch (e: IOException) {
-            Completable.error(ScannerDisconnectedException())
-        }
-    }
+            if (!device.isBonded()) throw ScannerNotPairedException()
+
+            try {
+                socket = device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
+                bluetoothAdapter.cancelDiscovery()
+                socket.connect()
+                scannerV2.connect(socket.getInputStream(), socket.getOutputStream())
+                    .andThen(scannerV2.getVersionInformation())
+                    .map {
+                        unifiedVersionInformation = it
+                    }
+                    .ignoreElement()
+                    .andThen(scannerV2.enterMainMode())
+            } catch (e: IOException) {
+                Completable.error(ScannerDisconnectedException())
+            }
+        }.retry(CONNECT_MAX_RETRIES)
 
     override fun disconnect(): Completable = Completable.fromAction {
         scannerV2.disconnect()
@@ -59,7 +73,14 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     override fun sensorShutDown(): Completable = scannerV2.turnUn20OffAndAwaitStateChangeEvent()
 
     override fun captureFingerprint(timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
-        scannerV2.captureFingerprint().ignoreElement() // TODO : Add in error propagation for no finger detected etc.
+        scannerV2.captureFingerprint().flatMapCompletable {
+            when (it) {
+                CaptureFingerprintResult.OK -> Completable.complete()
+                CaptureFingerprintResult.FINGERPRINT_NOT_FOUND -> Completable.error(NoFingerDetectedException())
+                CaptureFingerprintResult.DPI_UNSUPPORTED -> Completable.error(UnexpectedScannerException("Capture fingerprint DPI unsupported"))
+                CaptureFingerprintResult.UNKNOWN_ERROR -> Completable.error(UnknownScannerIssueException("Unknown error when capturing fingerprint"))
+            }
+        }
             .andThen(scannerV2.getImageQualityScore())
             .flatMap { imageQuality ->
                 scannerV2.acquireTemplate()
@@ -81,8 +102,13 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     override fun registerTriggerListener(triggerListener: ScannerTriggerListener) {
         triggerListenerToObserverMap[triggerListener] = object : DisposableObserver<Unit>() {
             override fun onComplete() {}
-            override fun onNext(t: Unit) { triggerListener.onTrigger() }
-            override fun onError(e: Throwable) { throw e }
+            override fun onNext(t: Unit) {
+                triggerListener.onTrigger()
+            }
+
+            override fun onError(e: Throwable) {
+                throw e
+            }
         }.also { scannerV2.triggerButtonListeners.add(it) }
     }
 
@@ -94,5 +120,6 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     companion object {
         private val DEFAULT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
+        private const val CONNECT_MAX_RETRIES = 1L
     }
 }
