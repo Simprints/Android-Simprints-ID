@@ -117,10 +117,10 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
             while (reader.hasNext()) {
                 this.send(JsonHelper.gson.fromJson(reader, ApiGetPerson::class.java))
             }
-        } finally {
             this.close()
+        } catch (t: Throwable) {
+            this.close(t)
         }
-
     }
 
     private suspend fun saveBatchAndUpdateDownSyncStatus(batchOfPeople: List<ApiGetPerson>) {
