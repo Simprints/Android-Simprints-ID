@@ -6,23 +6,32 @@ import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActi
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponseType
+import com.simprints.id.tools.TimeHelper
 
 class DashboardDailyActivityRepositoryImpl(
-    private val localDataSource: DailyActivityLocalDataSource
+    private val localDataSource: DailyActivityLocalDataSource,
+    private val timeHelper: TimeHelper
 ) : DashboardDailyActivityRepository {
 
-    private val dailyActivityState = DashboardDailyActivityState()
     private val liveData = MutableLiveData<DashboardDailyActivityState>()
 
-    override fun getDailyActivity(): LiveData<DashboardDailyActivityState> {
-        with(dailyActivityState) {
-            enrolments = localDataSource.getEnrolmentsMadeToday()
-            identifications = localDataSource.getIdentificationsMadeToday()
-            verifications = localDataSource.getVerificationsMadeToday()
-        }
+    private var dailyActivityState = DashboardDailyActivityState()
 
-        return liveData.apply {
-            value = dailyActivityState
+    override fun getDailyActivity(): LiveData<DashboardDailyActivityState> {
+        return clearOldActivityThenReturn {
+            val enrolments = localDataSource.getEnrolmentsMadeToday()
+            val identifications = localDataSource.getIdentificationsMadeToday()
+            val verifications = localDataSource.getVerificationsMadeToday()
+
+            dailyActivityState = DashboardDailyActivityState(
+                enrolments,
+                identifications,
+                verifications
+            )
+
+            liveData.apply {
+                value = dailyActivityState
+            }
         }
     }
 
@@ -35,19 +44,56 @@ class DashboardDailyActivityRepositoryImpl(
         }
     }
 
-    private fun computeNewEnrolment() {
-        dailyActivityState.enrolments = localDataSource.computeNewEnrolmentAndGet()
-        liveData.value = dailyActivityState
+    private fun computeNewEnrolment() = clearOldActivityThenReturn {
+        val enrolments = localDataSource.computeNewEnrolmentAndGet()
+
+        dailyActivityState = DashboardDailyActivityState(
+            enrolments,
+            dailyActivityState.identifications,
+            dailyActivityState.verifications
+        )
+
+        updateLiveDataAndLastActivityTime()
     }
 
-    private fun computeNewIdentification() {
-        dailyActivityState.identifications = localDataSource.computeNewIdentificationAndGet()
-        liveData.value = dailyActivityState
+    private fun computeNewIdentification() = clearOldActivityThenReturn {
+        val identifications = localDataSource.computeNewIdentificationAndGet()
+
+        dailyActivityState = DashboardDailyActivityState(
+            dailyActivityState.enrolments,
+            identifications,
+            dailyActivityState.verifications
+        )
+
+        updateLiveDataAndLastActivityTime()
     }
 
-    private fun computeNewVerification() {
-        dailyActivityState.verifications = localDataSource.computeNewVerificationAndGet()
+    private fun computeNewVerification() = clearOldActivityThenReturn {
+        val verifications = localDataSource.computeNewVerificationAndGet()
+
+        dailyActivityState = DashboardDailyActivityState(
+            dailyActivityState.enrolments,
+            dailyActivityState.identifications,
+            verifications
+        )
+
+        updateLiveDataAndLastActivityTime()
+    }
+
+    private fun <T> clearOldActivityThenReturn(block: () -> T): T {
+        val today = timeHelper.todayInMillis()
+        val lastActivityTime = localDataSource.getLastActivityTime()
+        val lastActivityWasNotToday = lastActivityTime < today
+
+        if (lastActivityWasNotToday)
+            localDataSource.clearActivity()
+
+        return block.invoke()
+    }
+
+    private fun updateLiveDataAndLastActivityTime() {
         liveData.value = dailyActivityState
+        localDataSource.setLastActivityTime(timeHelper.now())
     }
 
 }

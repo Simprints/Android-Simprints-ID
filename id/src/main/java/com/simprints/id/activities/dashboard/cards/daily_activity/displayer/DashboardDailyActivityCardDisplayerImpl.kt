@@ -1,7 +1,6 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.displayer
 
 import android.view.View
-import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
@@ -24,14 +23,10 @@ class DashboardDailyActivityCardDisplayerImpl(
 
     override fun displayDailyActivityState(dailyActivityState: DashboardDailyActivityState) {
         with(root) {
-            if (dailyActivityState.hasNoActivity()) {
-                visibility = GONE
-            } else {
-                setTitle()
-                setEnrolmentsCount(dailyActivityState.enrolments)
-                setIdentificationsCount(dailyActivityState.identifications)
-                setVerificationsCount(dailyActivityState.verifications)
-            }
+            setTitle()
+            setEnrolmentsCount(dailyActivityState.enrolments)
+            setIdentificationsCount(dailyActivityState.identifications)
+            setVerificationsCount(dailyActivityState.verifications)
         }
     }
 

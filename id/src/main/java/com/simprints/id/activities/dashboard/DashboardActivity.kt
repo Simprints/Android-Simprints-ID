@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -117,7 +119,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     private fun setupCards() {
         projectDetailsCardDisplayer.initRoot(dashboard_project_details_card)
         syncCardDisplayer.initRoot(dashboard_sync_card)
-        dailyActivityCardDisplayer.initRoot(dashboard_daily_activity_card)
+        dailyActivityCardDisplayer.initRoot(dashboard_daily_activity_card_root)
     }
 
     private fun observeCardData() {
@@ -153,7 +155,12 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
 
     private fun observeForDailyActivityState() {
         viewModel.getDailyActivity().observe(this, Observer {
-            dailyActivityCardDisplayer.displayDailyActivityState(it)
+            if (it.hasNoActivity()) {
+                dashboard_daily_activity_card.visibility = GONE
+            } else {
+                dashboard_daily_activity_card.visibility = VISIBLE
+                dailyActivityCardDisplayer.displayDailyActivityState(it)
+            }
         })
     }
 
