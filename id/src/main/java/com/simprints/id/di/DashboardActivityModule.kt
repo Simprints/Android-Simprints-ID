@@ -68,17 +68,17 @@ open class DashboardActivityModule {
 
     @Provides
     open fun provideDailyActivityRepository(
-        localDataSource: DailyActivityLocalDataSource
-    ): DashboardDailyActivityRepository = DashboardDailyActivityRepositoryImpl(localDataSource)
+        localDataSource: DailyActivityLocalDataSource,
+        timeHelper: TimeHelper
+    ): DashboardDailyActivityRepository = DashboardDailyActivityRepositoryImpl(
+        localDataSource,
+        timeHelper
+    )
 
     @Provides
     open fun provideDailyActivityLocalDataSource(
-        preferencesManager: RecentEventsPreferencesManager,
-        timeHelper: TimeHelper
-    ): DailyActivityLocalDataSource = DailyActivityLocalDataSourceImpl(
-        preferencesManager,
-        timeHelper
-    )
+        preferencesManager: RecentEventsPreferencesManager
+    ): DailyActivityLocalDataSource = DailyActivityLocalDataSourceImpl(preferencesManager)
 
     @Provides
     open fun provideDashboardDailyActivityCardDisplayer(
