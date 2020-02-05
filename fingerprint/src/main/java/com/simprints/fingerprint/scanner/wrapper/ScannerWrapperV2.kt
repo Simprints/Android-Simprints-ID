@@ -15,6 +15,8 @@ import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
 import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import io.reactivex.Completable
 import io.reactivex.Observer
@@ -76,7 +78,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     override fun sensorShutDown(): Completable = scannerV2.turnUn20OffAndAwaitStateChangeEvent()
 
     override fun captureFingerprint(timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
-        scannerV2.captureFingerprint().flatMapCompletable {
+        scannerV2.captureFingerprint(CAPTURE_DPI).flatMapCompletable {
             when (it) {
                 CaptureFingerprintResult.OK -> Completable.complete()
                 CaptureFingerprintResult.FINGERPRINT_NOT_FOUND -> Completable.error(NoFingerDetectedException())
@@ -85,6 +87,15 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             }
         }
             .andThen(scannerV2.getImageQualityScore())
+            .flatMap { qualityScore ->
+                val ledState = if (qualityScore >= qualityThreshold) {
+                    scannerUiHelper.goodScanLedState()
+                } else {
+                    scannerUiHelper.badScanLedState()
+                }
+                scannerV2.setSmileLedState(ledState)
+                    .andThen(Single.just(qualityScore))
+            }
             .flatMap { imageQuality ->
                 scannerV2.acquireTemplate()
                     .map { templateData ->
@@ -93,7 +104,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             }
 
     override fun acquireImage(): Single<AcquireImageResponse> =
-        scannerV2.acquireImage()
+        scannerV2.acquireImage(DEFAULT_IMAGE_ACQUISITION_FORMAT)
             .map { imageBytes ->
                 AcquireImageResponse(imageBytes.image)
             }
@@ -124,5 +135,9 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     companion object {
         private val DEFAULT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
         private const val CONNECT_MAX_RETRIES = 3L
+
+        private val CAPTURE_DPI = Dpi(1700)
+        private const val DEFAULT_COMPRESSION_FACTOR = 15
+        private val DEFAULT_IMAGE_ACQUISITION_FORMAT = ImageFormatData.WSQ(DEFAULT_COMPRESSION_FACTOR)
     }
 }
