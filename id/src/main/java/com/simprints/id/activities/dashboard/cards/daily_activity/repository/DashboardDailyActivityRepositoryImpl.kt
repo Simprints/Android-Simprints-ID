@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.repository
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSource
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
@@ -17,7 +16,7 @@ class DashboardDailyActivityRepositoryImpl(
 
     private var dailyActivityState = DashboardDailyActivityState()
 
-    override fun getDailyActivity(): LiveData<DashboardDailyActivityState> {
+    override fun getDailyActivity(): DashboardDailyActivityState {
         return clearOldActivityThenReturn {
             val enrolments = localDataSource.getEnrolmentsMadeToday()
             val identifications = localDataSource.getIdentificationsMadeToday()
@@ -29,9 +28,7 @@ class DashboardDailyActivityRepositoryImpl(
                 verifications
             )
 
-            liveData.apply {
-                value = dailyActivityState
-            }
+            dailyActivityState
         }
     }
 
@@ -82,8 +79,9 @@ class DashboardDailyActivityRepositoryImpl(
 
     private fun <T> clearOldActivityThenReturn(block: () -> T): T {
         val today = timeHelper.todayInMillis()
+        val tomorrow = timeHelper.tomorrowInMillis()
         val lastActivityTime = localDataSource.getLastActivityTime()
-        val lastActivityWasNotToday = lastActivityTime < today
+        val lastActivityWasNotToday = lastActivityTime < today || lastActivityTime >= tomorrow
 
         if (lastActivityWasNotToday)
             localDataSource.clearActivity()

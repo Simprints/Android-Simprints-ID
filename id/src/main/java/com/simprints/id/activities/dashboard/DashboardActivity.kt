@@ -4,8 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
-import android.view.View.GONE
-import android.view.View.VISIBLE
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -67,6 +66,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
         setupViewModel()
         setupCards()
         observeCardData()
+        loadDailyActivity()
     }
 
     private fun setupActionBar() {
@@ -125,7 +125,6 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     private fun observeCardData() {
         observeForProjectDetails()
         observeForSyncCardState()
-        observeForDailyActivityState()
     }
 
     private fun observeForProjectDetails() {
@@ -153,15 +152,15 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
         })
     }
 
-    private fun observeForDailyActivityState() {
-        viewModel.getDailyActivity().observe(this, Observer {
+    private fun loadDailyActivity() {
+        viewModel.getDailyActivity().let {
             if (it.hasNoActivity()) {
-                dashboard_daily_activity_card.visibility = GONE
+                dashboard_daily_activity_card.visibility = View.GONE
             } else {
-                dashboard_daily_activity_card.visibility = VISIBLE
+                dashboard_daily_activity_card.visibility = View.VISIBLE
                 dailyActivityCardDisplayer.displayDailyActivityState(it)
             }
-        })
+        }
     }
 
     private fun openSettings() {
@@ -175,9 +174,13 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     @ObsoleteCoroutinesApi
     override fun onResume() {
         super.onResume()
+        loadDailyActivity()
         lifecycleScope.launch {
             stopTickerToCheckIfSyncIsRequired()
-            syncAgainTicker = ticker(delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED, initialDelayMillis = 100).also {
+            syncAgainTicker = ticker(
+                delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
+                initialDelayMillis = 100
+            ).also {
                 for (event in it) {
                     Timber.tag(SYNC_LOG_TAG).d("Launch sync if required")
                     viewModel.syncIfRequired()

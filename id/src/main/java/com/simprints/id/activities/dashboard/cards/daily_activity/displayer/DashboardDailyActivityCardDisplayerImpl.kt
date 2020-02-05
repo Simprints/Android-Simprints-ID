@@ -1,6 +1,7 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.displayer
 
 import android.view.View
+import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
@@ -9,6 +10,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
+import kotlinx.android.synthetic.main.activity_dashboard_card_daily_activity.view.*
 
 class DashboardDailyActivityCardDisplayerImpl(
     private val timeHelper: TimeHelper,
@@ -27,6 +29,7 @@ class DashboardDailyActivityCardDisplayerImpl(
             setEnrolmentsCount(dailyActivityState.enrolments)
             setIdentificationsCount(dailyActivityState.identifications)
             setVerificationsCount(dailyActivityState.verifications)
+            setDividers(dailyActivityState)
         }
     }
 
@@ -37,24 +40,92 @@ class DashboardDailyActivityCardDisplayerImpl(
     }
 
     private fun View.setEnrolmentsCount(enrolmentsCount: Int) {
-        findViewById<Group>(R.id.group_enrolments).visibility = VISIBLE
-        findViewById<TextView>(
-            R.id.dashboard_daily_activity_card_enrolments_count
-        ).text = "$enrolmentsCount"
+        val enrolmentsGroup = findViewById<Group>(R.id.group_enrolments)
+
+        if (enrolmentsCount > 0) {
+            findViewById<TextView>(
+                R.id.dashboard_daily_activity_card_enrolments_count
+            ).text = "$enrolmentsCount"
+            enrolmentsGroup.visibility = VISIBLE
+        } else {
+            enrolmentsGroup.visibility = GONE
+        }
     }
 
     private fun View.setIdentificationsCount(identificationsCount: Int) {
-        findViewById<Group>(R.id.group_identifications).visibility = VISIBLE
-        findViewById<TextView>(
-            R.id.dashboard_daily_activity_card_identifications_count
-        ).text = "$identificationsCount"
+        val identificationsGroup = findViewById<Group>(R.id.group_identifications)
+
+        if (identificationsCount > 0) {
+            identificationsGroup.visibility = VISIBLE
+            findViewById<TextView>(
+                R.id.dashboard_daily_activity_card_identifications_count
+            ).text = "$identificationsCount"
+        } else {
+            identificationsGroup.visibility = GONE
+        }
     }
 
     private fun View.setVerificationsCount(verificationsCount: Int) {
-        findViewById<Group>(R.id.group_verifications).visibility = VISIBLE
-        findViewById<TextView>(
-            R.id.dashboard_daily_activity_card_verifications_count
-        ).text = "$verificationsCount"
+        val verificationsGroup = findViewById<Group>(R.id.group_verifications)
+
+        if (verificationsCount > 0) {
+            verificationsGroup.visibility = VISIBLE
+            findViewById<TextView>(
+                R.id.dashboard_daily_activity_card_verifications_count
+            ).text = "$verificationsCount"
+        } else {
+            verificationsGroup.visibility = GONE
+        }
+    }
+
+    private fun View.setDividers(dailyActivityState: DashboardDailyActivityState) {
+        val enrolmentsDivider = findViewById<View>(R.id.divider_enrolments)
+        val identificationsDivider = findViewById<View>(R.id.divider_identifications)
+
+        val shouldNotShowDividers = dailyActivityState.hasEnrolments()
+            .xor(dailyActivityState.hasIdentifications())
+            .xor(dailyActivityState.hasVerifications())
+
+        if (shouldNotShowDividers) {
+            divider_enrolments.visibility = GONE
+            divider_identifications.visibility = GONE
+        } else {
+            setEnrolmentsDividerVisibility(enrolmentsDivider, dailyActivityState)
+            setIdentificationsDividerVisibility(identificationsDivider, dailyActivityState)
+        }
+    }
+
+    private fun DashboardDailyActivityState.hasEnrolments() = enrolments > 0
+
+    private fun DashboardDailyActivityState.hasIdentifications() = identifications > 0
+
+    private fun DashboardDailyActivityState.hasVerifications() = verifications > 0
+
+    private fun setEnrolmentsDividerVisibility(
+        divider: View,
+        dailyActivityState: DashboardDailyActivityState
+    ) {
+        val shouldShowEnrolmentsDivider = dailyActivityState.hasEnrolments()
+            && (dailyActivityState.hasIdentifications()
+            || dailyActivityState.hasVerifications())
+
+        divider.visibility = if (shouldShowEnrolmentsDivider)
+            VISIBLE
+        else
+            GONE
+    }
+
+    private fun setIdentificationsDividerVisibility(
+        divider: View,
+        dailyActivityState: DashboardDailyActivityState
+    ) {
+        val shouldShowIdentificationsDivider = dailyActivityState.hasIdentifications()
+            && dailyActivityState.hasVerifications()
+
+        divider.visibility = if (shouldShowIdentificationsDivider)
+            VISIBLE
+        else
+            GONE
     }
 
 }

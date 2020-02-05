@@ -27,4 +27,14 @@ class TimeHelperImpl : TimeHelper {
         timeInMillis
     }
 
+    override fun tomorrowInMillis(): Long = Calendar.getInstance().run {
+        add(Calendar.DATE, 1)
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+
+        timeInMillis
+    }
+
 }
