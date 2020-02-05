@@ -88,7 +88,7 @@ object KoinInjector {
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
         factory<FingerprintAndroidResourcesHelper> { FingerprintAndroidResourcesHelperImpl(get()) }
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
-        factory<FingerprintImageManager> { FingerprintImageManagerImpl() }
+        factory<FingerprintImageManager> { FingerprintImageManagerImpl(get(), get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
