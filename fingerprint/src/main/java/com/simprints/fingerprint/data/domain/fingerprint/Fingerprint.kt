@@ -2,7 +2,7 @@ package com.simprints.fingerprint.data.domain.fingerprint
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.simprints.fingerprint.controllers.core.image.FingerprintImageRef
+import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
 import java.nio.ByteBuffer

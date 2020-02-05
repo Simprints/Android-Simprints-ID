@@ -56,6 +56,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     override var isBusyWithFingerTransitionAnimation = false
     private var lastCaptureStartedAt: Long = 0
     private var confirmDialog: AlertDialog? = null
+    private val captureEventIds: MutableMap<Finger, String> = mutableMapOf()
 
     override fun start() {
         initFingerDisplayHelper(view)
@@ -235,11 +236,21 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun saveImagesAndProceedToFinish(fingerprints: List<Finger>) {
         runBlocking { // TODO : Use viewModelScope once converted to MVVM
             fingerprints.forEach { finger ->
-                finger.imageBytes?.let { imageBytes ->
-                    finger.template?.imageRef = imageManager.save(imageBytes)
-                }
+                saveImage(finger)
             }
             proceedToFinish(fingerprints.mapNotNull { it.template })
+        }
+    }
+
+    private suspend fun saveImage(finger: Finger) {
+        val imageBytes = finger.imageBytes
+        val captureEventId = captureEventIds[finger]
+
+        if (imageBytes != null && captureEventId != null) {
+            finger.template?.imageRef = imageManager.save(imageBytes, captureEventId, "wsq") // STOPSHIP : Better determination of image extension
+        } else if (imageBytes != null && captureEventId == null) {
+            Timber.e("Could not save fingerprint image because of null capture ID")
+            crashReportManager.logMalfunction("Could not save fingerprint image because of null capture ID")
         }
     }
 
@@ -254,7 +265,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun addCaptureEventInSession(finger: Finger) {
-        sessionEventsManager.addEventInBackground(FingerprintCaptureEvent(
+        val captureEvent = FingerprintCaptureEvent(
             lastCaptureStartedAt,
             timeHelper.now(),
             finger.id,
@@ -263,7 +274,9 @@ class CollectFingerprintsPresenter(private val context: Context,
             finger.template?.let {
                 FingerprintCaptureEvent.Fingerprint(finger.id, it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))
             }
-        ))
+        )
+        captureEventIds[finger] = captureEvent.id
+        sessionEventsManager.addEventInBackground(captureEvent)
     }
 
     private fun createMapAndShowDialog() {

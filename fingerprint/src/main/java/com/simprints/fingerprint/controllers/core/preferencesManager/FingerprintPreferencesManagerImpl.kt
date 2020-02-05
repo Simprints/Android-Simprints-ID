@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.controllers.core.preferencesManager
 
-import com.simprints.fingerprint.data.domain.fingerprint.SaveFingerprintImagesStrategy
+import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.ScannerGeneration as IdScannerGeneration
