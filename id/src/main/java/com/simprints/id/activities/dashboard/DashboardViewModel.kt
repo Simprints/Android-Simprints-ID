@@ -29,9 +29,7 @@ class DashboardViewModel(
 
     fun getProjectDetails(): LiveData<DashboardProjectState> = projectCardStateLiveData
 
-    fun getDailyActivity(): LiveData<DashboardDailyActivityState> {
-        return dailyActivityRepository.getDailyActivity()
-    }
+    fun getDailyActivity(): DashboardDailyActivityState = dailyActivityRepository.getDailyActivity()
 
     private fun loadProjectDetails() {
         viewModelScope.launch {
