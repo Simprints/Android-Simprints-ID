@@ -6,6 +6,7 @@ import com.simprints.fingerprint.data.domain.images.Path
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import com.simprints.core.images.model.Path as CorePath
 
 class FingerprintImageManagerImpl(private val coreImageRepository: ImageRepository,
@@ -15,11 +16,13 @@ class FingerprintImageManagerImpl(private val coreImageRepository: ImageReposito
         withContext(Dispatchers.IO) {
 
             val path = determinePath(captureEventId, fileExtension)
+            Timber.d("Saving fingerprint image ${path.compose()}")
             val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, path)
 
             if (securedImageRef != null) {
                 FingerprintImageRef(securedImageRef.path.toDomain())
             } else {
+                Timber.e("Saving image failed for captureId $captureEventId")
                 null
             }
         }
