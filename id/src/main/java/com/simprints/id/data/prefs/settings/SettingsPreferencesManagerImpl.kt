@@ -93,7 +93,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val FINGER_IMAGES_EXIST_KEY = "FingerImagesExist"
         const val FINGER_IMAGES_EXIST_DEFAULT = true
 
-        val SAVE_FINGERPRINT_IMAGES_DEFAULT = SaveFingerprintImagesStrategy.ALWAYS // STOPSHIP
+        val SAVE_FINGERPRINT_IMAGES_DEFAULT = SaveFingerprintImagesStrategy.COMPRESSED_1700_WSQ_15 // STOPSHIP
         const val SAVE_FINGERPRINT_IMAGES_KEY = "SaveFingerprintImages"
 
         val SCANNER_GENERATIONS_DEFAULT = listOf(ScannerGeneration.VERO_2) // STOPSHIP

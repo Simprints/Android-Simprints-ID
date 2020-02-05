@@ -39,7 +39,7 @@ class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager) :
     override val saveFingerprintImages: SaveFingerprintImagesStrategy
         get() = when (prefs.saveFingerprintImages) {
             IdSaveFingerprintImagesStrategy.NEVER -> SaveFingerprintImagesStrategy.NEVER
-            IdSaveFingerprintImagesStrategy.ALWAYS -> SaveFingerprintImagesStrategy.ALWAYS
+            IdSaveFingerprintImagesStrategy.COMPRESSED_1700_WSQ_15 -> SaveFingerprintImagesStrategy.COMPRESSED_1700_WSQ_15
         }
 
     override val scannerGenerations: List<ScannerGeneration>
