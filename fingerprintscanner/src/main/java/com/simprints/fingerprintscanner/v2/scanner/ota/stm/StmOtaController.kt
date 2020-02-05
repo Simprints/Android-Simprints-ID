@@ -97,7 +97,7 @@ class StmOtaController {
 
     companion object {
         val ERASE_ALL_ADDRESS = byteArrayOf(0xFF, 0xFF)
-        const val START_ADDRESS = 0
+        const val START_ADDRESS = 0x08004000
         const val MAX_STM_OTA_CHUNK_SIZE = 256
     }
 }
