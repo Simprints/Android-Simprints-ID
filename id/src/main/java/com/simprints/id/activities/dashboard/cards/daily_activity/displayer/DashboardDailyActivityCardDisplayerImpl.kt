@@ -6,6 +6,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
+import com.simprints.core.tools.extentions.nand
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
 import com.simprints.id.tools.AndroidResourcesHelper
@@ -46,6 +47,13 @@ class DashboardDailyActivityCardDisplayerImpl(
             findViewById<TextView>(
                 R.id.dashboard_daily_activity_card_enrolments_count
             ).text = "$enrolmentsCount"
+
+            val labelText = androidResourcesHelper.getQuantityString(
+                R.plurals.dashboard_card_enrolments,
+                enrolmentsCount
+            )
+
+            findViewById<TextView>(R.id.enrolments_label).text = labelText
             enrolmentsGroup.visibility = VISIBLE
         } else {
             enrolmentsGroup.visibility = GONE
@@ -56,10 +64,18 @@ class DashboardDailyActivityCardDisplayerImpl(
         val identificationsGroup = findViewById<Group>(R.id.group_identifications)
 
         if (identificationsCount > 0) {
-            identificationsGroup.visibility = VISIBLE
             findViewById<TextView>(
                 R.id.dashboard_daily_activity_card_identifications_count
             ).text = "$identificationsCount"
+
+            val labelText = androidResourcesHelper.getQuantityString(
+                R.plurals.dashboard_card_identifications,
+                identificationsCount
+            )
+
+            findViewById<TextView>(R.id.identifications_label).text = labelText
+
+            identificationsGroup.visibility = VISIBLE
         } else {
             identificationsGroup.visibility = GONE
         }
@@ -69,10 +85,18 @@ class DashboardDailyActivityCardDisplayerImpl(
         val verificationsGroup = findViewById<Group>(R.id.group_verifications)
 
         if (verificationsCount > 0) {
-            verificationsGroup.visibility = VISIBLE
             findViewById<TextView>(
                 R.id.dashboard_daily_activity_card_verifications_count
             ).text = "$verificationsCount"
+
+            val labelText = androidResourcesHelper.getQuantityString(
+                R.plurals.dashboard_card_verifications,
+                verificationsCount
+            )
+
+            findViewById<TextView>(R.id.verifications_label).text = labelText
+
+            verificationsGroup.visibility = VISIBLE
         } else {
             verificationsGroup.visibility = GONE
         }
@@ -82,11 +106,9 @@ class DashboardDailyActivityCardDisplayerImpl(
         val enrolmentsDivider = findViewById<View>(R.id.divider_enrolments)
         val identificationsDivider = findViewById<View>(R.id.divider_identifications)
 
-        val shouldNotShowDividers = dailyActivityState.hasEnrolments()
-            .xor(dailyActivityState.hasIdentifications())
-            .xor(dailyActivityState.hasVerifications())
+        val shouldHideDividers = dailyActivityState.shouldHideDividers()
 
-        if (shouldNotShowDividers) {
+        if (shouldHideDividers) {
             divider_enrolments.visibility = GONE
             divider_identifications.visibility = GONE
         } else {
@@ -126,6 +148,16 @@ class DashboardDailyActivityCardDisplayerImpl(
             VISIBLE
         else
             GONE
+    }
+
+    /**
+     * The dividers will be hidden ONLY if exactly one of the
+     * 3 conditions (hasEnrolments, hasIdentifications, hasVerifications) is true
+     */
+    private fun DashboardDailyActivityState.shouldHideDividers(): Boolean {
+        return hasEnrolments().nand(hasIdentifications())
+            && hasEnrolments().nand(hasVerifications())
+            && hasIdentifications().nand(hasVerifications())
     }
 
 }

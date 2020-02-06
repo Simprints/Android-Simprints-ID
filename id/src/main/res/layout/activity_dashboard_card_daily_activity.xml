@@ -66,12 +66,12 @@
             style="@style/SimprintsStyle.TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/dashboard_card_enrolments"
             app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_enrolments_count"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/divider_enrolments"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+            app:layout_constraintHorizontal_chainStyle="spread"
+            tools:text="Enrolments"/>
 
         <View
             android:id="@+id/divider_enrolments"
@@ -90,11 +90,11 @@
             style="@style/SimprintsStyle.TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/dashboard_card_identifications"
             app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_identifications_count"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/divider_enrolments"
-            app:layout_constraintEnd_toStartOf="@+id/divider_identifications"/>
+            app:layout_constraintEnd_toStartOf="@+id/divider_identifications"
+            tools:text="Identifications"/>
 
         <View
             android:id="@+id/divider_identifications"
@@ -113,11 +113,11 @@
             style="@style/SimprintsStyle.TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/dashboard_card_verifications"
             app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_verifications_count"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/divider_identifications"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Verifications"/>
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/group_enrolments"

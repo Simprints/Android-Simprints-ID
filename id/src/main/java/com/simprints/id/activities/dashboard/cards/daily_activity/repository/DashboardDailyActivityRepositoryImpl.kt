@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.repository
 
-import androidx.lifecycle.MutableLiveData
 import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSource
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
@@ -11,8 +10,6 @@ class DashboardDailyActivityRepositoryImpl(
     private val localDataSource: DailyActivityLocalDataSource,
     private val timeHelper: TimeHelper
 ) : DashboardDailyActivityRepository {
-
-    private val liveData = MutableLiveData<DashboardDailyActivityState>()
 
     private var dailyActivityState = DashboardDailyActivityState()
 
@@ -50,7 +47,7 @@ class DashboardDailyActivityRepositoryImpl(
             dailyActivityState.verifications
         )
 
-        updateLiveDataAndLastActivityTime()
+        localDataSource.setLastActivityTime(timeHelper.now())
     }
 
     private fun computeNewIdentification() = clearOldActivityThenReturn {
@@ -62,7 +59,7 @@ class DashboardDailyActivityRepositoryImpl(
             dailyActivityState.verifications
         )
 
-        updateLiveDataAndLastActivityTime()
+        localDataSource.setLastActivityTime(timeHelper.now())
     }
 
     private fun computeNewVerification() = clearOldActivityThenReturn {
@@ -74,7 +71,7 @@ class DashboardDailyActivityRepositoryImpl(
             verifications
         )
 
-        updateLiveDataAndLastActivityTime()
+        localDataSource.setLastActivityTime(timeHelper.now())
     }
 
     private fun <T> clearOldActivityThenReturn(block: () -> T): T {
@@ -87,11 +84,6 @@ class DashboardDailyActivityRepositoryImpl(
             localDataSource.clearActivity()
 
         return block.invoke()
-    }
-
-    private fun updateLiveDataAndLastActivityTime() {
-        liveData.value = dailyActivityState
-        localDataSource.setLastActivityTime(timeHelper.now())
     }
 
 }
