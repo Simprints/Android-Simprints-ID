@@ -27,7 +27,7 @@ class SettingsPreferencePresenterTest {
     }
 
     private lateinit var presenter: SettingsPreferencePresenter
-    private val viewMock: SettingsPreferenceContract.View = Mockito.mock(SettingsPreferenceContract.View::class.java)
+    private val viewMock: SettingsPreferenceContract.View = mock()
 
     @Before
     fun setUp() {
