@@ -8,8 +8,10 @@ import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.testtools.unit.BaseUnitTestConfig
-import io.mockk.*
-import io.reactivex.Single
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -42,13 +44,13 @@ class ProjectRepositoryTest {
         val localProject = Project()
         val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns localProject
-        coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.just(remoteProject)
+        coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns remoteProject
 
         val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
 
         assertThat(project).isEqualTo(localProject)
         coVerify { projectLocalDataSourceMock.save(remoteProject) }
-        verify { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) }
+        coVerify { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) }
     }
 
     @Test
@@ -57,13 +59,13 @@ class ProjectRepositoryTest {
         val localProject = Project()
         val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns localProject
-        coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.error(NetworkErrorException(""))
+        coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } throws NetworkErrorException("")
 
         val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
 
         assertThat(project).isEqualTo(localProject)
         coVerify(exactly = 0) { projectLocalDataSourceMock.save(remoteProject) }
-        verify { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) }
+        coVerify { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) }
     }
 
     @Test
@@ -71,13 +73,13 @@ class ProjectRepositoryTest {
 
         val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns null
-        coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.just(remoteProject)
+        coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns remoteProject
 
         val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
 
         assertThat(project).isEqualTo(remoteProject)
         coVerify { projectLocalDataSourceMock.save(remoteProject) }
-        verify { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) }
+        coVerify { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) }
     }
 
     @Test
@@ -85,13 +87,13 @@ class ProjectRepositoryTest {
 
         val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns null
-        coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns Single.error(NetworkErrorException(""))
+        coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } throws NetworkErrorException("")
 
         val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
 
         assertThat(project).isNull()
         coVerify(exactly = 0) { projectLocalDataSourceMock.save(remoteProject) }
-        verify { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) }
+        coVerify { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) }
     }
 
 }

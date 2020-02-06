@@ -6,7 +6,6 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import io.reactivex.Completable
-import io.reactivex.Single
 import timber.log.Timber
 
 
@@ -40,9 +39,9 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
         }
     }
 
-    override fun getCurrentToken(): Single<String> = Single.fromCallable {
+    override suspend fun getCurrentToken(): String {
         val result = Tasks.await(firebaseAuth.getAccessToken(false))
-        result.token?.let {
+        return result.token?.let {
             cacheTokenClaims(it)
             it
         } ?: throw RemoteDbNotSignedInException()
