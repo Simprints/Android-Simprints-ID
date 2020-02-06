@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import androidx.annotation.PluralsRes
 import androidx.core.content.ContextCompat
 
 class AndroidResourcesHelperImpl(val context: Context) : AndroidResourcesHelper {
@@ -81,6 +82,16 @@ class AndroidResourcesHelperImpl(val context: Context) : AndroidResourcesHelper 
 
     override fun getStringPlural(stringQuantityKey: Int, quantity: Int, params: Array<Any>): String =
         getStringPlural(context, stringQuantityKey, quantity, params)
+
+    override fun getQuantityString(
+        @PluralsRes resId: Int,
+        quantity: Int,
+        params: Array<Any>
+    ): String = context.resources.getQuantityString(resId, quantity, params)
+
+    override fun getQuantityString(@PluralsRes resId: Int, quantity: Int): String {
+        return context.resources.getQuantityString(resId, quantity)
+    }
 
     override fun getString(res: Int): String = context.getString(res)
     override fun getString(resId: Int, params: Array<Any>): String = context.getString(resId, *params)
