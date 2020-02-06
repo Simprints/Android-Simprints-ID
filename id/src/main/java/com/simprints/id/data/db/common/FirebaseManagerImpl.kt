@@ -6,6 +6,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import io.reactivex.Completable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 
@@ -39,13 +41,15 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
         }
     }
 
-    override suspend fun getCurrentToken(): String {
-        val result = Tasks.await(firebaseAuth.getAccessToken(false))
-        return result.token?.let {
-            cacheTokenClaims(it)
-            it
-        } ?: throw RemoteDbNotSignedInException()
-    }
+    override suspend fun getCurrentToken(): String =
+        withContext(Dispatchers.IO) {
+            val result = Tasks.await(firebaseAuth.getAccessToken(false))
+            result.token?.let {
+                cacheTokenClaims(it)
+                it
+            } ?: throw RemoteDbNotSignedInException()
+        }
+
 
     private fun cacheTokenClaims(token: String) {
         extractTokenPayloadAsJson(token)?.let {
