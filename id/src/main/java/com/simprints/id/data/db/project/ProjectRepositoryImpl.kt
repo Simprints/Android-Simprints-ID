@@ -17,7 +17,7 @@ class ProjectRepositoryImpl(
         val trace = performanceTracker.newTrace("refreshProjectInfoWithServer").apply { start() }
         val projectInLocal = projectLocalDataSource.load(projectId)
         return projectInLocal?.apply {
-            fetchAndUpdateCache(projectId)
+            fetchAndUpdateCache(this.id)
             trace.stop()
         } ?: fetchAndUpdateCache(projectId).apply {
             trace.stop()

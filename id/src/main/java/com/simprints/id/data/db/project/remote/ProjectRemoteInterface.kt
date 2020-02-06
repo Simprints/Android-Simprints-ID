@@ -14,10 +14,10 @@ interface ProjectRemoteInterface: SimRemoteInterface {
     }
 
     @GET("projects/{projectId}")
-    fun requestProject(
+    suspend fun requestProject(
         @Path("projectId") projectId: String): Project //TODO: it should return an ApiProject
 
     @GET("projects/{projectId}/config")
-    fun requestProjectConfig(
+    suspend fun requestProjectConfig(
         @Path("projectId") projectId: String): JsonElement
 }
