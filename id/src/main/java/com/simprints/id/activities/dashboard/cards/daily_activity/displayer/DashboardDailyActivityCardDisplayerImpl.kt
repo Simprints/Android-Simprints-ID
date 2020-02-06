@@ -155,9 +155,9 @@ class DashboardDailyActivityCardDisplayerImpl(
      * 3 conditions (hasEnrolments, hasIdentifications, hasVerifications) is true
      */
     private fun DashboardDailyActivityState.shouldHideDividers(): Boolean {
-        return hasEnrolments().nand(hasIdentifications())
-            && hasEnrolments().nand(hasVerifications())
-            && hasIdentifications().nand(hasVerifications())
+        return (hasEnrolments() nand hasIdentifications())
+            && (hasEnrolments() nand hasVerifications())
+            && (hasIdentifications() nand hasVerifications())
     }
 
 }
