@@ -2,12 +2,11 @@ package com.simprints.id.data.db.project.remote
 
 import com.google.gson.JsonElement
 import com.simprints.id.data.db.project.domain.Project
-import io.reactivex.Single
 
 
 interface ProjectRemoteDataSource {
 
-    fun loadProjectFromRemote(projectId: String): Single<Project>
-    fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JsonElement>
-    fun getProjectApiClient(): Single<ProjectRemoteInterface>
+    suspend fun loadProjectFromRemote(projectId: String): Project
+    suspend fun loadProjectRemoteConfigSettingsJsonString(projectId: String): JsonElement
+    suspend fun getProjectApiClient(): ProjectRemoteInterface
 }
