@@ -5,11 +5,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
+import com.simprints.id.tools.extensions.awaitTask
 import io.reactivex.Completable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-
 
 open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteDbManager {
 
@@ -43,7 +43,7 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
 
     override suspend fun getCurrentToken(): String =
         withContext(Dispatchers.IO) {
-            val result = Tasks.await(firebaseAuth.getAccessToken(false))
+            val result = firebaseAuth.getAccessToken(false).awaitTask()
             result.token?.let {
                 cacheTokenClaims(it)
                 it
@@ -70,7 +70,5 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
     companion object {
         private const val TOKEN_PROJECT_ID_CLAIM = "projectId"
         private const val TOKEN_USER_ID_CLAIM = "userId"
-
-        const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
     }
 }
