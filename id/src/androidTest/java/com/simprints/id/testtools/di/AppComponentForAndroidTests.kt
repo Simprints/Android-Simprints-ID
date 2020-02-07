@@ -39,5 +39,4 @@ interface AppComponentForAndroidTests : AppComponent {
     fun inject(sessionEventsSyncManagerImplTest: SessionEventsSyncManagerImplAndroidTest)
     fun inject(moduleSelectionActivityAndroidTest: ModuleSelectionActivityAndroidTest)
     fun inject(peopleSyncIntegrationTest: PeopleSyncIntegrationTest)
-
 }

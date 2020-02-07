@@ -39,7 +39,6 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.kotlintest.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
-import io.reactivex.Single
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -112,7 +111,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
         remoteDbManagerSpy = spyk(FirebaseManagerImpl(mockk()))
-        every { remoteDbManagerSpy.getCurrentToken() } returns Single.just("")
+        coEvery { remoteDbManagerSpy.getCurrentToken() } returns ""
 
         coEvery { personLocalDataSourceMock.insertOrUpdate(capture(peopleInFakeDb)) } returns Unit
         coEvery { downSyncScopeRepository.insertOrUpdate(capture(syncOpsInFakeDb)) } returns Unit
