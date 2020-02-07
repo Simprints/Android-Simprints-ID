@@ -45,7 +45,8 @@ internal class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDa
     }
 
     override fun decryptImage(image: SecuredImageRef): FileInputStream? {
-        val file = File(image.path.compose())
+        val absolutePath = buildAbsolutePath(image.path)
+        val file = File(absolutePath)
         val encryptedFile = getEncryptedFile(file)
         return try {
             encryptedFile.openFileInput()
@@ -68,7 +69,8 @@ internal class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDa
     }
 
     override fun deleteImage(image: SecuredImageRef): Boolean {
-        val file = File(image.path.compose())
+        val absolutePath = buildAbsolutePath(image.path)
+        val file = File(absolutePath)
         return file.delete()
     }
 
@@ -88,6 +90,10 @@ internal class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDa
             masterKeyAlias,
             AES256_GCM_HKDF_4KB
         ).build()
+
+    private fun buildAbsolutePath(path: Path): String {
+        return Path.combine(imageRootPath, path).compose()
+    }
 
     private companion object {
         const val IMAGES_FOLDER = "images"
