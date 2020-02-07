@@ -14,14 +14,15 @@ import com.simprints.id.data.db.person.remote.PipeSeparatorWrapperForURLListPara
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.fromDomainToApi
 import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
+import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.extensions.bufferedChunks
 import com.simprints.id.tools.utils.retrySimNetworkCalls
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import timber.log.Timber
 import java.io.InputStreamReader
@@ -41,35 +42,57 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
     override suspend fun execute(downSyncOperation: PeopleDownSyncOperation,
                                  workerId: String,
                                  downSyncWorkerProgressReporter: WorkerProgressCountReporter): Int {
+        return withContext(Dispatchers.IO) {
+            this@PeopleDownSyncDownloaderTaskImpl.downSyncOperation = downSyncOperation
+            this@PeopleDownSyncDownloaderTaskImpl.downSyncWorkerProgressReporter = downSyncWorkerProgressReporter
 
-        this.downSyncOperation = downSyncOperation
-        this.downSyncWorkerProgressReporter = downSyncWorkerProgressReporter
+            count = cache.readProgress(workerId)
+            downSyncWorkerProgressReporter.reportCount(count)
 
-        count = cache.readProgress(workerId)
-        downSyncWorkerProgressReporter.reportCount(count)
+            var reader: JsonReader? = null
+            val bufferToSave = mutableListOf<ApiGetPerson>()
 
-        var reader: JsonReader? = null
-        try {
-            val client = personRemoteDataSource.getPeopleApiClient()
-            val response = makeDownSyncApiCallAndGetResponse(client)
-            reader = setupJsonReaderFromResponse(response)
-            val flowPeople = createPeopleFlowFromJsonReader(reader)
-            flowPeople.bufferedChunks(BATCH_SIZE_FOR_DOWNLOADING).collect {
-                saveBatchAndUpdateDownSyncStatus(it)
-                count += it.size
-                cache.saveProgress(workerId, count)
-                downSyncWorkerProgressReporter.reportCount(count)
+            try {
+                val client = personRemoteDataSource.getPeopleApiClient()
+                val response = makeDownSyncApiCallAndGetResponse(client)
+                reader = setupJsonReaderFromResponse(response)
+
+                val channelFromNetwork = createPeopleChannelFromJsonReader(reader)
+                while (!channelFromNetwork.isClosedForReceive) {
+                    channelFromNetwork.poll()?.let {
+                        bufferToSave.add(it)
+                        if (bufferToSave.size > BATCH_SIZE_FOR_DOWNLOADING) {
+                            saveBatch(workerId, bufferToSave)
+                        }
+                    }
+                }
+
+                saveBatch(workerId, bufferToSave)
+                updateDownSyncInfo(COMPLETE)
+
+            } catch (t: Throwable) {
+                t.printStackTrace()
+                saveBatch(workerId, bufferToSave)
+                finishDownload(reader)
+                updateDownSyncInfo(FAILED)
+                throw t
             }
-            updateDownSyncInfo(COMPLETE)
-        } catch (t: Throwable) {
-            t.printStackTrace()
-            finishDownload(reader)
-            updateDownSyncInfo(FAILED)
-            throw t
-        }
 
-        finishDownload(reader)
-        return count
+            finishDownload(reader)
+            count
+        }
+    }
+
+    private suspend fun saveBatch(workerId: String, batch: MutableList<ApiGetPerson>) {
+        saveBatchAndUpdateDownSyncStatus(batch)
+        updateCounters(workerId, batch.size)
+        batch.clear()
+    }
+
+    private suspend fun updateCounters(workerId: String, newElementsCount: Int) {
+        count += newElementsCount
+        cache.saveProgress(workerId, count)
+        downSyncWorkerProgressReporter.reportCount(count)
     }
 
     private suspend fun makeDownSyncApiCallAndGetResponse(client: PeopleRemoteInterface): ResponseBody =
@@ -91,16 +114,15 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
             }
 
 
-    private fun createPeopleFlowFromJsonReader(reader: JsonReader): Flow<ApiGetPerson> =
-        flow {
-            while (reader.hasNext()) {
-                this.emit(JsonHelper.gson.fromJson(reader, ApiGetPerson::class.java))
-            }
+    private fun CoroutineScope.createPeopleChannelFromJsonReader(reader: JsonReader) = produce<ApiGetPerson>(capacity = 5 * BATCH_SIZE_FOR_DOWNLOADING) {
+        while (reader.hasNext()) {
+            this.send(JsonHelper.gson.fromJson(reader, ApiGetPerson::class.java))
         }
+    }
 
     private suspend fun saveBatchAndUpdateDownSyncStatus(batchOfPeople: List<ApiGetPerson>) {
         filterBatchOfPeopleToSyncWithLocal(batchOfPeople)
-        Timber.d("Saved batch for $downSyncOperation")
+        Timber.tag(SYNC_LOG_TAG).d("Saved batch(${batchOfPeople.size}) for $downSyncOperation")
 
         updateDownSyncInfo(PeopleDownSyncOperationResult.DownSyncState.RUNNING, batchOfPeople.lastOrNull(), Date())
     }
@@ -131,7 +153,7 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
 
 
     private fun finishDownload(reader: JsonReader?) {
-        Timber.d("Download finished")
+        Timber.tag(SYNC_LOG_TAG).d("Download finished")
         reader?.endArray()
         reader?.close()
     }

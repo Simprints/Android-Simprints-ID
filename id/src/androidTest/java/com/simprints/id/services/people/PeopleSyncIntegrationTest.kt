@@ -5,10 +5,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.network.SimApiClient
-import com.simprints.core.tools.extentions.resumeSafely
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -45,10 +43,9 @@ import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
-import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.withTimeout
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -61,7 +58,6 @@ import javax.inject.Inject
 
 
 @RunWith(AndroidJUnit4::class)
-@SmallTest
 class PeopleSyncIntegrationTest {
 
     companion object {
@@ -118,122 +114,119 @@ class PeopleSyncIntegrationTest {
     }
 
     @Test
-    fun syncByProjectSuccessfully() {
-        runSyncTest { continuation, activity ->
+    fun syncByProjectSuccessfully() = runBlockingTest {
+        runSyncTest { activity ->
             mockUploadPeople()
             val total = mockResponsesForSync(projectSyncScope)
 
-            runAndVerifySyncSucceeds(activity, total + N_TO_UPLOAD, continuation)
+            runAndVerifySyncSucceeds(activity, total + N_TO_UPLOAD)
         }
     }
 
     @Test
-    fun syncByUserSuccessfully() {
-        runSyncTest { continuation, activity ->
+    fun syncByUserSuccessfully() = runBlockingTest {
+        runSyncTest { activity ->
             val total = mockResponsesForSync(userSyncScope)
-            runAndVerifySyncSucceeds(activity, total, continuation)
+            runAndVerifySyncSucceeds(activity, total)
         }
     }
 
 
     @Test
-    fun syncByModuleSuccessfully() {
-        runSyncTest { continuation, activity ->
+    fun syncByModuleSuccessfully() = runBlockingTest {
+        runSyncTest { activity ->
             val total = mockResponsesForSync(moduleSyncScope)
-            runAndVerifySyncSucceeds(activity, total, continuation)
+            runAndVerifySyncSucceeds(activity, total)
         }
     }
 
     @Test
-    fun uploadFailsBecauseANotCloudIssue_shouldSyncRetry() {
-        runSyncTest { continuation, activity ->
+    fun uploadFailsBecauseANotCloudIssue_shouldSyncRetry() = runBlockingTest {
+        runSyncTest { activity ->
             mockResponsesForSync(projectSyncScope)
             mockUploadPeople()
             mockDispatcher.uploadResponse = 300 to ""
 
-            runAndVerifySyncRetries(activity, continuation)
+            runAndVerifySyncRetries(activity)
         }
     }
 
     @Test
-    fun uploadFailsBecauseACloudIssue_shouldSyncFail() {
-        runSyncTest { continuation, activity ->
+    fun uploadFailsBecauseACloudIssue_shouldSyncFail() = runBlockingTest {
+        runSyncTest { activity ->
             mockResponsesForSync(projectSyncScope)
             mockUploadPeople()
             mockDispatcher.uploadResponse = 505 to ""
 
-            runAndVerifySyncFails(activity, continuation)
+            runAndVerifySyncFails(activity)
         }
     }
 
     @Test
-    fun downloadFailsBecauseACloudIssue_shouldSyncRetry() {
-        runSyncTest { continuation, activity ->
+    fun downloadFailsBecauseACloudIssue_shouldSyncRetry() = runBlockingTest {
+        runSyncTest { activity ->
             mockResponsesForSync(projectSyncScope)
             mockDispatcher.downResponse = 300 to listOf()
 
-            runAndVerifySyncRetries(activity, continuation)
+            runAndVerifySyncRetries(activity)
         }
     }
 
     @Test
-    fun downloadFailsBecauseACloudIssue_shouldSyncFail() {
-        runSyncTest { continuation, activity ->
+    fun downloadFailsBecauseACloudIssue_shouldSyncFail() = runBlockingTest {
+        runSyncTest { activity ->
             mockResponsesForSync(projectSyncScope)
             mockDispatcher.downResponse = 505 to listOf()
 
-            runAndVerifySyncFails(activity, continuation)
+            runAndVerifySyncFails(activity)
         }
     }
 
     @Test
-    fun downCountFailsBecauseANotCloudIssue_shouldSyncSucceed() {
-        runSyncTest { continuation, activity ->
+    fun downCountFailsBecauseANotCloudIssue_shouldSyncSucceed() = runBlockingTest {
+        runSyncTest { activity ->
             mockResponsesForSync(projectSyncScope)
             mockDispatcher.countResponse = 300 to null
 
-            runAndVerifySyncRetries(activity, continuation)
+            runAndVerifySyncRetries(activity)
         }
     }
 
     @Test
-    fun downCountFailsBecauseANotCloudIssue_shouldSyncRetry() {
-        runSyncTest { continuation, activity ->
+    fun downCountFailsBecauseANotCloudIssue_shouldSyncRetry() = runBlockingTest {
+        runSyncTest { activity ->
             mockResponsesForSync(projectSyncScope)
             mockDispatcher.countResponse = 300 to null
 
-            runAndVerifySyncRetries(activity, continuation)
+            runAndVerifySyncRetries(activity)
         }
     }
 
 
-    private fun runAndVerifySyncSucceeds(act: Activity, total: Int, cor: CancellableContinuation<Boolean>) {
+    private fun runAndVerifySyncSucceeds(act: Activity, total: Int) {
         peopleSyncManager.getLastSyncState().observe(act as LifecycleOwner, Observer {
             if (!(it.anySyncWorkersStillRunning() || it.anySyncWorkersEnqueued())) {
                 it.assertSyncSucceeds(total)
-                cor.resumeSafely(true)
             }
         })
 
         peopleSyncManager.sync()
     }
 
-    private fun runAndVerifySyncFails(act: Activity, cor: CancellableContinuation<Boolean>) {
+    private fun runAndVerifySyncFails(act: Activity) {
         peopleSyncManager.getLastSyncState().observe(act as LifecycleOwner, Observer {
             if (!(it.anySyncWorkersStillRunning() || it.anySyncWorkersEnqueued())) {
                 it.assertSyncFails()
-                cor.resumeSafely(true)
             }
         })
 
         peopleSyncManager.sync()
     }
 
-    private fun runAndVerifySyncRetries(act: Activity, cor: CancellableContinuation<Boolean>) {
+    private fun runAndVerifySyncRetries(act: Activity) {
         peopleSyncManager.getLastSyncState().observe(act as LifecycleOwner, Observer {
             if (!it.anySyncWorkersStillRunning()) {
                 it.assertSyncRetries()
-                cor.resumeSafely(true)
             }
         })
 
@@ -241,40 +234,36 @@ class PeopleSyncIntegrationTest {
     }
 
 
-    private fun runSyncTest(timeout: Long = 10000, block: (CancellableContinuation<Boolean>, act: Activity) -> Unit) =
-        runBlocking {
-            withTimeout(timeout) {
-                suspendCancellableCoroutine<Boolean> { cor ->
-                    runOnActivity<RequestLoginActivity> {
-                        block(cor, it)
-                    }
-                }
+    private suspend fun runSyncTest(timeout: Long = 10000, block: (act: Activity) -> Unit) =
+        withTimeout(timeout) {
+            runOnActivity<RequestLoginActivity> {
+                block(it)
             }
         }
 
 
-    private fun mockResponsesForSync(scope: PeopleDownSyncScope): Int {
-        val ops = runBlocking { downSyncScopeRepositorySpy.getDownSyncOperations(scope) }
-        val apiPeopleToDownload = ops.map {
-            val peopleToDownload = getRandomPeople(N_TO_DOWNLOAD_PER_MODULE, it, listOf(false))
-            peopleToDownload.map { it.fromDomainToGetApi() }.sortedBy { it.updatedAt }
-        }.flatten()
+private fun mockResponsesForSync(scope: PeopleDownSyncScope): Int {
+    val ops = runBlocking { downSyncScopeRepositorySpy.getDownSyncOperations(scope) }
+    val apiPeopleToDownload = ops.map {
+        val peopleToDownload = getRandomPeople(N_TO_DOWNLOAD_PER_MODULE, it, listOf(false))
+        peopleToDownload.map { it.fromDomainToGetApi() }.sortedBy { it.updatedAt }
+    }.flatten()
 
-        val countResponse = ApiPeopleOperationsResponse(listOf(PeopleCount(apiPeopleToDownload.size, 0, 0)).map {
-            ApiPeopleOperationGroupResponse(ApiPeopleOperationCounts(it.created, it.deleted, it.updated))
-        })
+    val countResponse = ApiPeopleOperationsResponse(listOf(PeopleCount(apiPeopleToDownload.size, 0, 0)).map {
+        ApiPeopleOperationGroupResponse(ApiPeopleOperationCounts(it.created, it.deleted, it.updated))
+    })
 
-        mockDispatcher.downResponse = 200 to apiPeopleToDownload
-        mockDispatcher.countResponse = 200 to countResponse
+    mockDispatcher.downResponse = 200 to apiPeopleToDownload
+    mockDispatcher.countResponse = 200 to countResponse
 
-        return apiPeopleToDownload.size
-    }
+    return apiPeopleToDownload.size
+}
 
 
-    private fun mockUploadPeople() {
-        val ops = runBlocking { downSyncScopeRepositorySpy.getDownSyncOperations(projectSyncScope) }
-        coEvery { personLocalDataSourceSpy.load(any()) } returns getRandomPeople(N_TO_UPLOAD, ops.first(), listOf(true)).asFlow()
-    }
+private fun mockUploadPeople() {
+    val ops = runBlocking { downSyncScopeRepositorySpy.getDownSyncOperations(projectSyncScope) }
+    coEvery { personLocalDataSourceSpy.load(any()) } returns getRandomPeople(N_TO_UPLOAD, ops.first(), listOf(true)).asFlow()
+}
 }
 
 class MockDispatcher : Dispatcher() {
