@@ -8,13 +8,13 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
 import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
 import com.simprints.testtools.android.tryOnUiUntilTimeout
+import com.simprints.testtools.android.waitOnSystem
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
 import org.junit.Test
@@ -71,6 +71,7 @@ class CoreExitFormActivityTest {
 
         onView(withId(R.id.btSubmitExitForm)).check(matches(not(isEnabled())))
         onView(withId(R.id.rbOther)).perform(click())
+        waitOnSystem(500) //Typing fails sometimes - adding a sleep to let keyboard animation to finish
         onView(withId(R.id.exitFormText)).perform(typeText("Reason for other"), closeSoftKeyboard())
         tryOnUiUntilTimeout(1000, 200) {
             onView(withId(R.id.btSubmitExitForm)).check(matches(isEnabled()))
@@ -83,6 +84,7 @@ class CoreExitFormActivityTest {
         val scenario = launchCoreExitFormActivity()
 
         onView(withId(R.id.rbReligiousConcerns)).perform(click())
+        waitOnSystem(500) //Typing fails sometimes - adding a sleep to let keyboard animation to finish
         onView(withId(R.id.exitFormText)).perform(typeText(refusalReasonText), closeSoftKeyboard())
         onView(withId(R.id.btSubmitExitForm)).perform(click())
 

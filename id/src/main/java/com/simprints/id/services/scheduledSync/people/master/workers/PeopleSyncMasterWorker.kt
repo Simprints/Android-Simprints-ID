@@ -8,8 +8,8 @@ import com.simprints.id.services.scheduledSync.people.common.*
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleLastSyncReporterWorker.Companion.SYNC_ID_TO_MARK_AS_COMPLETED
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -33,6 +33,7 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
     @Inject lateinit var upSyncWorkerBuilder: PeopleUpSyncWorkersBuilder
     @Inject lateinit var preferenceManager: PreferencesManager
     @Inject lateinit var peopleSyncCache: PeopleSyncCache
+    @Inject lateinit var peopleSyncSubMasterWorkersBuilder: PeopleSyncSubMasterWorkersBuilder
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(appContext)
@@ -57,10 +58,12 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
             crashlyticsLog("Start")
 
             if (!isSyncRunning()) {
+                val startSyncReporterWorker = peopleSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
                 val upSyncWorkers = upSyncWorkersChain(uniqueSyncId)
-                val downSyncWorkers =  downSyncWorkersChain(uniqueSyncId)
+                val downSyncWorkers = downSyncWorkersChain(uniqueSyncId)
                 val chain = upSyncWorkers + downSyncWorkers
-                wm.beginWith(chain).then(lastSyncWorker(uniqueSyncId)).enqueue()
+                val endSyncReporterWorker = peopleSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
+                wm.beginWith(startSyncReporterWorker).then(chain).then(endSyncReporterWorker).enqueue()
 
                 peopleSyncCache.clearProgresses()
                 clearWorkerHistory(uniqueSyncId)
@@ -77,15 +80,6 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
         }
     }
 
-    private fun lastSyncWorker(uniqueSyncID: String): OneTimeWorkRequest =
-        OneTimeWorkRequest.Builder(PeopleLastSyncReporterWorker::class.java)
-            .addTagForMasterSyncId(uniqueSyncID)
-            .addTagForScheduledAtNow()
-            .addCommonTagForAllSyncWorkers()
-            .addTagForLastSyncReporter()
-            .setInputData(workDataOf(SYNC_ID_TO_MARK_AS_COMPLETED to uniqueSyncID))
-            .build() as OneTimeWorkRequest
-
     private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
         val backgroundOnForPeriodicSync = preferenceManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.PERIODIC_BACKGROUND] == true
         val downSyncChainRequired = isOneTimeMasterWorker || backgroundOnForPeriodicSync
@@ -101,9 +95,12 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
         upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID)
 
     private fun clearWorkerHistory(uniqueId: String) {
-        val otherDownSyncWorkers = syncWorkers.filter { !it.isPartOfPeopleSync(uniqueId) }
+        val workersRelatedToOtherSync = syncWorkers.filter { !it.isPartOfPeopleSync(uniqueId) }
         val syncWorkersWithoutSyncId = syncWorkers.filter { it.getUniqueSyncId() == null && it.state != WorkInfo.State.CANCELLED }
-        (otherDownSyncWorkers + syncWorkersWithoutSyncId).forEach { wm.cancelWorkById(it.id) }
+        (workersRelatedToOtherSync + syncWorkersWithoutSyncId).forEach {
+            wm.cancelWorkById(it.id)
+            Timber.tag(SYNC_LOG_TAG).d("Deleted ${it.id} worker")
+        }
     }
 
 

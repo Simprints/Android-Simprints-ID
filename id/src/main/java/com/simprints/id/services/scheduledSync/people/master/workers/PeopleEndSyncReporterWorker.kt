@@ -8,10 +8,14 @@ import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSync
 import java.util.*
 import javax.inject.Inject
 
-class PeopleLastSyncReporterWorker(appContext: Context,
-                                   params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
+/**
+ * It's executed at the end of the sync, when all workers succeed (downloaders and uploaders).
+ * It stores the "last successful timestamp"
+ */
+class PeopleEndSyncReporterWorker(appContext: Context,
+                                  params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
 
-    override val tag: String = PeopleLastSyncReporterWorker::class.java.simpleName
+    override val tag: String = PeopleEndSyncReporterWorker::class.java.simpleName
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var syncCache: PeopleSyncCache
