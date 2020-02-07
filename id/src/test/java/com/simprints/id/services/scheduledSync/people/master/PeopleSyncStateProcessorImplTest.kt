@@ -9,11 +9,15 @@ import androidx.work.WorkInfo.State.FAILED
 import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.workDataOf
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.services.scheduledSync.people.common.TAG_MASTER_SYNC_ID
+import com.simprints.id.services.scheduledSync.people.common.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.people.common.TAG_PEOPLE_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.people.common.TAG_SCHEDULED_AT
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.internal.SyncWorkersLiveDataProvider
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.DOWNLOADER
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.START_SYNC_REPORTER
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.MockKAnnotations
@@ -24,6 +28,7 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class PeopleSyncStateProcessorImplTest {
@@ -40,7 +45,7 @@ class PeopleSyncStateProcessorImplTest {
     }
 
     private val successfulMasterWorkers: List<WorkInfo> =
-        listOf(createSyncMasterWorker(SUCCEEDED, UNIQUE_SYNC_ID), createSyncMasterWorker(SUCCEEDED, "${UNIQUE_SYNC_ID}_older"))
+        listOf(createStartSyncRerporterWorker(SUCCEEDED, "${UNIQUE_SYNC_ID}_older"), createStartSyncRerporterWorker(SUCCEEDED, UNIQUE_SYNC_ID))
 
     private val failedMasterWorkers: List<WorkInfo> =
         listOf(createWorkInfo(FAILED))
@@ -48,7 +53,7 @@ class PeopleSyncStateProcessorImplTest {
 
     private val ctx: Context = ApplicationProvider.getApplicationContext()
 
-    private var masterWorkersLiveData = MutableLiveData<List<WorkInfo>>()
+    private var startSyncReporterWorker = MutableLiveData<List<WorkInfo>>()
     private var syncWorkersLiveData = MutableLiveData<List<WorkInfo>>()
 
     lateinit var peopleSyncStateProcessor: PeopleSyncStateProcessor
@@ -66,7 +71,7 @@ class PeopleSyncStateProcessorImplTest {
 
     @Test
     fun processor_masterWorkerCompletes_shouldExtractTheUniqueSyncId() = runBlockingTest {
-        masterWorkersLiveData.value = successfulMasterWorkers
+        startSyncReporterWorker.value = successfulMasterWorkers
 
         peopleSyncStateProcessor.getLastSyncState().testObserver()
 
@@ -75,7 +80,7 @@ class PeopleSyncStateProcessorImplTest {
 
     @Test
     fun processor_masterWorkerFails_shouldNotExtractTheUniqueSyncId() = runBlockingTest {
-        masterWorkersLiveData.value = failedMasterWorkers
+        startSyncReporterWorker.value = failedMasterWorkers
 
         peopleSyncStateProcessor.getLastSyncState().testObserver()
 
@@ -84,7 +89,7 @@ class PeopleSyncStateProcessorImplTest {
 
     @Test
     fun processor_allWorkersSucceed_shouldSyncStateBeSuccess() = runBlockingTest {
-        masterWorkersLiveData.value = successfulMasterWorkers
+        startSyncReporterWorker.value = successfulMasterWorkers
         syncWorkersLiveData.value = createWorkInfosHistoryForSuccessfulSync()
 
         val syncStates = peopleSyncStateProcessor.getLastSyncState().testObserver().observedValues
@@ -95,7 +100,7 @@ class PeopleSyncStateProcessorImplTest {
 
     @Test
     fun processor_oneWorkerStillRunning_shouldSyncStateBeRunning() = runBlockingTest {
-        masterWorkersLiveData.value = successfulMasterWorkers
+        startSyncReporterWorker.value = successfulMasterWorkers
         syncWorkersLiveData.value = createWorkInfosHistoryForRunningSync()
 
         val syncStates = peopleSyncStateProcessor.getLastSyncState().testObserver().observedValues
@@ -106,7 +111,7 @@ class PeopleSyncStateProcessorImplTest {
 
     @Test
     fun processor_oneWorkerFailed_shouldSyncStateBeFail() = runBlockingTest {
-        masterWorkersLiveData.value = successfulMasterWorkers
+        startSyncReporterWorker.value = successfulMasterWorkers
         syncWorkersLiveData.value = createWorkInfosHistoryForFailingSync()
 
         val syncStates = peopleSyncStateProcessor.getLastSyncState().testObserver().observedValues
@@ -117,7 +122,7 @@ class PeopleSyncStateProcessorImplTest {
 
     @Test
     fun processor_oneWorkerEnqueued_shouldSyncStateBeConnecting() = runBlockingTest {
-        masterWorkersLiveData.value = successfulMasterWorkers
+        startSyncReporterWorker.value = successfulMasterWorkers
         syncWorkersLiveData.value = createWorkInfosHistoryForConnectingSync()
 
         val syncStates = peopleSyncStateProcessor.getLastSyncState().testObserver().observedValues
@@ -127,15 +132,19 @@ class PeopleSyncStateProcessorImplTest {
     }
 
 
-    private fun createSyncMasterWorker(state: WorkInfo.State,
-                                       uniqueMasterSyncId: String) =
+    private fun createStartSyncRerporterWorker(state: WorkInfo.State,
+                                               uniqueMasterSyncId: String) =
         createWorkInfo(state,
-            workDataOf(OUTPUT_LAST_SYNC_ID to uniqueMasterSyncId),
-            createCommonDownSyncTags(uniqueMasterSyncId, uniqueMasterSyncId) + listOf(tagForType(DOWNLOADER))
+            workDataOf(SYNC_ID_STARTED to uniqueMasterSyncId),
+            listOf(
+                "$TAG_SCHEDULED_AT${Date().time}",
+                TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS,
+                TAG_PEOPLE_SYNC_ALL_WORKERS,
+                "$TAG_MASTER_SYNC_ID${uniqueMasterSyncId}") + listOf(tagForType(START_SYNC_REPORTER))
         )
 
     private fun mockDependencies() {
-        every { syncWorkersLiveDataProvider.getMasterWorkersLiveData() } returns masterWorkersLiveData
+        every { syncWorkersLiveDataProvider.getStartSyncReportersLiveData() } returns startSyncReporterWorker
         every { syncWorkersLiveDataProvider.getSyncWorkersLiveData(any()) } returns syncWorkersLiveData
         every { peopleSyncCache.readProgress(any()) } returns 0
     }

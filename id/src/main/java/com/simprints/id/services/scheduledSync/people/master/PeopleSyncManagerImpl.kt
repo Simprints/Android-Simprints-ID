@@ -1,7 +1,6 @@
 package com.simprints.id.services.scheduledSync.people.master
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
@@ -70,8 +69,7 @@ class PeopleSyncManagerImpl(private val ctx: Context,
         wm.cancelAllPeopleSyncWorkers()
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun buildOneTimeRequest(): OneTimeWorkRequest =
+    private fun buildOneTimeRequest(): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(PeopleSyncMasterWorker::class.java)
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTagForSyncMasterWorkers()
@@ -79,11 +77,8 @@ class PeopleSyncManagerImpl(private val ctx: Context,
             .addTagForScheduledAtNow()
             .build() as OneTimeWorkRequest
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun buildPeriodicRequest(): PeriodicWorkRequest =
-        PeriodicWorkRequest.Builder(
-            PeopleSyncMasterWorker::class.java,
-            SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
+    private fun buildPeriodicRequest(): PeriodicWorkRequest =
+        PeriodicWorkRequest.Builder(PeopleSyncMasterWorker::class.java, SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTagForSyncMasterWorkers()
             .addTagForBackgroundSyncMasterWorker()
