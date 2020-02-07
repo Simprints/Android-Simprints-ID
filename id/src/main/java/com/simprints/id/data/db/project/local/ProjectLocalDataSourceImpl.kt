@@ -4,8 +4,8 @@ import android.content.Context
 import com.simprints.id.data.db.common.realm.PeopleRealmConfig
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.models.DbProject
-import com.simprints.id.data.db.project.local.models.toDomainProject
-import com.simprints.id.data.db.project.local.models.toRealmProject
+import com.simprints.id.data.db.project.local.models.fromDbToDomain
+import com.simprints.id.data.db.project.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
@@ -52,7 +52,7 @@ class ProjectLocalDataSourceImpl(
                 realm.where(DbProject::class.java)
                     .equalTo(PROJECT_ID_FIELD, projectId)
                     .awaitFirst()
-                    ?.toDomainProject()
+                    ?.fromDbToDomain() 
             }
         }
 
@@ -60,7 +60,7 @@ class ProjectLocalDataSourceImpl(
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use { realm ->
                 realm.transactAwait {
-                    it.insertOrUpdate(project.toRealmProject())
+                    it.insertOrUpdate(project.fromDomainToDb())
                 }
             }
         }
