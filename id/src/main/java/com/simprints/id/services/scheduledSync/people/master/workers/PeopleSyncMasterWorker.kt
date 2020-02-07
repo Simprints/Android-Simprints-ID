@@ -8,8 +8,6 @@ import com.simprints.id.services.scheduledSync.people.common.*
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleEndSyncReporterWorker.Companion.SYNC_ID_TO_MARK_AS_COMPLETED
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
 import timber.log.Timber
 import java.util.*
@@ -82,25 +80,6 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
         }
     }
 
-    private fun buildStartSyncReporterWorker(uniqueSyncID: String) =
-        OneTimeWorkRequest.Builder(PeopleStartSyncReporterWorker::class.java)
-            .addTagForMasterSyncId(uniqueSyncID)
-            .addTagForScheduledAtNow()
-            .addCommonTagForAllSyncWorkers()
-            .addTagForStartSyncReporter()
-            .setInputData(workDataOf(SYNC_ID_STARTED to uniqueSyncID))
-            .build() as OneTimeWorkRequest
-
-
-    private fun buildEndSyncReporterWorker(uniqueSyncID: String): OneTimeWorkRequest =
-        OneTimeWorkRequest.Builder(PeopleEndSyncReporterWorker::class.java)
-            .addTagForMasterSyncId(uniqueSyncID)
-            .addTagForScheduledAtNow()
-            .addCommonTagForAllSyncWorkers()
-            .addTagForEndSyncReporter()
-            .setInputData(workDataOf(SYNC_ID_TO_MARK_AS_COMPLETED to uniqueSyncID))
-            .build() as OneTimeWorkRequest
-
     private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
         val backgroundOnForPeriodicSync = preferenceManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.PERIODIC_BACKGROUND] == true
         val downSyncChainRequired = isOneTimeMasterWorker || backgroundOnForPeriodicSync
@@ -119,8 +98,8 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
         val workersRelatedToOtherSync = syncWorkers.filter { !it.isPartOfPeopleSync(uniqueId) }
         val syncWorkersWithoutSyncId = syncWorkers.filter { it.getUniqueSyncId() == null && it.state != WorkInfo.State.CANCELLED }
         (workersRelatedToOtherSync + syncWorkersWithoutSyncId).forEach {
-            Timber.tag(SYNC_LOG_TAG).d("Deleted ${it.id} worker")
             wm.cancelWorkById(it.id)
+            Timber.tag(SYNC_LOG_TAG).d("Deleted ${it.id} worker")
         }
     }
 
