@@ -25,6 +25,9 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class ProjectRepositoryTest {
 
+    private val localProject = Project(DEFAULT_PROJECT_ID, "local", "",  "")
+    private val remoteProject = Project(DEFAULT_PROJECT_ID, "remote", "",  "")
+
     private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mockk()
     private val projectLocalDataSourceMock: ProjectLocalDataSource = mockk(relaxUnitFun = true)
     private val firebasePerformanceMock: FirebasePerformance = mockk()
@@ -40,9 +43,6 @@ class ProjectRepositoryTest {
 
     @Test
     fun givenAProjectStoredLocally_shouldBeLoadedAndCacheRefreshed() = runBlocking {
-
-        val localProject = Project()
-        val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns localProject
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns remoteProject
 
@@ -55,9 +55,6 @@ class ProjectRepositoryTest {
 
     @Test
     fun givenAProjectStoredLocallyAndNotRemotely_shouldBeLoadedAndCacheNoRefreshed() = runBlocking {
-
-        val localProject = Project()
-        val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns localProject
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } throws NetworkErrorException("")
 
@@ -70,8 +67,6 @@ class ProjectRepositoryTest {
 
     @Test
     fun givenProjectStoredOnlyRemotely_shouldBeFetchedAndCacheRefreshed() = runBlocking {
-
-        val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns null
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } returns remoteProject
 
@@ -84,8 +79,6 @@ class ProjectRepositoryTest {
 
     @Test
     fun givenNoProjectStored_noErrorShouldBeThrown() = runBlocking {
-
-        val remoteProject = Project()
         coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns null
         coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } throws NetworkErrorException("")
 
