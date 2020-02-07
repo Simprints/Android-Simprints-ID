@@ -160,7 +160,7 @@ class SignerManagerTest {
     private fun mockFetchingProjectInto(error: Boolean = false) =
         coEvery { projectRepository.loadFromRemoteAndRefreshCache(any()) }.apply {
             if (!error) {
-                this.returns(Project())
+                this.returns(Project(DEFAULT_PROJECT_ID, "local", "",  ""))
             } else {
                 this.throws(Throwable("Failed to fetch project info"))
             }

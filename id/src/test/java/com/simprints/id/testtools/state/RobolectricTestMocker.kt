@@ -33,7 +33,7 @@ object RobolectricTestMocker {
     suspend fun mockLoadProject(projectRemoteDataSource: ProjectRemoteDataSource,
                                 projectLocalDataSource: ProjectLocalDataSource): RobolectricTestMocker {
 
-        val project = Project().apply { id = "project id"; name = "project name"; description = "project desc" }
+        val project = Project(DEFAULT_PROJECT_ID, "local", "",  "")
         val projectSettings: JsonObject = JsonObject().apply { addProperty("key", "value") }
         coEvery { projectLocalDataSource.load(any()) } returns project
         coEvery { projectRemoteDataSource.loadProjectFromRemote(any()) } returns project
