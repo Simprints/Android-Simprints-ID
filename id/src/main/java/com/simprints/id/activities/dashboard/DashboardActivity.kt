@@ -21,6 +21,7 @@ import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.tools.AndroidResourcesHelper
@@ -41,6 +42,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     @Inject lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
     @Inject lateinit var viewModelFactory: DashboardViewModelFactory
     @Inject lateinit var peopleSyncManager: PeopleSyncManager
+    @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
 
     private lateinit var viewModel: DashboardViewModel
 
@@ -98,10 +100,15 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.app_menu, menu)
 
-        menu?.findItem(R.id.menuSettings)?.title =
-            androidResourcesHelper.getString(R.string.menu_settings)
-        menu?.findItem(R.id.menuPrivacyNotice)?.title =
-            androidResourcesHelper.getString(R.string.menu_privacy_notice)
+        menu?.run {
+            findItem(R.id.menuSettings).title =
+                androidResourcesHelper.getString(R.string.menu_settings)
+
+            with(findItem(R.id.menuPrivacyNotice)) {
+                title = androidResourcesHelper.getString(R.string.menu_privacy_notice)
+                isVisible = settingsPreferencesManager.consentRequired
+            }
+        }
 
         return true
     }
