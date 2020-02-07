@@ -21,6 +21,7 @@
 
         <TextView
             android:id="@+id/dashboard_sync_card_try_again_message"
+            style="@style/SimprintsStyle.TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Placeholder - sync incomplete message"

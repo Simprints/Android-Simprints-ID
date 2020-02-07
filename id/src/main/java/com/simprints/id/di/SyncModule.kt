@@ -31,6 +31,8 @@ import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSync
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache.Companion.FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache.Companion.FILENAME_FOR_PROGRESSES_SHARED_PREFS
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCacheImpl
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncSubMasterWorkersBuilder
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncSubMasterWorkersBuilderImpl
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutorImpl
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
@@ -129,4 +131,7 @@ open class SyncModule {
             builder.buildEncryptedSharedPreferences(FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS)
         )
 
+    @Provides
+    open fun providePeopleSyncSubMasterWorkersBuilder(): PeopleSyncSubMasterWorkersBuilder =
+        PeopleSyncSubMasterWorkersBuilderImpl()
 }
