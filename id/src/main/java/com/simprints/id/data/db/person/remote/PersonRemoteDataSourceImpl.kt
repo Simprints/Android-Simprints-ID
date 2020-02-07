@@ -14,7 +14,6 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.request.Ap
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.WhereLabelKey.*
 import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
 import com.simprints.id.tools.utils.retrySimNetworkCalls
-import io.reactivex.schedulers.Schedulers
 
 
 open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager) : PersonRemoteDataSource {
@@ -86,13 +85,10 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
         retrySimNetworkCalls(getPeopleApiClient(), block, traceName)
 
 
-    override suspend fun getPeopleApiClient(): PeopleRemoteInterface =
-        remoteDbManager
-            .getCurrentToken()
-            .subscribeOn(Schedulers.io())
-            .blockingGet().let {
-                buildPeopleApi(it)
-            }
+    override suspend fun getPeopleApiClient(): PeopleRemoteInterface {
+        val token = remoteDbManager.getCurrentToken()
+        return buildPeopleApi(token)
+    }
 
     private fun buildPeopleApi(authToken: String): PeopleRemoteInterface =
         SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl, authToken).api

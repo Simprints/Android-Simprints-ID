@@ -7,7 +7,7 @@ import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.whenever
-import io.reactivex.Single
+import io.mockk.coEvery
 
 object LoginStateMocker {
 
@@ -27,6 +27,6 @@ object LoginStateMocker {
         editor.commit()
 
         whenever(secureLocalDbKeyProviderMock) { getLocalDbKeyOrThrow(anyNotNull()) } thenReturn localDbKey
-        whenever(remoteDbManagerMock.getCurrentToken()).thenReturn(Single.just(token))
+        coEvery { remoteDbManagerMock.getCurrentToken() } returns token
     }
 }
