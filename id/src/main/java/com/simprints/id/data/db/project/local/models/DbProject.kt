@@ -7,11 +7,6 @@ import io.realm.annotations.Required
 
 
 open class DbProject : RealmObject() {
-
-    companion object {
-        const val PROJECT_ID_FIELD = "id"
-    }
-
     @PrimaryKey
     @Required var id: String = ""
     @Required var name: String = ""
@@ -21,19 +16,9 @@ open class DbProject : RealmObject() {
 }
 
 
-fun DbProject.toDomainProject(): Project = Project().also {
-    it.id = id
-    it.creator = creator
-    it.description = description
-    it.name = name
+fun DbProject.fromDbToDomain(): Project = Project(id, name, description, creator, if (updatedAt.isBlank()) null else updatedAt)
 
-    it.updatedAt =
-        if (updatedAt.isBlank())
-            null
-        else updatedAt
-}
-
-fun Project.toRealmProject(): DbProject = DbProject().also {
+fun Project.fromDomainToDb(): DbProject = DbProject().also {
     it.id = id
     it.creator = creator
     it.description = description
