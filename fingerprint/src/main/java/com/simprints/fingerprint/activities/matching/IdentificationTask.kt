@@ -10,7 +10,6 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToManyMatchEvent
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
@@ -26,8 +25,7 @@ class IdentificationTask(private val viewModel: MatchingViewModel,
                          private val dbManager: FingerprintDbManager,
                          private val sessionEventsManager: FingerprintSessionEventsManager,
                          private val crashReportManager: FingerprintCrashReportManager,
-                         private val timeHelper: FingerprintTimeHelper,
-                         private val preferenceManager: FingerprintPreferencesManager) : MatchTask {
+                         private val timeHelper: FingerprintTimeHelper) : MatchTask {
 
     override val matchStartTime = timeHelper.now()
 
@@ -57,7 +55,6 @@ class IdentificationTask(private val viewModel: MatchingViewModel,
         val topCandidates = extractTopCandidates(candidates, scores)
 
         saveOneToManyMatchEvent(candidates.size, topCandidates)
-        saveLastIdentificationDate()
 
         postMatchFinishedSummary(topCandidates)
         postFinalProgress()
@@ -81,10 +78,6 @@ class IdentificationTask(private val viewModel: MatchingViewModel,
                 matchingRequest.queryForCandidates,
                 candidateSize,
                 topCandidates.map { MatchEntry(it.guid, it.confidence) }))
-    }
-
-    private fun saveLastIdentificationDate() {
-        preferenceManager.lastIdentificationDate = Date()
     }
 
     private fun postMatchFinishedSummary(topCandidates: List<MatchResult>) {

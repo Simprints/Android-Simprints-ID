@@ -96,10 +96,8 @@
 
     <!-- Dashboard -->
     <style name="DashboardCardStyle">
-        <item name="android:layout_marginTop">12dp</item>
-        <item name="android:layout_marginLeft">12dp</item>
-        <item name="android:layout_marginRight">12dp</item>
-        <item name="android:layout_marginBottom">0dp</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
         <item name="cardCornerRadius">8dp</item>
     </style>
 
