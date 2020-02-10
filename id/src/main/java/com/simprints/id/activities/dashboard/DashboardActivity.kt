@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -12,6 +13,7 @@ import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
+import com.simprints.id.activities.dashboard.cards.daily_activity.displayer.DashboardDailyActivityCardDisplayer
 import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
@@ -25,7 +27,9 @@ import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_dashboard.*
+import kotlinx.android.synthetic.main.activity_dashboard_card_daily_activity.*
 import kotlinx.android.synthetic.main.activity_dashboard_card_project_details.*
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
@@ -39,6 +43,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var projectDetailsCardDisplayer: DashboardProjectDetailsCardDisplayer
     @Inject lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
+    @Inject lateinit var dailyActivityCardDisplayer: DashboardDailyActivityCardDisplayer
     @Inject lateinit var viewModelFactory: DashboardViewModelFactory
     @Inject lateinit var peopleSyncManager: PeopleSyncManager
 
@@ -60,9 +65,8 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
         setupActionBar()
         setupViewModel()
         setupCards()
-
-        observeForProjectDetails()
-        observeForSyncCardState()
+        observeCardData()
+        loadDailyActivity()
     }
 
     private fun setupActionBar() {
@@ -115,32 +119,48 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     private fun setupCards() {
         projectDetailsCardDisplayer.initRoot(dashboard_project_details_card)
         syncCardDisplayer.initRoot(dashboard_sync_card)
+        dailyActivityCardDisplayer.initRoot(dashboard_daily_activity_card_root)
+    }
+
+    private fun observeCardData() {
+        observeForProjectDetails()
+        observeForSyncCardState()
     }
 
     private fun observeForProjectDetails() {
-        viewModel.getProjectDetails().observe(this@DashboardActivity, Observer {
+        viewModel.getProjectDetails().observe(this, Observer {
             projectDetailsCardDisplayer.displayProjectDetails(it)
         })
     }
 
     private fun observeForSyncCardState() {
-        syncCardDisplayer.initRoot(dashboard_sync_card)
-        viewModel.syncCardStateLiveData.observe(this@DashboardActivity, Observer<DashboardSyncCardState> {
+        viewModel.syncCardStateLiveData.observe(this, Observer<DashboardSyncCardState> {
             syncCardDisplayer.displayState(it)
         })
 
-        syncCardDisplayer.userWantsToOpenSettings.observe(this@DashboardActivity, LiveDataEventObserver {
+        syncCardDisplayer.userWantsToOpenSettings.observe(this, LiveDataEventObserver {
             openSettings()
         })
 
-        syncCardDisplayer.userWantsToSelectAModule.observe(this@DashboardActivity, LiveDataEventObserver {
+        syncCardDisplayer.userWantsToSelectAModule.observe(this, LiveDataEventObserver {
             openSelectModules()
         })
 
-        syncCardDisplayer.userWantsToSync.observe(this@DashboardActivity, LiveDataEventObserver {
+        syncCardDisplayer.userWantsToSync.observe(this, LiveDataEventObserver {
             syncCardDisplayer.displayState(SyncConnecting(null, 0, null))
             peopleSyncManager.sync()
         })
+    }
+
+    private fun loadDailyActivity() {
+        viewModel.getDailyActivity().let {
+            if (it.hasNoActivity()) {
+                dashboard_daily_activity_card.visibility = View.GONE
+            } else {
+                dashboard_daily_activity_card.visibility = View.VISIBLE
+                dailyActivityCardDisplayer.displayDailyActivityState(it)
+            }
+        }
     }
 
     private fun openSettings() {
@@ -151,11 +171,16 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
         startActivity(Intent(this, ModuleSelectionActivity::class.java))
     }
 
+    @ObsoleteCoroutinesApi
     override fun onResume() {
         super.onResume()
+        loadDailyActivity()
         lifecycleScope.launch {
             stopTickerToCheckIfSyncIsRequired()
-            syncAgainTicker = ticker(delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED, initialDelayMillis = 100).also {
+            syncAgainTicker = ticker(
+                delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
+                initialDelayMillis = 100
+            ).also {
                 for (event in it) {
                     Timber.tag(SYNC_LOG_TAG).d("Launch sync if required")
                     viewModel.syncIfRequired()
@@ -191,7 +216,6 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
             startCheckLoginActivityAndFinish()
         }
     }
-
 
     private fun startCheckLoginActivityAndFinish() {
         startActivity(Intent(this, RequestLoginActivity::class.java))

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,6 +30,8 @@
             android:id="@+id/dashboard_cards"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="@dimen/vertical_spacing_dashboard_cards"
+            android:paddingBottom="@dimen/vertical_spacing_dashboard_cards"
             android:orientation="vertical">
 
             <include layout="@layout/activity_dashboard_card_project_details" />
@@ -36,7 +39,11 @@
                 android:id="@+id/dashboard_sync_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vertical_spacing_dashboard_cards"
+                android:layout_marginBottom="@dimen/vertical_spacing_dashboard_cards"
                 android:orientation="vertical"/>
+            <include layout="@layout/activity_dashboard_card_daily_activity"/>
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
