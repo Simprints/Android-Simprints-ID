@@ -6,7 +6,7 @@ import com.simprints.moduleapi.common.ISecuredImageRef
 import kotlinx.android.parcel.Parcelize
 
 fun SecuredImageRef.fromDomainToModuleApi(): ISecuredImageRef = ISecuredImageRefImpl(
-    path.fromDomainToModuleApi()
+    relativePath.fromDomainToModuleApi()
 )
 
 fun ISecuredImageRef.fromModuleApiToDomain() = SecuredImageRef(path.fromModuleApiToDomain())
