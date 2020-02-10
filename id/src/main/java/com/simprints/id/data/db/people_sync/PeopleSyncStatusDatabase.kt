@@ -21,10 +21,10 @@ abstract class PeopleSyncStatusDatabase : RoomDatabase() {
     abstract val upSyncOperationLocalDataSource: PeopleUpSyncOperationLocalDataSource
 
     companion object {
-        private const val SYNC_STATUS_DB_NAME = "people_sync_db"
+        private const val ROOM_DB_NAME = "room_db"
 
         fun getDatabase(context: Context): PeopleSyncStatusDatabase = Room
-            .databaseBuilder(context.applicationContext, PeopleSyncStatusDatabase::class.java, SYNC_STATUS_DB_NAME)
+            .databaseBuilder(context.applicationContext, PeopleSyncStatusDatabase::class.java, ROOM_DB_NAME)
             .fallbackToDestructiveMigration()
             .allowMainThreadQueries()
             .build()
