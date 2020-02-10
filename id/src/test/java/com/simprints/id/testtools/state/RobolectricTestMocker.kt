@@ -19,10 +19,11 @@ import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.common.syntax.wheneverOnSuspend
+import io.mockk.coEvery
+import io.mockk.every
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
-import org.mockito.stubbing.Answer
 import java.math.BigInteger
 
 object RobolectricTestMocker {
@@ -32,24 +33,24 @@ object RobolectricTestMocker {
     suspend fun mockLoadProject(projectRemoteDataSource: ProjectRemoteDataSource,
                                 projectLocalDataSource: ProjectLocalDataSource): RobolectricTestMocker {
 
-        val project = Project().apply { id = "project id"; name = "project name"; description = "project desc" }
+        val project = Project(DEFAULT_PROJECT_ID, "local", "",  "")
         val projectSettings: JsonObject = JsonObject().apply { addProperty("key", "value") }
-        wheneverOnSuspend(projectLocalDataSource) { load(anyNotNull()) } thenOnBlockingReturn project
-        wheneverOnSuspend(projectRemoteDataSource) { loadProjectFromRemote(anyNotNull()) } thenOnBlockingReturn Single.just(project)
-        wheneverOnSuspend(projectLocalDataSource) { save(anyNotNull()) } thenOnBlockingReturn Unit
-        wheneverOnSuspend(projectRemoteDataSource) { loadProjectRemoteConfigSettingsJsonString(anyNotNull()) } thenOnBlockingReturn Single.just(projectSettings)
+        coEvery { projectLocalDataSource.load(any()) } returns project
+        coEvery { projectRemoteDataSource.loadProjectFromRemote(any()) } returns project
+        coEvery { projectLocalDataSource.save(any()) } returns Unit
+        coEvery { projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(any()) } returns projectSettings
         return this
     }
 
     fun initLogInStateMock(sharedPrefs: SharedPreferences,
                            remoteDbManagerMock: RemoteDbManager): RobolectricTestMocker {
 
-        val answer = Answer<Boolean> {
+        every { remoteDbManagerMock.isSignedIn(any(), any()) } answers {
             sharedPrefs.getBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, false)
         }
-        whenever { remoteDbManagerMock.isSignedIn(anyNotNull(), anyNotNull()) } thenAnswer answer
-        whenever { remoteDbManagerMock.getCurrentToken() } thenReturn Single.just("")
-        whenever { remoteDbManagerMock.signIn(anyNotNull()) } thenReturn Completable.complete()
+
+        coEvery { remoteDbManagerMock.getCurrentToken() } returns ""
+        every { remoteDbManagerMock.signIn(any()) } returns Completable.complete()
         return this
     }
 
@@ -79,11 +80,11 @@ object RobolectricTestMocker {
         PeopleRemoteInterface.baseUrl = mockServer?.url("/").toString()
         wheneverOnSuspend(personRepository) { insertOrUpdate(anyNotNull()) } thenOnBlockingReturn Unit
         wheneverOnSuspend(personRepository) { load(anyNotNull()) } thenOnBlockingThrow IllegalStateException::class.java
-        wheneverOnSuspend(personRepository) { count(anyNotNull()) } thenOnBlockingThrow  IllegalStateException::class.java
+        wheneverOnSuspend(personRepository) { count(anyNotNull()) } thenOnBlockingThrow IllegalStateException::class.java
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock)
 
-        whenever { remoteDbManagerSpy.getCurrentToken() } thenReturn Single.just("someToken")
+        coEvery { remoteDbManagerSpy.getCurrentToken() } returns "someToken"
         return this
     }
 

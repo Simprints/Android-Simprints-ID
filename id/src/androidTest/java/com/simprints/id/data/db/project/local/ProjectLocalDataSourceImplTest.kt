@@ -6,7 +6,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.RealmTestsBase
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.models.DbProject
-import com.simprints.id.data.db.project.local.models.toRealmProject
+import com.simprints.id.data.db.project.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
@@ -61,7 +61,7 @@ class ProjectLocalDataSourceImplTest : RealmTestsBase() {
     @Test
     fun load_shouldLoadAProjectFromTheDb() = runBlocking {
         realm.executeTransaction {
-            assertThat(it.insertOrUpdate(project.toRealmProject()))
+            assertThat(it.insertOrUpdate(project.fromDomainToDb()))
         }
 
         val projectFromDb = projectLocalDataSource.load(DEFAULT_PROJECT_ID)

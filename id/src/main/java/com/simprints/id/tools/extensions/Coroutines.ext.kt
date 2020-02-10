@@ -14,7 +14,7 @@ import kotlin.coroutines.coroutineContext
 
 @InternalCoroutinesApi
 @ExperimentalCoroutinesApi
-suspend fun <T> Flow<T>.bufferedChunks(maxChunkSize: Int): Flow<List<T>> = channelFlow<List<T>> {
+suspend fun <T> Flow<T>.bufferedChunks(maxChunkSize: Int): Flow<List<T>> = channelFlow {
     require(maxChunkSize >= 1) {
         "Max chunk size should be greater than 0 but was $maxChunkSize"
     }
