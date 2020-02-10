@@ -6,7 +6,8 @@ enum class PeopleSyncWorkerType {
     UP_COUNTER,
     UPLOADER,
     DOWNLOADER,
-    LAST_SYNC_REPORTER;
+    END_SYNC_REPORTER,
+    START_SYNC_REPORTER;
 
     companion object {
 

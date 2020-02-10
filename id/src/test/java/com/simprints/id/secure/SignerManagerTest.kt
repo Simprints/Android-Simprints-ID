@@ -112,28 +112,6 @@ class SignerManagerTest {
     }
 
     @Test
-    fun signIn_shouldResumePeopleSync() {
-        mockRemoteSignedIn()
-        mockStoreCredentialsLocally()
-        mockFetchingProjectInto()
-        mockResumePeopleSync()
-        signIn()
-        coVerify { syncManager.scheduleBackgroundSyncs() }
-    }
-
-    @Test
-    fun resumeProjectSyncFails_signInShouldFail() {
-        mockRemoteSignedIn()
-        mockStoreCredentialsLocally()
-        mockFetchingProjectInto()
-        mockResumePeopleSync(true)
-
-        val tester = signIn()
-
-        verifySignedInFailed(tester)
-    }
-
-    @Test
     fun signIn_shouldSucceed() {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
@@ -182,7 +160,7 @@ class SignerManagerTest {
     private fun mockFetchingProjectInto(error: Boolean = false) =
         coEvery { projectRepository.loadFromRemoteAndRefreshCache(any()) }.apply {
             if (!error) {
-                this.returns(Project())
+                this.returns(Project(DEFAULT_PROJECT_ID, "local", "",  ""))
             } else {
                 this.throws(Throwable("Failed to fetch project info"))
             }

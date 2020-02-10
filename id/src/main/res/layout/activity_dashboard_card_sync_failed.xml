@@ -25,6 +25,7 @@
 
         <ImageView
             android:id="@+id/dashboard_sync_card_failed_icon"
+            style="@style/SimprintsStyle.TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/activity_dashboard_card_space_below_title"
@@ -35,11 +36,13 @@
 
         <TextView
             android:id="@+id/dashboard_sync_card_failed_message"
+            style="@style/SimprintsStyle.TextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:text="Placeholder - failed message"
-            android:textSize="16sp"
             android:textColor="@color/simprints_red_dark"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/dashboard_sync_card_failed_icon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/dashboard_sync_card_failed_icon"

@@ -25,6 +25,7 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.testtools.android.BaseAssertions
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.mock
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,7 +41,7 @@ class LoginActivityAndroidTest : BaseAssertions() {
     private val module
         get() = TestAppModule(app,
             randomGeneratorRule = DependencyRule.ReplaceRule { mock<RandomGenerator>().apply { setupRandomGeneratorToGenerateKey(this) } },
-            keystoreManagerRule = DependencyRule.ReplaceRule { mock<KeystoreManager>().apply { setupFakeKeyStore(this) } },
+            keystoreManagerRule = DependencyRule.ReplaceRule { mockk<KeystoreManager>().apply { setupFakeKeyStore(this) } },
             secureApiInterfaceRule = secureApiInterfaceRule
         )
 

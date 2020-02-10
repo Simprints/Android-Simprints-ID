@@ -15,6 +15,8 @@ import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSy
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.*
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleEndSyncReporterWorker
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleStartSyncReporterWorker
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
@@ -66,6 +68,7 @@ class PeopleSyncMasterWorkerTest {
             downSyncWorkerBuilder = mockk(relaxed = true)
             upSyncWorkerBuilder = mockk(relaxed = true)
             peopleSyncCache = mockk(relaxed = true)
+            peopleSyncSubMasterWorkersBuilder = mockk(relaxed = true)
         }
         mockBackgroundTrigger(true)
     }
@@ -94,9 +97,12 @@ class PeopleSyncMasterWorkerTest {
             assertWorkerOutput(uniqueSyncId)
             coVerify(exactly = 0) { downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) }
             coVerify(exactly = 1) { upSyncWorkerBuilder.buildUpSyncWorkerChain(any()) }
-            assertUpSyncWorkersAreEnqueued(uniqueSyncId)
-            assertLastSyncTimeWorkerIsEnqueued(uniqueSyncId)
-            assertTotalNumberOfWorkers(uniqueSyncId, 3)
+
+            assertSyncWorkersState(uniqueSyncId, ENQUEUED, START_SYNC_REPORTER)
+            assertSyncWorkersState(uniqueSyncId, BLOCKED, UP_COUNTER)
+            assertSyncWorkersState(uniqueSyncId, BLOCKED, UPLOADER)
+            assertSyncWorkersState(uniqueSyncId, BLOCKED, END_SYNC_REPORTER)
+            assertTotalNumberOfWorkers(uniqueSyncId, 4)
         }
     }
 
@@ -157,24 +163,13 @@ class PeopleSyncMasterWorkerTest {
     }
 
     private fun assertAllWorkersAreEnqueued(uniqueSyncId: String) {
-        assertDownSyncWorkersAreEnqueued(uniqueSyncId)
-        assertUpSyncWorkersAreEnqueued(uniqueSyncId)
-        assertLastSyncTimeWorkerIsEnqueued(uniqueSyncId)
-        assertTotalNumberOfWorkers(uniqueSyncId, 5)
-    }
-
-    private fun assertDownSyncWorkersAreEnqueued(uniqueSyncId: String) {
-        assertSyncWorkersState(uniqueSyncId, ENQUEUED, DOWNLOADER)
-        assertSyncWorkersState(uniqueSyncId, ENQUEUED, DOWN_COUNTER)
-    }
-
-    private fun assertUpSyncWorkersAreEnqueued(uniqueSyncId: String) {
-        assertSyncWorkersState(uniqueSyncId, ENQUEUED, UPLOADER)
-        assertSyncWorkersState(uniqueSyncId, ENQUEUED, UP_COUNTER)
-    }
-
-    private fun assertLastSyncTimeWorkerIsEnqueued(uniqueSyncId: String) {
-        assertSyncWorkersState(uniqueSyncId, BLOCKED, LAST_SYNC_REPORTER)
+        assertSyncWorkersState(uniqueSyncId, ENQUEUED, START_SYNC_REPORTER)
+        assertSyncWorkersState(uniqueSyncId, BLOCKED, UP_COUNTER)
+        assertSyncWorkersState(uniqueSyncId, BLOCKED, UPLOADER)
+        assertSyncWorkersState(uniqueSyncId, BLOCKED, DOWNLOADER)
+        assertSyncWorkersState(uniqueSyncId, BLOCKED, DOWN_COUNTER)
+        assertSyncWorkersState(uniqueSyncId, BLOCKED, END_SYNC_REPORTER)
+        assertTotalNumberOfWorkers(uniqueSyncId, 6)
     }
 
     private fun assertTotalNumberOfWorkers(uniqueSyncId: String, total: Int) {
@@ -207,7 +202,30 @@ class PeopleSyncMasterWorkerTest {
     private fun prepareSyncWorkers(uniqueSyncId: String) {
         coEvery { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } returns buildDownSyncWorkers(uniqueSyncId)
         coEvery { masterWorker.upSyncWorkerBuilder.buildUpSyncWorkerChain(any()) } returns buildUpSyncWorkers(uniqueSyncId)
+        coEvery { masterWorker.peopleSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns buildStartSyncReporterWorker(uniqueSyncId)
+        coEvery { masterWorker.peopleSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(any()) } returns buildEndSyncReporterWorker(uniqueSyncId)
+
     }
+
+    private fun buildEndSyncReporterWorker(uniqueSyncId: String): OneTimeWorkRequest =
+        OneTimeWorkRequest.Builder(PeopleEndSyncReporterWorker::class.java)
+            .addTagForMasterSyncId(uniqueSyncId)
+            .addTagForScheduledAtNow()
+            .addCommonTagForAllSyncWorkers()
+            .addTagForEndSyncReporter()
+            .setInputData(workDataOf(PeopleEndSyncReporterWorker.SYNC_ID_TO_MARK_AS_COMPLETED to uniqueSyncId))
+            .setConstraints(constraintsForWorkers())
+            .build() as OneTimeWorkRequest
+
+    private fun buildStartSyncReporterWorker(uniqueSyncId: String): OneTimeWorkRequest =
+        OneTimeWorkRequest.Builder(PeopleStartSyncReporterWorker::class.java)
+            .addTagForMasterSyncId(uniqueSyncId)
+            .addTagForScheduledAtNow()
+            .addCommonTagForAllSyncWorkers()
+            .addTagForStartSyncReporter()
+            .setInputData(workDataOf(PeopleStartSyncReporterWorker.SYNC_ID_STARTED to uniqueSyncId))
+            .setConstraints(constraintsForWorkers())
+            .build() as OneTimeWorkRequest
 
     private fun buildDownSyncWorkers(uniqueSyncId: String): List<OneTimeWorkRequest> =
         listOf(

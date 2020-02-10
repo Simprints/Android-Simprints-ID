@@ -6,23 +6,18 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
 import org.mockito.ArgumentMatchers.anyInt
-import org.mockito.stubbing.Answer
 import kotlin.random.Random
 
 fun setupFakeEncryptedSharedPreferences(ctx: Context): SharedPreferences {
-   return ctx.getSharedPreferences("test", 0)
+    return ctx.getSharedPreferences("test", 0)
 }
 
 fun setupFakeKeyStore(keystoreManager: KeystoreManager) {
-    val encryptAnswer = Answer<String> {
-        "enc_" + it.arguments[0] as String
+    every { keystoreManager.decryptString(anyNotNull()) } answers {
+        (this.args[0] as String).replace("enc_", "")
     }
-
-    val decryptAnswer = Answer<String> {
-        (it.arguments[0] as String).replace("enc_", "")
-    }
-    whenever { keystoreManager.decryptString(anyNotNull()) } thenAnswer decryptAnswer
 }
 
 fun setupRandomGeneratorToGenerateKey(randomGeneratorMock: RandomGenerator) {
