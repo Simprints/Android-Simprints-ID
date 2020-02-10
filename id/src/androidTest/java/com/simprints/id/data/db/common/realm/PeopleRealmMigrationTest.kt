@@ -21,7 +21,9 @@ class PeopleRealmMigrationTest {
     companion object {
         private const val ASSET_FOLDER_FOR_REALM_DB = "realm"
         private const val DB_V6_FILENAME = "db_v6.realm"
+        private const val DB_V7_FILENAME = "db_v7.realm"
         private const val DB_V6_KEY = "KEWsuk0UdOawjyBtjSTMAv6D8o126b6zB+uDR8okr7UVpIe1+btEsZ/KtFRkkVlLp9SgsdC5P8VF\nfLvNHeiE0g==\n"
+        private const val DB_V7_KEY = "j1kkhzjFKEHlBnHO3AkijxaT03Fii6avZAcig0PfQbVlK8kRnHSNKrzRwdaLzpxzFaQIYoJ0naA5\n4yGAywAutg==\n"
         private const val PACKAGE_NAME = "com.simprints.id.test"
     }
 
@@ -30,7 +32,7 @@ class PeopleRealmMigrationTest {
 
         val app = ApplicationProvider.getApplicationContext<Application>()
         val resources = app.packageManager.getResourcesForApplication(PACKAGE_NAME)
-        val dbFileV6 = copyRealmFromAssets(app, resources.assets)
+        val dbFileV6 = copyRealmFromAssets(app, resources.assets, DB_V6_FILENAME)
 
         Realm.init(app)
 
@@ -38,7 +40,7 @@ class PeopleRealmMigrationTest {
             .Builder()
             .directory(dbFileV6.parentFile)
             .name(dbFileV6.name)
-            .schemaVersion(PeopleRealmMigration.REALM_SCHEMA_VERSION)
+            .schemaVersion(7)
             .encryptionKey(Base64.decode(DB_V6_KEY, Base64.DEFAULT))
             .modules(PeopleRealmMigration.PeopleModule())
             .migration(PeopleRealmMigration(DEFAULT_PROJECT_ID))
@@ -47,8 +49,30 @@ class PeopleRealmMigrationTest {
         Realm.getInstance(config).close()
     }
 
-    private fun copyRealmFromAssets(context: Context, assetManager: AssetManager): File {
-        val originalDb = assetManager.open("$ASSET_FOLDER_FOR_REALM_DB/$DB_V6_FILENAME")
+    @Test
+    fun migrateFromV7ToV8() {
+
+        val app = ApplicationProvider.getApplicationContext<Application>()
+        val resources = app.packageManager.getResourcesForApplication(PACKAGE_NAME)
+        val dbFileV7 = copyRealmFromAssets(app, resources.assets, DB_V7_FILENAME)
+
+        Realm.init(app)
+
+        val config = RealmConfiguration
+            .Builder()
+            .directory(dbFileV7.parentFile)
+            .name(dbFileV7.name)
+            .schemaVersion(8)
+            .encryptionKey(Base64.decode(DB_V7_KEY, Base64.DEFAULT))
+            .modules(PeopleRealmMigration.PeopleModule())
+            .migration(PeopleRealmMigration(DEFAULT_PROJECT_ID))
+            .build()
+
+        Realm.getInstance(config).close()
+    }
+
+    private fun copyRealmFromAssets(context: Context, assetManager: AssetManager, dbFile: String): File {
+        val originalDb = assetManager.open("$ASSET_FOLDER_FOR_REALM_DB/$dbFile")
         val tmpDb = File("${context.filesDir}", DB_V6_FILENAME)
         if (tmpDb.exists()) {
             tmpDb.delete()
