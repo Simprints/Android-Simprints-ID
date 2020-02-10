@@ -10,6 +10,7 @@ import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockitokotlin2.any
+import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
@@ -54,6 +55,7 @@ class OrchestratorManagerImplTest {
 
     private lateinit var appResponseFactoryMock: AppResponseFactory
     private lateinit var modalityFlowMock: ModalityFlow
+    private lateinit var dashboardDailyActivityRepositoryMock: DashboardDailyActivityRepository
     private lateinit var orchestrator: OrchestratorManager
     private val mockSteps = mutableListOf<Step>()
     private val modalities = listOf(FACE)
@@ -78,6 +80,7 @@ class OrchestratorManagerImplTest {
             whenever(this) { this.steps } thenAnswer Answer { mockSteps }
         }
         appResponseFactoryMock = mock()
+        dashboardDailyActivityRepositoryMock = mock()
 
         orchestrator = buildOrchestratorManager()
         prepareModalFlowForFaceEnrol()
@@ -191,7 +194,12 @@ class OrchestratorManagerImplTest {
         val stepEncoder = mock<StepEncoder>()
         val hotCache = HotCacheImpl(preferences, stepEncoder)
 
-        return OrchestratorManagerImpl(modalityFlowFactoryMock, appResponseFactoryMock, hotCache)
+        return OrchestratorManagerImpl(
+            modalityFlowFactoryMock,
+            appResponseFactoryMock,
+            hotCache,
+            dashboardDailyActivityRepositoryMock
+        )
     }
 
     private fun OrchestratorManager.startFlowForEnrol(

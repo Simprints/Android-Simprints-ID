@@ -10,7 +10,6 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
@@ -37,7 +36,6 @@ import com.simprints.fingerprintmatcher.Person as MatcherPerson
 class MatchingViewModel(private val dbManager: FingerprintDbManager,
                         private val sessionEventsManager: FingerprintSessionEventsManager,
                         private val crashReportManager: FingerprintCrashReportManager,
-                        private val preferencesManager: FingerprintPreferencesManager,
                         private val timeHelper: FingerprintTimeHelper,
                         private val masterFlowManager: MasterFlowManager) : ViewModel() {
 
@@ -73,9 +71,8 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
                                                       FingerprintDbManager,
                                                       FingerprintSessionEventsManager,
                                                       FingerprintCrashReportManager,
-                                                      FingerprintTimeHelper,
-                                                      FingerprintPreferencesManager) -> MatchTask) {
-        val matchTask = matchTaskConstructor(this, matchingRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper, preferencesManager)
+                                                      FingerprintTimeHelper) -> MatchTask) {
+        val matchTask = matchTaskConstructor(this, matchingRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper)
 
         matchTaskDisposable = matchTask.loadCandidates()
             .doOnSuccess { matchTask.handlesCandidatesLoaded(it) }

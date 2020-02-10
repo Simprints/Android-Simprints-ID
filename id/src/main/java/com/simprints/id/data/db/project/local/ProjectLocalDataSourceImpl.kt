@@ -19,9 +19,11 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.withContext
 
 @FlowPreview
-class ProjectLocalDataSourceImpl(private val appContext: Context,
-                                 val secureDataManager: SecureLocalDbKeyProvider,
-                                 val loginInfoManager: LoginInfoManager) : ProjectLocalDataSource {
+class ProjectLocalDataSourceImpl(
+    private val appContext: Context,
+    val secureDataManager: SecureLocalDbKeyProvider,
+    val loginInfoManager: LoginInfoManager
+) : ProjectLocalDataSource {
 
     companion object {
         const val PROJECT_ID_FIELD = "id"
@@ -44,16 +46,15 @@ class ProjectLocalDataSourceImpl(private val appContext: Context,
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): RealmConfiguration =
         PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
 
-
     override suspend fun load(projectId: String): Project? =
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use { realm ->
-                realm.where(DbProject::class.java).equalTo(PROJECT_ID_FIELD, projectId)
+                realm.where(DbProject::class.java)
+                    .equalTo(PROJECT_ID_FIELD, projectId)
                     .awaitFirst()
-                    ?.let { it.fromDbToDomain() }
+                    ?.fromDbToDomain() 
             }
         }
-
 
     override suspend fun save(project: Project) =
         withContext(Dispatchers.Main) {
@@ -63,6 +64,7 @@ class ProjectLocalDataSourceImpl(private val appContext: Context,
                 }
             }
         }
+
 }
 
 
