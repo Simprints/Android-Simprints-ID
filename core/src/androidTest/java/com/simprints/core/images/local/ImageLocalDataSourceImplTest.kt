@@ -37,10 +37,10 @@ class ImageLocalDataSourceImplTest {
         val securedImageRef = imageLocalDataSource.encryptAndStoreImage(byteArray, path)
         require(securedImageRef != null)
 
-        val file = File(securedImageRef.path.compose())
+        val file = File(securedImageRef.relativePath.compose())
 
         assertThat(file.absolutePath).isEqualTo("$imagesFolder/test/$FILE_NAME")
-        assertThat(securedImageRef.path.compose()).contains(FILE_NAME)
+        assertThat(securedImageRef.relativePath.compose()).contains(FILE_NAME)
         assertThat(file.readBytes()).isNotEqualTo(byteArray)
     }
 
@@ -92,7 +92,7 @@ class ImageLocalDataSourceImplTest {
         imageLocalDataSource.deleteImage(fileToDelete)
         val remainingFiles = imageLocalDataSource.listImages()
 
-        assertThat(remainingFiles.none { it.path == fileToDelete.path }).isTrue()
+        assertThat(remainingFiles.none { it.relativePath == fileToDelete.relativePath }).isTrue()
         assertThat(remainingFiles.size).isEqualTo(2)
     }
 

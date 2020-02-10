@@ -14,7 +14,7 @@ internal class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
         val rootRef = FirebaseStorage.getInstance().reference
 
         var fileRef = rootRef
-        imageRef.path.parts.forEach { pathPart ->
+        imageRef.relativePath.parts.forEach { pathPart ->
             fileRef = fileRef.child(pathPart)
         }
 
