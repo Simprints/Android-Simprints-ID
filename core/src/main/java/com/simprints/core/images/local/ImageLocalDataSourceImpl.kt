@@ -22,8 +22,8 @@ internal class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDa
 
     private val masterKeyAlias = MasterKeys.getOrCreate(AES256_GCM_SPEC)
 
-    override fun encryptAndStoreImage(imageBytes: ByteArray, path: Path): SecuredImageRef? {
-        val fullPath = Path.combine(imageRootPath, path).compose()
+    override fun encryptAndStoreImage(imageBytes: ByteArray, relativePath: Path): SecuredImageRef? {
+        val fullPath = Path.combine(imageRootPath, relativePath).compose()
 
         createDirectoryIfNonExistent(fullPath)
 
@@ -31,7 +31,7 @@ internal class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDa
         Timber.d(file.absoluteFile.toString())
 
         return try {
-            if (path.compose().isEmpty())
+            if (relativePath.compose().isEmpty())
                 throw FileNotFoundException()
 
             getEncryptedFile(file).openFileOutput().use { stream ->
@@ -45,7 +45,7 @@ internal class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDa
     }
 
     override fun decryptImage(image: SecuredImageRef): FileInputStream? {
-        val absolutePath = buildAbsolutePath(image.path)
+        val absolutePath = buildAbsolutePath(image.relativePath)
         val file = File(absolutePath)
         val encryptedFile = getEncryptedFile(file)
         return try {
@@ -69,7 +69,7 @@ internal class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDa
     }
 
     override fun deleteImage(image: SecuredImageRef): Boolean {
-        val absolutePath = buildAbsolutePath(image.path)
+        val absolutePath = buildAbsolutePath(image.relativePath)
         val file = File(absolutePath)
         return file.delete()
     }

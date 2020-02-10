@@ -14,7 +14,7 @@ internal interface ImageLocalDataSource {
      *
      * @param imageBytes
      *        the image, as a byte array
-     * @param path
+     * @param relativePath
      *        the path within the root images folder where the image will be stored,
      *        including file name.
      *        e.g.: for [root images folder]/fingerprints/bad_scans/image1.png [path] should be
@@ -22,7 +22,7 @@ internal interface ImageLocalDataSource {
      * @see [Path]
      * @return a reference to the newly stored image, if successful, otherwise null
      */
-    fun encryptAndStoreImage(imageBytes: ByteArray, path: Path): SecuredImageRef?
+    fun encryptAndStoreImage(imageBytes: ByteArray, relativePath: Path): SecuredImageRef?
 
     /**
      * Decrypts an image
