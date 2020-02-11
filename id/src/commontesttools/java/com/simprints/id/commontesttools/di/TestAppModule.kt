@@ -14,6 +14,7 @@ import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
 import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
@@ -37,22 +38,23 @@ import io.mockk.mockk
 
 class TestAppModule(
     app: Application,
-    var remoteDbManagerRule: DependencyRule = RealRule,
-    var remoteSessionsManagerRule: DependencyRule = RealRule,
-    var dbManagerRule: DependencyRule = RealRule,
-    var secureDataManagerRule: DependencyRule = RealRule,
-    var loginInfoManagerRule: DependencyRule = RealRule,
-    var randomGeneratorRule: DependencyRule = RealRule,
-    var keystoreManagerRule: DependencyRule = RealRule,
-    var crashReportManagerRule: DependencyRule = RealRule,
-    var sessionEventsManagerRule: DependencyRule = RealRule,
-    var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
-    var simNetworkUtilsRule: DependencyRule = RealRule,
-    var secureApiInterfaceRule: DependencyRule = RealRule,
-    var longConsentManagerRule: DependencyRule = RealRule,
-    var syncStatusDatabaseRule: DependencyRule = RealRule,
-    var deviceManagerRule: DependencyRule = RealRule,
-    private var encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) }
+    private val remoteDbManagerRule: DependencyRule = RealRule,
+    private val remoteSessionsManagerRule: DependencyRule = RealRule,
+    private val dbManagerRule: DependencyRule = RealRule,
+    private val secureDataManagerRule: DependencyRule = RealRule,
+    private val loginInfoManagerRule: DependencyRule = RealRule,
+    private val randomGeneratorRule: DependencyRule = RealRule,
+    private val keystoreManagerRule: DependencyRule = RealRule,
+    private val crashReportManagerRule: DependencyRule = RealRule,
+    private val sessionEventsManagerRule: DependencyRule = RealRule,
+    private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
+    private val simNetworkUtilsRule: DependencyRule = RealRule,
+    private val secureApiInterfaceRule: DependencyRule = RealRule,
+    private val longConsentManagerRule: DependencyRule = RealRule,
+    private val syncStatusDatabaseRule: DependencyRule = RealRule,
+    private val deviceManagerRule: DependencyRule = RealRule,
+    private val recentEventsPreferencesManagerRule: DependencyRule = RealRule,
+    private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) }
 ) : AppModule() {
 
     override fun provideCrashManager(): CrashReportManager =
@@ -145,4 +147,11 @@ class TestAppModule(
 
     override fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager =
         deviceManagerRule.resolveDependency { super.provideDeviceManager(connectivityHelper) }
+
+    override fun provideRecentEventsPreferencesManager(prefs: ImprovedSharedPreferences): RecentEventsPreferencesManager {
+        return recentEventsPreferencesManagerRule.resolveDependency {
+            super.provideRecentEventsPreferencesManager(prefs)
+        }
+    }
+
 }
