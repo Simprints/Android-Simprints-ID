@@ -198,7 +198,11 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         presenter.refreshDisplay()
         view.timeoutBar.startTimeoutBar()
         scanningTask?.dispose()
-        scanningTask = scannerManager.scanner<CaptureFingerprintResponse> { captureFingerprint(scanningTimeoutMs.toInt(), qualityThreshold) }
+        scanningTask = scannerManager.scanner<CaptureFingerprintResponse> { captureFingerprint(
+            fingerprintPreferencesManager.captureFingerprintStrategy,
+            scanningTimeoutMs.toInt(),
+            qualityThreshold
+        ) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -247,7 +251,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private fun proceedToImageTransfer() {
         currentFingerStatus = TRANSFERRING_IMAGE
         presenter.refreshDisplay()
-        imageTransferTask = scannerManager.onScanner { acquireImage() }
+        imageTransferTask = scannerManager.onScanner { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

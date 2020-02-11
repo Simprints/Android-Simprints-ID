@@ -1,5 +1,7 @@
 package com.simprints.fingerprint.scanner.wrapper
 
+import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
+import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
@@ -15,8 +17,8 @@ interface ScannerWrapper {
     fun sensorWakeUp(): Completable
     fun sensorShutDown(): Completable
 
-    fun captureFingerprint(timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse>
-    fun acquireImage(): Single<AcquireImageResponse>
+    fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse>
+    fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): Single<AcquireImageResponse>
 
     fun setUiIdle(): Completable
 

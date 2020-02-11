@@ -1,5 +1,7 @@
 package com.simprints.fingerprint.scanner.wrapper
 
+import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
+import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
@@ -77,7 +79,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
         }))
     }
 
-    override fun captureFingerprint(timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
+    override fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
         Single.create<CaptureFingerprintResponse> { emitter ->
             scannerV1.startContinuousCapture(qualityThreshold, timeOutMs.toLong(), continuousCaptureCallback(qualityThreshold, emitter))
         }.doOnDispose {
@@ -115,7 +117,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
         }
     }
 
-    override fun acquireImage(): Single<AcquireImageResponse> =
+    override fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): Single<AcquireImageResponse> =
         Single.error(UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION))
 
     override fun setUiIdle(): Completable = Completable.create { result ->
