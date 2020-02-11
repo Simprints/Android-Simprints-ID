@@ -125,7 +125,7 @@ def rootbeer = [
     core: "com.scottyab:rootbeer-lib:$rootbeer_version"
 ]
 
-def mockito_version = "3.0.0"
+def mockito_version = "3.2.4"
 def espresso_version = "3.2.0-alpha04"
 def robolectric_version = "4.1"
 def testing = [

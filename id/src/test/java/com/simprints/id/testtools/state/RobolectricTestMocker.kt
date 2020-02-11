@@ -16,8 +16,6 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
 import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.anyOrNull
-import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.common.syntax.wheneverOnSuspend
 import io.mockk.coEvery
 import io.mockk.every
@@ -89,8 +87,8 @@ object RobolectricTestMocker {
     }
 
     fun setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager): RobolectricTestMocker {
-        whenever { sessionEventsLocalDbManagerMock.loadSessions(anyOrNull(), anyOrNull()) } thenReturn Single.error(IllegalStateException())
-        whenever { sessionEventsLocalDbManagerMock.insertOrUpdateSessionEvents(anyNotNull()) } thenReturn Completable.complete()
+        every { sessionEventsLocalDbManagerMock.loadSessions(any(), any()) } returns Single.error(IllegalStateException())
+        every { sessionEventsLocalDbManagerMock.insertOrUpdateSessionEvents(any()) } returns Completable.complete()
         return this
     }
 }

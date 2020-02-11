@@ -5,7 +5,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.testtools.common.syntax.assertThrows
-import com.simprints.testtools.common.syntax.mock
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.instanceOf
@@ -16,8 +16,8 @@ import org.junit.Test
 class AppResponseBuilderForEnrolTest {
 
     private val responseBuilder = AppResponseBuilderForEnrol(
-        enrolmentHelper = mock(),
-        timeHelper = mock()
+        enrolmentHelper = mockk(),
+        timeHelper = mockk()
     )
 
     @Test

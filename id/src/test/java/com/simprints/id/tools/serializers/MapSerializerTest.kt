@@ -1,8 +1,8 @@
 package com.simprints.id.tools.serializers
 
 import com.google.gson.Gson
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Assert
 import org.junit.Test
 
@@ -21,16 +21,16 @@ class MapSerializerTest {
     private val mapSerializer = MapSerializer(intSerializer, booleanSerializer, Gson())
 
     private fun mockIntSerializer(): Serializer<Int> {
-        val serializer = mock<Serializer<Int>>()
-        whenever(serializer.serialize(originalInt)).thenReturn(serializedInt)
-        whenever(serializer.deserialize(serializedInt)).thenReturn(originalInt)
+        val serializer = mockk<Serializer<Int>>()
+        every { serializer.serialize(originalInt) } returns serializedInt
+        every { serializer.deserialize(serializedInt) } returns originalInt
         return serializer
     }
 
     private fun mockBooleanSerializer(): Serializer<Boolean> {
-        val serializer = mock<Serializer<Boolean>>()
-        whenever(serializer.serialize(originalBoolean)).thenReturn(serializedBoolean)
-        whenever(serializer.deserialize(serializedBoolean)).thenReturn(originalBoolean)
+        val serializer = mockk<Serializer<Boolean>>()
+        every { serializer.serialize(originalBoolean) } returns serializedBoolean
+        every { serializer.deserialize(serializedBoolean) } returns originalBoolean
         return serializer
     }
 
