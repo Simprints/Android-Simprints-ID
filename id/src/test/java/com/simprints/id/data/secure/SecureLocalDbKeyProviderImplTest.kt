@@ -11,7 +11,7 @@ import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REAL
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.testtools.common.syntax.assertThrows
+import io.kotlintest.shouldThrow
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -91,6 +91,7 @@ class SecureLocalDbKeyProviderImplTest {
 
     @Test
     fun getLocalDbKeyOrThrow_shouldThrowIfLocalKeyNotPresent() {
+        every { legacyLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } throws Throwable("Some Error")
         getLocalDbKeyAndVerifyThatMissingKeyWasThrown()
     }
 
@@ -103,7 +104,7 @@ class SecureLocalDbKeyProviderImplTest {
     }
 
     private fun getLocalDbKeyAndVerifyThatMissingKeyWasThrown() {
-        assertThrows<MissingLocalDatabaseKeyException> {
+        shouldThrow<MissingLocalDatabaseKeyException> {
             secureLocalDbKeyProvider.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID)
         }
     }
