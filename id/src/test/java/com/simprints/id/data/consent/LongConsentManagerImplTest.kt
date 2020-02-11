@@ -8,10 +8,10 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.spy
-import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,7 +30,7 @@ class LongConsentManagerImplTest {
     private val module by lazy {
         TestAppModule(
             app,
-            loginInfoManagerRule = DependencyRule.MockRule
+            loginInfoManagerRule = DependencyRule.MockkRule
         )
     }
 
@@ -38,28 +38,28 @@ class LongConsentManagerImplTest {
     fun setUp() {
         UnitTestConfig(this, module).fullSetup()
 
-        whenever { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } thenReturn PROJECT_ID_TEST
+        every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns PROJECT_ID_TEST
     }
 
     @Test
     fun createBaseFilePath_shouldHaveTheRightPath() {
-        val longConsentManager = LongConsentManagerImpl(ABSOLUTE_PATH, mock(), mock())
+        val longConsentManager = LongConsentManagerImpl(ABSOLUTE_PATH, mockk(), mockk())
         assertThat(longConsentManager.baseFilePath.toString()).isEqualTo(LONG_CONSENTS_PATH)
     }
 
     @Test
     fun createLocalFilePath_shouldHaveTheRightPath() {
-        val longConsentManagerSpy = spy(LongConsentManagerImpl(ABSOLUTE_PATH, loginInfoManagerMock, mock()))
-        val baseFilePathMock = mock<File>()
-        whenever { baseFilePathMock.absolutePath } thenReturn LONG_CONSENTS_PATH
-        whenever(longConsentManagerSpy) { baseFilePath } thenReturn baseFilePathMock
+        val longConsentManagerSpy = spyk(LongConsentManagerImpl(ABSOLUTE_PATH, loginInfoManagerMock, mockk()))
+        val baseFilePathMock = mockk<File>()
+        every { baseFilePathMock.absolutePath } returns LONG_CONSENTS_PATH
+        every { longConsentManagerSpy.baseFilePath } returns baseFilePathMock
 
         assertThat(longConsentManagerSpy.filePathForProject.toString()).contains("$LONG_CONSENTS_PATH/$PROJECT_ID_TEST")
     }
 
     @Test
     fun createFileForLanguage_shouldHaveTheRightPath() {
-        val longConsentManager = LongConsentManagerImpl(ABSOLUTE_PATH, mock(), mock())
+        val longConsentManager = LongConsentManagerImpl(ABSOLUTE_PATH, mockk(), mockk())
         val filePathForProject = File("$ABSOLUTE_PATH/$PROJECT_ID_TEST")
 
         assertThat(longConsentManager.createFileForLanguage(filePathForProject, EN).toString()).contains("$ABSOLUTE_PATH/$PROJECT_ID_TEST/$EN.txt")

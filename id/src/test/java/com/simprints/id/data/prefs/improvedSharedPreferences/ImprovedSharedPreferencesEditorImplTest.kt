@@ -2,12 +2,11 @@ package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.content.SharedPreferences
 import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeException
-import com.simprints.testtools.common.syntax.assertThrows
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.verifyOnlyInteraction
-import com.simprints.testtools.common.syntax.whenever
+import io.kotlintest.shouldThrow
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verifyAll
 import org.junit.Test
-import org.mockito.ArgumentMatchers.*
 
 class ImprovedSharedPreferencesEditorImplTest {
 
@@ -27,76 +26,70 @@ class ImprovedSharedPreferencesEditorImplTest {
     private val baseEditor: SharedPreferences.Editor = mockBaseEditor()
 
     private val improvedEditor: ImprovedSharedPreferences.Editor =
-            ImprovedSharedPreferencesEditorImpl(baseEditor)
+        ImprovedSharedPreferencesEditorImpl(baseEditor)
 
     private fun mockBaseEditor(): SharedPreferences.Editor {
-        val editor = mock<SharedPreferences.Editor>()
-        whenever(editor.putString(anyString(), anyString()))
-                .thenReturn(editor)
-        whenever(editor.putLong(anyString(), anyLong()))
-                .thenReturn(editor)
-        whenever(editor.putLong(anyString(), anyLong()))
-                .thenReturn(editor)
-        whenever(editor.putInt(anyString(), anyInt()))
-                .thenReturn(editor)
-        whenever(editor.putBoolean(anyString(), anyBoolean()))
-                .thenReturn(editor)
-        whenever(editor.putFloat(anyString(), anyFloat()))
-                .thenReturn(editor)
+        val editor = mockk<SharedPreferences.Editor>()
+        every { editor.putString(any(), any()) } returns editor
+        every { editor.putLong(any(), any()) } returns editor
+        every { editor.putLong(any(), any()) } returns editor
+        every { editor.putInt(any(), any()) } returns editor
+        every { editor.putBoolean(any(), any()) } returns editor
+        every { editor.putFloat(any(), any()) } returns editor
         return editor
     }
 
     @Test
     fun testPutPrimitivePutsIntWhenValueIsByte() {
         improvedEditor.putPrimitive(aKey, aByte)
-        verifyOnlyInteraction(baseEditor) { putInt(aKey, aByte.toInt()) }
+        verifyAll { baseEditor.putInt(aKey, aByte.toInt()) }
     }
 
     @Test
     fun testPutPrimitivePutsIntWhenValueIsShort() {
         improvedEditor.putPrimitive(aKey, aShort)
-        verifyOnlyInteraction(baseEditor) { putInt(aKey, aShort.toInt()) }
+        verifyAll { baseEditor.putInt(aKey, aShort.toInt()) }
     }
 
     @Test
     fun testPutPrimitivePutsIntWhenValueIsInt() {
         improvedEditor.putPrimitive(aKey, anInt)
-        verifyOnlyInteraction(baseEditor) { putInt(aKey, anInt) }
+        verifyAll { baseEditor.putInt(aKey, anInt) }
     }
 
     @Test
     fun testPutPrimitivePutsLongWhenValueIsLong() {
         improvedEditor.putPrimitive(aKey, aLong)
-        verifyOnlyInteraction(baseEditor) { putLong(aKey, aLong) }
+        verifyAll { baseEditor.putLong(aKey, aLong) }
     }
 
     @Test
     fun testPutPrimitivePutsFloatWhenValueIsFloat() {
         improvedEditor.putPrimitive(aKey, aFloat)
-        verifyOnlyInteraction(baseEditor) { putFloat(aKey, aFloat) }
+        verifyAll { baseEditor.putFloat(aKey, aFloat) }
     }
 
     @Test
     fun testPutPrimitivePutsLongBytesWhenValueIsDouble() {
         improvedEditor.putPrimitive(aKey, aDouble)
-        verifyOnlyInteraction(baseEditor) { putLong(aKey, aDouble.toRawBits()) }
+        verifyAll { baseEditor.putLong(aKey, aDouble.toRawBits()) }
     }
 
     @Test
     fun testPutPrimitivePutsStringWhenValueIsString() {
         improvedEditor.putPrimitive(aKey, aString)
-        verifyOnlyInteraction(baseEditor) { putString(aKey, aString) }
+        verifyAll { baseEditor.putString(aKey, aString) }
     }
 
     @Test
     fun testPutPrimitivePutsBooleanWhenValueIsBoolean() {
         improvedEditor.putPrimitive(aKey, aBoolean)
-        verifyOnlyInteraction(baseEditor) { putBoolean(aKey, aBoolean) }
+        verifyAll { baseEditor.putBoolean(aKey, aBoolean) }
     }
 
     @Test
     fun testPutPrimitiveThrowsExceptionWhenValueIsUnsupportedType() {
-        assertThrows<NonPrimitiveTypeException> {
+        shouldThrow<NonPrimitiveTypeException> {
             improvedEditor.putPrimitive(aKey, aClass)
         }
     }

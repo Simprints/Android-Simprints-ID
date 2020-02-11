@@ -13,29 +13,22 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.MATCH
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
-import com.simprints.id.orchestrator.verifyAppRequest
 import com.simprints.id.testtools.TestApplication
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.verify
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class)
 class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
-    @Mock lateinit var preferencesManagerMock: PreferencesManager
+    @MockK lateinit var preferencesManagerMock: PreferencesManager
 
     private val faceRequestFactory: FaceRequestFactory = FaceRequestFactoryImpl()
     private lateinit var faceStepProcess: FaceStepProcessor
@@ -50,13 +43,13 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
+        MockKAnnotations.init(this, relaxed = true)
         with(preferencesManagerMock) {
-            whenever(language) thenReturn "en"
-            whenever(fingerStatus) thenReturn emptyMap()
-            whenever(logoExists) thenReturn true
-            whenever(organizationName) thenReturn "some_org"
-            whenever(programName) thenReturn "some_name"
+            every { this@with.language } returns "en"
+            every { this@with.fingerStatus } returns emptyMap()
+            every { this@with.logoExists } returns true
+            every { this@with.organizationName } returns "some_org"
+            every { this@with.programName } returns "some_name"
         }
 
         faceStepProcess = FaceStepProcessorImpl(faceRequestFactory)
@@ -70,12 +63,12 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
         iFaceResponseMock = mockk()
         every {
             iFaceResponseMock.fromModuleApiToDomain()
-        } returns mock()
+        } returns mockk()
     }
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForVerify() {
-        val step = faceStepProcess.buildStepMatch(mock(), mock())
+        val step = faceStepProcess.buildStepMatch(mockk(), mockk())
 
         verifyFaceIntent<FaceMatchRequest>(step, MATCH.value)
     }
@@ -89,7 +82,7 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForIdentify() {
-        val step = faceStepProcess.buildStepMatch(mock(), mock())
+        val step = faceStepProcess.buildStepMatch(mockk(), mockk())
 
         verifyFaceIntent<FaceMatchRequest>(step, MATCH.value)
     }

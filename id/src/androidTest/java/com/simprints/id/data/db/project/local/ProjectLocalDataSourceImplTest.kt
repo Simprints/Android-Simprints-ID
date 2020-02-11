@@ -23,12 +23,11 @@ class ProjectLocalDataSourceImplTest : RealmTestsBase() {
 
     private lateinit var realm: Realm
     private lateinit var projectLocalDataSource: ProjectLocalDataSource
-    private val project = Project().apply {
-        id = DEFAULT_PROJECT_ID
-        name = "some_name"
-        description = "some_description"
-        creator = "some_creator"
-    }
+    private val project = Project(
+        DEFAULT_PROJECT_ID,
+        "some_name",
+        "some_description",
+        "some_creator")
 
 
     private val loginInfoManagerMock = mock<LoginInfoManager>().apply {

@@ -14,17 +14,18 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
-import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.AdditionalAnswers
-import org.mockito.Mockito
-import org.mockito.Mockito.spy
 import org.robolectric.annotation.Config
 import java.io.IOException
 
@@ -34,9 +35,9 @@ class SessionEventsMasterTaskTest {
 
     private val projectId = "projectId"
 
-    private val sessionsRemoteInterfaceMock: SessionsRemoteInterface = mock()
-    private val sessionsEventsManagerMock: SessionEventsManager = mock()
-    private val crashReportManagerMock: CrashReportManager = mock()
+    private val sessionsRemoteInterfaceMock: SessionsRemoteInterface = mockk()
+    private val sessionsEventsManagerMock: SessionEventsManager = mockk()
+    private val crashReportManagerMock: CrashReportManager = mockk()
     private val timeHelper: TimeHelper = TimeHelperImpl()
     private var sessionsInFakeDb = mutableListOf<SessionEvents>()
 
@@ -68,26 +69,26 @@ class SessionEventsMasterTaskTest {
 
     @Test
     fun manySessions_shouldBeUploadInBatches() {
-        with(spy(createMasterTask())) {
+        with(spyk(createMasterTask())) {
             mockOneSucceedingAndOneFailingUploadTask(this, NoSessionsFoundException())
             sessionsInFakeDb.addAll(createClosedSessions(BATCH_SIZE + 1))
 
             val testObserver = this.execute().test()
-        testObserver.awaitAndAssertSuccess()
+            testObserver.awaitAndAssertSuccess()
 
-            verifyNever(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
+            verify(exactly = 0) { crashReportManagerMock.logExceptionOrSafeException(any()) }
         }
     }
 
     @Test
     fun manySessions_shouldGenerateMultipleTasks() {
-        with(spy(createMasterTask())) {
+        with(spyk(createMasterTask())) {
             var batchedUploaded = 0
             val sessionsFirstBatch = createClosedSessions(BATCH_SIZE).toList()
             val sessionsSecondBatch = createClosedSessions(1)
             val batchesToUpload = Observable.fromIterable(listOf(sessionsFirstBatch, sessionsSecondBatch))
-            Mockito.doReturn(Completable.complete().doOnComplete { batchedUploaded++ })
-                .`when`(this).createUploadBatchTaskCompletable(anyNotNull())
+
+            every { this@with.createUploadBatchTaskCompletable(any()) } returns Completable.complete().doOnComplete { batchedUploaded++ }
 
             val testObserver = batchesToUpload
                 .executeUploaderTask()
@@ -100,7 +101,7 @@ class SessionEventsMasterTaskTest {
 
     @Test
     fun someUploadBatchFails_shouldLogTheException() {
-        with(spy(createMasterTask())) {
+        with(spyk(createMasterTask())) {
             mockOneSucceedingAndOneFailingUploadTask(this)
 
             val testObserver =
@@ -109,13 +110,13 @@ class SessionEventsMasterTaskTest {
                     .test()
 
             testObserver.awaitAndAssertSuccess()
-            verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
+            verify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
         }
     }
 
     @Test
     fun someUploadBatchFailsDueToNoSessionsFoundException_shouldNoLogTheException() {
-        with(spy(createMasterTask())) {
+        with(spyk(createMasterTask())) {
             mockOneSucceedingAndOneFailingUploadTask(this, NoSessionsFoundException())
 
             val testObserver =
@@ -124,15 +125,13 @@ class SessionEventsMasterTaskTest {
                     .test()
 
             testObserver.awaitAndAssertSuccess()
-            verifyNever(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
+            verify(exactly = 0) { crashReportManagerMock.logExceptionOrSafeException(any()) }
         }
     }
 
 
     private fun mockOneSucceedingAndOneFailingUploadTask(masterTaskSpy: SessionEventsSyncMasterTask, t: Throwable = IOException("network reason")) {
-        Mockito.doAnswer(AdditionalAnswers.returnsElementsOf<Completable>(
-            mutableListOf(Completable.complete(), Completable.error(t))
-        )).`when`(masterTaskSpy).createUploadBatchTaskCompletable(anyNotNull())
+        every { masterTaskSpy.createUploadBatchTaskCompletable(any()) } returns Completable.complete() andThen Completable.error(t)
     }
 
     private fun createMasterTask(): SessionEventsSyncMasterTask =

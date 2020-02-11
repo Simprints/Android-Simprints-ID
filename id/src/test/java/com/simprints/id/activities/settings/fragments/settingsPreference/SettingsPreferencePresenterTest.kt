@@ -81,5 +81,3 @@ class SettingsPreferencePresenterTest {
         } ?: Assert.fail("Action for open About Settings preference not set.")
     }
 }
-
-infix fun MockKStubScope<Unit, Unit>.just(runs: Runs) = answers(ConstantAnswer(Unit))

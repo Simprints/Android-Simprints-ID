@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator.steps
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
-import com.simprints.testtools.common.syntax.mock
+import io.mockk.mockk
 import org.junit.Test
 
 class StepTest {
@@ -15,8 +15,8 @@ class StepTest {
             requestCode = resultOk,
             activityName = "someActivityClassName",
             bundleKey = "bundle_key",
-            request = mock(),
-            result = mock(),
+            request = mockk(),
+            result = mockk(),
             status = ONGOING
         )
         assertThat(step.getStatus()).isEqualTo(COMPLETED)
