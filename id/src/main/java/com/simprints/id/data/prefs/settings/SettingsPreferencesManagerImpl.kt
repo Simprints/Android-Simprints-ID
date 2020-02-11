@@ -9,6 +9,9 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigCompl
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigPrimitivePreference
+import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
@@ -24,7 +27,8 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           languagesStringArraySerializer: Serializer<Array<String>>,
                                           moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
                                           peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>,
-                                          saveFingerprintImagesSerializer: Serializer<SaveFingerprintImagesStrategy>,
+                                          captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
+                                          saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
                                           scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>)
     : SettingsPreferencesManager {
 
@@ -93,8 +97,11 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val FINGER_IMAGES_EXIST_KEY = "FingerImagesExist"
         const val FINGER_IMAGES_EXIST_DEFAULT = true
 
-        val SAVE_FINGERPRINT_IMAGES_DEFAULT = SaveFingerprintImagesStrategy.COMPRESSED_1700_WSQ_15 // STOPSHIP
-        const val SAVE_FINGERPRINT_IMAGES_KEY = "SaveFingerprintImages"
+        val CAPTURE_FINGERPRINT_STRATEGY_DEFAULT = CaptureFingerprintStrategy.SECUGEN_ISO_1700_DPI
+        const val CAPTURE_FINGERPRINT_STRATEGY_KEY = "CaptureFingerprintStrategy"
+
+        val SAVE_FINGERPRINT_IMAGES_STRATEGY_DEFAULT = SaveFingerprintImagesStrategy.WSQ_15 // STOPSHIP
+        const val SAVE_FINGERPRINT_IMAGES_STRATEGY_KEY = "SaveFingerprintImagesStrategy"
 
         val SCANNER_GENERATIONS_DEFAULT = listOf(ScannerGeneration.VERO_2) // STOPSHIP
         const val SCANNER_GENERATIONS_KEY = "ScannerGenerations"
@@ -161,8 +168,11 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var fingerImagesExist: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, FINGER_IMAGES_EXIST_KEY, FINGER_IMAGES_EXIST_DEFAULT)
 
-    override var saveFingerprintImages: SaveFingerprintImagesStrategy
-        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SAVE_FINGERPRINT_IMAGES_KEY, SAVE_FINGERPRINT_IMAGES_DEFAULT, saveFingerprintImagesSerializer)
+    override var captureFingerprintStrategy: CaptureFingerprintStrategy
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, CAPTURE_FINGERPRINT_STRATEGY_KEY, CAPTURE_FINGERPRINT_STRATEGY_DEFAULT, captureFingerprintStrategySerializer)
+
+    override var saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SAVE_FINGERPRINT_IMAGES_STRATEGY_KEY, SAVE_FINGERPRINT_IMAGES_STRATEGY_DEFAULT, saveFingerprintImagesStrategySerializer)
 
     override var scannerGenerations: List<ScannerGeneration>
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SCANNER_GENERATIONS_KEY, SCANNER_GENERATIONS_DEFAULT, scannerGenerationsSerializer)
