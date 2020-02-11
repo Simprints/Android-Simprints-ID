@@ -8,7 +8,6 @@ import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.displayed
 import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.id.commontesttools.di.TestDashboardActivityModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
@@ -55,7 +54,7 @@ class DashboardActivityAndroidTest {
 
         openActionBarOverflowOrOptionsMenu(app.applicationContext)
 
-        onView(withText(R.string.menu_privacy_notice)).check(doesNotExist())
+        onView(withText("Privacy Notice")).check(doesNotExist())
     }
 
     @Test
@@ -65,7 +64,7 @@ class DashboardActivityAndroidTest {
         openActionBarOverflowOrOptionsMenu(app.applicationContext)
 
         displayed {
-            text(R.string.menu_privacy_notice)
+            text("Privacy Notice")
         }
     }
 
