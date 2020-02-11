@@ -39,7 +39,6 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.kotlintest.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
-import io.reactivex.Single
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -51,6 +50,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import kotlin.math.ceil
+
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
@@ -111,7 +111,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
         remoteDbManagerSpy = spyk(FirebaseManagerImpl(mockk()))
-        every { remoteDbManagerSpy.getCurrentToken() } returns Single.just("")
+        coEvery { remoteDbManagerSpy.getCurrentToken() } returns ""
 
         coEvery { personLocalDataSourceMock.insertOrUpdate(capture(peopleInFakeDb)) } returns Unit
         coEvery { downSyncScopeRepository.insertOrUpdate(capture(syncOpsInFakeDb)) } returns Unit
@@ -274,6 +274,42 @@ class PeopleDownSyncDownloaderTaskImplTest {
             assertThat(mockServer.requestCount).isEqualTo(1)
             coVerify(exactly = 2) { clientMock.downSync(any(), any(), any(), any(), any(), any()) }
         }
+    }
+
+    @Test
+    fun downSyncRequestFailsDueToMalformedJson_shouldSaveTheWellFormedElements() {
+        runBlocking {
+            val mockMalformedResponse = buildMalformedResponse(4)
+            mockServer.enqueue(mockMalformedResponse)
+
+            val syncTask = PeopleDownSyncDownloaderTaskImpl(
+                personLocalDataSourceMock,
+                personRemoteDataSourceMock,
+                downSyncScopeRepository,
+                peopleSyncCache,
+                TimeHelperImpl())
+
+            shouldThrow<Throwable> {
+                syncTask.execute(projectSyncOp, uniqueWorkerId, mockk(relaxed = true))
+            }
+            assertThat(mockServer.requestCount).isEqualTo(1)
+            coVerify(exactly = 1) {
+                personLocalDataSourceMock.insertOrUpdate(match {
+                    assertThat(it).hasSize(3)
+                    true
+                })
+            }
+        }
+    }
+
+    private fun buildMalformedResponse(malformedIndex: Int): MockResponse {
+        val response = mockSuccessfulResponseForPatients(prepareResponseForDownSyncOperation(projectSyncOp, 10))
+        val bodyString = String(response.getBody()?.readByteArray() ?: byteArrayOf())
+        val elements = bodyString.split("projectId")
+        val malformedElement = elements[malformedIndex - 1].replaceFirst("userId", "userId\"")
+        val newElements = (elements.subList(0, malformedIndex) + malformedElement + elements.subList(malformedIndex, 9)).joinToString(separator = "projectId")
+        response.setBody(newElements)
+        return response
     }
 
     private fun mockClientToThrowFirstAndThenExecuteNetworkCall(): PeopleRemoteInterface {

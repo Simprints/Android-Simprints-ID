@@ -1,7 +1,7 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
 import android.content.Context
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -14,7 +14,7 @@ import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
 
-class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
@@ -22,7 +22,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         Timber.d("SessionEventsMasterWorker doWork()")
         injectDependencies()
 
@@ -31,7 +31,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
                 loginInfoManager.getSignedInProjectIdOrEmpty(),
                 sessionEventsManager,
                 timeHelper,
-                remoteSessionsManager.getSessionsApiClient().blockingGet(),
+                remoteSessionsManager.getSessionsApiClient(),
                 crashReportManager
             )
             task.execute().blockingAwait()

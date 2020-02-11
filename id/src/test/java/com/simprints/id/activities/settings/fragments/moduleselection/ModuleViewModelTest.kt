@@ -4,8 +4,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.model.Module
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -15,7 +15,7 @@ import org.koin.core.context.stopKoin
 @RunWith(AndroidJUnit4::class)
 class ModuleViewModelTest {
 
-    private val repository: ModuleRepository = mock()
+    private val repository: ModuleRepository = mockk()
     private lateinit var viewModel: ModuleViewModel
 
     @Before
@@ -56,13 +56,13 @@ class ModuleViewModelTest {
     }
 
     private fun configureMock() {
-        whenever {
+        every {
             repository.getModules()
-        } thenReturn listOf(
-                Module("a", false),
-                Module("b", true),
-                Module("c", true),
-                Module("d", false)
-            )
+        } returns listOf(
+            Module("a", false),
+            Module("b", true),
+            Module("c", true),
+            Module("d", false)
+        )
     }
 }

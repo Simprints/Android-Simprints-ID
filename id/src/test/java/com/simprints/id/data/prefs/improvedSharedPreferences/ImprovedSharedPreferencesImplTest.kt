@@ -3,13 +3,12 @@ package com.simprints.id.data.prefs.improvedSharedPreferences
 import android.content.SharedPreferences
 import com.simprints.id.exceptions.unexpected.MismatchedTypeException
 import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeException
-import com.simprints.testtools.common.syntax.assertThrows
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.verifyOnlyInteraction
-import com.simprints.testtools.common.syntax.whenever
+import io.kotlintest.shouldThrow
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verifyAll
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.ArgumentMatchers.*
 import kotlin.reflect.KClass
 
 class ImprovedSharedPreferencesImplTest {
@@ -35,26 +34,26 @@ class ImprovedSharedPreferencesImplTest {
     }
 
     private val basePrefs: SharedPreferences =
-            mockBasePrefsWithValues(storedInt, storedLong, storedFloat, storedString, storedBoolean)
+        mockBasePrefsWithValues(storedInt, storedLong, storedFloat, storedString, storedBoolean)
 
     private val improvedPrefs: ImprovedSharedPreferences =
-            ImprovedSharedPreferencesImpl(basePrefs)
+        ImprovedSharedPreferencesImpl(basePrefs)
 
     private fun mockBasePrefsWithValues(int: Int, long: Long, float: Float, string: String,
                                         boolean: Boolean): SharedPreferences {
-        val prefs = mock<SharedPreferences>()
-        whenever(prefs) { getInt(anyString(), anyInt()) } thenReturn int
-        whenever(prefs) { getLong(anyString(), anyLong()) } thenReturn long
-        whenever(prefs) { getFloat(anyString(), anyFloat()) } thenReturn float
-        whenever(prefs) { getString(anyString(), anyString()) } thenReturn string
-        whenever(prefs) { getBoolean(anyString(), anyBoolean()) } thenReturn boolean
+        val prefs = mockk<SharedPreferences>()
+        every { prefs.getInt(any(), any()) } returns int
+        every { prefs.getLong(any(), any()) } returns long
+        every { prefs.getFloat(any(), any()) } returns float
+        every { prefs.getString(any(), any()) } returns string
+        every { prefs.getBoolean(any(), any()) } returns boolean
         return prefs
     }
 
     @Test
     fun testGetPrimitiveGetsIntWhenDefaultIsByte() {
         improvedPrefs.getPrimitive(aKey, aByte)
-        verifyOnlyInteraction(basePrefs) { getInt(aKey, aByte.toInt()) }
+        verifyAll { basePrefs.getInt(aKey, aByte.toInt()) }
     }
 
     @Test
@@ -65,7 +64,7 @@ class ImprovedSharedPreferencesImplTest {
     @Test
     fun testGetPrimitiveGetsIntWhenDefaultIsShort() {
         improvedPrefs.getPrimitive(aKey, aShort)
-        verifyOnlyInteraction(basePrefs) { getInt(aKey, aShort.toInt()) }
+        verifyAll { basePrefs.getInt(aKey, aShort.toInt()) }
     }
 
     @Test
@@ -76,7 +75,7 @@ class ImprovedSharedPreferencesImplTest {
     @Test
     fun testGetPrimitiveGetsIntWhenDefaultIsInt() {
         improvedPrefs.getPrimitive(aKey, anInt)
-        verifyOnlyInteraction(basePrefs) { getInt(aKey, anInt) }
+        verifyAll { basePrefs.getInt(aKey, anInt) }
     }
 
     @Test
@@ -87,7 +86,7 @@ class ImprovedSharedPreferencesImplTest {
     @Test
     fun testGetPrimitiveGetsLongWhenDefaultIsLong() {
         improvedPrefs.getPrimitive(aKey, aLong)
-        verifyOnlyInteraction(basePrefs) { getLong(aKey, aLong) }
+        verifyAll { basePrefs.getLong(aKey, aLong) }
     }
 
     @Test
@@ -98,7 +97,7 @@ class ImprovedSharedPreferencesImplTest {
     @Test
     fun testGetPrimitiveGetsFloatWhenDefaultIsFloat() {
         improvedPrefs.getPrimitive(aKey, aFloat)
-        verifyOnlyInteraction(basePrefs) { getFloat(aKey, aFloat) }
+        verifyAll { basePrefs.getFloat(aKey, aFloat) }
     }
 
     @Test
@@ -109,7 +108,7 @@ class ImprovedSharedPreferencesImplTest {
     @Test
     fun testGetPrimitiveGetsLongWhenDefaultIsDouble() {
         improvedPrefs.getPrimitive(aKey, aDouble)
-        verifyOnlyInteraction(basePrefs) { getLong(aKey, aDouble.toRawBits()) }
+        verifyAll { basePrefs.getLong(aKey, aDouble.toRawBits()) }
     }
 
     @Test
@@ -120,7 +119,7 @@ class ImprovedSharedPreferencesImplTest {
     @Test
     fun testGetPrimitiveGetsBooleanWhenDefaultIsBoolean() {
         improvedPrefs.getPrimitive(aKey, aBoolean)
-        verifyOnlyInteraction(basePrefs) { getBoolean(aKey, aBoolean) }
+        verifyAll { basePrefs.getBoolean(aKey, aBoolean) }
     }
 
     @Test
@@ -131,7 +130,7 @@ class ImprovedSharedPreferencesImplTest {
     @Test
     fun testGetPrimitiveGetsStringWhenDefaultIsString() {
         improvedPrefs.getPrimitive(aKey, aString)
-        verifyOnlyInteraction(basePrefs) { getString(aKey, aString) }
+        verifyAll { basePrefs.getString(aKey, aString) }
     }
 
     @Test
@@ -141,15 +140,15 @@ class ImprovedSharedPreferencesImplTest {
 
     @Test
     fun testGetPrimitiveWrapsExceptionsAsMismatchedTypeExceptions() {
-        whenever { basePrefs.getInt(anyString(), anyInt()) } thenThrow ClassCastException()
-        assertThrows<MismatchedTypeException> {
+        every { basePrefs.getInt(any(), any()) } throws ClassCastException()
+        shouldThrow<MismatchedTypeException> {
             improvedPrefs.getPrimitive(aKey, anInt)
         }
     }
 
     @Test
     fun testGetPrimitiveThrowsExceptionWhenValueIsUnsupportedType() {
-        assertThrows<NonPrimitiveTypeException> {
+        shouldThrow<NonPrimitiveTypeException> {
             improvedPrefs.getPrimitive(aKey, aClass)
         }
     }

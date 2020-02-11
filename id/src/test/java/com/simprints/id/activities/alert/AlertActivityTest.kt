@@ -16,8 +16,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.whenever
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.request.AlertActRequest
@@ -36,9 +34,10 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.android.hasImage
 import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
+import io.mockk.every
+import io.mockk.verify
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -57,15 +56,15 @@ class AlertActivityTest {
 
     private val preferencesModule by lazy {
         TestPreferencesModule(
-            settingsPreferencesManagerRule = DependencyRule.SpyRule
+            settingsPreferencesManagerRule = DependencyRule.SpykRule
         )
     }
 
     private val module by lazy {
         TestAppModule(
             app,
-            sessionEventsManagerRule = DependencyRule.MockRule,
-            crashReportManagerRule = DependencyRule.MockRule)
+            sessionEventsManagerRule = DependencyRule.MockkRule,
+            crashReportManagerRule = DependencyRule.MockkRule)
     }
 
     @Before
@@ -79,7 +78,7 @@ class AlertActivityTest {
         launchAlertActivity()
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
-        verifyOnce(sessionEventManagerMock) { addEventInBackground(any<AlertScreenEvent>()) }
+        verify(atLeast = 1) { sessionEventManagerMock.addEventInBackground(any<AlertScreenEvent>()) }
     }
 
     @Test
@@ -159,7 +158,7 @@ class AlertActivityTest {
 
     @Test
     fun guidNotFoundOffline_userClicksBack_shouldStartExitForm() {
-        whenever(preferencesManagerSpy.modalities).thenReturn(listOf(Modality.FINGER))
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FINGER)
 
         val scenario = launchAlertActivity(AlertActRequest(AlertType.GUID_NOT_FOUND_OFFLINE))
         ensureAlertScreenLaunched(AlertActivityViewModel.GUID_NOT_FOUND_OFFLINE)

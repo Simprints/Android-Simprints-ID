@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="loading_candidates">Loading candidates…</string>
+    <string name="loaded_candidates_quantity_key" translatable="false">loaded_candidates</string>
+    <string name="loaded_candidates_one">Loaded %d candidate.</string>
+    <string name="loaded_candidates_other">Loaded %d candidates.</string>
+    <string name="matching_fingerprints">Matching fingerprints…</string>
+    <string name="returning_results">Returning results…</string>
+    <string name="returned_results_quantity_key" translatable="false">returned_results</string>
+    <string name="returned_results_one">Returned %d results.</string>
+    <string name="returned_results_other">Returned %d results.</string>
+    <string name="tier1or2_matches_quantity_key" translatable="false">tier1or2_matches</string>
+    <string name="tier1or2_matches_zero">No very good matches</string>
+    <string name="tier1or2_matches_one">%d very good match</string>
+    <string name="tier1or2_matches_other">%d very good matches</string>
+    <string name="tier3_matches_quantity_key" translatable="false">tier3_matches</string>
+    <string name="tier3_matches_zero">No good matches</string>
+    <string name="tier3_matches_one">%d good match</string>
+    <string name="tier3_matches_other">%d good matches</string>
+    <string name="tier4_matches_quantity_key" translatable="false">tier4_matches</string>
+    <string name="tier4_matches_zero">No matches</string>
+    <string name="tier4_matches_one">%d match</string>
+    <string name="tier4_matches_other">%d matches</string>
+</resources>

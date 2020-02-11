@@ -6,13 +6,14 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.RealmTestsBase
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.models.DbProject
-import com.simprints.id.data.db.project.local.models.toRealmProject
+import com.simprints.id.data.db.project.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
+import io.mockk.mockk
 import io.realm.Realm
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -23,30 +24,37 @@ class ProjectLocalDataSourceImplTest : RealmTestsBase() {
 
     private lateinit var realm: Realm
     private lateinit var projectLocalDataSource: ProjectLocalDataSource
-    private val project = Project().apply {
-        id = DEFAULT_PROJECT_ID
-        name = "some_name"
-        description = "some_description"
-        creator = "some_creator"
+
+    private val project = Project(
+        DEFAULT_PROJECT_ID,
+        "some_name",
+        "some_description",
+        "some_creator")
+
+    private val loginInfoManagerMock = mockk<LoginInfoManager>().apply {
+        every { getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }
 
-
-    private val loginInfoManagerMock = mock<LoginInfoManager>().apply {
-        whenever(this) { getSignedInProjectIdOrEmpty() }
-            .thenReturn(DEFAULT_PROJECT_ID)
-    }
-    private val secureLocalDbKeyProviderMock = mock<SecureLocalDbKeyProvider>().apply {
-        whenever(this) { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
-            .thenReturn(LocalDbKey(newDatabaseName, newDatabaseKey))
+    private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>().apply {
+        every {
+            getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID)
+        } returns LocalDbKey(newDatabaseName, newDatabaseKey)
     }
 
     @Before
+    @FlowPreview
     fun setup() {
-        realm = Realm.getInstance(config)
-        realm.executeTransaction {
-            it.where(DbProject::class.java).findAll().deleteAllFromRealm()
+        realm = Realm.getInstance(config).apply {
+            executeTransaction {
+                it.where(DbProject::class.java).findAll().deleteAllFromRealm()
+            }
         }
-        projectLocalDataSource = ProjectLocalDataSourceImpl(testContext, secureLocalDbKeyProviderMock, loginInfoManagerMock)
+
+        projectLocalDataSource = ProjectLocalDataSourceImpl(
+            testContext,
+            secureLocalDbKeyProviderMock,
+            loginInfoManagerMock
+        )
     }
 
     @Test
@@ -54,14 +62,15 @@ class ProjectLocalDataSourceImplTest : RealmTestsBase() {
         projectLocalDataSource.save(project)
 
         realm.executeTransaction {
-            assertThat(realm.where(DbProject::class.java).findFirst()?.id).isEqualTo(DEFAULT_PROJECT_ID)
+            assertThat(realm.where(DbProject::class.java).findFirst()?.id)
+                .isEqualTo(DEFAULT_PROJECT_ID)
         }
     }
 
     @Test
     fun load_shouldLoadAProjectFromTheDb() = runBlocking {
         realm.executeTransaction {
-            assertThat(it.insertOrUpdate(project.toRealmProject()))
+            assertThat(it.insertOrUpdate(project.fromDomainToDb()))
         }
 
         val projectFromDb = projectLocalDataSource.load(DEFAULT_PROJECT_ID)
@@ -75,4 +84,5 @@ class ProjectLocalDataSourceImplTest : RealmTestsBase() {
 
         assertThat(projectFromDb).isNull()
     }
+
 }
