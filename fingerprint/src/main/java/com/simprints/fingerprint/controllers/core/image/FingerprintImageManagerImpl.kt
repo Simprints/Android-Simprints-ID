@@ -23,7 +23,7 @@ class FingerprintImageManagerImpl(private val coreImageRepository: ImageReposito
         val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, path)
 
         return if (securedImageRef != null) {
-            FingerprintImageRef(securedImageRef.path.toDomain())
+            FingerprintImageRef(securedImageRef.relativePath.toDomain())
         } else {
             Timber.e("Saving image failed for captureId $captureEventId")
             null
