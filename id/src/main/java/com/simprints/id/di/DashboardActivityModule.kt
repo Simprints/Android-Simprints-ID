@@ -2,6 +2,12 @@ package com.simprints.id.di
 
 import android.content.Context
 import com.simprints.id.activities.dashboard.DashboardViewModelFactory
+import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSource
+import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSourceImpl
+import com.simprints.id.activities.dashboard.cards.daily_activity.displayer.DashboardDailyActivityCardDisplayer
+import com.simprints.id.activities.dashboard.cards.daily_activity.displayer.DashboardDailyActivityCardDisplayerImpl
+import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
+import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepositoryImpl
 import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
 import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayerImpl
 import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
@@ -13,6 +19,7 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.tools.AndroidResourcesHelper
@@ -60,13 +67,38 @@ open class DashboardActivityModule {
     )
 
     @Provides
+    open fun provideDailyActivityRepository(
+        localDataSource: DailyActivityLocalDataSource,
+        timeHelper: TimeHelper
+    ): DashboardDailyActivityRepository = DashboardDailyActivityRepositoryImpl(
+        localDataSource,
+        timeHelper
+    )
+
+    @Provides
+    open fun provideDailyActivityLocalDataSource(
+        preferencesManager: RecentEventsPreferencesManager
+    ): DailyActivityLocalDataSource = DailyActivityLocalDataSourceImpl(preferencesManager)
+
+    @Provides
+    open fun provideDashboardDailyActivityCardDisplayer(
+        timeHelper: TimeHelper,
+        androidResourcesHelper: AndroidResourcesHelper
+    ): DashboardDailyActivityCardDisplayer = DashboardDailyActivityCardDisplayerImpl(
+        timeHelper,
+        androidResourcesHelper
+    )
+
+    @Provides
     open fun provideDashboardViewModelFactory(
         projectDetailsRepository: DashboardProjectDetailsRepository,
-        syncCardStateRepository: DashboardSyncCardStateRepository
+        syncCardStateRepository: DashboardSyncCardStateRepository,
+        dailyActivityRepository: DashboardDailyActivityRepository
     ): DashboardViewModelFactory {
         return DashboardViewModelFactory(
             projectDetailsRepository,
-            syncCardStateRepository
+            syncCardStateRepository,
+            dailyActivityRepository
         )
     }
 

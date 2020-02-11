@@ -11,6 +11,7 @@ import com.simprints.id.data.db.common.models.totalCount
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
 import com.simprints.id.services.scheduledSync.people.common.filterByTags
+import com.simprints.id.services.scheduledSync.people.common.sortByScheduledTime
 import com.simprints.id.services.scheduledSync.people.down.workers.extractDownSyncProgress
 import com.simprints.id.services.scheduledSync.people.down.workers.getDownCountsFromOutput
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
@@ -22,7 +23,7 @@ import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncSt
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.Companion.fromWorkInfo
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.*
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
+import com.simprints.id.services.scheduledSync.people.master.workers.PeopleStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import com.simprints.id.services.scheduledSync.people.up.workers.extractUpSyncProgress
 import com.simprints.id.services.scheduledSync.people.up.workers.getUpCountsFromOutput
 import timber.log.Timber
@@ -53,13 +54,15 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
 
 
     private fun observerForLastSyncId(): LiveData<String> {
-        return syncWorkersLiveDataProvider.getMasterWorkersLiveData().switchMap { masterWorkers ->
+        return syncWorkersLiveDataProvider.getStartSyncReportersLiveData().switchMap { startSyncReporters ->
             Timber.tag(SYNC_LOG_TAG).d("Update from MASTER_SYNC_SCHEDULERS")
 
-            val completedSyncMaster = masterWorkers.completedWorkers()
+            val completedSyncMaster = startSyncReporters.completedWorkers()
+            val mostRecentSyncMaster = completedSyncMaster.sortByScheduledTime().lastOrNull()
+
             MutableLiveData<String>().apply {
-                if (completedSyncMaster.isNotEmpty()) {
-                    val lastSyncId = completedSyncMaster.mapNotNull { it.outputData.getString(OUTPUT_LAST_SYNC_ID) }.firstOrNull()
+                if (mostRecentSyncMaster != null) {
+                    val lastSyncId = mostRecentSyncMaster.outputData.getString(SYNC_ID_STARTED)
                     if (!lastSyncId.isNullOrBlank()) {
                         Timber.tag(SYNC_LOG_TAG).d("Last sync id $lastSyncId}")
                         this.postValue(lastSyncId)

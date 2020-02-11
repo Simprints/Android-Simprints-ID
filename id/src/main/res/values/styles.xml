@@ -96,10 +96,8 @@
 
     <!-- Dashboard -->
     <style name="DashboardCardStyle">
-        <item name="android:layout_marginTop">12dp</item>
-        <item name="android:layout_marginLeft">12dp</item>
-        <item name="android:layout_marginRight">12dp</item>
-        <item name="android:layout_marginBottom">0dp</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
         <item name="cardCornerRadius">8dp</item>
     </style>
 
@@ -114,12 +112,14 @@
         <item name="android:textStyle">bold</item>
         <item name="android:layout_gravity">left</item>
         <item name="android:layout_marginBottom">@dimen/activity_dashboard_card_space_below_title</item>
+        <item name="android:fontFamily">@font/muli</item>
     </style>
 
     <style name="DashboardCardStyleLastSync">
         <item name="android:textColor">@color/colorAccent</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/muli</item>
     </style>
 
     <!-- Common -->

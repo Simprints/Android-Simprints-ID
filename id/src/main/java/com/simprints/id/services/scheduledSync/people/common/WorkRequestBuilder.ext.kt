@@ -60,8 +60,11 @@ internal fun WorkRequest.Builder<*, *>.addCommonTagForUpCounters(): WorkRequest.
     this.addTag(tagForType(UP_COUNTER))
 
 // Last Sync Reporter Worker tags
-internal fun WorkRequest.Builder<*, *>.addTagForLastSyncReporter(): WorkRequest.Builder<*, *> =
-    this.addTag(tagForType(LAST_SYNC_REPORTER))
+internal fun WorkRequest.Builder<*, *>.addTagForEndSyncReporter(): WorkRequest.Builder<*, *> =
+    this.addTag(tagForType(END_SYNC_REPORTER))
+
+internal fun WorkRequest.Builder<*, *>.addTagForStartSyncReporter(): WorkRequest.Builder<*, *> =
+    this.addTag(tagForType(START_SYNC_REPORTER))
 
 // Master Worker tags
 internal fun WorkRequest.Builder<*, *>.addTagForSyncMasterWorkers(): WorkRequest.Builder<*, *> = this.addTag(MASTER_SYNC_SCHEDULERS)
@@ -88,3 +91,4 @@ internal fun List<WorkInfo>.filterByTags(vararg tagsToFilter: String) =
 internal fun WorkManager.getAllPeopleSyncWorkersInfo() = getWorkInfosByTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
 internal fun WorkManager.cancelAllPeopleSyncWorkers() = cancelAllWorkByTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
 internal fun MutableList<WorkInfo>.sortByScheduledTime() = sortBy { it -> it.tags.first { it.contains(TAG_SCHEDULED_AT) } }
+internal fun List<WorkInfo>.sortByScheduledTime() = sortedBy { it -> it.tags.first { it.contains(TAG_SCHEDULED_AT) } }

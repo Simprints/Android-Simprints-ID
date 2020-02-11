@@ -29,7 +29,7 @@ interface ImprovedSharedPreferences {
      * Note that you must call [Editor.commit] or [Editor.apply] to have any
      * changes you perform in the Editor actually show up in the preferencesManager.
      */
-    fun edit(): ImprovedSharedPreferences.Editor
+    fun edit(): Editor
 
     fun getString(key: String, defaultValue: String): String
 
@@ -50,7 +50,7 @@ interface ImprovedSharedPreferences {
          *
          * Throw a [NonPrimitiveTypeException] if T is not a primitive type.
          */
-        fun <T : Any> putPrimitive(key: String, value: T): ImprovedSharedPreferences.Editor
+        fun <T : Any> putPrimitive(key: String, value: T): Editor
 
         fun commit()
 

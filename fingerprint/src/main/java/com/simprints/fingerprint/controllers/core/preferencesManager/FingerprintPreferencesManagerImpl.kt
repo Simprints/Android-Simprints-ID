@@ -9,18 +9,6 @@ import com.simprints.id.data.prefs.settings.SaveFingerprintImagesStrategy as IdS
 
 class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager) : FingerprintPreferencesManager {
 
-    override var lastVerificationDate: Date? = prefs.lastVerificationDate
-        set(value) {
-            field = value
-            prefs.lastVerificationDate = field
-        }
-
-    override var lastIdentificationDate: Date? = prefs.lastIdentificationDate
-        set(value) {
-            field = value
-            prefs.lastIdentificationDate = field
-        }
-
     override var lastScannerUsed: String = prefs.lastScannerUsed
         set(value) {
             field = value

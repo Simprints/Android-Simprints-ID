@@ -25,11 +25,19 @@ class AndroidTestConfig<T : Any>(
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private lateinit var testAppComponent: AppComponentForAndroidTests
 
-    fun fullSetup() =
-        initAndInjectComponent()
-            .initRxIdler()
-            .initRealm()
-            .initModules()
+    fun fullSetup() = initAndInjectComponent()
+        .initRxIdler()
+        .initRealm()
+        .initModules()
+
+    fun initAndInjectComponent() = initComponent().inject()
+
+    fun componentBuilder() = DaggerAppComponentForAndroidTests.builder()
+        .application(app)
+        .appModule(appModule ?: TestAppModule(app))
+        .dataModule(dataModule ?: TestDataModule())
+        .preferencesModule(preferencesModule ?: TestPreferencesModule())
+        .syncModule(syncModule ?: TestSyncModule())
 
     private fun initRxIdler() = also {
         RxJavaPlugins.setInitComputationSchedulerHandler(Rx2Idler.create("RxJava 2.x Computation Scheduler"))
@@ -37,22 +45,14 @@ class AndroidTestConfig<T : Any>(
         RxJavaPlugins.setInitNewThreadSchedulerHandler(Rx2Idler.create("RxJava 2.x New Thread Scheduler"))
         RxJavaPlugins.setInitSingleSchedulerHandler(Rx2Idler.create("RxJava 2.x Single Scheduler"))
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(Rx2Idler.create("RxJava 2.x Main Scheduler"))
-
     }
 
-    fun initAndInjectComponent() =
-        initComponent().inject()
+    private fun initRealm() = also {
+        Realm.init(app)
+    }
 
     private fun initComponent() = also {
-
-        testAppComponent = DaggerAppComponentForAndroidTests.builder()
-            .application(app)
-            .appModule(appModule ?: TestAppModule(app))
-            .dataModule(dataModule ?: TestDataModule())
-            .preferencesModule(preferencesModule ?: TestPreferencesModule())
-            .syncModule(syncModule ?: TestSyncModule())
-            .build()
-
+        testAppComponent = componentBuilder().build()
         app.component = testAppComponent
     }
 
@@ -60,11 +60,8 @@ class AndroidTestConfig<T : Any>(
         injectClassFromComponent(testAppComponent, test)
     }
 
-    fun initRealm() = also {
-        Realm.init(app)
-    }
-
-    fun initModules() = also {
+    private fun initModules() = also {
         app.initModules()
     }
+
 }

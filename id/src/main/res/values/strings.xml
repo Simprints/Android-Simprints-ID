@@ -221,6 +221,20 @@
     <string name="dashboard_card_to_download">To Download</string>
     <string name="dashboard_card_syncing">Syncing…</string>
     <string name="dashboard_card_calculating">Calculating…</string>
+    <string name="dashboard_card_activity">Activity: %1$s</string>
+
+    <plurals name="dashboard_card_enrolments">
+        <item quantity="one">Enrolment</item>
+        <item quantity="other">Enrolments</item>
+    </plurals>
+    <plurals name="dashboard_card_identifications">
+        <item quantity="one">Identification</item>
+        <item quantity="other">Identifications</item>
+    </plurals>
+    <plurals name="dashboard_card_verifications">
+        <item quantity="one">Verification</item>
+        <item quantity="other">Verifications</item>
+    </plurals>
 
     <string name="menu_privacy_notice">Privacy Notice</string>
     <string name="privacy_notice_title">Privacy Notice</string>

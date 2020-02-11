@@ -119,7 +119,7 @@ open class AppModule {
 
     @Provides
     @Singleton
-    fun provideRecentEventsPreferencesManager(prefs: ImprovedSharedPreferences): RecentEventsPreferencesManager =
+    open fun provideRecentEventsPreferencesManager(prefs: ImprovedSharedPreferences): RecentEventsPreferencesManager =
         RecentEventsPreferencesManagerImpl(prefs)
 
     @Provides

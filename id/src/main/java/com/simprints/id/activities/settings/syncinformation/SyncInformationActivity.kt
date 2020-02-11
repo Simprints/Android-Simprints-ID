@@ -92,6 +92,9 @@ class SyncInformationActivity : AppCompatActivity() {
         if (isModuleSyncAndModuleIdOptionsNotEmpty()) {
             moduleSelectionButton.visibility = View.VISIBLE
             modulesTabHost.visibility = View.VISIBLE
+        } else {
+            moduleSelectionButton.visibility = View.GONE
+            modulesTabHost.visibility = View.GONE
         }
     }
 

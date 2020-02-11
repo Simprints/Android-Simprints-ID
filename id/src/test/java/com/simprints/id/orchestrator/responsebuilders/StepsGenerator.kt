@@ -16,7 +16,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.testtools.common.syntax.mock
+import io.mockk.mockk
 
 fun mockFingerprintCaptureStep(): Step {
     val request = FingerprintCaptureRequest(
@@ -45,7 +45,7 @@ fun mockFingerprintCaptureStep(): Step {
 }
 
 fun mockFingerprintMatchStep(): Step {
-    val request = FingerprintMatchRequest(mock(), mock())
+    val request = FingerprintMatchRequest(mockk(), mockk())
 
     return Step(
         requestCode = 234,
@@ -81,7 +81,7 @@ fun mockFaceCaptureStep(): Step {
 }
 
 fun mockFaceMatchStep(): Step {
-    val request = FaceMatchRequest(mock(), mock())
+    val request = FaceMatchRequest(mockk(), mockk())
 
     val response =
         FaceMatchResponse(listOf(FaceMatchResult(guidFound = "guid", confidence = 75f)))
