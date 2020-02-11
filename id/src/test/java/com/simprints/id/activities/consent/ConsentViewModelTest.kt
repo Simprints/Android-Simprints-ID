@@ -3,16 +3,15 @@ package com.simprints.id.activities.consent
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.any
 import com.simprints.id.data.consent.shortconsent.ConsentRepository
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.livedata.testObserver
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,10 +30,10 @@ class ConsentViewModelTest {
     fun givenAppRequest_shouldReturnCorrectGeneralConsentText() {
         val generalConsentText = "general_consent"
         val generalConsentTextLiveData = MutableLiveData(generalConsentText)
-        val consentTextManagerMock = mock<ConsentRepository>().apply {
-            whenever(this) { getGeneralConsentText(any()) } thenReturn generalConsentTextLiveData
-        }
-        val consentViewModel = ConsentViewModel(buildAskConsentRequest(), consentTextManagerMock, mock())
+        val consentTextManagerMock = mockk<ConsentRepository>(relaxed = true)
+        every { consentTextManagerMock.getGeneralConsentText(any()) } returns generalConsentTextLiveData
+
+        val consentViewModel = ConsentViewModel(buildAskConsentRequest(), consentTextManagerMock, mockk(relaxed = true))
 
         val generalConsentTestObserver = consentViewModel.generalConsentText.testObserver()
 
@@ -45,11 +44,11 @@ class ConsentViewModelTest {
     fun givenAppRequest_shouldReturnCorrectParentalConsentText() {
         val parentalConsentText = "parental_consent"
         val parentalConsentTextLiveData = MutableLiveData(parentalConsentText)
-        val consentTextManagerMock = mock<ConsentRepository>().apply {
-            whenever(this) { getParentalConsentText(any()) } thenReturn parentalConsentTextLiveData
-            whenever(this) { parentalConsentExists() } thenReturn MutableLiveData(true)
-        }
-        val consentViewModel = ConsentViewModel(buildAskConsentRequest(), consentTextManagerMock, mock())
+        val consentTextManagerMock = mockk<ConsentRepository>(relaxed = true)
+        every { consentTextManagerMock.getParentalConsentText(any()) } returns parentalConsentTextLiveData
+        every { consentTextManagerMock.parentalConsentExists() } returns MutableLiveData(true)
+
+        val consentViewModel = ConsentViewModel(buildAskConsentRequest(), consentTextManagerMock, mockk(relaxed = true))
 
         val parentalConsentTestObserver = consentViewModel.parentalConsentText.testObserver()
         val parentalConsentExistsObserver = consentViewModel.parentalConsentExists.testObserver()

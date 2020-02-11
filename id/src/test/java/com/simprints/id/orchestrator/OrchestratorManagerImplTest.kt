@@ -9,7 +9,6 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.nhaarman.mockitokotlin2.any
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
@@ -30,7 +29,8 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import com.simprints.testtools.common.syntax.*
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
@@ -41,8 +41,6 @@ import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
-import org.mockito.Mockito.*
-import org.mockito.stubbing.Answer
 import org.robolectric.annotation.Config
 
 @ExperimentalCoroutinesApi
@@ -53,9 +51,9 @@ class OrchestratorManagerImplTest {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    private lateinit var appResponseFactoryMock: AppResponseFactory
-    private lateinit var modalityFlowMock: ModalityFlow
-    private lateinit var dashboardDailyActivityRepositoryMock: DashboardDailyActivityRepository
+    @MockK private lateinit var appResponseFactoryMock: AppResponseFactory
+    @MockK private lateinit var modalityFlowMock: ModalityFlow
+    @MockK private lateinit var dashboardDailyActivityRepositoryMock: DashboardDailyActivityRepository
     private lateinit var orchestrator: OrchestratorManager
     private val mockSteps = mutableListOf<Step>()
     private val modalities = listOf(FACE)
@@ -69,6 +67,8 @@ class OrchestratorManagerImplTest {
 
     @Before
     fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+
         UnitTestConfig(this)
             .coroutinesMainThread()
             .rescheduleRxMainThread()
@@ -76,11 +76,7 @@ class OrchestratorManagerImplTest {
         Intents.init()
 
         mockSteps.clear()
-        modalityFlowMock = mock<ModalityFlow>().apply {
-            whenever(this) { this.steps } thenAnswer Answer { mockSteps }
-        }
-        appResponseFactoryMock = mock()
-        dashboardDailyActivityRepositoryMock = mock()
+        every { modalityFlowMock.steps } answers { mockSteps }
 
         orchestrator = buildOrchestratorManager()
         prepareModalFlowForFaceEnrol()
@@ -90,21 +86,17 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun orchestratorStarts_shouldGetFirstStepFromModalityFlow() {
-        runBlocking {
-            orchestrator.startFlowForEnrol(modalities)
-        }
+    fun orchestratorStarts_shouldGetFirstStepFromModalityFlow() = runBlockingTest {
+        orchestrator.startFlowForEnrol(modalities)
 
         verifyOrchestratorGotNextStepFromModalityFlow()
     }
 
     @Test
-    fun modalityFlowCompletes_orchestratorShouldTryToBuildAppResponse() {
-        runBlocking {
-            with(orchestrator) {
-                startFlowForEnrol(modalities)
-                progressWitFaceCapture()
-            }
+    fun modalityFlowCompletes_orchestratorShouldTryToBuildAppResponse() = runBlockingTest {
+        with(orchestrator) {
+            startFlowForEnrol(modalities)
+            progressWitFaceCapture()
         }
 
         verifyOrchestratorTriedToBuildFinalAppResponse()
@@ -123,12 +115,10 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun orchestratorReceivesAResult_itShouldBeForwardedToModalityFlowAndMoveOn() {
+    fun orchestratorReceivesAResult_itShouldBeForwardedToModalityFlowAndMoveOn() = runBlockingTest {
         with(orchestrator) {
-            runBlocking {
-                startFlowForEnrol(modalities)
-                progressWitFaceCapture()
-            }
+            startFlowForEnrol(modalities)
+            progressWitFaceCapture()
 
             verifyOrchestratorForwardedResultsToModalityFlow()
             verifyOrchestratorGotNextStepFromModalityFlow(2)
@@ -142,31 +132,19 @@ class OrchestratorManagerImplTest {
     }
 
     private fun verifyOrchestratorGotNextStepFromModalityFlow(nTimes: Int = 1) =
-        verify(modalityFlowMock, times(nTimes)).getNextStepToLaunch()
+        verify(exactly = nTimes) { modalityFlowMock.getNextStepToLaunch() }
 
     private fun verifyOrchestratorForwardedResultsToModalityFlow() =
-        verifyOnce(modalityFlowMock) { handleIntentResult(safeEq(enrolAppRequest), anyInt(), anyInt(), anyNotNull()) }
-
-    private fun <T : Any> safeEq(value: T): T = eq(value) ?: value
+        verify(exactly = 1) { modalityFlowMock.handleIntentResult(eq(enrolAppRequest), any(), any(), any()) }
 
     private fun verifyOrchestratorDidntTryToBuildFinalAppResponse() =
-        verifyNever(appResponseFactoryMock) {
-            runBlockingTest {
-                buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())
-            }
-        }
+        coVerify(exactly = 0) { appResponseFactoryMock.buildAppResponse(any(), any(), any(), any()) }
 
     private fun verifyOrchestratorTriedToBuildFinalAppResponse() =
-        verifyOnce(appResponseFactoryMock) {
-            runBlockingTest {
-                buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())
-            }
-        }
+        coVerify(exactly = 1) { appResponseFactoryMock.buildAppResponse(any(), any(), any(), any()) }
 
     private fun prepareModalFlowForFaceEnrol() {
-        whenever(modalityFlowMock) {
-            getNextStepToLaunch()
-        } thenAnswer {
+        every { modalityFlowMock.getNextStepToLaunch() } answers {
             mockSteps.firstOrNull { it.getStatus() == NOT_STARTED }
         }
 
@@ -185,15 +163,15 @@ class OrchestratorManagerImplTest {
     }
 
     private fun buildOrchestratorManager(): OrchestratorManager {
-        val modalityFlowFactoryMock = mock<ModalityFlowFactory>().apply {
-            whenever(this) { createModalityFlow(any(), any()) } thenReturn modalityFlowMock
+        val modalityFlowFactoryMock = mockk<ModalityFlowFactory>().apply {
+            every { this@apply.createModalityFlow(any(), any()) } returns modalityFlowMock
         }
-        val preferences = mock<SharedPreferences>()
-        whenever(preferences) { edit() } thenReturn mock()
+        val preferences = mockk<SharedPreferences>()
+        every { preferences.edit() } returns mockk()
 
-        val stepEncoder = mock<StepEncoder>()
+        val stepEncoder = mockk<StepEncoder>()
         val hotCache = HotCacheImpl(preferences, stepEncoder)
-
+        coEvery { appResponseFactoryMock.buildAppResponse(any(), any(), any(), any()) } returns mockk()
         return OrchestratorManagerImpl(
             modalityFlowFactoryMock,
             appResponseFactoryMock,
@@ -208,7 +186,7 @@ class OrchestratorManagerImplTest {
         initialise(modalities, appEnrolRequest, sessionId)
     }
 
-    private fun OrchestratorManager.progressWitFaceCapture(
+    private suspend fun OrchestratorManager.progressWitFaceCapture(
         requestCode: Int = CAPTURE.value,
         response: IFaceCaptureResponse? = IFaceCaptureResponseImpl(emptyList())
     ) {
@@ -218,13 +196,11 @@ class OrchestratorManagerImplTest {
             }?.setResult(it.fromModuleApiToDomain())
         }
 
-        runBlockingTest {
-            handleIntentResult(
-                enrolAppRequest,
-                requestCode,
-                Activity.RESULT_OK,
-                Intent().putExtra(IFaceResponse.BUNDLE_KEY, response))
-        }
+        handleIntentResult(
+            enrolAppRequest,
+            requestCode,
+            Activity.RESULT_OK,
+            Intent().putExtra(IFaceResponse.BUNDLE_KEY, response))
     }
 
     companion object {

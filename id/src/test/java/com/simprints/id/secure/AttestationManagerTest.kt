@@ -6,31 +6,28 @@ import com.google.android.gms.common.api.Status
 import com.google.android.gms.safetynet.SafetyNetApi
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.MockitoKotlinException
-import com.nhaarman.mockitokotlin2.doReturn
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason.INVALID_CLAIMS
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason.SERVICE_UNAVAILABLE
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.whenever
+import io.mockk.MockKAnnotations
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.spyk
 import io.reactivex.observers.TestObserver
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.AutoCloseKoinTest
-import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import org.mockito.Spy
 
 @RunWith(AndroidJUnit4::class)
-class AttestationManagerTest: AutoCloseKoinTest() {
+class AttestationManagerTest : AutoCloseKoinTest() {
 
-    @Mock lateinit var safetyNetClientMock: SafetyNetClient
-    @Spy lateinit var attestationManagerSpy: AttestationManager
-    @Mock lateinit var safetyNetAttestationResponseMock: SafetyNetApi.AttestationResponse
+    @MockK lateinit var safetyNetClientMock: SafetyNetClient
+    @MockK lateinit var safetyNetAttestationResponseMock: SafetyNetApi.AttestationResponse
+    private var attestationManagerSpy: AttestationManager = spyk(AttestationManager())
+
     private val nonce = Nonce("nonce")
 
     companion object {
@@ -40,7 +37,7 @@ class AttestationManagerTest: AutoCloseKoinTest() {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
+        MockKAnnotations.init(this)
     }
 
     @Test
@@ -68,8 +65,8 @@ class AttestationManagerTest: AutoCloseKoinTest() {
 
     @Test
     fun attestationFailedToRetrieve_shouldThrowWithUnavailable() {
-        whenever { safetyNetClientMock.attest(anyNotNull(), anyString()) } thenThrow
-            MockitoKotlinException("Google SafetyNet CANCELED result",
+        every { safetyNetClientMock.attest(any(), any()) } throws
+            Throwable("Google SafetyNet CANCELED result",
                 ApiException(Status.RESULT_CANCELED))
 
         with(requestSafetyNetAttestation(attestationManagerSpy)) {
@@ -85,10 +82,10 @@ class AttestationManagerTest: AutoCloseKoinTest() {
         }
 
     private fun mockAttestationManagerToReturnSafetyNetResponse(safetyNetAttestationResponseMock: SafetyNetApi.AttestationResponse) {
-        doReturn(safetyNetAttestationResponseMock).`when`(attestationManagerSpy).getSafetyNetAttestationResponse(safetyNetClientMock, nonce)
+        every { attestationManagerSpy.getSafetyNetAttestationResponse(safetyNetClientMock, nonce) } returns safetyNetAttestationResponseMock
     }
 
     private fun mockSafetyNetResponseResult(result: String) {
-        whenever { safetyNetAttestationResponseMock.jwsResult } thenReturn result
+        every { safetyNetAttestationResponseMock.jwsResult } returns result
     }
 }

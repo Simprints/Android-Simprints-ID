@@ -19,12 +19,12 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.extensions.scannerAppIntent
-import com.simprints.testtools.common.di.DependencyRule.MockRule
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.verifyOnce
-import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createActivity
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*
 import org.junit.Assert
@@ -32,7 +32,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowToast
@@ -48,9 +47,9 @@ class LoginActivityTest {
 
     private val module by lazy {
         TestAppModule(app,
-            dbManagerRule = MockRule,
-            sessionEventsLocalDbManagerRule = MockRule,
-            crashReportManagerRule = MockRule)
+            dbManagerRule = MockkRule,
+            sessionEventsLocalDbManagerRule = MockkRule,
+            crashReportManagerRule = MockkRule)
     }
 
     @Before
@@ -72,8 +71,8 @@ class LoginActivityTest {
     @Test
     fun loginSuccesses_shouldReturnSuccessResultCode() {
         val controller = createRoboLoginActivity(getIntentForLoginAct()).start().resume().visible()
-        val projectAuthenticator = mock(ProjectAuthenticator::class.java)
-        whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull())).thenReturn(Completable.complete())
+        val projectAuthenticator = mockk<ProjectAuthenticator>()
+        every { projectAuthenticator.authenticate(any(), any()) } returns Completable.complete()
 
         val loginAct = controller.get().apply {
             viewPresenter.projectAuthenticator = projectAuthenticator
@@ -173,12 +172,12 @@ class LoginActivityTest {
         act.loginButtonSignIn.performClick()
         assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
 
-        act.viewPresenter = mock(LoginPresenter::class.java)
+        act.viewPresenter = mockk<LoginPresenter>(relaxed = true)
 
         act.loginEditTextUserId.setText(DEFAULT_USER_ID)
         act.loginButtonSignIn.performClick()
-        verifyOnce(act.viewPresenter) {
-            signIn(DEFAULT_USER_ID,
+        verify(atLeast = 1) {
+            act.viewPresenter.signIn(DEFAULT_USER_ID,
                 DEFAULT_PROJECT_ID,
                 DEFAULT_PROJECT_SECRET,
                 DEFAULT_PROJECT_ID)
