@@ -1,5 +1,7 @@
 package com.simprints.fingerprint.scanner.wrapper
 
+import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
+import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
@@ -77,8 +79,8 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     override fun sensorShutDown(): Completable = scannerV2.turnUn20OffAndAwaitStateChangeEvent()
 
-    override fun captureFingerprint(timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
-        scannerV2.captureFingerprint(CAPTURE_DPI).flatMapCompletable {
+    override fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
+        scannerV2.captureFingerprint(captureFingerprintStrategy.deduceCaptureDpi()).flatMapCompletable {
             when (it) {
                 CaptureFingerprintResult.OK -> Completable.complete()
                 CaptureFingerprintResult.FINGERPRINT_NOT_FOUND -> Completable.error(NoFingerDetectedException())
@@ -103,11 +105,13 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                     }
             }
 
-    override fun acquireImage(): Single<AcquireImageResponse> =
-        scannerV2.acquireImage(DEFAULT_IMAGE_ACQUISITION_FORMAT)
-            .map { imageBytes ->
-                AcquireImageResponse(imageBytes.image)
-            }
+    override fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): Single<AcquireImageResponse> =
+        saveFingerprintImagesStrategy.deduceImageAcquisitionFormat()?.let {
+            scannerV2.acquireImage(it)
+                .map { imageBytes ->
+                    AcquireImageResponse(imageBytes.image)
+                }
+        } ?: TODO("Convert getImage to use Maybe instead of Single")
 
     override fun setUiIdle(): Completable = scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
 
@@ -132,12 +136,19 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
         }
     }
 
+    private fun CaptureFingerprintStrategy.deduceCaptureDpi(): Dpi =
+        when (this) {
+            CaptureFingerprintStrategy.SECUGEN_ISO_1700_DPI -> Dpi(1700)
+        }
+
+    private fun SaveFingerprintImagesStrategy.deduceImageAcquisitionFormat(): ImageFormatData? =
+        when (this) {
+            SaveFingerprintImagesStrategy.NEVER -> null
+            SaveFingerprintImagesStrategy.WSQ_15 -> ImageFormatData.WSQ(15)
+        }
+
     companion object {
         private val DEFAULT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
         private const val CONNECT_MAX_RETRIES = 3L
-
-        private val CAPTURE_DPI = Dpi(1700)
-        private const val DEFAULT_COMPRESSION_FACTOR = 15
-        private val DEFAULT_IMAGE_ACQUISITION_FORMAT = ImageFormatData.WSQ(DEFAULT_COMPRESSION_FACTOR)
     }
 }
