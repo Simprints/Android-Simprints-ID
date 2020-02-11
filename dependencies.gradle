@@ -125,11 +125,6 @@ def rootbeer = [
     core: "com.scottyab:rootbeer-lib:$rootbeer_version"
 ]
 
-// Joda-Time
-def joda_time_version = "2.10.5"
-def joda_time = [
-    core: "joda-time:joda-time:$joda_time_version"
-]
 def mockito_version = "3.2.4"
 def espresso_version = "3.2.0-alpha04"
 def robolectric_version = "4.1"
@@ -219,6 +214,5 @@ ext.deps = [
     commons_io     : commons_io,
     koin           : koin,
     fuzzywuzzy     : fuzzywuzzy,
-    rootbeer       : rootbeer,
-    joda_time      : joda_time
+    rootbeer       : rootbeer
 ]

@@ -202,9 +202,6 @@ dependencies {
     // RootBeer (root detection)
     implementation deps.rootbeer.core
 
-    // Joda-Time (time formatting)
-    implementation deps.joda_time.core
-
     // Test
     testImplementation project(':fingerprintscannermock')
     testImplementation deps.testing.retrofit
