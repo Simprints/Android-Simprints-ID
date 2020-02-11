@@ -1,5 +1,6 @@
-package com.simprints.id.data.prefs.settings
+package com.simprints.id.data.prefs.settings.fingerprint.serializers
 
+import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.tools.serializers.Serializer
 
 class ScannerGenerationsSerializer : Serializer<List<ScannerGeneration>> {

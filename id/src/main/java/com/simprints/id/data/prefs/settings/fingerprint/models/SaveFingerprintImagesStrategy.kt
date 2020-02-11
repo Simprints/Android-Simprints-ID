@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.data.domain.images
+package com.simprints.id.data.prefs.settings.fingerprint.models
 
 enum class SaveFingerprintImagesStrategy {
     NEVER,

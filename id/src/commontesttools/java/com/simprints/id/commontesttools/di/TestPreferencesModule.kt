@@ -4,8 +4,8 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.data.prefs.settings.SaveFingerprintImagesStrategy
-import com.simprints.id.data.prefs.settings.ScannerGeneration
+import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.PreferencesModule
 import com.simprints.id.domain.GROUP

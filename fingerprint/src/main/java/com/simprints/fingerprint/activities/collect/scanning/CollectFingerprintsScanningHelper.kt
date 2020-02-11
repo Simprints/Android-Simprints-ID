@@ -84,9 +84,9 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun isDoingImageTransfer(): Boolean =
-        when (fingerprintPreferencesManager.saveFingerprintImages) {
+        when (fingerprintPreferencesManager.saveFingerprintImagesStrategy) {
             SaveFingerprintImagesStrategy.NEVER -> false
-            SaveFingerprintImagesStrategy.COMPRESSED_1700_WSQ_15 -> true
+            SaveFingerprintImagesStrategy.WSQ_15 -> true
         }
 
     private fun initTimeoutBar(): ScanningTimeoutBar =
