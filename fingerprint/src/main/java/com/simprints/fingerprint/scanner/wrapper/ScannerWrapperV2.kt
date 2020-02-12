@@ -55,6 +55,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
         return Single.fromCallable {
             try {
+                Timber.d("Attempting connect...")
                 socket = device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
                 bluetoothAdapter.cancelDiscovery()
                 socket.connect()
@@ -64,6 +65,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             }
         }.retry(CONNECT_MAX_RETRIES)
             .flatMapCompletable { socket ->
+                Timber.d("Socket connected. Setting up scanner...")
                 scannerV2.connect(socket.getInputStream(), socket.getOutputStream())
                     .andThen(scannerV2.getVersionInformation())
                     .map {
@@ -81,13 +83,22 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     override fun sensorWakeUp(): Completable =
         scannerV2
-            .turnUn20OnAndAwaitStateChangeEvent()
+            .ensureUn20State(true)
             .wrapErrorsFromScanner()
 
     override fun sensorShutDown(): Completable =
         scannerV2
-            .turnUn20OffAndAwaitStateChangeEvent()
+            .ensureUn20State(false)
             .wrapErrorsFromScanner()
+
+    private fun ScannerV2.ensureUn20State(desiredState: Boolean): Completable =
+        getUn20Status().flatMapCompletable { actualState ->
+            when {
+                desiredState && !actualState -> turnUn20OnAndAwaitStateChangeEvent()
+                !desiredState && actualState -> turnUn20OffAndAwaitStateChangeEvent()
+                else -> Completable.complete()
+            }
+        }
 
     override fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
         scannerV2

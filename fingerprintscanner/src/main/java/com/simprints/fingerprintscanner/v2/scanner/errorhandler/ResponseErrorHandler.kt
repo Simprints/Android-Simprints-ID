@@ -1,7 +1,7 @@
 package com.simprints.fingerprintscanner.v2.scanner.errorhandler
 
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.CaptureFingerprintResponse
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.GetImageQualityResponse
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.GetImageResponse
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.SetUn20OnResponse
 import io.reactivex.Scheduler
@@ -16,11 +16,11 @@ class ResponseErrorHandler(val strategy: ResponseErrorHandlingStrategy,
 
     inline fun <reified T> handle(source: Single<T>): Single<T> {
         val timeOut = when (T::class.java) {
-            SetUn20OnResponse::class.java -> strategy.un20StateChangeEventTimeOut
+            SetUn20OnResponse::class.java -> strategy.setUn20ResponseTimeOut
             Un20StateChangeEvent::class.java -> strategy.un20StateChangeEventTimeOut
             CaptureFingerprintResponse::class.java -> strategy.captureFingerprintResponseTimeOut
-            GetImageQualityResponse::class.java -> strategy.getImageResponseTimeOut
-            else -> strategy.timeOutMs
+            GetImageResponse::class.java -> strategy.getImageResponseTimeOut
+            else -> strategy.generalTimeOutMs
         }
         return handle(source, timeOut, strategy.retryTimes)
     }

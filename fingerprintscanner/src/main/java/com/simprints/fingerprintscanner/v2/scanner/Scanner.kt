@@ -207,7 +207,7 @@ class Scanner(
                 .doSimultaneously(
                     mainMessageChannel.incoming.receiveResponse<Un20StateChangeEvent>(
                         withPredicate = { it.value == DigitalValue.TRUE }
-                    )))
+                    )).handleErrorsWith(responseErrorHandler))
             .completeOnceReceived()
             .doOnComplete { state.un20On = true }
 
@@ -218,7 +218,7 @@ class Scanner(
             ).completeOnceReceived()
                 .doSimultaneously(mainMessageChannel.incoming.receiveResponse<Un20StateChangeEvent>(
                     withPredicate = { it.value == DigitalValue.FALSE }
-                )))
+                )).handleErrorsWith(responseErrorHandler))
             .completeOnceReceived()
             .doOnComplete { state.un20On = false }
 

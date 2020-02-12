@@ -21,7 +21,7 @@ import kotlin.random.Random
 
 class StmOtaControllerTest {
 
-    private val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.None)
+    private val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.NONE)
 
     @Test
     fun program_correctlyEmitsProgressValuesAndCompletes() {

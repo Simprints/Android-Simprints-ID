@@ -69,7 +69,7 @@ import java.io.OutputStream
 
 class ScannerTest {
 
-    private val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.None)
+    private val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.NONE)
 
     @Test
     fun scanner_callEnterModeBeforeConnect_throwsException() {

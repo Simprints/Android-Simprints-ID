@@ -70,7 +70,8 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                 }
             }
             else -> {
-                ScannerGeneration.VERO_1.also { // TODO : Better scanner generation determination in case a project has multiple generations of Vero
+                ScannerGeneration.VERO_1.also {
+                    // TODO : Better scanner generation determination in case a project has multiple generations of Vero
                     Timber.w("Multiple scanner generations found: $availableScannerGenerations. Defaulting to $it")
                 }
             }
@@ -136,7 +137,7 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                 CypressOtaController(Crc32Calculator()),
                 StmOtaController(),
                 Un20OtaController(Crc32Calculator()),
-                ResponseErrorHandler(ResponseErrorHandlingStrategy.None) // STOPSHIP : Fix error handling strategy
+                ResponseErrorHandler(ResponseErrorHandlingStrategy.DEFAULT)
             ),
             scannerUiHelper,
             macAddress,
