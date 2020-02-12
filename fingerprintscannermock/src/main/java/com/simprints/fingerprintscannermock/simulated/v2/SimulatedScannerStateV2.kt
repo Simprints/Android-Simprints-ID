@@ -26,5 +26,8 @@ class SimulatedScannerStateV2(
         LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
         LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00)),
     var batteryPercentCharge: Int = 80,
+    var batteryVoltageMilliVolts: Int = 4200,
+    var batteryCurrentMilliAmps: Int = 20,
+    var batteryTemperatureDeciKelvin: Int = 3000,
     var lastFingerCapturedDpi: Dpi = Scanner.DEFAULT_DPI
 ) : SimulatedScannerState()

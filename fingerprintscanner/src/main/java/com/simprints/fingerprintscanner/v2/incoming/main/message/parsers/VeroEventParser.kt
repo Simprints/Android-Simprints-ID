@@ -25,7 +25,10 @@ class VeroEventParser : MessageParser<VeroEvent> {
                     VeroMessageType.GET_BLUETOOTH_LED_STATE,
                     VeroMessageType.GET_POWER_LED_STATE,
                     VeroMessageType.SET_SMILE_LED_STATE,
-                    VeroMessageType.GET_BATTERY_PERCENT_CHARGE ->
+                    VeroMessageType.GET_BATTERY_PERCENT_CHARGE,
+                    VeroMessageType.GET_BATTERY_VOLTAGE,
+                    VeroMessageType.GET_BATTERY_CURRENT,
+                    VeroMessageType.GET_BATTERY_TEMPERATURE ->
                         throw InvalidMessageException("Illegal message $type received in Vero events route")
                 }
             }

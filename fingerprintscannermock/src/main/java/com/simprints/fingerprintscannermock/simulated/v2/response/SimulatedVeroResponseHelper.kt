@@ -31,6 +31,9 @@ class SimulatedVeroResponseHelper(private val simulatedScannerManager: Simulated
             )
             is SetSmileLedStateCommand -> SetSmileLedStateResponse(OperationResultCode.OK)
             is GetBatteryPercentChargeCommand -> GetBatteryPercentChargeResponse(BatteryPercentCharge(simulatedScannerV2.scannerState.batteryPercentCharge.toByte()))
+            is GetBatteryVoltageCommand -> GetBatteryVoltageResponse(BatteryVoltage(simulatedScannerV2.scannerState.batteryVoltageMilliVolts.toShort()))
+            is GetBatteryCurrentCommand -> GetBatteryCurrentResponse(BatteryCurrent(simulatedScannerV2.scannerState.batteryCurrentMilliAmps.toShort()))
+            is GetBatteryTemperatureCommand -> GetBatteryTemperatureResponse(BatteryTemperature(simulatedScannerV2.scannerState.batteryTemperatureDeciKelvin.toShort()))
             else -> throw UnsupportedOperationException("Un-mocked response to $command in SimulatedVeroResponseHelper")
         }
 

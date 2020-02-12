@@ -115,6 +115,9 @@ class SimulatedCommandInputStream {
                     GET_POWER_LED_STATE -> GetPowerLedStateCommand.fromBytes(data)
                     SET_SMILE_LED_STATE -> SetSmileLedStateCommand.fromBytes(data)
                     GET_BATTERY_PERCENT_CHARGE -> GetBatteryPercentChargeCommand.fromBytes(data)
+                    GET_BATTERY_VOLTAGE -> GetBatteryVoltageCommand.fromBytes(data)
+                    GET_BATTERY_CURRENT -> GetBatteryCurrentCommand.fromBytes(data)
+                    GET_BATTERY_TEMPERATURE -> GetBatteryTemperatureCommand.fromBytes(data)
                     UN20_STATE_CHANGE, TRIGGER_BUTTON_PRESSED -> throw IllegalArgumentException("Should not send events")
                 }
             }

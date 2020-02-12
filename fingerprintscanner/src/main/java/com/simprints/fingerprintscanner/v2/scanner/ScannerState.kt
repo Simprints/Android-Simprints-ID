@@ -9,7 +9,10 @@ data class ScannerState(
     var un20On: Boolean?,
     var triggerButtonActive: Boolean?,
     var smileLedState: SmileLedState?,
-    var batteryPercentCharge: Int?
+    var batteryPercentCharge: Int?,
+    var batteryVoltageMilliVolts: Int?,
+    var batteryCurrentMilliAmps: Int?,
+    var batteryTemperatureDeciKelvin: Int?
 )
 
 fun disconnectedScannerState() =
@@ -19,4 +22,7 @@ fun disconnectedScannerState() =
         un20On = null,
         triggerButtonActive = null,
         smileLedState = null,
-        batteryPercentCharge = null)
+        batteryPercentCharge = null,
+        batteryVoltageMilliVolts = null,
+        batteryCurrentMilliAmps = null,
+        batteryTemperatureDeciKelvin = null)
