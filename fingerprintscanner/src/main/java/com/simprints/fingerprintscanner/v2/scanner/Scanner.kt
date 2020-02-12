@@ -297,7 +297,7 @@ class Scanner(
             sendMainModeCommandAndReceiveResponse<GetBatteryCurrentResponse>(
                 GetBatteryCurrentCommand()
             ))
-            .map { it.batteryCurrent.milliAmps.unsignedToInt() }
+            .map { it.batteryCurrent.milliAmps.toInt() }
             .doOnSuccess { state.batteryCurrentMilliAmps = it }
 
     fun getBatteryTemperatureDeciKelvin(): Single<Int> =
