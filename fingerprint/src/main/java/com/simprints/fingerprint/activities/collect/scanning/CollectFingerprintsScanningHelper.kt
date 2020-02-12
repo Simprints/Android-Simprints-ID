@@ -38,6 +38,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 
 class CollectFingerprintsScanningHelper(private val context: Context,
@@ -59,9 +60,13 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private val scannerTriggerListener = ScannerTriggerListener {
         crashReportManager.logMessageForCrashReport(FINGER_CAPTURE, SCANNER_BUTTON, message = "Scanner button clicked")
         if (presenter.isConfirmDialogShown)
-            presenter.handleConfirmFingerprintsAndContinue()
+            context.runOnUiThread {
+                presenter.handleConfirmFingerprintsAndContinue()
+            }
         else if (shouldEnableScanButton())
-            presenter.handleScannerButtonPressed()
+            context.runOnUiThread {
+                presenter.handleScannerButtonPressed()
+            }
     }
 
     private var scanningTask: Disposable? = null
@@ -199,11 +204,13 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         presenter.refreshDisplay()
         view.timeoutBar.startTimeoutBar()
         scanningTask?.dispose()
-        scanningTask = scannerManager.scanner<CaptureFingerprintResponse> { captureFingerprint(
-            fingerprintPreferencesManager.captureFingerprintStrategy,
-            scanningTimeoutMs.toInt(),
-            qualityThreshold
-        ) }
+        scanningTask = scannerManager.scanner<CaptureFingerprintResponse> {
+            captureFingerprint(
+                fingerprintPreferencesManager.captureFingerprintStrategy,
+                scanningTimeoutMs.toInt(),
+                qualityThreshold
+            )
+        }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
