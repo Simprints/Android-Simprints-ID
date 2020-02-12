@@ -207,7 +207,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
     private fun makeConnectToVeroStepSucceeding() {
         whenever(scannerWrapperMock) { connect() } then {
-            whenever(scannerWrapperMock) { versionInformation } thenReturn mock()
+            whenever(scannerWrapperMock) { versionInformation() } thenReturn mock()
             Completable.complete()
         }
     }
