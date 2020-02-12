@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.scanner.wrapper
 
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
@@ -24,6 +25,7 @@ import io.reactivex.Completable
 import io.reactivex.Observer
 import io.reactivex.Single
 import io.reactivex.observers.DisposableObserver
+import timber.log.Timber
 import java.io.IOException
 import java.util.*
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
@@ -31,7 +33,8 @@ import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 class ScannerWrapperV2(private val scannerV2: ScannerV2,
                        private val scannerUiHelper: ScannerUiHelper,
                        private val macAddress: String,
-                       private val bluetoothAdapter: BluetoothComponentAdapter) : ScannerWrapper {
+                       private val bluetoothAdapter: BluetoothComponentAdapter,
+                       private val crashReportManager: FingerprintCrashReportManager) : ScannerWrapper {
 
     private lateinit var socket: BluetoothComponentSocket
 
@@ -68,16 +71,23 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                     }
                     .ignoreElement()
                     .andThen(scannerV2.enterMainMode())
-            }
+            }.wrapErrorsFromScanner()
     }
 
     override fun disconnect(): Completable =
         scannerV2.disconnect()
             .doOnComplete { socket.close() }
+            .wrapErrorsFromScanner()
 
-    override fun sensorWakeUp(): Completable = scannerV2.turnUn20OnAndAwaitStateChangeEvent()
+    override fun sensorWakeUp(): Completable =
+        scannerV2
+            .turnUn20OnAndAwaitStateChangeEvent()
+            .wrapErrorsFromScanner()
 
-    override fun sensorShutDown(): Completable = scannerV2.turnUn20OffAndAwaitStateChangeEvent()
+    override fun sensorShutDown(): Completable =
+        scannerV2
+            .turnUn20OffAndAwaitStateChangeEvent()
+            .wrapErrorsFromScanner()
 
     override fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
         scannerV2
@@ -89,6 +99,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             .acquireTemplateAndAssembleResponse()
             .switchIfEmpty(Single.error(NoFingerDetectedException()))
             .ifNoFingerDetectedThenSetBadScanLedState()
+            .wrapErrorsFromScanner()
 
     private fun Single<CaptureFingerprintResult>.ensureCaptureResultOkOrError() =
         flatMapCompletable {
@@ -141,11 +152,15 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                         AcquireImageResponse(imageBytes.image)
                     }
             }?.switchIfEmpty(Single.error(NoFingerDetectedException()))
+            ?.wrapErrorsFromScanner()
             ?: Single.error(
                 IllegalArgumentException("Fingerprint strategy $saveFingerprintImagesStrategy should not call acquireImage in ScannerWrapper")
             )
 
-    override fun setUiIdle(): Completable = scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
+    override fun setUiIdle(): Completable =
+        scannerV2
+            .setSmileLedState(scannerUiHelper.idleLedState())
+            .wrapErrorsFromScanner()
 
     private val triggerListenerToObserverMap = mutableMapOf<ScannerTriggerListener, Observer<Unit>>()
 
@@ -157,7 +172,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             }
 
             override fun onError(e: Throwable) {
-                throw e
+                throw wrapErrorFromScanner(e)
             }
         }.also { scannerV2.triggerButtonListeners.add(it) }
     }
@@ -179,9 +194,31 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             SaveFingerprintImagesStrategy.WSQ_15 -> ImageFormatData.WSQ(15)
         }
 
+    private fun Completable.wrapErrorsFromScanner() =
+        onErrorResumeNext { Completable.error(wrapErrorFromScanner(it)) }
+
+    private fun <T> Single<T>.wrapErrorsFromScanner() =
+        onErrorResumeNext { Single.error(wrapErrorFromScanner(it)) }
+
+    private fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
+        is IOException -> { // Disconnected or timed-out communications with Scanner
+            Timber.d(e, "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException")
+            ScannerDisconnectedException()
+        }
+        is IllegalStateException, // We're calling scanner methods out of order somehow
+        is IllegalArgumentException -> { // We've received unexpected/invalid bytes from the scanner
+            Timber.e(e)
+            crashReportManager.logExceptionOrSafeException(e)
+            UnexpectedScannerException(e)
+        }
+        else -> { // Propagate error
+            e
+        }
+    }
+
     companion object {
         private val DEFAULT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
         private const val CONNECT_MAX_RETRIES = 3L
-        private const val NO_FINGER_IMAGE_QUALITY_THRESHOLD = 0 // The image quality at which we decide a fingerprint wasn't detected
+        private const val NO_FINGER_IMAGE_QUALITY_THRESHOLD = 10 // The image quality at which we decide a fingerprint wasn't detected
     }
 }
