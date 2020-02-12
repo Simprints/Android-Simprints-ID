@@ -89,6 +89,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             }
         }
             .andThen(scannerV2.getImageQualityScore())
+            .switchIfEmpty(Single.error(NoFingerDetectedException()))
             .flatMap { qualityScore ->
                 val ledState = if (qualityScore >= qualityThreshold) {
                     scannerUiHelper.goodScanLedState()
@@ -98,20 +99,25 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                 scannerV2.setSmileLedState(ledState)
                     .andThen(Single.just(qualityScore))
             }
-            .flatMap { imageQuality ->
+            .flatMapMaybe { imageQuality ->
                 scannerV2.acquireTemplate()
                     .map { templateData ->
                         CaptureFingerprintResponse(templateData.template, imageQuality)
                     }
             }
+            .switchIfEmpty(Single.error(NoFingerDetectedException()))
 
     override fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): Single<AcquireImageResponse> =
-        saveFingerprintImagesStrategy.deduceImageAcquisitionFormat()?.let {
-            scannerV2.acquireImage(it)
-                .map { imageBytes ->
-                    AcquireImageResponse(imageBytes.image)
-                }
-        } ?: TODO("Convert getImage to use Maybe instead of Single")
+        saveFingerprintImagesStrategy
+            .deduceImageAcquisitionFormat()?.let {
+                scannerV2.acquireImage(it)
+                    .map { imageBytes ->
+                        AcquireImageResponse(imageBytes.image)
+                    }
+            }?.switchIfEmpty(Single.error(NoFingerDetectedException()))
+            ?: Single.error(
+                IllegalArgumentException("Fingerprint strategy $saveFingerprintImagesStrategy should not call acquireImage in ScannerWrapper")
+            )
 
     override fun setUiIdle(): Completable = scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
 

@@ -33,14 +33,8 @@ import com.simprints.fingerprintscanner.v2.scanner.ota.cypress.CypressOtaControl
 import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.scanner.ota.un20.Un20OtaController
 import com.simprints.fingerprintscanner.v2.tools.primitives.unsignedToInt
-import com.simprints.fingerprintscanner.v2.tools.reactive.completable
-import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
-import com.simprints.fingerprintscanner.v2.tools.reactive.doSimultaneously
-import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Observer
-import io.reactivex.Single
+import com.simprints.fingerprintscanner.v2.tools.reactive.*
+import io.reactivex.*
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import java.io.InputStream
@@ -303,12 +297,12 @@ class Scanner(
             ))
             .map { it.supportedTemplateTypes }
 
-    fun acquireTemplate(templateType: TemplateType = DEFAULT_TEMPLATE_TYPE): Single<TemplateData> =
+    fun acquireTemplate(templateType: TemplateType = DEFAULT_TEMPLATE_TYPE): Maybe<TemplateData> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetTemplateResponse>(
                 GetTemplateCommand(templateType)
             ))
-            .map { it.templateData }
+            .mapToMaybeEmptyIfNull { it.templateData }
 
     fun getSupportedImageFormats(): Single<Set<ImageFormat>> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
@@ -317,19 +311,19 @@ class Scanner(
             ))
             .map { it.supportedImageFormats }
 
-    fun acquireImage(imageFormatData: ImageFormatData = DEFAULT_IMAGE_FORMAT_DATA): Single<ImageData> =
+    fun acquireImage(imageFormatData: ImageFormatData = DEFAULT_IMAGE_FORMAT_DATA): Maybe<ImageData> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetImageResponse>(
                 GetImageCommand(imageFormatData)
             ))
-            .map { it.imageData }
+            .mapToMaybeEmptyIfNull { it.imageData }
 
-    fun getImageQualityScore(): Single<Int> =
+    fun getImageQualityScore(): Maybe<Int> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetImageQualityResponse>(
                 GetImageQualityCommand()
             ))
-            .map { it.imageQualityScore }
+            .mapToMaybeEmptyIfNull { it.imageQualityScore }
 
     fun startCypressOta(firmwareBinFile: ByteArray): Observable<Float> =
         assertConnected().andThen(assertMode(CYPRESS_OTA)).andThen(
