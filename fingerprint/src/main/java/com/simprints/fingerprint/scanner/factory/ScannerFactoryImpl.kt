@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.scanner.factory
 
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
@@ -51,6 +52,7 @@ import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
 class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter,
                          private val preferencesManager: FingerprintPreferencesManager,
+                         private val crashReportManager: FingerprintCrashReportManager,
                          private val scannerUiHelper: ScannerUiHelper) : ScannerFactory {
 
     override fun create(macAddress: String): ScannerWrapper {
@@ -138,6 +140,7 @@ class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter
             ),
             scannerUiHelper,
             macAddress,
-            bluetoothAdapter
+            bluetoothAdapter,
+            crashReportManager
         )
 }

@@ -27,6 +27,7 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
+import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.scanner.ScannerManager
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -180,7 +181,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     override fun getTitle(): String =
         when (masterFlowManager.getCurrentAction()) {
             ENROL -> androidResourcesHelper.getString(R.string.register_title)
-            IDENTIFY ->  androidResourcesHelper.getString(R.string.identify_title)
+            IDENTIFY -> androidResourcesHelper.getString(R.string.identify_title)
             VERIFY -> androidResourcesHelper.getString(R.string.verify_title)
         }
 
@@ -235,7 +236,8 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun saveImagesAndProceedToFinish(fingerprints: List<Finger>) {
-        runBlocking { // TODO : Use viewModelScope once converted to MVVM
+        runBlocking {
+            // TODO : Use viewModelScope once converted to MVVM
             fingerprints.forEach { finger ->
                 saveImage(finger)
             }
@@ -252,7 +254,7 @@ class CollectFingerprintsPresenter(private val context: Context,
                 fingerprintPreferencesManager.saveFingerprintImagesStrategy.deduceFileExtension())
         } else if (imageBytes != null && captureEventId == null) {
             Timber.e("Could not save fingerprint image because of null capture ID")
-            crashReportManager.logMalfunction("Could not save fingerprint image because of null capture ID")
+            crashReportManager.logExceptionOrSafeException(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
         }
     }
 
