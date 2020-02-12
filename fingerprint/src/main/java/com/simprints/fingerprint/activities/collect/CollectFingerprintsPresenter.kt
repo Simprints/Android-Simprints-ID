@@ -26,6 +26,7 @@ import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.ScannerManager
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -247,12 +248,19 @@ class CollectFingerprintsPresenter(private val context: Context,
         val captureEventId = captureEventIds[finger]
 
         if (imageBytes != null && captureEventId != null) {
-            finger.template?.imageRef = imageManager.save(imageBytes, captureEventId, "wsq") // STOPSHIP : Better determination of image extension
+            finger.template?.imageRef = imageManager.save(imageBytes, captureEventId,
+                fingerprintPreferencesManager.saveFingerprintImagesStrategy.deduceFileExtension())
         } else if (imageBytes != null && captureEventId == null) {
             Timber.e("Could not save fingerprint image because of null capture ID")
             crashReportManager.logMalfunction("Could not save fingerprint image because of null capture ID")
         }
     }
+
+    private fun SaveFingerprintImagesStrategy.deduceFileExtension(): String =
+        when (this) {
+            SaveFingerprintImagesStrategy.NEVER -> ""
+            SaveFingerprintImagesStrategy.WSQ_15 -> "wsq"
+        }
 
     private fun proceedToFinish(fingerprints: List<Fingerprint>) {
         view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(fingerprints))
