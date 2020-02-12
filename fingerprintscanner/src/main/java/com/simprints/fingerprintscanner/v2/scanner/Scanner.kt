@@ -24,6 +24,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.commands.*
 import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprintscanner.v2.domain.root.responses.*
+import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprintscanner.v2.exceptions.state.IllegalUn20StateException
 import com.simprints.fingerprintscanner.v2.exceptions.state.IncorrectModeException
 import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedException
@@ -37,9 +38,16 @@ import com.simprints.fingerprintscanner.v2.tools.reactive.*
 import io.reactivex.*
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 
+/**
+ * Methods in this class can throw various subclasses of these exceptions:
+ * @throws IOException If disconnection or timeout occurs
+ * @throws IllegalStateException On attempting to call certain methods whilst in an incorrect state
+ * @throws IllegalArgumentException On receiving unexpected or invalid bytes from the scanner
+ */
 @Suppress("unused")
 class Scanner(
     private val mainMessageChannel: MainMessageChannel,
@@ -325,14 +333,17 @@ class Scanner(
             ))
             .mapToMaybeEmptyIfNull { it.imageQualityScore }
 
+    /** @throws OtaFailedException If a domain error occurs at any step during the OTA process */
     fun startCypressOta(firmwareBinFile: ByteArray): Observable<Float> =
         assertConnected().andThen(assertMode(CYPRESS_OTA)).andThen(
             cypressOtaController.program(cypressOtaMessageChannel, responseErrorHandler, firmwareBinFile))
 
+    /** @throws OtaFailedException If a domain error occurs at any step during the OTA process */
     fun startStmOta(firmwareBinFile: ByteArray): Observable<Float> =
         assertConnected().andThen(assertMode(STM_OTA)).andThen(
             stmOtaController.program(stmOtaMessageChannel, responseErrorHandler, firmwareBinFile))
 
+    /** @throws OtaFailedException If a domain error occurs at any step during the OTA process */
     fun startUn20Ota(firmwareBinFile: ByteArray): Observable<Float> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             un20OtaController.program(mainMessageChannel, responseErrorHandler, firmwareBinFile))
