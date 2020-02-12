@@ -191,6 +191,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun startContinuousCapture() {
+        scannerManager.scanner { setUiIdle() }.doInBackground()
         previousStatus = currentFingerStatus
         currentFingerStatus = COLLECTING
         presenter.refreshDisplay()
@@ -218,6 +219,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     private fun handleNoFingerTemplateDetected() {
         currentFingerStatus = NO_FINGER_DETECTED
+        view.timeoutBar.handleAllStepsFinished()
         Vibrate.vibrate(context)
         presenter.refreshDisplay()
     }

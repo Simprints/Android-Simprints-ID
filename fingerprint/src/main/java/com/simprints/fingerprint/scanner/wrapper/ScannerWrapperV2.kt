@@ -80,7 +80,18 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     override fun sensorShutDown(): Completable = scannerV2.turnUn20OffAndAwaitStateChangeEvent()
 
     override fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
-        scannerV2.captureFingerprint(captureFingerprintStrategy.deduceCaptureDpi()).flatMapCompletable {
+        scannerV2
+            .captureFingerprint(captureFingerprintStrategy.deduceCaptureDpi())
+            .ensureCaptureResultOkOrError()
+            .andThen(scannerV2.getImageQualityScore())
+            .switchIfEmpty(Single.error(NoFingerDetectedException()))
+            .setLedStateBasedOnQualityScoreOrInterpretAsNoFingerDetected(qualityThreshold)
+            .acquireTemplateAndAssembleResponse()
+            .switchIfEmpty(Single.error(NoFingerDetectedException()))
+            .ifNoFingerDetectedThenSetBadScanLedState()
+
+    private fun Single<CaptureFingerprintResult>.ensureCaptureResultOkOrError() =
+        flatMapCompletable {
             when (it) {
                 CaptureFingerprintResult.OK -> Completable.complete()
                 CaptureFingerprintResult.FINGERPRINT_NOT_FOUND -> Completable.error(NoFingerDetectedException())
@@ -88,9 +99,10 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                 CaptureFingerprintResult.UNKNOWN_ERROR -> Completable.error(UnknownScannerIssueException("Unknown error when capturing fingerprint"))
             }
         }
-            .andThen(scannerV2.getImageQualityScore())
-            .switchIfEmpty(Single.error(NoFingerDetectedException()))
-            .flatMap { qualityScore ->
+
+    private fun Single<Int>.setLedStateBasedOnQualityScoreOrInterpretAsNoFingerDetected(qualityThreshold: Int) =
+        flatMap { qualityScore ->
+            if (qualityScore > NO_FINGER_IMAGE_QUALITY_THRESHOLD) {
                 val ledState = if (qualityScore >= qualityThreshold) {
                     scannerUiHelper.goodScanLedState()
                 } else {
@@ -98,14 +110,28 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                 }
                 scannerV2.setSmileLedState(ledState)
                     .andThen(Single.just(qualityScore))
+            } else {
+                Single.error(NoFingerDetectedException())
             }
-            .flatMapMaybe { imageQuality ->
-                scannerV2.acquireTemplate()
-                    .map { templateData ->
-                        CaptureFingerprintResponse(templateData.template, imageQuality)
-                    }
+        }
+
+    private fun Single<Int>.acquireTemplateAndAssembleResponse() =
+        flatMapMaybe { imageQuality ->
+            scannerV2.acquireTemplate()
+                .map { templateData ->
+                    CaptureFingerprintResponse(templateData.template, imageQuality)
+                }
+        }
+
+    private fun Single<CaptureFingerprintResponse>.ifNoFingerDetectedThenSetBadScanLedState() =
+        onErrorResumeNext {
+            if (it is NoFingerDetectedException) {
+                scannerV2.setSmileLedState(scannerUiHelper.badScanLedState())
+                    .andThen(Single.error(it))
+            } else {
+                Single.error(it)
             }
-            .switchIfEmpty(Single.error(NoFingerDetectedException()))
+        }
 
     override fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): Single<AcquireImageResponse> =
         saveFingerprintImagesStrategy
@@ -156,5 +182,6 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     companion object {
         private val DEFAULT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
         private const val CONNECT_MAX_RETRIES = 3L
+        private const val NO_FINGER_IMAGE_QUALITY_THRESHOLD = 0 // The image quality at which we decide a fingerprint wasn't detected
     }
 }
