@@ -26,7 +26,7 @@ import kotlin.random.Random
 
 class CypressOtaControllerTest {
 
-    private val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.None)
+    private val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.NONE)
 
     @Test
     fun program_correctlyEmitsProgressValuesAndCompletes() {

@@ -21,7 +21,7 @@ class ResponseErrorHandlerTest {
         val testScheduler = TestScheduler()
 
         val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy(
-            timeOutMs = 500, retryTimes = 3
+            generalTimeOutMs = 500, retryTimes = 3
         ), testScheduler)
 
         val testSubscriber =
@@ -53,7 +53,7 @@ class ResponseErrorHandlerTest {
         val testScheduler = TestScheduler()
 
         val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy(
-            timeOutMs = 500, retryTimes = 2
+            generalTimeOutMs = 500, retryTimes = 2
         ), testScheduler)
 
         val testSubscriber =
@@ -79,7 +79,7 @@ class ResponseErrorHandlerTest {
     fun handleError_propagatesNonTimeoutErrors() {
         val thrownException = InvalidMessageException()
 
-        val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.Default)
+        val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.DEFAULT)
 
         val testSubscriber = Single
             .error<String>(thrownException)
@@ -98,7 +98,7 @@ class ResponseErrorHandlerTest {
 
         val testScheduler = TestScheduler()
 
-        val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.None, testScheduler)
+        val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.NONE, testScheduler)
 
         val testSubscriber =
             Single.defer {
