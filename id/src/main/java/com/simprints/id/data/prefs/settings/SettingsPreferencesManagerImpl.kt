@@ -100,10 +100,10 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         val CAPTURE_FINGERPRINT_STRATEGY_DEFAULT = CaptureFingerprintStrategy.SECUGEN_ISO_1700_DPI
         const val CAPTURE_FINGERPRINT_STRATEGY_KEY = "CaptureFingerprintStrategy"
 
-        val SAVE_FINGERPRINT_IMAGES_STRATEGY_DEFAULT = SaveFingerprintImagesStrategy.NEVER
+        val SAVE_FINGERPRINT_IMAGES_STRATEGY_DEFAULT = SaveFingerprintImagesStrategy.WSQ_15 // STOPSHIP
         const val SAVE_FINGERPRINT_IMAGES_STRATEGY_KEY = "SaveFingerprintImagesStrategy"
 
-        val SCANNER_GENERATIONS_DEFAULT = listOf(ScannerGeneration.VERO_1)
+        val SCANNER_GENERATIONS_DEFAULT = listOf(ScannerGeneration.VERO_2) // STOPSHIP
         const val SCANNER_GENERATIONS_KEY = "ScannerGenerations"
 
     }

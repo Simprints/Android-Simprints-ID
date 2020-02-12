@@ -26,7 +26,10 @@ enum class VeroMessageType(val majorByte: Byte, val minorByte: Byte) {
     SET_SMILE_LED_STATE(0x41, 0x10),
 
     // 0x5_ : Gas gauge information
-    GET_BATTERY_PERCENT_CHARGE(0x50, 0x10);
+    GET_BATTERY_PERCENT_CHARGE(0x50, 0x10),
+    GET_BATTERY_VOLTAGE(0x50, 0x11),
+    GET_BATTERY_CURRENT(0x50, 0x12),
+    GET_BATTERY_TEMPERATURE(0x50, 0x13);
 
     fun getBytes() = byteArrayOf(majorByte, minorByte)
 

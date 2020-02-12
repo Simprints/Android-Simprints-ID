@@ -284,6 +284,30 @@ class Scanner(
             .map { it.batteryPercentCharge.percentCharge.unsignedToInt() }
             .doOnSuccess { state.batteryPercentCharge = it }
 
+    fun getBatteryVoltageMilliVolts(): Single<Int> =
+        assertConnected().andThen(assertMode(MAIN)).andThen(
+            sendMainModeCommandAndReceiveResponse<GetBatteryVoltageResponse>(
+                GetBatteryVoltageCommand()
+            ))
+            .map { it.batteryVoltage.milliVolts.unsignedToInt() }
+            .doOnSuccess { state.batteryVoltageMilliVolts = it }
+
+    fun getBatteryCurrentMilliAmps(): Single<Int> =
+        assertConnected().andThen(assertMode(MAIN)).andThen(
+            sendMainModeCommandAndReceiveResponse<GetBatteryCurrentResponse>(
+                GetBatteryCurrentCommand()
+            ))
+            .map { it.batteryCurrent.milliAmps.unsignedToInt() }
+            .doOnSuccess { state.batteryCurrentMilliAmps = it }
+
+    fun getBatteryTemperatureDeciKelvin(): Single<Int> =
+        assertConnected().andThen(assertMode(MAIN)).andThen(
+            sendMainModeCommandAndReceiveResponse<GetBatteryTemperatureResponse>(
+                GetBatteryTemperatureCommand()
+            ))
+            .map { it.batteryTemperature.deciKelvin.unsignedToInt() }
+            .doOnSuccess { state.batteryTemperatureDeciKelvin = it }
+
     fun getUn20AppVersion(): Single<Un20AppVersion> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetUn20AppVersionResponse>(
