@@ -89,9 +89,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
         tickerToUpdateLastSyncTimeText?.let {
             for (event in it) {
                 lastSyncTimeTextView?.let {
-                    if (cachedLastSyncTime != null) {
-                        updateLastSyncUI(cachedLastSyncTime, it)
-                    }
+                    updateLastSyncUI(cachedLastSyncTime, it)
                 }
             }
         }
@@ -218,8 +216,11 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     }
 
     private fun updateLastSyncUI(lastSyncTime: Date?, textView: TextView) {
-        val lastSyncTimeText = lastSyncTime?.let { timeHelper.readableBetweenNowAndTime(lastSyncTime) } ?: ""
-        textView.text = androidResourcesHelper.getString(R.string.dashboard_card_sync_last_sync, arrayOf(lastSyncTimeText))
+        lastSyncTime?.let {
+            val lastSyncTimeText = timeHelper.readableBetweenNowAndTime(it)
+            textView.visibility = VISIBLE
+            textView.text = androidResourcesHelper.getString(R.string.dashboard_card_sync_last_sync, arrayOf(lastSyncTimeText))
+        } ?: run { textView.visibility = GONE }
     }
 
     private fun removeOldViewState() {

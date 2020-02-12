@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dashboard_daily_activity_card"
     style="@style/DashboardCardStyle"
     android:layout_width="match_parent"
@@ -21,9 +20,9 @@
             style="@style/DashboardCardStyleTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:text="Activity: 31/01/2020"/>
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Activity: 31/01/2020" />
 
         <TextView
             android:id="@+id/dashboard_daily_activity_card_enrolments_count"
@@ -31,11 +30,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_large"
-            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_title"
-            app:layout_constraintStart_toStartOf="@+id/enrolments_label"
-            app:layout_constraintEnd_toEndOf="@+id/enrolments_label"
             android:textSize="20sp"
-            tools:text="250"/>
+            app:layout_constraintEnd_toEndOf="@+id/enrolments_label"
+            app:layout_constraintStart_toStartOf="@+id/enrolments_label"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_title"
+            tools:text="250" />
 
         <TextView
             android:id="@+id/dashboard_daily_activity_card_identifications_count"
@@ -43,11 +42,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_large"
-            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_title"
-            app:layout_constraintStart_toStartOf="@id/identifications_label"
-            app:layout_constraintEnd_toEndOf="@id/identifications_label"
             android:textSize="20sp"
-            tools:text="200"/>
+            app:layout_constraintEnd_toEndOf="@id/identifications_label"
+            app:layout_constraintStart_toStartOf="@id/identifications_label"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_title"
+            tools:text="200" />
 
         <TextView
             android:id="@+id/dashboard_daily_activity_card_verifications_count"
@@ -55,23 +54,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_large"
-            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_title"
-            app:layout_constraintStart_toStartOf="@+id/verifications_label"
-            app:layout_constraintEnd_toEndOf="@+id/verifications_label"
             android:textSize="20sp"
-            tools:text="150"/>
+            app:layout_constraintEnd_toEndOf="@+id/verifications_label"
+            app:layout_constraintStart_toStartOf="@+id/verifications_label"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_title"
+            tools:text="150" />
 
         <TextView
             android:id="@+id/enrolments_label"
             style="@style/SimprintsStyle.TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_enrolments_count"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/divider_enrolments"
             app:layout_constraintHorizontal_chainStyle="spread"
-            tools:text="Enrolments"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_enrolments_count"
+            tools:text="Enrolments" />
 
         <View
             android:id="@+id/divider_enrolments"
@@ -79,22 +78,22 @@
             android:layout_height="0dp"
             android:background="@drawable/divider_dashboard_daily_activity"
             android:visibility="gone"
-            app:layout_constraintTop_toTopOf="@id/dashboard_daily_activity_card_enrolments_count"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/enrolments_label"
             app:layout_constraintEnd_toStartOf="@+id/identifications_label"
-            tools:visibility="visible"/>
+            app:layout_constraintStart_toEndOf="@id/enrolments_label"
+            app:layout_constraintTop_toTopOf="@id/dashboard_daily_activity_card_enrolments_count"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/identifications_label"
             style="@style/SimprintsStyle.TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_identifications_count"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/divider_enrolments"
             app:layout_constraintEnd_toStartOf="@+id/divider_identifications"
-            tools:text="Identifications"/>
+            app:layout_constraintStart_toEndOf="@id/divider_enrolments"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_identifications_count"
+            tools:text="Identifications" />
 
         <View
             android:id="@+id/divider_identifications"
@@ -102,22 +101,22 @@
             android:layout_height="0dp"
             android:background="@drawable/divider_dashboard_daily_activity"
             android:visibility="gone"
-            app:layout_constraintTop_toTopOf="@id/dashboard_daily_activity_card_identifications_count"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/identifications_label"
             app:layout_constraintEnd_toStartOf="@+id/verifications_label"
-            tools:visibility="visible"/>
+            app:layout_constraintStart_toEndOf="@id/identifications_label"
+            app:layout_constraintTop_toTopOf="@id/dashboard_daily_activity_card_identifications_count"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/verifications_label"
             style="@style/SimprintsStyle.TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_verifications_count"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/divider_identifications"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="Verifications"/>
+            app:layout_constraintStart_toEndOf="@id/divider_identifications"
+            app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_verifications_count"
+            tools:text="Verifications" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/group_enrolments"
@@ -125,7 +124,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:constraint_referenced_ids="dashboard_daily_activity_card_enrolments_count,enrolments_label"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/group_identifications"
@@ -133,7 +132,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:constraint_referenced_ids="dashboard_daily_activity_card_identifications_count,identifications_label"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/group_verifications"
@@ -141,7 +140,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:constraint_referenced_ids="dashboard_daily_activity_card_verifications_count,verifications_label"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
