@@ -6,17 +6,16 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Templ
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20MessageType
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
 
-class GetTemplateResponse(val templateData: TemplateData) : Un20Response(Un20MessageType.GetTemplate(templateData.templateType.byte)) {
+class GetTemplateResponse(val templateType: TemplateType, val templateData: TemplateData?) : Un20Response(Un20MessageType.GetTemplate(templateType.byte)) {
 
-    override fun getDataBytes(): ByteArray = byteArrayOf(templateData.template)
+    override fun getDataBytes(): ByteArray = templateData?.let { byteArrayOf(it.template) }
+        ?: byteArrayOf()
 
     companion object {
         fun fromBytes(minorResponseByte: Byte, data: ByteArray) =
             GetTemplateResponse(
-                TemplateData(
-                    templateType = TemplateType.fromBytes(byteArrayOf(minorResponseByte)),
-                    template = data
-                )
+                TemplateType.fromBytes(byteArrayOf(minorResponseByte)),
+                if (data.isNotEmpty()) TemplateData(template = data) else null
             )
     }
 }

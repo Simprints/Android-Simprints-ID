@@ -423,7 +423,7 @@ class ScannerTest {
         val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<GetTemplateCommand>()) } then {
                 Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(GetTemplateResponse(TemplateData(Scanner.DEFAULT_TEMPLATE_TYPE, template)))
+                    responseSubject.onNext(GetTemplateResponse(Scanner.DEFAULT_TEMPLATE_TYPE, TemplateData(template)))
                 }
             }
         }
@@ -458,7 +458,7 @@ class ScannerTest {
         val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
             whenThis { sendMessage(isA<GetImageCommand>()) } then {
                 Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(GetImageResponse(ImageData(ImageFormat.RAW, image, crcCheck)))
+                    responseSubject.onNext(GetImageResponse(ImageFormat.RAW, ImageData(image, crcCheck)))
                 }
             }
         }

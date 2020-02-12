@@ -6,21 +6,22 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Image
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormat
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20MessageType
 
-class GetImageResponse(val imageData: ImageData) : Un20Response(Un20MessageType.GetImage(imageData.imageFormat.byte)) {
+class GetImageResponse(val imageFormat: ImageFormat, val imageData: ImageData?) : Un20Response(Un20MessageType.GetImage(imageFormat.byte)) {
 
-    override fun getDataBytes(): ByteArray = imageData.image +
-        with(Un20MessageProtocol) { imageData.crcValue.toByteArray() }
+    override fun getDataBytes(): ByteArray = imageData?.let {
+        it.image + with(Un20MessageProtocol) { it.crcValue.toByteArray() }
+    } ?: byteArrayOf()
 
     companion object {
         fun fromBytes(minorTypeByte: Byte, data: ByteArray) =
             GetImageResponse(
-                ImageData(
-                    ImageFormat.fromByte(minorTypeByte),
+                ImageFormat.fromByte(minorTypeByte),
+                if (data.isNotEmpty()) ImageData(
                     data.sliceArray(0 until data.size - 4),
                     with(Un20MessageProtocol) {
                         data.sliceArray(data.size - 4 until data.size).extract({ int })
                     }
-                )
+                ) else null
             )
     }
 }

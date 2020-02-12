@@ -26,18 +26,20 @@ class SimulatedUn20ResponseHelper(private val simulatedScannerManager: Simulated
                     .captureFingerprintResult
             )
             is GetSupportedTemplateTypesCommand -> GetSupportedTemplateTypesResponse(setOf(TemplateType.ISO_19794_2_2011))
-            is GetTemplateCommand -> GetTemplateResponse(TemplateData(
-                command.templateType,
-                simulatedScannerManager.currentMockFinger().toV2().templateBytes
-            )
-                .also { simulatedScannerManager.cycleToNextFinger() })
+            is GetTemplateCommand -> GetTemplateResponse(command.templateType,
+                TemplateData(
+                    simulatedScannerManager.currentMockFinger().toV2().templateBytes
+                )
+            ).also { simulatedScannerManager.cycleToNextFinger() }
             is GetSupportedImageFormatsCommand -> GetSupportedImageFormatsResponse(setOf(ImageFormat.RAW))
             is GetImageCommand -> {
                 val imageBytes = Random.nextBytes((120000 * (((simulatedScannerV2.scannerState.lastFingerCapturedDpi.value / 100) * 100) / 500f)).toInt())
-                GetImageResponse(ImageData(
-                    command.imageFormatData.imageFormat,
-                    imageBytes,
-                    Crc32Calculator().calculateCrc32(imageBytes)))
+                GetImageResponse(command.imageFormatData.imageFormat,
+                    ImageData(
+                        imageBytes,
+                        Crc32Calculator().calculateCrc32(imageBytes)
+                    )
+                )
             }
             is GetImageQualityCommand -> GetImageQualityResponse(simulatedScannerManager.currentMockFinger().toV2().imageQuality)
             else -> throw UnsupportedOperationException("Unmocked response to $command in SimulatedUn20ResponseHelper")

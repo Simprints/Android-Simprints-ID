@@ -2,6 +2,7 @@ package com.simprints.fingerprintscanner.v2.tools.reactive
 
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.flowables.ConnectableFlowable
 import io.reactivex.rxkotlin.Singles
@@ -34,3 +35,13 @@ fun <T> Flowable<T>.subscribeOnIoAndPublish(): ConnectableFlowable<T> =
 
 fun <T> Completable.doSimultaneously(single: Single<T>): Single<T> =
     Singles.zip(single, this.toSingleDefault(Unit)) { value, _ -> value }
+
+fun <T, R> Single<T>.mapToMaybeEmptyIfNull(block: (T) -> R?): Maybe<R> =
+    flatMapMaybe {
+        val value: R? = block(it)
+        if (value != null) {
+            Maybe.just<R>(value)
+        } else {
+            Maybe.empty<R>()
+        }
+    }
