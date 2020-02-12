@@ -476,6 +476,35 @@ class ScannerTest {
     }
 
     @Test
+    fun scanner_acquireImage_noImageTakenCallsComplete() {
+        val responseSubject = PublishSubject.create<Un20Response>()
+
+        val messageInputStreamSpy = spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
+            whenThis { connect(anyNotNull()) } thenDoNothing {}
+            un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
+            veroEvents = Flowable.empty()
+        }
+        val mockMessageOutputStream = setupMock<MainMessageOutputStream> {
+            whenThis { sendMessage(isA<GetImageCommand>()) } then {
+                Completable.complete().doAfterTerminate {
+                    responseSubject.onNext(GetImageResponse(ImageFormat.RAW, null))
+                }
+            }
+        }
+
+        val scanner = Scanner(MainMessageChannel(messageInputStreamSpy, mockMessageOutputStream), setupRootMessageChannelMock(), mock(), mock(), mock(), mock(), mock(), responseErrorHandler).apply {
+            connect(mock(), mock()).blockingAwait()
+            enterMainMode().blockingAwait()
+            state.un20On = true
+        }
+
+        val testObserver = scanner.acquireImage().testSubscribe()
+        testObserver.awaitAndAssertSuccess()
+        testObserver.assertValueCount(0)
+        testObserver.assertComplete()
+    }
+
+    @Test
     fun scanner_connectThenDisconnect_resetsToDisconnectedState() {
         val scanner = Scanner(mock(), setupRootMessageChannelMock(), mock(), mock(), mock(), mock(), mock(), responseErrorHandler)
         scanner.connect(mock(), mock()).blockingAwait()
