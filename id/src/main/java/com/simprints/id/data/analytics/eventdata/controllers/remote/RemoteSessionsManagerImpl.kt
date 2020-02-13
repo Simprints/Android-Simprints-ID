@@ -1,16 +1,14 @@
 package com.simprints.id.data.analytics.eventdata.controllers.remote
 
-import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
 
 
-open class RemoteSessionsManagerImpl(private val remoteDbManager: RemoteDbManager) : RemoteSessionsManager {
+open class RemoteSessionsManagerImpl(private val remoteDbManager: RemoteDbManager,
+                                     private val simApiClientFactory: SimApiClientFactory) : RemoteSessionsManager {
 
     override suspend fun getSessionsApiClient(): SessionsRemoteInterface {
         val token = remoteDbManager.getCurrentToken()
-        return buildSessionsApi(token)
+        return simApiClientFactory.build<SessionsRemoteInterface>(token).api
     }
-
-    private fun buildSessionsApi(authToken: String): SessionsRemoteInterface =
-        SimApiClient(SessionsRemoteInterface::class.java, SessionsRemoteInterface.baseUrl, authToken).api
 }

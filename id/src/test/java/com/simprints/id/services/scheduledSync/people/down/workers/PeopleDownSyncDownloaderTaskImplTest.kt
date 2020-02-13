@@ -3,7 +3,8 @@ package com.simprints.id.services.scheduledSync.people.down.workers
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.NetworkConstants
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
@@ -118,8 +119,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
         mockServer.start()
 
-        PeopleRemoteInterface.baseUrl = this.mockServer.url("/").toString()
-        val remotePeopleApi: PeopleRemoteInterface = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl).api
+        val remotePeopleApi = SimApiClientFactory("deviceId", endpoint = mockServer.url("/").toString()).build<PeopleRemoteInterface>().api
 
         coEvery { personRemoteDataSourceMock.getPeopleApiClient() } returns remotePeopleApi
     }
@@ -313,7 +313,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
     }
 
     private fun mockClientToThrowFirstAndThenExecuteNetworkCall(): PeopleRemoteInterface {
-        val remotePeopleApi: PeopleRemoteInterface = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl).api
+        val remotePeopleApi = SimApiClientFactory("deviceId", endpoint = NetworkConstants.baseUrl).build<PeopleRemoteInterface>().api
         return mockk {
             coEvery { downSync(any(), any(), any(), any(), any(), any()) } throws Throwable("Network issue") coAndThen {
                 remotePeopleApi.downSync(

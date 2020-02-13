@@ -1,6 +1,5 @@
 package com.simprints.id.secure
 
-import com.simprints.core.network.NetworkConstants
 import com.simprints.id.BuildConfig
 import com.simprints.id.secure.models.AuthRequestBody
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
@@ -11,7 +10,6 @@ import retrofit2.http.*
 
 interface SecureApiInterface {
     companion object {
-        const val baseUrl = NetworkConstants.baseUrl
         const val apiKey: String = BuildConfig.ANDROID_AUTH_API_KEY
     }
 
