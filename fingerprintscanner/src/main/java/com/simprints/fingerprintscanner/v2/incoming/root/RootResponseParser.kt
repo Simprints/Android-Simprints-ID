@@ -15,6 +15,7 @@ class RootResponseParser : MessageParser<RootResponse> {
                     ENTER_MAIN_MODE -> EnterMainModeResponse.fromBytes(data)
                     ENTER_CYPRESS_OTA_MODE -> EnterCypressOtaModeResponse.fromBytes(data)
                     ENTER_STM_OTA_MODE -> EnterStmOtaModeResponse.fromBytes(data)
+                    GET_CYPRESS_VERSION -> GetCypressVersionResponse.fromBytes(data)
                     GET_VERSION -> GetVersionResponse.fromBytes(data)
                     SET_VERSION -> SetVersionResponse.fromBytes(data)
                 }

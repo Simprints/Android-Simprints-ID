@@ -94,6 +94,7 @@ class SimulatedCommandInputStream {
                     ENTER_MAIN_MODE -> EnterMainModeCommand.fromBytes(data)
                     ENTER_CYPRESS_OTA_MODE -> EnterCypressOtaModeCommand.fromBytes(data)
                     ENTER_STM_OTA_MODE -> EnterStmOtaModeCommand.fromBytes(data)
+                    GET_CYPRESS_VERSION -> GetCypressVersionCommand.fromBytes(data)
                     GET_VERSION -> GetVersionCommand.fromBytes(data)
                     SET_VERSION -> SetVersionCommand.fromBytes(data)
                 }
