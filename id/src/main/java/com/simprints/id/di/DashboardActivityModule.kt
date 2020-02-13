@@ -108,6 +108,6 @@ open class DashboardActivityModule {
         timeHelper: TimeHelper,
         ctx: Context
     ): DashboardSyncCardDisplayer =
-        DashboardSyncCardDisplayerImpl(androidResourcesHelper, timeHelper, ctx)
+        DashboardSyncCardDisplayerImpl(androidResourcesHelper, timeHelper)
 
 }
