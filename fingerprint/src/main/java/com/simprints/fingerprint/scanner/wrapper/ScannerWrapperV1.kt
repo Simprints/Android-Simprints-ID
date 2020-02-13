@@ -1,5 +1,8 @@
 package com.simprints.fingerprint.scanner.wrapper
 
+import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
+import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
+import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ScannerVersionInformation
@@ -18,8 +21,8 @@ import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 
 class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
 
-    override val versionInformation: ScannerVersionInformation
-        get() = ScannerVersionInformation(
+    override fun versionInformation(): ScannerVersionInformation =
+        ScannerVersionInformation(
             veroVersion = 1,
             firmwareVersion = scannerV1.ucVersion.toInt(),
             un20Version = scannerV1.unVersion.toInt()
@@ -76,7 +79,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
         }))
     }
 
-    override fun captureFingerprint(timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
+    override fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
         Single.create<CaptureFingerprintResponse> { emitter ->
             scannerV1.startContinuousCapture(qualityThreshold, timeOutMs.toLong(), continuousCaptureCallback(qualityThreshold, emitter))
         }.doOnDispose {
@@ -113,6 +116,9 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
             else -> emitter.onError(UnexpectedScannerException.forScannerError(error, "ScannerWrapperV1"))
         }
     }
+
+    override fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): Single<AcquireImageResponse> =
+        Single.error(UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION))
 
     override fun setUiIdle(): Completable = Completable.create { result ->
         scannerV1.resetUI(ScannerCallbackWrapper({

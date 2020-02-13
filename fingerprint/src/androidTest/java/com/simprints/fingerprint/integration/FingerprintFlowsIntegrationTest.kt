@@ -59,7 +59,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
         val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager(simulationMode))
         declare {
             single<ScannerFactory> {
-                spy(ScannerFactoryImpl(simulatedBluetoothAdapter, get())).apply {
+                spy(ScannerFactoryImpl(simulatedBluetoothAdapter, mock(), mock(), mock())).apply {
                     whenThis { create(anyNotNull()) } then {
                         val macAddress = it.arguments[0] as String
                         when (simulationMode) {

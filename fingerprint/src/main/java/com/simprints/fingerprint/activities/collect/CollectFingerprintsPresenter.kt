@@ -22,10 +22,14 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.flow.Action.*
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
+import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.data.domain.images.deduceFileExtension
+import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.scanner.ScannerManager
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.util.*
 import kotlin.math.min
@@ -39,7 +43,8 @@ class CollectFingerprintsPresenter(private val context: Context,
                                    private val scannerManager: ScannerManager,
                                    private val androidResourcesHelper: FingerprintAndroidResourcesHelper,
                                    private val masterFlowManager: MasterFlowManager,
-                                   private val fingerprintPreferencesManager: FingerprintPreferencesManager)
+                                   private val fingerprintPreferencesManager: FingerprintPreferencesManager,
+                                   private val imageManager: FingerprintImageManager)
     : CollectFingerprintsContract.Presenter {
 
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
@@ -53,6 +58,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     override var isBusyWithFingerTransitionAnimation = false
     private var lastCaptureStartedAt: Long = 0
     private var confirmDialog: AlertDialog? = null
+    private val captureEventIds: MutableMap<Finger, String> = mutableMapOf()
 
     override fun start() {
         initFingerDisplayHelper(view)
@@ -76,7 +82,15 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun initScanningHelper(context: Context, view: CollectFingerprintsContract.View) {
-        scanningHelper = CollectFingerprintsScanningHelper(context, view, this, scannerManager, crashReportManager, androidResourcesHelper)
+        scanningHelper = CollectFingerprintsScanningHelper(
+            context,
+            view,
+            this,
+            scannerManager,
+            crashReportManager,
+            androidResourcesHelper,
+            fingerprintPreferencesManager
+        )
     }
 
     private fun initScanButtonListeners() {
@@ -146,7 +160,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun everyActiveFingerHasSatisfiedTerminalCondition(): Boolean =
         activeFingers.all { fingerHasSatisfiedTerminalCondition(it) }
 
-    private fun tooManyBadScans(finger: Finger) =
+    override fun tooManyBadScans(finger: Finger) =
         finger.numberOfBadScans >= numberOfBadScansRequiredToAutoAddNewFinger
 
     private fun haveNotExceedMaximumNumberOfFingersToAutoAdd() =
@@ -167,7 +181,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     override fun getTitle(): String =
         when (masterFlowManager.getCurrentAction()) {
             ENROL -> androidResourcesHelper.getString(R.string.register_title)
-            IDENTIFY ->  androidResourcesHelper.getString(R.string.identify_title)
+            IDENTIFY -> androidResourcesHelper.getString(R.string.identify_title)
             VERIFY -> androidResourcesHelper.getString(R.string.verify_title)
         }
 
@@ -193,7 +207,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         if (isScanning()) {
             stopCapturing()
         } else {
-            scanningHelper.stopReconnecting()
+            scanningHelper.stopScannerCommunications()
             view.startRefusalActivity()
         }
     }
@@ -209,7 +223,7 @@ class CollectFingerprintsPresenter(private val context: Context,
             Toast.makeText(context, androidResourcesHelper.getString(R.string.no_fingers_scanned), Toast.LENGTH_LONG).show()
             handleRestart()
         } else {
-            proceedToFinish(fingers.mapNotNull { it.template })
+            saveImagesAndProceedToFinish(fingers.filter { it.template != null })
         }
     }
 
@@ -218,6 +232,28 @@ class CollectFingerprintsPresenter(private val context: Context,
             if (it.isShowing) {
                 it.dismiss()
             }
+        }
+    }
+
+    private fun saveImagesAndProceedToFinish(fingerprints: List<Finger>) {
+        runBlocking {
+            // TODO : Use viewModelScope once converted to MVVM
+            fingerprints.forEach { finger ->
+                saveImage(finger)
+            }
+            proceedToFinish(fingerprints.mapNotNull { it.template })
+        }
+    }
+
+    private suspend fun saveImage(finger: Finger) {
+        val imageBytes = finger.imageBytes
+        val captureEventId = captureEventIds[finger]
+
+        if (imageBytes != null && captureEventId != null) {
+            finger.template?.imageRef = imageManager.save(imageBytes, captureEventId,
+                fingerprintPreferencesManager.saveFingerprintImagesStrategy.deduceFileExtension())
+        } else if (imageBytes != null && captureEventId == null) {
+            crashReportManager.logExceptionOrSafeException(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
         }
     }
 
@@ -232,7 +268,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun addCaptureEventInSession(finger: Finger) {
-        sessionEventsManager.addEventInBackground(FingerprintCaptureEvent(
+        val captureEvent = FingerprintCaptureEvent(
             lastCaptureStartedAt,
             timeHelper.now(),
             finger.id,
@@ -241,7 +277,9 @@ class CollectFingerprintsPresenter(private val context: Context,
             finger.template?.let {
                 FingerprintCaptureEvent.Fingerprint(finger.id, it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))
             }
-        ))
+        )
+        captureEventIds[finger] = captureEvent.id
+        sessionEventsManager.addEventInBackground(captureEvent)
     }
 
     private fun createMapAndShowDialog() {
@@ -296,6 +334,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         private const val maximumTotalNumberOfFingersForAutoAdding = 4
         const val numberOfBadScansRequiredToAutoAddNewFinger = 3
         const val qualityThreshold = 60
-        const val timeoutInMillis = 3000
+        const val scanningTimeoutMs = 3000L
+        const val imageTransferTimeoutMs = 3000L
     }
 }
