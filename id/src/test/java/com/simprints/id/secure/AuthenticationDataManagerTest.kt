@@ -2,7 +2,7 @@ package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.simprints.core.network.NetworkConstants.Companion.baseUrl
+import com.simprints.core.network.NetworkConstants.Companion.BASE_URL
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
@@ -34,7 +34,7 @@ class AuthenticationDataManagerTest {
     private val publicKeyFromServer = "public_key_from_server"
     private val validAuthenticationJsonResponse = "{\"nonce\":\"$nonceFromServer\", \"publicKey\":\"$publicKeyFromServer\"}"
     private val expectedAuthenticationData = AuthenticationData(Nonce(nonceFromServer), PublicKeyString(publicKeyFromServer))
-    private val expectedUrl = baseUrl + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?key=$apiKey"
+    private val expectedUrl = BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?key=$apiKey"
 
     private val validateUrl: (url: String) -> Unit  = {
         Truth.assertThat(it).isEqualTo(expectedUrl)
@@ -44,7 +44,7 @@ class AuthenticationDataManagerTest {
 
     @Before
     fun setUp() {
-        apiClient = SimApiClientFactory("deviceId", endpoint = baseUrl).build()
+        apiClient = SimApiClientFactory("deviceId", endpoint = BASE_URL).build()
     }
 
     @Test

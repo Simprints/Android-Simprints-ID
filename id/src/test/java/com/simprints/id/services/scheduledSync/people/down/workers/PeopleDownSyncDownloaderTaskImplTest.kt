@@ -313,7 +313,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
     }
 
     private fun mockClientToThrowFirstAndThenExecuteNetworkCall(): PeopleRemoteInterface {
-        val remotePeopleApi = SimApiClientFactory("deviceId", endpoint = NetworkConstants.baseUrl).build<PeopleRemoteInterface>().api
+        val remotePeopleApi = SimApiClientFactory("deviceId", endpoint = NetworkConstants.BASE_URL).build<PeopleRemoteInterface>().api
         return mockk {
             coEvery { downSync(any(), any(), any(), any(), any(), any()) } throws Throwable("Network issue") coAndThen {
                 remotePeopleApi.downSync(
