@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard.cards.sync
 
-import android.content.Context
 import android.graphics.PorterDuff
 import android.view.View
 import android.view.View.GONE
@@ -26,8 +25,7 @@ import kotlin.math.min
 
 
 class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResourcesHelper,
-                                     val timeHelper: TimeHelper,
-                                     val ctx: Context) : DashboardSyncCardDisplayer {
+                                     val timeHelper: TimeHelper) : DashboardSyncCardDisplayer {
 
     var tickerToUpdateLastSyncTimeText: ReceiveChannel<Unit>? = null
     private var lastSyncTimeTextView: TextView? = null
@@ -60,7 +58,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     }
 
     private fun createViewForSyncState(layout: Int, root: ViewGroup) =
-        ctx.layoutInflater.inflate(layout, root, false).also {
+        root.context.layoutInflater.inflate(layout, root, false).also {
             it.visibility = GONE
             it.textViewCardTitle().text = getString(R.string.dashboard_card_sync_title)
         }
@@ -89,9 +87,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
         tickerToUpdateLastSyncTimeText?.let {
             for (event in it) {
                 lastSyncTimeTextView?.let {
-                    if (cachedLastSyncTime != null) {
-                        updateLastSyncUI(cachedLastSyncTime, it)
-                    }
+                    updateLastSyncUI(cachedLastSyncTime, it)
                 }
             }
         }
@@ -110,10 +106,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
             }
             withVisible(progressCardSyncProgress()) {
                 setSyncProgress(100, 100)
-                val green = androidResourcesHelper.getColorStateList(R.color.simprints_green_dark)
-                green?.let {
-                    progressDrawable.setColorFilter(it.defaultColor, PorterDuff.Mode.SRC_IN)
-                }
+                setProgressColor(getDefaultColor(R.color.simprints_green_dark), this)
             }
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
@@ -127,6 +120,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
             }
             withVisible(progressCardSyncProgress()) {
                 setSyncProgress(syncCardState.progress, syncCardState.total)
+                setProgressColor(getDefaultColor(R.color.colorPrimaryDark), this)
             }
 
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
@@ -147,6 +141,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
             }
             withVisible(progressCardSyncProgress()) {
                 setSyncProgress(syncCardState.progress, syncCardState.total)
+                setProgressColor(getDefaultColor(R.color.colorPrimaryDark), this)
             }
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
@@ -218,8 +213,11 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     }
 
     private fun updateLastSyncUI(lastSyncTime: Date?, textView: TextView) {
-        val lastSyncTimeText = lastSyncTime?.let { timeHelper.readableBetweenNowAndTime(lastSyncTime) } ?: ""
-        textView.text = androidResourcesHelper.getString(R.string.dashboard_card_sync_last_sync, arrayOf(lastSyncTimeText))
+        lastSyncTime?.let {
+            val lastSyncTimeText = timeHelper.readableBetweenNowAndTime(it)
+            textView.visibility = VISIBLE
+            textView.text = androidResourcesHelper.getString(R.string.dashboard_card_sync_last_sync, arrayOf(lastSyncTimeText))
+        } ?: run { textView.visibility = GONE }
     }
 
     private fun removeOldViewState() {
@@ -238,8 +236,9 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     // Hacky way to extract the color from the title and use for the other TextViews
     private fun getDefaultGrayTextColor(view: View): Int = view.textViewCardTitle().textColors.defaultColor
 
-
     private fun getString(res: Int) = androidResourcesHelper.getString(res)
+
+    private fun getDefaultColor(colorState: Int) = androidResourcesHelper.getColorStateList(colorState)?.defaultColor
 
     private fun View.textViewCardTitle() = this.findViewById<TextView>(R.id.dashboard_sync_card_title)
     private fun View.progressCardConnectingProgress() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)
@@ -264,10 +263,12 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
             // Setting it only when required otherwise it creates glitches
             setProgressBarIndeterminate(this, true)
         }
+    }
 
-        val blue = androidResourcesHelper.getColorStateList(R.color.colorPrimaryDark)
-        blue?.let {
-            progressDrawable.setColorFilter(it.defaultColor, PorterDuff.Mode.SRC_IN)
+    private fun setProgressColor(color: Int?, progressBar: ProgressBar) {
+        color?.let {
+            progressBar.progressDrawable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            progressBar.indeterminateDrawable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
         }
     }
 

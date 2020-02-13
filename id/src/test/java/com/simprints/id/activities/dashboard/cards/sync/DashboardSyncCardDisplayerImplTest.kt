@@ -44,7 +44,7 @@ class DashboardSyncCardDisplayerImplTest {
         ctx = ApplicationProvider.getApplicationContext()
         syncCardRootLayout = LinearLayout(ctx)
         androidResHelper = AndroidResourcesHelperImpl(ctx)
-        syncCardDisplayer = DashboardSyncCardDisplayerImpl(androidResHelper, TimeHelperImpl(), ctx)
+        syncCardDisplayer = DashboardSyncCardDisplayerImpl(androidResHelper, TimeHelperImpl())
         syncCardDisplayer.initRoot(syncCardRootLayout)
     }
 
@@ -96,6 +96,14 @@ class DashboardSyncCardDisplayerImplTest {
     fun syncCardDisplayer_completeSyncState_shouldDisplayTheCorrectUI() {
         syncCardDisplayer.displayState(SyncComplete(lastSyncTime))
         syncCardRootLayout.assessCompleteStateSyncUI()
+    }
+
+    @Test
+    fun syncCardDisplayer_lastSyncEmpty_shouldHideLastSyncTime() {
+        syncCardDisplayer.displayState(SyncComplete(null))
+        val card = syncCardRootLayout.children.first() as CardView
+        val cardContent = card.children.first() as ConstraintLayout
+        assertThat(cardContent.lastSyncTimeTextView().visibility).isEqualTo(GONE)
     }
 
     private fun LinearLayout.assessDefaultStateSyncUI() {
@@ -213,7 +221,8 @@ class DashboardSyncCardDisplayerImplTest {
     }
 
     private fun View.cardTitle() = this.findViewById<TextView>(R.id.dashboard_sync_card_title).text.toString()
-    private fun View.lastSyncTime() = this.findViewById<TextView>(R.id.dashboard_sync_card_last_sync).text.toString()
+    private fun View.lastSyncTimeTextView() = this.findViewById<TextView>(R.id.dashboard_sync_card_last_sync)
+    private fun View.lastSyncTime() = lastSyncTimeTextView().text.toString()
 
     private fun View.defaultSyncButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_default_state_sync_button).text.toString()
 
@@ -234,7 +243,10 @@ class DashboardSyncCardDisplayerImplTest {
     private fun View.progressConnectingProgressBar() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)
     private fun View.progressSyncProgressBar() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_sync_progress_bar)
 
-    private fun View.assessLastSyncTime() = assertThat(lastSyncTime()).isEqualTo(LAST_SYNC_TEXT)
+    private fun View.assessLastSyncTime() {
+        assertThat(lastSyncTimeTextView().visibility).isEqualTo(VISIBLE)
+        assertThat(lastSyncTime()).isEqualTo(LAST_SYNC_TEXT)
+    }
 
     companion object {
         const val SYNC_CARD_TITLE = "Sync status"

@@ -1,6 +1,8 @@
 package com.simprints.id.activities.dashboard.cards.project.displayer
 
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.simprints.id.R
@@ -38,11 +40,18 @@ class DashboardProjectDetailsCardDisplayerImpl(
     }
 
     private fun View.setScannerUsed(scannerUsed: String) {
-        findViewById<TextView>(
+        with(findViewById<TextView>(
             R.id.dashboard_project_details_card_scanner_used
-        ).text = androidResourcesHelper.getString(
-            R.string.dashboard_card_scanner_used, arrayOf(scannerUsed)
-        )
+        )) {
+            if (scannerUsed.isEmpty()) {
+                this.visibility = GONE
+            } else {
+                this.visibility = VISIBLE
+                text = androidResourcesHelper.getString(
+                    R.string.dashboard_card_scanner_used, arrayOf(scannerUsed)
+                )
+            }
+        }
     }
 
 }

@@ -57,16 +57,20 @@ class PeopleSyncManagerImpl(private val ctx: Context,
         wm.cancelAllWorkByTag(MASTER_SYNC_SCHEDULERS)
     }
 
+    override fun stop() {
+        wm.cancelAllPeopleSyncWorkers()
+    }
+
     override fun cancelAndRescheduleSync() {
         cancelScheduledSync()
         stop()
-        wm.pruneWork()
+        cleanScheduledHistory()
 
         scheduleSync()
     }
 
-    override fun stop() {
-        wm.cancelAllPeopleSyncWorkers()
+    private fun cleanScheduledHistory() {
+        wm.pruneWork()
     }
 
     private fun buildOneTimeRequest(): OneTimeWorkRequest =
@@ -95,5 +99,6 @@ class PeopleSyncManagerImpl(private val ctx: Context,
         peopleDownSyncScopeRepository.deleteAll()
         peopleSyncCache.clearProgresses()
         peopleSyncCache.storeLastSuccessfulSyncTime(null)
+        cleanScheduledHistory()
     }
 }
