@@ -2,7 +2,8 @@ package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.NetworkConstants.Companion.baseUrl
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
@@ -53,10 +54,7 @@ class SessionEventsUploaderTaskTest {
 
         ShadowLog.stream = System.out
 
-        sessionsRemoteInterfaceSpy = spyk(SimApiClient(
-            SessionsRemoteInterface::class.java,
-            SessionsRemoteInterface.baseUrl,
-            "").api)
+        sessionsRemoteInterfaceSpy = spyk(SimApiClientFactory("deviceId", baseUrl).build<SessionsRemoteInterface>().api)
 
         every { sessionsEventsManagerMock.deleteSessions(any(), any(), any(), any()) } returns Completable.complete()
         every { sessionsEventsManagerMock.insertOrUpdateSessionEvents(any()) } returns Completable.complete()

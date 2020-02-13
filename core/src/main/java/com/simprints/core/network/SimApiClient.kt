@@ -9,6 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 open class SimApiClient<T>(val service: Class<T>,
                            private val endpoint: String,
+                           private val deviceId: String,
                            private val authToken: String? = null,
                            private val jsonAdapter: Gson = JsonHelper.gson) {
 
@@ -25,6 +26,6 @@ open class SimApiClient<T>(val service: Class<T>,
     }
 
     val okHttpClientConfig: OkHttpClient.Builder by lazy {
-        DefaultOkHttpClientBuilder().get(authToken)
+        DefaultOkHttpClientBuilder(deviceId).get(authToken)
     }
 }

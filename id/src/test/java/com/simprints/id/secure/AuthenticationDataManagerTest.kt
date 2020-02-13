@@ -2,10 +2,11 @@ package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
+import com.simprints.core.network.NetworkConstants.Companion.baseUrl
 import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.secure.SecureApiInterface.Companion.apiKey
-import com.simprints.id.secure.SecureApiInterface.Companion.baseUrl
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.PublicKeyString
@@ -25,10 +26,9 @@ import java.io.IOException
 class AuthenticationDataManagerTest {
 
     companion object {
-        const val PROJECT_ID = "projectId"
-        const val USER_ID = "userId"
+        private const val PROJECT_ID = "projectId"
+        private const val USER_ID = "userId"
     }
-
 
     private val nonceFromServer = "nonce_from_server"
     private val publicKeyFromServer = "public_key_from_server"
@@ -44,7 +44,7 @@ class AuthenticationDataManagerTest {
 
     @Before
     fun setUp() {
-        apiClient = SimApiClient(SecureApiInterface::class.java, baseUrl)
+        apiClient = SimApiClientFactory("deviceId", endpoint = baseUrl).build()
     }
 
     @Test

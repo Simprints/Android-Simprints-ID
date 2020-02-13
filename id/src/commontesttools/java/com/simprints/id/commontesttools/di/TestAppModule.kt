@@ -2,6 +2,7 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -99,8 +100,8 @@ class TestAppModule(
     override fun provideKeystoreManager(): KeystoreManager =
         keystoreManagerRule.resolveDependency { super.provideKeystoreManager() }
 
-    override fun provideSecureApiInterface(): SecureApiInterface =
-        secureApiInterfaceRule.resolveDependency { super.provideSecureApiInterface() }
+    override fun provideSecureApiInterface(simApiClientFactory: SimApiClientFactory): SecureApiInterface =
+        secureApiInterfaceRule.resolveDependency { super.provideSecureApiInterface(simApiClientFactory) }
 
     override fun provideSessionEventsManager(
         ctx: Context,
@@ -130,8 +131,9 @@ class TestAppModule(
     override fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager): LongConsentManager =
         longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager, crashReportManager) }
 
-    override fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager =
-        remoteSessionsManagerRule.resolveDependency { super.provideRemoteSessionsManager(remoteDbManager) }
+    override fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager,
+                                              factory: SimApiClientFactory): RemoteSessionsManager =
+        remoteSessionsManagerRule.resolveDependency { super.provideRemoteSessionsManager(remoteDbManager, factory) }
 
     override fun provideSyncStatusDatabase(ctx: Context): PeopleSyncStatusDatabase =
         syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase(ctx) }

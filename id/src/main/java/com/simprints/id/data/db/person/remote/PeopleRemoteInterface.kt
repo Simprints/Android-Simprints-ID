@@ -1,6 +1,5 @@
 package com.simprints.id.data.db.person.remote
 
-import com.simprints.core.network.NetworkConstants
 import com.simprints.core.network.SimRemoteInterface
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.ApiModes
@@ -12,10 +11,6 @@ import retrofit2.http.*
 
 @JvmSuppressWildcards
 interface PeopleRemoteInterface : SimRemoteInterface {
-
-    companion object {
-        var baseUrl = NetworkConstants.baseUrl
-    }
 
     @GET("projects/{projectId}/patients")
     @Streaming
