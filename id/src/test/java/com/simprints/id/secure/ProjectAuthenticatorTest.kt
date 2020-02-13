@@ -4,7 +4,9 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.common.truth.Truth
+import com.simprints.core.network.NetworkConstants.Companion.BASE_URL
 import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
@@ -89,7 +91,7 @@ class ProjectAuthenticatorTest {
 
         coEvery { remoteSessionsManagerMock.getSessionsApiClient() } throws IllegalStateException()
 
-        apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)
+        apiClient = SimApiClientFactory("deviceId", endpoint = BASE_URL).build()
     }
 
     @Test
@@ -155,7 +157,7 @@ class ProjectAuthenticatorTest {
         val authenticator = spyk(ProjectAuthenticator(
             app.component,
             SafetyNet.getClient(app),
-            SimApiClient(SecureApiInterface::class.java, mockWebServer.url("/").toString()).api,
+            SimApiClientFactory("deviceId", mockWebServer.url("/").toString()).build<SecureApiInterface>().api,
             getMockAttestationManager()))
 
         every { authenticator.projectSecretManager } returns mockProjectSecretManager

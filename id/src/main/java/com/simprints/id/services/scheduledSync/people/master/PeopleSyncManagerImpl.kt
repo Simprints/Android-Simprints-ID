@@ -22,7 +22,7 @@ class PeopleSyncManagerImpl(private val ctx: Context,
                             private val peopleSyncCache: PeopleSyncCache) : PeopleSyncManager {
 
     companion object {
-        const val SYNC_WORKER_REPEAT_INTERVAL = 15L
+        const val SYNC_WORKER_REPEAT_INTERVAL = 15L //StopShip
         val SYNC_WORKER_REPEAT_UNIT = TimeUnit.MINUTES
     }
 

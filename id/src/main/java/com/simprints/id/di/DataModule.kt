@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import com.simprints.core.images.repository.ImageRepository
 import com.simprints.core.images.repository.ImageRepositoryImpl
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
@@ -32,8 +33,9 @@ open class DataModule {
     @Provides
     @Singleton
     open fun providePersonRemoteDataSource(
-        remoteDbManager: RemoteDbManager
-    ): PersonRemoteDataSource = PersonRemoteDataSourceImpl(remoteDbManager)
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory
+    ): PersonRemoteDataSource = PersonRemoteDataSourceImpl(remoteDbManager, simApiClientFactory)
 
     @Provides
     @FlowPreview
@@ -50,8 +52,9 @@ open class DataModule {
     @Provides
     @Singleton
     open fun provideProjectRemoteDataSource(
-        remoteDbManager: RemoteDbManager
-    ): ProjectRemoteDataSource = ProjectRemoteDataSourceImpl(remoteDbManager)
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory
+    ): ProjectRemoteDataSource = ProjectRemoteDataSourceImpl(remoteDbManager, simApiClientFactory)
 
     @Provides
     open fun provideProjectRepository(

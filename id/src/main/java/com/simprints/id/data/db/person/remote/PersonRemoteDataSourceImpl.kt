@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.person.remote
 
-import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
@@ -16,7 +16,8 @@ import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsExceptio
 import com.simprints.id.tools.utils.retrySimNetworkCalls
 
 
-open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager) : PersonRemoteDataSource {
+open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
+                                      private val simApiClientFactory: SimApiClientFactory) : PersonRemoteDataSource {
 
     override suspend fun downloadPerson(patientId: String, projectId: String): Person =
         makeNetworkRequest({
@@ -87,9 +88,6 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
 
     override suspend fun getPeopleApiClient(): PeopleRemoteInterface {
         val token = remoteDbManager.getCurrentToken()
-        return buildPeopleApi(token)
+        return simApiClientFactory.build<PeopleRemoteInterface>(token).api
     }
-
-    private fun buildPeopleApi(authToken: String): PeopleRemoteInterface =
-        SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl, authToken).api
 }
