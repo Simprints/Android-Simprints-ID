@@ -3,7 +3,6 @@ package com.simprints.id.services.scheduledSync.people.down.workers
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.network.NetworkConstants
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
@@ -313,7 +312,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
     }
 
     private fun mockClientToThrowFirstAndThenExecuteNetworkCall(): PeopleRemoteInterface {
-        val remotePeopleApi = SimApiClientFactory("deviceId", endpoint = NetworkConstants.BASE_URL).build<PeopleRemoteInterface>().api
+        val remotePeopleApi = SimApiClientFactory("deviceId", endpoint = mockServer.url("/").toString()).build<PeopleRemoteInterface>().api
         return mockk {
             coEvery { downSync(any(), any(), any(), any(), any(), any()) } throws Throwable("Network issue") coAndThen {
                 remotePeopleApi.downSync(
