@@ -51,7 +51,6 @@
     <string name="scan_label">Scan</string>
     <string name="cancel_button" tools:ignore="ButtonCase">Cancel</string>
     <string name="please_wait_button">Please Wait</string>
-    <string name="ok">OK</string>
     <string name="scan">Scan</string>
     <string name="confirm">Confirm</string>
     <string name="restart">Restart</string>
