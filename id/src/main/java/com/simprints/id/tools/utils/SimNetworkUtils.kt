@@ -10,5 +10,4 @@ interface SimNetworkUtils {
 
     val mobileNetworkType: String?
     val connectionsStates: List<Connection>
-    fun isConnected():Boolean
 }

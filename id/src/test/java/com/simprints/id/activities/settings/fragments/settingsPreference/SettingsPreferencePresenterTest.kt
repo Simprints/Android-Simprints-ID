@@ -5,13 +5,12 @@ import android.preference.MultiSelectListPreference
 import android.preference.Preference
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import io.mockk.*
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.robolectric.annotation.Config
 
 @Suppress("UsePropertyAccessSyntax")
@@ -27,50 +26,50 @@ class SettingsPreferencePresenterTest {
     }
 
     private lateinit var presenter: SettingsPreferencePresenter
-    private val viewMock: SettingsPreferenceContract.View = Mockito.mock(SettingsPreferenceContract.View::class.java)
+    private val viewMock: SettingsPreferenceContract.View = mockk(relaxed = true)
 
     @Before
     fun setUp() {
-        presenter = spy(SettingsPreferencePresenter(viewMock, mock()))
+        presenter = spyk(SettingsPreferencePresenter(viewMock, mockk(relaxed = true)))
     }
 
     @Test
     fun languagePreference_bindChangeListener_preferenceShouldHaveListenerBoundedAndValues() {
-        val mockPreference = Mockito.mock(ListPreference::class.java)
-        whenever(viewMock.getPreferenceForLanguage()).thenReturn(mockPreference)
-        whenever(viewMock.getKeyForLanguagePreference()).thenReturn(PREFERENCE_KEY_FOR_LANGUAGES)
-        whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_LANGUAGES)
-        whenever(presenter) { loadLanguagePreference(anyNotNull()) } thenDoNothing {}
+        val mockPreference = mockk<ListPreference>(relaxed = true)
+        every { viewMock.getPreferenceForLanguage() } returns mockPreference
+        every { viewMock.getKeyForLanguagePreference() } returns PREFERENCE_KEY_FOR_LANGUAGES
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_LANGUAGES
+        every { presenter.loadLanguagePreference(any()) } just Runs
 
         presenter.loadValueAndBindChangeListener(mockPreference)
 
-        verifyOnce(mockPreference) { setOnPreferenceChangeListener(anyNotNull()) }
-        verifyOnce(presenter) { loadLanguagePreference(anyNotNull()) }
+        verify(atLeast = 1) { mockPreference.setOnPreferenceChangeListener(any()) }
+        verify(atLeast = 1) { presenter.loadLanguagePreference(any()) }
     }
 
     @Test
     fun defaultFingersPreference_bindChangeListener_preferenceShouldHaveListenerBoundedAndValues() {
-        val mockPreference = Mockito.mock(MultiSelectListPreference::class.java)
-        whenever(viewMock.getPreferenceForDefaultFingers()).thenReturn(mockPreference)
-        whenever(viewMock.getKeyForDefaultFingersPreference()).thenReturn(PREFERENCE_KEY_FOR_FINGERS)
-        whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_FINGERS)
-        whenever(presenter) { loadDefaultFingersPreference(anyNotNull()) } thenDoNothing {}
+        val mockPreference = mockk<MultiSelectListPreference>(relaxed = true)
+        every { viewMock.getPreferenceForDefaultFingers() } returns mockPreference
+        every { viewMock.getKeyForDefaultFingersPreference() } returns PREFERENCE_KEY_FOR_FINGERS
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_FINGERS
+        every { presenter.loadDefaultFingersPreference(any()) } just Runs
 
         presenter.loadValueAndBindChangeListener(mockPreference)
 
-        verifyOnce(mockPreference) { setOnPreferenceChangeListener(anyNotNull()) }
-        verifyOnce(presenter) { loadDefaultFingersPreference(anyNotNull()) }
+        verify(atLeast = 1) { mockPreference.setOnPreferenceChangeListener(any()) }
+        verify(atLeast = 1) { presenter.loadDefaultFingersPreference(any()) }
     }
 
     @Test
     fun aboutPreference_userClicksOnIt_shouldStartAboutActivity() {
-        val mockPreference = Mockito.mock(Preference::class.java)
-        whenever(viewMock.getPreferenceForAbout()).thenReturn(mockPreference)
-        whenever(viewMock.getKeyForAboutPreference()).thenReturn(PREFERENCE_KEY_FOR_ABOUT_APP)
-        whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_ABOUT_APP)
+        val mockPreference = mockk<Preference>()
+        every { viewMock.getPreferenceForAbout() } returns mockPreference
+        every { viewMock.getKeyForAboutPreference() } returns PREFERENCE_KEY_FOR_ABOUT_APP
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_ABOUT_APP
         var actionForAboutAppPreference: Preference.OnPreferenceClickListener? = null
-        whenever(mockPreference) { setOnPreferenceClickListener(anyNotNull()) } thenAnswer {
-            actionForAboutAppPreference = it.arguments.first() as Preference.OnPreferenceClickListener
+        every { mockPreference.setOnPreferenceClickListener(any()) } answers {
+            actionForAboutAppPreference = this.args.first() as Preference.OnPreferenceClickListener?
             null
         }
 
@@ -78,7 +77,7 @@ class SettingsPreferencePresenterTest {
 
         actionForAboutAppPreference?.let {
             it.onPreferenceClick(mockPreference)
-            verifyOnce(viewMock) { openSettingAboutActivity() }
+            verify(atLeast = 1) { viewMock.openSettingAboutActivity() }
         } ?: Assert.fail("Action for open About Settings preference not set.")
     }
 }

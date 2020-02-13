@@ -3,7 +3,6 @@ package com.simprints.id.activities.orchestrator
 import android.app.Activity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import com.nhaarman.mockitokotlin2.any
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
@@ -20,27 +19,23 @@ import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.SOME_METADATA
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.verifyOnce
-import com.simprints.testtools.common.syntax.whenever
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import io.reactivex.Single
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 
 class OrchestratorViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    @Mock private lateinit var sessionEventsManagerMock: SessionEventsManager
-    @Mock private lateinit var orchestratorEventsHelperMock: OrchestratorEventsHelper
-    @Mock private lateinit var orchestratorManagerMock: OrchestratorManager
-    @Mock private lateinit var domainToModuleApiConverter: DomainToModuleApiAppResponse
+    @MockK private lateinit var sessionEventsManagerMock: SessionEventsManager
+    @MockK private lateinit var orchestratorEventsHelperMock: OrchestratorEventsHelper
+    @MockK private lateinit var orchestratorManagerMock: OrchestratorManager
+    @MockK private lateinit var domainToModuleApiConverter: DomainToModuleApiAppResponse
     private lateinit var liveDataAppResponse: MutableLiveData<AppResponse>
     private lateinit var liveDataNextIntent: MutableLiveData<Step>
 
@@ -55,7 +50,7 @@ class OrchestratorViewModelTest {
             .rescheduleRxMainThread()
             .coroutinesMainThread()
 
-        MockitoAnnotations.initMocks(this)
+        MockKAnnotations.init(this, relaxed = true)
 
         liveDataAppResponse = MutableLiveData()
         liveDataNextIntent = MutableLiveData()
@@ -66,21 +61,17 @@ class OrchestratorViewModelTest {
     }
 
     private fun configureMocks() {
-        whenever(domainToModuleApiConverter) { fromDomainModuleApiAppResponse(anyNotNull()) } thenReturn mock()
-        whenever(sessionEventsManagerMock) { getCurrentSession() } thenReturn Single.just(fakeSession)
-        whenever(orchestratorManagerMock) { appResponse } thenReturn liveDataAppResponse
-        whenever(orchestratorManagerMock) { ongoingStep } thenReturn liveDataNextIntent
+        every { domainToModuleApiConverter.fromDomainModuleApiAppResponse(any()) } returns mockk()
+        every { sessionEventsManagerMock.getCurrentSession() } returns Single.just(fakeSession)
+        every { orchestratorManagerMock.appResponse } returns liveDataAppResponse
+        every { orchestratorManagerMock.ongoingStep } returns liveDataNextIntent
     }
 
     @Test
     fun viewModelStart_shouldStartOrchestrator() {
         runBlocking {
             vm.startModalityFlow(enrolAppRequest)
-            verifyOnce(orchestratorManagerMock) {
-                runBlocking {
-                    initialise(listOf(FACE), enrolAppRequest, SOME_SESSION_ID)
-                }
-            }
+            coVerify(exactly = 1) { orchestratorManagerMock.initialise(listOf(FACE), enrolAppRequest, SOME_SESSION_ID) }
         }
     }
 
@@ -88,11 +79,7 @@ class OrchestratorViewModelTest {
     fun viewModelStart_shouldForwardResultToOrchestrator() {
         runBlocking {
             vm.onModalStepRequestDone(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
-            verifyOnce(orchestratorManagerMock) {
-                runBlocking {
-                    handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
-                }
-            }
+            coVerify(exactly = 1) { orchestratorManagerMock.handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null) }
         }
     }
 
@@ -103,14 +90,15 @@ class OrchestratorViewModelTest {
 
             liveDataAppResponse.postFakeAppResponse<AppEnrolResponse>(ENROL)
 
-            whenever(orchestratorEventsHelperMock) { addCallbackEventInSessions(anyNotNull()) } thenDoNothing {}
-            verifyOnce(orchestratorEventsHelperMock) { addCallbackEventInSessions(any<AppEnrolResponse>()) }
+            every { orchestratorEventsHelperMock.addCallbackEventInSessions(any()) } just runs
+            verify(exactly = 1) { orchestratorEventsHelperMock.addCallbackEventInSessions(any<AppEnrolResponse>()) }
         }
     }
 
+
     private inline fun <reified T : AppResponse> MutableLiveData<AppResponse>.postFakeAppResponse(typeToReturn: AppResponseType) {
-        val appResponse = mock<T>().apply {
-            whenever(this) { type } thenReturn typeToReturn
+        val appResponse = mockk<T>().apply {
+            every { this@apply.type } returns typeToReturn
         }
 
         postValue(appResponse)

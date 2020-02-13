@@ -10,11 +10,10 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
+import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Single
@@ -25,8 +24,7 @@ class VerificationTask(private val viewModel: MatchingViewModel,
                        private val dbManager: FingerprintDbManager,
                        private val sessionEventsManager: FingerprintSessionEventsManager,
                        private val crashReportManager: FingerprintCrashReportManager,
-                       private val timeHelper: FingerprintTimeHelper,
-                       private val preferenceManager: FingerprintPreferencesManager) : MatchTask {
+                       private val timeHelper: FingerprintTimeHelper) : MatchTask {
 
     override val matchStartTime = timeHelper.now()
 
@@ -58,7 +56,6 @@ class VerificationTask(private val viewModel: MatchingViewModel,
         val resultData = Intent().putExtra(MatchingTaskResult.BUNDLE_KEY,
             MatchingTaskResult(listOf(MatchResult(candidate.personId, score))))
 
-        preferenceManager.lastVerificationDate = Date()
         viewModel.result.postValue(MatchingViewModel.FinishResult(ResultCode.OK, resultData, 0))
     }
 

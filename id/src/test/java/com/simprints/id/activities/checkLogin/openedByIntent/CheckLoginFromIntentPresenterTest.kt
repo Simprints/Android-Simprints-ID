@@ -4,24 +4,18 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
-import com.simprints.id.exceptions.unexpected.RootedDeviceException
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.tools.extensions.just
 import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.common.syntax.*
+import io.mockk.*
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
@@ -31,14 +25,10 @@ class CheckLoginFromIntentPresenterTest {
     private val app = ApplicationProvider.getApplicationContext<TestApplication>()
 
     private val appModule by lazy {
-        TestAppModule(
-            app,
-            crashReportManagerRule = DependencyRule.MockRule,
-            deviceManagerRule = DependencyRule.MockRule
-        )
+        TestAppModule(app, crashReportManagerRule = DependencyRule.MockRule)
     }
 
-    private val viewSpy = spy<CheckLoginFromIntentActivity>()
+    private val viewMock = mockk<CheckLoginFromIntentActivity>()
 
     @Before
     fun setUp() {
@@ -47,146 +37,111 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun givenCheckLoginFromIntentPresenter_setupIsCalled_shouldAddCalloutEvent() {
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(viewSpy, "device_id", mock())).apply {
+        val checkLoginFromIntentPresenter = spyk(CheckLoginFromIntentPresenter(viewMock, "device_id", mockk(relaxed = true))).apply {
 
-            whenever(view) { parseRequest() } thenReturn mock<AppEnrolRequest>()
-            remoteConfigFetcher = mock()
-            analyticsManager = mock()
-            personLocalDataSource = mock()
-            preferencesManager = mock()
+            every { viewMock.parseRequest() } returns mockk(relaxed = true)
+            remoteConfigFetcher = mockk()
+            analyticsManager = mockk()
+            personLocalDataSource = mockk()
+            preferencesManager = mockk()
 
-            analyticsManager = mock<AnalyticsManager>().apply {
-                whenever(this) { analyticsId } thenReturn Single.just("analyticsId")
-            }
+            analyticsManager = mockk()
+            every { analyticsManager.analyticsId } returns Single.just("analyticsId")
 
-            crashReportManager = mock<CrashReportManager>().apply {
-                whenever(this) { setSessionIdCrashlyticsKey(anyNotNull()) } thenDoNothing {}
-            }
+            crashReportManager = mockk()
+            every { crashReportManager.setSessionIdCrashlyticsKey(any()) } just Runs
 
-            sessionEventsManager = mock<SessionEventsManager>().apply {
-                whenever(this) { createSession("") } thenReturn Single.just(createFakeSession())
-                whenever(this) { getCurrentSession() } thenReturn Single.just(createFakeSession())
-            }
+            sessionEventsManager = mockk(relaxed = true)
+            every { sessionEventsManager.createSession("") } returns Single.just(createFakeSession())
+            every { sessionEventsManager.getCurrentSession() } returns Single.just(createFakeSession())
         }
 
         checkLoginFromIntentPresenter.setup()
 
-        verifyOnce(checkLoginFromIntentPresenter) { addCalloutAndConnectivityEventsInSession(anyNotNull()) }
+        verify(exactly = 1) { checkLoginFromIntentPresenter.addCalloutAndConnectivityEventsInSession(any()) }
     }
 
     @Test
     fun givenCheckLoginFromIntentPresenter_buildRequestIsCalledForEnrolment_buildsEnrolmentCallout() {
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(viewSpy, "device_id", mock()))
+        val checkLoginFromIntentPresenter = spyk(CheckLoginFromIntentPresenter(viewMock, "device_id", mockk(relaxed = true)))
 
-        checkLoginFromIntentPresenter.appRequest = mock<AppEnrolRequest>().apply {
-            whenever(this) { projectId } thenReturn "projectId"
-            whenever(this) { userId } thenReturn "userId"
-            whenever(this) { moduleId } thenReturn "moduleId"
-            whenever(this) { metadata } thenReturn "metadata"
+        checkLoginFromIntentPresenter.appRequest = mockk<AppEnrolRequest>().apply {
+            every { this@apply.projectId } returns "projectId"
+            every { this@apply.userId } returns "userId"
+            every { this@apply.moduleId } returns "moduleId"
+            every { this@apply.metadata } returns "metadata"
         }
 
         checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest)
 
-        verifyOnce(checkLoginFromIntentPresenter) {
-            buildEnrolmentCalloutEvent(anyNotNull(), ArgumentMatchers.anyLong())
-        }
+        verify(exactly = 1) { checkLoginFromIntentPresenter.buildEnrolmentCalloutEvent(any(), any()) }
     }
 
     @Test
     fun givenCheckLoginFromIntentPresenter_buildRequestIsCalledForIdentification_buildsIdentificationCallout() {
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(viewSpy, "device_id", mock()))
+        val checkLoginFromIntentPresenter = spyk(CheckLoginFromIntentPresenter(viewMock, "device_id", mockk(relaxed = true)))
 
-        checkLoginFromIntentPresenter.appRequest = mock<AppIdentifyRequest>().apply {
-            whenever(this) { projectId } thenReturn "projectId"
-            whenever(this) { userId } thenReturn "userId"
-            whenever(this) { moduleId } thenReturn "moduleId"
-            whenever(this) { metadata } thenReturn "metadata"
+        checkLoginFromIntentPresenter.appRequest = mockk<AppIdentifyRequest>().apply {
+            every { this@apply.projectId } returns "projectId"
+            every { this@apply.userId } returns "userId"
+            every { this@apply.moduleId } returns "moduleId"
+            every { this@apply.metadata } returns "metadata"
         }
 
         checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest)
 
-        verifyOnce(checkLoginFromIntentPresenter) {
-            buildIdentificationCalloutEvent(anyNotNull(), ArgumentMatchers.anyLong())
-        }
+        verify(exactly = 1) { checkLoginFromIntentPresenter.buildIdentificationCalloutEvent(any(), any()) }
     }
 
     @Test
     fun givenCheckLoginFromIntentPresenter_buildRequestIsCalledForVerification_buildsVerificationCallout() {
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(viewSpy, "device_id", mock()))
+        val checkLoginFromIntentPresenter = spyk(CheckLoginFromIntentPresenter(viewMock, "device_id", mockk(relaxed = true)))
 
-        checkLoginFromIntentPresenter.appRequest = mock<AppVerifyRequest>().apply {
-            whenever(this) { projectId } thenReturn "projectId"
-            whenever(this) { userId } thenReturn "userId"
-            whenever(this) { moduleId } thenReturn "moduleId"
-            whenever(this) { metadata } thenReturn "metadata"
-            whenever(this) { verifyGuid } thenReturn "verifyGuid"
+        checkLoginFromIntentPresenter.appRequest = mockk<AppVerifyRequest>().apply {
+            every { this@apply.projectId } returns "projectId"
+            every { this@apply.userId } returns "userId"
+            every { this@apply.moduleId } returns "moduleId"
+            every { this@apply.metadata } returns "metadata"
+            every { this@apply.verifyGuid } returns "verifyGuid"
         }
 
         checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest)
 
-        verifyOnce(checkLoginFromIntentPresenter) {
-            buildVerificationCalloutEvent(anyNotNull(), ArgumentMatchers.anyLong())
-        }
+        verify(exactly = 1) { checkLoginFromIntentPresenter.buildVerificationCalloutEvent(any(), any()) }
+
     }
 
     @Test
     fun givenCheckLoginFromIntentPresenter_setupIsCalled_shouldAddInfoToSession() {
 
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(viewSpy, "device_id", mock())).apply {
+        val checkLoginFromIntentPresenter = spyk(CheckLoginFromIntentPresenter(viewMock, "device_id", mockk(relaxed = true))).apply {
 
-            whenever(view) { parseRequest() } thenReturn mock<AppEnrolRequest>()
+            every { view.parseRequest() } returns mockk<AppEnrolRequest>()
 
-            remoteConfigFetcher = mock()
-            analyticsManager = mock()
-            preferencesManager = mock()
+            remoteConfigFetcher = mockk()
+            analyticsManager = mockk()
+            preferencesManager = mockk()
 
-            personLocalDataSource = mock<PersonLocalDataSource>().apply {
-                wheneverOnSuspend(this) { count() } thenOnBlockingReturn 0
-            }
+            personLocalDataSource = mockk()
+            coEvery { personLocalDataSource.count() } returns 0
 
-            crashReportManager = mock<CrashReportManager>().apply {
-                whenever(this) { setSessionIdCrashlyticsKey(anyNotNull()) } thenDoNothing {}
-            }
 
-            sessionEventsManager = mock<SessionEventsManager>().apply {
-                whenever(this) { createSession("") } thenReturn Single.just(createFakeSession())
-                whenever(this) { getCurrentSession() } thenReturn Single.just(createFakeSession())
-                whenever(this) { getSessionCount() } thenReturn Single.just(0)
-            }
+            crashReportManager = mockk()
+            every { crashReportManager.setSessionIdCrashlyticsKey(any()) } just runs
 
-            analyticsManager = mock<AnalyticsManager>().apply {
-                whenever(this) { analyticsId } thenReturn Single.just("analyticsId")
-            }
+
+            sessionEventsManager = mockk(relaxed = true)
+            every { sessionEventsManager.createSession("") } returns Single.just(createFakeSession())
+            every { sessionEventsManager.getCurrentSession() } returns Single.just(createFakeSession())
+            every { sessionEventsManager.getSessionCount() } returns Single.just(0)
+
+            analyticsManager = mockk()
+            every { analyticsManager.analyticsId } returns Single.just("analyticsId")
         }
 
         checkLoginFromIntentPresenter.setup()
 
-        verifyOnce(checkLoginFromIntentPresenter) { addAnalyticsInfoAndProjectId() }
-    }
-
-    @Test
-    fun withRootedDevice_shouldLogException() {
-        val exception = RootedDeviceException()
-        val presenterSpy = spy(CheckLoginFromIntentPresenter(mock(), "device_id", app.component))
-        whenever { presenterSpy.deviceManager.checkIfDeviceIsRooted() } thenThrow exception
-
-        presenterSpy.start()
-
-        verifyOnce(presenterSpy.crashReportManager) {
-            logExceptionOrSafeException(exception)
-        }
-    }
-
-    @Test
-    fun withRootedDevice_shouldShowAlertScreen() {
-        val presenterSpy = spy(CheckLoginFromIntentPresenter(mock(), "device_id", app.component))
-        whenever(presenterSpy.deviceManager) { checkIfDeviceIsRooted() } thenThrow RootedDeviceException()
-
-        presenterSpy.start()
-
-        verifyOnce(presenterSpy.view) {
-            openAlertActivityForError(AlertType.ROOTED_DEVICE)
-        }
+        verify(exactly = 1) { checkLoginFromIntentPresenter.addAnalyticsInfoAndProjectId() }
     }
 
 }

@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator
 
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
+import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequestType
@@ -15,7 +16,8 @@ import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 open class OrchestratorManagerImpl(
     private val flowModalityFactory: ModalityFlowFactory,
     private val appResponseFactory: AppResponseFactory,
-    private val hotCache: HotCache
+    private val hotCache: HotCache,
+    private val dashboardDailyActivityRepository: DashboardDailyActivityRepository
 ) : OrchestratorManager, FlowProvider {
 
     override val ongoingStep = MutableLiveData<Step?>()
@@ -72,7 +74,7 @@ open class OrchestratorManagerImpl(
                 if (potentialNextStep != null) {
                     startStep(potentialNextStep)
                 } else {
-                    buildAppResponse()
+                    buildAppResponseAndUpdateDailyActivity()
                 }
             }
         }
@@ -84,16 +86,16 @@ open class OrchestratorManagerImpl(
         appResponse.value = null
     }
 
-    private fun ModalityFlow.anyStepOngoing() =
-        steps.any { it.getStatus() == ONGOING }
+    private fun ModalityFlow.anyStepOngoing() = steps.any { it.getStatus() == ONGOING }
 
-    private suspend fun buildAppResponse() {
+    private suspend fun buildAppResponseAndUpdateDailyActivity() {
         val steps = modalitiesFlow.steps
         val appResponseToReturn = appResponseFactory.buildAppResponse(
             modalities, appRequest, steps, sessionId
         )
         ongoingStep.value = null
         appResponse.value = appResponseToReturn
+        dashboardDailyActivityRepository.updateDailyActivity(appResponseToReturn)
     }
 
     private fun resetInternalState() {

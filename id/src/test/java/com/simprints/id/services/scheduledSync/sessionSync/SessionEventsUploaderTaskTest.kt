@@ -16,22 +16,22 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
-import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.ResponseBody
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.*
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 import retrofit2.Response
@@ -41,7 +41,7 @@ import retrofit2.adapter.rxjava2.Result
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionEventsUploaderTaskTest {
 
-    private val sessionsEventsManagerMock: SessionEventsManager = mock()
+    private val sessionsEventsManagerMock: SessionEventsManager = mockk()
     private val timeHelper: TimeHelper = TimeHelperImpl()
     private lateinit var sessionsRemoteInterfaceSpy: SessionsRemoteInterface
 
@@ -53,13 +53,13 @@ class SessionEventsUploaderTaskTest {
 
         ShadowLog.stream = System.out
 
-        sessionsRemoteInterfaceSpy = spy(SimApiClient(
+        sessionsRemoteInterfaceSpy = spyk(SimApiClient(
             SessionsRemoteInterface::class.java,
             SessionsRemoteInterface.baseUrl,
             "").api)
 
-        whenever(sessionsEventsManagerMock.deleteSessions(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Completable.complete())
-        whenever(sessionsEventsManagerMock.insertOrUpdateSessionEvents(anyNotNull())).thenReturn(Completable.complete())
+        every { sessionsEventsManagerMock.deleteSessions(any(), any(), any(), any()) } returns Completable.complete()
+        every { sessionsEventsManagerMock.insertOrUpdateSessionEvents(any()) } returns Completable.complete()
     }
 
     @Test
@@ -114,7 +114,7 @@ class SessionEventsUploaderTaskTest {
                 createFakeClosedSession(timeHelper),
                 createFakeClosedSession(timeHelper))
 
-            doReturn(Single.just(createSuccessUploadResponse())).`when`(sessionsRemoteInterfaceSpy).uploadSessions(anyNotNull(), anyNotNull())
+            every { sessionsRemoteInterfaceSpy.uploadSessions(any(), any()) } returns Single.just(createSuccessUploadResponse())
             val uploadTask = Single.just(sessions)
                 .uploadClosedSessionsOrThrowIfNoSessions(DefaultTestConstants.DEFAULT_PROJECT_ID)
                 .test()
@@ -164,7 +164,7 @@ class SessionEventsUploaderTaskTest {
 
     @Test
     fun sessionsAfterUpload_shouldBeDeleted() {
-        spy(createTask()).apply {
+        spyk(createTask()).apply {
 
             val sessions = listOf(
                 createFakeClosedSession(timeHelper),
@@ -176,8 +176,7 @@ class SessionEventsUploaderTaskTest {
                 .test()
             filterTask.awaitAndAssertSuccess()
 
-            verify(sessionsEventsManagerMock, times(sessions.size))
-                .deleteSessions(isNull() as String?, anyString(), anyBoolean(), isNull() as Long?)
+            verify(exactly = sessions.size) { sessionsEventsManagerMock.deleteSessions(isNull() as String?, any(), any(), isNull() as Long?) }
         }
     }
 
@@ -191,14 +190,14 @@ class SessionEventsUploaderTaskTest {
     }
 
     private fun testUploadRequestIsNotRetriedForServerErrorCode(code: Int, callsExpected: Int = 1): TestObserver<Void>? {
-        spy(createTask()).apply {
+        spyk(createTask()).apply {
             var requests = 0
             val checkResponseTask = Single.fromCallable {
                 requests++
                 createFailureUploadResponse(code)
             }
-                .checkUploadSucceedAndRetryIfNecessary()
-                .test()
+            .checkUploadSucceedAndRetryIfNecessary()
+            .test()
 
             checkResponseTask.awaitTerminalEvent()
             assertThat(requests).isEqualTo(callsExpected)
@@ -216,7 +215,7 @@ class SessionEventsUploaderTaskTest {
 
 
     private fun createFailureUploadResponse(code: Int = 500) =
-        Result.response<Void>(Response.error(ResponseBody.create(MediaType.parse("application/json"), ""), okhttp3.Response.Builder() //
+        Result.response<Void>(Response.error(ResponseBody.create("application/json".toMediaTypeOrNull(), ""), okhttp3.Response.Builder() //
             .code(code)
             .message("AppResponse.reason()")
             .protocol(Protocol.HTTP_1_1)

@@ -5,7 +5,8 @@ import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -17,8 +18,8 @@ import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.testtools.typeText
 import com.simprints.id.Application
-import com.simprints.testtools.android.tryOnUiUntilTimeout
 import org.hamcrest.CoreMatchers.not
 import org.junit.After
 import org.junit.Before
@@ -77,9 +78,7 @@ class RefusalActivityTest {
         onView(withId(R.id.btSubmitRefusalForm)).check(matches(not(isEnabled())))
         onView(withId(R.id.rbOther)).perform(click())
         onView(withId(R.id.refusalText)).perform(typeText("Reason for other"), closeSoftKeyboard())
-        tryOnUiUntilTimeout(1000, 200) {
-            onView(withId(R.id.btSubmitRefusalForm)).check(matches(isEnabled()))
-        }
+        onView(withId(R.id.btSubmitRefusalForm)).check(matches(isEnabled()))
     }
 
     @Test
