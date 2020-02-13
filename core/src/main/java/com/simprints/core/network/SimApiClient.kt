@@ -7,8 +7,9 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
-open class SimApiClient<T>(val service: Class<T>,
-                           private val endpoint: String,
+open class SimApiClient<T>(private val service: Class<T>,
+                           private val url: String,
+                           private val deviceId: String,
                            private val authToken: String? = null,
                            private val jsonAdapter: Gson = JsonHelper.gson) {
 
@@ -20,11 +21,11 @@ open class SimApiClient<T>(val service: Class<T>,
         Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(jsonAdapter))
-            .baseUrl(endpoint)
+            .baseUrl(url)
             .client(okHttpClientConfig.build()).build()
     }
 
     val okHttpClientConfig: OkHttpClient.Builder by lazy {
-        DefaultOkHttpClientBuilder().get(authToken)
+        DefaultOkHttpClientBuilder().get(authToken, deviceId)
     }
 }

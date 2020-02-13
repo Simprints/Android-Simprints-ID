@@ -3,7 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
@@ -180,8 +180,12 @@ open class AppModule {
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
-    open fun provideSecureApiInterface(): SecureApiInterface =
-        SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api
+    open fun provideSimApiClientFactory(ctx: Context) =
+        SimApiClientFactory(ctx.deviceId)
+
+    @Provides
+    open fun provideSecureApiInterface(simApiClientFactory: SimApiClientFactory): SecureApiInterface =
+        simApiClientFactory.build<SecureApiInterface>(null).api
 
     @Provides
     @Singleton
@@ -244,8 +248,9 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager =
-        RemoteSessionsManagerImpl(remoteDbManager)
+    open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager,
+                                          simApiClientFactory: SimApiClientFactory): RemoteSessionsManager =
+        RemoteSessionsManagerImpl(remoteDbManager, simApiClientFactory)
 
     @Provides
     open fun provideGuidSelectionManager(

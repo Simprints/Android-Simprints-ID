@@ -8,7 +8,13 @@ import java.util.concurrent.TimeUnit
 
 class DefaultOkHttpClientBuilder {
 
-    fun get(authToken: String? = null): OkHttpClient.Builder =
+    companion object {
+        const val DEVICE_ID_HEADER = "X-Device-ID"
+        const val AUTHORIZATION_HEADER = "Authorization"
+    }
+
+    fun get(authToken: String? = null,
+            deviceId: String): OkHttpClient.Builder =
         OkHttpClient.Builder()
             .followRedirects(false)
             .followSslRedirects(false)
@@ -24,12 +30,20 @@ class DefaultOkHttpClientBuilder {
                     addInterceptor(buildLoggingInterceptor())
                 }
             }
-            .addInterceptor(buildTemporaryRedirectionFollowingInterceptor())
+            .addInterceptor(buildDeviceIdInterceptor(deviceId))
 
     private fun buildAuthenticationInterceptor(authToken: String): Interceptor =
         Interceptor { chain ->
             val newRequest = chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer $authToken")
+                .addHeader(AUTHORIZATION_HEADER, "Bearer $authToken")
+                .build()
+            return@Interceptor chain.proceed(newRequest)
+        }
+
+    private fun buildDeviceIdInterceptor(deviceId: String): Interceptor =
+        Interceptor { chain ->
+            val newRequest = chain.request().newBuilder()
+                .addHeader(DEVICE_ID_HEADER, deviceId)
                 .build()
             return@Interceptor chain.proceed(newRequest)
         }
@@ -40,23 +54,4 @@ class DefaultOkHttpClientBuilder {
             level = HttpLoggingInterceptor.Level.HEADERS
         }
     }
-
-    // if the server returns 307, we follow the url in the "Location" header field.
-    private fun buildTemporaryRedirectionFollowingInterceptor(): Interceptor =
-        Interceptor { chain ->
-            val initialRequest = chain.request()
-            val initialResponse = chain.proceed(initialRequest)
-
-            if (initialResponse.code != 307) {
-                return@Interceptor initialResponse
-            }
-
-            val redirectLocation = initialResponse.header("Location") ?: return@Interceptor initialResponse
-
-            val newRequest = chain.request().newBuilder()
-                .url(redirectLocation)
-                .build()
-
-            return@Interceptor chain.proceed(newRequest)
-        }
 }

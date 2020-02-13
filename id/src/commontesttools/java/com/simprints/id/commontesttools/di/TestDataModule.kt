@@ -2,6 +2,7 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import com.simprints.core.images.repository.ImageRepository
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
@@ -34,9 +35,10 @@ class TestDataModule(
         projectLocalDataSourceRule.resolveDependency { super.provideProjectLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager) }
 
     override fun provideProjectRemoteDataSource(
-        remoteDbManager: RemoteDbManager
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory
     ): ProjectRemoteDataSource = projectRemoteDataSourceRule.resolveDependency {
-        super.provideProjectRemoteDataSource(remoteDbManager)
+        super.provideProjectRemoteDataSource(remoteDbManager, simApiClientFactory)
     }
 
     override fun provideProjectRepository(
@@ -66,8 +68,9 @@ class TestDataModule(
         super.provideImageRepository(context)
     }
 
-    override fun providePersonRemoteDataSource(remoteDbManager: RemoteDbManager): PersonRemoteDataSource =
-        personRemoteDataSourceRule.resolveDependency { super.providePersonRemoteDataSource(remoteDbManager) }
+    override fun providePersonRemoteDataSource(remoteDbManager: RemoteDbManager,
+                                               simApiClientFactory: SimApiClientFactory): PersonRemoteDataSource =
+        personRemoteDataSourceRule.resolveDependency { super.providePersonRemoteDataSource(remoteDbManager, simApiClientFactory) }
 
     @FlowPreview
     override fun providePersonLocalDataSource(ctx: Context,
