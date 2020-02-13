@@ -39,6 +39,6 @@ interface SettingsAboutContract {
     }
 
     interface Presenter : BasePresenter {
-        fun logout()
+        suspend fun logout()
     }
 }

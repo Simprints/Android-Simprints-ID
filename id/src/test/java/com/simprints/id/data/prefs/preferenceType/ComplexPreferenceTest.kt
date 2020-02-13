@@ -6,14 +6,12 @@ import com.simprints.id.domain.GROUP
 import com.simprints.id.exceptions.unexpected.MismatchedTypeException
 import com.simprints.id.tools.serializers.EnumSerializer
 import com.simprints.id.tools.serializers.Serializer
-import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.assertThrows
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mockito.verify
 
 class ComplexPreferenceTest {
 
@@ -55,39 +53,37 @@ class ComplexPreferenceTest {
         EnumSerializer(GROUP::class.java))
 
     private fun mockFingerIdentifierSerializer(): Serializer<FingerIdentifier> {
-        val serializer = mock<Serializer<FingerIdentifier>>()
-        whenever(serializer.serialize(defaultFingerId)).thenReturn(serializedDefaultFingerId)
-        whenever(serializer.deserialize(serializedDefaultFingerId)).thenReturn(defaultFingerId)
-        whenever(serializer.serialize(storedFingerId)).thenReturn(storedSerializedFingerId)
-        whenever(serializer.deserialize(storedSerializedFingerId)).thenReturn(storedFingerId)
+        val serializer = mockk<Serializer<FingerIdentifier>>()
+        every { serializer.serialize(defaultFingerId) } returns serializedDefaultFingerId
+        every { serializer.deserialize(serializedDefaultFingerId) } returns defaultFingerId
+        every { serializer.serialize(storedFingerId) } returns storedSerializedFingerId
+        every { serializer.deserialize(storedSerializedFingerId) } returns storedFingerId
         return serializer
     }
 
     private fun mockImprovedEditor(): ImprovedSharedPreferences.Editor {
-        val editor = mock<ImprovedSharedPreferences.Editor>()
-        whenever(editor.putPrimitive(anyString(), anyNotNull())).thenReturn(editor)
+        val editor = mockk<ImprovedSharedPreferences.Editor>(relaxed = true)
+        every { editor.putPrimitive(any(), any<String>()) } returns editor
         return editor
     }
 
     private fun mockImprovedPreferences(editorToReturn: ImprovedSharedPreferences.Editor): ImprovedSharedPreferences {
-        val prefs = mock<ImprovedSharedPreferences>()
-        whenever(prefs.getPrimitive(aKey, serializedDefaultFingerId)).thenReturn(storedSerializedFingerId)
+        val prefs = mockk<ImprovedSharedPreferences>(relaxed = true)
+        every { prefs.getPrimitive(aKey, serializedDefaultFingerId) } returns storedSerializedFingerId
 
-        whenever(prefs.getPrimitive(aKey, -1)).thenReturn(2)
-        whenever(prefs.getPrimitive(aKey, serializedDefaultGroupEnum))
-            .thenThrow(
-                MismatchedTypeException("Expecting String, integer stored",
+        every { prefs.getPrimitive(aKey, -1) } returns 2
+        every { prefs.getPrimitive(aKey, serializedDefaultGroupEnum) } throws (
+            MismatchedTypeException("Expecting String, integer stored",
                 Throwable("Expecting String, integer stored")))
 
-        whenever(prefs.getPrimitive(bKey, serializedDefaultGroupEnum)).thenReturn(GROUP.MODULE.name)
+        every { prefs.getPrimitive(bKey, serializedDefaultGroupEnum) } returns GROUP.MODULE.name
 
-        whenever(prefs.getPrimitive(cKey, -1)).thenReturn(5)
-        whenever(prefs.getPrimitive(cKey, serializedDefaultGroupEnum))
-            .thenThrow(
-                MismatchedTypeException("Expecting String, integer stored",
+        every { prefs.getPrimitive(cKey, -1) } returns 5
+        every { prefs.getPrimitive(cKey, serializedDefaultGroupEnum) } throws (
+            MismatchedTypeException("Expecting String, integer stored",
                 Throwable("Expecting String, integer stored")))
 
-        whenever(prefs.edit()).thenReturn(editorToReturn)
+        every { prefs.edit() } returns editorToReturn
         return prefs
     }
 
@@ -113,21 +109,21 @@ class ComplexPreferenceTest {
     @Test
     fun testGetValueSerializesDefaultValue() {
         val get = fingerPreference
-        verify(fingerIdSerializer).serialize(defaultFingerId)
+        verify { fingerIdSerializer.serialize(defaultFingerId) }
     }
 
     @Suppress("UNUSED_VARIABLE")
     @Test
     fun testGetValueGetsPrimitive() {
         val get = fingerPreference
-        verify(improvedPrefs).getPrimitive(aKey, serializedDefaultFingerId)
+        verify { improvedPrefs.getPrimitive(aKey, serializedDefaultFingerId) }
     }
 
     @Suppress("UNUSED_VARIABLE")
     @Test
     fun testGetValueDeserializesStoredValue() {
         val get = fingerPreference
-        verify(fingerIdSerializer).deserialize(storedSerializedFingerId)
+        verify { fingerIdSerializer.deserialize(storedSerializedFingerId) }
     }
 
     @Suppress("UNUSED_VARIABLE")
@@ -140,13 +136,13 @@ class ComplexPreferenceTest {
     @Test
     fun testSetValueSerializesValue() {
         fingerPreference = storedFingerId
-        verify(fingerIdSerializer).serialize(storedFingerId)
+        verify { fingerIdSerializer.serialize(storedFingerId) }
     }
 
     @Test
     fun testSetValuePutsSerializedValueWithPutsPrimitive() {
         fingerPreference = storedFingerId
-        verify(improvedEditor).putPrimitive(aKey, storedSerializedFingerId)
-        verify(improvedEditor).apply()
+        verify { improvedEditor.putPrimitive(aKey, storedSerializedFingerId) }
+        verify { improvedEditor.apply() }
     }
 }

@@ -12,7 +12,7 @@ open class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: Shared
                                         private val unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider) : SecureLocalDbKeyProvider {
 
     companion object {
-        private const val REALM_KEY = "REALM_KEY"
+        const val SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER = "REALM_KEY"
     }
 
     override fun setLocalDatabaseKey(projectId: String) {
@@ -52,7 +52,7 @@ open class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: Shared
         return null
     }
 
-    private fun getSharedPrefsKeyForRealm(projectId: String) = "${REALM_KEY}_$projectId"
+    private fun getSharedPrefsKeyForRealm(projectId: String) = "${SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER}_$projectId"
 
     private fun readRealmKeyFromSharedPrefs(projectId: String): String? {
         val sharedPrefsKeyForRealm = getSharedPrefsKeyForRealm(projectId)

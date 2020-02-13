@@ -8,7 +8,7 @@ import com.google.common.truth.Truth
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.commontesttools.DefaultTestConstants
+import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
@@ -46,6 +46,7 @@ import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.observers.TestObserver
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -86,7 +87,7 @@ class SessionEventsUploaderTaskAndroidTest {
     private val module by lazy {
         TestAppModule(
             app,
-            remoteDbManagerRule = DependencyRule.SpyRule,
+            remoteDbManagerRule = DependencyRule.SpykRule,
             randomGeneratorRule = DependencyRule.ReplaceRule { mock<RandomGenerator>().apply { setupRandomGeneratorToGenerateKey(this) } },
             secureDataManagerRule = DependencyRule.SpyRule
         )
@@ -94,7 +95,7 @@ class SessionEventsUploaderTaskAndroidTest {
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, module, preferencesModule).fullSetup()
+        AndroidTestConfig(this, module, preferencesModule = preferencesModule).fullSetup()
 
         whenever(settingsPreferencesManagerSpy.fingerStatus).thenReturn(hashMapOf(
             FingerIdentifier.LEFT_THUMB to true,
@@ -105,7 +106,7 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     @Test
-    fun closeSessions_shouldGetUploaded() {
+    fun closeSessions_shouldGetUploaded() = runBlockingTest {
         mockBeingSignedIn()
 
         val nSession = BATCH_SIZE + 1
@@ -124,7 +125,7 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     @Test
-    fun closeSession_withAllEvents_shouldGetUploaded() {
+    fun closeSession_withAllEvents_shouldGetUploaded() = runBlockingTest {
         mockBeingSignedIn()
 
         createClosedSessions(1).first().apply {
@@ -290,11 +291,11 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
 
-    private fun executeUpload(): TestObserver<Void> {
+    private suspend fun executeUpload(): TestObserver<Void> {
         val syncTask = SessionEventsUploaderTask(
             sessionEventsManager,
             timeHelper,
-            remoteSessionsManager.getSessionsApiClient().blockingGet())
+            remoteSessionsManager.getSessionsApiClient())
 
         return syncTask.execute(
             testProject.id,
@@ -321,7 +322,7 @@ class SessionEventsUploaderTaskAndroidTest {
             testProject.secret,
             LocalDbKey(
                 testProject.id,
-                DefaultTestConstants.DEFAULT_REALM_KEY),
+                DEFAULT_REALM_KEY),
             token.token)
     }
 }

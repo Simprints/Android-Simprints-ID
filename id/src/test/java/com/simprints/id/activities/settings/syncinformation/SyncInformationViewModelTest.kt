@@ -2,43 +2,43 @@ package com.simprints.id.activities.settings.syncinformation
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.any
+import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
+import com.simprints.id.data.db.common.models.PeopleCount
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.reactivex.Single
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
-
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SyncInformationViewModelTest {
 
-    @Mock lateinit var personLocalDataSourceMock: PersonLocalDataSource
-    @Mock lateinit var personRepositoryMock: PersonRepository
-    @Mock lateinit var preferencesManagerMock: PreferencesManager
-    @Mock lateinit var syncScopesBuilderMock: SyncScopesBuilder
+    @MockK lateinit var personLocalDataSourceMock: PersonLocalDataSource
+    @MockK lateinit var preferencesManagerMock: PreferencesManager
+    @MockK lateinit var peopleDownSyncScopeRepositoryMock: PeopleDownSyncScopeRepository
+    private lateinit var personRepositoryMock: PersonRepository
 
     private val projectId = "projectId"
     private lateinit var viewModel: SyncInformationViewModel
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
+        MockKAnnotations.init(this, relaxed = true)
+        personRepositoryMock = mockk()
         UnitTestConfig(this).rescheduleRxMainThread()
-        viewModel = SyncInformationViewModel(personRepositoryMock, personLocalDataSourceMock, preferencesManagerMock, projectId, syncScopesBuilderMock)
+        viewModel = SyncInformationViewModel(personRepositoryMock, personLocalDataSourceMock, preferencesManagerMock, projectId, peopleDownSyncScopeRepositoryMock)
     }
 
     @Test
@@ -56,9 +56,9 @@ class SyncInformationViewModelTest {
         val countInRemoteForCreate = 123
         val countInRemoteForUpdate = 0
         val countInRemoteForDelete = 22
-        val peopleCount = PeopleCount(projectId, null, null, null, countInRemoteForCreate, countInRemoteForDelete, countInRemoteForUpdate)
-        whenever(syncScopesBuilderMock) { buildSyncScope() } thenReturn SyncScope(projectId, null, null)
-        whenever(personRepositoryMock) { countToDownSync(any()) } thenReturn Single.just(listOf(peopleCount))
+        val peopleCount = PeopleCount(countInRemoteForCreate, countInRemoteForDelete, countInRemoteForUpdate)
+        every { peopleDownSyncScopeRepositoryMock.getDownSyncScope() } returns projectSyncScope
+        coEvery { personRepositoryMock.countToDownSync(any()) } returns listOf(peopleCount)
 
         viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount()
 
@@ -80,7 +80,7 @@ class SyncInformationViewModelTest {
     fun fetchSelectedModulesCount_shouldUpdateValue() {
         val moduleName = "module1"
         val countForModule = 123
-        whenever(preferencesManagerMock) { selectedModules } thenReturn setOf(moduleName)
+        every { preferencesManagerMock.selectedModules } returns setOf(moduleName)
         mockPersonLocalDataSourceCount(countForModule)
 
         viewModel.fetchAndUpdateSelectedModulesCount()
@@ -98,8 +98,8 @@ class SyncInformationViewModelTest {
         val moduleOptions = setOf(selectedModuleName, unselectedModuleName)
         val selectedModuleSet = setOf(selectedModuleName)
         val countForUnselectedModules = 122
-        whenever(preferencesManagerMock) { moduleIdOptions } thenReturn moduleOptions
-        whenever(preferencesManagerMock) { selectedModules } thenReturn selectedModuleSet
+        every { preferencesManagerMock.moduleIdOptions } returns moduleOptions
+        every { preferencesManagerMock.selectedModules } returns selectedModuleSet
         mockPersonLocalDataSourceCount(countForUnselectedModules)
 
         viewModel.fetchAndUpdatedUnselectedModulesCount()
@@ -117,8 +117,8 @@ class SyncInformationViewModelTest {
         val moduleOptions = setOf(selectedModuleName, unselectedModuleName)
         val selectedModuleSet = setOf(selectedModuleName)
         val countForUnselectedModules = 0
-        whenever(preferencesManagerMock) { moduleIdOptions } thenReturn moduleOptions
-        whenever(preferencesManagerMock) { selectedModules } thenReturn selectedModuleSet
+        every { preferencesManagerMock.moduleIdOptions } returns moduleOptions
+        every { preferencesManagerMock.selectedModules } returns selectedModuleSet
         mockPersonLocalDataSourceCount(countForUnselectedModules)
 
         viewModel.fetchAndUpdatedUnselectedModulesCount()
@@ -127,6 +127,6 @@ class SyncInformationViewModelTest {
     }
 
     private fun mockPersonLocalDataSourceCount(recordCount: Int) {
-        whenever(personLocalDataSourceMock) { count(any()) } thenReturn recordCount
+        every { personLocalDataSourceMock.count(any()) } returns recordCount
     }
 }

@@ -3,6 +3,7 @@ package com.simprints.id
 import androidx.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
+import com.simprints.core.tools.LineNumberDebugTree
 import com.simprints.id.di.*
 import com.simprints.id.tools.FileLoggingTree
 import io.fabric.sdk.android.Fabric
@@ -29,6 +30,7 @@ open class Application : MultiDexApplication() {
             .appModule(AppModule())
             .preferencesModule(PreferencesModule())
             .serializerModule(SerializerModule())
+            .syncModule(SyncModule())
             .build()
     }
 
@@ -55,7 +57,7 @@ open class Application : MultiDexApplication() {
                 Timber.plant(FileLoggingTree())
                 Timber.d("Release with log file set up.")
             } else if (BuildConfig.DEBUG) {
-                Timber.plant(Timber.DebugTree())
+                Timber.plant(LineNumberDebugTree())
             }
         }
 
@@ -102,7 +104,6 @@ open class Application : MultiDexApplication() {
         }
     }
 
-    
     private fun Module.defineBuildersForCoreManagers() {
         factory { component.getPreferencesManager() }
         factory { component.getAnalyticsManager() }
@@ -115,10 +116,12 @@ open class Application : MultiDexApplication() {
         factory { component.getAndroidResourcesHelper() }
         factory { orchestratorComponent.getFlowManager() }
         factory { component.getPersonRepository() }
+        factory { component.getImageRepository() }
     }
 
     override fun onTerminate() {
         super.onTerminate()
         stopKoin()
     }
+
 }

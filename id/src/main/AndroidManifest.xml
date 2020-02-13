@@ -75,6 +75,10 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".activities.debug.DebugActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".activities.login.LoginActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"

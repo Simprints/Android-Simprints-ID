@@ -3,23 +3,21 @@ package com.simprints.id.activities.coreexitform
 import android.app.Instrumentation
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
 import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
-import com.simprints.testtools.android.tryOnUiUntilTimeout
+import com.simprints.id.testtools.typeText
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-
 
 @RunWith(AndroidJUnit4::class)
 class CoreExitFormActivityTest {
@@ -66,16 +64,14 @@ class CoreExitFormActivityTest {
     }
 
     @Test
-    @SmallTest
     fun chooseOtherOptionAndEnterText_shouldEnableSubmitButton() {
         launchCoreExitFormActivity()
 
         onView(withId(R.id.btSubmitExitForm)).check(matches(not(isEnabled())))
         onView(withId(R.id.rbOther)).perform(click())
-        onView(withId(R.id.exitFormText)).perform(typeText("Reason for other"), closeSoftKeyboard())
-        tryOnUiUntilTimeout(1000, 200) {
-            onView(withId(R.id.btSubmitExitForm)).check(matches(isEnabled()))
-        }
+        onView(withId(R.id.exitFormText)).perform(typeText("Reason for other"))
+        onView(withId(R.id.btSubmitExitForm)).check(matches(isEnabled()))
+
     }
 
     @Test
@@ -84,7 +80,7 @@ class CoreExitFormActivityTest {
         val scenario = launchCoreExitFormActivity()
 
         onView(withId(R.id.rbReligiousConcerns)).perform(click())
-        onView(withId(R.id.exitFormText)).perform(typeText(refusalReasonText), closeSoftKeyboard())
+        onView(withId(R.id.exitFormText)).perform(typeText(refusalReasonText))
         onView(withId(R.id.btSubmitExitForm)).perform(click())
 
         verifyIntentReturned(scenario.result, CoreExitFormActivityResult.Action.SUBMIT,

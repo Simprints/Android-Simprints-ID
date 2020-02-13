@@ -47,7 +47,7 @@ class DefaultOkHttpClientBuilder {
             val initialRequest = chain.request()
             val initialResponse = chain.proceed(initialRequest)
 
-            if (initialResponse.code() != 307) {
+            if (initialResponse.code != 307) {
                 return@Interceptor initialResponse
             }
 
