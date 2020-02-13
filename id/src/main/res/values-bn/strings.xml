@@ -163,4 +163,17 @@
     <string name="refusal_toast_submit">ফরম সাবমিট করুন</string>
     <string name="refusal_too_young">বয়স কম</string>
     <string name="refusal_other">অন্যান্য</string>
+
+    <plurals name="dashboard_card_enrolments">
+        <item quantity="one">তালিকাভুক্ত করণ</item>
+        <item quantity="other">Enrolments</item>
+    </plurals>
+    <plurals name="dashboard_card_identifications">
+        <item quantity="one">সনাক্তকরণ</item>
+        <item quantity="other">Identifications</item>
+    </plurals>
+    <plurals name="dashboard_card_verifications">
+        <item quantity="one">যাচাই করুন</item>
+        <item quantity="other">Verifications</item>
+    </plurals>
 </resources>

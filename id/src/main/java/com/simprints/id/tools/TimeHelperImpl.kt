@@ -1,7 +1,7 @@
 package com.simprints.id.tools
 
 import android.text.format.DateUtils.*
-import java.text.SimpleDateFormat
+import java.text.DateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -17,7 +17,8 @@ class TimeHelperImpl : TimeHelper {
         getRelativeTimeSpanString(date.time, Date().time, MINUTE_IN_MILLIS, FORMAT_SHOW_DATE).toString()
 
     override fun getCurrentDateAsString(): String {
-        return SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+        val dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault())
+        return dateFormat.format(Date())
     }
 
     override fun todayInMillis(): Long = Calendar.getInstance().run {

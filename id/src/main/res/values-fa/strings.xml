@@ -96,4 +96,17 @@
     <string name="test_loaded_candidates_one"> فرد یا اشتراک کننده آماده است %d</string>
     <string name="test_loaded_candidates_other"> افراد یا اشتراک کنندگان آماده شدند %d</string>
 
+    <plurals name="dashboard_card_enrolments">
+        <item quantity="one">شامل شدن</item>
+        <item quantity="other">Enrolments</item>
+    </plurals>
+    <plurals name="dashboard_card_identifications">
+        <item quantity="one">مشخص کردن</item>
+        <item quantity="other">Identifications</item>
+    </plurals>
+    <plurals name="dashboard_card_verifications">
+        <item quantity="one">تشخیص</item>
+        <item quantity="other">Verifications</item>
+    </plurals>
+
 </resources>
