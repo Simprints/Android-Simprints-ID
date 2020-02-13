@@ -33,6 +33,8 @@ class SyncInformationActivity : AppCompatActivity() {
     private lateinit var selectedModulesTabSpec: TabHost.TabSpec
     private lateinit var unselectedModulesTabSpec: TabHost.TabSpec
 
+    private var isProgressOverlayDisplayed = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
@@ -57,6 +59,7 @@ class SyncInformationActivity : AppCompatActivity() {
         clearValues()
         setFocusOnDefaultModulesTab()
         viewModel.start()
+        showProgressOverlay()
     }
 
     private fun setTextInLayout() {
@@ -149,36 +152,43 @@ class SyncInformationActivity : AppCompatActivity() {
 
     private fun observeLocalRecordCount() {
         viewModel.localRecordCount.observe(this, Observer {
+            hideProgressOverlayIfNecessary()
             totalRecordsCount.text = it.toString()
         })
     }
 
     private fun observeUpSyncRecordCount() {
         viewModel.recordsToUpSyncCount.observe(this, Observer {
+            hideProgressOverlayIfNecessary()
             recordsToUploadCount.text = it.toString()
         })
     }
 
     private fun observeDownSyncRecordCount() {
         viewModel.recordsToDownSyncCount.observe(this, Observer {
+            hideProgressOverlayIfNecessary()
             recordsToDownloadCount.text = it.toString()
         })
     }
 
     private fun observeDeleteRecordCount() {
         viewModel.recordsToDeleteCount.observe(this, Observer {
+            hideProgressOverlayIfNecessary()
             recordsToDeleteCount.text = it.toString()
         })
     }
 
     private fun observeSelectedModules() {
         viewModel.selectedModulesCount.observe(this, Observer {
+            hideProgressOverlayIfNecessary()
             addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
         })
     }
 
     private fun observeUnselectedModules() {
         viewModel.unselectedModulesCount.observe(this, Observer {
+            hideProgressOverlayIfNecessary()
+
             if (it.isEmpty()) {
                 removeUnselectedModulesTab()
             } else {
@@ -186,6 +196,22 @@ class SyncInformationActivity : AppCompatActivity() {
                 addTotalRowAndSubmitList(it, moduleCountAdapterForUnselected)
             }
         })
+    }
+
+    private fun showProgressOverlay() {
+        with(progressOverlayContainer) {
+            visibility = View.VISIBLE
+            setOnTouchListener { _, _ -> true }
+        }
+
+        isProgressOverlayDisplayed = true
+    }
+
+    private fun hideProgressOverlayIfNecessary() {
+        if (isProgressOverlayDisplayed) {
+            progressOverlayContainer.visibility = View.GONE
+            isProgressOverlayDisplayed = false
+        }
     }
 
     private fun addTotalRowAndSubmitList(moduleCounts: List<ModuleCount>, moduleCountAdapter: ModuleCountAdapter) {
