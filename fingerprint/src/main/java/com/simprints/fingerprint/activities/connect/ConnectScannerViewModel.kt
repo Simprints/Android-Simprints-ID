@@ -19,6 +19,7 @@ import com.simprints.fingerprintscanner.v1.ScannerUtils.convertAddressToSerial
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 
 class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashReportManager,
                               private val scannerManager: ScannerManager,
@@ -51,6 +52,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
             .andThen(connectToVero())
             .andThen(resetVeroUI())
             .andThen(wakeUpVero())
+            .subscribeOn(Schedulers.io())
             .subscribeBy(onError = { it.printStackTrace() }, onComplete = {
                 handleSetupFinished()
             })
@@ -82,7 +84,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
 
     private fun updateBluetoothConnectivityEventWithVeroInfo() {
         scannerManager.let {
-            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.onScanner { versionInformation }.firmwareVersion.toString())
+            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.onScanner { versionInformation() }.firmwareVersion.toString())
         }
     }
 
@@ -119,7 +121,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
         vibrate.postValue(Unit)
         preferencesManager.lastScannerUsed = convertAddressToSerial(scannerManager.lastPairedMacAddress
             ?: "")
-        preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation }.firmwareVersion.toString()
+        preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.firmwareVersion.toString()
         analyticsManager.logScannerProperties(scannerManager.lastPairedMacAddress
             ?: "", scannerManager.lastPairedScannerId ?: "")
         finish.postValue(Unit)
@@ -145,7 +147,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
                     ScannerConnectionEvent.ScannerInfo(
                         lastPairedScannerId ?: "",
                         lastPairedMacAddress ?: "",
-                        onScanner { versionInformation }.toString())))
+                        onScanner { versionInformation() }.toString())))
         }
     }
 

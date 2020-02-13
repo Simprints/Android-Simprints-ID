@@ -25,7 +25,7 @@ class ImageUpSyncSchedulerImpl(context: Context) : ImageUpSyncScheduler {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        return PeriodicWorkRequestBuilder<ImageUpSyncWorker>(6, TimeUnit.HOURS)
+        return PeriodicWorkRequestBuilder<ImageUpSyncWorker>(15, TimeUnit.MINUTES) // STOPSHIP
             .setConstraints(constraints)
             .setBackoffCriteria(
                 BackoffPolicy.EXPONENTIAL,
