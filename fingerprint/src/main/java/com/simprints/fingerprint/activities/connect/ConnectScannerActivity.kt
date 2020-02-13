@@ -17,7 +17,6 @@ import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestFor
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate.vibrate
-import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_connect_scanner.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel

@@ -1,10 +1,7 @@
 package com.simprints.fingerprint.scanner
 
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
-import com.simprints.fingerprint.scanner.exceptions.safe.MultipleScannersPairedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerLowBatteryException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
+import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.NullScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
@@ -66,6 +63,7 @@ class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAdapter
             is MultipleScannersPairedException -> FingerprintAlert.MULTIPLE_PAIRED_SCANNERS
             is ScannerLowBatteryException -> FingerprintAlert.LOW_BATTERY
             is ScannerNotPairedException -> FingerprintAlert.NOT_PAIRED
+            is ScannerDisconnectedException -> FingerprintAlert.DISCONNECTED
             is UnknownScannerIssueException -> FingerprintAlert.DISCONNECTED
             else -> FingerprintAlert.UNEXPECTED_ERROR
         }
