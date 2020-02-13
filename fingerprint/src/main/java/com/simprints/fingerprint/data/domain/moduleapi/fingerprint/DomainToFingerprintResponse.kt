@@ -3,9 +3,10 @@ package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 import android.os.Parcelable
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.*
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.UNEXPECTED_ERROR
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintRefusalFormReason
+import com.simprints.moduleapi.common.IPath
 import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintSample
@@ -21,14 +22,16 @@ object DomainToFingerprintResponse {
         IFingerprintErrorResponseImpl(fromFingerprintErrorReasonToErrorResponse(error.reason))
 
     fun fromDomainToFingerprintCaptureResponse(capture: FingerprintCaptureResponse): IFingerprintCaptureResponse =
-        IFingerprintCaptureResponseImpl(capture.fingerprints.map {
+        IFingerprintCaptureResponseImpl(capture.fingerprints.map { fingerprint ->
             IFingerprintCaptureResultImpl(
-                it.fingerId.fromDomainToModuleApi(),
+                fingerprint.fingerId.fromDomainToModuleApi(),
                 IFingerprintSampleImpl(
-                    it.fingerId.fromDomainToModuleApi(),
-                    it.templateBytes,
-                    it.qualityScore,
-                    null
+                    fingerprint.fingerId.fromDomainToModuleApi(),
+                    fingerprint.templateBytes,
+                    fingerprint.qualityScore,
+                    fingerprint.imageRef?.path?.let {
+                        ISecuredImageRefImpl(IPathImpl(it.parts))
+                    }
                 ))
         })
 
@@ -103,3 +106,14 @@ private class IFingerprintSampleImpl(
     override val template: ByteArray,
     override val templateQualityScore: Int,
     override val imageRef: ISecuredImageRef?) : IFingerprintSample
+
+@Parcelize
+private class ISecuredImageRefImpl(
+    override val path: IPath
+) : ISecuredImageRef
+
+@Parcelize
+private class IPathImpl(
+    override val parts: Array<String>
+) : IPath
+

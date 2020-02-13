@@ -19,6 +19,8 @@ data class Finger(val id: FingerIdentifier,
                   private val order: Int,
                   var status: FingerStatus = FingerStatus.NOT_COLLECTED,
                   var template: Fingerprint? = null,
+                  var templateQuality: Int? = null,
+                  var imageBytes: ByteArray? = null,
                   var isLastFinger: Boolean = false,
                   var numberOfBadScans: Int = 0) : Comparable<Finger>, Parcelable {
 
@@ -36,7 +38,7 @@ data class Finger(val id: FingerIdentifier,
         get() = status == FingerStatus.RESCAN_GOOD_SCAN
 
     val isCollecting: Boolean
-        get() = status == FingerStatus.COLLECTING
+        get() = status == FingerStatus.COLLECTING || status == FingerStatus.TRANSFERRING_IMAGE
 
     val isNotCollected: Boolean
         get() = status == FingerStatus.NOT_COLLECTED

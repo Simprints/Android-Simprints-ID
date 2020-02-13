@@ -4,7 +4,10 @@ import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedExce
 import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
 
 
-class UnexpectedScannerException(message: String = "UnexpectedScannerException") : FingerprintUnexpectedException(message) {
+class UnexpectedScannerException : FingerprintUnexpectedException {
+
+    constructor(message: String): super(message)
+    constructor(cause: Throwable): super(cause)
 
     companion object {
 

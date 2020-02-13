@@ -13,8 +13,11 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManager
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManagerImpl
+import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
+import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
@@ -72,7 +75,10 @@ open class PreferencesModule {
         @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
         @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
         @Named("PeopleDownSyncTriggerToBooleanSerializer") peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>,
-        @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>
+        @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
+        @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
+        @Named("SaveFingerprintImagesStrategySerializer") saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
+        @Named("ScannerGenerationsSerializer") scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
     ): SettingsPreferencesManager =
         SettingsPreferencesManagerImpl(prefs,
             remoteConfigWrapper,
@@ -81,7 +87,10 @@ open class PreferencesModule {
             modalitiesSerializer,
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
-            peopleDownSyncTriggerToBooleanSerializer)
+            peopleDownSyncTriggerToBooleanSerializer,
+            captureFingerprintStrategySerializer,
+            saveFingerprintImagesStrategySerializer,
+            scannerGenerationsSerializer)
 
     @Provides
     @Singleton

@@ -86,4 +86,16 @@ class ByteArrayToolsTest {
         assertThrows<IndexOutOfBoundsException> { bytes.extract({ int }, 2..5, byteOrder) }
         assertThrows<BufferUnderflowException> { bytes.extract({ int }, 0..2, byteOrder) }
     }
+
+    @Test
+    fun xorAll_evaluatesCorrectly() {
+        assertThat(byteArrayOf(0x12, 0x34, 0x56, 0x67, 0x89).xorAll()).isEqualTo(0x9E.toByte())
+        assertThat(byteArrayOf(0x12).xorAll()).isEqualTo(0x12.toByte())
+    }
+
+    @Test
+    fun nxorAll_evaluatesCorrectly() {
+        assertThat(byteArrayOf(0x12, 0x34, 0x56, 0x67, 0x89).nxorAll()).isEqualTo(0x61.toByte())
+        assertThat(byteArrayOf(0x12).nxorAll()).isEqualTo(0xED.toByte())
+    }
 }
