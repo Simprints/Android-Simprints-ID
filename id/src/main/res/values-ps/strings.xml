@@ -86,5 +86,17 @@
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
 
+    <plurals name="dashboard_card_enrolments">
+        <item quantity="one">شاملیدل</item>
+        <item quantity="other">Enrolments</item>
+    </plurals>
+    <plurals name="dashboard_card_identifications">
+        <item quantity="one">مشخص کول</item>
+        <item quantity="other">Identifications</item>
+    </plurals>
+    <plurals name="dashboard_card_verifications">
+        <item quantity="one">پیدا کول</item>
+        <item quantity="other">Verifications</item>
+    </plurals>
 
 </resources>

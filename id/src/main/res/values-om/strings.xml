@@ -96,4 +96,17 @@
     <string name="button_scan_prints">Ashaaraa qubaa fuudhi</string>
     <string name="button_submit">Ol ergi</string>
     <string name="hint_other_reason">Odeeffannoo dabalataa</string>
+
+    <plurals name="dashboard_card_enrolments">
+        <item quantity="one">Galmee</item>
+        <item quantity="other">Enrolments</item>
+    </plurals>
+    <plurals name="dashboard_card_identifications">
+        <item quantity="one">Adda baafannaa</item>
+        <item quantity="other">Identifications</item>
+    </plurals>
+    <plurals name="dashboard_card_verifications">
+        <item quantity="one">Mirkaneeffannaa</item>
+        <item quantity="other">Verifications</item>
+    </plurals>
 </resources>

@@ -96,4 +96,17 @@
     <string name="button_scan_prints">የጣት አሻራውን እስካን ያድርጉ</string>
     <string name="button_submit">ይላኩ</string>
     <string name="hint_other_reason">ተጨማሪ ኢንፎርሜሽን</string>
+
+    <plurals name="dashboard_card_enrolments">
+        <item quantity="one">ወደ ሲስተሙ ማስገባት</item>
+        <item quantity="other">Enrolments</item>
+    </plurals>
+    <plurals name="dashboard_card_identifications">
+        <item quantity="one">መለየት</item>
+        <item quantity="other">Identifications</item>
+    </plurals>
+    <plurals name="dashboard_card_verifications">
+        <item quantity="one">ማመሳከር</item>
+        <item quantity="other">Verifications</item>
+    </plurals>
 </resources>

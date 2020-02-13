@@ -84,5 +84,17 @@
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
 
+    <plurals name="dashboard_card_enrolments">
+        <item quantity="one">भर्ना </item>
+        <item quantity="other">Enrolments</item>
+    </plurals>
+    <plurals name="dashboard_card_identifications">
+        <item quantity="one">पहिचान गर्नुहोस </item>
+        <item quantity="other">Identifications</item>
+    </plurals>
+    <plurals name="dashboard_card_verifications">
+        <item quantity="one">प्रमाणित</item>
+        <item quantity="other">Verifications</item>
+    </plurals>
 
 </resources>
