@@ -88,14 +88,14 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
     }
 
-    private fun isDoingImageTransfer(): Boolean =
+    private fun isImageTransferRequired(): Boolean =
         when (fingerprintPreferencesManager.saveFingerprintImagesStrategy) {
             SaveFingerprintImagesStrategy.NEVER -> false
             SaveFingerprintImagesStrategy.WSQ_15 -> true
         }
 
     private fun initTimeoutBar(): ScanningTimeoutBar =
-        if (isDoingImageTransfer()) {
+        if (isImageTransferRequired()) {
             ScanningWithImageTransferTimeoutBar(context, view.progressBar, scanningTimeoutMs, imageTransferTimeoutMs)
         } else {
             ScanningOnlyTimeoutBar(context, view.progressBar, scanningTimeoutMs)
@@ -254,7 +254,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun shouldProceedToImageTransfer(quality: Int) =
-        isDoingImageTransfer() &&
+        isImageTransferRequired() &&
             (quality >= qualityThreshold || presenter.tooManyBadScans(presenter.currentFinger()))
 
     private fun proceedToImageTransfer() {
