@@ -84,6 +84,9 @@
     <!-- MatchingActivity : the waiting screen after an identification -->
     <!-- Screen Text -->
     <!-- Loading text -->
+    <string name="test_loaded_candidates_quantity_key" translatable="false">test_loaded_candidates</string>
+    <string name="test_loaded_candidates_one">Loaded %d candidate.</string>
+    <string name="test_loaded_candidates_other">Loaded %d candidates.</string>
 
     <!-- AlertActivity : the Simprints ID error message screen -->
     <!-- Error Message Titles -->
