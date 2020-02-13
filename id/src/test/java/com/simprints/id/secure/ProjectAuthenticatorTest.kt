@@ -4,7 +4,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.common.truth.Truth
-import com.simprints.core.network.NetworkConstants.Companion.baseUrl
+import com.simprints.core.network.NetworkConstants.Companion.BASE_URL
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
@@ -91,7 +91,7 @@ class ProjectAuthenticatorTest {
 
         coEvery { remoteSessionsManagerMock.getSessionsApiClient() } throws IllegalStateException()
 
-        apiClient = SimApiClientFactory("deviceId", endpoint = baseUrl).build()
+        apiClient = SimApiClientFactory("deviceId", endpoint = BASE_URL).build()
     }
 
     @Test

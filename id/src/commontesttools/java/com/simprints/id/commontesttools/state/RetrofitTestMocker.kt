@@ -9,6 +9,6 @@ import com.simprints.testtools.common.retrofit.createMockBehaviorService
 fun replaceSecureApiClientWithFailingClientProvider() = createFailingApiClient<SecureApiInterface>()
 
 inline fun <reified T> createFailingApiClient(): T {
-    val apiClient = SimApiClientFactory("deviceId", endpoint = NetworkConstants.baseUrl)
+    val apiClient = SimApiClientFactory("deviceId", endpoint = NetworkConstants.BASE_URL)
     return createMockBehaviorService(apiClient.build<SecureApiInterface>().retrofit, 100, T::class.java).returningResponse(null)
 }
