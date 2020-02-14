@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.id.Application
+import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.dashboard.cards.daily_activity.displayer.DashboardDailyActivityCardDisplayer
@@ -95,7 +96,9 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
                         SettingsActivity::class.java
                     ), SETTINGS_ACTIVITY_REQUEST_CODE
                 )
-                R.id.debug -> startActivity(Intent(this, DebugActivity::class.java))
+                R.id.debug -> if (BuildConfig.DEBUG) {
+                    startActivity(Intent(this, DebugActivity::class.java))
+                }
             }
             true
         }
@@ -105,6 +108,8 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
         menuInflater.inflate(R.menu.app_menu, menu)
 
         menu?.run {
+            this.findItem(R.id.debug)?.isVisible = BuildConfig.DEBUG
+
             findItem(R.id.menuSettings).title =
                 androidResourcesHelper.getString(R.string.menu_settings)
 
