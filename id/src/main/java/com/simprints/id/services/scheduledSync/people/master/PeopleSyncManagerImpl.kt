@@ -22,8 +22,8 @@ class PeopleSyncManagerImpl(private val ctx: Context,
                             private val peopleSyncCache: PeopleSyncCache) : PeopleSyncManager {
 
     companion object {
-        const val SYNC_WORKER_REPEAT_INTERVAL = 15L //StopShip
-        val SYNC_WORKER_REPEAT_UNIT = TimeUnit.MINUTES
+        const val SYNC_REPEAT_INTERVAL = 15L
+        val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
     }
 
     private val wm: WorkManager
@@ -82,7 +82,7 @@ class PeopleSyncManagerImpl(private val ctx: Context,
             .build() as OneTimeWorkRequest
 
     private fun buildPeriodicRequest(): PeriodicWorkRequest =
-        PeriodicWorkRequest.Builder(PeopleSyncMasterWorker::class.java, SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
+        PeriodicWorkRequest.Builder(PeopleSyncMasterWorker::class.java, SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTagForSyncMasterWorkers()
             .addTagForBackgroundSyncMasterWorker()

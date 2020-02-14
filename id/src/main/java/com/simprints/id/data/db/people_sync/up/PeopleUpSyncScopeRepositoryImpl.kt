@@ -20,7 +20,6 @@ class PeopleUpSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
         return PeopleUpSyncScope(projectId)
     }
 
-    //StopShip: consider to make suspend
     override suspend fun getUpSyncOperations(syncScope: PeopleUpSyncScope): List<PeopleUpSyncOperation> {
         val key = DbUpSyncOperationKey(syncScope.projectId)
         var storedOp = upSyncOperationOperationLocalDataSource.getUpSyncOperation(key)
