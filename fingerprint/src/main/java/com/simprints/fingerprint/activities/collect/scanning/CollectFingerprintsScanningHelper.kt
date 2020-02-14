@@ -196,7 +196,6 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun startContinuousCapture() {
-        scannerManager.scanner { setUiIdle() }.doInBackground()
         previousStatus = currentFingerStatus
         currentFingerStatus = COLLECTING
         presenter.refreshDisplay()
@@ -204,13 +203,14 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         presenter.refreshDisplay()
         view.timeoutBar.startTimeoutBar()
         scanningTask?.dispose()
-        scanningTask = scannerManager.scanner<CaptureFingerprintResponse> {
-            captureFingerprint(
-                fingerprintPreferencesManager.captureFingerprintStrategy,
-                scanningTimeoutMs.toInt(),
-                qualityThreshold
-            )
-        }
+        scanningTask = scannerManager.scanner { setUiIdle() }
+            .andThen(scannerManager.scanner<CaptureFingerprintResponse> {
+                captureFingerprint(
+                    fingerprintPreferencesManager.captureFingerprintStrategy,
+                    scanningTimeoutMs.toInt(),
+                    qualityThreshold
+                )
+            })
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
