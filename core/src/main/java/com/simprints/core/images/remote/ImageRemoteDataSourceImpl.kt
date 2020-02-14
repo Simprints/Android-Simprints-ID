@@ -3,6 +3,7 @@ package com.simprints.core.images.remote
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.core.images.model.SecuredImageRef
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import java.io.FileInputStream
 
 internal class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
@@ -17,6 +18,8 @@ internal class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
         imageRef.relativePath.parts.forEach { pathPart ->
             fileRef = fileRef.child(pathPart)
         }
+
+        Timber.tag("Uploading ${fileRef.path}")
 
         val uploadTask = fileRef.putStream(imageStream).await()
 
