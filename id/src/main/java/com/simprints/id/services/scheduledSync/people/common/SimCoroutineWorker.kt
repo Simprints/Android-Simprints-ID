@@ -59,7 +59,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
     }
 
     protected fun crashlyticsLog(message: String) {
-        Timber.tag("$tag - $message")
+        Timber.d("$tag - $message")
 
         crashReportManager.logMessageForCrashReport(
             CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = "$tag - $message")
