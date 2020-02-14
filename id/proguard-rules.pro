@@ -79,10 +79,27 @@
 # Dagger
 -dontwarn com.google.errorprone.annotations.**
 
+# RxJava https://github.com/ReactiveX/RxJava
+-dontwarn java.util.concurrent.Flow*
+
 # Kotlin Coroutines
+# ServiceLoader support
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepnames class kotlinx.coroutines.android.AndroidExceptionPreHandler {}
+-keepnames class kotlinx.coroutines.android.AndroidDispatcherFactory {}
+
+# Most of volatile fields are updated with AFU and should not be mangled
 -keepclassmembernames class kotlinx.** {
     volatile <fields>;
 }
--dontwarn kotlinx.coroutines.flow.**inlined**
+
+# Same story for the standard library's SafeContinuation that also uses AtomicReferenceFieldUpdater
+-keepclassmembernames class kotlin.coroutines.SafeContinuation {
+    volatile <fields>;
+}
+# https://github.com/Kotlin/kotlinx.coroutines/issues/1270
+-dontwarn kotlinx.coroutines.flow.**
+-dontwarn com.simprints.id.data.db.person.local.**
+-dontwarn com.simprints.id.services.scheduledSync.people.up.workers.**
+-dontwarn com.simprints.id.tools.extensions.**

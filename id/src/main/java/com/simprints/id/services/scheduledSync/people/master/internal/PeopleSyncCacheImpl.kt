@@ -2,8 +2,6 @@ package com.simprints.id.services.scheduledSync.people.master.internal
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
-import timber.log.Timber
 import java.util.*
 
 @SuppressLint("ApplySharedPref")
@@ -21,17 +19,10 @@ class PeopleSyncCacheImpl(private val sharedForProgresses: SharedPreferences,
     }
 
     override fun readProgress(workerId: String): Int =
-        (sharedForProgresses.getInt(workerId, 0)).also {
-
-            //StopShip: Remove after tests
-            Timber.tag(SYNC_LOG_TAG).d("Cache - ${workerId.take(4)} $it")
-        }
+        (sharedForProgresses.getInt(workerId, 0))
 
     override fun saveProgress(workerId: String, progress: Int) {
         sharedForProgresses.edit().putInt(workerId, progress).commit()
-
-        //StopShip: Remove after tests
-        Timber.tag(SYNC_LOG_TAG).d("Cache - ${workerId.take(4)} $progress")
     }
 
     override fun clearProgresses() {

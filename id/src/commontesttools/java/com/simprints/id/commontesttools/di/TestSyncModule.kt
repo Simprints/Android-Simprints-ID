@@ -1,6 +1,7 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
+import androidx.work.WorkManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactory
@@ -74,8 +75,8 @@ class TestSyncModule(
     }
 
     @Singleton
-    override fun provideSessionEventsSyncManager(): SessionEventsSyncManager =
-        peopleSessionEventsSyncManager.resolveDependency { super.provideSessionEventsSyncManager() }
+    override fun provideSessionEventsSyncManager(workManager: WorkManager): SessionEventsSyncManager =
+        peopleSessionEventsSyncManager.resolveDependency { super.provideSessionEventsSyncManager(workManager) }
 
     @Singleton
     override fun providePeopleSyncStateProcessor(

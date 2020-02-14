@@ -1,6 +1,7 @@
 package com.simprints.id.di
 
 import android.content.Context
+import androidx.work.WorkManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepositoryImpl
@@ -67,9 +68,12 @@ open class SyncModule {
         PeopleDownSyncDownloaderTaskImpl(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, peopleSyncCache, timeHelper)
 
     @Provides
-    open fun provideSessionEventsSyncManager(): SessionEventsSyncManager =
-        SessionEventsSyncManagerImpl()
+    open fun provideWorkManager(ctx: Context): WorkManager =
+        WorkManager.getInstance(ctx)
 
+    @Provides
+    open fun provideSessionEventsSyncManager(workManager: WorkManager): SessionEventsSyncManager =
+        SessionEventsSyncManagerImpl(workManager)
 
     @Provides
     open fun providePeopleSyncStateProcessor(ctx: Context,

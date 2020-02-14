@@ -25,7 +25,7 @@ class ImageUpSyncSchedulerImpl(context: Context) : ImageUpSyncScheduler {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        return PeriodicWorkRequestBuilder<ImageUpSyncWorker>(15, TimeUnit.MINUTES) // STOPSHIP
+        return PeriodicWorkRequestBuilder<ImageUpSyncWorker>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
             .setConstraints(constraints)
             .setBackoffCriteria(
                 BackoffPolicy.EXPONENTIAL,
@@ -36,6 +36,8 @@ class ImageUpSyncSchedulerImpl(context: Context) : ImageUpSyncScheduler {
 
     companion object {
         private const val WORK_NAME = "image-upsync-work"
+        private const val SYNC_REPEAT_INTERVAL = 15L
+        private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
     }
 
 }
