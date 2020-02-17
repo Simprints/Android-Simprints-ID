@@ -74,6 +74,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         it.putExtra(ODK_EXIT_REASON, reason)
         it.putExtra(ODK_EXIT_EXTRA, extra)
         it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
+        it.putExtra(ODK_SESSION_ID, sessionId)
 
         sendOkResult(it)
     }
@@ -87,6 +88,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
                                      flowCompletedCheck: Boolean,
                                      sessionId: String) = Intent().let {
         it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
+        it.putExtra(ODK_SESSION_ID, sessionId)
+
         sendOkResult(it)
     }
 
