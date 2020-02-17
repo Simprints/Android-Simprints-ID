@@ -125,8 +125,10 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
              * Sync has finished and last time it run quite long time ago.
              * use case: user does sync in the dashboard and then it leaves the dashboard open
              */
-            (hasSyncFinished(lastSyncState) && hasSyncRunLongTimeAgo()))
-            
+            (hasSyncFinished(lastSyncState) && hasSyncRunLongTimeAgo()) ||
+
+            lastSyncState is SyncDefault && hasSyncRunLongTimeAgo())
+
             && isConnected() && !isModuleSelectionRequired()
 
     }
@@ -135,6 +137,10 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
         state is SyncFailed || state is SyncTryAgain
 
     private fun hasSyncRunLongTimeAgo(): Boolean {
+        if(lastSyncTimeObservedFinishing == null && lastTimeSyncSucceed == null) {
+            return true
+        }
+
         val timeSinceLastObservedSyncCompleted = timeHelper.msBetweenNowAndTime(lastSyncTimeObservedFinishing?.time ?: Date().time)
         val timeSinceLastSuccess = timeHelper.msBetweenNowAndTime(lastTimeSyncSucceed?.time ?: Date().time)
 

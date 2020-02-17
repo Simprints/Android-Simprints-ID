@@ -61,14 +61,6 @@ class PeopleSyncManagerImpl(private val ctx: Context,
         wm.cancelAllPeopleSyncWorkers()
     }
 
-    override fun cancelAndRescheduleSync() {
-        cancelScheduledSync()
-        stop()
-        cleanScheduledHistory()
-
-        scheduleSync()
-    }
-
     private fun cleanScheduledHistory() {
         wm.pruneWork()
     }
