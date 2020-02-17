@@ -21,7 +21,6 @@ import com.simprints.id.testtools.UnitTestConfig
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
@@ -100,17 +99,6 @@ class PeopleSyncManagerImplTest {
         syncWorkers.forEach {
             assertThat(it.state).isEqualTo(CANCELLED)
         }
-    }
-
-    @Test
-    fun cancelAndRescheduleSync_shouldRescheduleMasterWorkers() {
-        peopleSyncManager = spyk(PeopleSyncManagerImpl(ctx, peopleSyncStateProcessor, peopleUpSyncScopeRepository, peopleDownSyncScopeRepository, peopleSyncCache))
-
-        peopleSyncManager.cancelAndRescheduleSync()
-
-        verify { peopleSyncManager.cancelScheduledSync() }
-        verify { peopleSyncManager.stop() }
-        verify { peopleSyncManager.scheduleSync() }
     }
 
     @Test
