@@ -67,7 +67,6 @@ class SyncInformationActivity : AppCompatActivity() {
         super.onResume()
         clearValues()
         setFocusOnDefaultModulesTab()
-        showProgressOverlay()
     }
 
     private fun setTextInLayout() {
