@@ -16,6 +16,9 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_sync_information.*
 import javax.inject.Inject
@@ -25,6 +28,7 @@ class SyncInformationActivity : AppCompatActivity() {
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var viewModelFactory: SyncInformationViewModelFactory
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var peopleSyncManager: PeopleSyncManager
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
     private val moduleCountAdapterForUnselected by lazy { ModuleCountAdapter() }
@@ -50,21 +54,32 @@ class SyncInformationActivity : AppCompatActivity() {
         setupModulesTabs()
         setupClickListeners()
         observeUi()
+        showProgressOverlay()
+        peopleSyncManager.getLastSyncState().observe(this, Observer { syncState ->
+            if (syncState.isNotRunning()) {
+                hideProgressOverlay()
+                viewModel.start()
+            }
+        })
     }
 
     override fun onResume() {
         super.onResume()
         clearValues()
         setFocusOnDefaultModulesTab()
-        viewModel.start()
     }
 
     private fun setTextInLayout() {
-        moduleSelectionButton.text = androidResourcesHelper.getString(R.string.select_modules_button_title)
-        recordsToUploadText.text = androidResourcesHelper.getString(R.string.sync_info_records_to_upload)
-        recordsToDownloadText.text = androidResourcesHelper.getString(R.string.sync_info_records_to_download)
-        recordsToDeleteText.text = androidResourcesHelper.getString(R.string.sync_info_records_to_delete)
-        totalRecordsOnDeviceText.text = androidResourcesHelper.getString(R.string.sync_info_total_records_on_device)
+        moduleSelectionButton.text =
+            androidResourcesHelper.getString(R.string.select_modules_button_title)
+        recordsToUploadText.text =
+            androidResourcesHelper.getString(R.string.sync_info_records_to_upload)
+        recordsToDownloadText.text =
+            androidResourcesHelper.getString(R.string.sync_info_records_to_download)
+        recordsToDeleteText.text =
+            androidResourcesHelper.getString(R.string.sync_info_records_to_delete)
+        totalRecordsOnDeviceText.text =
+            androidResourcesHelper.getString(R.string.sync_info_total_records_on_device)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -188,13 +203,28 @@ class SyncInformationActivity : AppCompatActivity() {
         })
     }
 
-    private fun addTotalRowAndSubmitList(moduleCounts: List<ModuleCount>, moduleCountAdapter: ModuleCountAdapter) {
+    private fun showProgressOverlay() {
+        with(progressOverlayContainer) {
+            visibility = View.VISIBLE
+            setOnTouchListener { _, _ -> true }
+        }
+    }
+
+    private fun hideProgressOverlay() {
+        progressOverlayContainer.visibility = View.GONE
+    }
+
+    private fun addTotalRowAndSubmitList(
+        moduleCounts: List<ModuleCount>,
+        moduleCountAdapter: ModuleCountAdapter
+    ) {
         val moduleCountsArray = ArrayList<ModuleCount>().apply {
             addAll(moduleCounts)
         }
 
-        val totalRecordsEntry = ModuleCount(androidResourcesHelper.getString(R.string.sync_info_total_records),
-            moduleCounts.sumBy { it.count })
+        val totalRecordsEntry =
+            ModuleCount(androidResourcesHelper.getString(R.string.sync_info_total_records),
+                moduleCounts.sumBy { it.count })
         moduleCountsArray.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)
 
         moduleCountAdapter.submitList(moduleCountsArray)
@@ -210,6 +240,13 @@ class SyncInformationActivity : AppCompatActivity() {
         if (modulesTabHost.tabWidget.tabCount != MAX_MODULES_TAB_COUNT) {
             modulesTabHost.addTab(unselectedModulesTabSpec)
         }
+    }
+
+    private fun PeopleSyncState.isNotRunning(): Boolean {
+        val downSyncStates = downSyncWorkersInfo
+        val upSyncStates = upSyncWorkersInfo
+        val allSyncStates = downSyncStates + upSyncStates
+        return allSyncStates.none { it.state is PeopleSyncWorkerState.Running }
     }
 
     companion object {
