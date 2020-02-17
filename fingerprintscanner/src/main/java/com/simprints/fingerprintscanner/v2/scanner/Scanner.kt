@@ -22,6 +22,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.*
 import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
 import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.commands.*
+import com.simprints.fingerprintscanner.v2.domain.root.models.CypressFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprintscanner.v2.domain.root.responses.*
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
@@ -132,6 +133,13 @@ class Scanner(
                 SetVersionCommand(versionInformation)
             ))
             .completeOnceReceived()
+
+    fun getCypressFirmwareVersion(): Single<CypressFirmwareVersion> =
+        assertConnected().andThen(assertMode(ROOT)).andThen(
+            sendRootModeCommandAndReceiveResponse<GetCypressVersionResponse>(
+                GetCypressVersionCommand()
+            ))
+            .map { it.version }
 
     fun enterMainMode(): Completable =
         assertConnected().andThen(assertMode(ROOT)).andThen(
