@@ -41,7 +41,8 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
     }
 
-    //as default, the manager tries to load the last open activeSession
+    // as default, the manager tries to load the last open activeSession
+    //
     override fun getCurrentSession(): Single<SessionEvents> =
         sessionEventsLocalDbManager.loadSessions(openSession = true).map {
             if (it.isEmpty())
@@ -155,7 +156,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         }
 
     override fun signOut() {
-        deleteSessions()
+        deleteSessions(openSession = false)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onComplete = {}, onError = {
