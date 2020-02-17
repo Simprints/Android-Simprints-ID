@@ -7,6 +7,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.Digit
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.LedState
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.SmileLedState
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
+import com.simprints.fingerprintscanner.v2.domain.root.models.CypressFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedScannerState
@@ -14,7 +15,8 @@ import com.simprints.fingerprintscannermock.simulated.common.SimulatedScannerSta
 class SimulatedScannerStateV2(
     var mode: Mode = Mode.ROOT,
     var versionInfo: UnifiedVersionInformation =
-        UnifiedVersionInformation(10L, 8L,
+        UnifiedVersionInformation(10L,
+            CypressFirmwareVersion(12,13, 14, 15),
             StmFirmwareVersion(1, 2, 3, 4),
             Un20AppVersion(5, 6, 7, 8)),
     var isUn20On: Boolean = false,
