@@ -21,7 +21,6 @@ import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
-import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.Flowable
 import io.reactivex.rxkotlin.toFlowable
 import io.reactivex.schedulers.TestScheduler
@@ -53,7 +52,7 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().testSubscribe(testScheduler)
+        val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).test()
 
         routes[Route.Remote.VeroServer]?.connect()
 
@@ -80,7 +79,7 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val testSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().testSubscribe(testScheduler)
+        val testSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().observeOn(testScheduler).test()
 
         routes[Route.Remote.Un20Server]?.connect()
 
@@ -108,7 +107,7 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val testSubscriber = messageInputStream.veroEvents!!.testSubscribe(testScheduler)
+        val testSubscriber = messageInputStream.veroEvents!!.observeOn(testScheduler).test()
 
         routes[Route.Remote.VeroEvent]?.connect()
 
@@ -135,7 +134,7 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val responseSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().testSubscribe(testScheduler)
+        val responseSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).test()
 
         routes[Route.Remote.VeroServer]?.connect()
 
@@ -162,7 +161,7 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().testSubscribe(testScheduler)
+        val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).test()
 
         routes[Route.Remote.VeroServer]?.connect()
 
@@ -197,9 +196,9 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val veroResponseTestSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().testSubscribe(testScheduler)
-        val veroEventTestSubscriber = messageInputStream.veroEvents!!.testSubscribe(testScheduler)
-        val un20ResponseTestSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().testSubscribe(testScheduler)
+        val veroResponseTestSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).test()
+        val veroEventTestSubscriber = messageInputStream.veroEvents!!.observeOn(testScheduler).test()
+        val un20ResponseTestSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().observeOn(testScheduler).test()
 
         routes.values.forEach { it.connect() }
 
