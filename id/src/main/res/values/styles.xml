@@ -63,6 +63,13 @@
     <style name="SimprintsStyle.TextView.Orange">
         <item name="android:textColor">@color/colorAccent</item>
     </style>
+
+    <style name="SimprintsStyle.TextView.ProgressBarOverlay">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:fontFamily">@font/muli</item>
+    </style>
     <!-- endregion -->
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -132,6 +139,4 @@
         <item name="android:paddingStart">12dp</item>
         <item name="android:paddingEnd">12dp</item>
     </style>
-
-    <dimen name="activity_dashboard_card_space_below_title">12dp</dimen>
 </resources>
