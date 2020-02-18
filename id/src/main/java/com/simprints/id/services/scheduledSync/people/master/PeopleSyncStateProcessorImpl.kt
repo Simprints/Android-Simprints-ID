@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
 import androidx.work.WorkInfo
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.models.fromDownSync
 import com.simprints.id.data.db.common.models.totalCount
 import com.simprints.id.data.db.person.PersonRepository
@@ -46,7 +45,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
 
                         val syncState = PeopleSyncState(lastSyncId, progress, total, upSyncStates, downSyncStates)
                         this@apply.postValue(syncState)
-                        Timber.tag(SYNC_LOG_TAG).d("Emitting ${JsonHelper.toJson(syncState)}")
+                        Timber.tag(SYNC_LOG_TAG).d("Emitting $syncState")
                     }
                 }
             }
