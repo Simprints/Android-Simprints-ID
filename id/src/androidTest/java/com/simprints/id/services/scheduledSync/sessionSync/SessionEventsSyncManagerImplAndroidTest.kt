@@ -1,8 +1,9 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
+import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -23,7 +24,9 @@ class SessionEventsSyncManagerImplAndroidTest {
     @get:Rule val simprintsActionTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
     @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
-    private var sessionEventsSyncManager = SessionEventsSyncManagerImpl()
+
+    private val app = ApplicationProvider.getApplicationContext<Application>()
+    private var sessionEventsSyncManager = SessionEventsSyncManagerImpl(WorkManager.getInstance(app))
 
     @Before
     fun setUp() {
