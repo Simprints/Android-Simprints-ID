@@ -7,8 +7,8 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.Ge
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.TriggerButtonPressedEvent
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.GetUn20OnResponse
-import com.simprints.fingerprintscanner.v2.domain.main.packet.Route
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Packet
+import com.simprints.fingerprintscanner.v2.domain.main.packet.Route
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.Un20ResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroEventAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroResponseAccumulator
@@ -45,14 +45,14 @@ class MainMessageInputStreamTest {
 
         val routes = mapOf(
             Route.Remote.VeroServer as Route to packets.toFlowable().observeOn(testScheduler).publish(),
-            Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().publish(),
-            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().publish())
+            Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().observeOn(testScheduler).publish(),
+            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().observeOn(testScheduler).publish())
 
         whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
         messageInputStream.connect(mock())
 
-        val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().test()
+        val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).test()
 
         routes[Route.Remote.VeroServer]?.connect()
 
@@ -71,15 +71,15 @@ class MainMessageInputStreamTest {
         val expectedResponse = GetSupportedTemplateTypesResponse(setOf(TemplateType.ISO_19794_2_2011))
 
         val routes = mapOf(
-            Route.Remote.VeroServer as Route to Flowable.empty<Packet>().publish(),
-            Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().publish(),
+            Route.Remote.VeroServer as Route to Flowable.empty<Packet>().observeOn(testScheduler).publish(),
+            Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().observeOn(testScheduler).publish(),
             Route.Remote.Un20Server as Route to packets.toFlowable().observeOn(testScheduler).publish())
 
         whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
         messageInputStream.connect(mock())
 
-        val testSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().test()
+        val testSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().observeOn(testScheduler).test()
 
         routes[Route.Remote.Un20Server]?.connect()
 
@@ -99,15 +99,15 @@ class MainMessageInputStreamTest {
         val expectedEvent = TriggerButtonPressedEvent()
 
         val routes = mapOf(
-            Route.Remote.VeroServer as Route to Flowable.empty<Packet>().publish(),
+            Route.Remote.VeroServer as Route to Flowable.empty<Packet>().observeOn(testScheduler).publish(),
             Route.Remote.VeroEvent as Route to packets.toFlowable().observeOn(testScheduler).publish(),
-            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().publish())
+            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().observeOn(testScheduler).publish())
 
         whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
         messageInputStream.connect(mock())
 
-        val testSubscriber = messageInputStream.veroEvents!!.test()
+        val testSubscriber = messageInputStream.veroEvents!!.observeOn(testScheduler).test()
 
         routes[Route.Remote.VeroEvent]?.connect()
 
@@ -127,14 +127,14 @@ class MainMessageInputStreamTest {
 
         val routes = mapOf(
             Route.Remote.VeroServer as Route to packets.toFlowable().observeOn(testScheduler).publish(),
-            Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().publish(),
-            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().publish())
+            Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().observeOn(testScheduler).publish(),
+            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().observeOn(testScheduler).publish())
 
         whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
         messageInputStream.connect(mock())
 
-        val responseSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().test()
+        val responseSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).test()
 
         routes[Route.Remote.VeroServer]?.connect()
 
@@ -154,14 +154,14 @@ class MainMessageInputStreamTest {
 
         val routes = mapOf(
             Route.Remote.VeroServer as Route to packets.toFlowable().observeOn(testScheduler).publish(),
-            Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().publish(),
-            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().publish())
+            Route.Remote.VeroEvent as Route to Flowable.empty<Packet>().observeOn(testScheduler).publish(),
+            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().observeOn(testScheduler).publish())
 
         whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
         messageInputStream.connect(mock())
 
-        val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().test()
+        val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).test()
 
         routes[Route.Remote.VeroServer]?.connect()
 
@@ -196,9 +196,9 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val veroResponseTestSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().test()
-        val veroEventTestSubscriber = messageInputStream.veroEvents!!.test()
-        val un20ResponseTestSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().test()
+        val veroResponseTestSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).test()
+        val veroEventTestSubscriber = messageInputStream.veroEvents!!.observeOn(testScheduler).test()
+        val un20ResponseTestSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().observeOn(testScheduler).test()
 
         routes.values.forEach { it.connect() }
 
