@@ -180,16 +180,6 @@ def testing = [
     awaitility     : "org.awaitility:awaitility-kotlin:4.0.1"
 ]
 
-//Not using Realm plugin: https://github.com/realm/realm-java/issues/5982
-def realm_version = "4.3.4"
-def realm = [
-    annotations          : "io.realm:realm-annotations:$realm_version",
-    annotations_processor: "io.realm:realm-annotations-processor:$realm_version",
-    kotlin               : "io.realm:realm-android-kotlin-extensions:$realm_version",
-    android              : "io.realm:realm-android-library:$realm_version",
-    glassfish_annotation : "org.glassfish:javax.annotation:10.0-b28"
-]
-
 // For Tee-d stream
 def commons_io_version = "2.6"
 def commons_io = [
@@ -210,7 +200,6 @@ ext.deps = [
     timber         : timber,
     rxjava2        : rxjava2,
     testing        : testing,
-    realm          : realm,
     commons_io     : commons_io,
     koin           : koin,
     fuzzywuzzy     : fuzzywuzzy,

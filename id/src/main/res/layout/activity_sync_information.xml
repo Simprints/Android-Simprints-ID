@@ -47,7 +47,7 @@
                 android:id="@+id/recordsToUploadText"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.75"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="5dp"
                 android:textColor="@android:color/black"
@@ -56,8 +56,7 @@
             <TextView
                 android:id="@+id/recordsToUploadCount"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="0.25"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:textSize="16sp" />
 
@@ -86,7 +85,7 @@
                 android:id="@+id/recordsToDownloadText"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.75"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="5dp"
                 android:textColor="@android:color/black"
@@ -95,8 +94,7 @@
             <TextView
                 android:id="@+id/recordsToDownloadCount"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="0.25"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:textSize="16sp" />
 
@@ -128,7 +126,7 @@
                 android:id="@+id/recordsToDeleteText"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.75"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="5dp"
                 android:textColor="@android:color/black"
@@ -137,8 +135,7 @@
             <TextView
                 android:id="@+id/recordsToDeleteCount"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="0.25"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:textSize="16sp" />
 

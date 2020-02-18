@@ -14,7 +14,7 @@
     <string name="dashboard_card_identification_title">Adda Baafannaa xumuraa</string>
     <string name="dashboard_card_lastscanner_title">Iskaanarii hojii irra oole</string>
     <string name="dashboard_card_scanner_used">Iskaanarii hojii irra oole: %1$s</string>
-    <string name="dashboard_card_sync_last_sync">Yeroo dhumaaf siink kan tahe:</string>
+    <string name="dashboard_card_sync_last_sync">Yeroo dhumaaf siink kan tahe: %1$s</string>
     <string name="dashboard_card_sync_now">Amma Siink godhi</string>
     <string name="dashboard_card_syncing">Siink gochaa jira</string>
     <string name="dashboard_card_to_download">Gadi buusuuf</string>

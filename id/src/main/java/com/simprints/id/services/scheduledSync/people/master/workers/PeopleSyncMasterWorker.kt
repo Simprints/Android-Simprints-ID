@@ -82,7 +82,9 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
 
     private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
         val backgroundOnForPeriodicSync = preferenceManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.PERIODIC_BACKGROUND] == true
-        val downSyncChainRequired = isOneTimeMasterWorker || backgroundOnForPeriodicSync
+        val manualDownSyncAllowed = preferenceManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL] == true && isOneTimeMasterWorker
+
+        val downSyncChainRequired = manualDownSyncAllowed || backgroundOnForPeriodicSync
 
         return if (downSyncChainRequired) {
             downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncID)
