@@ -5,27 +5,27 @@ import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 
-fun <T> Flowable<T>.testSubscribe(): TestSubscriber<T> = this
+fun <T> Flowable<T>.testSubscribe(observeOn: Scheduler = Schedulers.trampoline()): TestSubscriber<T> = this
     .subscribeOn(Schedulers.io())
-    .observeOn(Schedulers.trampoline())
+    .observeOn(observeOn)
     .test()
 
-fun <T> Observable<T>.testSubscribe(): TestObserver<T> = this
+fun <T> Observable<T>.testSubscribe(observeOn: Scheduler = Schedulers.trampoline()): TestObserver<T> = this
     .subscribeOn(Schedulers.io())
-    .observeOn(Schedulers.trampoline())
+    .observeOn(observeOn)
     .test()
 
-fun <T> Single<T>.testSubscribe(): TestObserver<T> = this
+fun <T> Single<T>.testSubscribe(observeOn: Scheduler = Schedulers.trampoline()): TestObserver<T> = this
     .subscribeOn(Schedulers.io())
-    .observeOn(Schedulers.trampoline())
+    .observeOn(observeOn)
     .test()
 
-fun Completable.testSubscribe(): TestObserver<Void> = this
+fun Completable.testSubscribe(observeOn: Scheduler = Schedulers.trampoline()): TestObserver<Void> = this
     .subscribeOn(Schedulers.io())
-    .observeOn(Schedulers.trampoline())
+    .observeOn(observeOn)
     .test()
 
-fun <T> Maybe<T>.testSubscribe(): TestObserver<T> = this
+fun <T> Maybe<T>.testSubscribe(observeOn: Scheduler = Schedulers.trampoline()): TestObserver<T> = this
     .subscribeOn(Schedulers.io())
-    .observeOn(Schedulers.trampoline())
+    .observeOn(observeOn)
     .test()
