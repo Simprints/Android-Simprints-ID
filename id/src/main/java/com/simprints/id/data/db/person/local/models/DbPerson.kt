@@ -30,10 +30,8 @@ open class DbPerson(
 
     var toSync: Boolean = false,
 
-    @Required
     var fingerprintSamples: RealmList<DbFingerprintSample> = RealmList(),
 
-    @Required
     var faceSamples: RealmList<DbFaceSample> = RealmList()
 
 ) : RealmObject()

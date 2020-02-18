@@ -71,7 +71,7 @@ class SessionEventsManagerImplTest {
 
         sessionsEventsManagerSpy.signOut()
 
-        verify(exactly = 1) { sessionsEventsManagerSpy.deleteSessions(null, null, null, null) }
+        verify(exactly = 1) { sessionsEventsManagerSpy.deleteSessions(null, null, false, null) }
         verify(exactly = 1) { sessionEventsSyncManagerMock.cancelSyncWorkers() }
     }
 
