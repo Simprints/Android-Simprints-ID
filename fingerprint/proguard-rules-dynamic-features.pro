@@ -20,4 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.simprints.fingerprintscanner.** { *; }
+-keep class com.simprints.fingerprintscanner.v2.domain.** { *; }
