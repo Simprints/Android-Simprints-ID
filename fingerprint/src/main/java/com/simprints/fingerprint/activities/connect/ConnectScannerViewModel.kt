@@ -20,6 +20,7 @@ import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 
 class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashReportManager,
                               private val scannerManager: ScannerManager,
@@ -53,7 +54,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
             .andThen(resetVeroUI())
             .andThen(wakeUpVero())
             .subscribeOn(Schedulers.io())
-            .subscribeBy(onError = { it.printStackTrace() }, onComplete = {
+            .subscribeBy(onError = { Timber.e(it) }, onComplete = {
                 handleSetupFinished()
             })
     }
@@ -102,7 +103,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
             }
 
     private fun manageVeroErrors(it: Throwable) {
-        it.printStackTrace()
+        Timber.d(it)
         launchScannerAlertOrShowDialog(scannerManager.getAlertType(it))
         crashReportManager.logExceptionOrSafeException(it)
     }
