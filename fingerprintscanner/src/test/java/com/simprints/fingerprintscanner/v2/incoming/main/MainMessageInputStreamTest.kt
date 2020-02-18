@@ -7,8 +7,8 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.Ge
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.TriggerButtonPressedEvent
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.GetUn20OnResponse
-import com.simprints.fingerprintscanner.v2.domain.main.packet.Route
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Packet
+import com.simprints.fingerprintscanner.v2.domain.main.packet.Route
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.Un20ResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroEventAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.main.message.accumulators.VeroResponseAccumulator
@@ -196,9 +196,9 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val veroResponseTestSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().test()
-        val veroEventTestSubscriber = messageInputStream.veroEvents!!.test()
-        val un20ResponseTestSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().test()
+        val veroResponseTestSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).test()
+        val veroEventTestSubscriber = messageInputStream.veroEvents!!.observeOn(testScheduler).test()
+        val un20ResponseTestSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().observeOn(testScheduler).test()
 
         routes.values.forEach { it.connect() }
 
