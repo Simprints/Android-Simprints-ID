@@ -194,4 +194,6 @@ dependencies {
 
     // Truth
     androidTestImplementation deps.testing.truth
+
+    androidTestImplementation deps.testing.rx2_idler
 }
