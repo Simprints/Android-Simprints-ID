@@ -123,10 +123,8 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
     override fun setUiIdle(): Completable = Completable.create { result ->
         scannerV1.resetUI(ScannerCallbackWrapper({
             result.onComplete()
-        }, { scannerError ->
-            scannerError?.let {
-                result.onError(UnknownScannerIssueException.forScannerError(it))
-            } ?: result.onComplete()
+        }, {
+            result.onComplete() // This call on Vero 1 can sometimes be buggy
         }))
     }
 
