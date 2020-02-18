@@ -12,6 +12,7 @@ import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncSt
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.*
 
@@ -26,16 +27,81 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
 
     private var syncStateLiveData = peopleSyncManager.getLastSyncState()
     private var isConnectedLiveData = deviceManager.isConnectedLiveData
-    private var lastSyncTimeObservedRunning: Date? = null
-    private var lastSyncTimeObservedFinishing: Date? = null
+
+    private var lastTimeSyncRun: Date? = null
 
     private val lastTimeSyncSucceed
         get() = cacheSync.readLastSuccessfulSyncTime()
 
-    private val hasSyncEverRun
-        get() = peopleSyncManager.hasSyncEverRunBefore()
+    private var isUIBoundToSources = false
 
-    init {
+    private fun emitNewCardState(isConnected: Boolean,
+                                 isModuleSelectionRequired: Boolean,
+                                 syncState: PeopleSyncState?) {
+
+        val syncRunningAndInfoNotReadyYet = syncState == null && syncCardStateLiveData.value is SyncConnecting
+        val syncNoRunningAndInfoNotReadyYet = syncState == null && syncCardStateLiveData.value !is SyncConnecting
+
+        when {
+            isModuleSelectionRequired -> SyncNoModules(lastTimeSyncSucceed)
+            !isConnected -> SyncOffline(lastTimeSyncSucceed)
+            syncRunningAndInfoNotReadyYet -> SyncConnecting(lastTimeSyncSucceed, 0, null)
+            syncNoRunningAndInfoNotReadyYet -> SyncDefault(lastTimeSyncSucceed)
+            syncState == null -> SyncDefault(null) //Useless after the 2 above - just to satisfy nullability in the else
+            else -> processRecentSyncState(syncState)
+        }.let { newState ->
+
+            if (syncState != null && isSyncRunning(syncState.downSyncWorkersInfo + syncState.upSyncWorkersInfo)) {
+                lastTimeSyncRun = Date()
+            }
+
+            updateDashboardCardState(newState)
+        }
+    }
+
+    private fun processRecentSyncState(syncState: PeopleSyncState): DashboardSyncCardState {
+
+        val downSyncStates = syncState.downSyncWorkersInfo
+        val upSyncStates = syncState.upSyncWorkersInfo
+        val allSyncStates = downSyncStates + upSyncStates
+        return when {
+            isThereNotSyncHistory(allSyncStates) -> SyncDefault(lastTimeSyncSucceed)
+            isSyncCompleted(allSyncStates) -> SyncComplete(lastTimeSyncSucceed)
+            isSyncProcess(allSyncStates) -> SyncProgress(lastTimeSyncSucceed, syncState.progress, syncState.total)
+            isSyncConnecting(allSyncStates) -> SyncConnecting(lastTimeSyncSucceed, syncState.progress, syncState.total)
+            isSyncFailedBecauseCloudIntegration(allSyncStates) -> SyncFailed(lastTimeSyncSucceed)
+            isSyncFailed(allSyncStates) -> SyncTryAgain(lastTimeSyncSucceed)
+            else -> SyncProgress(lastTimeSyncSucceed, syncState.progress, syncState.total)
+        }
+    }
+
+    override suspend fun syncIfRequired() {
+        if (syncCardStateLiveData.value == null) {
+            updateDashboardCardState(SyncConnecting(lastTimeSyncSucceed, 0, null))
+        }
+
+        var delayBeforeObserve = 0L
+        if (shouldForceOneTimeSync()) {
+            Timber.tag(SYNC_LOG_TAG).d("Re-launching one time sync")
+            peopleSyncManager.sync()
+            delayBeforeObserve = 1000
+        }
+
+        if (!isUIBoundToSources) {
+            isUIBoundToSources = true
+            delay(delayBeforeObserve)
+            bindUIToSync()
+        }
+    }
+
+    private fun shouldForceOneTimeSync(): Boolean {
+        val isRunning = syncStateLiveData.value?.let { isSyncRunning(it.downSyncWorkersInfo + it.upSyncWorkersInfo) } ?: false
+        val lastUpdate = lastTimeSyncRun ?: lastTimeSyncSucceed
+
+        return !isRunning && (lastUpdate == null || timeHelper.msBetweenNowAndTime(lastUpdate.time) > MAX_TIME_BEFORE_SYNC_AGAIN)
+    }
+
+    private fun bindUIToSync() {
         syncCardStateLiveData.addSource(isConnectedLiveData) { connectivity ->
             emitNewCardState(
                 connectivity,
@@ -51,103 +117,9 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
         }
     }
 
-    private fun emitNewCardState(isConnected: Boolean,
-                                 isModuleSelectionRequired: Boolean,
-                                 syncState: PeopleSyncState?) {
-
-        when {
-            isModuleSelectionRequired -> SyncNoModules(lastTimeSyncSucceed)
-            !isConnected -> SyncOffline(lastTimeSyncSucceed)
-            else -> processRecentSyncState(syncState)
-        }.let { newState ->
-
-            if (isSyncRunning(newState)) {
-                lastSyncTimeObservedRunning = Date()
-            } else if (hasSyncFinished(newState)) {
-                lastSyncTimeObservedFinishing = Date()
-            }
-
-            syncCardStateLiveData.value = newState
-            syncIfRequired()
-        }
-    }
-
-    private fun processRecentSyncState(syncState: PeopleSyncState?): DashboardSyncCardState {
-
-        val downSyncStates = syncState?.downSyncWorkersInfo ?: emptyList()
-        val upSyncStates = syncState?.upSyncWorkersInfo ?: emptyList()
-        val allSyncStates = downSyncStates + upSyncStates
-        return when {
-            !hasSyncEverRun || syncState == null || isThereNotSyncHistory(allSyncStates) -> SyncDefault(lastTimeSyncSucceed)
-            isSyncCompleted(allSyncStates) -> SyncComplete(lastTimeSyncSucceed)
-            isSyncProcess(allSyncStates) -> SyncProgress(lastTimeSyncSucceed, syncState.progress, syncState.total)
-            isSyncConnecting(allSyncStates) -> SyncConnecting(lastTimeSyncSucceed, syncState.progress, syncState.total)
-            isSyncFailedBecauseCloudIntegration(allSyncStates) -> SyncFailed(lastTimeSyncSucceed)
-            isSyncFailed(allSyncStates) -> SyncTryAgain(lastTimeSyncSucceed)
-            else -> SyncProgress(lastTimeSyncSucceed, syncState.progress, syncState.total)
-        }
-    }
-
-    private fun isSyncRunning(state: DashboardSyncCardState): Boolean =
-        state is SyncProgress || state is SyncConnecting
-
-    private fun hasSyncFinished(state: DashboardSyncCardState): Boolean =
-        state is SyncTryAgain || state is SyncFailed || state is SyncComplete
-
-    override fun syncIfRequired() {
-        val lastSyncState = syncCardStateLiveData.value
-        lastSyncState?.let {
-
-            // Cases when we want to force a one time sync
-            if (shouldForceOneTimeSync(it)) {
-
-                Timber.tag(SYNC_LOG_TAG).d("Re-launching one time sync")
-                syncCardStateLiveData.value = SyncConnecting(null, 0, null)
-                lastSyncTimeObservedRunning = Date()
-                peopleSyncManager.sync()
-            }
-        }
-    }
-
-    private fun shouldForceOneTimeSync(lastSyncState: DashboardSyncCardState): Boolean {
-        val hasSyncEverBeenObservedRunning = lastSyncTimeObservedRunning != null
-        /**
-         * Sync never run before.
-         * use case: after the login
-         */
-        return (!hasSyncEverRun ||
-            /**
-             * Sync has never been observed running in the dashboard and last sync (in background) failed.
-             * use case: user opens the dashboard and the sync failed before in background
-             */
-            (!hasSyncEverBeenObservedRunning && hasLastSyncFailed(lastSyncState)) ||
-            /**
-             * Sync has finished and last time it run quite long time ago.
-             * use case: user does sync in the dashboard and then it leaves the dashboard open
-             */
-            (hasSyncFinished(lastSyncState) && hasSyncRunLongTimeAgo()) ||
-
-            lastSyncState is SyncDefault && hasSyncRunLongTimeAgo())
-
-            && isConnected() && !isModuleSelectionRequired()
-
-    }
-
-    private fun hasLastSyncFailed(state: DashboardSyncCardState): Boolean =
-        state is SyncFailed || state is SyncTryAgain
-
-    private fun hasSyncRunLongTimeAgo(): Boolean {
-        if(lastSyncTimeObservedFinishing == null && lastTimeSyncSucceed == null) {
-            return true
-        }
-
-        val timeSinceLastObservedSyncCompleted = timeHelper.msBetweenNowAndTime(lastSyncTimeObservedFinishing?.time ?: Date().time)
-        val timeSinceLastSuccess = timeHelper.msBetweenNowAndTime(lastTimeSyncSucceed?.time ?: Date().time)
-
-        // if sync has never been observed running (e.g. user opens SPID), then we fall back using
-        // the last time when sync completed
-        return timeSinceLastObservedSyncCompleted > MAX_TIME_BEFORE_SYNC_AGAIN ||
-            (timeSinceLastSuccess > MAX_TIME_BEFORE_SYNC_AGAIN)
+    private fun updateDashboardCardState(newState: DashboardSyncCardState) {
+        Timber.tag(SYNC_LOG_TAG).d("new dashboard state: $newState")
+        syncCardStateLiveData.value = newState
     }
 
     private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<PeopleSyncState.SyncWorkerInfo>) =
@@ -166,6 +138,10 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
 
     private fun isSyncCompleted(allSyncStates: List<PeopleSyncState.SyncWorkerInfo>) =
         allSyncStates.all { it.state is PeopleSyncWorkerState.Succeeded }
+
+
+    private fun isSyncRunning(allSyncStates: List<PeopleSyncState.SyncWorkerInfo>) =
+        isSyncProcess(allSyncStates) || isSyncConnecting(allSyncStates)
 
 
     private fun isModuleSelectionRequired() =

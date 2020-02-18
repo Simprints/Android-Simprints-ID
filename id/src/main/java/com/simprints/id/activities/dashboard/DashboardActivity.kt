@@ -191,7 +191,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
             stopTickerToCheckIfSyncIsRequired()
             syncAgainTicker = ticker(
                 delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
-                initialDelayMillis = 100
+                initialDelayMillis = 0
             ).also {
                 for (event in it) {
                     Timber.tag(SYNC_LOG_TAG).d("Launch sync if required")
