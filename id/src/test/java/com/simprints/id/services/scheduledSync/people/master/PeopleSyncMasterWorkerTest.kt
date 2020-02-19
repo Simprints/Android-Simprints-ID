@@ -28,7 +28,7 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -75,7 +75,7 @@ class PeopleSyncMasterWorkerTest {
     }
 
     @Test
-    fun doWork_syncNotGoing_shouldEnqueueANewUniqueSync() = runBlockingTest {
+    fun doWork_syncNotGoing_shouldEnqueueANewUniqueSync() = runBlocking {
         val uniqueSyncId = masterWorker.uniqueSyncId
         prepareSyncWorkers(uniqueSyncId)
 
@@ -87,7 +87,7 @@ class PeopleSyncMasterWorkerTest {
     }
 
     @Test
-    fun doWork_syncNotGoingAndBackgroundOff_shouldEnqueueOnlyUpSyncWorkers() = runBlockingTest {
+    fun doWork_syncNotGoingAndBackgroundOff_shouldEnqueueOnlyUpSyncWorkers() = runBlocking {
         with(masterWorker) {
             val uniqueSyncId = masterWorker.uniqueSyncId
             prepareSyncWorkers(uniqueSyncId)
@@ -108,7 +108,7 @@ class PeopleSyncMasterWorkerTest {
     }
 
     @Test
-    fun doWork_syncNotGoingAndBackgroundOn_shouldEnqueueAllWorkers() = runBlockingTest {
+    fun doWork_syncNotGoingAndBackgroundOn_shouldEnqueueAllWorkers() = runBlocking {
         val uniqueSyncId = masterWorker.uniqueSyncId
         prepareSyncWorkers(uniqueSyncId)
         mockBackgroundTrigger(true)
@@ -121,7 +121,7 @@ class PeopleSyncMasterWorkerTest {
     }
 
     @Test
-    fun doWorkAsOneTimeSync_syncBackgroundOff_shouldEnqueueAllWorkers() = runBlockingTest {
+    fun doWorkAsOneTimeSync_syncBackgroundOff_shouldEnqueueAllWorkers() = runBlocking {
         buildOneTimeMasterWorker()
         every { masterWorker.preferenceManager.peopleDownSyncTriggers[MANUAL] } returns true
         val uniqueSyncId = masterWorker.uniqueSyncId
@@ -136,7 +136,7 @@ class PeopleSyncMasterWorkerTest {
     }
 
     @Test
-    fun doWork_syncGoing_shouldReturnTheExistingUniqueSync() = runBlockingTest {
+    fun doWork_syncGoing_shouldReturnTheExistingUniqueSync() = runBlocking {
         val existingSyncId = enqueueASyncWorker()
 
         masterWorker.doWork()
@@ -146,7 +146,7 @@ class PeopleSyncMasterWorkerTest {
     }
 
     @Test
-    fun doWork_errorOccurs_shouldWorkerFail() = runBlockingTest {
+    fun doWork_errorOccurs_shouldWorkerFail() = runBlocking {
         coEvery { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } throws Throwable("IO Error")
 
         masterWorker.doWork()

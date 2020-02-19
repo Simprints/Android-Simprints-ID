@@ -9,6 +9,8 @@ import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDow
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -52,33 +54,34 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
     private val isOneTimeMasterWorker
         get() = tags.contains(MASTER_SYNC_SCHEDULER_ONE_TIME)
 
-    override suspend fun doWork(): Result {
-        return try {
-            getComponent<PeopleSyncMasterWorker> { it.inject(this) }
-            crashlyticsLog("Start")
+    override suspend fun doWork(): Result =
+        withContext(Dispatchers.IO) {
+            try {
+                getComponent<PeopleSyncMasterWorker> { it.inject(this@PeopleSyncMasterWorker) }
+                crashlyticsLog("Start")
 
-            if (!isSyncRunning()) {
-                val startSyncReporterWorker = peopleSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
-                val upSyncWorkers = upSyncWorkersChain(uniqueSyncId)
-                val downSyncWorkers = downSyncWorkersChain(uniqueSyncId)
-                val chain = upSyncWorkers + downSyncWorkers
-                val endSyncReporterWorker = peopleSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
-                wm.beginWith(startSyncReporterWorker).then(chain).then(endSyncReporterWorker).enqueue()
+                if (!isSyncRunning()) {
+                    val startSyncReporterWorker = peopleSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
+                    val upSyncWorkers = upSyncWorkersChain(uniqueSyncId)
+                    val downSyncWorkers = downSyncWorkersChain(uniqueSyncId)
+                    val chain = upSyncWorkers + downSyncWorkers
+                    val endSyncReporterWorker = peopleSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
+                    wm.beginWith(startSyncReporterWorker).then(chain).then(endSyncReporterWorker).enqueue()
 
-                peopleSyncCache.clearProgresses()
-                clearWorkerHistory(uniqueSyncId)
-                success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId),
-                    "Master work done: new id $uniqueSyncId")
-            } else {
-                val lastSyncId = getLastSyncId()
+                    peopleSyncCache.clearProgresses()
+                    clearWorkerHistory(uniqueSyncId)
+                    success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId),
+                        "Master work done: new id $uniqueSyncId")
+                } else {
+                    val lastSyncId = getLastSyncId()
 
-                success(workDataOf(OUTPUT_LAST_SYNC_ID to lastSyncId),
-                    "Master work done: id already exists $lastSyncId")
+                    success(workDataOf(OUTPUT_LAST_SYNC_ID to lastSyncId),
+                        "Master work done: id already exists $lastSyncId")
+                }
+            } catch (t: Throwable) {
+                fail(t)
             }
-        } catch (t: Throwable) {
-            fail(t)
         }
-    }
 
     private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
         val backgroundOnForPeriodicSync = preferenceManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.PERIODIC_BACKGROUND] == true

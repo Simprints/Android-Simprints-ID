@@ -9,6 +9,7 @@ import com.simprints.id.testtools.TestApplication
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +35,7 @@ class ImageUpSyncWorkerTest {
     }
 
     @Test
-    fun whenAllUploadsAreSuccessful_shouldReturnSuccess() = runBlockingTest {
+    fun whenAllUploadsAreSuccessful_shouldReturnSuccess() = runBlocking {
         mockUploadResults(allUploadsSuccessful = true)
 
         val result = imageUpSyncWorker.doWork()
@@ -43,7 +44,7 @@ class ImageUpSyncWorkerTest {
     }
 
     @Test
-    fun whenNotAllUploadsAreSuccessful_shouldReturnRetry() = runBlockingTest {
+    fun whenNotAllUploadsAreSuccessful_shouldReturnRetry() = runBlocking {
         mockUploadResults(allUploadsSuccessful = false)
 
         val result = imageUpSyncWorker.doWork()
