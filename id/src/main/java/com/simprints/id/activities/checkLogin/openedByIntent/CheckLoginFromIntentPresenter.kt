@@ -1,6 +1,7 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
+import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
@@ -29,7 +30,9 @@ import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -188,7 +191,14 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
                 it.databaseInfo.recordCount = recordCount
             }
-        }.subscribeBy(onError = { it.printStackTrace() })
+        }
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeBy(onComplete = {
+           Timber.d("Session updated")
+        }, onError = {
+            it.printStackTrace()
+        })
 
         view.openOrchestratorActivity(appRequest)
 
@@ -220,7 +230,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private fun fetchAnalyticsId() =
         analyticsManager.analyticsId.onErrorReturn { "" }
 
-    private fun fetchPeopleCountInLocalDatabase(): Single<Int> = Single.just(personLocalDataSource.count())
+    private fun fetchPeopleCountInLocalDatabase(): Single<Int> = singleWithSuspend {personLocalDataSource.count() }
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
         session.addEvent(AuthorizationEvent(

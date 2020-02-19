@@ -41,7 +41,7 @@ class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimC
         }
     }
 
-    private fun execute(upSyncScope: PeopleUpSyncScope): Result {
+    private suspend fun execute(upSyncScope: PeopleUpSyncScope): Result {
         val upCount = getUpCount(upSyncScope)
         val output = JsonHelper.gson.toJson(upCount)
 
@@ -50,7 +50,7 @@ class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimC
 
     }
 
-    private fun getUpCount(syncScope: PeopleUpSyncScope) =
+    private suspend fun getUpCount(syncScope: PeopleUpSyncScope) =
         PeopleCount(created = personRepository.count(PersonLocalDataSource.Query(toSync = true)))
 
 }
