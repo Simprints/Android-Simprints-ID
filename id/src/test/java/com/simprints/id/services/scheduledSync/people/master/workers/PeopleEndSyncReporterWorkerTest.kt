@@ -12,7 +12,7 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,7 +39,7 @@ class PeopleEndSyncReporterWorkerTest {
     }
 
     @Test
-    fun worker_withInvalidSyncIdAsInput_shouldFail() = runBlockingTest {
+    fun worker_withInvalidSyncIdAsInput_shouldFail() = runBlocking {
         endSyncReportWorker = createWorker(workDataOf(SYNC_ID_TO_MARK_AS_COMPLETED to ""))
         with(endSyncReportWorker) {
             doWork()
@@ -48,7 +48,7 @@ class PeopleEndSyncReporterWorkerTest {
     }
 
     @Test
-    fun worker_withValidSyncIdAsInput_shouldReportLastSyncTime() = runBlockingTest {
+    fun worker_withValidSyncIdAsInput_shouldReportLastSyncTime() = runBlocking {
         with(endSyncReportWorker) {
             doWork()
             verify { syncCache.storeLastSuccessfulSyncTime(any()) }

@@ -5,6 +5,8 @@ import androidx.work.WorkerParameters
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
@@ -21,20 +23,22 @@ class PeopleEndSyncReporterWorker(appContext: Context,
     @Inject lateinit var syncCache: PeopleSyncCache
 
     override suspend fun doWork(): Result =
-        try {
-            getComponent<PeopleSyncMasterWorker> { it.inject(this) }
-            val syncId = inputData.getString(SYNC_ID_TO_MARK_AS_COMPLETED)
-            crashlyticsLog("Start - Params: $syncId")
+        withContext(Dispatchers.IO) {
+            try {
+                getComponent<PeopleSyncMasterWorker> { it.inject(this@PeopleEndSyncReporterWorker) }
+                val syncId = inputData.getString(SYNC_ID_TO_MARK_AS_COMPLETED)
+                crashlyticsLog("Start - Params: $syncId")
 
-            if (!syncId.isNullOrEmpty()) {
-                syncCache.storeLastSuccessfulSyncTime(Date())
-                success()
-            } else {
-                throw IllegalArgumentException("SyncId missed")
+                if (!syncId.isNullOrEmpty()) {
+                    syncCache.storeLastSuccessfulSyncTime(Date())
+                    success()
+                } else {
+                    throw IllegalArgumentException("SyncId missed")
+                }
+            } catch (t: Throwable) {
+                t.printStackTrace()
+                fail(t)
             }
-        } catch (t: Throwable) {
-            t.printStackTrace()
-            fail(t)
         }
 
     companion object {
