@@ -13,7 +13,6 @@ import com.simprints.id.tools.extensions.isXLargeTablet
 import kotlinx.android.synthetic.main.settings_toolbar.*
 import javax.inject.Inject
 
-
 class SettingsActivity : AppCompatPreferenceActivity() {
 
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
@@ -72,12 +71,8 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         startActivityForResult(Intent(this, SettingsAboutActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
     }
 
-    fun openModuleSelectionActivity() {
-        val intent = Intent(this, ModuleSelectionActivity::class.java)
-        startActivityForResult(intent, SETTINGS_ACTIVITY_REQUEST_CODE)
-    }
-
     fun openSyncInformationActivity() {
         startActivity(Intent(this, SyncInformationActivity::class.java))
     }
+    
 }
