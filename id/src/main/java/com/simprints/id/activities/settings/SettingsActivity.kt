@@ -6,6 +6,7 @@ import android.view.MenuItem
 import androidx.preference.PreferenceFragment
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.tools.AndroidResourcesHelper
@@ -73,6 +74,10 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
     fun openSyncInformationActivity() {
         startActivity(Intent(this, SyncInformationActivity::class.java))
+    }
+
+    fun openCheckLoginFromMainLauncherActivity() {
+        startActivity(Intent(this, CheckLoginFromMainLauncherActivity::class.java))
     }
     
 }
