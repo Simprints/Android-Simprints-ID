@@ -8,6 +8,7 @@ import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -18,6 +19,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_sync_information.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SyncInformationActivity : AppCompatActivity() {
@@ -56,7 +58,10 @@ class SyncInformationActivity : AppCompatActivity() {
         super.onResume()
         clearValues()
         setFocusOnDefaultModulesTab()
-        viewModel.start()
+
+        lifecycleScope.launch {
+            viewModel.start()
+        }
     }
 
     private fun setTextInLayout() {

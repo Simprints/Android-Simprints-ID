@@ -16,6 +16,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,7 +43,7 @@ class SyncInformationViewModelTest {
     }
 
     @Test
-    fun fetchCountFromLocal_shouldUpdateValue() {
+    fun fetchCountFromLocal_shouldUpdateValue() = runBlocking {
         val totalRecordsInLocal = 322
         mockPersonLocalDataSourceCount(totalRecordsInLocal)
 
@@ -67,7 +68,7 @@ class SyncInformationViewModelTest {
     }
 
     @Test
-    fun fetchRecordsToUpSyncCount_shouldUpdateValue() {
+    fun fetchRecordsToUpSyncCount_shouldUpdateValue() = runBlocking {
         val recordsToUpSyncCount = 123
         mockPersonLocalDataSourceCount(recordsToUpSyncCount)
 
@@ -77,7 +78,7 @@ class SyncInformationViewModelTest {
     }
 
     @Test
-    fun fetchSelectedModulesCount_shouldUpdateValue() {
+    fun fetchSelectedModulesCount_shouldUpdateValue() = runBlocking {
         val moduleName = "module1"
         val countForModule = 123
         every { preferencesManagerMock.selectedModules } returns setOf(moduleName)
@@ -92,7 +93,7 @@ class SyncInformationViewModelTest {
     }
 
     @Test
-    fun unselectedModulesCountGreaterThanZero_shouldUpdateValue() {
+    fun unselectedModulesCountGreaterThanZero_shouldUpdateValue() = runBlocking {
         val selectedModuleName = "module1"
         val unselectedModuleName = "module2"
         val moduleOptions = setOf(selectedModuleName, unselectedModuleName)
@@ -111,7 +112,7 @@ class SyncInformationViewModelTest {
     }
 
     @Test
-    fun unselectedModulesCountIsZero_shouldUpdateValueAsEmptyList() {
+    fun unselectedModulesCountIsZero_shouldUpdateValueAsEmptyList() = runBlocking {
         val selectedModuleName = "module1"
         val unselectedModuleName = "module2"
         val moduleOptions = setOf(selectedModuleName, unselectedModuleName)
@@ -127,6 +128,6 @@ class SyncInformationViewModelTest {
     }
 
     private fun mockPersonLocalDataSourceCount(recordCount: Int) {
-        every { personLocalDataSourceMock.count(any()) } returns recordCount
+        coEvery { personLocalDataSourceMock.count(any()) } returns recordCount
     }
 }
