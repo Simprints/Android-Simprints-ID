@@ -114,7 +114,7 @@ class CommCarePresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnConfirmation(flowCompletedCheck)
+            view.returnConfirmation(flowCompletedCheck, getCurrentSessionId())
         }
     }
 
