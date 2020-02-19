@@ -10,8 +10,8 @@ inline fun <reified T> List<T>.toRealmList(): RealmList<T> =
 
 // Strong reference to query results otherwise they may get garbage collected while we are
 // waiting for the listeners to deliver the results
-val firstAsyncQueriesResult = mutableListOf<RealmObject>()
-val findAllQueriesResult = mutableListOf<RealmResults<RealmObject>>()
+private val firstAsyncQueriesResult = mutableListOf<RealmObject>()
+private val findAllQueriesResult = mutableListOf<RealmResults<RealmObject>>()
 
 private suspend fun <T : RealmObject, S : RealmQuery<T>> findAllAwait(query: S): RealmResults<T>? = suspendCancellableCoroutine { continuation ->
     val result = query.findAllAsync()
