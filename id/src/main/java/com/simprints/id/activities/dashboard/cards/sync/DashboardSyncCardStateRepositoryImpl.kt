@@ -84,9 +84,12 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
         if (shouldForceOneTimeSync()) {
             Timber.tag(SYNC_LOG_TAG).d("Re-launching one time sync")
             peopleSyncManager.sync()
-            delayBeforeObserve = 1000
+            delayBeforeObserve = 6000
         }
 
+        // Only on the first launch, if sync gets triggered,
+        // the UI binding is delayed, so only the new states are shown
+        // instead of already terminated syncs
         if (!isUIBoundToSources) {
             isUIBoundToSources = true
             delay(delayBeforeObserve)
