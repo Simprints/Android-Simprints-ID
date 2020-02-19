@@ -21,7 +21,7 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,7 +54,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_shouldParseInputDataCorrectly() = runBlockingTest {
+    fun worker_shouldParseInputDataCorrectly() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
             doWork()
             coEvery { peopleDownSyncDownloaderTask.execute(projectSyncOp, any(), any()) }
@@ -62,7 +62,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_shouldExecuteTheTask() = runBlockingTest {
+    fun worker_shouldExecuteTheTask() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
             coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any()) } returns 0
 
@@ -75,7 +75,7 @@ class PeopleDownSyncDownloaderWorkerTest {
 
 
     @Test
-    fun worker_failForCloudIntegration_shouldFail() = runBlockingTest {
+    fun worker_failForCloudIntegration_shouldFail() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
             coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any()) } throws SyncCloudIntegrationException("Cloud integration", Throwable())
 
@@ -86,7 +86,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_failForNetworkIssue_shouldRetry() = runBlockingTest {
+    fun worker_failForNetworkIssue_shouldRetry() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
             coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any()) } throws Throwable("Network Exception")
 
@@ -97,7 +97,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_inputDataIsWrong_shouldFail() = runBlockingTest {
+    fun worker_inputDataIsWrong_shouldFail() = runBlocking<Unit> {
         peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to ""))
         with(peopleDownSyncDownloaderWorker) {
 
@@ -108,7 +108,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_progressCountInProgressData_shouldExtractTheProgressCountCorrectly() = runBlockingTest {
+    fun worker_progressCountInProgressData_shouldExtractTheProgressCountCorrectly() = runBlocking {
         val progress = 2
         val syncCacheMock = mockk<PeopleSyncCache>()
         every { syncCacheMock.readProgress(any()) } returns 1
@@ -118,7 +118,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_SyncDown_shouldExtractTheFinalProgressCountCorrectly() = runBlockingTest {
+    fun worker_SyncDown_shouldExtractTheFinalProgressCountCorrectly() = runBlocking {
         val progress = 2
         val syncCacheMock = mockk<PeopleSyncCache>()
         every { syncCacheMock.readProgress(any()) } returns 1
@@ -128,7 +128,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun workerResumed_progressCountInCache_shouldExtractTheProgressCountCorrectly() = runBlockingTest {
+    fun workerResumed_progressCountInCache_shouldExtractTheProgressCountCorrectly() = runBlocking {
         val progress = 2
         val syncCacheMock = mockk<PeopleSyncCache>()
         every { syncCacheMock.readProgress(any()) } returns progress

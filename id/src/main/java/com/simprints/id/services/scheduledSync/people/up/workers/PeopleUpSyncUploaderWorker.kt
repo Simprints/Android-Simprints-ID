@@ -16,7 +16,9 @@ import com.simprints.id.services.scheduledSync.people.master.internal.OUTPUT_FAI
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 // TODO: uncomment userId when multitenancy is properly implemented
@@ -32,9 +34,9 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
     @Inject lateinit var peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository
     @Inject lateinit var peopleSyncCache: PeopleSyncCache
 
-    override suspend fun doWork(): Result {
-        return try {
-            getComponent<PeopleUpSyncUploaderWorker> { it.inject(this) }
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+        try {
+            getComponent<PeopleUpSyncUploaderWorker> { it.inject(this@PeopleUpSyncUploaderWorker) }
             crashlyticsLog("Start")
 
             val task = PeopleUpSyncUploaderTask(
@@ -44,7 +46,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
                 peopleSyncCache
             )
 
-            val totalUploaded = task.execute(this.id.toString(), this)
+            val totalUploaded = task.execute(this@PeopleUpSyncUploaderWorker.id.toString(), this@PeopleUpSyncUploaderWorker)
             success(workDataOf(OUTPUT_UP_SYNC to totalUploaded), "Total uploaded: $totalUploaded")
         } catch (t: Throwable) {
             retryOrFailIfCloudIntegrationError(t)

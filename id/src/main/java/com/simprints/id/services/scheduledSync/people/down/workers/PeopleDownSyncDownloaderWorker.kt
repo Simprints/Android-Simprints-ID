@@ -15,6 +15,8 @@ import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyn
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.id.services.scheduledSync.people.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
@@ -36,9 +38,9 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
             ?: throw IllegalArgumentException("input required")
     }
 
-    override suspend fun doWork(): Result {
-        return try {
-            getComponent<PeopleDownSyncDownloaderWorker> { it.inject(this) }
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+        try {
+            getComponent<PeopleDownSyncDownloaderWorker> { it.inject(this@PeopleDownSyncDownloaderWorker) }
             val downSyncOperation = extractSubSyncScopeFromInput()
             crashlyticsLog("Start - Params: $downSyncOperation")
 

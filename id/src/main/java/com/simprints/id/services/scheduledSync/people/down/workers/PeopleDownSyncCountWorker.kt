@@ -20,6 +20,8 @@ import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWo
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.DOWNLOADER
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.UPLOADER
 import com.simprints.id.tools.delegates.lazyVar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
@@ -38,18 +40,19 @@ class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) 
     @Inject lateinit var personRepository: PersonRepository
     @Inject lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
 
-    override suspend fun doWork(): Result {
-        return try {
-            getComponent<PeopleDownSyncCountWorker> { it.inject(this) }
+    override suspend fun doWork(): Result =
+        withContext(Dispatchers.IO) {
+            try {
+                getComponent<PeopleDownSyncCountWorker> { it.inject(this@PeopleDownSyncCountWorker) }
 
-            val downSyncScope = downSyncScopeRepository.getDownSyncScope()
-            crashlyticsLog("Start - Params: $downSyncScope")
+                val downSyncScope = downSyncScopeRepository.getDownSyncScope()
+                crashlyticsLog("Start - Params: $downSyncScope")
 
-            execute(downSyncScope)
-        } catch (t: Throwable) {
-            fail(t)
+                execute(downSyncScope)
+            } catch (t: Throwable) {
+                fail(t)
+            }
         }
-    }
 
     private suspend fun execute(downSyncScope: PeopleDownSyncScope): Result {
         return try {
@@ -63,7 +66,7 @@ class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) 
 
             if (t is SyncCloudIntegrationException) {
                 fail(t)
-            }else if (isSyncStillRunning()) {
+            } else if (isSyncStillRunning()) {
                 retry(t)
             } else {
                 t.printStackTrace()
