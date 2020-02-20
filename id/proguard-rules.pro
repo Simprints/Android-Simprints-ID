@@ -103,3 +103,4 @@
 -dontwarn com.simprints.id.data.db.person.local.**
 -dontwarn com.simprints.id.services.scheduledSync.people.up.workers.**
 -dontwarn com.simprints.id.tools.extensions.**
+-dontwarn  com.simprints.id.activities.settings.syncinformation.**
