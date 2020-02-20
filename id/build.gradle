@@ -19,8 +19,8 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionName "2020.1.1-rc8"
-        versionCode 208
+        versionName "2020.1.1-rc9"
+        versionCode 209
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -43,8 +43,6 @@ android {
             lintOptions {
                 // TODO : Remove whenever possible
                 // Check in the Translations Editor for crucial translations that may be missing
-                disable "MissingTranslation"
-                disable "ExtraTranslation"
                 abortOnError true
                 fatal 'StopShip'
                 checkReleaseBuilds true
