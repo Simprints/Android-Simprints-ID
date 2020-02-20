@@ -37,7 +37,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
                     BLUETOOTH_DISABLED -> BluetoothNotEnabledException()
                     BLUETOOTH_NOT_SUPPORTED -> BluetoothNotSupportedException()
                     SCANNER_UNBONDED -> ScannerNotPairedException()
-                    BUSY, IO_ERROR -> UnknownScannerIssueException.forScannerError(scannerError)
+                    BUSY, IO_ERROR -> ScannerDisconnectedException()
                     else -> UnknownScannerIssueException.forScannerError(scannerError)
                 }
                 result.onError(issue)
@@ -111,7 +111,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
     private fun handleFingerprintCaptureError(error: SCANNER_ERROR?, emitter: SingleEmitter<CaptureFingerprintResponse>) {
         when (error) {
             UN20_SDK_ERROR -> emitter.onError(NoFingerDetectedException()) // If no finger is detected on the sensor
-            INVALID_STATE, SCANNER_UNREACHABLE, UN20_INVALID_STATE, OUTDATED_SCANNER_INFO -> emitter.onError(ScannerDisconnectedException())
+            INVALID_STATE, SCANNER_UNREACHABLE, UN20_INVALID_STATE, OUTDATED_SCANNER_INFO, IO_ERROR -> emitter.onError(ScannerDisconnectedException())
             BUSY, INTERRUPTED, TIMEOUT -> emitter.onError(ScannerOperationInterruptedException())
             else -> emitter.onError(UnexpectedScannerException.forScannerError(error, "ScannerWrapperV1"))
         }
