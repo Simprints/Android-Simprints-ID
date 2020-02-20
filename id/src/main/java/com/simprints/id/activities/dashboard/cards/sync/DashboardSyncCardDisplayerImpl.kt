@@ -166,7 +166,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
                 text = getString(R.string.dashboard_sync_card_no_modules_message)
             }
             with(buttonSelectModule()) {
-                text = getString(R.string.dashboard_sync_card_no_modules_button)
+                text = getString(R.string.dashboard_sync_card_no_modules_button).capitalize()
                 setOnClickListener {
                     userWantsToSelectAModule.send()
                 }
@@ -181,7 +181,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
                 text = getString(R.string.dashboard_sync_card_incomplete)
             }
             with(buttonProgressSync()) {
-                text = getString(R.string.dashboard_sync_card_try_again_button)
+                text = getString(R.string.dashboard_sync_card_try_again_button).capitalize()
                 setOnClickListener {
                     userWantsToSync.send()
                 }
@@ -192,7 +192,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     private fun prepareSyncDefaultStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForDefaultState) {
             withVisible(buttonDefaultSync()) {
-                text = getString(R.string.dashboard_sync_card_sync_button)
+                text = getString(R.string.dashboard_sync_card_sync_button).capitalize()
                 setOnClickListener {
                     userWantsToSync.send()
                 }
