@@ -42,7 +42,11 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     override fun versionInformation(): ScannerVersionInformation =
         unifiedVersionInformation?.let {
-            ScannerVersionInformation(2, it.masterFirmwareVersion.toInt(), it.un20AppVersion.firmwareMajorVersion.toInt())
+            ScannerVersionInformation(2, it.masterFirmwareVersion,
+                (it.un20AppVersion.apiMajorVersion.toLong() shl 48) or
+                    (it.un20AppVersion.apiMinorVersion.toLong() shl 32) or
+                    (it.un20AppVersion.firmwareMajorVersion.toLong() shl 16) or
+                    (it.un20AppVersion.firmwareMinorVersion.toLong()))
         } ?: ScannerVersionInformation(2, -1, -1)
 
     override fun connect(): Completable {
