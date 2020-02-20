@@ -54,7 +54,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
             .andThen(resetVeroUI())
             .andThen(wakeUpVero())
             .subscribeOn(Schedulers.io())
-            .subscribeBy(onError = { Timber.e(it) }, onComplete = {
+            .subscribeBy(onError = { manageVeroErrors(it) }, onComplete = {
                 handleSetupFinished()
             })
     }
@@ -97,7 +97,6 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
         }
             .andThen(task)
             .andThen(Completable.fromAction { callback?.invoke() })
-            .doOnError { manageVeroErrors(it) }
             .doOnComplete {
                 logMessageForCrashReport(crashReportMessage)
             }
