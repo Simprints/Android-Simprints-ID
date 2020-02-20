@@ -196,6 +196,9 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     private fun CaptureFingerprintStrategy.deduceCaptureDpi(): Dpi =
         when (this) {
+            CaptureFingerprintStrategy.SECUGEN_ISO_500_DPI -> Dpi(500)
+            CaptureFingerprintStrategy.SECUGEN_ISO_1000_DPI -> Dpi(1000)
+            CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI -> Dpi(1300)
             CaptureFingerprintStrategy.SECUGEN_ISO_1700_DPI -> Dpi(1700)
         }
 
