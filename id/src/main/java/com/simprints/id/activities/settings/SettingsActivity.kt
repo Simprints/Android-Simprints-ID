@@ -77,6 +77,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     }
 
     fun openCheckLoginFromMainLauncherActivity() {
+        overridePendingTransition(0, 0)
         startActivity(Intent(this, CheckLoginFromMainLauncherActivity::class.java))
     }
     

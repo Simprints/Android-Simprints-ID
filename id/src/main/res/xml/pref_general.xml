@@ -7,7 +7,8 @@
             android:entries="@array/language_array"
             android:entryValues="@array/language_values"
             android:key="@string/preference_select_language_key"
-            android:negativeButtonText="@string/cancel_button"/>
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
 
         <MultiSelectListPreference
             android:entries="@array/finger_array"

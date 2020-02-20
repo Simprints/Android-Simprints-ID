@@ -172,7 +172,11 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
     }
 
     private fun migrateTo8(schema: RealmSchema) {
-        schema.remove("DbSyncInfo")
+        try {
+            schema.remove("DbSyncInfo")
+        } catch (t: Throwable) {
+            t.printStackTrace()
+        }
     }
 
     private inline fun <reified T> RealmObjectSchema.addNewField(name: String, vararg attributes: FieldAttribute): RealmObjectSchema =
