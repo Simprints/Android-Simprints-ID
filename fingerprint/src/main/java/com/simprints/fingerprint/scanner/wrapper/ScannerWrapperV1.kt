@@ -24,8 +24,8 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
     override fun versionInformation(): ScannerVersionInformation =
         ScannerVersionInformation(
             veroVersion = 1,
-            firmwareVersion = scannerV1.ucVersion.toInt(),
-            un20Version = scannerV1.unVersion.toInt()
+            firmwareVersion = scannerV1.ucVersion.toLong(),
+            un20Version = scannerV1.unVersion.toLong()
         )
 
     override fun connect(): Completable = Completable.create { result ->
