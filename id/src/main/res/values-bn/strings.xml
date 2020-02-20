@@ -156,15 +156,15 @@
 
     <plurals name="dashboard_card_enrolments">
         <item quantity="one">তালিকাভুক্ত করণ</item>
-        <item quantity="other">Enrolments</item>
+        <item quantity="other">নিবন্ধন সমূহ</item>
     </plurals>
     <plurals name="dashboard_card_identifications">
         <item quantity="one">সনাক্তকরণ</item>
-        <item quantity="other">Identifications</item>
+        <item quantity="other">সনাক্তকরণ সমূহ</item>
     </plurals>
     <plurals name="dashboard_card_verifications">
         <item quantity="one">যাচাই করুন</item>
-        <item quantity="other">Verifications</item>
+        <item quantity="other">যাচাইকরণ সমূহ</item>
     </plurals>
     <string name="title_activity_sync_information">তথ্য সিঙ্ক করুন</string>
     <string name="preference_sync_information_title">তথ্য সিঙ্ক করুন</string>
@@ -193,4 +193,6 @@
     <string name="dashboard_sync_card_offline_button">স্ক্যানার যোগ করুন</string>
     <string name="dashboard_sync_card_sync_button">সিঙ্ক করুন</string>
     <string name="dashboard_sync_card_try_again_button">আবার চেষ্টা করুন</string>
+    <string name="dashboard_sync_card_progress">সিঙ্ক করা হচ্ছে… %1$s</string>
+    <string name="dashboard_card_activity">কার্যক্রম তথ্য: %1$s</string>
 </resources>
