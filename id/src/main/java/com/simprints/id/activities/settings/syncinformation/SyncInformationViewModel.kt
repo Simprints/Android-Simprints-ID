@@ -8,6 +8,8 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 class SyncInformationViewModel(private val personRepository: PersonRepository,
@@ -64,13 +66,16 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
     }
 
     internal suspend fun fetchAndUpdatedUnselectedModulesCount() {
-        val unselectedModules = preferencesManager.moduleIdOptions.minus(preferencesManager.selectedModules)
+        val unselectedModules = personLocalDataSource.load(
+            PersonLocalDataSource.Query(projectId = projectId)
+        ).filter { !preferencesManager.selectedModules.contains(it.moduleId) }
+            .toList()
+            .groupBy { it.moduleId }
+
         val unselectedModulesWithCount = unselectedModules.map {
-            ModuleCount(it, personLocalDataSource.count(PersonLocalDataSource.Query(
-                projectId = projectId,
-                moduleId = it)))
+            ModuleCount(it.key, it.value.size)
         }
 
-        unselectedModulesCount.value = unselectedModulesWithCount.filter { it.count > 0 }
+        unselectedModulesCount.value = unselectedModulesWithCount
     }
 }
