@@ -41,6 +41,7 @@ class StmOtaController {
                 sendOtaPacket(stmOtaMessageChannel, errorHandler, chunk)
                     .andThen(Observable.just(progress))
             }
+            .concatWith(sendGoCommandAndAddress(stmOtaMessageChannel, errorHandler))
 
     private fun sendInitBootloaderCommand(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler): Completable =
         sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
@@ -86,6 +87,15 @@ class StmOtaController {
             )
         ).verifyResponseIsAck()
 
+    private fun sendGoCommandAndAddress(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler): Completable =
+        sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
+            GoCommand()
+        ).verifyResponseIsAck().andThen(
+            stmOtaMessageChannel.outgoing.sendMessage( // The ACK sometimes doesn't make it back before the Cypress module disconnects
+                GoAddressCommand(GO_ADDRESS.toByteArray(StmOtaMessageProtocol.byteOrder))
+            )
+        )
+
     private fun Single<out CommandAcknowledgement>.verifyResponseIsAck(): Completable =
         flatMapCompletable {
             completable {
@@ -98,6 +108,7 @@ class StmOtaController {
     companion object {
         val ERASE_ALL_ADDRESS = byteArrayOf(0xFF, 0xFF)
         const val START_ADDRESS = 0x08004000
+        const val GO_ADDRESS = 0x08000000
         const val MAX_STM_OTA_CHUNK_SIZE = 256
     }
 }
