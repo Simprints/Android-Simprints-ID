@@ -2,11 +2,9 @@ package com.simprints.id.activities.settings.fragments.moduleselection
 
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
@@ -37,7 +35,7 @@ import javax.inject.Inject
 
 class ModuleSelectionFragment(
     private val application: Application
-) : Fragment(), ModuleSelectionListener, ChipClickListener {
+) : Fragment(R.layout.fragment_module_selection), ModuleSelectionListener, ChipClickListener {
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
@@ -54,10 +52,6 @@ class ModuleSelectionFragment(
 
     private var modules = emptyList<Module>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_module_selection, container, false)
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configureRecyclerView()
@@ -73,7 +67,6 @@ class ModuleSelectionFragment(
             scrollView.fullScroll(View.FOCUS_DOWN)
             scrollView.isSmoothScrollingEnabled = true
         }
-        searchView.requestFocus()
     }
 
     private fun refreshSyncWorkers(){
