@@ -41,7 +41,7 @@ class StmOtaControllerTest {
     @Test
     fun program_correctlyCallsParseAndSendCorrectNumberOfTimes() {
         val firmwareBin = generateRandomBinFile()
-        val expectedNumberOfCalls = expectedNumberOfChunks(firmwareBin) * 3 + 3
+        val expectedNumberOfCalls = expectedNumberOfChunks(firmwareBin) * 3 + 5
 
         val messageStreamMock = configureMessageStreamMock()
         val stmOtaController = StmOtaController()
