@@ -91,10 +91,10 @@ class StmOtaController {
         sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
             GoCommand()
         ).verifyResponseIsAck().andThen(
-            sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
+            stmOtaMessageChannel.outgoing.sendMessage( // The ACK sometimes doesn't make it back before the Cypress module disconnects
                 GoAddressCommand(GO_ADDRESS.toByteArray(StmOtaMessageProtocol.byteOrder))
             )
-        ).verifyResponseIsAck()
+        )
 
     private fun Single<out CommandAcknowledgement>.verifyResponseIsAck(): Completable =
         flatMapCompletable {
