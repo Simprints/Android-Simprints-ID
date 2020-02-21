@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.settings_toolbar.*
 
 class ModuleSelectionActivity : AppCompatActivity() {
 
-    lateinit var moduleSelectionFragment: ModuleSelectionFragment
+    private lateinit var moduleSelectionFragment: ModuleSelectionFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,4 +41,5 @@ class ModuleSelectionActivity : AppCompatActivity() {
     override fun onBackPressed() {
         moduleSelectionFragment.showModuleSelectionDialogIfNecessary()
     }
+
 }
