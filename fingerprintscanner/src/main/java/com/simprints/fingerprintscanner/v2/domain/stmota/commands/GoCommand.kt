@@ -7,6 +7,6 @@ class GoCommand : StmOtaCommand() {
     override fun getDataBytes(): ByteArray = byteArrayOf(GO_COMMAND_BYTE)
 
     companion object {
-        const val GO_COMMAND_BYTE = 0x31.toByte()
+        const val GO_COMMAND_BYTE = 0x21.toByte()
     }
 }
