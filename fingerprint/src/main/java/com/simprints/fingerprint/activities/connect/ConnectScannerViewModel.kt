@@ -14,6 +14,7 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprintscanner.v1.ScannerUtils.convertAddressToSerial
 import io.reactivex.Completable
@@ -104,7 +105,9 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
     private fun manageVeroErrors(it: Throwable) {
         Timber.d(it)
         launchScannerAlertOrShowDialog(scannerManager.getAlertType(it))
-        crashReportManager.logExceptionOrSafeException(it)
+        if (it !is FingerprintSafeException) {
+            crashReportManager.logExceptionOrSafeException(it)
+        }
     }
 
     private fun launchScannerAlertOrShowDialog(alert: FingerprintAlert) {
