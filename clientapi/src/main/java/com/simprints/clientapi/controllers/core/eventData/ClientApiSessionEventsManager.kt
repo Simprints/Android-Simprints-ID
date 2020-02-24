@@ -17,5 +17,5 @@ interface ClientApiSessionEventsManager {
 
     fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>): Completable
 
-    suspend fun getCurrentSessionId(): String
+    suspend fun getCurrentSessionId(): String?
 }

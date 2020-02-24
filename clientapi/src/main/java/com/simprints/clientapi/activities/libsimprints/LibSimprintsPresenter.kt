@@ -101,7 +101,7 @@ class LibSimprintsPresenter(
         }
     }
 
-    private suspend fun getCurrentSessionId() = sessionEventsManager.getCurrentSessionId()
+    private suspend fun getCurrentSessionId() = sessionEventsManager.getCurrentSessionId() ?: ""
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
