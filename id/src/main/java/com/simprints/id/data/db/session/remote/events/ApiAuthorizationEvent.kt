@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.session.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.session.domain.events.AuthorizationEvent
+import com.simprints.id.data.db.session.domain.models.events.AuthorizationEvent
 
 @Keep
 class ApiAuthorizationEvent(val relativeStartTime: Long,

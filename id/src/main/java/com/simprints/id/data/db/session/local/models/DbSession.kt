@@ -1,8 +1,9 @@
-package com.simprints.id.data.db.session.local
+package com.simprints.id.data.db.session.local.models
 
 import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.session.Device
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
+import com.simprints.id.data.db.session.local.toDomainEvent
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey

@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.session.remote.session
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.session.domain.session.SessionEvents
+import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.remote.events.ApiEvent
 import com.simprints.id.data.db.session.remote.toApiEvent
 import java.util.*

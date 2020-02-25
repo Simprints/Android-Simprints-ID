@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.session.remote.events.callback
 
-import com.simprints.id.data.db.session.domain.events.callback.ErrorCallbackEvent
-import com.simprints.id.data.db.session.domain.events.callback.ErrorCallbackEvent.Reason.*
+import com.simprints.id.data.db.session.domain.models.events.callback.ErrorCallbackEvent
+import com.simprints.id.data.db.session.domain.models.events.callback.ErrorCallbackEvent.Reason.*
 import io.realm.internal.Keep
 
 @Keep

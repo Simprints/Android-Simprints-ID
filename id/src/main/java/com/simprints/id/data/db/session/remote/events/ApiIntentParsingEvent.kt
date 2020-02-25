@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.session.remote.events
 
-import com.simprints.id.data.db.session.domain.events.IntentParsingEvent
+import com.simprints.id.data.db.session.domain.models.events.IntentParsingEvent
 import com.simprints.id.data.db.session.remote.events.ApiIntentParsingEvent.ApiIntegrationInfo.Companion.fromDomainToApi
 import io.realm.internal.Keep
 
