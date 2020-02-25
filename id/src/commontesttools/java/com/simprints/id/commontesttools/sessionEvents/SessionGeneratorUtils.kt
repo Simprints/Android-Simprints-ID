@@ -1,8 +1,8 @@
 package com.simprints.id.commontesttools.sessionEvents
 
-import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
-import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
-import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.data.db.session.eventdata.models.domain.session.DatabaseInfo
+import com.simprints.id.data.db.session.eventdata.models.domain.session.Device
+import com.simprints.id.data.db.session.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.tools.TimeHelper
 import java.util.*
 

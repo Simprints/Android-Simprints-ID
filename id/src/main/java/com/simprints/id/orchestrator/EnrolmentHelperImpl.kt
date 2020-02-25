@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.EnrolmentEvent
+import com.simprints.id.data.db.session.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.eventdata.models.domain.events.EnrolmentEvent
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.tools.TimeHelper

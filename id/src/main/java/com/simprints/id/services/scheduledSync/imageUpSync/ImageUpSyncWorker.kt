@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.simprints.core.images.repository.ImageRepository
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.db.session.crashreport.CrashReportManager
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

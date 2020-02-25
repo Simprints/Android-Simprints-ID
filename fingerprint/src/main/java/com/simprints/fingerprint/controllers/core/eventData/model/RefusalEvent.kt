@@ -2,8 +2,8 @@ package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
-import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent as CoreRefusalEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent.Answer as CoreRefusalAnswer
+import com.simprints.id.data.db.session.domain.models.events.RefusalEvent as CoreRefusalEvent
+import com.simprints.id.data.db.session.domain.models.events.RefusalEvent.Answer as CoreRefusalAnswer
 
 @Keep
 class RefusalEvent(starTime: Long,

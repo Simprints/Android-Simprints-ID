@@ -2,7 +2,7 @@ package com.simprints.id.activities.consent
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.consent.shortconsent.ConsentRepository
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 

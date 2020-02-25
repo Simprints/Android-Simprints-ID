@@ -2,7 +2,7 @@ package com.simprints.id.data.consent
 
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.db.session.crashreport.CrashReportManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable

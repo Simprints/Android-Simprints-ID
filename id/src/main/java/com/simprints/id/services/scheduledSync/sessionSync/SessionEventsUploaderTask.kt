@@ -2,11 +2,11 @@ package com.simprints.id.services.scheduledSync.sessionSync
 
 import android.annotation.SuppressLint
 import android.util.Log
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.controllers.remote.SessionsRemoteInterface
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ArtificialTerminationEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiSessionEvents
+import com.simprints.id.data.db.session.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.eventdata.controllers.remote.SessionsRemoteInterface
+import com.simprints.id.data.db.session.eventdata.models.domain.events.ArtificialTerminationEvent
+import com.simprints.id.data.db.session.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.data.db.session.eventdata.models.remote.session.ApiSessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureRetryException
