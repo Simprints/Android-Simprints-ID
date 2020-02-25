@@ -34,6 +34,8 @@ interface SettingsPreferenceContract {
         fun openSettingAboutActivity()
 
         fun openSyncInfoActivity()
+
+        fun clearActivityStackAndRelaunchApp()
     }
 
     interface Presenter : BasePresenter

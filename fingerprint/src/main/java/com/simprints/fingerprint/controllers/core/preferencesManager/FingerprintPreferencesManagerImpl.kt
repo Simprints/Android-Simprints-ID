@@ -27,6 +27,9 @@ class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager) :
 
     override val captureFingerprintStrategy: CaptureFingerprintStrategy
         get() = when (prefs.captureFingerprintStrategy) {
+            IdCaptureFingerprintStrategy.SECUGEN_ISO_500_DPI -> CaptureFingerprintStrategy.SECUGEN_ISO_500_DPI
+            IdCaptureFingerprintStrategy.SECUGEN_ISO_1000_DPI -> CaptureFingerprintStrategy.SECUGEN_ISO_1000_DPI
+            IdCaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI -> CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI
             IdCaptureFingerprintStrategy.SECUGEN_ISO_1700_DPI -> CaptureFingerprintStrategy.SECUGEN_ISO_1700_DPI
         }
 

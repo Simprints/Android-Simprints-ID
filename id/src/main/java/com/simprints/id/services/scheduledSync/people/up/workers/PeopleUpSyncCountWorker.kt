@@ -12,6 +12,8 @@ import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncScope
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
@@ -26,9 +28,9 @@ class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimC
     @Inject lateinit var personRepository: PersonRepository
     @Inject lateinit var peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository
 
-    override suspend fun doWork(): Result {
-        return try {
-            getComponent<PeopleUpSyncCountWorker> { it.inject(this) }
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+        try {
+            getComponent<PeopleUpSyncCountWorker> { it.inject(this@PeopleUpSyncCountWorker) }
 
             val upSyncScope = peopleUpSyncScopeRepository.getUpSyncScope()
             crashlyticsLog("Start - $upSyncScope")
@@ -39,7 +41,7 @@ class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimC
         }
     }
 
-    private fun execute(upSyncScope: PeopleUpSyncScope): Result {
+    private suspend fun execute(upSyncScope: PeopleUpSyncScope): Result {
         val upCount = getUpCount(upSyncScope)
         val output = JsonHelper.gson.toJson(upCount)
 
@@ -48,7 +50,7 @@ class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimC
 
     }
 
-    private fun getUpCount(syncScope: PeopleUpSyncScope) =
+    private suspend fun getUpCount(syncScope: PeopleUpSyncScope) =
         PeopleCount(created = personRepository.count(PersonLocalDataSource.Query(toSync = true)))
 
 }

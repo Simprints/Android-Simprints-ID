@@ -101,9 +101,13 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
         }
     }
 
-    override fun count(query: PersonLocalDataSource.Query): Int =
-        Realm.getInstance(config).use { realm ->
-            realm.buildRealmQueryForPerson(query).count().toInt()
+    override suspend fun count(query: PersonLocalDataSource.Query): Int =
+        withContext(Dispatchers.Main) {
+            Realm.getInstance(config).use { realm ->
+                realm.buildRealmQueryForPerson(query)
+                    .await()
+                    ?.size ?: 0
+            }
         }
 
     private fun Realm.buildRealmQueryForPerson(query: PersonLocalDataSource.Query?): RealmQuery<DbPerson> =

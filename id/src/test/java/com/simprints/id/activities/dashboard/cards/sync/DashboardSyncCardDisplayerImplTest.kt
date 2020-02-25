@@ -250,12 +250,12 @@ class DashboardSyncCardDisplayerImplTest {
 
     companion object {
         const val SYNC_CARD_TITLE = "Sync status"
-        const val SYNC_CARD_DEFAULT_STATE_SYNC_BUTTON = "SYNC NOW"
+        const val SYNC_CARD_DEFAULT_STATE_SYNC_BUTTON = "Sync now"
         const val LAST_SYNC_TEXT = "Last sync: Yesterday"
         const val SYNC_CARD_FAILED_STATE_MESSAGE = "Sync failed. Please contact your supervisor"
         const val SYNC_CARD_TRY_AGAIN_STATE_MESSAGE = "Sync incomplete"
-        const val SYNC_CARD_TRY_AGAIN_STATE_SYNC_BUTTON = "TRY AGAIN"
-        const val SYNC_CARD_NO_MODULES_STATE_BUTTON = "MODULES"
+        const val SYNC_CARD_TRY_AGAIN_STATE_SYNC_BUTTON = "Try again"
+        const val SYNC_CARD_NO_MODULES_STATE_BUTTON = "Modules"
         const val SYNC_CARD_NO_MODULES_STATE_MESSAGE = "Please select modules to sync"
         const val SYNC_CARD_OFFLINE_STATE_MESSAGE = "Please turn on internet connection in settings"
         const val SYNC_CARD_CONNECTING_STATE_STATE_MESSAGE = "Connecting"

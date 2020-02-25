@@ -10,7 +10,6 @@ import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.domain.GROUP
 import javax.inject.Inject
 
 
@@ -71,7 +70,10 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         when (preference.key) {
             view.getKeyForLanguagePreference() -> {
                 loadLanguagePreference(preference as ListPreference)
-                preference.setChangeListener { value: String -> handleLanguagePreferenceChanged(preference, value) }
+                preference.setChangeListener { value: String ->
+                    handleLanguagePreferenceChanged(preference, value)
+                    view.clearActivityStackAndRelaunchApp()
+                }
             }
 
             view.getKeyForDefaultFingersPreference() -> {

@@ -16,34 +16,38 @@ import com.simprints.core.images.model.Path as CorePath
 class FingerprintImageManagerImpl(private val coreImageRepository: ImageRepository,
                                   private val coreSessionEventsManager: SessionEventsManager) : FingerprintImageManager {
 
-    override suspend fun save(imageBytes: ByteArray, captureEventId: String, fileExtension: String): FingerprintImageRef? {
+    override suspend fun save(imageBytes: ByteArray, captureEventId: String, fileExtension: String): FingerprintImageRef? =
+        determinePath(captureEventId, fileExtension)?.let { path ->
+            Timber.d("Saving fingerprint image ${path.compose()}")
+            val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, path)
 
-        val path = determinePath(captureEventId, fileExtension)
-        Timber.d("Saving fingerprint image ${path.compose()}")
-        val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, path)
-
-        return if (securedImageRef != null) {
-            FingerprintImageRef(securedImageRef.relativePath.toDomain())
-        } else {
-            Timber.e("Saving image failed for captureId $captureEventId")
-            null
-        }
-    }
-
-    private suspend fun determinePath(captureEventId: String, fileExtension: String): CorePath =
-        withContext(Dispatchers.IO) {
-            suspendCancellableCoroutine<CorePath> { cont ->
-                coreSessionEventsManager.getCurrentSession().subscribeBy(
-                    onSuccess = { currentSession ->
-                        val projectId = currentSession.projectId
-                        val sessionId = currentSession.id
-                        val path = CorePath(arrayOf(
-                            PROJECTS_PATH, projectId, SESSIONS_PATH, sessionId, FINGERPRINTS_PATH, "$captureEventId.$fileExtension"
-                        ))
-
-                        cont.resumeSafely(path)
-                    }, onError = { cont.resumeWithExceptionSafely(it) })
+            return if (securedImageRef != null) {
+                FingerprintImageRef(securedImageRef.relativePath.toDomain())
+            } else {
+                Timber.e("Saving image failed for captureId $captureEventId")
+                null
             }
+        }
+
+    private suspend fun determinePath(captureEventId: String, fileExtension: String): CorePath? =
+        try {
+            withContext(Dispatchers.IO) {
+                suspendCancellableCoroutine<CorePath> { cont ->
+                    coreSessionEventsManager.getCurrentSession().subscribeBy(
+                        onSuccess = { currentSession ->
+                            val projectId = currentSession.projectId
+                            val sessionId = currentSession.id
+                            val path = CorePath(arrayOf(
+                                PROJECTS_PATH, projectId, SESSIONS_PATH, sessionId, FINGERPRINTS_PATH, "$captureEventId.$fileExtension"
+                            ))
+
+                            cont.resumeSafely(path)
+                        }, onError = { cont.resumeWithExceptionSafely(it) })
+                }
+            }
+        } catch (t: Throwable) {
+            Timber.d(t)
+            null
         }
 
     private fun CorePath.toDomain(): Path =

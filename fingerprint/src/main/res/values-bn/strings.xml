@@ -6,7 +6,7 @@
     <!-- Activity Titles -->
     <string name="register_title">তালিকাভুক্ত করণ</string>
     <string name="identify_title">সনাক্তকরণ</string>
-    <string name="verify_title">যাচাই করুন</string>
+    <string name="verify_title">যাচাইকরণ</string>
     <string name="refusal_label">প্রস্থান ফর্ম</string>
 
 
@@ -125,6 +125,9 @@
     <string name="scanner_error_turn_scanner_on_title">স্ক্যানার চালু করুন</string>
     <string name="title_fingerprint">আঙ্গুলের ছাপ</string>
     <string name="try_another_finger">আরেকটি আঙুল চেষ্টা করুন</string>
+    <string name="connect_scanner_finished">সংযুক্ত হয়েছে</string>
+    <string name="please_wait_button">অপেক্ষা করুন</string>
+    <string name="transfering_data">তথ্য প্রদান করা হচ্ছে</string>
 
 
 </resources>

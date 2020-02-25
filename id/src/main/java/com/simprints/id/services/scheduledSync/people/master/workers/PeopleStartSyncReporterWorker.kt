@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -22,14 +24,16 @@ class PeopleStartSyncReporterWorker(appContext: Context,
     @Inject override lateinit var crashReportManager: CrashReportManager
 
     override suspend fun doWork(): Result =
-        try {
-            getComponent<PeopleSyncMasterWorker> { it.inject(this) }
-            val syncId = inputData.getString(SYNC_ID_STARTED)
-            crashlyticsLog("Start - Params: $syncId")
-            success(inputData)
-        } catch (t: Throwable) {
-            t.printStackTrace()
-            fail(t)
+        withContext(Dispatchers.IO) {
+            try {
+                getComponent<PeopleSyncMasterWorker> { it.inject(this@PeopleStartSyncReporterWorker) }
+                val syncId = inputData.getString(SYNC_ID_STARTED)
+                crashlyticsLog("Start - Params: $syncId")
+                success(inputData)
+            } catch (t: Throwable) {
+                t.printStackTrace()
+                fail(t)
+            }
         }
 
     companion object {

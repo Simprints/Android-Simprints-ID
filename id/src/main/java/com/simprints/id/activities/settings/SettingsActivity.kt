@@ -6,13 +6,13 @@ import android.view.MenuItem
 import androidx.preference.PreferenceFragment
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.isXLargeTablet
 import kotlinx.android.synthetic.main.settings_toolbar.*
 import javax.inject.Inject
-
 
 class SettingsActivity : AppCompatPreferenceActivity() {
 
@@ -72,12 +72,13 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         startActivityForResult(Intent(this, SettingsAboutActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
     }
 
-    fun openModuleSelectionActivity() {
-        val intent = Intent(this, ModuleSelectionActivity::class.java)
-        startActivityForResult(intent, SETTINGS_ACTIVITY_REQUEST_CODE)
-    }
-
     fun openSyncInformationActivity() {
         startActivity(Intent(this, SyncInformationActivity::class.java))
     }
+
+    fun openCheckLoginFromMainLauncherActivity() {
+        overridePendingTransition(0, 0)
+        startActivity(Intent(this, CheckLoginFromMainLauncherActivity::class.java))
+    }
+    
 }

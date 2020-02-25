@@ -22,7 +22,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,14 +55,14 @@ class PeopleDownSyncCountWorkerTest {
     }
 
     @Test
-    fun countWorker_shouldExtractTheDownSyncScopeFromTheRepo() = runBlockingTest {
+    fun countWorker_shouldExtractTheDownSyncScopeFromTheRepo() = runBlocking {
         countWorker.doWork()
 
         verify { countWorker.downSyncScopeRepository.getDownSyncScope() }
     }
 
     @Test
-    fun countWorker_shouldExecuteTheTaskSuccessfully() = runBlockingTest {
+    fun countWorker_shouldExecuteTheTaskSuccessfully() = runBlocking {
         val counts = listOf(PeopleCount(1, 1, 1))
         mockDependenciesToSucceed(counts)
 
@@ -74,7 +74,7 @@ class PeopleDownSyncCountWorkerTest {
     }
 
     @Test
-    fun countWorker_anUnexpectedErrorOccurs_shouldFail() = runBlockingTest {
+    fun countWorker_anUnexpectedErrorOccurs_shouldFail() = runBlocking {
         coEvery { countWorker.downSyncScopeRepository.getDownSyncScope() } throws Throwable("Impossible to extract downSyncScope")
 
         countWorker.doWork()
@@ -83,7 +83,7 @@ class PeopleDownSyncCountWorkerTest {
     }
 
     @Test
-    fun countWorkerFailed_syncStillRunning_shouldRetry() = runBlockingTest {
+    fun countWorkerFailed_syncStillRunning_shouldRetry() = runBlocking {
         coEvery { countWorker.personRepository.countToDownSync(any()) } throws Throwable("IO Error")
         coEvery { countWorker.downSyncScopeRepository.getDownSyncScope() } returns ProjectSyncScope(DEFAULT_PROJECT_ID, listOf(Modes.FINGERPRINT))
         mockDependenciesToHaveSyncStillRunning()
@@ -94,7 +94,7 @@ class PeopleDownSyncCountWorkerTest {
     }
 
     @Test
-    fun countWorkerFailed_syncIsNotRunning_shouldSucceed() = runBlockingTest {
+    fun countWorkerFailed_syncIsNotRunning_shouldSucceed() = runBlocking {
         coEvery { countWorker.personRepository.countToDownSync(any()) } throws Throwable("IO Error")
         coEvery { countWorker.downSyncScopeRepository.getDownSyncScope() } returns ProjectSyncScope(DEFAULT_PROJECT_ID, listOf(Modes.FINGERPRINT))
         mockDependenciesToHaveSyncNotRunning()

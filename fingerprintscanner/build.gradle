@@ -3,7 +3,7 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
-project.version = "2020.1.0"
+project.version = "2020.1.2"
 
 android {
     compileSdkVersion 28
@@ -27,6 +27,11 @@ android {
     testOptions {
         unitTests {
             includeAndroidResources = true
+            all {
+                testLogging {
+                    events 'started', 'passed', 'skipped', 'failed'
+                }
+            }
         }
     }
 }
