@@ -204,7 +204,6 @@ class SyncInformationActivity : AppCompatActivity() {
     }
 
     private fun setupProgressOverlay() {
-        hideProgressOverlay()
         progressOverlayContainer.setOnTouchListener { _, _ -> true }
         progress_sync_overlay.text = androidResourcesHelper.getString(R.string.progress_sync_overlay)
     }
