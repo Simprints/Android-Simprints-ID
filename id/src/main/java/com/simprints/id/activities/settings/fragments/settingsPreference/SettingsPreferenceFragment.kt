@@ -145,4 +145,13 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
             (activity as SettingsActivity).openSyncInformationActivity()
         }
     }
+
+    override fun clearActivityStackAndRelaunchApp() {
+        activity.runOnUiThreadIfStillRunning {
+            activity.overridePendingTransition(0, 0)
+            activity.finishAffinity()
+            (activity as SettingsActivity).openCheckLoginFromMainLauncherActivity()
+        }
+    }
+
 }

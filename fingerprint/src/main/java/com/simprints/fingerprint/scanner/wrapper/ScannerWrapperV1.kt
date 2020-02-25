@@ -24,8 +24,8 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
     override fun versionInformation(): ScannerVersionInformation =
         ScannerVersionInformation(
             veroVersion = 1,
-            firmwareVersion = scannerV1.ucVersion.toInt(),
-            un20Version = scannerV1.unVersion.toInt()
+            firmwareVersion = scannerV1.ucVersion.toLong(),
+            un20Version = scannerV1.unVersion.toLong()
         )
 
     override fun connect(): Completable = Completable.create { result ->
@@ -37,7 +37,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
                     BLUETOOTH_DISABLED -> BluetoothNotEnabledException()
                     BLUETOOTH_NOT_SUPPORTED -> BluetoothNotSupportedException()
                     SCANNER_UNBONDED -> ScannerNotPairedException()
-                    BUSY, IO_ERROR -> UnknownScannerIssueException.forScannerError(scannerError)
+                    BUSY, IO_ERROR -> ScannerDisconnectedException()
                     else -> UnknownScannerIssueException.forScannerError(scannerError)
                 }
                 result.onError(issue)
@@ -111,7 +111,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
     private fun handleFingerprintCaptureError(error: SCANNER_ERROR?, emitter: SingleEmitter<CaptureFingerprintResponse>) {
         when (error) {
             UN20_SDK_ERROR -> emitter.onError(NoFingerDetectedException()) // If no finger is detected on the sensor
-            INVALID_STATE, SCANNER_UNREACHABLE, UN20_INVALID_STATE, OUTDATED_SCANNER_INFO -> emitter.onError(ScannerDisconnectedException())
+            INVALID_STATE, SCANNER_UNREACHABLE, UN20_INVALID_STATE, OUTDATED_SCANNER_INFO, IO_ERROR -> emitter.onError(ScannerDisconnectedException())
             BUSY, INTERRUPTED, TIMEOUT -> emitter.onError(ScannerOperationInterruptedException())
             else -> emitter.onError(UnexpectedScannerException.forScannerError(error, "ScannerWrapperV1"))
         }
@@ -123,10 +123,8 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
     override fun setUiIdle(): Completable = Completable.create { result ->
         scannerV1.resetUI(ScannerCallbackWrapper({
             result.onComplete()
-        }, { scannerError ->
-            scannerError?.let {
-                result.onError(UnknownScannerIssueException.forScannerError(it))
-            } ?: result.onComplete()
+        }, {
+            result.onComplete() // This call on Vero 1 can sometimes be buggy
         }))
     }
 

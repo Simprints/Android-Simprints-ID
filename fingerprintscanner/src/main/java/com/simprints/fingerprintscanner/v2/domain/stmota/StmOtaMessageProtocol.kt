@@ -18,6 +18,8 @@ object StmOtaMessageProtocol : Protocol {
             is WriteMemoryStartCommand -> appendComplement(message.getDataBytes())
             is WriteMemoryAddressCommand -> appendCheckSum(message.getDataBytes())
             is WriteMemoryDataCommand -> appendCheckSum(message.getDataBytes())
+            is GoCommand -> appendComplement(message.getDataBytes())
+            is GoAddressCommand -> appendCheckSum(message.getDataBytes())
             else -> message.getDataBytes()
         }
 

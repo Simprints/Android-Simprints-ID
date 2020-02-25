@@ -79,8 +79,9 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         sendOkResult(it)
     }
 
-    override fun returnConfirmation(flowCompletedCheck: Boolean) = Intent().let {
+    override fun returnConfirmation(flowCompletedCheck: Boolean, sessionId: String) = Intent().let {
         it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
+        it.putExtra(ODK_SESSION_ID, sessionId)
         sendOkResult(it)
     }
 

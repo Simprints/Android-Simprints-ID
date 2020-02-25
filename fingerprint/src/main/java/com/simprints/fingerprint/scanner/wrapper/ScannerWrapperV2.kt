@@ -28,6 +28,7 @@ import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 import java.io.IOException
 import java.util.*
+import java.util.concurrent.TimeUnit
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
 class ScannerWrapperV2(private val scannerV2: ScannerV2,
@@ -42,7 +43,11 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     override fun versionInformation(): ScannerVersionInformation =
         unifiedVersionInformation?.let {
-            ScannerVersionInformation(2, it.masterFirmwareVersion.toInt(), it.un20AppVersion.firmwareMajorVersion.toInt())
+            ScannerVersionInformation(2, it.masterFirmwareVersion,
+                (it.un20AppVersion.apiMajorVersion.toLong() shl 48) or
+                    (it.un20AppVersion.apiMinorVersion.toLong() shl 32) or
+                    (it.un20AppVersion.firmwareMajorVersion.toLong() shl 16) or
+                    (it.un20AppVersion.firmwareMinorVersion.toLong()))
         } ?: ScannerVersionInformation(2, -1, -1)
 
     override fun connect(): Completable {
@@ -67,12 +72,14 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             .flatMapCompletable { socket ->
                 Timber.d("Socket connected. Setting up scanner...")
                 scannerV2.connect(socket.getInputStream(), socket.getOutputStream())
+                    .delay(100, TimeUnit.MILLISECONDS) // Speculatively needed
                     .andThen(scannerV2.getVersionInformation())
                     .map {
                         unifiedVersionInformation = it
                     }
                     .ignoreElement()
                     .andThen(scannerV2.enterMainMode())
+                    .delay(100, TimeUnit.MILLISECONDS) // Speculatively needed
             }.wrapErrorsFromScanner()
     }
 
@@ -196,6 +203,9 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     private fun CaptureFingerprintStrategy.deduceCaptureDpi(): Dpi =
         when (this) {
+            CaptureFingerprintStrategy.SECUGEN_ISO_500_DPI -> Dpi(500)
+            CaptureFingerprintStrategy.SECUGEN_ISO_1000_DPI -> Dpi(1000)
+            CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI -> Dpi(1300)
             CaptureFingerprintStrategy.SECUGEN_ISO_1700_DPI -> Dpi(1700)
         }
 
@@ -229,7 +239,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     companion object {
         private val DEFAULT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
-        private const val CONNECT_MAX_RETRIES = 3L
+        private const val CONNECT_MAX_RETRIES = 1L
         private const val NO_FINGER_IMAGE_QUALITY_THRESHOLD = 10 // The image quality at which we decide a fingerprint wasn't detected
     }
 }

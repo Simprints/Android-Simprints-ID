@@ -17,7 +17,7 @@ class TimeHelperImpl : TimeHelper {
         getRelativeTimeSpanString(date.time, Date().time, MINUTE_IN_MILLIS, FORMAT_SHOW_DATE).toString()
 
     override fun getCurrentDateAsString(): String {
-        val dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault())
+        val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
         return dateFormat.format(Date())
     }
 

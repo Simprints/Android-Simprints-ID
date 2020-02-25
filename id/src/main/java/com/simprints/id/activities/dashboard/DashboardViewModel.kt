@@ -21,11 +21,12 @@ class DashboardViewModel(
 
     private val projectCardStateLiveData = MutableLiveData<DashboardProjectState>()
 
-    fun syncIfRequired() = syncCardStateRepository.syncIfRequired()
 
     init {
         loadProjectDetails()
     }
+
+    suspend fun syncIfRequired() = syncCardStateRepository.syncIfRequired()
 
     fun getProjectDetails(): LiveData<DashboardProjectState> = projectCardStateLiveData
 

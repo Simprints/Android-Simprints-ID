@@ -2,10 +2,12 @@ package com.simprints.id.activities.settings.syncinformation
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.testtools.TestApplication
@@ -16,6 +18,8 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,7 +46,7 @@ class SyncInformationViewModelTest {
     }
 
     @Test
-    fun fetchCountFromLocal_shouldUpdateValue() {
+    fun fetchCountFromLocal_shouldUpdateValue() = runBlocking {
         val totalRecordsInLocal = 322
         mockPersonLocalDataSourceCount(totalRecordsInLocal)
 
@@ -67,7 +71,7 @@ class SyncInformationViewModelTest {
     }
 
     @Test
-    fun fetchRecordsToUpSyncCount_shouldUpdateValue() {
+    fun fetchRecordsToUpSyncCount_shouldUpdateValue() = runBlocking {
         val recordsToUpSyncCount = 123
         mockPersonLocalDataSourceCount(recordsToUpSyncCount)
 
@@ -77,7 +81,7 @@ class SyncInformationViewModelTest {
     }
 
     @Test
-    fun fetchSelectedModulesCount_shouldUpdateValue() {
+    fun fetchSelectedModulesCount_shouldUpdateValue() = runBlocking {
         val moduleName = "module1"
         val countForModule = 123
         every { preferencesManagerMock.selectedModules } returns setOf(moduleName)
@@ -92,34 +96,52 @@ class SyncInformationViewModelTest {
     }
 
     @Test
-    fun unselectedModulesCountGreaterThanZero_shouldUpdateValue() {
+    fun withUnselectedModules_shouldUpdateValue() = runBlocking {
         val selectedModuleName = "module1"
         val unselectedModuleName = "module2"
-        val moduleOptions = setOf(selectedModuleName, unselectedModuleName)
+        val recordWithSelectedModule = Person(
+            randomUUID(),
+            projectId,
+            "some_user_id",
+            selectedModuleName
+        )
+
+        val recordWithUnselectedModule = recordWithSelectedModule.copy(
+            moduleId = unselectedModuleName
+        )
+
+        val peopleRecords = flowOf(
+            recordWithSelectedModule,
+            recordWithUnselectedModule,
+            recordWithUnselectedModule
+        )
         val selectedModuleSet = setOf(selectedModuleName)
-        val countForUnselectedModules = 122
-        every { preferencesManagerMock.moduleIdOptions } returns moduleOptions
+
+        coEvery { personLocalDataSourceMock.load(any()) } returns peopleRecords
         every { preferencesManagerMock.selectedModules } returns selectedModuleSet
-        mockPersonLocalDataSourceCount(countForUnselectedModules)
 
         viewModel.fetchAndUpdatedUnselectedModulesCount()
 
         with(viewModel.unselectedModulesCount.value?.first()) {
             assertThat(this?.name).isEqualTo(unselectedModuleName)
-            assertThat(this?.count).isEqualTo(countForUnselectedModules)
+            assertThat(this?.count).isEqualTo(2)
         }
     }
 
     @Test
-    fun unselectedModulesCountIsZero_shouldUpdateValueAsEmptyList() {
+    fun withNoUnselectedModules_shouldUpdateValueAsEmptyList() = runBlocking {
         val selectedModuleName = "module1"
-        val unselectedModuleName = "module2"
-        val moduleOptions = setOf(selectedModuleName, unselectedModuleName)
+        val recordWithSelectedModule = Person(
+            randomUUID(),
+            projectId,
+            "some_user_id",
+            selectedModuleName
+        )
+        val peopleRecords = flowOf(recordWithSelectedModule, recordWithSelectedModule)
         val selectedModuleSet = setOf(selectedModuleName)
-        val countForUnselectedModules = 0
-        every { preferencesManagerMock.moduleIdOptions } returns moduleOptions
+
+        coEvery { personLocalDataSourceMock.load(any()) } returns peopleRecords
         every { preferencesManagerMock.selectedModules } returns selectedModuleSet
-        mockPersonLocalDataSourceCount(countForUnselectedModules)
 
         viewModel.fetchAndUpdatedUnselectedModulesCount()
 
@@ -127,6 +149,7 @@ class SyncInformationViewModelTest {
     }
 
     private fun mockPersonLocalDataSourceCount(recordCount: Int) {
-        every { personLocalDataSourceMock.count(any()) } returns recordCount
+        coEvery { personLocalDataSourceMock.count(any()) } returns recordCount
     }
+
 }
