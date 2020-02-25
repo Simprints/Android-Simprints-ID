@@ -60,7 +60,7 @@ class CommCarePresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(enroll.guid, getCurrentSessionId(), flowCompletedCheck)
+            view.returnRegistration(enroll.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
 
@@ -78,7 +78,7 @@ class CommCarePresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionId())
+            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -90,7 +90,7 @@ class CommCarePresenter(
                 verify.matchResult.confidence,
                 Tier.valueOf(verify.matchResult.tier.name),
                 verify.matchResult.guidFound,
-                getCurrentSessionId(),
+                getCurrentSessionIdOrEmpty(),
                 flowCompletedCheck
             )
         }
@@ -101,11 +101,11 @@ class CommCarePresenter(
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
             view.returnExitForms(refusalForm.reason, refusalForm.extra,
-                getCurrentSessionId(), flowCompletedCheck)
+                getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
 
-    private suspend fun getCurrentSessionId() = sessionEventsManager.getCurrentSessionId()
+    private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId() ?: ""
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
@@ -114,7 +114,7 @@ class CommCarePresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnConfirmation(flowCompletedCheck, getCurrentSessionId())
+            view.returnConfirmation(flowCompletedCheck, getCurrentSessionIdOrEmpty())
         }
     }
 

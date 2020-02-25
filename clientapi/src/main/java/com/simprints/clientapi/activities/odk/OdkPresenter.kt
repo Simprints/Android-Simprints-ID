@@ -55,7 +55,7 @@ class OdkPresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
             sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
-            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionId())
+            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -63,7 +63,7 @@ class OdkPresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(enroll.guid, getCurrentSessionId(), flowCompletedCheck)
+            view.returnRegistration(enroll.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
 
@@ -89,7 +89,7 @@ class OdkPresenter(
                 verify.matchResult.guidFound,
                 verify.matchResult.confidence.toString(),
                 verify.matchResult.tier.toString(),
-                getCurrentSessionId(),
+                getCurrentSessionIdOrEmpty(),
                 flowCompletedCheck
             )
         }
@@ -99,11 +99,11 @@ class OdkPresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnExitForm(refusalForm.reason, refusalForm.extra, getCurrentSessionId(), flowCompletedCheck)
+            view.returnExitForm(refusalForm.reason, refusalForm.extra, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
 
-    private suspend fun getCurrentSessionId() = sessionEventsManager.getCurrentSessionId()
+    private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId() ?: ""
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
@@ -112,7 +112,7 @@ class OdkPresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnConfirmation(flowCompletedCheck, getCurrentSessionId())
+            view.returnConfirmation(flowCompletedCheck, getCurrentSessionIdOrEmpty())
         }
     }
 }
