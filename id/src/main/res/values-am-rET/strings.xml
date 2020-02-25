@@ -114,4 +114,6 @@
         <item quantity="one">ማመሳከር</item>
         <item quantity="other">Verifications</item>
     </plurals>
+
+    <string name="progress_sync_overlay">በግንኙነት ላይ</string>
 </resources>

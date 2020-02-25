@@ -25,7 +25,7 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
     val selectedModulesCount = MutableLiveData<List<ModuleCount>>()
     val unselectedModulesCount = MutableLiveData<List<ModuleCount>>()
 
-    suspend fun start() {
+    suspend fun fetchRecordsInfo() {
         fetchAndUpdateLocalRecordCount()
         fetchAndUpdateRecordsToUpSyncCount()
         fetchAndUpdateRecordsToDownSyncAndDeleteCount()
