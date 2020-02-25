@@ -52,7 +52,7 @@ class LibSimprintsPresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionId())
+            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -60,7 +60,7 @@ class LibSimprintsPresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(Registration(enroll.guid), getCurrentSessionId(), flowCompletedCheck)
+            view.returnRegistration(Registration(enroll.guid), getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
 
@@ -87,7 +87,7 @@ class LibSimprintsPresenter(
                     matchResult.confidence,
                     matchResult.tier.fromDomainToLibsimprintsTier(),
                     matchResult.guidFound)
-                view.returnVerification(verification, getCurrentSessionId(), flowCompletedCheck)
+                view.returnVerification(verification, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
             }
         }
     }
@@ -97,11 +97,11 @@ class LibSimprintsPresenter(
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
             view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra),
-                getCurrentSessionId(), flowCompletedCheck)
+                getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
 
-    private suspend fun getCurrentSessionId() = sessionEventsManager.getCurrentSessionId()
+    private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId() ?: ""
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
@@ -110,7 +110,7 @@ class LibSimprintsPresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnConfirmation(flowCompletedCheck, getCurrentSessionId())
+            view.returnConfirmation(flowCompletedCheck, getCurrentSessionIdOrEmpty())
         }
     }
 }
