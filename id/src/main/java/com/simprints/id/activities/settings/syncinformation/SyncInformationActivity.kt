@@ -22,6 +22,7 @@ import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncSt
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_sync_information.*
+import kotlinx.android.synthetic.main.progress_overlay.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -56,23 +57,15 @@ class SyncInformationActivity : AppCompatActivity() {
         setupModulesTabs()
         setupClickListeners()
         observeUi()
-        showProgressOverlay()
-        peopleSyncManager.getLastSyncState().observe(this, Observer { syncState ->
-            if (syncState.isNotRunning()) {
-                hideProgressOverlay()
-                viewModel.start()
-            }
-        })
+        setupProgressOverlay()
+
+        fetchRecordsInfo()
     }
 
     override fun onResume() {
         super.onResume()
         clearValues()
         setFocusOnDefaultModulesTab()
-
-        lifecycleScope.launch {
-            viewModel.start()
-        }
     }
 
     private fun setTextInLayout() {
@@ -166,6 +159,7 @@ class SyncInformationActivity : AppCompatActivity() {
         observeDeleteRecordCount()
         observeSelectedModules()
         observeUnselectedModules()
+        observeForSyncState()
     }
 
     private fun observeLocalRecordCount() {
@@ -209,11 +203,15 @@ class SyncInformationActivity : AppCompatActivity() {
         })
     }
 
+    private fun setupProgressOverlay() {
+        progressOverlayContainer.setOnTouchListener { _, _ -> true }
+        progress_sync_overlay.text = androidResourcesHelper.getString(R.string.progress_sync_overlay)
+    }
+
+    private fun isProgressOverlayVisible() = progressOverlayContainer.visibility == View.VISIBLE
+
     private fun showProgressOverlay() {
-        with(progressOverlayContainer) {
-            visibility = View.VISIBLE
-            setOnTouchListener { _, _ -> true }
-        }
+        progressOverlayContainer.visibility = View.VISIBLE
     }
 
     private fun hideProgressOverlay() {
@@ -248,11 +246,31 @@ class SyncInformationActivity : AppCompatActivity() {
         }
     }
 
-    private fun PeopleSyncState.isNotRunning(): Boolean {
+    private fun observeForSyncState() {
+        peopleSyncManager.getLastSyncState().observe(this, Observer { syncState ->
+            if (syncState.isRunning() && !isProgressOverlayVisible()) {
+                showProgressOverlay()
+            } else if (!syncState.isRunning() && isProgressOverlayVisible()) {
+                hideProgressOverlay()
+                fetchRecordsInfo()
+            }
+        })
+    }
+
+    private fun fetchRecordsInfo() {
+        lifecycleScope.launch {
+            viewModel.fetchRecordsInfo()
+        }
+    }
+
+    private fun PeopleSyncState.isRunning(): Boolean {
         val downSyncStates = downSyncWorkersInfo
         val upSyncStates = upSyncWorkersInfo
         val allSyncStates = downSyncStates + upSyncStates
-        return allSyncStates.none { it.state is PeopleSyncWorkerState.Running }
+        return allSyncStates.any {
+            it.state is PeopleSyncWorkerState.Running ||
+                it.state is PeopleSyncWorkerState.Enqueued
+        }
     }
 
     companion object {
