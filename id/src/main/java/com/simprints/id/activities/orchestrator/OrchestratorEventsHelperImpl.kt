@@ -1,7 +1,7 @@
 package com.simprints.id.activities.orchestrator
 
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.*
+import com.simprints.id.data.db.session.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.domain.models.events.callback.*
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.tools.TimeHelper
 

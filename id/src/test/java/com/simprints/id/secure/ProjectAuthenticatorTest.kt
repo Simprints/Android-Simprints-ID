@@ -11,7 +11,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.commontesttools.state.setupFakeKeyStore
-import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
+import com.simprints.id.data.db.session.eventdata.controllers.remote.RemoteSessionsManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource

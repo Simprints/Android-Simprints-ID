@@ -14,9 +14,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
+import com.simprints.id.data.db.session.eventdata.models.domain.events.ConsentEvent
+import com.simprints.id.data.db.session.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
+import com.simprints.id.data.db.session.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse

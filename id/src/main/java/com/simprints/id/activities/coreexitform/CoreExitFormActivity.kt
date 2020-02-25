@@ -12,9 +12,9 @@ import com.simprints.id.R
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult.Action.GO_BACK
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult.Action.SUBMIT
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.data.db.session.crashreport.CrashReportManager
+import com.simprints.id.data.db.session.crashreport.CrashReportTag
+import com.simprints.id.data.db.session.crashreport.CrashReportTrigger
 import com.simprints.id.data.exitform.CoreExitFormReason.*
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
 import com.simprints.id.tools.AndroidResourcesHelper

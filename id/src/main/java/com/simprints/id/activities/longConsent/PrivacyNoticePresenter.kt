@@ -1,9 +1,9 @@
 package com.simprints.id.activities.longConsent
 
 import android.annotation.SuppressLint
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.data.db.session.crashreport.CrashReportManager
+import com.simprints.id.data.db.session.crashreport.CrashReportTag
+import com.simprints.id.data.db.session.crashreport.CrashReportTrigger
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent

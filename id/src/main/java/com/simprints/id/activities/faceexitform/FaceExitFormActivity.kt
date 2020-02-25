@@ -11,9 +11,9 @@ import com.simprints.id.R
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Action
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Answer
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.data.db.session.crashreport.CrashReportManager
+import com.simprints.id.data.db.session.crashreport.CrashReportTag
+import com.simprints.id.data.db.session.crashreport.CrashReportTrigger
 import com.simprints.id.data.exitform.FaceExitFormReason.*
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
 import com.simprints.id.tools.AndroidResourcesHelper

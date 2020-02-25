@@ -2,7 +2,7 @@ package com.simprints.id.moduleselection
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.db.session.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.testtools.TestApplication

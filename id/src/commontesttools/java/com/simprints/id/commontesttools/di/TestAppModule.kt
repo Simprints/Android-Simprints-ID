@@ -5,10 +5,10 @@ import android.content.SharedPreferences
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
+import com.simprints.id.data.db.session.crashreport.CrashReportManager
+import com.simprints.id.data.db.session.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.eventdata.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.eventdata.controllers.remote.RemoteSessionsManager
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase

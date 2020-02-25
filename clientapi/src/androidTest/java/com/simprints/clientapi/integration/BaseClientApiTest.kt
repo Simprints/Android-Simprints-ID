@@ -8,8 +8,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.simprints.clientapi.di.KoinInjector
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.data.db.session.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.eventdata.models.domain.session.SessionEvents
 import com.simprints.moduleapi.app.responses.IAppResponse
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Completable
