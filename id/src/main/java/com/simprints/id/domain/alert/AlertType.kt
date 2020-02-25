@@ -1,6 +1,6 @@
 package com.simprints.id.domain.alert
 
-import com.simprints.id.data.db.session.eventdata.models.domain.events.AlertScreenEvent
+import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
 
 enum class AlertType {
     GUID_NOT_FOUND_ONLINE,

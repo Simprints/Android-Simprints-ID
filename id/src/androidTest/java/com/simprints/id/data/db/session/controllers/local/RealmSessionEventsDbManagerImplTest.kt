@@ -3,8 +3,6 @@ package com.simprints.id.data.db.session.controllers.local
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.simprints.id.data.db.session.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
-import com.simprints.id.data.db.session.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.session.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
 import com.simprints.id.data.secure.LocalDbKey

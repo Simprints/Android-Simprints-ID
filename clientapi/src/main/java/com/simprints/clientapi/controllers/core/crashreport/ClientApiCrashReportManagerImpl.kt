@@ -1,7 +1,7 @@
 package com.simprints.clientapi.controllers.core.crashreport
 
 import com.simprints.clientapi.exceptions.ClientApiSafeException
-import com.simprints.id.data.db.session.crashreport.CoreCrashReportManager
+import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 
 class ClientApiCrashReportManagerImpl(private val coreCrashReportManager: CoreCrashReportManager)
     : ClientApiCrashReportManager {

@@ -31,11 +31,11 @@ import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAbou
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
-import com.simprints.id.data.db.session.AnalyticsManager
-import com.simprints.id.data.db.session.crashreport.CoreCrashReportManager
-import com.simprints.id.data.db.session.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
+import com.simprints.id.data.db.session.domain.SessionEventsManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences

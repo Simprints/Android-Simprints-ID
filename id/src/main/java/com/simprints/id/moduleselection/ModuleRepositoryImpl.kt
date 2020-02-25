@@ -1,8 +1,8 @@
 package com.simprints.id.moduleselection
 
-import com.simprints.id.data.db.session.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.crashreport.CrashReportTag
-import com.simprints.id.data.db.session.crashreport.CrashReportTrigger
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 

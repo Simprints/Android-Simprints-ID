@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.session.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.domain.SessionEventsManager
 import com.simprints.id.data.db.person.local.PersonLocalDataSource.Query
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE

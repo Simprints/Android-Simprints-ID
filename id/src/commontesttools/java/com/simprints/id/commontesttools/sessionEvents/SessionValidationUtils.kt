@@ -3,13 +3,13 @@ package com.simprints.id.commontesttools.sessionEvents
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.simprints.id.data.db.session.eventdata.models.domain.events.EventType
-import com.simprints.id.data.db.session.eventdata.models.remote.events.ApiAlertScreenEvent
-import com.simprints.id.data.db.session.eventdata.models.remote.events.ApiArtificialTerminationEvent
-import com.simprints.id.data.db.session.eventdata.models.remote.events.ApiAuthenticationEvent
-import com.simprints.id.data.db.session.eventdata.models.remote.events.ApiRefusalEvent
-import com.simprints.id.data.db.session.eventdata.models.remote.events.callback.ApiCallbackType
-import com.simprints.id.data.db.session.eventdata.models.remote.events.callout.ApiCalloutType
+import com.simprints.id.data.db.session.domain.models.events.EventType
+import com.simprints.id.data.db.session.remote.events.ApiAlertScreenEvent
+import com.simprints.id.data.db.session.remote.events.ApiArtificialTerminationEvent
+import com.simprints.id.data.db.session.remote.events.ApiAuthenticationEvent
+import com.simprints.id.data.db.session.remote.events.ApiRefusalEvent
+import com.simprints.id.data.db.session.remote.events.callback.ApiCallbackType
+import com.simprints.id.data.db.session.remote.events.callout.ApiCalloutType
 import com.simprints.id.tools.extensions.getString
 import com.simprints.id.tools.extensions.isGuid
 
@@ -347,6 +347,9 @@ fun validateEvent(json: JsonObject) {
         EventType.CALLOUT_ENROLMENT,
         EventType.CALLOUT_CONFIRMATION,
         EventType.CALLOUT_VERIFICATION,
+        EventType.CALLBACK_ERROR,
+        EventType.INTENT_PARSING,
+        EventType.COMPLETION_CHECK,
         EventType.CALLOUT_IDENTIFICATION -> validateCalloutEventApiModel(json)
     }
 }

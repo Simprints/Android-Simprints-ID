@@ -4,7 +4,7 @@ import com.google.common.truth.Truth
 import com.nhaarman.mockitokotlin2.any
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.id.data.db.session.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.domain.SessionEventsManager
 import com.simprints.id.data.db.session.eventdata.models.domain.events.AlertScreenEvent
 import com.simprints.id.data.db.session.eventdata.models.domain.events.IntentParsingEvent
 import com.simprints.id.data.db.session.eventdata.models.domain.events.InvalidIntentEvent
@@ -19,7 +19,7 @@ import org.junit.Test
 import com.nhaarman.mockitokotlin2.any as MockitoArgThat
 import com.nhaarman.mockitokotlin2.argThat as MockitoArgThat
 import com.simprints.id.data.db.session.eventdata.models.domain.events.AlertScreenEvent.AlertScreenEventType
-import com.simprints.id.data.db.session.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.eventdata.models.domain.events.IntentParsingEvent.IntegrationInfo as CoreIntegrationInfo
 
 class ClientApiSessionEventsManagerImplTest {
