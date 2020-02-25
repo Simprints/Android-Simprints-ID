@@ -13,7 +13,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.db.session.eventdata.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig

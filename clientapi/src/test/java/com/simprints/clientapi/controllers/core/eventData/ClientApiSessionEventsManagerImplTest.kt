@@ -5,10 +5,10 @@ import com.nhaarman.mockitokotlin2.any
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.id.data.db.session.domain.SessionEventsManager
-import com.simprints.id.data.db.session.eventdata.models.domain.events.AlertScreenEvent
-import com.simprints.id.data.db.session.eventdata.models.domain.events.IntentParsingEvent
-import com.simprints.id.data.db.session.eventdata.models.domain.events.InvalidIntentEvent
-import com.simprints.id.data.db.session.eventdata.models.domain.events.SuspiciousIntentEvent
+import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
+import com.simprints.id.data.db.session.domain.models.events.InvalidIntentEvent
+import com.simprints.id.data.db.session.domain.models.events.SuspiciousIntentEvent
+import com.simprints.id.data.db.session.domain.models.events.IntentParsingEvent
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.reactivex.Completable
@@ -18,9 +18,9 @@ import org.junit.Before
 import org.junit.Test
 import com.nhaarman.mockitokotlin2.any as MockitoArgThat
 import com.nhaarman.mockitokotlin2.argThat as MockitoArgThat
-import com.simprints.id.data.db.session.eventdata.models.domain.events.AlertScreenEvent.AlertScreenEventType
+import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.session.eventdata.models.domain.events.IntentParsingEvent.IntegrationInfo as CoreIntegrationInfo
+import com.simprints.id.data.db.session.domain.models.events.IntentParsingEvent.IntegrationInfo as CoreIntegrationInfo
 
 class ClientApiSessionEventsManagerImplTest {
 
