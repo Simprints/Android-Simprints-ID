@@ -195,4 +195,6 @@
     <string name="dashboard_sync_card_try_again_button">আবার চেষ্টা করুন</string>
     <string name="dashboard_sync_card_progress">সিঙ্ক করা হচ্ছে… %1$s</string>
     <string name="dashboard_card_activity">কার্যক্রম তথ্য: %1$s</string>
+    <string name="progress_sync_overlay">সিঙ্ক করা হচ্ছে</string>
+
 </resources>

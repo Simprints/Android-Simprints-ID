@@ -30,11 +30,12 @@
         android:layout_height="0dp"
         android:elevation="10dp"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-        <include layout="@layout/progress_overlay"/>
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout">
+
+        <include layout="@layout/progress_overlay" />
     </FrameLayout>
 
     <androidx.cardview.widget.CardView
@@ -43,9 +44,9 @@
         android:layout_height="0dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
-        app:layout_constraintHeight_min="wrap"
         app:layout_constraintBottom_toBottomOf="@+id/recordsCardsBarrier"
         app:layout_constraintEnd_toStartOf="@+id/recordsToDownloadCardView"
+        app:layout_constraintHeight_min="wrap"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recordsInLocalCardView">
 
@@ -122,9 +123,9 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="10dp"
-        app:layout_constraintHeight_min="wrap"
         app:layout_constraintBottom_toBottomOf="@+id/recordsCardsBarrier"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_min="wrap"
         app:layout_constraintStart_toEndOf="@+id/recordsToDownloadCardView"
         app:layout_constraintTop_toBottomOf="@+id/recordsInLocalCardView">
 
@@ -159,8 +160,8 @@
         android:id="@+id/recordsInLocalCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="15dp"
         android:layout_marginEnd="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -200,10 +201,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="15dp"
+        app:layout_constraintBottom_toTopOf="@+id/moduleSelectionButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recordsToDeleteCardView"
-        app:layout_constraintBottom_toTopOf="@+id/moduleSelectionButton">
+        app:layout_constraintTop_toBottomOf="@+id/recordsToDeleteCardView">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -265,10 +266,10 @@
         android:fontFamily="@font/muli"
         android:textColor="@color/simprints_white"
         android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
         app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/modulesTabHost"/>
+        app:layout_constraintTop_toBottomOf="@+id/modulesTabHost" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/recordsCardsBarrier"
