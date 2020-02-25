@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.session.local
+package com.simprints.id.data.db.session.local.models
 
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.session.domain.models.events.Event

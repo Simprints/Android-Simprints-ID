@@ -1,9 +1,9 @@
-package com.simprints.id.data.db.session.domain.events.callback
+package com.simprints.id.data.db.session.domain.models.events.callback
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.session.domain.events.Event
-import com.simprints.id.data.db.session.domain.events.EventType
-import com.simprints.id.data.db.session.domain.events.callback.ErrorCallbackEvent.Reason.Companion.fromAppResponseErrorReasonToEventReason
+import com.simprints.id.data.db.session.domain.models.events.Event
+import com.simprints.id.data.db.session.domain.models.events.EventType
+import com.simprints.id.data.db.session.domain.models.events.callback.ErrorCallbackEvent.Reason.Companion.fromAppResponseErrorReasonToEventReason
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 
 @Keep

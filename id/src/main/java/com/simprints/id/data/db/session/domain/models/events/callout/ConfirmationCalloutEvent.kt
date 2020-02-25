@@ -1,8 +1,8 @@
-package com.simprints.id.data.db.session.domain.events.callout
+package com.simprints.id.data.db.session.domain.models.events.callout
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.session.domain.events.Event
-import com.simprints.id.data.db.session.domain.events.EventType
+import com.simprints.id.data.db.session.domain.models.events.Event
+import com.simprints.id.data.db.session.domain.models.events.EventType
 
 @Keep
 class ConfirmationCalloutEvent(starTime: Long,

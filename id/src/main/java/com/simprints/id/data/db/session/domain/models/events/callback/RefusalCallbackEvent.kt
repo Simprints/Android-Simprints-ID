@@ -1,8 +1,8 @@
-package com.simprints.id.data.db.session.domain.events.callback
+package com.simprints.id.data.db.session.domain.models.events.callback
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.session.domain.events.Event
-import com.simprints.id.data.db.session.domain.events.EventType
+import com.simprints.id.data.db.session.domain.models.events.Event
+import com.simprints.id.data.db.session.domain.models.events.EventType
 
 @Keep
 class RefusalCallbackEvent(starTime: Long,

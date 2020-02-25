@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.session.domain.session
+package com.simprints.id.data.db.session.domain.models.session
 
 import android.os.Build
 import androidx.annotation.Keep

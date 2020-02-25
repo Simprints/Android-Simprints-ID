@@ -1,11 +1,11 @@
-package com.simprints.id.data.db.session.domain.session
+package com.simprints.id.data.db.session.domain.models.session
 
 import androidx.annotation.Keep
 import com.google.gson.GsonBuilder
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.db.session.domain.events.ArtificialTerminationEvent
-import com.simprints.id.data.db.session.domain.events.Event
-import com.simprints.id.data.db.session.domain.events.EventType
+import com.simprints.id.data.db.session.domain.models.events.ArtificialTerminationEvent
+import com.simprints.id.data.db.session.domain.models.events.Event
+import com.simprints.id.data.db.session.domain.models.events.EventType
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import java.util.*

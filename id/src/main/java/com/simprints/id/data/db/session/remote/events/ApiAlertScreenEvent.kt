@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.session.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.session.domain.events.AlertScreenEvent
+import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
 import com.simprints.id.data.db.session.remote.events.ApiAlertScreenEvent.ApiAlertScreenEvent.Companion.fromDomainToApi
 
 @Keep

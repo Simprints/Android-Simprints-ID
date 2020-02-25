@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.session.domain.events
+package com.simprints.id.data.db.session.domain.models.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.person.domain.FingerIdentifier
