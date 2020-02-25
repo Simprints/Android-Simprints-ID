@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.session.remote.events
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.session.eventdata.models.domain.events.AlertScreenEvent
-import com.simprints.id.data.db.session.eventdata.models.remote.events.ApiAlertScreenEvent
-import com.simprints.id.data.db.session.eventdata.models.remote.events.ApiAlertScreenEvent.ApiAlertScreenEvent.Companion.fromDomainToApi
+import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
+import com.simprints.id.data.db.session.remote.events.ApiAlertScreenEvent
+import com.simprints.id.data.db.session.remote.events.ApiAlertScreenEvent.ApiAlertScreenEvent.Companion.fromDomainToApi
 import org.junit.Test
 
 class ApiAlertScreenEventTest {
