@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.controllers.core.analytics
 
-import com.simprints.id.data.db.session.AnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsManager
 
 class FingerprintAnalyticsManagerImpl(val analytics: AnalyticsManager) : FingerprintAnalyticsManager {
 

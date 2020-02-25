@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.crashreport
 
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
-import com.simprints.id.data.db.session.crashreport.CoreCrashReportManager
+import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 
 class FingerprintCrashReportManagerImpl(val crashReportManager: CoreCrashReportManager): FingerprintCrashReportManager {
 

@@ -16,7 +16,7 @@ import com.simprints.id.data.db.session.eventdata.models.domain.events.callout.V
 import com.simprints.id.data.db.session.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.db.session.eventdata.models.domain.session.Device
 import com.simprints.id.data.db.session.eventdata.models.domain.session.Location
-import com.simprints.id.data.db.session.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.remote.events.*
 import com.simprints.id.data.db.session.eventdata.models.remote.session.ApiDatabaseInfo
 import com.simprints.id.data.db.session.eventdata.models.remote.session.ApiDevice

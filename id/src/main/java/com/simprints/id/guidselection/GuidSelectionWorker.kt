@@ -5,9 +5,9 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
-import com.simprints.id.data.db.session.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.crashreport.CrashReportTag
-import com.simprints.id.data.db.session.crashreport.CrashReportTrigger
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
 import com.simprints.id.services.GuidSelectionManager
 import io.reactivex.android.schedulers.AndroidSchedulers

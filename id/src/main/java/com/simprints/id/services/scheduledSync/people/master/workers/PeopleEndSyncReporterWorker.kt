@@ -2,7 +2,7 @@ package com.simprints.id.services.scheduledSync.people.master.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.simprints.id.data.db.session.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import kotlinx.coroutines.Dispatchers

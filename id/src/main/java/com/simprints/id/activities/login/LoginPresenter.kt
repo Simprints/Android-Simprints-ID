@@ -1,13 +1,12 @@
 package com.simprints.id.activities.login
 
 import android.annotation.SuppressLint
-import com.simprints.id.data.db.session.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.crashreport.CrashReportTag
-import com.simprints.id.data.db.session.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.session.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.session.eventdata.models.domain.events.AuthenticationEvent
-import com.simprints.id.data.db.session.eventdata.models.domain.events.AuthenticationEvent.Result.*
-import com.simprints.id.data.db.session.eventdata.models.domain.events.AuthenticationEvent.UserInfo
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
+import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent.Result.*
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
@@ -92,7 +91,7 @@ class LoginPresenter(val view: LoginContract.View,
     fun handleSignInSuccess(suppliedProjectId: String,
                             suppliedUserId: String) {
         logMessageForCrashReportWithNetworkTrigger("Sign in success")
-        addAuthenticatedEventAndUpdateProjectIdIfRequired(AUTHENTICATED, suppliedProjectId, suppliedUserId)
+        addAuthenticatedEventAndUpdateProjectIdIfRequired(AuthenticationEvent.Result.AUTHENTICATED, suppliedProjectId, suppliedUserId)
         view.handleSignInSuccess()
     }
 
@@ -104,7 +103,7 @@ class LoginPresenter(val view: LoginContract.View,
             AuthenticationEvent(
                 startTimeLogin,
                 timeHelper.now(),
-                UserInfo(suppliedProjectId, suppliedUserId),
+                AuthenticationEvent.UserInfo(suppliedProjectId, suppliedUserId),
                 result))
     }
 

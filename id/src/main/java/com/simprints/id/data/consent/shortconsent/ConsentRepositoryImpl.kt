@@ -3,7 +3,7 @@ package com.simprints.id.data.consent.shortconsent
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.session.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.tools.AndroidResourcesHelper

@@ -2,7 +2,7 @@ package com.simprints.id.activities.coreexitform
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.id.data.db.session.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.domain.SessionEventsManager
 
 class CoreExitFormViewModelFactory(private val sessionEventsManager: SessionEventsManager) : ViewModelProvider.Factory {
 
