@@ -57,7 +57,7 @@ class OrchestratorViewModelTest {
 
         configureMocks()
 
-        vm = OrchestratorViewModel(orchestratorManagerMock, orchestratorEventsHelperMock, listOf(FACE), sessionEventsManagerMock, domainToModuleApiConverter)
+        vm = OrchestratorViewModel(orchestratorManagerMock, orchestratorEventsHelperMock, listOf(FACE), sessionEventsManagerMock, domainToModuleApiConverter, mockk(relaxed = true))
     }
 
     private fun configureMocks() {
