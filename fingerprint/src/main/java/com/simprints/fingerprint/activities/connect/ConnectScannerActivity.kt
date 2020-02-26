@@ -109,7 +109,7 @@ class ConnectScannerActivity : FingerprintActivity() {
     private fun buildConfirmScannerErrorAlertDialog(scannerId: String) =
         ConfirmScannerErrorBuilder()
             .build(
-                this, scannerId,
+                this, androidResourcesHelper, scannerId,
                 onYes = { viewModel.handleScannerDisconnectedYesClick() },
                 onNo = { viewModel.handleScannerDisconnectedNoClick() }
             )
