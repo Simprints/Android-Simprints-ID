@@ -38,22 +38,35 @@ class ConnectScannerActivity : FingerprintActivity() {
             this.intent.extras?.getParcelable(ConnectScannerTaskRequest.BUNDLE_KEY) as ConnectScannerTaskRequest?
                 ?: throw InvalidRequestForConnectScannerActivityException()
 
+        viewModel.start()
+    }
+
+    override fun onResume() {
+        super.onResume()
         observeScannerEvents()
         observeLifecycleEvents()
-
-        viewModel.start()
     }
 
     private fun observeScannerEvents() {
         viewModel.progress.observe(this, Observer { connectScannerProgressBar.progress = it })
         viewModel.message.observe(this, Observer { connectScannerInfoTextView.text = androidResourcesHelper.getString(it) })
-        viewModel.vibrate.observe(this, Observer { vibrate(this) })
-        viewModel.showScannerErrorDialogWithScannerId.observe(this, Observer { showDialogForScannerErrorConfirmation(it) })
+        viewModel.vibrate.observe(this, Observer { it?.let { vibrate(this) } })
+        viewModel.showScannerErrorDialogWithScannerId.observe(this, Observer { it?.let { showDialogForScannerErrorConfirmation(it) } })
     }
 
     private fun observeLifecycleEvents() {
-        viewModel.launchAlert.observe(this, Observer { launchAlert(this, it) })
-        viewModel.finish.observe(this, Observer { continueToNextActivity() })
+        viewModel.launchAlert.observe(this, Observer { it?.let { launchAlert(this, it) } })
+        viewModel.finish.observe(this, Observer { it?.let { continueToNextActivity() } })
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.progress.removeObservers(this)
+        viewModel.message.removeObservers(this)
+        viewModel.vibrate.removeObservers(this)
+        viewModel.showScannerErrorDialogWithScannerId.removeObservers(this)
+        viewModel.launchAlert.removeObservers(this)
+        viewModel.finish.removeObservers(this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
