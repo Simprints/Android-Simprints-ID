@@ -11,5 +11,6 @@
     <string name="different_userId_message">የተለየ የተጠቃሚ መለያ ቁጥር ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>
     <string name="invalid_intentAction_message">በሲስተሙ ያልተፈቀደ ፍላጎት ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
     <string name="invalid_metadata_message">ልተፈቀደ ሜታዳታ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="rooted_device_title">ዋናው መሳሪያ ተገኝቷል</string>
 
 </resources>

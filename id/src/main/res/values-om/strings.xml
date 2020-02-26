@@ -6,7 +6,7 @@
     <string name="confirmation_logout_cancel">Addan kuti</string>
     <string name="confirmation_logout_message">Keessa bahuu barbaadda?</string>
     <string name="confirmation_logout_title">Keessaa bahi</string>
-    <string name="dashboard_card_calculating">Shalagaa jira</string>
+    <string name="dashboard_card_calculating">Shalagaa jira...</string>
     <string name="dashboard_card_current_user">Fayyadamaa Mosaajii: %1$s</string>
     <string name="dashboard_card_scanner_used">Iskaanarii hojii irra oole: %1$s</string>
     <string name="dashboard_card_sync_last_sync">Yeroo dhumaaf siink kan tahe: %1$s</string>
@@ -36,8 +36,8 @@
     <string name="preference_summary_settings_fingers">Quba ashaaraan isaa fuudhuu barbaaddu filadhu</string>
     <string name="preference_sync_and_search_title">Siinkii fi Sirreeffama barbaadi</string>
     <string name="records_up_to_date">Galmeen hundi haaromfameera</string>
-    <string name="requestLogin_message">"Seenuu si barbaachisa. \"Simprints ID\" banuuf maaloo mosaajii tajaajilamtuu seeni "</string>
-    <string name="requestLogin_title">"Seenuu si barbaachisa "</string>
+    <string name="requestLogin_message">Seenuu si barbaachisa. \"Simprints ID\" banuuf maaloo mosaajii tajaajilamtuu seeni</string>
+    <string name="requestLogin_title">Seenuu si barbaachisa</string>
     <string name="safetynet_down_alert_message">Daqiiqaa 5–10 booda irra deebi\'uun yaali</string>
     <string name="settings_app_details">Odeeffannoo Mosaajii</string>
     <string name="settings_general">Waliigala</string>
@@ -73,7 +73,7 @@
     <string name="privacy_notice_text"><u>Yaadachiisa iccitiin eegamu</u></string>
     <string name="privacy_notice_title">Yaadachiisa iccitiin eegamu</string>
 
-    <string name="refusal_toast_select_option_submit">"Maaloo tokko filachuun ol ergi "</string>
+    <string name="refusal_toast_select_option_submit">Maaloo tokko filachuun ol ergi</string>
     <string name="refusal_toast_submit">Maaloo unkicha ol ergi</string>
     <string name="refusal_app_not_working">Mosaajichi hin hojjeetu</string>
     <string name="refusal_data_concerns">Ragaa kennuu hin barbaanne</string>
@@ -89,14 +89,61 @@
 
     <plurals name="dashboard_card_enrolments">
         <item quantity="one">Galmee</item>
-        <item quantity="other">Enrolments</item>
+        <item quantity="other">Galmee</item>
     </plurals>
     <plurals name="dashboard_card_identifications">
         <item quantity="one">Adda baafannaa</item>
-        <item quantity="other">Identifications</item>
+        <item quantity="other">Adda baafannaa</item>
     </plurals>
     <plurals name="dashboard_card_verifications">
         <item quantity="one">Mirkaneeffannaa</item>
-        <item quantity="other">Verifications</item>
+        <item quantity="other">Mirkaneeffannaa</item>
     </plurals>
+    <string name="dashboard_sync_card_try_again_button">Yeroo gabaabaa keessatti irra deebi\'uun yaali</string>
+    <string name="cancel_button">Addaan kuti</string>
+    <string name="confirm_module_selection_cancel">Addaan kuti</string>
+    <string name="confirm_module_selection_title">Mojuulaa filatamee</string>
+    <string name="confirm_module_selection_yes">Mirkaneessi</string>
+    <string name="dashboard_card_activity">Hojii guyyaa guyyaa:%1$s</string>
+    <string name="dashboard_card_sync_title">Haala siinkii</string>
+    <string name="dashboard_sync_card_complete">Siinkiin xumureera</string>
+    <string name="dashboard_sync_card_connecting">Walqunnamaa jira</string>
+    <string name="dashboard_sync_card_failed_message">Siinkiin hin milkoofne, supparvaayzara kee qunnami</string>
+    <string name="dashboard_sync_card_incomplete">Siinkiin hin xumuramne</string>
+    <string name="dashboard_sync_card_no_modules_button">Moojula</string>
+    <string name="dashboard_sync_card_no_modules_message">Maaloo moojuula sinkii gootuu filadhu</string>
+    <string name="dashboard_sync_card_offline_button">Mijeessaa</string>
+    <string name="dashboard_sync_card_offline_message">Maaloo gara mijeessaa internetii keetii deebi\'i</string>
+    <string name="dashboard_sync_card_progress">Siink gochaa jira...%1$s</string>
+    <string name="dashboard_sync_card_sync_button">Amma Siink godhi</string>
+    <string name="hint_search_modules">Mojuula barbaadi</string>
+    <string name="l_1_finger_name">Quba guddaa</string>
+    <string name="l_2_finger_name">Quba bitaa quba guddaa</string>
+    <string name="l_3_finger_name">Quba bitaa 3ffaa</string>
+    <string name="l_4_finger_name">Quba bitaa 4ffaa</string>
+    <string name="l_5_finger_name">Quba bitaa 5ffaa</string>
+    <string name="no_modules_selected">Moojuula hin filatamne</string>
+    <string name="no_results">Firiin hin jiruu</string>
+    <string name="ok">Tole</string>
+    <string name="preference_sync_information_title">Odeffannoo Siinkii</string>
+    <string name="r_1_finger_name">Quba guddaa</string>
+    <string name="r_2_finger_name">Quba mirgaa quba guddaa</string>
+    <string name="r_3_finger_name">Quba mirgaa 3ffaa</string>
+    <string name="r_4_finger_name">Quba mirgaa 4ffaa</string>
+    <string name="r_5_finger_name">Quba mirgaa 5ffaa</string>
+    <string name="select_modules_button_title">Moojuulaa filadhuu</string>
+    <string name="selected_modules">Moojuula filatamee</string>
+    <string name="settings_label">Seetingii bilbilaa</string>
+    <string name="sync_info_records_to_delete">Barreeffama haquuf</string>
+    <string name="sync_info_records_to_download">Barreeffama gad-buussuf</string>
+    <string name="sync_info_records_to_upload">Barreeffama olfe\'aa</string>
+    <string name="sync_info_selected_modules">Mojuulaa filadhuu</string>
+    <string name="sync_info_total_records">Barreeffama waliigalaa</string>
+    <string name="sync_info_total_records_on_device">Barreeffama waliigalaa meeshaarra</string>
+    <string name="sync_info_unselected_modules">Moojuulaa hin filatamne</string>
+    <string name="title_activity_sync_information">Odeffannoo Siinkii</string>
+    <string name="try_again_label">Irra deebi\'ii yaali</string>
+    <string name="verify_guid_not_found_offline_message">Namni arti barbaadde hin argamne,maaloo tajaajia interneetii argachuu kee mirkaneeffadhuu irra deebi\'ii yaali.</string>
+    <string name="verify_guid_not_found_online_message">Namni mirkaneessaaf filatame daataa beezii keessa hin jiru.</string>
+    <string name="verify_guid_not_found_title">Namni argame hin jiru</string>
 </resources>

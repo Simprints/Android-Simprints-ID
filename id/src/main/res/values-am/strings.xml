@@ -90,14 +90,64 @@
 
     <plurals name="dashboard_card_enrolments">
         <item quantity="one">ወደ ሲስተሙ ማስገባት</item>
-        <item quantity="other">Enrolments</item>
+        <item quantity="other">ወደ ሲስተሙ ማስገባት</item>
     </plurals>
     <plurals name="dashboard_card_identifications">
         <item quantity="one">መለየት</item>
-        <item quantity="other">Identifications</item>
+        <item quantity="other">መለየት</item>
     </plurals>
     <plurals name="dashboard_card_verifications">
         <item quantity="one">ማመሳከር</item>
-        <item quantity="other">Verifications</item>
+        <item quantity="other">ማመሳከር</item>
     </plurals>
+    <string name="dashboard_sync_card_try_again_button">ትንሽ ቆይተው ይሞክሩ</string>
+    <string name="cancel_button">ሰርዝ</string>
+    <string name="confirm_module_selection_cancel">ሰርዝ</string>
+    <string name="confirm_module_selection_title">ሞጁል ተመርጧል</string>
+    <string name="confirm_module_selection_yes">ማረጋገጥ</string>
+    <string name="dashboard_card_activity">የየዕለት ተግባር: %1$s</string>
+    <string name="dashboard_card_sync_title">መረጃውን መገናኘት</string>
+    <string name="dashboard_sync_card_complete">ሲንክ ማድረጉ ተጠናቋል</string>
+    <string name="dashboard_sync_card_connecting">በመገኛኘት ላይ ነው</string>
+    <string name="dashboard_sync_card_failed_message">ሲንክ ማድረግ አልተቻለም እባክዎ የበላይ አካል ያግኙ</string>
+    <string name="dashboard_sync_card_incomplete">ሲንክ ማድረጉ አልተጠናቀቀም</string>
+    <string name="dashboard_sync_card_no_modules_button">ሞጁሎች</string>
+    <string name="dashboard_sync_card_no_modules_message">ሲንክ ለማድረግ ሞጁል ይምረጡ</string>
+    <string name="dashboard_sync_card_offline_button">ማስተካከያ</string>
+    <string name="dashboard_sync_card_offline_message">የስልኩ ሴቲንግ በመግባት የሞባይል ዳታ ያብሩ</string>
+    <string name="dashboard_sync_card_progress">በግንኙነት ላይ...%1$s</string>
+    <string name="dashboard_sync_card_sync_button">አሁን ግንኙነት ፍጠር</string>
+    <string name="fetch_guid_checking_person_in_database">ተገልጋዩ ዳታቤዝ ውስጥ መኖሩን ማረጋገጥ</string>
+    <string name="hint_search_modules">ሞጁሎችን መፈለግ</string>
+    <string name="l_1_finger_name">የግራ አውራጣትዎን</string>
+    <string name="l_2_finger_name">የግራ እጅ ጠቋሚ ጣት</string>
+    <string name="l_3_finger_name">የግራ እጅ ሶስተኛ ጣት</string>
+    <string name="l_4_finger_name">የግራ እጅ አራተኛ ጣት</string>
+    <string name="l_5_finger_name">የግራ እጅ አምስተኛ ጣት</string>
+    <string name="no_modules_selected">የተመረጠ ሞጁል የለም</string>
+    <string name="no_results">ምንም ውጤት የለም</string>
+    <string name="ok">እሽ</string>
+    <string name="r_1_finger_name">የቀኝ አውራጣትዎን</string>
+    <string name="r_2_finger_name">የቀኝ እጅ ጠቋሚ ጣት</string>
+    <string name="r_3_finger_name">የቀኝ  እጅ ሶስተኛ ጣት</string>
+    <string name="r_4_finger_name">የቀኝ እጅ አራተኛ ጣት</string>
+    <string name="r_5_finger_name">የቀኝ እጅ አምስተኛ ጣት</string>
+    <string name="select_modules_button_title">ሞጅውሎችን ይምረጡ</string>
+    <string name="selected_modules">የተመረጠ ሞጁል</string>
+    <string name="settings_label">የስልክ ማስተካከያ</string>
+    <string name="sync_info_records_to_delete">የተመዘገበውን ለመሰረዝ</string>
+    <string name="sync_info_records_to_download">የተመዘገበውን ለመማውረድ</string>
+    <string name="sync_info_records_to_upload">የተመዘገበውን ለመጫን</string>
+    <string name="sync_info_selected_modules">የተመረጡ ሞጁሎች</string>
+    <string name="sync_info_total_records">አጠቃላይ የተመዘገበ</string>
+    <string name="sync_info_total_records_on_device">በስልኩ አጠቃላይ የተመዘገበ</string>
+    <string name="sync_info_unselected_modules">ያልተመረጡ ሞጁሎች</string>
+    <string name="title_activity_sync_information">ሲንክ የተደረገ መረጃ</string>
+    <string name="try_again_label">እንደገና ይሞክሩ</string>
+    <string name="verify_guid_not_found_offline_message">ግለሰቡ የለም፡ እባክዎ ከኢንተርኔት ጋር መገናኘትዎን አረጋግጠው እንደገና ይሞክሩ</string>
+    <string name="verify_guid_not_found_online_message">አንዲጠራ የተመረጠው ግለሰብ ዳታቤዙ ውስጥ የለም</string>
+    <string name="verify_guid_not_found_title">ግለሰቡ አልተገኘም</string>
+    <string name="login_enter_project_secret_id">የፕሮጀክት መለያ ቁጥሩን እና ቁልፉን ያስገቡ</string>
+    <string name="preference_summary_sync_information">ሲንክ ላይ ተጨማሪ ዝርዝር መረጃ</string>
+    <string name="preference_sync_information_title">ሲንክ የተደረገ መረጃ</string>
 </resources>

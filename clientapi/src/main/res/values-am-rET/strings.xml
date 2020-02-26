@@ -6,4 +6,5 @@
     <string name="configuration_error_title">የተግበቦት ስህተት</string>
     <string name="guid_selection_data_sent">መረጃው ተልኳል</string>
     <string name="guid_selection_result_sent">ውጤቱ ተልኳል</string>
+    <string name="rooted_device_title">ዋናው መሳሪያ ተገኝቷል</string>
 </resources>
