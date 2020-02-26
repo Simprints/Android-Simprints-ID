@@ -32,12 +32,12 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
 
     val progress: MutableLiveData<Int> = MutableLiveData(0)
     val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
-    val vibrate = MutableLiveData<Unit>()
+    val vibrate = MutableLiveData<Unit?>(null)
 
-    val launchAlert = MutableLiveData<FingerprintAlert>()
-    val finish = MutableLiveData<Unit>()
+    val launchAlert = MutableLiveData<FingerprintAlert?>(null)
+    val finish = MutableLiveData<Unit?>(null)
 
-    val showScannerErrorDialogWithScannerId = MutableLiveData<String>()
+    val showScannerErrorDialogWithScannerId = MutableLiveData<String?>(null)
 
     private var setupFlow: Disposable? = null
 
@@ -47,6 +47,12 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
 
     @SuppressLint("CheckResult")
     private fun startSetup() {
+        progress.value = 0
+        message.value = R.string.connect_scanner_bt_connect
+        vibrate.value = null
+        launchAlert.value = null
+        finish.value = null
+        showScannerErrorDialogWithScannerId.value = null
         setupFlow?.dispose()
         setupFlow = disconnectVero()
             .andThen(checkIfBluetoothIsEnabled())
