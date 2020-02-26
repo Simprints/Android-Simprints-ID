@@ -60,9 +60,10 @@ class ModuleSelectionFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        application.component.inject(this)
+
         configureRecyclerView()
         configureTextViews()
-        application.component.inject(this)
         fetchData()
     }
 

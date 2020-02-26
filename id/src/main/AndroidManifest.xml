@@ -99,7 +99,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
         <activity android:name=".activities.settings.ModuleSelectionActivity"
-            android:label="@string/preference_select_modules_title"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.MaterialComponents"/>
