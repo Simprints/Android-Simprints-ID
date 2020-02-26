@@ -25,6 +25,7 @@ import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.images.deduceFileExtension
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
@@ -58,7 +59,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     override var isBusyWithFingerTransitionAnimation = false
     private var lastCaptureStartedAt: Long = 0
     private var confirmDialog: AlertDialog? = null
-    private val captureEventIds: MutableMap<Finger, String> = mutableMapOf()
+    private val captureEventIds: MutableMap<FingerIdentifier, String> = mutableMapOf()
 
     override fun start() {
         initFingerDisplayHelper(view)
@@ -247,7 +248,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private suspend fun saveImage(finger: Finger) {
         val imageBytes = finger.imageBytes
-        val captureEventId = captureEventIds[finger]
+        val captureEventId = captureEventIds[finger.id]
 
         if (imageBytes != null && captureEventId != null) {
             finger.template?.imageRef = imageManager.save(imageBytes, captureEventId,
@@ -278,7 +279,7 @@ class CollectFingerprintsPresenter(private val context: Context,
                 FingerprintCaptureEvent.Fingerprint(finger.id, it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))
             }
         )
-        captureEventIds[finger] = captureEvent.id
+        captureEventIds[finger.id] = captureEvent.id
         sessionEventsManager.addEventInBackground(captureEvent)
     }
 
