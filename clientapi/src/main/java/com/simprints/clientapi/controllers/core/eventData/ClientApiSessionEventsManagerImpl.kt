@@ -15,7 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import timber.log.Timber
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
 
 class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: SessionEventsManager,
@@ -61,18 +60,13 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: Se
         coreSessionEventsManager.addEvent(event)
 
     override suspend fun getCurrentSessionId(): String? =
-        try {
-            suspendCancellableCoroutine { cont ->
-                CoroutineScope(Dispatchers.IO).launch {
-                    coreSessionEventsManager.getCurrentSession().subscribeBy(
-                        onSuccess = { cont.resumeSafely(it.id) },
-                        onError = { cont.resumeWithExceptionSafely(it) }
-                    )
-                }
+        suspendCancellableCoroutine { cont ->
+            CoroutineScope(Dispatchers.IO).launch {
+                coreSessionEventsManager.getCurrentSession().subscribeBy(
+                    onSuccess = { cont.resumeSafely(it.id) },
+                    onError = { cont.resumeSafely(null) }
+                )
             }
-        } catch (t: Throwable) {
-            Timber.d(t)
-            null
         }
 }
 
