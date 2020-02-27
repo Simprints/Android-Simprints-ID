@@ -35,7 +35,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 //
 //    private lateinit var sharedPrefs: SharedPreferences
 //
-//    @Inject lateinit var sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager
+//    @Inject lateinit var sessionEventsLocalDbManagerMock: SessionLocalDataSource
 //    @Inject lateinit var remoteDbManagerMock: RemoteDbManager
 //    @Inject lateinit var localDbManagerMock: LocalDbManager
 //    @Inject lateinit var crashReportManagerMock: CrashReportManager

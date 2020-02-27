@@ -11,7 +11,7 @@ import com.simprints.id.data.db.session.domain.models.events.EventType.GUID_SELE
 import com.simprints.id.data.db.session.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.session.domain.models.session.Device
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
@@ -29,13 +29,13 @@ import timber.log.Timber
 open class SessionRepositoryImpl(private val deviceId: String,
                                  private val appVersionName: String,
                                  private val sessionEventsSyncManager: SessionEventsSyncManager,
-                                 private val sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+                                 private val sessionLocalDataSource: SessionLocalDataSource,
                                  private val preferencesManager: PreferencesManager,
                                  private val timeHelper: TimeHelper,
                                  private val crashReportManager: CrashReportManager) :
 
     SessionRepository,
-    SessionEventsLocalDbManager by sessionEventsLocalDbManager {
+    SessionLocalDataSource by sessionLocalDataSource {
 
     companion object {
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
@@ -44,14 +44,14 @@ open class SessionRepositoryImpl(private val deviceId: String,
     // as default, the manager tries to load the last open activeSession
     //
     override fun getCurrentSession(): Single<SessionEvents> =
-        sessionEventsLocalDbManager.loadSessions(openSession = true).map {
+        sessionLocalDataSource.loadSessions(openSession = true).map {
             if (it.isEmpty())
                 throw NoSessionsFoundException()
             it[0]
         }
 
     override fun createSession(libSimprintsVersionName: String): Single<SessionEvents> =
-        sessionEventsLocalDbManager.getSessionCount().flatMap {
+        sessionLocalDataSource.getSessionCount().flatMap {
             createSessionWithAvailableInfo(
                 PROJECT_ID_FOR_NOT_SIGNED_IN,
                 libSimprintsVersionName,
@@ -102,7 +102,7 @@ open class SessionRepositoryImpl(private val deviceId: String,
     }
 
     private fun closeLastSessionsIfPending(): Completable =
-        sessionEventsLocalDbManager.loadSessions(openSession = true).flatMapCompletable { openSessions ->
+        sessionLocalDataSource.loadSessions(openSession = true).flatMapCompletable { openSessions ->
 
             openSessions.forEach {
                 it.addArtificialTerminationIfRequired(timeHelper, ArtificialTerminationEvent.Reason.NEW_SESSION)
@@ -115,7 +115,7 @@ open class SessionRepositoryImpl(private val deviceId: String,
         }.onErrorComplete()
 
     override fun addGuidSelectionEvent(selectedGuid: String, sessionId: String): Completable =
-        sessionEventsLocalDbManager.loadSessionById(sessionId).flatMapCompletable { session ->
+        sessionLocalDataSource.loadSessionById(sessionId).flatMapCompletable { session ->
 
             if (session.isOpen() &&
                 !session.hasEvent(GUID_SELECTION) &&
