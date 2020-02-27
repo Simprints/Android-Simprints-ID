@@ -3,6 +3,8 @@ package com.simprints.id.data.db.session
 import android.annotation.SuppressLint
 import android.os.Build
 import com.simprints.core.tools.EncodingUtils
+import com.simprints.core.tools.extentions.completableWithSuspend
+import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.session.domain.models.events.*
@@ -12,6 +14,7 @@ import com.simprints.id.data.db.session.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.session.domain.models.session.Device
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
+import com.simprints.id.data.db.session.local.SessionLocalDataSource.Query
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
@@ -23,6 +26,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.flow.toList
 import timber.log.Timber
 
 // Class to manage the current activeSession
@@ -44,14 +48,14 @@ open class SessionRepositoryImpl(private val deviceId: String,
     // as default, the manager tries to load the last open activeSession
     //
     override fun getCurrentSession(): Single<SessionEvents> =
-        sessionLocalDataSource.loadSessions(openSession = true).map {
+        singleWithSuspend { sessionLocalDataSource.load(Query(openSession = true)).toList() }.map {
             if (it.isEmpty())
                 throw NoSessionsFoundException()
             it[0]
         }
 
     override fun createSession(libSimprintsVersionName: String): Single<SessionEvents> =
-        sessionLocalDataSource.getSessionCount().flatMap {
+        singleWithSuspend { sessionLocalDataSource.count(Query()) }.flatMap {
             createSessionWithAvailableInfo(
                 PROJECT_ID_FOR_NOT_SIGNED_IN,
                 libSimprintsVersionName,
@@ -61,7 +65,7 @@ open class SessionRepositoryImpl(private val deviceId: String,
                 sessionEventsSyncManager.scheduleSessionsSync()
 
                 closeLastSessionsIfPending()
-                    .andThen(insertOrUpdateSessionEvents(it))
+                    .andThen(completableWithSuspend { sessionLocalDataSource.insertOrUpdateSessionEvents(it) })
                     .toSingle { it }
             }
         }
@@ -87,7 +91,7 @@ open class SessionRepositoryImpl(private val deviceId: String,
         getCurrentSession().flatMapCompletable {
             if (it.isOpen()) {
                 block(it)
-                insertOrUpdateSessionEvents(it)
+                completableWithSuspend { sessionLocalDataSource.insertOrUpdateSessionEvents(it) }
             } else {
                 throw AttemptedToModifyASessionAlreadyClosedException()
             }
@@ -102,12 +106,12 @@ open class SessionRepositoryImpl(private val deviceId: String,
     }
 
     private fun closeLastSessionsIfPending(): Completable =
-        sessionLocalDataSource.loadSessions(openSession = true).flatMapCompletable { openSessions ->
+        singleWithSuspend { sessionLocalDataSource.load(Query(openSession = true)).toList() }.flatMapCompletable { openSessions ->
 
             openSessions.forEach {
                 it.addArtificialTerminationIfRequired(timeHelper, ArtificialTerminationEvent.Reason.NEW_SESSION)
                 it.closeIfRequired(timeHelper)
-                insertOrUpdateSessionEvents(it).blockingAwait()
+                completableWithSuspend { sessionLocalDataSource.insertOrUpdateSessionEvents(it) }.blockingAwait()
             }
             Completable.complete()
         }.doOnError {
@@ -115,14 +119,14 @@ open class SessionRepositoryImpl(private val deviceId: String,
         }.onErrorComplete()
 
     override fun addGuidSelectionEvent(selectedGuid: String, sessionId: String): Completable =
-        sessionLocalDataSource.loadSessionById(sessionId).flatMapCompletable { session ->
+        singleWithSuspend { sessionLocalDataSource.load(Query(id = sessionId)).toList().first() }.flatMapCompletable { session ->
 
             if (session.isOpen() &&
                 !session.hasEvent(GUID_SELECTION) &&
                 session.hasEvent(CALLBACK_IDENTIFICATION)) {
 
                 session.addEvent(GuidSelectionEvent(timeHelper.now(), selectedGuid))
-                insertOrUpdateSessionEvents(session)
+                completableWithSuspend { sessionLocalDataSource.insertOrUpdateSessionEvents(session) }
             } else {
                 Completable.error(InvalidSessionForGuidSelectionEvent("open: ${session.isOpen()}"))
             }
@@ -156,7 +160,7 @@ open class SessionRepositoryImpl(private val deviceId: String,
         }
 
     override fun signOut() {
-        deleteSessions(openSession = false)
+        completableWithSuspend { sessionLocalDataSource.delete(Query(openSession = false)) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onComplete = {}, onError = {

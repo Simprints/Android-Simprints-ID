@@ -1,20 +1,22 @@
 package com.simprints.id.data.db.session.local
 
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import io.reactivex.Completable
-import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 interface SessionLocalDataSource {
 
-    fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents): Completable
-    fun loadSessions(projectId: String? = null, openSession: Boolean? = null): Single<ArrayList<SessionEvents>>
-    /** @throws SessionNotFoundException */
-    fun loadSessionById(sessionId: String): Single<SessionEvents>
+    data class Query(val id: String? = null,
+                     val projectId: String? = null,
+                     val openSession: Boolean? = null,
+                     val startedBefore: Long? = null)
 
-    fun getSessionCount(projectId: String? = null): Single<Int>
-    fun deleteSessions(projectId: String? = null,
-                       sessionId: String? = null,
-                       openSession: Boolean? = null,
-                       startedBefore: Long? = null): Completable
+    suspend fun create(sessionEvents: SessionEvents): Completable
+    suspend fun load(query: Query): Flow<SessionEvents>
+    suspend fun count(query: Query): Int
+    suspend fun delete(query: Query)
+
+
+    @Deprecated("gonna remove it soon")
+    suspend fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents)
 }
