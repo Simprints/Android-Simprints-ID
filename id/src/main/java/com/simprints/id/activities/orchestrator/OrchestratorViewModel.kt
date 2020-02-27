@@ -4,14 +4,11 @@ import android.content.Intent
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.domain.SessionEventsManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.OrchestratorManager
-import com.simprints.id.orchestrator.OrchestratorManagerImpl
-import com.simprints.id.orchestrator.cache.HotCache
-import com.simprints.id.orchestrator.modality.ModalityFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
