@@ -9,12 +9,12 @@ interface SessionRepository : SessionLocalDataSource {
 
     fun signOut()
 
-    suspend fun createSession(libSimprintsVersionName: String): SessionEvents
+    suspend fun createSession(libSimprintsVersionName: String)
     suspend fun getCurrentSession(): SessionEvents
     suspend fun addGuidSelectionEvent(selectedGuid: String, sessionId: String)
 
-    fun addPersonCreationEventInBackground(fingerprintSamples: List<FingerprintSample>)
-    fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
+    suspend fun addPersonCreationEventInBackground(fingerprintSamples: List<FingerprintSample>)
+    suspend fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
 
     companion object {
         fun build(app: Application): SessionRepository =

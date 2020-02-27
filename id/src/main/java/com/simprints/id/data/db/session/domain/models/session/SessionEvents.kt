@@ -39,4 +39,12 @@ open class SessionEvents(var projectId: String,
     fun hasEvent(eventType: EventType) =
         events.any { it.type == eventType }
 
+    fun closeIfRequired(timeHelper: TimeHelper) {
+        if (!isClosed()) {
+            relativeEndTime = timeRelativeToStartTime(timeHelper.now())
+        }
+    }
+
+    fun timeRelativeToStartTime(time: Long): Long = time - startTime
+
 }

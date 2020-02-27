@@ -1,8 +1,8 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.person.domain.FingerprintSample
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequestType
@@ -89,7 +89,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         steps.forEach { it.setStatus(Step.Status.COMPLETED) }
     }
 
-    fun extractFingerprintAndAddPersonCreationEvent(fingerprintCaptureResponse: FingerprintCaptureResponse) {
+    suspend fun extractFingerprintAndAddPersonCreationEvent(fingerprintCaptureResponse: FingerprintCaptureResponse) {
         val fingerprintSamples = extractFingerprintSamples(fingerprintCaptureResponse)
         addPersonCreationEventForFingerprintSamples(fingerprintSamples)
     }
@@ -102,7 +102,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
             }
         }
 
-    private fun addPersonCreationEventForFingerprintSamples(fingerprintSamples: List<FingerprintSample>) {
+    private suspend fun addPersonCreationEventForFingerprintSamples(fingerprintSamples: List<FingerprintSample>) {
         sessionRepository.addPersonCreationEventInBackground(fingerprintSamples)
     }
 }

@@ -5,25 +5,13 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import io.reactivex.Single
+import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
 class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
                            private val firebaseAnalytics: FirebaseAnalytics) : AnalyticsManager {
 
-    override val analyticsId: Single<String> = Single.create<String> {
-        firebaseAnalytics.appInstanceId.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val result = task.result
-                if (result == null) {
-                    it.onError(NullPointerException())
-                } else {
-                    it.onSuccess(result)
-                }
-            } else {
-                it.onError(task.exception as Throwable)
-            }
-        }
-    }
+    override suspend fun getAnalyticsId(): String = firebaseAnalytics.appInstanceId.await()
 
     override fun logCallout(appRequest: AppRequest) {
         Timber.d("AnalyticsManagerImpl.logCallout(appRequest=$appRequest)")

@@ -9,6 +9,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationReq
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.tools.TimeHelper
 import io.reactivex.Completable
+import timber.log.Timber
 
 class GuidSelectionManagerImpl(val deviceId: String,
                                val loginInfoManager: LoginInfoManager,
@@ -17,30 +18,32 @@ class GuidSelectionManagerImpl(val deviceId: String,
                                private val timerHelper: TimeHelper,
                                val sessionRepository: SessionRepository) : GuidSelectionManager {
 
-    override fun handleIdentityConfirmationRequest(request: AppIdentityConfirmationRequest): Completable =
-        addConfirmationCalloutEvent(request)
-            .andThen(checkRequest(request))
-            .andThen(saveGuidSelectionEvent(request))
-            .doOnError {
-                it.printStackTrace()
-                crashReportManager.logExceptionOrSafeException(it)
-                reportToAnalytics(request, false)
-            }
-            .doOnComplete { reportToAnalytics(request, true) }
+    override suspend fun handleIdentityConfirmationRequest(request: AppIdentityConfirmationRequest) {
+        try {
+            addConfirmationCalloutEvent(request)
+            checkRequest(request)
+            saveGuidSelectionEvent(request)
+            reportToAnalytics(request, true)
+        } catch (t: Throwable) {
+            Timber.e(t)
+            crashReportManager.logExceptionOrSafeException(t)
+            reportToAnalytics(request, false)
+        }
+    }
 
     private fun checkRequest(request: AppIdentityConfirmationRequest): Completable = Completable.fromCallable {
         checkProjectId(request.projectId)
     }
 
     private fun addConfirmationCalloutEvent(request: AppIdentityConfirmationRequest) =
-        sessionRepository.addEvent(ConfirmationCalloutEvent(
+        sessionRepository.addEventInBackground(ConfirmationCalloutEvent(
             timerHelper.now(),
             request.projectId,
             request.selectedGuid,
             request.sessionId))
 
 
-    private fun saveGuidSelectionEvent(request: AppIdentityConfirmationRequest): Completable =
+    private suspend fun saveGuidSelectionEvent(request: AppIdentityConfirmationRequest) =
         sessionRepository
             .addGuidSelectionEvent(request.selectedGuid, request.sessionId)
 

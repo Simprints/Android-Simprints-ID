@@ -1,9 +1,11 @@
 package com.simprints.fingerprint.controllers.core.eventData
 
+import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
 import com.simprints.id.data.db.session.SessionRepository
 import io.reactivex.Completable
+import kotlinx.coroutines.runBlocking
 import com.simprints.id.data.db.session.domain.models.events.Event as CoreEvent
 
 class FingerprintSessionEventsManagerImpl(private val sessionRepository: SessionRepository) : FingerprintSessionEventsManager {
@@ -13,12 +15,18 @@ class FingerprintSessionEventsManagerImpl(private val sessionRepository: Session
     }
 
     override fun addEvent(event: Event): Completable =
-        fromDomainToCore(event)
-            ?.let { sessionRepository.addEvent(it) }
-            ?: Completable.complete()
+        completableWithSuspend {
+            fromDomainToCore(event)?.let {
+                runBlocking {
+                    sessionRepository.updateCurrentSession { currentSession ->
+                        currentSession.events.add(it)
+                    }
+                }
+            }
+        }
 
     override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) =
-        sessionRepository.updateHardwareVersionInScannerConnectivityEvent(hardwareVersion)
+        runBlocking { sessionRepository.updateHardwareVersionInScannerConnectivityEvent(hardwareVersion) }
 
     private fun fromDomainToCore(event: Event): CoreEvent? =
         when (event.type) {
