@@ -4,7 +4,7 @@ import android.content.Intent
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
@@ -18,7 +18,7 @@ class OrchestratorViewModel(
     private val orchestratorManager: OrchestratorManager,
     private val orchestratorEventsHelper: OrchestratorEventsHelper,
     private val modalities: List<Modality>,
-    private val sessionEventsManager: SessionEventsManager,
+    private val sessionRepository: SessionRepository,
     private val domainToModuleApiConverter: DomainToModuleApiAppResponse,
     private val crashReportManager: CrashReportManager
 ) : ViewModel() {
@@ -42,7 +42,7 @@ class OrchestratorViewModel(
     }
 
     private fun getCurrentSessionId(): String =
-        sessionEventsManager
+        sessionRepository
             .getCurrentSession()
             .map { it.id }
             .onErrorResumeNext {

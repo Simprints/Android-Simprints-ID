@@ -8,7 +8,7 @@ import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.simprints.id.Application
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.callback.ConfirmationCallbackEvent
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppConfirmationResponse
@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 class GuidSelectionActivity : AppCompatActivity() {
 
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var timeHelper: TimeHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +65,7 @@ class GuidSelectionActivity : AppCompatActivity() {
     }
 
     private fun addConfirmationCallbackEvent(response: AppConfirmationResponse) {
-        sessionEventsManager.addEventInBackground(
+        sessionRepository.addEventInBackground(
             ConfirmationCallbackEvent(timeHelper.now(), response.identificationOutcome)
         )
     }

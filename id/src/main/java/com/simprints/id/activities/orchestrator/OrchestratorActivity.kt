@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
@@ -22,7 +22,7 @@ class OrchestratorActivity : AppCompatActivity() {
 
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var orchestratorViewModelFactory: OrchestratorViewModelFactory
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var timeHelper: TimeHelper
 

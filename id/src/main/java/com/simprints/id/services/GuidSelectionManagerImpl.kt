@@ -2,7 +2,7 @@ package com.simprints.id.services
 
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
@@ -15,7 +15,7 @@ class GuidSelectionManagerImpl(val deviceId: String,
                                val analyticsManager: AnalyticsManager,
                                val crashReportManager: CrashReportManager,
                                private val timerHelper: TimeHelper,
-                               val sessionEventsManager: SessionEventsManager) : GuidSelectionManager {
+                               val sessionRepository: SessionRepository) : GuidSelectionManager {
 
     override fun handleIdentityConfirmationRequest(request: AppIdentityConfirmationRequest): Completable =
         addConfirmationCalloutEvent(request)
@@ -33,7 +33,7 @@ class GuidSelectionManagerImpl(val deviceId: String,
     }
 
     private fun addConfirmationCalloutEvent(request: AppIdentityConfirmationRequest) =
-        sessionEventsManager.addEvent(ConfirmationCalloutEvent(
+        sessionRepository.addEvent(ConfirmationCalloutEvent(
             timerHelper.now(),
             request.projectId,
             request.selectedGuid,
@@ -41,7 +41,7 @@ class GuidSelectionManagerImpl(val deviceId: String,
 
 
     private fun saveGuidSelectionEvent(request: AppIdentityConfirmationRequest): Completable =
-        sessionEventsManager
+        sessionRepository
             .addGuidSelectionEvent(request.selectedGuid, request.sessionId)
 
     private fun reportToAnalytics(request: AppIdentityConfirmationRequest, callbackSent: Boolean) =

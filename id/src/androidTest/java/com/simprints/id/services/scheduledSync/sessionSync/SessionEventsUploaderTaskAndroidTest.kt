@@ -17,7 +17,7 @@ import com.simprints.id.commontesttools.state.LoginStateMocker
 import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.domain.FingerIdentifier
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.callback.*
 import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
@@ -71,7 +71,7 @@ class SessionEventsUploaderTaskAndroidTest {
     @get:Rule val simprintsActionTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
     @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
     @Inject lateinit var timeHelper: TimeHelper
@@ -293,7 +293,7 @@ class SessionEventsUploaderTaskAndroidTest {
 
     private suspend fun executeUpload(): TestObserver<Void> {
         val syncTask = SessionEventsUploaderTask(
-            sessionEventsManager,
+            sessionRepository,
             timeHelper,
             remoteSessionsManager.getSessionsApiClient())
 

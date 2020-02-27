@@ -1,17 +1,17 @@
-package com.simprints.id.data.db.session.domain
+package com.simprints.id.data.db.session
 
 import android.annotation.SuppressLint
 import android.os.Build
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.EventType.CALLBACK_IDENTIFICATION
 import com.simprints.id.data.db.session.domain.models.events.EventType.GUID_SELECTION
 import com.simprints.id.data.db.session.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.session.domain.models.session.Device
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.person.domain.FingerprintSample
+import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
@@ -26,15 +26,15 @@ import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 // Class to manage the current activeSession
-open class SessionEventsManagerImpl(private val deviceId: String,
-                                    private val appVersionName: String,
-                                    private val sessionEventsSyncManager: SessionEventsSyncManager,
-                                    private val sessionEventsLocalDbManager: SessionEventsLocalDbManager,
-                                    private val preferencesManager: PreferencesManager,
-                                    private val timeHelper: TimeHelper,
-                                    private val crashReportManager: CrashReportManager) :
+open class SessionRepositoryImpl(private val deviceId: String,
+                                 private val appVersionName: String,
+                                 private val sessionEventsSyncManager: SessionEventsSyncManager,
+                                 private val sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+                                 private val preferencesManager: PreferencesManager,
+                                 private val timeHelper: TimeHelper,
+                                 private val crashReportManager: CrashReportManager) :
 
-    SessionEventsManager,
+    SessionRepository,
     SessionEventsLocalDbManager by sessionEventsLocalDbManager {
 
     companion object {

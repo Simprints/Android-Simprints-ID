@@ -2,23 +2,23 @@ package com.simprints.fingerprint.controllers.core.eventData
 
 import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import io.reactivex.Completable
 import com.simprints.id.data.db.session.domain.models.events.Event as CoreEvent
 
-class FingerprintSessionEventsManagerImpl(private val sessionEventsManager: SessionEventsManager) : FingerprintSessionEventsManager {
+class FingerprintSessionEventsManagerImpl(private val sessionRepository: SessionRepository) : FingerprintSessionEventsManager {
 
     override fun addEventInBackground(event: Event) {
-        fromDomainToCore(event)?.let { sessionEventsManager.addEventInBackground(it) }
+        fromDomainToCore(event)?.let { sessionRepository.addEventInBackground(it) }
     }
 
     override fun addEvent(event: Event): Completable =
         fromDomainToCore(event)
-            ?.let { sessionEventsManager.addEvent(it) }
+            ?.let { sessionRepository.addEvent(it) }
             ?: Completable.complete()
 
     override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) =
-        sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(hardwareVersion)
+        sessionRepository.updateHardwareVersionInScannerConnectivityEvent(hardwareVersion)
 
     private fun fromDomainToCore(event: Event): CoreEvent? =
         when (event.type) {

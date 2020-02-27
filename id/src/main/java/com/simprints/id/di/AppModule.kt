@@ -30,8 +30,8 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.session.domain.SessionEventsManager
-import com.simprints.id.data.db.session.domain.SessionEventsManagerImpl
+import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.session.SessionRepositoryImpl
 import com.simprints.id.data.db.session.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.session.remote.RemoteSessionsManager
@@ -218,8 +218,8 @@ open class AppModule {
         preferencesManager: PreferencesManager,
         timeHelper: TimeHelper,
         crashReportManager: CrashReportManager
-    ): SessionEventsManager =
-        SessionEventsManagerImpl(
+    ): SessionRepository =
+        SessionRepositoryImpl(
             ctx.deviceId,
             ctx.packageVersionName,
             sessionEventsSyncManager,
@@ -259,7 +259,7 @@ open class AppModule {
         analyticsManager: AnalyticsManager,
         crashReportManager: CrashReportManager,
         timeHelper: TimeHelper,
-        sessionEventsManager: SessionEventsManager
+        sessionRepository: SessionRepository
     ): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId,
@@ -267,7 +267,7 @@ open class AppModule {
             analyticsManager,
             crashReportManager,
             timeHelper,
-            sessionEventsManager
+            sessionRepository
         )
 
     @Provides
@@ -300,18 +300,18 @@ open class AppModule {
     @Provides
     open fun provideConsentViewModelFactory(
         consentTextManager: ConsentRepository,
-        sessionEventsManager: SessionEventsManager,
+        sessionRepository: SessionRepository,
         timeHelper: TimeHelper
     ) =
-        ConsentViewModelFactory(consentTextManager, sessionEventsManager)
+        ConsentViewModelFactory(consentTextManager, sessionRepository)
 
     @Provides
-    open fun provideCoreExitFormViewModelFactory(sessionEventsManager: SessionEventsManager) =
-        CoreExitFormViewModelFactory(sessionEventsManager)
+    open fun provideCoreExitFormViewModelFactory(sessionRepository: SessionRepository) =
+        CoreExitFormViewModelFactory(sessionRepository)
 
     @Provides
-    open fun provideFingerprintExitFormViewModelFactory(sessionEventsManager: SessionEventsManager) =
-        FingerprintExitFormViewModelFactory(sessionEventsManager)
+    open fun provideFingerprintExitFormViewModelFactory(sessionRepository: SessionRepository) =
+        FingerprintExitFormViewModelFactory(sessionRepository)
 
     @Provides
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
@@ -319,9 +319,9 @@ open class AppModule {
     @Provides
     open fun provideFetchGuidViewModelFactory(personRepository: PersonRepository,
                                               deviceManager: DeviceManager,
-                                              sessionEventsManager: SessionEventsManager,
+                                              sessionRepository: SessionRepository,
                                               timeHelper: TimeHelper) =
-        FetchGuidViewModelFactory(personRepository, deviceManager, sessionEventsManager, timeHelper)
+        FetchGuidViewModelFactory(personRepository, deviceManager, sessionRepository, timeHelper)
 
     @Provides
     open fun provideSyncInformationViewModelFactory(

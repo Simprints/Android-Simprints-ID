@@ -51,9 +51,9 @@ class CheckLoginFromIntentPresenterTest {
             crashReportManager = mockk()
             every { crashReportManager.setSessionIdCrashlyticsKey(any()) } just Runs
 
-            sessionEventsManager = mockk(relaxed = true)
-            every { sessionEventsManager.createSession("") } returns Single.just(createFakeSession())
-            every { sessionEventsManager.getCurrentSession() } returns Single.just(createFakeSession())
+            sessionRepository = mockk(relaxed = true)
+            every { sessionRepository.createSession("") } returns Single.just(createFakeSession())
+            every { sessionRepository.getCurrentSession() } returns Single.just(createFakeSession())
         }
 
         checkLoginFromIntentPresenter.setup()
@@ -130,10 +130,10 @@ class CheckLoginFromIntentPresenterTest {
             every { crashReportManager.setSessionIdCrashlyticsKey(any()) } just runs
 
 
-            sessionEventsManager = mockk(relaxed = true)
-            every { sessionEventsManager.createSession("") } returns Single.just(createFakeSession())
-            every { sessionEventsManager.getCurrentSession() } returns Single.just(createFakeSession())
-            every { sessionEventsManager.getSessionCount() } returns Single.just(0)
+            sessionRepository = mockk(relaxed = true)
+            every { sessionRepository.createSession("") } returns Single.just(createFakeSession())
+            every { sessionRepository.getCurrentSession() } returns Single.just(createFakeSession())
+            every { sessionRepository.getSessionCount() } returns Single.just(0)
 
             analyticsManager = mockk()
             every { analyticsManager.analyticsId } returns Single.just("analyticsId")

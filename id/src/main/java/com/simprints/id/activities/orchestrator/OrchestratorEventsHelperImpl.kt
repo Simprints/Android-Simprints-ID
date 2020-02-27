@@ -1,11 +1,11 @@
 package com.simprints.id.activities.orchestrator
 
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.callback.*
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.tools.TimeHelper
 
-class OrchestratorEventsHelperImpl(private val sessionEventsManager: SessionEventsManager,
+class OrchestratorEventsHelperImpl(private val sessionRepository: SessionRepository,
                                    private val timeHelper: TimeHelper) : OrchestratorEventsHelper {
 
     override fun addCallbackEventInSessions(appResponse: AppResponse) {
@@ -18,7 +18,7 @@ class OrchestratorEventsHelperImpl(private val sessionEventsManager: SessionEven
             AppResponseType.CONFIRMATION -> null
         }
 
-        callbackEvent?.let { sessionEventsManager.addEventInBackground(it) }
+        callbackEvent?.let { sessionRepository.addEventInBackground(it) }
     }
 
     private fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) =
