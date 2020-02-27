@@ -76,4 +76,5 @@
     <string name="unforeseen_error_message">Tafadhali jaribu tena na iwapo progrmu ya Simprints haitafanya kazi wasiliana na msimamizi wako wa huu mfumo</string>
     <string name="verify_title">Thibitisha</string>
     <string name="why_did_you_skip_fingerprinting">Je, kwanini umeruka kuweka alama za vidole?</string>
+    <string name="missing_finger"><u>Kidole hakipo</u></string>
 </resources>

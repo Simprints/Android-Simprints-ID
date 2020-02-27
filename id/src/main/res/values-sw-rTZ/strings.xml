@@ -27,6 +27,18 @@
     <string name="dashboard_sync_card_progress">Inaoanisha...%1$s</string>
     <string name="dashboard_sync_card_sync_button">Oanisha sasa</string>
     <string name="dashboard_sync_card_try_again_button">Jaribu tena</string>
+    <plurals name="dashboard_card_enrolments">
+        <item quantity="one">Usajili</item>
+        <item quantity="other">Uandikishaji</item>
+    </plurals>
+    <plurals name="dashboard_card_identifications">
+        <item quantity="one">Utambulisho</item>
+        <item quantity="other">Utambulisho</item>
+    </plurals>
+    <plurals name="dashboard_card_verifications">
+        <item quantity="one">Uhakiki</item>
+        <item quantity="other">Uhakikishaji</item>
+    </plurals>
     <string name="different_projectId_message">Kosa la kiufundi limetokea (namba ya utambulisho tofauti na ya mradi), tafadhali funga kutoka kwenye ukurasa wa mwanzo au wasiliana na msimamizi wako wa mfumo huu</string>
     <string name="different_userId_message">Kosa la kiufundi limetokea (namba ya mtumiaji ni tofauti), tafadhali funga kutoka kwenye ukurasa wa mwanzo kwenye simu au wasiliana na msimamizi wako wa mfumo huu</string>
     <string name="error_occurred_title">Kosa limetokea</string>
