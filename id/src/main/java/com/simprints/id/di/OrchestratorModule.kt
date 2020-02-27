@@ -7,7 +7,7 @@ import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
@@ -67,14 +67,14 @@ class OrchestratorModule {
         fingerprintStepProcessor: FingerprintStepProcessor,
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
-        sessionEventsManager: SessionEventsManager,
+        sessionRepository: SessionRepository,
         preferenceManager: PreferencesManager
     ): ModalityFlow =
         ModalityFlowEnrolImpl(
             fingerprintStepProcessor,
             faceStepProcessor,
             coreStepProcessor,
-            sessionEventsManager,
+            sessionRepository,
             preferenceManager.consentRequired
         )
 
@@ -84,14 +84,14 @@ class OrchestratorModule {
         fingerprintStepProcessor: FingerprintStepProcessor,
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
-        sessionEventsManager: SessionEventsManager,
+        sessionRepository: SessionRepository,
         preferenceManager: PreferencesManager
     ): ModalityFlow =
         ModalityFlowVerifyImpl(
             fingerprintStepProcessor,
             faceStepProcessor,
             coreStepProcessor,
-            sessionEventsManager,
+            sessionRepository,
             preferenceManager.consentRequired
         )
 
@@ -102,11 +102,11 @@ class OrchestratorModule {
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
         prefs: PreferencesManager,
-        sessionEventsManager: SessionEventsManager
+        sessionRepository: SessionRepository
     ): ModalityFlow =
         ModalityFlowIdentifyImpl(
             fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, prefs.matchGroup, sessionEventsManager, prefs.consentRequired
+            coreStepProcessor, prefs.matchGroup, sessionRepository, prefs.consentRequired
         )
 
     // Orchestration
@@ -139,24 +139,24 @@ class OrchestratorModule {
 
     @Provides
     fun provideOrchestratorEventsHelper(
-        sessionEventsManager: SessionEventsManager,
+        sessionRepository: SessionRepository,
         timeHelper: TimeHelper
     ): OrchestratorEventsHelper =
-        OrchestratorEventsHelperImpl(sessionEventsManager, timeHelper)
+        OrchestratorEventsHelperImpl(sessionRepository, timeHelper)
 
     @Provides
     fun provideOrchestratorViewModelFactory(
         orchestratorManager: OrchestratorManager,
         orchestratorEventsHelper: OrchestratorEventsHelper,
         preferenceManager: PreferencesManager,
-        sessionEventsManager: SessionEventsManager,
+        sessionRepository: SessionRepository,
         crashReportManager: CrashReportManager
     ): OrchestratorViewModelFactory {
         return OrchestratorViewModelFactory(
             orchestratorManager,
             orchestratorEventsHelper,
             preferenceManager.modalities,
-            sessionEventsManager,
+            sessionRepository,
             DomainToModuleApiAppResponse,
             crashReportManager
         )
@@ -180,9 +180,9 @@ class OrchestratorModule {
     @Provides
     fun provideEnrolmentHelper(
         repository: PersonRepository,
-        sessionEventsManager: SessionEventsManager,
+        sessionRepository: SessionRepository,
         timeHelper: TimeHelper
-    ): EnrolmentHelper = EnrolmentHelperImpl(repository, sessionEventsManager, timeHelper)
+    ): EnrolmentHelper = EnrolmentHelperImpl(repository, sessionRepository, timeHelper)
 
     @Provides
     fun provideFlowManager(

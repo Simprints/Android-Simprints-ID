@@ -3,7 +3,7 @@ package com.simprints.id.activities.alert
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
@@ -20,7 +20,7 @@ class AlertPresenter(val view: AlertContract.View,
                      private val alertType: AlertType) : AlertContract.Presenter {
 
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var sessionManager: SessionEventsManager
+    @Inject lateinit var sessionManager: SessionRepository
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var exitFormHelper: ExitFormHelper

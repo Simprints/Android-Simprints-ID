@@ -8,7 +8,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.simprints.clientapi.di.KoinInjector
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.moduleapi.app.responses.IAppResponse
 import com.simprints.testtools.common.syntax.*
@@ -64,8 +64,8 @@ open class BaseClientApiTest : KoinTest {
         }
     }
 
-    private fun buildDummySessionEventsManagerMock(): SessionEventsManager =
-        mock<SessionEventsManager>().apply {
+    private fun buildDummySessionEventsManagerMock(): SessionRepository =
+        mock<SessionRepository>().apply {
             val sessionMock = mock<SessionEvents>().apply {
                 whenever(this) { id } thenReturn ""
             }

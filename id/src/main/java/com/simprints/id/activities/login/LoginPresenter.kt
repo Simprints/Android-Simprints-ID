@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
 import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent.Result.*
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -34,7 +34,7 @@ class LoginPresenter(val view: LoginContract.View,
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var timeHelper: TimeHelper
 
     private var startTimeLogin: Long = 0
@@ -99,7 +99,7 @@ class LoginPresenter(val view: LoginContract.View,
                                                                   suppliedProjectId: String,
                                                                   suppliedUserId: String) {
 
-        sessionEventsManager.addEventInBackground(
+        sessionRepository.addEventInBackground(
             AuthenticationEvent(
                 startTimeLogin,
                 timeHelper.now(),

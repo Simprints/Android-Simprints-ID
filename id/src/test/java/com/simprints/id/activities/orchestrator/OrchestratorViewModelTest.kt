@@ -7,7 +7,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
@@ -32,7 +32,7 @@ class OrchestratorViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    @MockK private lateinit var sessionEventsManagerMock: SessionEventsManager
+    @MockK private lateinit var sessionRepositoryMock: SessionRepository
     @MockK private lateinit var orchestratorEventsHelperMock: OrchestratorEventsHelper
     @MockK private lateinit var orchestratorManagerMock: OrchestratorManager
     @MockK private lateinit var domainToModuleApiConverter: DomainToModuleApiAppResponse
@@ -57,12 +57,12 @@ class OrchestratorViewModelTest {
 
         configureMocks()
 
-        vm = OrchestratorViewModel(orchestratorManagerMock, orchestratorEventsHelperMock, listOf(FACE), sessionEventsManagerMock, domainToModuleApiConverter, mockk(relaxed = true))
+        vm = OrchestratorViewModel(orchestratorManagerMock, orchestratorEventsHelperMock, listOf(FACE), sessionRepositoryMock, domainToModuleApiConverter, mockk(relaxed = true))
     }
 
     private fun configureMocks() {
         every { domainToModuleApiConverter.fromDomainModuleApiAppResponse(any()) } returns mockk()
-        every { sessionEventsManagerMock.getCurrentSession() } returns Single.just(fakeSession)
+        every { sessionRepositoryMock.getCurrentSession() } returns Single.just(fakeSession)
         every { orchestratorManagerMock.appResponse } returns liveDataAppResponse
         every { orchestratorManagerMock.ongoingStep } returns liveDataNextIntent
     }

@@ -1,7 +1,7 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
 import android.annotation.SuppressLint
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.ArtificialTerminationEvent
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.remote.SessionsRemoteInterface
@@ -16,7 +16,7 @@ import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
 import timber.log.Timber
 
-class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsManager,
+class SessionEventsUploaderTask(private val sessionRepository: SessionRepository,
                                 private val timeHelper: TimeHelper,
                                 private val sessionApiClient: SessionsRemoteInterface) {
 
@@ -47,7 +47,7 @@ class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsM
             sessions.forEach {
                 forceSessionToCloseIfOpenAndNotInProgress(it, timeHelper)
                 it.relativeUploadTime = it.timeRelativeToStartTime(timeHelper.now())
-                sessionEventsManager.insertOrUpdateSessionEvents(it).blockingAwait()
+                sessionRepository.insertOrUpdateSessionEvents(it).blockingAwait()
             }
             Single.just(sessions)
         }
@@ -114,7 +114,7 @@ class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsM
             Timber.d("SessionEventsUploaderTask deleteSessionsFromDb()")
             Completable.fromCallable {
                 sessions.forEach { session ->
-                    sessionEventsManager.deleteSessions(sessionId = session.id, openSession = false).blockingGet()
+                    sessionRepository.deleteSessions(sessionId = session.id, openSession = false).blockingGet()
                 }
             }
         }

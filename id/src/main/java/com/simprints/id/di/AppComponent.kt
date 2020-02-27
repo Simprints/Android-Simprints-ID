@@ -35,7 +35,7 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -121,7 +121,7 @@ interface AppComponent {
     fun inject(peopleEndSyncReporterWorker: PeopleEndSyncReporterWorker)
     fun inject(peopleStartSyncWorker: PeopleStartSyncReporterWorker)
 
-    fun getSessionEventsManager(): SessionEventsManager
+    fun getSessionEventsManager(): SessionRepository
     fun getCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
     fun getPersonRepository(): PersonRepository

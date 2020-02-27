@@ -5,7 +5,7 @@ import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.AuthorizationEvent
 import com.simprints.id.data.db.session.domain.models.events.ConnectivitySnapshotEvent
 import com.simprints.id.data.db.session.domain.models.events.Event
@@ -46,7 +46,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var setupFailed: Boolean = false
 
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var personLocalDataSource: PersonLocalDataSource
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     internal lateinit var appRequest: AppRequest
@@ -76,7 +76,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     internal fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
-        sessionEventsManager.updateSessionInBackground {
+        sessionRepository.updateSessionInBackground {
             it.events.apply {
                 add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
                 add(buildRequestEvent(timeHelper.now(), appRequest))
@@ -144,7 +144,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
 
     override fun handleNotSignedInUser() {
-        sessionEventsManager.updateSessionInBackground {
+        sessionRepository.updateSessionInBackground {
             addAuthorizationEvent(it, AuthorizationEvent.Result.NOT_AUTHORIZED)
         }
 
@@ -182,7 +182,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
         fetchPeopleCountInLocalDatabase().flatMapCompletable { recordCount ->
-            sessionEventsManager.updateSession {
+            sessionRepository.updateSession {
                 it.events.apply {
                     addAuthorizationEvent(it, AuthorizationEvent.Result.AUTHORIZED)
                 }
@@ -216,7 +216,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     internal fun addAnalyticsInfoAndProjectId() =
         fetchAnalyticsId()
             .flatMapCompletable { gaId ->
-                sessionEventsManager.updateSession {
+                sessionRepository.updateSession {
                     val signedInProject = loginInfoManager.getSignedInProjectIdOrEmpty()
                     if (signedInProject.isNotEmpty()) {
                         it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
@@ -244,7 +244,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     @SuppressLint("CheckResult")
     private fun setSessionIdCrashlyticsKey() {
-        sessionEventsManager.getCurrentSession()
+        sessionRepository.getCurrentSession()
             .subscribeBy(onSuccess = {
                 crashReportManager.setSessionIdCrashlyticsKey(it.id)
             }, onError = {
