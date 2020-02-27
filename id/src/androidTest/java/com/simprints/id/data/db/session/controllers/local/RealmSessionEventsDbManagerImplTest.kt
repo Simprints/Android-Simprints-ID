@@ -3,8 +3,8 @@ package com.simprints.id.data.db.session.controllers.local
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.simprints.id.data.db.session.local.RealmSessionEventsDbManagerImpl
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.testtools.AndroidTestConfig
@@ -21,9 +21,9 @@ import kotlin.random.Random
 @RunWith(AndroidJUnit4::class)
 class RealmSessionEventsDbManagerImplTest { // TODO : Tests are failing because creating a project remotely is throwing a 404
 
-    private lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
+    private lateinit var realmSessionManager: SessionLocalDataSource
     private val realmForDataEvent
-        get() = (realmSessionEventsManager as RealmSessionEventsDbManagerImpl).getRealmInstance().blockingGet()
+        get() = (realmSessionManager as SessionLocalDataSourceImpl).getRealmInstance().blockingGet()
 
     private var localDbKey: LocalDbKey = LocalDbKey("database_name", Random.nextBytes(64))
 
@@ -39,7 +39,7 @@ class RealmSessionEventsDbManagerImplTest { // TODO : Tests are failing because 
 
         val secureLocalDbKeyProvider: SecureLocalDbKeyProvider = mock()
         whenever(secureLocalDbKeyProvider) { getLocalDbKeyOrThrow(anyNotNull()) } thenReturn localDbKey
-        realmSessionEventsManager = RealmSessionEventsDbManagerImpl(ApplicationProvider.getApplicationContext(), secureLocalDbKeyProvider)
+        realmSessionManager = SessionLocalDataSourceImpl(ApplicationProvider.getApplicationContext(), secureLocalDbKeyProvider)
     }
 
     @Test
@@ -54,13 +54,13 @@ class RealmSessionEventsDbManagerImplTest { // TODO : Tests are failing because 
 
         verifyNumberOfSessionsInDb(5, realmForDataEvent)
 
-        realmSessionEventsManager.deleteSessions(projectId = testProjectId3).blockingAwait()
+        realmSessionManager.deleteSessions(projectId = testProjectId3).blockingAwait()
         verifySessionsStoredInDb(sessionOpenProject1Id, sessionCloseProject1Id, sessionCloseProject2Id)
 
-        realmSessionEventsManager.deleteSessions(openSession = true).blockingAwait()
+        realmSessionManager.deleteSessions(openSession = true).blockingAwait()
         verifySessionsStoredInDb(sessionCloseProject1Id, sessionCloseProject2Id)
 
-        realmSessionEventsManager.deleteSessions(openSession = false).blockingAwait()
+        realmSessionManager.deleteSessions(openSession = false).blockingAwait()
 
         verifyNumberOfSessionsInDb(0, realmForDataEvent)
         verifyNumberOfEventsInDb(0, realmForDataEvent)
@@ -70,15 +70,15 @@ class RealmSessionEventsDbManagerImplTest { // TODO : Tests are failing because 
     }
 
     private fun verifySessionsStoredInDb(vararg sessionsIds: String) {
-        with(realmSessionEventsManager.loadSessions().blockingGet()) {
+        with(realmSessionManager.loadSessions().blockingGet()) {
             val ids = this.map { it.id }
             Truth.assertThat(ids).containsExactlyElementsIn(sessionsIds)
         }
     }
 
     private fun createAndSaveCloseSession(projectId: String = testProjectId1): String =
-        createAndSaveCloseFakeSession(timeHelper, realmSessionEventsManager, projectId)
+        createAndSaveCloseFakeSession(timeHelper, realmSessionManager, projectId)
 
     private fun createAndSaveOpenSession(projectId: String = testProjectId1): String =
-        createAndSaveOpenFakeSession(timeHelper, realmSessionEventsManager, projectId)
+        createAndSaveOpenFakeSession(timeHelper, realmSessionManager, projectId)
 }

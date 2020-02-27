@@ -10,7 +10,7 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
 import io.mockk.coEvery
@@ -65,9 +65,9 @@ object RobolectricTestMocker {
         return this
     }
 
-    fun setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager): RobolectricTestMocker {
-        every { sessionEventsLocalDbManagerMock.loadSessions(any(), any()) } returns Single.error(IllegalStateException())
-        every { sessionEventsLocalDbManagerMock.insertOrUpdateSessionEvents(any()) } returns Completable.complete()
+    fun setupSessionEventsManagerToAvoidRealmCall(sessionLocalDataSourceMock: SessionLocalDataSource): RobolectricTestMocker {
+        every { sessionLocalDataSourceMock.loadSessions(any(), any()) } returns Single.error(IllegalStateException())
+        every { sessionLocalDataSourceMock.insertOrUpdateSessionEvents(any()) } returns Completable.complete()
         return this
     }
 }

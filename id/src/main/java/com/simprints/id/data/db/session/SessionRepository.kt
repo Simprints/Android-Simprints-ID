@@ -4,11 +4,11 @@ import com.simprints.id.Application
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import io.reactivex.Completable
 import io.reactivex.Single
 
-interface SessionRepository : SessionEventsLocalDbManager {
+interface SessionRepository : SessionLocalDataSource {
 
     fun signOut()
 

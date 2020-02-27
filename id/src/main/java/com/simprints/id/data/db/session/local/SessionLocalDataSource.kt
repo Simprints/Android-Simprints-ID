@@ -5,7 +5,7 @@ import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import io.reactivex.Completable
 import io.reactivex.Single
 
-interface SessionEventsLocalDbManager {
+interface SessionLocalDataSource {
 
     fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents): Completable
     fun loadSessions(projectId: String? = null, openSession: Boolean? = null): Single<ArrayList<SessionEvents>>

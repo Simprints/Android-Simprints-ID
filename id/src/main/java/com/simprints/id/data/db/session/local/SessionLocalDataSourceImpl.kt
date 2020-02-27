@@ -17,8 +17,8 @@ import io.realm.RealmQuery
 import io.realm.Sort
 import timber.log.Timber
 
-open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
-                                           private val secureDataManager: SecureLocalDbKeyProvider) : SessionEventsLocalDbManager {
+open class SessionLocalDataSourceImpl(private val appContext: Context,
+                                      private val secureDataManager: SecureLocalDbKeyProvider) : SessionLocalDataSource {
 
     companion object {
         const val PROJECT_ID = "projectId"
