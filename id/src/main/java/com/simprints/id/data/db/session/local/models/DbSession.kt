@@ -54,6 +54,8 @@ open class DbSession : RealmObject {
         clear()
         addAll(events.map { DbEvent(it) })
     }
+
+    fun timeRelativeToStartTime(time: Long): Long = time - startTime
 }
 
 fun DbSession.toDomain(): SessionEvents {

@@ -26,6 +26,9 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.toList
 import timber.log.Timber
 
@@ -47,90 +50,50 @@ open class SessionRepositoryImpl(private val deviceId: String,
 
     // as default, the manager tries to load the last open activeSession
     //
-    override fun getCurrentSession(): Single<SessionEvents> =
-        singleWithSuspend { sessionLocalDataSource.load(Query(openSession = true)).toList() }.map {
-            if (it.isEmpty())
-                throw NoSessionsFoundException()
-            it[0]
-        }
+    override suspend fun getCurrentSession(): SessionEvents =
+        sessionLocalDataSource.load(Query(openSession = true)).first()
 
-    override fun createSession(libSimprintsVersionName: String): Single<SessionEvents> =
-        singleWithSuspend { sessionLocalDataSource.count(Query()) }.flatMap {
-            createSessionWithAvailableInfo(
-                PROJECT_ID_FOR_NOT_SIGNED_IN,
-                libSimprintsVersionName,
-                appVersionName,
-                DatabaseInfo(it)).let {
-                Timber.d("Created session: ${it.id}")
-                sessionEventsSyncManager.scheduleSessionsSync()
+    override suspend fun createSession(libSimprintsVersionName: String): SessionEvents {
+        val count = sessionLocalDataSource.count(Query())
 
-                closeLastSessionsIfPending()
-                    .andThen(completableWithSuspend { sessionLocalDataSource.insertOrUpdateSessionEvents(it) })
-                    .toSingle { it }
-            }
-        }
-
-
-    private fun createSessionWithAvailableInfo(projectId: String,
-                                               libVersionName: String,
-                                               appVersionName: String,
-                                               databaseInfo: DatabaseInfo): SessionEvents =
-        SessionEvents(
-            projectId,
+        val session = SessionEvents(
+            PROJECT_ID_FOR_NOT_SIGNED_IN,
             appVersionName,
-            libVersionName,
+            libSimprintsVersionName,
             preferencesManager.language,
             Device(
                 Build.VERSION.SDK_INT.toString(),
                 Build.MANUFACTURER + "_" + Build.MODEL,
                 deviceId),
             timeHelper.now(),
-            databaseInfo)
+            DatabaseInfo(count))
 
-    override fun updateSession(block: (sessionEvents: SessionEvents) -> Unit): Completable =
-        getCurrentSession().flatMapCompletable {
-            if (it.isOpen()) {
-                block(it)
-                completableWithSuspend { sessionLocalDataSource.insertOrUpdateSessionEvents(it) }
-            } else {
-                throw AttemptedToModifyASessionAlreadyClosedException()
-            }
-        }.doOnError {
-            Timber.e(it)
-            crashReportManager.logExceptionOrSafeException(it)
-        }.onErrorComplete() // because events are low priority, it swallows the exception
-
-    @SuppressLint("CheckResult")
-    override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit) {
-        updateSession(block).subscribeBy()
+        closeLastSessionsIfPending()
+        sessionLocalDataSource.create(session)
+        return session
     }
 
-    private fun closeLastSessionsIfPending(): Completable =
-        singleWithSuspend { sessionLocalDataSource.load(Query(openSession = true)).toList() }.flatMapCompletable { openSessions ->
 
-            openSessions.forEach {
-                it.addArtificialTerminationIfRequired(timeHelper, ArtificialTerminationEvent.Reason.NEW_SESSION)
-                it.closeIfRequired(timeHelper)
-                completableWithSuspend { sessionLocalDataSource.insertOrUpdateSessionEvents(it) }.blockingAwait()
-            }
-            Completable.complete()
-        }.doOnError {
-            crashReportManager.logExceptionOrSafeException(it)
-        }.onErrorComplete()
-
-    override fun addGuidSelectionEvent(selectedGuid: String, sessionId: String): Completable =
-        singleWithSuspend { sessionLocalDataSource.load(Query(id = sessionId)).toList().first() }.flatMapCompletable { session ->
-
-            if (session.isOpen() &&
-                !session.hasEvent(GUID_SELECTION) &&
-                session.hasEvent(CALLBACK_IDENTIFICATION)) {
-
-                session.addEvent(GuidSelectionEvent(timeHelper.now(), selectedGuid))
-                completableWithSuspend { sessionLocalDataSource.insertOrUpdateSessionEvents(session) }
-            } else {
-                Completable.error(InvalidSessionForGuidSelectionEvent("open: ${session.isOpen()}"))
-            }
+    private suspend fun closeLastSessionsIfPending() {
+        val openSessions = sessionLocalDataSource.load(Query(openSession = true))
+        openSessions.collect {
+            val artificialTerminationEvent = ArtificialTerminationEvent(timeHelper.now(), ArtificialTerminationEvent.Reason.NEW_SESSION)
+            sessionLocalDataSource.addEvent(it.id, listOf(artificialTerminationEvent))
+            sessionLocalDataSource.closeSession(it.id)
         }
+    }
+
+    override suspend fun addGuidSelectionEvent(selectedGuid: String, sessionId: String) {
+        val currentSession = getCurrentSession()
+
+        if (currentSession.isOpen() &&
+            !currentSession.hasEvent(GUID_SELECTION) &&
+            currentSession.hasEvent(CALLBACK_IDENTIFICATION)) {
+
+            val guidEvent = GuidSelectionEvent(timeHelper.now(), selectedGuid)
+            sessionLocalDataSource.addEvent(currentSession.id, listOf(guidEvent))
+        }
+    }
 
     override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
         updateSessionInBackground { session ->
