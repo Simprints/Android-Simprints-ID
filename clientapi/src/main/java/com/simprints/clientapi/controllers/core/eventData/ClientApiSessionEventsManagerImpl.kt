@@ -4,69 +4,62 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.core.tools.extentions.resumeSafely
-import com.simprints.core.tools.extentions.resumeWithExceptionSafely
+import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.*
-import com.simprints.libsimprints.BuildConfig.VERSION_NAME
+import com.simprints.libsimprints.BuildConfig
 import io.reactivex.Completable
-import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
 
 class ClientApiSessionEventsManagerImpl(private val coreSessionRepository: SessionRepository,
                                         private val timeHelper: ClientApiTimeHelper) :
     ClientApiSessionEventsManager {
 
-    override suspend fun createSession(integration: IntegrationInfo): String =
-        suspendCancellableCoroutine { cont ->
-            CoroutineScope(Dispatchers.IO).launch {
-                coreSessionRepository.createSession(VERSION_NAME).flatMap {
-                    addIntentParsingEvent(integration).toSingleDefault(it.id)
-                }.subscribeBy(
-                    onSuccess = { cont.resumeSafely(it) },
-                    onError = { cont.resumeWithExceptionSafely(it) }
-                )
-            }
+    override suspend fun createSession(integration: IntegrationInfo): String {
+        runBlocking {
+            coreSessionRepository.createSession(BuildConfig.VERSION_NAME)
         }
 
-    private fun addIntentParsingEvent(integration: IntegrationInfo): Completable = addEvent(
-        IntentParsingEvent(timeHelper.now(), integration.fromDomainToCore())
-    )
+        coreSessionRepository.updateCurrentSession { currentSession ->
+            currentSession.events.add(IntentParsingEvent(timeHelper.now(), integration.fromDomainToCore()))
+        }
+        return coreSessionRepository.getCurrentSession().id
+    }
 
-    override fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert): Completable = addEvent(
-        AlertScreenEvent(timeHelper.now(), clientApiAlertType.fromAlertToAlertTypeEvent())
-    )
-
-    override suspend fun addCompletionCheckEvent(complete: Boolean) = suspendCancellableCoroutine<Unit> { cont ->
-        try {
-            addEvent(CompletionCheckEvent(timeHelper.now(), complete)).blockingAwait()
-            cont.resumeSafely(Unit)
-        } catch (t: Throwable) {
-            cont.resumeWithExceptionSafely(t)
+    override fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert): Completable = completableWithSuspend {
+        coreSessionRepository.updateCurrentSession { currentSession ->
+            currentSession.events.add(AlertScreenEvent(timeHelper.now(), clientApiAlertType.fromAlertToAlertTypeEvent()))
         }
     }
 
+    override suspend fun addCompletionCheckEvent(complete: Boolean) =
+        coreSessionRepository.updateCurrentSession { currentSession ->
+            currentSession.events.add(CompletionCheckEvent(timeHelper.now(), complete))
+        }
+
     override fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>): Completable =
-        addEvent(SuspiciousIntentEvent(timeHelper.now(), unexpectedExtras))
+        completableWithSuspend {
+            coreSessionRepository.updateCurrentSession { currentSession ->
+                currentSession.events.add(SuspiciousIntentEvent(timeHelper.now(), unexpectedExtras))
+            }
+        }
 
     override fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>): Completable =
-        addEvent(InvalidIntentEvent(timeHelper.now(), action, extras))
-
-    private fun addEvent(event: Event): Completable =
-        coreSessionRepository.addEvent(event)
-
-    override suspend fun getCurrentSessionId(): String? =
-        suspendCancellableCoroutine { cont ->
-            CoroutineScope(Dispatchers.IO).launch {
-                coreSessionRepository.getCurrentSession().subscribeBy(
-                    onSuccess = { cont.resumeSafely(it.id) },
-                    onError = { cont.resumeSafely(null) }
-                )
+        completableWithSuspend {
+            coreSessionRepository.updateCurrentSession { currentSession ->
+                currentSession.events.add(InvalidIntentEvent(timeHelper.now(), action, extras))
             }
+        }
+
+    //StopShip Remove nullability - throw exceptions
+    override suspend fun getCurrentSessionId(): String? =
+        try {
+            coreSessionRepository.getCurrentSession().id
+        } catch (t: Throwable) {
+            Timber.e(t)
+            null
         }
 }
 

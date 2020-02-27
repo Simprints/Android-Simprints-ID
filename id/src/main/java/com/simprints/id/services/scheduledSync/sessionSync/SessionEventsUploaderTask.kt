@@ -3,7 +3,6 @@ package com.simprints.id.services.scheduledSync.sessionSync
 import android.annotation.SuppressLint
 import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.ArtificialTerminationEvent
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.remote.SessionsRemoteInterface
@@ -54,13 +53,14 @@ class SessionEventsUploaderTask(private val sessionRepository: SessionRepository
             Single.just(sessions)
         }
 
+    @Deprecated("TO BE REMOVED")
     private fun forceSessionToCloseIfOpenAndNotInProgress(session: SessionEvents, timeHelper: TimeHelper) {
-        Timber.d("SessionEventsUploaderTask forceSessionToCloseIfOpenAndNotInProgress()")
-
-        if (session.isOpen() && !session.isPossiblyInProgress(timeHelper)) {
-            session.addArtificialTerminationIfRequired(timeHelper, ArtificialTerminationEvent.Reason.TIMED_OUT)
-            session.closeIfRequired(timeHelper)
-        }
+//        Timber.d("SessionEventsUploaderTask forceSessionToCloseIfOpenAndNotInProgress()")
+//
+//        if (session.isOpen() && !session.isPossiblyInProgress(timeHelper)) {
+//            session.addArtificialTerminationIfRequired(timeHelper, ArtificialTerminationEvent.Reason.TIMED_OUT)
+//            session.closeIfRequired(timeHelper)
+//        }
     }
 
     @SuppressLint("CheckResult")

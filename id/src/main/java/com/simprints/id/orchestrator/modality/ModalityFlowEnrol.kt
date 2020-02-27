@@ -39,7 +39,7 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
 
     override fun getNextStepToLaunch(): Step? = steps.firstOrNull { it.getStatus() == NOT_STARTED }
 
-    override fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step? {
+    override suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step? {
         val result = when {
             isCoreResult(requestCode) -> coreStepProcessor.processResult(data)
             isFingerprintResult(requestCode) -> {
@@ -56,7 +56,7 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
         return stepForRequest?.apply { setResult(result) }
     }
 
-    private fun addEventIfFingerprintCaptureResponse(it: Step.Result?) {
+    private suspend fun addEventIfFingerprintCaptureResponse(it: Step.Result?) {
         if (it is FingerprintCaptureResponse) {
             extractFingerprintAndAddPersonCreationEvent(it)
         }

@@ -32,8 +32,8 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.SessionRepositoryImpl
-import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
+import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl
 import com.simprints.id.data.db.session.remote.RemoteSessionsManager
 import com.simprints.id.data.db.session.remote.RemoteSessionsManagerImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -205,9 +205,10 @@ open class AppModule {
     @Singleton
     open fun provideSessionEventsLocalDbManager(
         ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider
+        secureDataManager: SecureLocalDbKeyProvider,
+        timeHelper: TimeHelper
     ): SessionLocalDataSource =
-        SessionLocalDataSourceImpl(ctx, secureDataManager)
+        SessionLocalDataSourceImpl(ctx, secureDataManager, timeHelper)
 
     @Provides
     @Singleton
