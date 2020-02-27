@@ -17,12 +17,6 @@ import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManagerImpl
-import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
-import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
-import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManagerImpl
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.consent.LongConsentManagerImpl
 import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSource
@@ -36,6 +30,12 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.domain.SessionEventsManagerImpl
+import com.simprints.id.data.db.session.local.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.remote.RemoteSessionsManager
+import com.simprints.id.data.db.session.remote.RemoteSessionsManagerImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager

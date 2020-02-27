@@ -1,8 +1,8 @@
 package com.simprints.id.activities.coreexitform
 
 import androidx.lifecycle.ViewModel
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent
+import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.domain.models.events.RefusalEvent
 import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.id.data.exitform.toRefusalEventAnswer
 

@@ -6,9 +6,9 @@ import com.simprints.fingerprint.activities.collect.models.FingerStatus.*
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
-import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent as FingerprintCaptureEventCore
-import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent.Fingerprint as FingerprintCore
-import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent.Result as ResultCore
+import com.simprints.id.data.db.session.domain.models.events.FingerprintCaptureEvent as FingerprintCaptureEventCore
+import com.simprints.id.data.db.session.domain.models.events.FingerprintCaptureEvent.Fingerprint as FingerprintCore
+import com.simprints.id.data.db.session.domain.models.events.FingerprintCaptureEvent.Result as ResultCore
 import com.simprints.id.data.db.person.domain.FingerIdentifier as FingerIdentifierCore
 
 @Keep

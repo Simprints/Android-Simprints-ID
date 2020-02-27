@@ -4,7 +4,7 @@ import com.simprints.id.Application
 import com.simprints.id.activities.dashboard.DashboardActivityAndroidTest
 import com.simprints.id.activities.login.LoginActivityAndroidTest
 import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
-import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImplTest
+import com.simprints.id.data.db.session.controllers.local.RealmSessionEventsDbManagerImplTest
 import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImplTest
 import com.simprints.id.di.*
 import com.simprints.id.services.people.PeopleSyncIntegrationTest

@@ -2,9 +2,9 @@ package com.simprints.fingerprint.controllers.core.eventData
 
 import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.domain.SessionEventsManager
 import io.reactivex.Completable
-import com.simprints.id.data.analytics.eventdata.models.domain.events.Event as CoreEvent
+import com.simprints.id.data.db.session.domain.models.events.Event as CoreEvent
 
 class FingerprintSessionEventsManagerImpl(private val sessionEventsManager: SessionEventsManager) : FingerprintSessionEventsManager {
 

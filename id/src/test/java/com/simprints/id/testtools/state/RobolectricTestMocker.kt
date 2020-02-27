@@ -6,11 +6,11 @@ import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REAL
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
+import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
 import io.mockk.coEvery

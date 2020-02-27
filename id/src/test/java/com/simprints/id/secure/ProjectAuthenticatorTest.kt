@@ -11,10 +11,10 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.commontesttools.state.setupFakeKeyStore
-import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
+import com.simprints.id.data.db.session.remote.RemoteSessionsManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
