@@ -61,18 +61,13 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: Se
         coreSessionEventsManager.addEvent(event)
 
     override suspend fun getCurrentSessionId(): String? =
-        try {
-            suspendCancellableCoroutine { cont ->
-                CoroutineScope(Dispatchers.IO).launch {
-                    coreSessionEventsManager.getCurrentSession().subscribeBy(
-                        onSuccess = { cont.resumeSafely(it.id) },
-                        onError = { cont.resumeWithExceptionSafely(it) }
-                    )
-                }
+        suspendCancellableCoroutine { cont ->
+            CoroutineScope(Dispatchers.IO).launch {
+                coreSessionEventsManager.getCurrentSession().subscribeBy(
+                    onSuccess = { cont.resumeSafely(it.id) },
+                    onError = { cont.resumeSafely(null) }
+                )
             }
-        } catch (t: Throwable) {
-            Timber.d(t)
-            null
         }
 }
 

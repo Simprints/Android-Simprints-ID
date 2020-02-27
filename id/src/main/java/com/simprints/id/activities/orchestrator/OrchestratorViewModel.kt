@@ -5,10 +5,12 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.OrchestratorManager
+import io.reactivex.Single
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -17,7 +19,8 @@ class OrchestratorViewModel(
     private val orchestratorEventsHelper: OrchestratorEventsHelper,
     private val modalities: List<Modality>,
     private val sessionEventsManager: SessionEventsManager,
-    private val domainToModuleApiConverter: DomainToModuleApiAppResponse
+    private val domainToModuleApiConverter: DomainToModuleApiAppResponse,
+    private val crashReportManager: CrashReportManager
 ) : ViewModel() {
 
     val ongoingStep = orchestratorManager.ongoingStep
@@ -39,7 +42,13 @@ class OrchestratorViewModel(
     }
 
     private fun getCurrentSessionId(): String =
-        sessionEventsManager.getCurrentSession().map { it.id }.blockingGet()
+        sessionEventsManager
+            .getCurrentSession()
+            .map { it.id }
+            .onErrorResumeNext {
+                crashReportManager.logException(it)
+                Single.just("")
+            }.blockingGet()
 
     fun onModalStepRequestDone(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?) {
         viewModelScope.launch {

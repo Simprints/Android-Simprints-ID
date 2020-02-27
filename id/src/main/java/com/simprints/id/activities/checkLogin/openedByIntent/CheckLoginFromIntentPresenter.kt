@@ -190,13 +190,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 it.databaseInfo.recordCount = recordCount
             }
         }
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribeBy(onComplete = {
-           Timber.d("Session updated")
-        }, onError = {
-            it.printStackTrace()
-        })
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onComplete = {
+                Timber.d("Session updated")
+            }, onError = {
+                it.printStackTrace()
+            })
 
         view.openOrchestratorActivity(appRequest)
 
@@ -228,7 +228,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private fun fetchAnalyticsId() =
         analyticsManager.analyticsId.onErrorReturn { "" }
 
-    private fun fetchPeopleCountInLocalDatabase(): Single<Int> = singleWithSuspend {personLocalDataSource.count() }
+    private fun fetchPeopleCountInLocalDatabase(): Single<Int> = singleWithSuspend { personLocalDataSource.count() }
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
         session.addEvent(AuthorizationEvent(
@@ -244,8 +244,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     @SuppressLint("CheckResult")
     private fun setSessionIdCrashlyticsKey() {
-        sessionEventsManager.getCurrentSession().subscribeBy {
-            crashReportManager.setSessionIdCrashlyticsKey(it.id)
-        }
+        sessionEventsManager.getCurrentSession()
+            .subscribeBy(onSuccess = {
+                crashReportManager.setSessionIdCrashlyticsKey(it.id)
+            }, onError = {
+                it.printStackTrace()
+            })
     }
 }
