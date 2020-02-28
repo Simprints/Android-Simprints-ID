@@ -1,6 +1,5 @@
 package com.simprints.id.activities.qrcapture
 
-import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.android.gms.tasks.OnSuccessListener
@@ -22,9 +21,7 @@ class QrCodeAnalyser(
                 .setBarcodeFormats(FirebaseVisionBarcode.FORMAT_QR_CODE)
                 .build()
             val detector = FirebaseVision.getInstance().getVisionBarcodeDetector(options)
-            detector.detectInImage(image).addOnSuccessListener(listener).addOnFailureListener {
-                Log.e("TEST_ALAN", it.message, it)
-            }
+            detector.detectInImage(image).addOnSuccessListener(listener)
         }
     }
 
