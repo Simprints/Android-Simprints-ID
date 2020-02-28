@@ -19,7 +19,6 @@ import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMana
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
-import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -120,7 +119,7 @@ class SessionRepositoryImplTest {
     @Test
     fun updateSession_shouldUpdateSession() {
         sessionsRepositorySpy.createSession("").blockingGet()
-        sessionsRepositorySpy.updateSession {
+        sessionsRepositorySpy.update {
             it.projectId = "new_project"
         }.blockingAwait()
 
@@ -130,7 +129,7 @@ class SessionRepositoryImplTest {
 
     @Test
     fun updateSession_shouldSwallowException() {
-        val tester = sessionsRepositorySpy.updateSession { it.projectId = "new_project" }.test()
+        val tester = sessionsRepositorySpy.update { it.projectId = "new_project" }.test()
         tester.awaitAndAssertSuccess()
         verify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
     }

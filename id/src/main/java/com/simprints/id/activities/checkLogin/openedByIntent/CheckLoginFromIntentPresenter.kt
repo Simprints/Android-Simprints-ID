@@ -138,7 +138,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
 
     override fun handleNotSignedInUser() {
-        sessionRepository.addEventInBackground(buildAuthorizationEvent(AuthorizationEvent.Result.NOT_AUTHORIZED))
+        sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(AuthorizationEvent.Result.NOT_AUTHORIZED))
 
         if (!loginAlreadyTried.get()) {
             loginAlreadyTried.set(true)

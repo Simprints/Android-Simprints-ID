@@ -48,7 +48,7 @@ package com.simprints.id.services
 //    fun testWithStartedService() {
 //        var session = sessionRepository.createSession("").blockingGet()
 //
-//        sessionRepository.updateSession {
+//        sessionRepository.update {
 //            it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
 //        }.blockingGet()
 //

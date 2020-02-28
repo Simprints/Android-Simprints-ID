@@ -78,7 +78,7 @@ class AlertActivityTest {
         launchAlertActivity()
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
-        verify(atLeast = 1) { sessionEventManagerMock.addEventInBackground(any<AlertScreenEvent>()) }
+        verify(atLeast = 1) { sessionEventManagerMock.addEventToCurrentSessionInBackground(any<AlertScreenEvent>()) }
     }
 
     @Test
