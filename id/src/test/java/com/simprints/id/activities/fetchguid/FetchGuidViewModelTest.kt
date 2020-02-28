@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -34,7 +34,7 @@ class FetchGuidViewModelTest {
 
     @MockK private lateinit var personRepository: PersonRepository
     @MockK private lateinit var deviceManager: DeviceManager
-    @MockK private lateinit var sessionEventsManager: SessionEventsManager
+    @MockK private lateinit var sessionRepository: SessionRepository
     @MockK private lateinit var timeHelper: TimeHelper
 
     companion object {
@@ -53,7 +53,7 @@ class FetchGuidViewModelTest {
     }
 
     private fun configureMocks() {
-        every { sessionEventsManager.addEventInBackground(any()) } just Runs
+        every { sessionRepository.addEventInBackground(any()) } just Runs
         every { timeHelper.now() } returns Date().time
     }
 
@@ -61,7 +61,7 @@ class FetchGuidViewModelTest {
     fun fetchGuidSucceedsFromLocal_shouldReturnCorrectPersonSource() {
         coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } returns PersonFetchResult(PeopleGeneratorUtils.getRandomPerson(), PersonFetchResult.PersonSource.LOCAL)
 
-        val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionEventsManager, timeHelper)
+        val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionRepository, timeHelper)
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
         val testObserver = viewModel.personFetch.testObserver()
@@ -73,7 +73,7 @@ class FetchGuidViewModelTest {
     fun fetchGuidSucceedsFromRemote_shouldReturnCorrectPersonSource() {
         coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } returns PersonFetchResult(PeopleGeneratorUtils.getRandomPerson(), PersonFetchResult.PersonSource.REMOTE)
 
-        val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionEventsManager, timeHelper)
+        val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionRepository, timeHelper)
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
         val testObserver = viewModel.personFetch.testObserver()
@@ -86,7 +86,7 @@ class FetchGuidViewModelTest {
         coEvery { deviceManager.isConnected() } returns false
         coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } throws HttpException(Response.error<String>(404, "".toResponseBody(null)))
 
-        val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionEventsManager, timeHelper)
+        val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionRepository, timeHelper)
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
         val testObserver = viewModel.personFetch.testObserver()
@@ -99,7 +99,7 @@ class FetchGuidViewModelTest {
         coEvery { deviceManager.isConnected() } returns true
         coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } throws DownloadingAPersonWhoDoesntExistOnServerException("")
 
-        val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionEventsManager, timeHelper)
+        val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionRepository, timeHelper)
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
         val testObserver = viewModel.personFetch.testObserver()

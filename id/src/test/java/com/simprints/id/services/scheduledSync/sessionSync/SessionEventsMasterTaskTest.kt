@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.state.mockSessionEventsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.remote.SessionsRemoteInterface
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
@@ -36,7 +36,7 @@ class SessionEventsMasterTaskTest {
     private val projectId = "projectId"
 
     private val sessionsRemoteInterfaceMock: SessionsRemoteInterface = mockk()
-    private val sessionsEventsManagerMock: SessionEventsManager = mockk()
+    private val sessionsRepositoryMock: SessionRepository = mockk()
     private val crashReportManagerMock: CrashReportManager = mockk()
     private val timeHelper: TimeHelper = TimeHelperImpl()
     private var sessionsInFakeDb = mutableListOf<SessionEvents>()
@@ -46,7 +46,7 @@ class SessionEventsMasterTaskTest {
         UnitTestConfig(this).rescheduleRxMainThread()
 
         sessionsInFakeDb.clear()
-        mockSessionEventsManager(sessionsEventsManagerMock, sessionsInFakeDb)
+        mockSessionEventsManager(sessionsRepositoryMock, sessionsInFakeDb)
     }
 
 
@@ -137,7 +137,7 @@ class SessionEventsMasterTaskTest {
     private fun createMasterTask(): SessionEventsSyncMasterTask =
         SessionEventsSyncMasterTask(
             projectId,
-            sessionsEventsManagerMock,
+            sessionsRepositoryMock,
             timeHelper,
             sessionsRemoteInterfaceMock,
             crashReportManagerMock

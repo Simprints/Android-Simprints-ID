@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.orchestrator.enrolAppRequest
@@ -35,7 +35,7 @@ class ModalityFlowEnrolImplTest {
     @MockK lateinit var fingerprintStepMock: Step
     @MockK lateinit var faceStepMock: Step
     @MockK lateinit var coreStepMock: Step
-    @MockK lateinit var sessionEventsManager: SessionEventsManager
+    @MockK lateinit var sessionRepository: SessionRepository
 
     @Before
     fun setUp() {
@@ -137,6 +137,6 @@ class ModalityFlowEnrolImplTest {
 
     private fun buildModalityFlowEnrol(consentRequired: Boolean) {
         modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, sessionEventsManager, consentRequired)
+            coreStepProcessor, sessionRepository, consentRequired)
     }
 }

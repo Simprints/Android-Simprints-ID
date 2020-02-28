@@ -24,7 +24,7 @@ import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.AlertActivityViewModel
@@ -51,7 +51,7 @@ class AlertActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    @Inject lateinit var sessionEventManagerMock: SessionEventsManager
+    @Inject lateinit var sessionEventManagerMock: SessionRepository
     @Inject lateinit var preferencesManagerSpy: PreferencesManager
 
     private val preferencesModule by lazy {

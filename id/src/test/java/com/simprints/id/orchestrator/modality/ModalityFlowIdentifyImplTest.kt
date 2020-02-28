@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
@@ -29,7 +29,7 @@ class ModalityFlowIdentifyImplTest {
     @MockK lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @MockK lateinit var faceStepProcessor: FaceStepProcessor
     @MockK lateinit var coreStepProcessor: CoreStepProcessor
-    @MockK lateinit var sessionEventsManager: SessionEventsManager
+    @MockK lateinit var sessionRepository: SessionRepository
     @MockK lateinit var fingerprintStepMock: Step
     @MockK lateinit var faceStepMock: Step
     @MockK lateinit var coreStepMock: Step
@@ -157,6 +157,6 @@ class ModalityFlowIdentifyImplTest {
 
     private fun buildModalityFlowIdentify(consentRequired: Boolean) {
         modalityFlowIdentify = ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, GROUP.GLOBAL, sessionEventsManager, consentRequired)
+            coreStepProcessor, GROUP.GLOBAL, sessionRepository, consentRequired)
     }
 }

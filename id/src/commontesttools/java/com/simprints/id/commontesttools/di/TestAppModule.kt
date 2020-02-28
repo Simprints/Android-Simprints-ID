@@ -10,7 +10,7 @@ import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.session.remote.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -110,7 +110,7 @@ class TestAppModule(
         preferencesManager: PreferencesManager,
         timeHelper: TimeHelper,
         crashReportManager: CrashReportManager
-    ): SessionEventsManager = sessionEventsManagerRule.resolveDependency {
+    ): SessionRepository = sessionEventsManagerRule.resolveDependency {
         super.provideSessionEventsManager(
             ctx,
             sessionEventsSyncManager,

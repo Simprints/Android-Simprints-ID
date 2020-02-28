@@ -16,7 +16,7 @@ package com.simprints.id.services
 //            remoteDbManagerRule = DependencyRule.SpyRule)
 //    }
 //
-//    @Inject lateinit var sessionEventsManager: SessionEventsManager
+//    @Inject lateinit var sessionRepository: SessionRepository
 //    @Inject lateinit var loginInfoManager: LoginInfoManager
 //    @Inject lateinit var realmSessionEventsManagerMock: SessionEventsLocalDbManager
 //    @Inject lateinit var guidSelectionManager: GuidSelectionManager
@@ -46,9 +46,9 @@ package com.simprints.id.services
 //
 //    @Test
 //    fun testWithStartedService() {
-//        var session = sessionEventsManager.createSession("").blockingGet()
+//        var session = sessionRepository.createSession("").blockingGet()
 //
-//        sessionEventsManager.updateSession {
+//        sessionRepository.updateSession {
 //            it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
 //        }.blockingGet()
 //
