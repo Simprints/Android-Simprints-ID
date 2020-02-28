@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -21,7 +21,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProcessor,
                                     private val fingerprintStepProcessor: FingerprintStepProcessor,
                                     private val faceStepProcessor: FaceStepProcessor,
-                                    private val sessionEventsManager: SessionEventsManager,
+                                    private val sessionRepository: SessionRepository,
                                     private val consentRequired: Boolean): ModalityFlow {
 
     override val steps: MutableList<Step> = mutableListOf()
@@ -103,6 +103,6 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         }
 
     private fun addPersonCreationEventForFingerprintSamples(fingerprintSamples: List<FingerprintSample>) {
-        sessionEventsManager.addPersonCreationEventInBackground(fingerprintSamples)
+        sessionRepository.addPersonCreationEventInBackground(fingerprintSamples)
     }
 }

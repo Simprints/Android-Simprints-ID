@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Client API</string>
+    <string name="configuration_error_title">Kosa la kiufundi</string>
+    <string name="guid_selection_data_sent">Taarifa zimetumwa</string>
+    <string name="guid_selection_result_sent">Matokeo yametumwa</string>
+    <string name="close">Funga</string>
+    <string name="invalid_intentAction_message">Tatizo la kiufundi limetokea (namba ya utambulisho iliyokusudiwa kufanywa ni batili), tafadhali wasiliana na msimmizi wako wa programu</string>
+    <string name="invalid_metadata_message">Tatiizo la kiufundi limetokea (metadata sio sahihi), tafadhali wasiliana na msimamizi wako wa programu</string>
+    <string name="rooted_device_message">1. Wasiliana na msimamizi wako- kifaa chako kimeonekana kimekuewa rooted \n2. Gusa funga</string>
+    <string name="rooted_device_title">Kifaa chako kimeonekana kimekua rooted</string>
+    <string name="invalid_projectId_message">Kosa la kiufundi limetokea (namba ya utambulisho wa mradi batili),tafadhali wasiliana na msimamizi wa programu</string>
+    <string name="invalid_selectedId_message">Tatizo la kiufundi limetokea (namba ya utambullisho iliyochaguliwa ni batili),tafadhali wasiliana na msimamizi wako wa programu</string>
+    <string name="invalid_sessionId_message">Tatizo la kiufundi limetoke (namba ya utambulisho ya kipindi ni batili), tafadhali wasiliana na msimamizi wako wa programu</string>
+    <string name="different_projectId_message">Kosa la kiufundi limetokea (namba ya utambulisho tofauti  na ya mradi), tafadhali funga kutoka kwenye ukurasa wa mwanzo au wasiliana na msimamizi wako wa mfumo huu</string>
+    <string name="different_userId_message">Kosa la kiufundi limetokea (namba ya mtumiaji ni tofauti), tafadhali funga kutoka kwenye ukurasa wa mwanzo kwenye simu au wasiliana na msimamizi wako wa mfumo huu</string>
+    <string name="invalid_userId_message">Tatizo la kiufundi limetokea (namba ya utambulisho wa mtumiaji ni batili),tafadhali wasiliana na msimamizi wako wa program</string>
+    <string name="invalid_moduleId_message">Tatizo la kiufundi limetokea(namba ya utambulisho ya kipengele ni batili), tafadhari wasiliana na msimamizi wako wa program</string>
+    <string name="invalid_verifyId_message">Tatizo la kiufundi limetokea (namba ya utambulisho  sio sahihi), tafadhali wasiliana na msimamizi wako wa programu</string>
+    <string name="configuration_error_message">Tatizo la kiufundi limetokea (%1s$), tafadhali wasiliana na msimamizi wako wa programu</string>
+
+
+</resources>
+

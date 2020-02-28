@@ -8,7 +8,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSessionButExpired
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.remote.SessionsRemoteInterface
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
@@ -42,7 +42,7 @@ import retrofit2.adapter.rxjava2.Result
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionEventsUploaderTaskTest {
 
-    private val sessionsEventsManagerMock: SessionEventsManager = mockk()
+    private val sessionsRepositoryMock: SessionRepository = mockk()
     private val timeHelper: TimeHelper = TimeHelperImpl()
     private lateinit var sessionsRemoteInterfaceSpy: SessionsRemoteInterface
 
@@ -56,8 +56,8 @@ class SessionEventsUploaderTaskTest {
 
         sessionsRemoteInterfaceSpy = spyk(SimApiClientFactory("deviceId", BASE_URL).build<SessionsRemoteInterface>().api)
 
-        every { sessionsEventsManagerMock.deleteSessions(any(), any(), any(), any()) } returns Completable.complete()
-        every { sessionsEventsManagerMock.insertOrUpdateSessionEvents(any()) } returns Completable.complete()
+        every { sessionsRepositoryMock.deleteSessions(any(), any(), any(), any()) } returns Completable.complete()
+        every { sessionsRepositoryMock.insertOrUpdateSessionEvents(any()) } returns Completable.complete()
     }
 
     @Test
@@ -174,7 +174,7 @@ class SessionEventsUploaderTaskTest {
                 .test()
             filterTask.awaitAndAssertSuccess()
 
-            verify(exactly = sessions.size) { sessionsEventsManagerMock.deleteSessions(isNull() as String?, any(), any(), isNull() as Long?) }
+            verify(exactly = sessions.size) { sessionsRepositoryMock.deleteSessions(isNull() as String?, any(), any(), isNull() as Long?) }
         }
     }
 
@@ -226,7 +226,7 @@ class SessionEventsUploaderTaskTest {
 
     private fun createTask() =
         SessionEventsUploaderTask(
-            sessionsEventsManagerMock,
+            sessionsRepositoryMock,
             timeHelper,
             sessionsRemoteInterfaceSpy)
 

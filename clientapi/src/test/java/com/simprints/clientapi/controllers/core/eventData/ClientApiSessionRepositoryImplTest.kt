@@ -4,7 +4,7 @@ import com.google.common.truth.Truth
 import com.nhaarman.mockitokotlin2.any
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
 import com.simprints.id.data.db.session.domain.models.events.InvalidIntentEvent
 import com.simprints.id.data.db.session.domain.models.events.SuspiciousIntentEvent
@@ -16,15 +16,13 @@ import io.reactivex.Single
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import com.nhaarman.mockitokotlin2.any as MockitoArgThat
-import com.nhaarman.mockitokotlin2.argThat as MockitoArgThat
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.domain.models.events.IntentParsingEvent.IntegrationInfo as CoreIntegrationInfo
 
-class ClientApiSessionEventsManagerImplTest {
+class ClientApiSessionRepositoryImplTest {
 
-    private lateinit var coreSessionEventsMgrMock: SessionEventsManager
+    private lateinit var coreSessionEventsMgrMock: SessionRepository
     private lateinit var clientSessionEventsMgr: ClientApiSessionEventsManagerImpl
 
     @Before
@@ -97,8 +95,8 @@ class ClientApiSessionEventsManagerImplTest {
         }
     }
 
-    private fun mockCoreSessionEventsManager(): SessionEventsManager =
-        mock<SessionEventsManager>().apply {
+    private fun mockCoreSessionEventsManager(): SessionRepository =
+        mock<SessionRepository>().apply {
             val session = mock<SessionEvents>().apply {
                 whenever(this) { id } thenReturn "session_id"
             }

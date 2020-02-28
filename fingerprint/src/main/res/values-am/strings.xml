@@ -72,4 +72,11 @@
     <string name="bluetooth_error_pair_scanner_and_device_title">እስካነርና ስልኩን ያጣምሩ</string>
     <string name="scanner_error_turn_scanner_on_title">እስካነሩን ያብሩ</string>
     <string name="settings_label">የስልክ ማስተካከያ</string>
+    <string name="connect_scanner_finished">ተገናኝቷል</string>
+    <string name="please_wait_button">እባክዎትን ይጠብቁ</string>
+    <string name="scan">"እስካን "</string>
+    <string name="transfering_data">መረጃ በማስተላለፍ ላይ ነው</string>
+    <string name="returning_results">ውጤቱን መመለስ</string>
+    <string name="privacy_notice_text"><u>የደህንነት ማሳታወቂያ</u></string>
+    <string name="scanner_not_working">እስካነሩ አይሰራም</string>
 </resources>

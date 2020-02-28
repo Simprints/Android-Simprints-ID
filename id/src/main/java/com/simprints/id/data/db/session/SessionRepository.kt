@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.session.domain
+package com.simprints.id.data.db.session
 
 import com.simprints.id.Application
 import com.simprints.id.data.db.person.domain.FingerprintSample
@@ -8,7 +8,7 @@ import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
 import io.reactivex.Completable
 import io.reactivex.Single
 
-interface SessionEventsManager : SessionEventsLocalDbManager {
+interface SessionRepository : SessionEventsLocalDbManager {
 
     fun signOut()
 
@@ -26,7 +26,7 @@ interface SessionEventsManager : SessionEventsLocalDbManager {
     fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
 
     companion object {
-        fun build(app: Application): SessionEventsManager =
+        fun build(app: Application): SessionRepository =
             app.component.getSessionEventsManager()
     }
 }

@@ -6,7 +6,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.extentions.resumeSafely
 import com.simprints.core.tools.extentions.resumeWithExceptionSafely
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.libsimprints.BuildConfig.VERSION_NAME
 import io.reactivex.Completable
@@ -15,17 +15,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import timber.log.Timber
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
 
-class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: SessionEventsManager,
+class ClientApiSessionEventsManagerImpl(private val coreSessionRepository: SessionRepository,
                                         private val timeHelper: ClientApiTimeHelper) :
     ClientApiSessionEventsManager {
 
     override suspend fun createSession(integration: IntegrationInfo): String =
         suspendCancellableCoroutine { cont ->
             CoroutineScope(Dispatchers.IO).launch {
-                coreSessionEventsManager.createSession(VERSION_NAME).flatMap {
+                coreSessionRepository.createSession(VERSION_NAME).flatMap {
                     addIntentParsingEvent(integration).toSingleDefault(it.id)
                 }.subscribeBy(
                     onSuccess = { cont.resumeSafely(it) },
@@ -58,21 +57,16 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: Se
         addEvent(InvalidIntentEvent(timeHelper.now(), action, extras))
 
     private fun addEvent(event: Event): Completable =
-        coreSessionEventsManager.addEvent(event)
+        coreSessionRepository.addEvent(event)
 
     override suspend fun getCurrentSessionId(): String? =
-        try {
-            suspendCancellableCoroutine { cont ->
-                CoroutineScope(Dispatchers.IO).launch {
-                    coreSessionEventsManager.getCurrentSession().subscribeBy(
-                        onSuccess = { cont.resumeSafely(it.id) },
-                        onError = { cont.resumeWithExceptionSafely(it) }
-                    )
-                }
+        suspendCancellableCoroutine { cont ->
+            CoroutineScope(Dispatchers.IO).launch {
+                coreSessionRepository.getCurrentSession().subscribeBy(
+                    onSuccess = { cont.resumeSafely(it.id) },
+                    onError = { cont.resumeSafely(null) }
+                )
             }
-        } catch (t: Throwable) {
-            Timber.d(t)
-            null
         }
 }
 

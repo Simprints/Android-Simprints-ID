@@ -1,7 +1,7 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.remote.SessionsRemoteInterface
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
@@ -13,7 +13,7 @@ import timber.log.Timber
 
 class SessionEventsSyncMasterTask(
     private val projectId: String,
-    private val sessionEventsManager: SessionEventsManager,
+    private val sessionRepository: SessionRepository,
     private val timeHelper: TimeHelper,
     private val sessionApi: SessionsRemoteInterface,
     private val crashReportManager: CrashReportManager) {
@@ -28,7 +28,7 @@ class SessionEventsSyncMasterTask(
             .executeUploaderTask()
 
     private fun loadSessionsToUpload() =
-        sessionEventsManager.loadSessions(projectId).map { it.toList() }
+        sessionRepository.loadSessions(projectId).map { it.toList() }
 
     internal fun Single<List<SessionEvents>>.createBatches(): Observable<List<SessionEvents>> =
         this.flattenAsObservable { it }
@@ -46,5 +46,5 @@ class SessionEventsSyncMasterTask(
         }
 
     internal fun createUploadBatchTaskCompletable(sessions: List<SessionEvents>): Completable =
-        SessionEventsUploaderTask(sessionEventsManager, timeHelper, sessionApi).execute(projectId, sessions)
+        SessionEventsUploaderTask(sessionRepository, timeHelper, sessionApi).execute(projectId, sessions)
 }

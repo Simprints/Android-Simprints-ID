@@ -20,7 +20,7 @@ android {
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         versionName "2020.2.0-dev"
-        versionCode 210
+        versionCode 212
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
