@@ -32,8 +32,8 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.SessionRepositoryImpl
-import com.simprints.id.data.db.session.local.RealmSessionEventsDbManagerImpl
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
+import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl
 import com.simprints.id.data.db.session.remote.RemoteSessionsManager
 import com.simprints.id.data.db.session.remote.RemoteSessionsManagerImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -205,16 +205,17 @@ open class AppModule {
     @Singleton
     open fun provideSessionEventsLocalDbManager(
         ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider
-    ): SessionEventsLocalDbManager =
-        RealmSessionEventsDbManagerImpl(ctx, secureDataManager)
+        secureDataManager: SecureLocalDbKeyProvider,
+        timeHelper: TimeHelper
+    ): SessionLocalDataSource =
+        SessionLocalDataSourceImpl(ctx, secureDataManager, timeHelper)
 
     @Provides
     @Singleton
     open fun provideSessionEventsManager(
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
-        sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+        sessionLocalDataSource: SessionLocalDataSource,
         preferencesManager: PreferencesManager,
         timeHelper: TimeHelper,
         crashReportManager: CrashReportManager
@@ -223,7 +224,7 @@ open class AppModule {
             ctx.deviceId,
             ctx.packageVersionName,
             sessionEventsSyncManager,
-            sessionEventsLocalDbManager,
+            sessionLocalDataSource,
             preferencesManager,
             timeHelper,
             crashReportManager

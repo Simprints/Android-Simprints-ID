@@ -12,7 +12,7 @@ import com.simprints.id.data.db.session.SessionRepositoryImpl
 import com.simprints.id.data.db.session.domain.models.events.ArtificialTerminationEvent
 import com.simprints.id.data.db.session.domain.models.events.callback.IdentificationCallbackEvent
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.unexpected.InvalidSessionForGuidSelectionEvent
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
@@ -41,7 +41,7 @@ class SessionRepositoryImplTest {
 
     val timeHelper: TimeHelper = TimeHelperImpl()
     @MockK private lateinit var sessionEventsSyncManagerMock: SessionEventsSyncManager
-    @MockK private lateinit var sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager
+    @MockK private lateinit var sessionLocalDataSourceMock: SessionLocalDataSource
     @MockK private lateinit var preferencesManagerMock: PreferencesManager
     @MockK private lateinit var crashReportManagerMock: CrashReportManager
     private lateinit var sessionsRepositorySpy: SessionRepository
@@ -56,10 +56,10 @@ class SessionRepositoryImplTest {
         sessionsRepositorySpy = spyk(SessionRepositoryImpl(
             "deviceID",
             "com.simprints.id",
-            sessionEventsSyncManagerMock, sessionEventsLocalDbManagerMock, preferencesManagerMock, timeHelper, crashReportManagerMock))
+            sessionEventsSyncManagerMock, sessionLocalDataSourceMock, preferencesManagerMock, timeHelper, crashReportManagerMock))
 
         sessionsInFakeDb.clear()
-        mockSessionEventsManager(sessionEventsLocalDbManagerMock, sessionsInFakeDb)
+        mockSessionEventsManager(sessionLocalDataSourceMock, sessionsInFakeDb)
         mockPreferenceManagerInfo()
     }
 
@@ -109,7 +109,7 @@ class SessionRepositoryImplTest {
 
     @Test
     fun closeLastSessionsIfPending_shouldSwallowException() {
-        every { sessionEventsLocalDbManagerMock.loadSessions(any(), any()) } returns (Single.error(Throwable("error_reading_db")))
+        every { sessionLocalDataSourceMock.loadSessions(any(), any()) } returns (Single.error(Throwable("error_reading_db")))
 
         sessionsRepositorySpy.createSession("").blockingGet()
 

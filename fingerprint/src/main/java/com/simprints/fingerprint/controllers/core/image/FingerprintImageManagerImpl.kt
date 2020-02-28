@@ -1,14 +1,9 @@
 package com.simprints.fingerprint.controllers.core.image
 
 import com.simprints.core.images.repository.ImageRepository
-import com.simprints.core.tools.extentions.resumeSafely
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.fingerprint.data.domain.images.Path
 import com.simprints.id.data.db.session.SessionRepository
-import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import com.simprints.core.images.model.Path as CorePath
 
@@ -29,19 +24,17 @@ class FingerprintImageManagerImpl(private val coreImageRepository: ImageReposito
         }
 
     private suspend fun determinePath(captureEventId: String, fileExtension: String): CorePath? =
-        withContext(Dispatchers.IO) {
-            suspendCancellableCoroutine<CorePath?> { cont ->
-                coreSessionRepository.getCurrentSession().subscribeBy(
-                    onSuccess = { currentSession ->
-                        val projectId = currentSession.projectId
-                        val sessionId = currentSession.id
-                        val path = CorePath(arrayOf(
-                            PROJECTS_PATH, projectId, SESSIONS_PATH, sessionId, FINGERPRINTS_PATH, "$captureEventId.$fileExtension"
-                        ))
+        try {
+            val currentSession = coreSessionRepository.getCurrentSession()
 
-                        cont.resumeSafely(path)
-                    }, onError = { cont.resumeSafely(null) })
-            }
+            val projectId = currentSession.projectId
+            val sessionId = currentSession.id
+            CorePath(arrayOf(
+                PROJECTS_PATH, projectId, SESSIONS_PATH, sessionId, FINGERPRINTS_PATH, "$captureEventId.$fileExtension"
+            ))
+        } catch (t: Throwable) {
+            Timber.e(t)
+            null
         }
 
     private fun CorePath.toDomain(): Path =

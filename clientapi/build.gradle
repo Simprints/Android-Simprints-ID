@@ -71,6 +71,8 @@ dependencies {
     // Support
     implementation deps.androidx.appcompat
     implementation deps.androidx.ui.constraintlayout
+    implementation deps.androidx.lifecycle.scope
+
     implementation deps.support.material
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko

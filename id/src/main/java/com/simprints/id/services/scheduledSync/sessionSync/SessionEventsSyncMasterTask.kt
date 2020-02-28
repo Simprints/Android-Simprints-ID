@@ -1,14 +1,17 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
+import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.remote.SessionsRemoteInterface
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.tools.TimeHelper
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import kotlinx.coroutines.flow.toList
 import timber.log.Timber
 
 class SessionEventsSyncMasterTask(
@@ -28,7 +31,7 @@ class SessionEventsSyncMasterTask(
             .executeUploaderTask()
 
     private fun loadSessionsToUpload() =
-        sessionRepository.loadSessions(projectId).map { it.toList() }
+        singleWithSuspend{ sessionRepository.load(SessionLocalDataSource.Query(projectId = projectId)).toList() }
 
     internal fun Single<List<SessionEvents>>.createBatches(): Observable<List<SessionEvents>> =
         this.flattenAsObservable { it }
