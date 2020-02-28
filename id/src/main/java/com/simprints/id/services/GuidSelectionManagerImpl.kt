@@ -36,7 +36,7 @@ class GuidSelectionManagerImpl(val deviceId: String,
     }
 
     private fun addConfirmationCalloutEvent(request: AppIdentityConfirmationRequest) =
-        sessionRepository.addEventInBackground(ConfirmationCalloutEvent(
+        sessionRepository.addEventToCurrentSessionInBackground(ConfirmationCalloutEvent(
             timerHelper.now(),
             request.projectId,
             request.selectedGuid,

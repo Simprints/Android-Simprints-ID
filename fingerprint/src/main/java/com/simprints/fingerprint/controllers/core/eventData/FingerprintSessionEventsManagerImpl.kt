@@ -11,7 +11,7 @@ import com.simprints.id.data.db.session.domain.models.events.Event as CoreEvent
 class FingerprintSessionEventsManagerImpl(private val sessionRepository: SessionRepository) : FingerprintSessionEventsManager {
 
     override fun addEventInBackground(event: Event) {
-        fromDomainToCore(event)?.let { sessionRepository.addEventInBackground(it) }
+        fromDomainToCore(event)?.let { sessionRepository.addEventToCurrentSessionInBackground(it) }
     }
 
     override fun addEvent(event: Event): Completable =
