@@ -84,7 +84,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".activities.login.QrCaptureActivity"
+        <activity android:name=".activities.qrcapture.QrCaptureActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"/>
         <activity
