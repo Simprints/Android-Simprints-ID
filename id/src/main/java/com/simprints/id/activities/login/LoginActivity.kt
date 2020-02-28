@@ -2,7 +2,6 @@ package com.simprints.id.activities.login
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.safetynet.SafetyNet
@@ -21,7 +20,6 @@ import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.SimProgressDialog
-import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_login.*
 import javax.inject.Inject
@@ -30,9 +28,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     companion object {
         const val QR_REQUEST_CODE: Int = 0
-        const val QR_RESULT_KEY = "SCAN_RESULT"
-        const val GOOGLE_PLAY_LINK_FOR_QR_APP =
-            "https://play.google.com/store/apps/details?id=com.google.zxing.client.android"
     }
 
     override lateinit var viewPresenter: LoginContract.Presenter
@@ -66,7 +61,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         val projectAuthenticator = ProjectAuthenticator(
             component,
             SafetyNet.getClient(this),
-            secureApiInterface)
+            secureApiInterface
+        )
 
         viewPresenter = LoginPresenter(this, component, projectAuthenticator)
         viewPresenter.start()
@@ -86,10 +82,12 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     private fun initUI() {
         progressDialog = SimProgressDialog(this)
         loginEditTextUserId.setText(loginActRequest.userIdFromIntent)
+
         loginButtonScanQr.setOnClickListener {
             viewPresenter.logMessageForCrashReportWithUITrigger("Scan QR button clicked")
-            viewPresenter.openScanQRApp()
+            handleOpenScanQRApp()
         }
+
         loginButtonSignIn.setOnClickListener {
             viewPresenter.logMessageForCrashReportWithUITrigger("Login button clicked")
             handleSignInStart()
@@ -97,13 +95,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     override fun handleOpenScanQRApp() {
-        val intent = packageManager.scannerAppIntent()
-        if (intent.resolveActivity(packageManager) != null) {
-            startActivityForResult(intent, QR_REQUEST_CODE)
-        } else {
-            startActivity(Intent(Intent.ACTION_VIEW,
-                Uri.parse(GOOGLE_PLAY_LINK_FOR_QR_APP)))
-        }
+        val intent = QrCaptureActivity.getIntent(this)
+        startActivityForResult(intent, QR_REQUEST_CODE)
     }
 
     private fun handleSignInStart() {
@@ -130,7 +123,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     fun handleScannerAppResult(resultCode: Int, data: Intent) =
         runOnUiThread {
-            val scannedText = data.getStringExtra(QR_RESULT_KEY)
+            val scannedText = data.getStringExtra(QrCaptureActivity.QR_RESULT_KEY)
 
             if (resultCode == Activity.RESULT_OK) {
                 viewPresenter.processQRScannerAppResponse(scannedText)

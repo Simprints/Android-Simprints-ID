@@ -157,6 +157,9 @@ dependencies {
     implementation deps.playservices.location
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
+    def camerax_version = '1.0.0-alpha06'
+    implementation "androidx.camera:camera-core:${camerax_version}"
+    implementation "androidx.camera:camera-camera2:${camerax_version}"
 
     api deps.firebase.database
     api deps.firebase.core
@@ -164,12 +167,16 @@ dependencies {
     api deps.firebase.config
     api deps.firebase.perf
     api deps.firebase.storage
+    api deps.firebase.mlkit
+    api deps.firebase.mlkit_barcode
+
     implementation(deps.crashlytics.core) {
         transitive = true
     }
     implementation(deps.crashlytics.ndk) {
         transitive = true
     }
+
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter
     implementation deps.retrofit.convertergson
