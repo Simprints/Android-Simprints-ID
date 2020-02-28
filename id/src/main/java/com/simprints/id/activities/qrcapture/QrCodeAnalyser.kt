@@ -1,4 +1,4 @@
-package com.simprints.id.activities.login
+package com.simprints.id.activities.qrcapture
 
 import android.util.Log
 import androidx.camera.core.ImageAnalysis

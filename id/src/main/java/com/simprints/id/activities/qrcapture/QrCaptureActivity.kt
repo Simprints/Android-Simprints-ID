@@ -1,4 +1,4 @@
-package com.simprints.id.activities.login
+package com.simprints.id.activities.qrcapture
 
 import android.Manifest.permission.CAMERA
 import android.app.Activity
