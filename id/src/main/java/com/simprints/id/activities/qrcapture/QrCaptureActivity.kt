@@ -56,7 +56,7 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture),
     }
 
     private fun startCamera() {
-        val resolution = Size(640, 480)
+        val resolution = Size(1280, 720)
         val previewConfig = PreviewConfig.Builder()
             .setTargetResolution(resolution)
             .build()
