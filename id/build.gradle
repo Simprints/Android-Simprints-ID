@@ -152,14 +152,13 @@ dependencies {
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
     implementation deps.androidx.security
+    implementation deps.androidx.camerax.core
+    implementation deps.androidx.camerax.camera2
     implementation deps.support.material
     implementation deps.arch_components.work
     implementation deps.playservices.location
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
-    def camerax_version = '1.0.0-alpha06'
-    implementation "androidx.camera:camera-core:${camerax_version}"
-    implementation "androidx.camera:camera-camera2:${camerax_version}"
 
     api deps.firebase.database
     api deps.firebase.core
