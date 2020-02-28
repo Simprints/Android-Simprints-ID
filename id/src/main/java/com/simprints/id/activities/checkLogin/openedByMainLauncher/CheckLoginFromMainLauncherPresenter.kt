@@ -11,7 +11,7 @@ class CheckLoginFromMainLauncherPresenter(
         component.inject(this)
     }
 
-    override fun start() {
+    override suspend fun start() {
         checkSignedInStateAndMoveOn()
     }
 
@@ -19,7 +19,7 @@ class CheckLoginFromMainLauncherPresenter(
         view.openRequestLoginActivity()
     }
 
-    override fun handleSignedInUser() {
+    override suspend fun handleSignedInUser() {
         view.openDashboardActivity()
     }
 

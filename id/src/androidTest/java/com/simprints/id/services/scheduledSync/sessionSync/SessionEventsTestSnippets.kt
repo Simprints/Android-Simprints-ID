@@ -5,7 +5,7 @@ import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.local.models.*
 import com.simprints.id.tools.TimeHelper
 import io.realm.Realm
@@ -130,19 +130,19 @@ fun verifySessionIsOpen(sessionEvents: SessionEvents) {
 }
 
 fun createAndSaveCloseFakeSession(timeHelper: TimeHelper,
-                                  realmSessionEventsManager: SessionEventsLocalDbManager,
+                                  realmSessionManager: SessionLocalDataSource,
                                   projectId: String,
                                   id: String = UUID.randomUUID().toString() + "close"): String =
-    createFakeClosedSession(timeHelper, projectId, id).also { saveSessionInDb(it, realmSessionEventsManager) }.id
+    createFakeClosedSession(timeHelper, projectId, id).also { saveSessionInDb(it, realmSessionManager) }.id
 
 fun createAndSaveOpenFakeSession(timeHelper: TimeHelper,
-                                 realmSessionEventsManager: SessionEventsLocalDbManager,
+                                 realmSessionManager: SessionLocalDataSource,
                                  projectId: String,
                                  id: String = UUID.randomUUID().toString() + "open") =
-    createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(1000)).also { saveSessionInDb(it, realmSessionEventsManager) }.id
+    createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(1000)).also { saveSessionInDb(it, realmSessionManager) }.id
 
-fun saveSessionInDb(session: SessionEvents, realmSessionEventsManager: SessionEventsLocalDbManager) {
-    realmSessionEventsManager.insertOrUpdateSessionEvents(session).blockingAwait()
+fun saveSessionInDb(session: SessionEvents, realmSessionManager: SessionLocalDataSource) {
+    realmSessionManager.insertOrUpdateSessionEvents(session).blockingAwait()
 }
 
 fun verifyNumberOfSessionsInDb(count: Int, realmForDataEvent: Realm) {

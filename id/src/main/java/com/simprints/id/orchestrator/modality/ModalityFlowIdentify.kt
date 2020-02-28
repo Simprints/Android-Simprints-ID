@@ -1,8 +1,8 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource.Query
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
@@ -47,7 +47,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
     override fun getNextStepToLaunch(): Step? =
         steps.firstOrNull { it.getStatus() == NOT_STARTED }
 
-    override fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step? {
+    override suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step? {
         require(appRequest is AppIdentifyRequest)
         val result = when {
             isCoreResult(requestCode) -> coreStepProcessor.processResult(data)
@@ -66,7 +66,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
         }
     }
 
-    private fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, appRequest: AppIdentifyRequest) {
+    private suspend fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, appRequest: AppIdentifyRequest) {
         if (result is FingerprintCaptureResponse) {
             val query = buildQuery(appRequest, matchGroup)
             addMatchingStepForFinger(result.captureResult.mapNotNull { it.sample }, query)

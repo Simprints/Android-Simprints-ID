@@ -1,8 +1,8 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource.Query
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
@@ -45,7 +45,7 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
 
     override fun getNextStepToLaunch(): Step? = steps.firstOrNull { it.getStatus() == NOT_STARTED }
 
-    override fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step? {
+    override suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step? {
         require(appRequest is AppVerifyRequest)
 
         val result = when {
@@ -69,7 +69,7 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
         }
     }
 
-    private fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, appRequest: AppVerifyRequest) {
+    private suspend fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, appRequest: AppVerifyRequest) {
         if (result is FingerprintCaptureResponse) {
             val query = Query(personId = appRequest.verifyGuid)
             addMatchingStep(result.captureResult.mapNotNull { it.sample }, query)

@@ -1,9 +1,10 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
 import android.annotation.SuppressLint
+import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.ArtificialTerminationEvent
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.remote.SessionsRemoteInterface
 import com.simprints.id.data.db.session.remote.session.ApiSessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
@@ -47,18 +48,19 @@ class SessionEventsUploaderTask(private val sessionRepository: SessionRepository
             sessions.forEach {
                 forceSessionToCloseIfOpenAndNotInProgress(it, timeHelper)
                 it.relativeUploadTime = it.timeRelativeToStartTime(timeHelper.now())
-                sessionRepository.insertOrUpdateSessionEvents(it).blockingAwait()
+                completableWithSuspend { sessionRepository.insertOrUpdateSessionEvents(it) }.blockingAwait()
             }
             Single.just(sessions)
         }
 
+    @Deprecated("TO BE REMOVED")
     private fun forceSessionToCloseIfOpenAndNotInProgress(session: SessionEvents, timeHelper: TimeHelper) {
-        Timber.d("SessionEventsUploaderTask forceSessionToCloseIfOpenAndNotInProgress()")
-
-        if (session.isOpen() && !session.isPossiblyInProgress(timeHelper)) {
-            session.addArtificialTerminationIfRequired(timeHelper, ArtificialTerminationEvent.Reason.TIMED_OUT)
-            session.closeIfRequired(timeHelper)
-        }
+//        Timber.d("SessionEventsUploaderTask forceSessionToCloseIfOpenAndNotInProgress()")
+//
+//        if (session.isOpen() && !session.isPossiblyInProgress(timeHelper)) {
+//            session.addArtificialTerminationIfRequired(timeHelper, ArtificialTerminationEvent.Reason.TIMED_OUT)
+//            session.closeIfRequired(timeHelper)
+//        }
     }
 
     @SuppressLint("CheckResult")
@@ -114,7 +116,7 @@ class SessionEventsUploaderTask(private val sessionRepository: SessionRepository
             Timber.d("SessionEventsUploaderTask deleteSessionsFromDb()")
             Completable.fromCallable {
                 sessions.forEach { session ->
-                    sessionRepository.deleteSessions(sessionId = session.id, openSession = false).blockingGet()
+                    completableWithSuspend { sessionRepository.delete(SessionLocalDataSource.Query(id = session.id, openSession = false)) }.blockingAwait()
                 }
             }
         }

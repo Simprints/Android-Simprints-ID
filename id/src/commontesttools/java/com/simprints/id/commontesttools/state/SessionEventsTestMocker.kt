@@ -1,43 +1,43 @@
 package com.simprints.id.commontesttools.state
 
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import io.mockk.every
 import io.reactivex.Completable
 import io.reactivex.Single
 
-fun mockSessionEventsManager(sessionsEventsManager: SessionEventsLocalDbManager,
+fun mockSessionEventsManager(sessionsManager: SessionLocalDataSource,
                              sessionsInFakeDb: MutableList<SessionEvents>) {
 
-    mockSessionEventsMgrLoadSessionsToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
-    mockSessionEventsMgrInsertOrUpdateSessionsToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
-    mockSessionEventsMgrToDeleteSessionsToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
-    mockSessionEventsMgrLoadSessionByIdToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
-    mockSessionEventsMgrCountToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
+    mockSessionEventsMgrLoadSessionsToUseFakeDb(sessionsManager, sessionsInFakeDb)
+    mockSessionEventsMgrInsertOrUpdateSessionsToUseFakeDb(sessionsManager, sessionsInFakeDb)
+    mockSessionEventsMgrToDeleteSessionsToUseFakeDb(sessionsManager, sessionsInFakeDb)
+    mockSessionEventsMgrLoadSessionByIdToUseFakeDb(sessionsManager, sessionsInFakeDb)
+    mockSessionEventsMgrCountToUseFakeDb(sessionsManager, sessionsInFakeDb)
 }
 
-fun mockSessionEventsMgrLoadSessionByIdToUseFakeDb(sessionsEventsManager: SessionEventsLocalDbManager,
+fun mockSessionEventsMgrLoadSessionByIdToUseFakeDb(sessionsManager: SessionLocalDataSource,
                                                    sessionsInFakeDb: MutableList<SessionEvents>) {
 
-    every { sessionsEventsManager.loadSessionById(any()) } answers {
+    every { sessionsManager.loadSessionById(any()) } answers {
         val session = sessionsInFakeDb.find { it.id == args[0] }
         session?.let { Single.just(session) } ?: throw SessionNotFoundException()
     }
 }
 
-fun mockSessionEventsMgrCountToUseFakeDb(sessionsEventsManager: SessionEventsLocalDbManager,
+fun mockSessionEventsMgrCountToUseFakeDb(sessionsManager: SessionLocalDataSource,
                                          sessionsInFakeDb: MutableList<SessionEvents>) {
 
-    every { sessionsEventsManager.getSessionCount(any()) } answers {
+    every { sessionsManager.getSessionCount(any()) } answers {
         Single.just(sessionsInFakeDb.count { it.projectId == args[0] })
     }
 }
 
-fun mockSessionEventsMgrToDeleteSessionsToUseFakeDb(sessionsEventsManager: SessionEventsLocalDbManager,
+fun mockSessionEventsMgrToDeleteSessionsToUseFakeDb(sessionsManager: SessionLocalDataSource,
                                                     sessionsInFakeDb: MutableList<SessionEvents>) {
 
-    every { sessionsEventsManager.deleteSessions(any(), any(), any(), any()) } answers {
+    every { sessionsManager.deleteSessions(any(), any(), any(), any()) } answers {
         val sessionToDelete = findSessions(
             sessionsInFakeDb,
             args[0] as String?,
@@ -50,10 +50,10 @@ fun mockSessionEventsMgrToDeleteSessionsToUseFakeDb(sessionsEventsManager: Sessi
     }
 }
 
-fun mockSessionEventsMgrLoadSessionsToUseFakeDb(sessionsEventsManager: SessionEventsLocalDbManager,
+fun mockSessionEventsMgrLoadSessionsToUseFakeDb(sessionsManager: SessionLocalDataSource,
                                                 sessionsInFakeDb: MutableList<SessionEvents>) {
 
-    every { sessionsEventsManager.loadSessions(any(), any()) } answers {
+    every { sessionsManager.loadSessions(any(), any()) } answers {
         val sessions = findSessions(
             sessionsInFakeDb,
             args[0] as String?,
@@ -78,10 +78,10 @@ private fun findSessions(sessionsInFakeDb: MutableList<SessionEvents>,
     }
 }
 
-private fun mockSessionEventsMgrInsertOrUpdateSessionsToUseFakeDb(sessionsEventsManager: SessionEventsLocalDbManager,
+private fun mockSessionEventsMgrInsertOrUpdateSessionsToUseFakeDb(sessionsManager: SessionLocalDataSource,
                                                                   sessionsInFakeDb: MutableList<SessionEvents>) {
 
-    every { sessionsEventsManager.insertOrUpdateSessionEvents(any()) } answers {
+    every { sessionsManager.insertOrUpdateSessionEvents(any()) } answers {
         val newSession = args[0] as SessionEvents
         sessionsInFakeDb.removeIf { session -> session.id == newSession.id }
         sessionsInFakeDb.add(newSession)

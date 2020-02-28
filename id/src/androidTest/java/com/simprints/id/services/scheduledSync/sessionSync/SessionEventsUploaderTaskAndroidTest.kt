@@ -25,7 +25,7 @@ import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCa
 import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
 import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.remote.RemoteSessionsManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
@@ -70,7 +70,7 @@ class SessionEventsUploaderTaskAndroidTest {
 
     @get:Rule val simprintsActionTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
-    @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
+    @Inject lateinit var realmSessionManager: SessionLocalDataSource
     @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
@@ -112,7 +112,7 @@ class SessionEventsUploaderTaskAndroidTest {
         val nSession = BATCH_SIZE + 1
         createClosedSessions(nSession).forEach {
             it.addAlertScreenEvents()
-            realmSessionEventsManager.insertOrUpdateSessionEvents(it).blockingAwait()
+            realmSessionManager.insertOrUpdateSessionEvents(it).blockingAwait()
         }
 
         val testObserver = executeUpload()
@@ -151,7 +151,7 @@ class SessionEventsUploaderTaskAndroidTest {
             addCalloutEvent()
             addCompletionCheckEvent()
         }.also {
-            realmSessionEventsManager.insertOrUpdateSessionEvents(it).blockingAwait()
+            realmSessionManager.insertOrUpdateSessionEvents(it).blockingAwait()
         }
 
         val testObserver = executeUpload()
@@ -299,7 +299,7 @@ class SessionEventsUploaderTaskAndroidTest {
 
         return syncTask.execute(
             testProject.id,
-            realmSessionEventsManager.loadSessions().blockingGet()).test()
+            realmSessionManager.loadSessions().blockingGet()).test()
     }
 
     private fun createClosedSessions(nSessions: Int) =
