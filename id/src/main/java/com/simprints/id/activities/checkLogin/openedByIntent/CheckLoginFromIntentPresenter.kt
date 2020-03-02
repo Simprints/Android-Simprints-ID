@@ -4,17 +4,15 @@ import android.annotation.SuppressLint
 import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.Result.AUTHORIZED
-import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.UserInfo
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConnectivitySnapshotEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.EnrolmentCalloutEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCalloutEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCalloutEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.domain.models.events.AuthorizationEvent
+import com.simprints.id.data.db.session.domain.models.events.ConnectivitySnapshotEvent
+import com.simprints.id.data.db.session.domain.models.events.Event
+import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
+import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
+import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
+import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
@@ -186,19 +184,19 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         fetchPeopleCountInLocalDatabase().flatMapCompletable { recordCount ->
             sessionEventsManager.updateSession {
                 it.events.apply {
-                    addAuthorizationEvent(it, AUTHORIZED)
+                    addAuthorizationEvent(it, AuthorizationEvent.Result.AUTHORIZED)
                 }
                 it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
                 it.databaseInfo.recordCount = recordCount
             }
         }
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribeBy(onComplete = {
-           Timber.d("Session updated")
-        }, onError = {
-            it.printStackTrace()
-        })
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onComplete = {
+                Timber.d("Session updated")
+            }, onError = {
+                it.printStackTrace()
+            })
 
         view.openOrchestratorActivity(appRequest)
 
@@ -230,14 +228,14 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private fun fetchAnalyticsId() =
         analyticsManager.analyticsId.onErrorReturn { "" }
 
-    private fun fetchPeopleCountInLocalDatabase(): Single<Int> = singleWithSuspend {personLocalDataSource.count() }
+    private fun fetchPeopleCountInLocalDatabase(): Single<Int> = singleWithSuspend { personLocalDataSource.count() }
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
         session.addEvent(AuthorizationEvent(
             timeHelper.now(),
             result,
-            if (result == AUTHORIZED) {
-                UserInfo(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
+            if (result == AuthorizationEvent.Result.AUTHORIZED) {
+                AuthorizationEvent.UserInfo(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
             } else {
                 null
             }
@@ -246,8 +244,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     @SuppressLint("CheckResult")
     private fun setSessionIdCrashlyticsKey() {
-        sessionEventsManager.getCurrentSession().subscribeBy {
-            crashReportManager.setSessionIdCrashlyticsKey(it.id)
-        }
+        sessionEventsManager.getCurrentSession()
+            .subscribeBy(onSuccess = {
+                crashReportManager.setSessionIdCrashlyticsKey(it.id)
+            }, onError = {
+                it.printStackTrace()
+            })
     }
 }

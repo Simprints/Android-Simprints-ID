@@ -14,9 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
+import com.simprints.id.data.db.session.domain.models.events.ConsentEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
@@ -159,8 +157,8 @@ class ConsentActivity : AppCompatActivity() {
         ConsentEvent(startConsentEventTime, timeHelper.now(), getCurrentConsentTab(), consentResult)
 
     private fun getCurrentConsentTab() = when(tabHost.currentTabTag) {
-        GENERAL_CONSENT_TAB_TAG -> INDIVIDUAL
-        PARENTAL_CONSENT_TAB_TAG -> PARENTAL
+        GENERAL_CONSENT_TAB_TAG -> ConsentEvent.Type.INDIVIDUAL
+        PARENTAL_CONSENT_TAB_TAG -> ConsentEvent.Type.PARENTAL
         else -> throw IllegalStateException("Invalid consent tab selected")
     }
 

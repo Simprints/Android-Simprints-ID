@@ -16,5 +16,6 @@
     <string name="invalid_sessionId_message">Dogoggorri \'configuration\' uumameera (session ID\'n sirrii miti) maaloo suppervaayizera kee quunnami.</string>
     <string name="invalid_userId_message">Dogoggorri \'configuration\' uumameera (ID\'n fayyadamaa sirrii miti) maaloo suppervaayizera kee quunnami.</string>
     <string name="invalid_verifyId_message">Dogoggorri \'configuration\' uumameera (GUID\'n mirkanaa\'u sirrii miti) maaloo suppervaayizera kee quunnami.</string>
-
+    <string name="rooted_device_title">Meeshaa barbaadee argachuu</string>
+    <string name="rooted_device_message">1. Supparvaayzara kee quunnami-meeshaa barbaaddee argachuuf\n2. Cufi1</string>
 </resources>

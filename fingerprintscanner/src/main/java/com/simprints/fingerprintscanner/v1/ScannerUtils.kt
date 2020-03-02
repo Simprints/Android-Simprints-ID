@@ -46,6 +46,8 @@ object ScannerUtils {
             return SERIAL_PREFIX + BigInteger(macAddress
                     .replace(MAC_ADDRESS_PREFIX, "")
                     .replace(":", ""), 16)
+                .toString()
+                .padStart(6, '0')
         }
 
         /**

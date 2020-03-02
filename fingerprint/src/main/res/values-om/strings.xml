@@ -73,4 +73,8 @@
     <string name="bluetooth_error_pair_scanner_and_device_title">Skaanarii fi meshaa walquunnamsisi</string>
     <string name="low_battery_message">Chaarjiin tiriikaa (battery) iskaanarii gadi aanaa dha, maaloo iskaanarii kee chaarjii godhi.</string>
     <string name="pair_scanner_label">Mijeessaa</string>
+    <string name="connect_scanner_finished">Walqunnameera</string>
+    <string name="please_wait_button">Maaloo eegi</string>
+    <string name="scan">Scan\' godhi</string>
+    <string name="transfering_data">Odeffannoo dabarsi...</string>
 </resources>
