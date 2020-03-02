@@ -1,6 +1,7 @@
 package com.simprints.id.data.exitform
 
-import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent
+import com.simprints.id.data.db.session.domain.models.events.RefusalEvent
+
 
 enum class CoreExitFormReason {
     REFUSED_RELIGION,

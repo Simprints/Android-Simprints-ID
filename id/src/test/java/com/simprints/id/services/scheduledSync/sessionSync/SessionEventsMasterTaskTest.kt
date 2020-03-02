@@ -5,9 +5,9 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.state.mockSessionEventsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.controllers.remote.SessionsRemoteInterface
-import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.domain.models.session.SessionEvents
+import com.simprints.id.data.db.session.remote.SessionsRemoteInterface
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.testtools.TestApplication
