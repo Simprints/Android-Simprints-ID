@@ -10,6 +10,8 @@ import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
+import com.simprints.id.activities.qrcapture.tools.QrCaptureHelper
+import com.simprints.id.activities.qrcapture.tools.QrCaptureHelperImpl
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -350,6 +352,9 @@ open class AppModule {
 
     @Provides
     open fun provideConnectivityHelper(ctx: Context): ConnectivityHelper = ConnectivityHelperImpl(ctx)
+
+    @Provides
+    open fun provideQrCaptureHelper(): QrCaptureHelper = QrCaptureHelperImpl()
 
 }
 
