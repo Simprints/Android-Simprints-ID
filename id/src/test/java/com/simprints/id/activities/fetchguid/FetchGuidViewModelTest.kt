@@ -3,9 +3,9 @@ package com.simprints.id.activities.fetchguid
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.session.domain.SessionEventsManager
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig

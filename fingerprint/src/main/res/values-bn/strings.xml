@@ -128,6 +128,7 @@
     <string name="connect_scanner_finished">সংযুক্ত হয়েছে</string>
     <string name="please_wait_button">অপেক্ষা করুন</string>
     <string name="transfering_data">তথ্য প্রদান করা হচ্ছে</string>
+    <string name="scanner_id_confirmation_message">%1$s কি আপনার স্ক্যানার?</string>
 
 
 </resources>

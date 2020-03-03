@@ -1,8 +1,8 @@
 package com.simprints.id.activities.settings.fragments.settingsAbout
 
 import android.preference.Preference
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.consent.LongConsentManager
+import com.simprints.id.data.db.session.domain.SessionEventsManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.di.AppComponent
