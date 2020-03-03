@@ -7,23 +7,26 @@ import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.graphics.Matrix
 import android.os.Bundle
-import android.util.Size
 import android.view.Surface
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.*
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import androidx.camera.core.CameraX
+import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.qrcapture.tools.QrCaptureHelper
+import com.simprints.id.activities.qrcapture.tools.QrCaptureListener
 import com.simprints.id.tools.extensions.hasPermission
 import kotlinx.android.synthetic.main.activity_qr_capture.*
-import java.util.concurrent.Executors
+import javax.inject.Inject
 
-class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture),
-    OnSuccessListener<List<FirebaseVisionBarcode>> {
+class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture), QrCaptureListener {
+
+    @Inject lateinit var qrCaptureHelper: QrCaptureHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (application as Application).component.inject(this)
+
         if (hasPermission(CAMERA))
             startCamera()
         else
@@ -44,23 +47,14 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture),
         }
     }
 
-    override fun onSuccess(qrCodes: List<FirebaseVisionBarcode>?) {
-        if (!qrCodes.isNullOrEmpty()) {
-            val qrCode = qrCodes.first { !it.rawValue.isNullOrEmpty() }
-            qrCode.rawValue?.let {
-                val data = Intent().putExtra(QR_RESULT_KEY, it)
-                setResult(Activity.RESULT_OK, data)
-                finish()
-            }
-        }
+    override fun onQrCodeCaptured(qrCodeValue: String) {
+        val data = Intent().putExtra(QR_RESULT_KEY, qrCodeValue)
+        setResult(Activity.RESULT_OK, data)
+        finish()
     }
 
     private fun startCamera() {
-        val resolution = Size(1280, 720)
-        val previewConfig = PreviewConfig.Builder()
-            .setTargetResolution(resolution)
-            .build()
-        val preview = Preview(previewConfig).apply {
+        val preview = qrCaptureHelper.buildPreview().apply {
             setOnPreviewOutputUpdateListener {
                 with(cameraPreview.parent as ViewGroup) {
                     removeView(cameraPreview)
@@ -72,12 +66,7 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture),
             }
         }
 
-        val analysisConfig = ImageAnalysisConfig.Builder()
-            .setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
-            .build()
-        val useCase = ImageAnalysis(analysisConfig).also {
-            it.setAnalyzer(Executors.newSingleThreadExecutor(), QrCodeAnalyser(this))
-        }
+        val useCase = qrCaptureHelper.buildUseCase(qrCaptureListener = this)
 
         CameraX.bindToLifecycle(this, preview, useCase)
     }

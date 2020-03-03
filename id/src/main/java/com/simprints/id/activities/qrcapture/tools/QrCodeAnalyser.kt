@@ -1,4 +1,4 @@
-package com.simprints.id.activities.qrcapture
+package com.simprints.id.activities.qrcapture.tools
 
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -9,9 +9,13 @@ import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOption
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 
-class QrCodeAnalyser(
-    private val listener: OnSuccessListener<List<FirebaseVisionBarcode>>
-) : ImageAnalysis.Analyzer {
+class QrCodeAnalyser : ImageAnalysis.Analyzer {
+
+    private var listener: OnSuccessListener<List<FirebaseVisionBarcode>>? = null
+
+    fun setOnSuccessListener(listener: OnSuccessListener<List<FirebaseVisionBarcode>>) {
+        this.listener = listener
+    }
 
     override fun analyze(imageProxy: ImageProxy?, rotationDegrees: Int) {
         imageProxy?.image?.let { mediaImage ->
@@ -21,7 +25,7 @@ class QrCodeAnalyser(
                 .setBarcodeFormats(FirebaseVisionBarcode.FORMAT_QR_CODE)
                 .build()
             val detector = FirebaseVision.getInstance().getVisionBarcodeDetector(options)
-            detector.detectInImage(image).addOnSuccessListener(listener)
+            listener?.let(detector.detectInImage(image)::addOnSuccessListener)
         }
     }
 
