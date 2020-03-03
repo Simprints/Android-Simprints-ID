@@ -130,7 +130,6 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
     private suspend fun updateFirstSession(query: SessionQuery, updateBlock: (SessionEvents) -> Unit) {
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                realm.refresh()
                 realm.executeTransaction {
                     val session = addQueryParams(query).findFirst() ?: throw NoSessionsFoundException()
                     val domainSession = session.toDomain()
