@@ -27,14 +27,15 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Co
         injectDependencies()
 
         return try {
-            val task = SessionEventsSyncMasterTask(
-                loginInfoManager.getSignedInProjectIdOrEmpty(),
-                sessionRepository,
-                timeHelper,
-                remoteSessionsManager.getSessionsApiClient(),
-                crashReportManager
-            )
-            task.execute().blockingAwait()
+            //StopShip - gonna being fixed by the remote hawkeye recatoring
+//            val task = SessionEventsSyncMasterTask(
+//                loginInfoManager.getSignedInProjectIdOrEmpty(),
+//                sessionRepository,
+//                timeHelper,
+//                remoteSessionsManager.getSessionsApiClient(),
+//                crashReportManager
+//            )
+//            task.execute().blockingAwait()
             Result.success()
         } catch (e: NoSessionsFoundException) {
             Timber.d("No sessions found")

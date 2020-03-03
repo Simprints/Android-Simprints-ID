@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 open class SessionLocalDataSourceImpl(private val appContext: Context,
                                       private val secureDataManager: SecureLocalDbKeyProvider,
@@ -117,11 +116,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
 
     override fun addEventToCurrentSessionInBackground(event: Event) {
         CoroutineScope(Dispatchers.IO).launch {
-            try {
-                addEventToCurrentSession(event)
-            } catch (t: Throwable) {
-                Timber.d(t)
-            }
+            addEventToCurrentSession(event)
         }
     }
 

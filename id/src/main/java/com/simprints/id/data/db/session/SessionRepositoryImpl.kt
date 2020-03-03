@@ -16,7 +16,6 @@ import com.simprints.id.tools.TimeHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
 // Class to manage the current activeSession
@@ -35,43 +34,53 @@ open class SessionRepositoryImpl(private val deviceId: String,
     // as default, the manager tries to load the last open activeSession
     //
     override suspend fun getCurrentSession(): SessionEvents =
-        sessionLocalDataSource.load(SessionQuery(openSession = true)).first()
+        suspendReportAndThrow { sessionLocalDataSource.load(SessionQuery(openSession = true)).first() }
 
     override suspend fun createSession(libSimprintsVersionName: String) =
-        sessionLocalDataSource.create(appVersionName, libSimprintsVersionName, preferencesManager.language, deviceId)
+        suspendReportAndThrow { sessionLocalDataSource.create(appVersionName, libSimprintsVersionName, preferencesManager.language, deviceId) }
 
     override suspend fun addGuidSelectionEvent(selectedGuid: String, sessionId: String) {
-        sessionLocalDataSource.updateCurrentSession { currentSession ->
-            if (currentSession.hasEvent(GUID_SELECTION) &&
-                currentSession.hasEvent(CALLBACK_IDENTIFICATION)) {
+        suspendReportAndThrow {
+            sessionLocalDataSource.updateCurrentSession { currentSession ->
+                if (currentSession.hasEvent(GUID_SELECTION) &&
+                    currentSession.hasEvent(CALLBACK_IDENTIFICATION)) {
 
-                val guidEvent = GuidSelectionEvent(timeHelper.now(), selectedGuid)
-                currentSession.events.add(guidEvent)
+                    val guidEvent = GuidSelectionEvent(timeHelper.now(), selectedGuid)
+                    currentSession.events.add(guidEvent)
+                }
             }
         }
     }
 
     override suspend fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
-        sessionLocalDataSource.updateCurrentSession { currentSession ->
-            val scannerConnectivityEvents = currentSession.events.filterIsInstance(ScannerConnectionEvent::class.java)
-            scannerConnectivityEvents.forEach { it.scannerInfo.hardwareVersion = hardwareVersion }
+        suspendReportAndThrow {
+            sessionLocalDataSource.updateCurrentSession { currentSession ->
+                val scannerConnectivityEvents = currentSession.events.filterIsInstance(ScannerConnectionEvent::class.java)
+                scannerConnectivityEvents.forEach { it.scannerInfo.hardwareVersion = hardwareVersion }
+            }
         }
     }
 
     override suspend fun addPersonCreationEvent(fingerprintSamples: List<FingerprintSample>) {
-        sessionLocalDataSource.updateCurrentSession { currentSession ->
-            currentSession.events.add(PersonCreationEvent(
-                timeHelper.now(),
-                extractCaptureEventIdsBasedOnPersonTemplate(currentSession, fingerprintSamples.map { EncodingUtils.byteArrayToBase64(it.template) })
-            ))
+        suspendReportAndThrow {
+            sessionLocalDataSource.updateCurrentSession { currentSession ->
+                currentSession.events.add(PersonCreationEvent(
+                    timeHelper.now(),
+                    extractCaptureEventIdsBasedOnPersonTemplate(currentSession, fingerprintSamples.map { EncodingUtils.byteArrayToBase64(it.template) })
+                ))
+            }
         }
     }
 
-    override fun addEventToCurrentSessionInBackground(event: Event) = sessionLocalDataSource.addEventToCurrentSessionInBackground(event)
-    override suspend fun updateCurrentSession(updateBlock: (SessionEvents) -> Unit) = sessionLocalDataSource.updateCurrentSession(updateBlock)
-    override suspend fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents) = sessionLocalDataSource.insertOrUpdateSessionEvents(sessionEvents)
-    override suspend fun delete(query: SessionQuery) = sessionLocalDataSource.delete(query)
-    override suspend fun load(query: SessionQuery): Flow<SessionEvents> = sessionLocalDataSource.load(query)
+    override fun addEventToCurrentSessionInBackground(event: Event) =
+        try {
+            sessionLocalDataSource.addEventToCurrentSessionInBackground(event)
+        } catch (t: Throwable) {
+            crashReportManager.logExceptionOrSafeException(t)
+        }
+
+    override suspend fun updateCurrentSession(updateBlock: (SessionEvents) -> Unit) =
+        suspendReportAndThrow { sessionLocalDataSource.updateCurrentSession(updateBlock) }
 
     override fun signOut() {
         completableWithSuspend { sessionLocalDataSource.delete(SessionQuery(openSession = false)) }
@@ -91,4 +100,13 @@ open class SessionRepositoryImpl(private val deviceId: String,
             .filterIsInstance(FingerprintCaptureEvent::class.java)
             .filter { it.fingerprint?.template in personTemplates && it.result != FingerprintCaptureEvent.Result.SKIPPED }
             .map { it.id }
+
+    private suspend fun <T> suspendReportAndThrow(block: suspend () -> T): T =
+        try {
+            block()
+        } catch (t: Throwable) {
+            crashReportManager.logExceptionOrSafeException(t)
+            throw t
+        }
+
 }
