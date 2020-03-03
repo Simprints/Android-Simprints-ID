@@ -135,7 +135,7 @@ class OrchestratorManagerImplTest {
         verify(exactly = nTimes) { modalityFlowMock.getNextStepToLaunch() }
 
     private fun verifyOrchestratorForwardedResultsToModalityFlow() =
-        verify(exactly = 1) { modalityFlowMock.handleIntentResult(eq(enrolAppRequest), any(), any(), any()) }
+        coVerify(exactly = 1) { modalityFlowMock.handleIntentResult(eq(enrolAppRequest), any(), any(), any()) }
 
     private fun verifyOrchestratorDidntTryToBuildFinalAppResponse() =
         coVerify(exactly = 0) { appResponseFactoryMock.buildAppResponse(any(), any(), any(), any()) }

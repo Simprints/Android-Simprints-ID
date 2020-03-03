@@ -21,12 +21,10 @@ import com.simprints.id.tools.TimeHelper
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 open class SessionLocalDataSourceImpl(private val appContext: Context,
@@ -111,12 +109,6 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
                     sessions?.deleteAllFromRealm()
                 }
             }
-        }
-    }
-
-    override fun addEventToCurrentSessionInBackground(event: Event) {
-        CoroutineScope(Dispatchers.IO).launch {
-            addEventToCurrentSession(event)
         }
     }
 
@@ -224,12 +216,4 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         } catch (t: Throwable) {
             throw SessionDataSourceException(t)
         }
-
-    override suspend fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents) {
-        withContext(Dispatchers.IO) {
-            realm.executeTransaction {
-                it.insertOrUpdate(DbSession(sessionEvents))
-            }
-        }
-    }
 }

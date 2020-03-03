@@ -4,10 +4,10 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
-import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.BaseUnitTestConfig
-import io.reactivex.Completable
-import kotlinx.coroutines.*
+import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 
@@ -25,15 +25,15 @@ class ErrorPresenterTest {
 
     @Test
     fun start_shouldSetCorrectErrorMessage() {
-        val clientApiSessionEventsManagerMock = mock<ClientApiSessionEventsManager>().apply {
-            whenever(this) { addAlertScreenEvent(anyNotNull()) } thenReturn Completable.complete()
-        }
+        runBlockingTest {
+            val clientApiSessionEventsManagerMock = mockk<ClientApiSessionEventsManager>(relaxed = true)
 
-        ErrorPresenter(view, clientApiSessionEventsManagerMock).apply {
-            start(ClientApiAlert.INVALID_CLIENT_REQUEST)
-        }
+            ErrorPresenter(view, clientApiSessionEventsManagerMock).apply {
+                start(ClientApiAlert.INVALID_CLIENT_REQUEST)
+            }
 
-        verifyOnce(view) { setErrorMessageText(anyNotNull()) }
+            verifyOnce(view) { setErrorMessageText(anyNotNull()) }
+        }
     }
 
     @Test
