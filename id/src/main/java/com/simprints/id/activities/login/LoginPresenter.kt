@@ -99,7 +99,7 @@ class LoginPresenter(val view: LoginContract.View,
                                                                   suppliedProjectId: String,
                                                                   suppliedUserId: String) {
 
-        sessionRepository.addEventInBackground(
+        sessionRepository.addEventToCurrentSessionInBackground(
             AuthenticationEvent(
                 startTimeLogin,
                 timeHelper.now(),

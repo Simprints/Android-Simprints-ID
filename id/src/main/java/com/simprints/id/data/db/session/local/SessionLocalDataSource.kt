@@ -12,17 +12,20 @@ interface SessionLocalDataSource {
                      val startedBefore: Long? = null)
 
     suspend fun create(appVersionName: String,
-               libSimprintsVersionName: String,
-               language: String,
-               deviceId: String)
+                       libSimprintsVersionName: String,
+                       language: String,
+                       deviceId: String)
 
     suspend fun count(query: Query): Int
     suspend fun load(query: Query): Flow<SessionEvents>
     suspend fun delete(query: Query)
-    suspend fun updateCurrentSession(update: (SessionEvents) -> Unit)
+    suspend fun update(sessionId: String, updateBlock: (SessionEvents) -> Unit)
 
-    @Deprecated("Respect coroutines - use updateCurrentSession")
-    fun addEventInBackground(event: Event)
+
+    suspend fun addEventToCurrentSession(event: Event)
+    fun addEventToCurrentSessionInBackground(event: Event)
+    suspend fun updateCurrentSession(updateBlock: (SessionEvents) -> Unit)
+
 
     @Deprecated("gonna remove it soon")
     suspend fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents)

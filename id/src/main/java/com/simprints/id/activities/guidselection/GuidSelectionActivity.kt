@@ -65,7 +65,7 @@ class GuidSelectionActivity : AppCompatActivity() {
     }
 
     private fun addConfirmationCallbackEvent(response: AppConfirmationResponse) {
-        sessionRepository.addEventInBackground(
+        sessionRepository.addEventToCurrentSessionInBackground(
             ConfirmationCallbackEvent(timeHelper.now(), response.identificationOutcome)
         )
     }

@@ -18,7 +18,7 @@ class OrchestratorEventsHelperImpl(private val sessionRepository: SessionReposit
             AppResponseType.CONFIRMATION -> null
         }
 
-        callbackEvent?.let { sessionRepository.addEventInBackground(it) }
+        callbackEvent?.let { sessionRepository.addEventToCurrentSessionInBackground(it) }
     }
 
     private fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) =
