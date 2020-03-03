@@ -3,8 +3,8 @@ package com.simprints.id.services.scheduledSync.sessionSync
 import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.session.domain.models.SessionQuery
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.remote.SessionsRemoteInterface
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.tools.TimeHelper
@@ -31,7 +31,7 @@ class SessionEventsSyncMasterTask(
             .executeUploaderTask()
 
     private fun loadSessionsToUpload() =
-        singleWithSuspend{ sessionRepository.load(SessionLocalDataSource.Query(projectId = projectId)).toList() }
+        singleWithSuspend{ sessionRepository.load(SessionQuery(projectId = projectId)).toList() }
 
     internal fun Single<List<SessionEvents>>.createBatches(): Observable<List<SessionEvents>> =
         this.flattenAsObservable { it }
