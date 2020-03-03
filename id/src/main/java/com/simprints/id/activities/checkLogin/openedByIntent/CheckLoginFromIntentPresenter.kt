@@ -222,6 +222,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     @SuppressLint("CheckResult")
     private suspend fun setSessionIdCrashlyticsKey() {
-        crashReportManager.setSessionIdCrashlyticsKey(sessionRepository.getCurrentSession().id)
+        try {
+            crashReportManager.setSessionIdCrashlyticsKey(sessionRepository.getCurrentSession().id)
+        } catch (t: Throwable) {
+            Timber.d("Error setting sessionId in Crashlytics")
+        }
     }
 }

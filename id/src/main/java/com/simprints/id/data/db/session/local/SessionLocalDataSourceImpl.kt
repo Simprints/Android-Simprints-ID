@@ -3,18 +3,19 @@ package com.simprints.id.data.db.session.local
 import android.content.Context
 import android.os.Build
 import com.simprints.id.data.db.session.SessionRepositoryImpl
+import com.simprints.id.data.db.session.domain.models.SessionQuery
 import com.simprints.id.data.db.session.domain.models.events.ArtificialTerminationEvent
 import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.session.domain.models.session.Device
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.session.local.SessionLocalDataSource.Query
 import com.simprints.id.data.db.session.local.models.DbSession
 import com.simprints.id.data.db.session.local.models.toDomain
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
+import com.simprints.id.exceptions.safe.session.SessionDataSourceException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.tools.TimeHelper
 import io.realm.Realm
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 open class SessionLocalDataSourceImpl(private val appContext: Context,
                                       private val secureDataManager: SecureLocalDbKeyProvider,
@@ -49,56 +51,76 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
                                 libSimprintsVersionName: String,
                                 language: String,
                                 deviceId: String) {
-        withContext(Dispatchers.IO) {
-            realm.executeTransaction { reamInTrans ->
-                closeAnyOpenSession(reamInTrans)
+        wrapSuspendExceptionIfNeeded {
+            withContext(Dispatchers.IO) {
+                realm.executeTransaction { reamInTrans ->
+                    closeAnyOpenSession(reamInTrans)
 
-                val count = addQueryParams(Query()).count().toInt()
-                val session = SessionEvents(
-                    SessionRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN,
-                    appVersionName,
-                    libSimprintsVersionName,
-                    language,
-                    Device(
-                        Build.VERSION.SDK_INT.toString(),
-                        Build.MANUFACTURER + "_" + Build.MODEL,
-                        deviceId),
-                    timeHelper.now(),
-                    DatabaseInfo(count))
+                    val count = addQueryParams(SessionQuery()).count().toInt()
+                    val session = SessionEvents(
+                        SessionRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN,
+                        appVersionName,
+                        libSimprintsVersionName,
+                        language,
+                        Device(
+                            Build.VERSION.SDK_INT.toString(),
+                            Build.MANUFACTURER + "_" + Build.MODEL,
+                            deviceId),
+                        timeHelper.now(),
+                        DatabaseInfo(count))
 
-                val dbSession = DbSession(session)
-                realm.insert(dbSession)
+                    val dbSession = DbSession(session)
+                    realm.insert(dbSession)
+                }
             }
         }
     }
 
     private fun closeAnyOpenSession(reamInTrans: Realm) {
-        val currentSession = addQueryParams(Query(openSession = true)).findAll()
-        currentSession.forEach {
-            val updatedSession = it.toDomain()
-            val artificialTerminationEvent = ArtificialTerminationEvent(timeHelper.now(), ArtificialTerminationEvent.Reason.NEW_SESSION)
-            updatedSession.events.add(artificialTerminationEvent)
-            updatedSession.closeIfRequired(timeHelper)
+        wrapExceptionIfNeeded {
+            val currentSession = addQueryParams(SessionQuery(openSession = true)).findAll()
+            currentSession.forEach {
+                val updatedSession = it.toDomain()
+                val artificialTerminationEvent = ArtificialTerminationEvent(timeHelper.now(), ArtificialTerminationEvent.Reason.NEW_SESSION)
+                updatedSession.events.add(artificialTerminationEvent)
+                updatedSession.closeIfRequired(timeHelper)
 
-            reamInTrans.insertOrUpdate(DbSession(updatedSession))
+                reamInTrans.insertOrUpdate(DbSession(updatedSession))
+            }
         }
     }
 
-    override suspend fun load(query: Query): Flow<SessionEvents> =
-        withContext(Dispatchers.IO) {
-            addQueryParams(query).findAll()?.map { it.toDomain() }?.asFlow() ?: emptyFlow()
+    override suspend fun load(query: SessionQuery): Flow<SessionEvents> =
+        wrapSuspendExceptionIfNeeded {
+            withContext(Dispatchers.IO) {
+                addQueryParams(query).findAll()?.map { it.toDomain() }?.asFlow() ?: emptyFlow()
+            }
         }
 
-    override suspend fun count(query: Query): Int =
-        withContext(Dispatchers.IO) {
-            addQueryParams(query).findAll()?.count() ?: 0
+    override suspend fun count(query: SessionQuery): Int =
+        wrapSuspendExceptionIfNeeded {
+            withContext(Dispatchers.IO) {
+                addQueryParams(query).findAll()?.count() ?: 0
+            }
         }
 
-    override suspend fun delete(query: Query) {
-        withContext(Dispatchers.IO) {
-            realm.executeTransaction {
-                val sessions = addQueryParams(query).findAll()
-                sessions?.deleteAllFromRealm()
+    override suspend fun delete(query: SessionQuery) {
+        wrapSuspendExceptionIfNeeded {
+            withContext(Dispatchers.IO) {
+                realm.executeTransaction {
+                    val sessions = addQueryParams(query).findAll()
+                    sessions?.deleteAllFromRealm()
+                }
+            }
+        }
+    }
+
+    override fun addEventToCurrentSessionInBackground(event: Event) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                addEventToCurrentSession(event)
+            } catch (t: Throwable) {
+                Timber.d(t)
             }
         }
     }
@@ -110,27 +132,30 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
     }
 
     override suspend fun updateCurrentSession(updateBlock: (SessionEvents) -> Unit) {
-        updateFirstSession(Query(openSession = true), updateBlock)
+        updateFirstSession(SessionQuery(openSession = true), updateBlock)
     }
 
     override suspend fun update(sessionId: String, updateBlock: (SessionEvents) -> Unit) {
-        updateFirstSession(Query(id = sessionId), updateBlock)
+        updateFirstSession(SessionQuery(id = sessionId), updateBlock)
     }
 
-    private suspend fun updateFirstSession(query: Query, updateBlock: (SessionEvents) -> Unit) {
-        withContext(Dispatchers.IO) {
-            realm.refresh()
-            realm.executeTransaction {
-                val session = addQueryParams(query).findFirst() ?: throw NoSessionsFoundException()
-                val domainSession = session.toDomain()
-                updateBlock(domainSession)
-                it.insertOrUpdate(DbSession(domainSession))
+
+    private suspend fun updateFirstSession(query: SessionQuery, updateBlock: (SessionEvents) -> Unit) {
+        wrapSuspendExceptionIfNeeded {
+            withContext(Dispatchers.IO) {
+                realm.refresh()
+                realm.executeTransaction {
+                    val session = addQueryParams(query).findFirst() ?: throw NoSessionsFoundException()
+                    val domainSession = session.toDomain()
+                    updateBlock(domainSession)
+                    it.insertOrUpdate(DbSession(domainSession))
+                }
             }
         }
     }
 
 
-    private fun addQueryParams(query: Query): RealmQuery<DbSession> =
+    private fun addQueryParams(query: SessionQuery): RealmQuery<DbSession> =
         realm.where(DbSession::class.java).apply {
             addQueryParamForProjectId(query.projectId, this)
             addQueryParamForOpenSession(query.openSession, this)
@@ -191,13 +216,19 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         return secureDataManager.getLocalDbKeyOrThrow(SESSIONS_REALM_DB_FILE_NAME)
     }
 
-    override fun addEventToCurrentSessionInBackground(event: Event) {
-        CoroutineScope(Dispatchers.IO).launch {
-            updateCurrentSession {
-                it.events.add(event)
-            }
+    private fun <T> wrapExceptionIfNeeded(block: () -> T): T =
+        try {
+            block()
+        } catch (t: Throwable) {
+            throw SessionDataSourceException(t)
         }
-    }
+
+    private suspend fun <T> wrapSuspendExceptionIfNeeded(block: suspend () -> T): T =
+        try {
+            block()
+        } catch (t: Throwable) {
+            throw SessionDataSourceException(t)
+        }
 
     override suspend fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents) {
         withContext(Dispatchers.IO) {
