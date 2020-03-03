@@ -69,6 +69,7 @@ class ModuleSelectionFragment(
 
     override fun onModuleSelected(module: Module) {
         searchView.setQuery("", false)
+        hideKeyboard()
         updateSelectionIfPossible(module)
         scrollView.post {
             scrollView.isSmoothScrollingEnabled = false
@@ -78,8 +79,10 @@ class ModuleSelectionFragment(
     }
 
     private fun refreshSyncWorkers() {
-        peopleSyncManager.stop()
-        peopleSyncManager.sync()
+        with(peopleSyncManager) {
+            stop()
+            sync()
+        }
     }
 
     override fun onChipClick(module: Module) {
