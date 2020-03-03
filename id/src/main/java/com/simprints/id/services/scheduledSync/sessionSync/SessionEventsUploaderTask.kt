@@ -3,8 +3,8 @@ package com.simprints.id.services.scheduledSync.sessionSync
 import android.annotation.SuppressLint
 import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.session.domain.models.SessionQuery
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.remote.SessionsRemoteInterface
 import com.simprints.id.data.db.session.remote.session.ApiSessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
@@ -116,7 +116,7 @@ class SessionEventsUploaderTask(private val sessionRepository: SessionRepository
             Timber.d("SessionEventsUploaderTask deleteSessionsFromDb()")
             Completable.fromCallable {
                 sessions.forEach { session ->
-                    completableWithSuspend { sessionRepository.delete(SessionLocalDataSource.Query(id = session.id, openSession = false)) }.blockingAwait()
+                    completableWithSuspend { sessionRepository.delete(SessionQuery(id = session.id, openSession = false)) }.blockingAwait()
                 }
             }
         }

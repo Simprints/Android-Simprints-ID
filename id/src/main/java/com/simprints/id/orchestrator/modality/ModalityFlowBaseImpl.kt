@@ -103,6 +103,6 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         }
 
     private suspend fun addPersonCreationEventForFingerprintSamples(fingerprintSamples: List<FingerprintSample>) {
-        sessionRepository.addPersonCreationEventInBackground(fingerprintSamples)
+        sessionRepository.addPersonCreationEvent(fingerprintSamples)
     }
 }

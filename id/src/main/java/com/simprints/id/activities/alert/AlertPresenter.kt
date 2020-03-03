@@ -20,7 +20,7 @@ class AlertPresenter(val view: AlertContract.View,
                      private val alertType: AlertType) : AlertContract.Presenter {
 
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var sessionManager: SessionRepository
+    @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var exitFormHelper: ExitFormHelper
@@ -38,7 +38,7 @@ class AlertPresenter(val view: AlertContract.View,
         initColours()
         initTextAndDrawables()
 
-        sessionManager.addEventToCurrentSessionInBackground(AlertScreenEvent(timeHelper.now(), alertType.fromAlertToAlertTypeEvent()))
+        sessionRepository.addEventToCurrentSessionInBackground(AlertScreenEvent(timeHelper.now(), alertType.fromAlertToAlertTypeEvent()))
     }
 
     private fun initButtons() {
