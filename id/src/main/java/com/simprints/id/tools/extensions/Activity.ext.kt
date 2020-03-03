@@ -36,12 +36,18 @@ fun Activity.hideKeyboard() {
     inputMethodManager.hideSoftInputFromWindow(focusedView.windowToken, flags)
 }
 
-fun Activity.requestPermissionsIfRequired(permissions: Array<String>, permissionsRequestCode: Int) {
-    val permissionsToAsk = permissions.filter {
-        checkSelfPermission(this, it) != PERMISSION_GRANTED
-    }.toTypedArray()
+fun Activity.requestPermissionsIfRequired(permissions: Array<String>, permissionsRequestCode: Int): Boolean {
+    val permissionsToAsk = getNotGrantedPermissions(permissions)
 
-    if (permissionsToAsk.isNotEmpty()) {
+    return if (permissionsToAsk.isNotEmpty()) {
         requestPermissions(this, permissionsToAsk, permissionsRequestCode)
+        true
+    } else {
+        false
     }
 }
+
+fun Activity.getNotGrantedPermissions(permissions: Array<String>) =
+    permissions.filter {
+        checkSelfPermission(this, it) != PERMISSION_GRANTED
+    }.toTypedArray()
