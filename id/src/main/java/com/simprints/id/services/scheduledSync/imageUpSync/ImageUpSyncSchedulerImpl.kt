@@ -36,8 +36,7 @@ class ImageUpSyncSchedulerImpl(context: Context) : ImageUpSyncScheduler {
 
     companion object {
         private const val WORK_NAME = "image-upsync-work"
-        private const val SYNC_REPEAT_INTERVAL = 15L
-        private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
+        private const val SYNC_REPEAT_INTERVAL = 1L
+        private val SYNC_REPEAT_UNIT = TimeUnit.HOURS
     }
-
 }
