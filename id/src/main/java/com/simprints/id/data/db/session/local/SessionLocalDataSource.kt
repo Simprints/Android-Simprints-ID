@@ -19,8 +19,4 @@ interface SessionLocalDataSource {
 
     suspend fun updateCurrentSession(updateBlock: (SessionEvents) -> Unit)
     suspend fun addEventToCurrentSession(event: Event)
-    fun addEventToCurrentSessionInBackground(event: Event)
-
-    @Deprecated("gonna remove it soon")
-    suspend fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents)
 }
