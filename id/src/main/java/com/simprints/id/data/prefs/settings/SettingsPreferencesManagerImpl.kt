@@ -9,10 +9,13 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigCompl
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigPrimitivePreference
+import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.Serializer
 
 
@@ -23,7 +26,10 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           modalitySerializer: Serializer<List<Modality>>,
                                           languagesStringArraySerializer: Serializer<Array<String>>,
                                           moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-                                          peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>)
+                                          peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>,
+                                          captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
+                                          saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
+                                          scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>)
     : SettingsPreferencesManager {
 
     companion object {
@@ -75,6 +81,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val LOGO_EXISTS_KEY = "LogoExists"
         const val LOGO_EXISTS_DEFAULT = true
 
+        const val CONSENT_REQUIRED_KEY = "ConsentRequired"
+        const val CONSENT_REQUIRED_DEFAULT = true
+
         const val PEOPLE_DOWN_SYNC_TRIGGERS_KEY = "PeopleDownSyncTriggers"
         val PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT = mapOf(
             PeopleDownSyncTrigger.MANUAL to true,
@@ -87,6 +96,16 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         const val FINGER_IMAGES_EXIST_KEY = "FingerImagesExist"
         const val FINGER_IMAGES_EXIST_DEFAULT = true
+
+        val CAPTURE_FINGERPRINT_STRATEGY_DEFAULT = CaptureFingerprintStrategy.SECUGEN_ISO_1700_DPI
+        const val CAPTURE_FINGERPRINT_STRATEGY_KEY = "CaptureFingerprintStrategy"
+
+        val SAVE_FINGERPRINT_IMAGES_STRATEGY_DEFAULT = SaveFingerprintImagesStrategy.NEVER
+        const val SAVE_FINGERPRINT_IMAGES_STRATEGY_KEY = "SaveFingerprintImagesStrategy"
+
+        val SCANNER_GENERATIONS_DEFAULT = listOf(ScannerGeneration.VERO_1)
+        const val SCANNER_GENERATIONS_KEY = "ScannerGenerations"
+
     }
 
     // Number of GUIDs to be returned to the calling app as the result of an identification
@@ -136,6 +155,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var logoExists: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, LOGO_EXISTS_KEY, LOGO_EXISTS_DEFAULT)
 
+    override var consentRequired: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, CONSENT_REQUIRED_KEY, CONSENT_REQUIRED_DEFAULT)
+
     override var modalities: List<Modality>
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MODALITY_KEY, MODALITY_DEFAULT, modalitySerializer)
 
@@ -145,6 +167,15 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     override var fingerImagesExist: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, FINGER_IMAGES_EXIST_KEY, FINGER_IMAGES_EXIST_DEFAULT)
+
+    override var captureFingerprintStrategy: CaptureFingerprintStrategy
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, CAPTURE_FINGERPRINT_STRATEGY_KEY, CAPTURE_FINGERPRINT_STRATEGY_DEFAULT, captureFingerprintStrategySerializer)
+
+    override var saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SAVE_FINGERPRINT_IMAGES_STRATEGY_KEY, SAVE_FINGERPRINT_IMAGES_STRATEGY_DEFAULT, saveFingerprintImagesStrategySerializer)
+
+    override var scannerGenerations: List<ScannerGeneration>
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SCANNER_GENERATIONS_KEY, SCANNER_GENERATIONS_DEFAULT, scannerGenerationsSerializer)
 
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()

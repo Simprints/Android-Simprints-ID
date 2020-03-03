@@ -4,8 +4,9 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.common.truth.Truth
-import com.nhaarman.mockitokotlin2.any
+import com.simprints.core.network.NetworkConstants.Companion.BASE_URL
 import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
@@ -22,16 +23,16 @@ import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.ApiToken
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
-import com.simprints.testtools.common.di.DependencyRule.MockRule
+import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.common.di.DependencyRule.ReplaceRule
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
-import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.getSharedPreferences
+import io.mockk.*
 import io.reactivex.Single
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -39,7 +40,6 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
 import org.robolectric.annotation.Config
 import java.io.IOException
 import javax.inject.Inject
@@ -52,12 +52,12 @@ class ProjectAuthenticatorTest {
 
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
 
-    private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mock()
-    private val projectLocalDAtaSourceMock: ProjectLocalDataSource = mock()
+    private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mockk()
+    private val projectLocalDAtaSourceMock: ProjectLocalDataSource = mockk()
 
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var remoteSessionsManagerMock: RemoteSessionsManager
-    @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
+    @Inject lateinit var peopleSyncManagerMock: PeopleSyncManager
 
     private val projectId = "project_id"
     private val userId = "user_id"
@@ -65,11 +65,9 @@ class ProjectAuthenticatorTest {
     private val module by lazy {
         TestAppModule(
             app,
-            remoteDbManagerRule = MockRule,
-            loginInfoManagerRule = MockRule,
-            syncSchedulerHelperRule = MockRule,
-            peopleUpSyncMasterRule = MockRule,
-            keystoreManagerRule = ReplaceRule { mock<KeystoreManager>().apply { setupFakeKeyStore(this) } }
+            remoteDbManagerRule = MockkRule,
+            loginInfoManagerRule = MockkRule,
+            keystoreManagerRule = ReplaceRule { mockk<KeystoreManager>().apply { setupFakeKeyStore(this) } }
         )
     }
 
@@ -91,9 +89,9 @@ class ProjectAuthenticatorTest {
 
         }
 
-        whenever(remoteSessionsManagerMock.getSessionsApiClient()).thenReturn(Single.create { it.onError(IllegalStateException()) })
+        coEvery { remoteSessionsManagerMock.getSessionsApiClient() } throws IllegalStateException()
 
-        apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)
+        apiClient = SimApiClientFactory("deviceId", endpoint = BASE_URL).build()
     }
 
     @Test
@@ -114,8 +112,6 @@ class ProjectAuthenticatorTest {
         testObserver
             .assertNoErrors()
             .assertComplete()
-
-        verifyOnce(peopleUpSyncMasterMock) { resume(projectId/*, userId*/) } // TODO: uncomment userId when multitenancy is properly implemented
     }
 
     @Test
@@ -138,33 +134,33 @@ class ProjectAuthenticatorTest {
 
     @Test
     fun getAuthenticationData_invokeAuthenticationDataManagerCorrectly() {
-        val authenticationDataManager = mock<AuthenticationDataManager>()
-        val projectAuthenticator = ProjectAuthenticator(mock(), mock(), mock(), mock(), authenticationDataManager)
+        val authenticationDataManager = mockk<AuthenticationDataManager>(relaxed = true)
+        val projectAuthenticator = ProjectAuthenticator(app.component, mockk(), mockk(), mockk(), authenticationDataManager)
         projectAuthenticator.getAuthenticationData(projectId, userId)
 
-        verifyOnce(authenticationDataManager) { requestAuthenticationData(projectId, userId) }
+        verify(exactly = 1) { authenticationDataManager.requestAuthenticationData(projectId, userId) }
     }
 
     @Test
     fun authenticate_shouldAuthenticateWithRightRequestsToSecureApiInterface() {
 
         val mockWebServer = MockWebServer()
-        val mockProjectSecretManager: ProjectSecretManager = mock()
+        val mockProjectSecretManager: ProjectSecretManager = mockk()
 
-        whenever {
-            mockProjectSecretManager.encryptAndStoreAndReturnProjectSecret(ArgumentMatchers.anyString(), anyNotNull())
-        } thenReturn "encrypted_project_secret"
+        every {
+            mockProjectSecretManager.encryptAndStoreAndReturnProjectSecret(any(), any())
+        } returns "encrypted_project_secret"
 
         mockWebServer.enqueue(mockResponseForAuthenticationData())
         mockWebServer.enqueue(mockResponseForApiToken())
 
-        val authenticator = spy(ProjectAuthenticator(
+        val authenticator = spyk(ProjectAuthenticator(
             app.component,
             SafetyNet.getClient(app),
-            SimApiClient(SecureApiInterface::class.java, mockWebServer.url("/").toString()).api,
+            SimApiClientFactory("deviceId", mockWebServer.url("/").toString()).build<SecureApiInterface>().api,
             getMockAttestationManager()))
 
-        whenever { authenticator.projectSecretManager } thenReturn mockProjectSecretManager
+        every { authenticator.projectSecretManager } returns mockProjectSecretManager
 
         val testObserver = authenticator.authenticate(NonceScope(projectId, userId), "encrypted_project_secret").test()
 
@@ -175,12 +171,12 @@ class ProjectAuthenticatorTest {
 
     @Test
     fun safetyNetFailed_shouldThrowRightException() {
-        val attestationManager = mock<AttestationManager>()
+        val attestationManager = mockk<AttestationManager>()
         val nonceScope = NonceScope(projectId, userId)
 
-        whenever {
+        every {
             attestationManager.requestAttestation(any(), any())
-        }  thenThrow(SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
+        } throws (SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
 
         val testObserver = ProjectAuthenticator(
             app.component,
@@ -197,10 +193,10 @@ class ProjectAuthenticatorTest {
     }
 
     private fun getMockAttestationManager(): AttestationManager {
-        val attestationManager = mock<AttestationManager>()
-        whenever {
-            attestationManager.requestAttestation(anyNotNull(), anyNotNull())
-        } thenReturn Single.just(AttestToken("google_attestation"))
+        val attestationManager = mockk<AttestationManager>()
+        every {
+            attestationManager.requestAttestation(any(), any())
+        } returns Single.just(AttestToken("google_attestation"))
 
         return attestationManager
     }

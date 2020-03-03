@@ -7,19 +7,25 @@ import android.content.Context
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsContract
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter.Companion.imageTransferTimeoutMs
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter.Companion.qualityThreshold
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter.Companion.timeoutInMillis
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter.Companion.scanningTimeoutMs
 import com.simprints.fingerprint.activities.collect.models.FingerStatus
 import com.simprints.fingerprint.activities.collect.models.FingerStatus.*
-import com.simprints.fingerprint.activities.collect.views.TimeoutBar
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningOnlyTimeoutBar
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningWithImageTransferTimeoutBar
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.SCANNER_BUTTON
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
@@ -32,6 +38,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 
 class CollectFingerprintsScanningHelper(private val context: Context,
@@ -39,7 +46,8 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                                         private val presenter: CollectFingerprintsContract.Presenter,
                                         private val scannerManager: ScannerManager,
                                         private val crashReportManager: FingerprintCrashReportManager,
-                                        private val androidResourcesHelper: FingerprintAndroidResourcesHelper) {
+                                        private val androidResourcesHelper: FingerprintAndroidResourcesHelper,
+                                        private val fingerprintPreferencesManager: FingerprintPreferencesManager) {
 
 
     private var previousStatus: FingerStatus = NOT_COLLECTED
@@ -52,13 +60,18 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private val scannerTriggerListener = ScannerTriggerListener {
         crashReportManager.logMessageForCrashReport(FINGER_CAPTURE, SCANNER_BUTTON, message = "Scanner button clicked")
         if (presenter.isConfirmDialogShown)
-            presenter.handleConfirmFingerprintsAndContinue()
+            context.runOnUiThread {
+                presenter.handleConfirmFingerprintsAndContinue()
+            }
         else if (shouldEnableScanButton())
-            presenter.handleScannerButtonPressed()
+            context.runOnUiThread {
+                presenter.handleScannerButtonPressed()
+            }
     }
 
     private var scanningTask: Disposable? = null
     private var reconnectingTask: Disposable? = null
+    private var imageTransferTask: Disposable? = null
 
     private fun shouldEnableScanButton() = !presenter.isBusyWithFingerTransitionAnimation
 
@@ -75,8 +88,18 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
     }
 
-    private fun initTimeoutBar(): TimeoutBar =
-        TimeoutBar(context.applicationContext, view.progressBar, timeoutInMillis)
+    private fun isImageTransferRequired(): Boolean =
+        when (fingerprintPreferencesManager.saveFingerprintImagesStrategy) {
+            SaveFingerprintImagesStrategy.NEVER -> false
+            SaveFingerprintImagesStrategy.WSQ_15 -> true
+        }
+
+    private fun initTimeoutBar(): ScanningTimeoutBar =
+        if (isImageTransferRequired()) {
+            ScanningWithImageTransferTimeoutBar(context, view.progressBar, scanningTimeoutMs, imageTransferTimeoutMs)
+        } else {
+            ScanningOnlyTimeoutBar(context, view.progressBar, scanningTimeoutMs)
+        }
 
     // Creates a progress dialog when the scan gets disconnected
     private fun initUn20Dialog(): ProgressDialog =
@@ -162,6 +185,9 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 startContinuousCapture()
             COLLECTING ->
                 stopContinuousCapture()
+            TRANSFERRING_IMAGE -> {
+                /* Do nothing as cannot cancel image transfer */
+            }
         }
 
     private fun askIfWantRescan() {
@@ -177,7 +203,14 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         presenter.refreshDisplay()
         view.timeoutBar.startTimeoutBar()
         scanningTask?.dispose()
-        scanningTask = scannerManager.scanner<CaptureFingerprintResponse> { captureFingerprint(timeoutInMillis, qualityThreshold) }
+        scanningTask = scannerManager.scanner { setUiIdle() }
+            .andThen(scannerManager.scanner<CaptureFingerprintResponse> {
+                captureFingerprint(
+                    fingerprintPreferencesManager.captureFingerprintStrategy,
+                    scanningTimeoutMs.toInt(),
+                    qualityThreshold
+                )
+            })
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -193,21 +226,55 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     private fun handleNoFingerTemplateDetected() {
         currentFingerStatus = NO_FINGER_DETECTED
+        view.timeoutBar.handleAllStepsFinished()
         Vibrate.vibrate(context)
         presenter.refreshDisplay()
     }
 
     private fun cancelCaptureUI() {
         currentFingerStatus = previousStatus
-        view.timeoutBar.cancelTimeoutBar()
+        view.timeoutBar.handleCancelled()
         presenter.refreshDisplay()
     }
 
     private fun handleCaptureSuccess(captureFingerprintResponse: CaptureFingerprintResponse) {
-        view.timeoutBar.stopTimeoutBar()
         val quality = captureFingerprintResponse.imageQualityScore
         parseTemplateAndAddToCurrentFinger(captureFingerprintResponse.template)
+        presenter.currentFinger().templateQuality = quality
+        Vibrate.vibrate(context)
         setGoodOrBadScanFingerStatusToCurrentFinger(quality)
+        if (shouldProceedToImageTransfer(quality)) {
+            view.timeoutBar.handleScanningFinished()
+            proceedToImageTransfer()
+        } else {
+            view.timeoutBar.handleAllStepsFinished()
+            presenter.refreshDisplay()
+            presenter.handleCaptureSuccess()
+        }
+    }
+
+    private fun shouldProceedToImageTransfer(quality: Int) =
+        isImageTransferRequired() &&
+            (quality >= qualityThreshold || presenter.tooManyBadScans(presenter.currentFinger()))
+
+    private fun proceedToImageTransfer() {
+        currentFingerStatus = TRANSFERRING_IMAGE
+        presenter.refreshDisplay()
+        imageTransferTask = scannerManager.onScanner { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = ::handleImageTransferSuccess,
+                onError = ::handleError
+            )
+    }
+
+    private fun handleImageTransferSuccess(acquireImageResponse: AcquireImageResponse) {
+        view.timeoutBar.handleAllStepsFinished()
+        val imageBytes = acquireImageResponse.imageBytes
+        presenter.currentFinger().imageBytes = imageBytes
+        setGoodOrBadScanFingerStatusToCurrentFinger(presenter.currentFinger().templateQuality
+            ?: throw IllegalStateException("Must have set template quality before here"))
         Vibrate.vibrate(context)
         presenter.refreshDisplay()
         presenter.handleCaptureSuccess()
@@ -237,9 +304,10 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         scannerManager.scanner { setUiIdle() }.doInBackground()
     }
 
-    fun stopReconnecting() {
+    fun stopScannerCommunications() {
         reconnectingTask?.dispose()
-        scannerManager.scanner { disconnect() }.doInBackground()
+        imageTransferTask?.dispose()
+        disconnectScannerIfNeeded()
     }
 
     fun disconnectScannerIfNeeded() {

@@ -1,18 +1,18 @@
 package com.simprints.id.commontesttools.state
 
 import android.content.SharedPreferences
-import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.LocalDbKey
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.whenever
-import io.reactivex.Single
+import io.mockk.coEvery
 
 object LoginStateMocker {
 
     fun setupLoginStateFullyToBeSignedIn(sharedPrefs: SharedPreferences,
-                                         secureDataManagerMock: SecureDataManager,
+                                         secureLocalDbKeyProviderMock: SecureLocalDbKeyProvider,
                                          remoteDbManagerMock: RemoteDbManager,
                                          projectId: String,
                                          userId: String,
@@ -26,7 +26,7 @@ object LoginStateMocker {
         editor.putString(LoginInfoManagerImpl.USER_ID, userId)
         editor.commit()
 
-        whenever(secureDataManagerMock) { getLocalDbKeyOrThrow(anyNotNull()) } thenReturn localDbKey
-        whenever(remoteDbManagerMock.getCurrentToken()).thenReturn(Single.just(token))
+        whenever(secureLocalDbKeyProviderMock) { getLocalDbKeyOrThrow(anyNotNull()) } thenReturn localDbKey
+        coEvery { remoteDbManagerMock.getCurrentToken() } returns token
     }
 }

@@ -15,7 +15,7 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
 import com.simprints.id.testtools.state.RobolectricTestMocker.initLogInStateMock
 import com.simprints.id.testtools.state.RobolectricTestMocker.setUserLogInState
-import com.simprints.testtools.common.di.DependencyRule.MockRule
+import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import com.simprints.testtools.unit.robolectric.createActivity
@@ -37,9 +37,7 @@ class CheckLoginFromMainLauncherActivityTest {
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
 
     private val module by lazy {
-        TestAppModule(app,
-            remoteDbManagerRule = MockRule,
-            secureDataManagerRule = MockRule)
+        TestAppModule(app, remoteDbManagerRule = MockkRule, secureDataManagerRule = MockkRule)
     }
 
     @Before
@@ -85,6 +83,7 @@ class CheckLoginFromMainLauncherActivityTest {
 
     @Test
     fun userIsLogged_shouldDashboardActComeUp() {
+        editor.putBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, true).commit()
         startCheckLoginAndCheckNextActivity(DashboardActivity::class.java)
     }
 

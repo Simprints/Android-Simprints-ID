@@ -1,9 +1,11 @@
 package com.simprints.id.di
 
 import android.content.SharedPreferences
+import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.prefs.PreferencesManager
@@ -41,15 +43,18 @@ class OrchestratorModule {
     fun provideFaceRequestFactory(): FaceRequestFactory = FaceRequestFactoryImpl()
 
     @Provides
-    fun provideFingerprintRequestFactory(): FingerprintRequestFactory = FingerprintRequestFactoryImpl()
+    fun provideFingerprintRequestFactory(): FingerprintRequestFactory =
+        FingerprintRequestFactoryImpl()
 
     @Provides
     fun provideFaceStepProcessor(faceRequestFactory: FaceRequestFactory): FaceStepProcessor =
         FaceStepProcessorImpl(faceRequestFactory)
 
     @Provides
-    fun provideFingerprintStepProcessor(fingerprintRequestFactory: FingerprintRequestFactory,
-                                        preferenceManager: PreferencesManager): FingerprintStepProcessor =
+    fun provideFingerprintStepProcessor(
+        fingerprintRequestFactory: FingerprintRequestFactory,
+        preferenceManager: PreferencesManager
+    ): FingerprintStepProcessor =
         FingerprintStepProcessorImpl(fingerprintRequestFactory, preferenceManager)
 
     @Provides
@@ -58,35 +63,59 @@ class OrchestratorModule {
     // ModalFlow [Enrol, Identify, Verify]
     @Provides
     @Named("ModalityFlowEnrol")
-    fun provideModalityFlow(fingerprintStepProcessor: FingerprintStepProcessor,
-                            faceStepProcessor: FaceStepProcessor,
-                            coreStepProcessor: CoreStepProcessor,
-                            sessionEventsManager: SessionEventsManager): ModalityFlow =
-        ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, sessionEventsManager)
+    fun provideModalityFlow(
+        fingerprintStepProcessor: FingerprintStepProcessor,
+        faceStepProcessor: FaceStepProcessor,
+        coreStepProcessor: CoreStepProcessor,
+        sessionEventsManager: SessionEventsManager,
+        preferenceManager: PreferencesManager
+    ): ModalityFlow =
+        ModalityFlowEnrolImpl(
+            fingerprintStepProcessor,
+            faceStepProcessor,
+            coreStepProcessor,
+            sessionEventsManager,
+            preferenceManager.consentRequired
+        )
 
     @Provides
     @Named("ModalityFlowVerify")
-    fun provideModalityFlowVerify(fingerprintStepProcessor: FingerprintStepProcessor,
-                                  faceStepProcessor: FaceStepProcessor,
-                                  coreStepProcessor: CoreStepProcessor,
-                                  sessionEventsManager: SessionEventsManager): ModalityFlow =
-        ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, sessionEventsManager)
+    fun provideModalityFlowVerify(
+        fingerprintStepProcessor: FingerprintStepProcessor,
+        faceStepProcessor: FaceStepProcessor,
+        coreStepProcessor: CoreStepProcessor,
+        sessionEventsManager: SessionEventsManager,
+        preferenceManager: PreferencesManager
+    ): ModalityFlow =
+        ModalityFlowVerifyImpl(
+            fingerprintStepProcessor,
+            faceStepProcessor,
+            coreStepProcessor,
+            sessionEventsManager,
+            preferenceManager.consentRequired
+        )
 
     @Provides
     @Named("ModalityFlowIdentify")
-    fun provideModalityFlowIdentify(fingerprintStepProcessor: FingerprintStepProcessor,
-                                    faceStepProcessor: FaceStepProcessor,
-                                    coreStepProcessor: CoreStepProcessor,
-                                    prefs: PreferencesManager,
-                                    sessionEventsManager: SessionEventsManager): ModalityFlow =
-        ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, prefs, sessionEventsManager)
+    fun provideModalityFlowIdentify(
+        fingerprintStepProcessor: FingerprintStepProcessor,
+        faceStepProcessor: FaceStepProcessor,
+        coreStepProcessor: CoreStepProcessor,
+        prefs: PreferencesManager,
+        sessionEventsManager: SessionEventsManager
+    ): ModalityFlow =
+        ModalityFlowIdentifyImpl(
+            fingerprintStepProcessor, faceStepProcessor,
+            coreStepProcessor, prefs.matchGroup, sessionEventsManager, prefs.consentRequired
+        )
 
     // Orchestration
     @Provides
-    fun provideModalityFlowFactory(@Named("ModalityFlowEnrol") enrolFlow: ModalityFlow,
-                                   @Named("ModalityFlowVerify") verifyFlow: ModalityFlow,
-                                   @Named("ModalityFlowIdentify") identifyFlow: ModalityFlow): ModalityFlowFactory =
+    fun provideModalityFlowFactory(
+        @Named("ModalityFlowEnrol") enrolFlow: ModalityFlow,
+        @Named("ModalityFlowVerify") verifyFlow: ModalityFlow,
+        @Named("ModalityFlowIdentify") identifyFlow: ModalityFlow
+    ): ModalityFlowFactory =
         ModalityFlowFactoryImpl(enrolFlow, verifyFlow, identifyFlow)
 
     @Provides
@@ -96,14 +125,23 @@ class OrchestratorModule {
 
     @Provides
     @OrchestratorScope // Since OrchestratorManagerImpl is also a FlowProvider, it needs to be a Singleton
-    fun provideOrchestratorManagerImpl(modalityFlowFactory: ModalityFlowFactory,
-                                       appResponseFactory: AppResponseFactory,
-                                       hotCache: HotCache): OrchestratorManagerImpl =
-        OrchestratorManagerImpl(modalityFlowFactory, appResponseFactory, hotCache)
+    fun provideOrchestratorManagerImpl(
+        modalityFlowFactory: ModalityFlowFactory,
+        appResponseFactory: AppResponseFactory,
+        hotCache: HotCache,
+        dashboardDailyActivityRepository: DashboardDailyActivityRepository
+    ): OrchestratorManagerImpl = OrchestratorManagerImpl(
+        modalityFlowFactory,
+        appResponseFactory,
+        hotCache,
+        dashboardDailyActivityRepository
+    )
 
     @Provides
-    fun provideOrchestratorEventsHelper(sessionEventsManager: SessionEventsManager,
-                                        timeHelper: TimeHelper): OrchestratorEventsHelper =
+    fun provideOrchestratorEventsHelper(
+        sessionEventsManager: SessionEventsManager,
+        timeHelper: TimeHelper
+    ): OrchestratorEventsHelper =
         OrchestratorEventsHelperImpl(sessionEventsManager, timeHelper)
 
     @Provides
@@ -111,20 +149,22 @@ class OrchestratorModule {
         orchestratorManager: OrchestratorManager,
         orchestratorEventsHelper: OrchestratorEventsHelper,
         preferenceManager: PreferencesManager,
-        sessionEventsManager: SessionEventsManager
+        sessionEventsManager: SessionEventsManager,
+        crashReportManager: CrashReportManager
     ): OrchestratorViewModelFactory {
         return OrchestratorViewModelFactory(
             orchestratorManager,
             orchestratorEventsHelper,
             preferenceManager.modalities,
             sessionEventsManager,
-            DomainToModuleApiAppResponse
+            DomainToModuleApiAppResponse,
+            crashReportManager
         )
     }
 
     @Provides
     fun provideHotCache(
-        @Named("EncryptedSharedPreferences")  sharedPrefs: SharedPreferences,
+        @Named("EncryptedSharedPreferences") sharedPrefs: SharedPreferences,
         stepEncoder: StepEncoder
     ): HotCache = HotCacheImpl(sharedPrefs, stepEncoder)
 

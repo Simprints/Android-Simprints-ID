@@ -2,10 +2,11 @@ package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
+import com.simprints.core.network.NetworkConstants.Companion.BASE_URL
 import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.secure.SecureApiInterface.Companion.apiKey
-import com.simprints.id.secure.SecureApiInterface.Companion.baseUrl
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.PublicKeyString
@@ -25,16 +26,15 @@ import java.io.IOException
 class AuthenticationDataManagerTest {
 
     companion object {
-        const val PROJECT_ID = "projectId"
-        const val USER_ID = "userId"
+        private const val PROJECT_ID = "projectId"
+        private const val USER_ID = "userId"
     }
-
 
     private val nonceFromServer = "nonce_from_server"
     private val publicKeyFromServer = "public_key_from_server"
     private val validAuthenticationJsonResponse = "{\"nonce\":\"$nonceFromServer\", \"publicKey\":\"$publicKeyFromServer\"}"
     private val expectedAuthenticationData = AuthenticationData(Nonce(nonceFromServer), PublicKeyString(publicKeyFromServer))
-    private val expectedUrl = baseUrl + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?key=$apiKey"
+    private val expectedUrl = BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?key=$apiKey"
 
     private val validateUrl: (url: String) -> Unit  = {
         Truth.assertThat(it).isEqualTo(expectedUrl)
@@ -44,7 +44,7 @@ class AuthenticationDataManagerTest {
 
     @Before
     fun setUp() {
-        apiClient = SimApiClient(SecureApiInterface::class.java, baseUrl)
+        apiClient = SimApiClientFactory("deviceId", endpoint = BASE_URL).build()
     }
 
     @Test

@@ -1,105 +1,103 @@
 package com.simprints.id.activities.debug
 
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.WorkManager
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.R
-import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
-import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
+import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncOperationLocalDataSource
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.*
 import kotlinx.android.synthetic.main.activity_debug.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 class DebugActivity : AppCompatActivity() {
 
-    @Inject lateinit var preferencesManager: PreferencesManager
-    //@Inject lateinit var localDbManager: LocalDbManager
-    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
+    @Inject lateinit var peopleSyncManager: PeopleSyncManager
+    @Inject lateinit var peopleDownSyncOperationLocalDataSource: PeopleDownSyncOperationLocalDataSource
 
-    private lateinit var viewModel: DebugContract.Presenter
-
-    private val listOfLocalDbViewModels = mutableListOf<LocalDbViewModel>()
-    private val listOfLocalDownSyncStatus = mutableListOf<RoomDownStatusViewModel>()
-
-    private lateinit var localDbViewAdapter: LocalDbRecycleViewAdapter
-    private lateinit var roomDownSyncStatusAdapter: RoomDownStatusRecycleViewAdapter
+    private val wm: WorkManager
+        get() = WorkManager.getInstance(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_debug)
-        if (!BuildConfig.DEBUG) {
-            finish()
-        }
-
         val component = (application as Application).component
         component.inject(this)
 
-        setUpRecyclerViewForLocalDbInfo()
-        setUpRecyclerViewForRoomInfo()
+        setContentView(R.layout.activity_debug)
 
-        viewModel = DebugViewModel(component)
-        viewModel.stateLiveData.observe(this, updateLocalDbCountersUI)
-        viewModel.refresh()
-    }
+        peopleSyncManager.getLastSyncState().observe(this, Observer {
+            val states = (it.downSyncWorkersInfo.map { it.state } + it.upSyncWorkersInfo.map { it.state })
+            val message =
+                "${it.syncId.takeLast(3)} - " +
+                "${states.toDebugActivitySyncState().name} - " +
+                "${it.progress}/${it.total}"
 
-    private fun setUpRecyclerViewForRoomInfo() {
-        localDb_room_down_status.layoutManager = LinearLayoutManager(this)
-        roomDownSyncStatusAdapter = RoomDownStatusRecycleViewAdapter(listOfLocalDownSyncStatus, this)
-        localDb_room_down_status.adapter = roomDownSyncStatusAdapter
-        syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData().observe(this, updateRoomDownSyncStatusUI)
-    }
+            val ssb = SpannableStringBuilder(logs.text)
+            ssb.append(coloredText(message + "\n", Color.parseColor(getRandomColor(it.syncId))))
 
-    private fun setUpRecyclerViewForLocalDbInfo() {
-        localDb_subscopes.layoutManager = LinearLayoutManager(this)
-        localDbViewAdapter = LocalDbRecycleViewAdapter(listOfLocalDbViewModels, this)
-        localDb_subscopes.adapter = localDbViewAdapter
-    }
+            logs.setText(ssb, TextView.BufferType.SPANNABLE)
+        })
 
-    private val updateLocalDbCountersUI: Observer<in State> = Observer { state ->
-        runOnUiThread {
-            listOfLocalDbViewModels.clear()
-            listOfLocalDbViewModels.addAll(state.nPeople.map {
-                LocalDbViewModel(it.key, it.value) { subScopeToDelete ->
-                    GlobalScope.launch(Dispatchers.IO) { onDeleteSubModule(subScopeToDelete) }
-                }
-            })
-            localDbViewAdapter.notifyDataSetChanged()
+        syncSchedule.setOnClickListener {
+            peopleSyncManager.scheduleSync()
+        }
+
+        syncStart.setOnClickListener {
+            peopleSyncManager.sync()
+        }
+
+        syncStop.setOnClickListener {
+            peopleSyncManager.stop()
+        }
+
+        cleanAll.setOnClickListener {
+            peopleSyncManager.cancelScheduledSync()
+            peopleSyncManager.stop()
+            wm.pruneWork()
+
+            peopleDownSyncOperationLocalDataSource.deleteAll()
         }
     }
 
-    private val updateRoomDownSyncStatusUI: Observer<in List<DownSyncStatus>?> = Observer {
-        runOnUiThread {
-            listOfLocalDownSyncStatus.clear()
-            listOfLocalDownSyncStatus.addAll(it?.map { downStatus ->
-                RoomDownStatusViewModel(downStatus) { downStatusToDelete ->
-                    GlobalScope.launch(Dispatchers.IO) { onDeleteRoomInfo(downStatusToDelete) }
-                }
-            }?.toList() ?: arrayListOf())
-            roomDownSyncStatusAdapter.notifyDataSetChanged()
+    private fun getRandomColor(seed: String): String {
+        val rnd = seed.toCharArray().sumBy { it.toInt() } % 4
+        return arrayOf("red", "yellow", "green", "blue")[rnd]
+    }
+
+    private fun coloredText(text: String, color: Int): SpannableString? {
+        val spannableString = SpannableString(text)
+        try {
+            spannableString.setSpan(ForegroundColorSpan(color), 0,
+                text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        } catch (e: Exception) {
         }
+        return spannableString
     }
 
-
-    private fun onDeleteRoomInfo(downSyncStatus: DownSyncStatus) {
-        syncStatusDatabase.downSyncDao.deleteDownSyncStatus(downSyncStatus.id)
-        runOnUiThread {
-            roomDownSyncStatusAdapter.notifyDataSetChanged()
+    private fun List<PeopleSyncWorkerState>.toDebugActivitySyncState(): DebugActivitySyncState =
+        when {
+            isEmpty() -> DebugActivitySyncState.NOT_RUNNING
+            this.any { it is Running } -> DebugActivitySyncState.RUNNING
+            this.any { it is Enqueued } -> DebugActivitySyncState.CONNECTING
+            this.all { it is Succeeded } -> DebugActivitySyncState.SUCCESS
+            else -> DebugActivitySyncState.FAILED
         }
-    }
 
-
-    private fun onDeleteSubModule(subScopeToDelete: SubSyncScope) {
-        //localDbManager.deletePeopleFromLocal(subScopeToDelete).blockingAwait()
-    }
-
-    class State {
-        var nPeople: MutableMap<SubSyncScope, Int> = mutableMapOf()
+    enum class DebugActivitySyncState {
+        RUNNING,
+        NOT_RUNNING,
+        CONNECTING,
+        SUCCESS,
+        FAILED
     }
 }

@@ -2,10 +2,10 @@ package com.simprints.id.data.prefs.preferenceType
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeException
-import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.common.syntax.assertThrows
+import io.mockk.*
 import org.junit.Assert
 import org.junit.Test
-import org.mockito.Mockito.*
 
 class PrimitivePreferenceTest {
 
@@ -21,31 +21,29 @@ class PrimitivePreferenceTest {
     private var stringPref by PrimitivePreference(improvedPrefs, aKey, aString)
 
     private fun mockImprovedEditor(): ImprovedSharedPreferences.Editor {
-        val editor = com.simprints.testtools.common.syntax.mock<ImprovedSharedPreferences.Editor>()
-        whenever(editor.putPrimitive(anyString(), anyNotNull())).thenReturn(editor)
-        whenever(editor.putPrimitive(anyString(), anyNotNull())).thenReturn(editor)
+        val editor = mockk<ImprovedSharedPreferences.Editor>(relaxed = true)
+        every { editor.putPrimitive(any(), any<String>()) } returns editor
+        every { editor.putPrimitive(any(), any<String>()) } returns editor
         return editor
     }
 
     private fun mockImprovedPrefs(editorToReturn: ImprovedSharedPreferences.Editor): ImprovedSharedPreferences {
-        val prefs = com.simprints.testtools.common.syntax.mock<ImprovedSharedPreferences>()
-        whenever(prefs.edit()).thenReturn(editorToReturn)
-        whenever(prefs.getPrimitive(aKey, aString)).thenReturn(storedString)
+        val prefs = mockk<ImprovedSharedPreferences>(relaxed = true)
+        every { prefs.edit() } returns editorToReturn
+        every { prefs.getPrimitive(aKey, aString) } returns storedString
         return prefs
     }
 
     @Test
     fun testDeclarationDoesNotReadPreferences() {
-        verifyZeroInteractions(improvedPrefs)
+        verify { improvedPrefs wasNot Called }
     }
 
     @Suppress("UNUSED_VARIABLE")
     @Test
     fun testFirstGetValueReadsPreferencesWithGetPrimitive() {
         val firstGet = stringPref
-        verifyOnlyInteraction(improvedPrefs) {
-            getPrimitive(aKey, aString)
-        }
+        verifyAll { improvedPrefs.getPrimitive(aKey, aString) }
     }
 
     @Test
@@ -58,7 +56,7 @@ class PrimitivePreferenceTest {
     fun testSecondGetValueDoesReadPreferences() {
         val firstGet = stringPref
         val secondGet = stringPref
-        verify(improvedPrefs, times(2)).getPrimitive(aKey, aString)
+        verify(exactly = 2) { improvedPrefs.getPrimitive(aKey, aString) }
     }
 
     @Suppress("UNUSED_VARIABLE")
@@ -73,9 +71,10 @@ class PrimitivePreferenceTest {
     @Test
     fun testSetValuePutsPrimitiveAndAppliesChange() {
         stringPref = storedString
-        verifyOnlyInteractions(improvedEditor,
-            { putPrimitive(aKey, storedString) },
-            { apply() })
+        verifyAll {
+            improvedEditor.putPrimitive(aKey, storedString)
+            improvedEditor.apply()
+        }
     }
 
     @Suppress("UNUSED_VALUE", "UNUSED_VARIABLE")
@@ -83,7 +82,7 @@ class PrimitivePreferenceTest {
     fun testGetValueAfterSetValueDoesReadPreferences() {
         stringPref = storedString
         val firstGet = stringPref
-        verify(improvedPrefs, times(1)).getPrimitive(aKey, aString)
+        verify(exactly = 1) { improvedPrefs.getPrimitive(aKey, aString) }
     }
 
     @Suppress("UnnecessaryVariable")

@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.odk
 
+import com.nhaarman.mockitokotlin2.eq
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_CONFIRM_IDENTITY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_IDENTIFY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_REGISTER
@@ -24,7 +25,6 @@ import org.junit.Before
 import org.junit.Test
 import java.util.*
 
-
 class OdkPresenterTest {
 
     private val view = mock<OdkActivity>()
@@ -38,11 +38,10 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
-
         val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
 
-        OdkPresenter(view, ACTION_REGISTER, mockSessionManagerToCreateSession(), mock()).apply {
+        OdkPresenter(view, ACTION_REGISTER, mockSessionManagerToCreateSession(), mock(), mock()).apply {
             runBlocking { start() }
         }
 
@@ -54,7 +53,7 @@ class OdkPresenterTest {
         val identificationExtractor = IdentifyRequestFactory.getMockExtractor()
         whenever(view) { identifyExtractor } thenReturn identificationExtractor
 
-        OdkPresenter(view, ACTION_IDENTIFY, mockSessionManagerToCreateSession(), mock()).apply {
+        OdkPresenter(view, ACTION_IDENTIFY, mockSessionManagerToCreateSession(), mock(), mock()).apply {
             runBlocking { start() }
         }
 
@@ -66,7 +65,7 @@ class OdkPresenterTest {
         val verifyExractor = VerifyRequestFactory.getMockExtractor()
         whenever(view) { verifyExtractor } thenReturn verifyExractor
 
-        OdkPresenter(view, ACTION_VERIFY, mockSessionManagerToCreateSession(), mock()).apply {
+        OdkPresenter(view, ACTION_VERIFY, mockSessionManagerToCreateSession(), mock(), mock()).apply {
             runBlocking { start() }
         }
 
@@ -75,7 +74,7 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        OdkPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock()).apply {
+        OdkPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock(), mock()).apply {
             runBlocking { start() }
         }
         verifyOnce(view) { handleClientRequestError(anyNotNull()) }
@@ -84,12 +83,15 @@ class OdkPresenterTest {
     @Test
     fun handleRegistration_ShouldReturnValidOdkRegistration() {
         val registerId = UUID.randomUUID().toString()
+        val sessionId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_REGISTER, mock(), mock()).apply {
+        val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
+        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
+        OdkPresenter(view, ACTION_REGISTER, sessionEventsManagerMock, mock(), mock()).apply {
             handleEnrollResponse(EnrollResponse(registerId))
         }
 
-        verifyOnce(view) { returnRegistration(registerId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        verifyOnce(view) { returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
     }
 
     @Test
@@ -98,7 +100,7 @@ class OdkPresenterTest {
         val id2 = MatchResult(UUID.randomUUID().toString(), 15, TIER_5)
         val sessionId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock()).apply {
+        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock(), mock()).apply {
             handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
         }
 
@@ -115,8 +117,12 @@ class OdkPresenterTest {
     @Test
     fun handleVerification_ShouldReturnValidOdkVerification() {
         val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
+        val sessionId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock()).apply {
+        val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
+        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
+
+        OdkPresenter(view, ACTION_IDENTIFY, sessionEventsManagerMock, mock(), mock()).apply {
             handleVerifyResponse(verification)
         }
 
@@ -125,6 +131,7 @@ class OdkPresenterTest {
                 id = verification.matchResult.guidFound,
                 confidence = verification.matchResult.confidence.toString(),
                 tier = verification.matchResult.tier.toString(),
+                sessionId = sessionId,
                 flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
     }
@@ -132,11 +139,13 @@ class OdkPresenterTest {
     @Test
     fun handleResponseError_ShouldCallActionError() {
         val error = ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID)
-        OdkPresenter(view, "", mock(), mock()).apply {
-            handleResponseError(error)
-        }
+        val sessionId = UUID.randomUUID().toString()
+        val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
+        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
 
-        verifyOnce(view) { returnErrorToClient(error, RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        OdkPresenter(view, "", sessionEventsManagerMock, mock(), mock()).handleResponseError(error)
+
+        verifyOnce(view) { returnErrorToClient(eq(error), eq(RETURN_FOR_FLOW_COMPLETED_CHECK), eq(sessionId)) }
     }
 
     @Test
@@ -144,7 +153,7 @@ class OdkPresenterTest {
         val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
         whenever(view) { confirmIdentityExtractor } thenReturn confirmIdentify
 
-        OdkPresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock()).apply {
+        OdkPresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock(), mock()).apply {
             runBlocking { start() }
         }
 

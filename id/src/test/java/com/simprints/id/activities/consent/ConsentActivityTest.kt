@@ -17,11 +17,12 @@ import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CO
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
-import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.common.di.DependencyRule.MockkRule
+import com.simprints.testtools.common.di.DependencyRule.SpykRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import com.simprints.testtools.unit.robolectric.createActivity
+import io.mockk.every
 import kotlinx.android.synthetic.main.activity_consent.*
 import org.junit.Before
 import org.junit.Test
@@ -41,15 +42,15 @@ class ConsentActivityTest {
 
     private val preferencesModule by lazy {
         TestPreferencesModule(
-            settingsPreferencesManagerRule = DependencyRule.SpyRule
+            settingsPreferencesManagerRule = SpykRule
         )
     }
 
     private val module by lazy {
         TestAppModule(app,
-            dbManagerRule = DependencyRule.MockRule,
-            sessionEventsLocalDbManagerRule = DependencyRule.MockRule,
-            crashReportManagerRule = DependencyRule.MockRule)
+            dbManagerRule = MockkRule,
+            sessionEventsLocalDbManagerRule = MockkRule,
+            crashReportManagerRule = MockkRule)
     }
 
     @Before
@@ -61,7 +62,7 @@ class ConsentActivityTest {
 
     @Test
     fun consentDeclineOnMultipleModalities_shouldLaunchCoreExitFormActivity() {
-        whenever(preferencesManagerSpy.modalities).thenReturn(listOf(Modality.FACE, Modality.FINGER))
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE, Modality.FINGER)
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
@@ -72,7 +73,7 @@ class ConsentActivityTest {
 
     @Test
     fun consentDeclineOnFingerprintModalityOnly_shouldLaunchFingerprintExitFormActivity() {
-        whenever(preferencesManagerSpy.modalities).thenReturn(listOf(Modality.FINGER))
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FINGER)
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
@@ -83,7 +84,7 @@ class ConsentActivityTest {
 
     @Test
     fun consentDeclineOnFaceModalityOnly_shouldLaunchCoreExitFormActivity() {
-        whenever(preferencesManagerSpy.modalities).thenReturn(listOf(Modality.FACE))
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 

@@ -27,7 +27,6 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.util.*
 
-
 class LibSimprintsPresenterTest {
 
     companion object {
@@ -48,7 +47,13 @@ class LibSimprintsPresenterTest {
         val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, mockSessionManagerToCreateSession(), mock()).apply {
+        LibSimprintsPresenter(
+            view,
+            Constants.SIMPRINTS_REGISTER_INTENT,
+            mockSessionManagerToCreateSession(),
+            mock(),
+            mock()
+        ).apply {
             runBlocking { start() }
         }
 
@@ -60,7 +65,13 @@ class LibSimprintsPresenterTest {
         val identifyExtractor = IdentifyRequestFactory.getMockExtractor()
         whenever(view.identifyExtractor) thenReturn identifyExtractor
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT, mockSessionManagerToCreateSession(), mock()).apply {
+        LibSimprintsPresenter(
+            view,
+            Constants.SIMPRINTS_IDENTIFY_INTENT,
+            mockSessionManagerToCreateSession(),
+            mock(),
+            mock()
+        ).apply {
             runBlocking { start() }
         }
 
@@ -72,7 +83,13 @@ class LibSimprintsPresenterTest {
         val verificationExtractor = VerifyRequestFactory.getMockExtractor()
         whenever(view.verifyExtractor) thenReturn verificationExtractor
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, mockSessionManagerToCreateSession(), mock()).apply { runBlocking { start() } }
+        LibSimprintsPresenter(
+            view,
+            Constants.SIMPRINTS_VERIFY_INTENT,
+            mockSessionManagerToCreateSession(),
+            mock(),
+            mock()
+        ).apply { runBlocking { start() } }
 
         verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(STANDARD)) }
     }
@@ -82,29 +99,49 @@ class LibSimprintsPresenterTest {
         val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
         whenever(view) { confirmIdentityExtractor } thenReturn confirmIdentify
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_SELECT_GUID_INTENT, mockSessionManagerToCreateSession(), mock()).apply { runBlocking { start() } }
+        LibSimprintsPresenter(
+            view,
+            Constants.SIMPRINTS_SELECT_GUID_INTENT,
+            mockSessionManagerToCreateSession(),
+            mock(),
+            mock()
+        ).apply { runBlocking { start() } }
 
         verifyOnce(view) { sendSimprintsConfirmation(ConfirmIdentityFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        LibSimprintsPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock()).apply { runBlocking { start() } }
+        LibSimprintsPresenter(
+            view,
+            "Garbage",
+            mockSessionManagerToCreateSession(),
+            mock(),
+            mock()
+        ).apply { runBlocking { start() } }
         verifyOnce(view) { handleClientRequestError(anyNotNull()) }
     }
 
     @Test
     fun handleRegistration_ShouldReturnValidRegistration() {
         val registerId = UUID.randomUUID().toString()
+        val sessionId = UUID.randomUUID().toString()
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, clientApiSessionEventsManager, mock())
-            .handleEnrollResponse(EnrollResponse(registerId))
+        wheneverOnSuspend(clientApiSessionEventsManager) { getCurrentSessionId() } thenOnBlockingReturn sessionId
+        LibSimprintsPresenter(
+            view,
+            Constants.SIMPRINTS_REGISTER_INTENT,
+            clientApiSessionEventsManager,
+            mock(),
+            mock()
+        ).handleEnrollResponse(EnrollResponse(registerId))
 
         verifyOnce(view) {
             returnRegistration(
                 argThat {
                     assertThat(it.guid).isEqualTo(registerId)
                 },
+                eq(sessionId),
                 eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
         }
         verifyCompletionCheckEventWasAdded()
@@ -117,8 +154,13 @@ class LibSimprintsPresenterTest {
         val expectedReturnedList = arrayListOf(id1, id2)
         val sessionId = UUID.randomUUID().toString()
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT, clientApiSessionEventsManager, mock()).handleIdentifyResponse(
-            IdentifyResponse(arrayListOf(id1, id2), sessionId))
+        LibSimprintsPresenter(
+            view,
+            Constants.SIMPRINTS_IDENTIFY_INTENT,
+            clientApiSessionEventsManager,
+            mock(),
+            mock()
+        ).handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
 
         verifyOnce(view) {
             returnIdentification(
@@ -141,8 +183,19 @@ class LibSimprintsPresenterTest {
     @Test
     fun handleVerification_ShouldReturnValidVerification() {
         val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
+        val sessionId = UUID.randomUUID().toString()
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, clientApiSessionEventsManager, mock()).apply {
+        wheneverOnSuspend(clientApiSessionEventsManager) {
+            getCurrentSessionId()
+        } thenOnBlockingReturn sessionId
+
+        LibSimprintsPresenter(
+            view,
+            Constants.SIMPRINTS_VERIFY_INTENT,
+            clientApiSessionEventsManager,
+            mock(),
+            mock()
+        ).apply {
             handleVerifyResponse(verification)
         }
 
@@ -158,6 +211,7 @@ class LibSimprintsPresenterTest {
                     assertThat(it.tier).isEqualTo(libVerification.tier)
                     assertThat(it.guid).isEqualTo(libVerification.guid)
                 },
+                eq(sessionId),
                 eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
         }
         verifyCompletionCheckEventWasAdded()
@@ -165,15 +219,29 @@ class LibSimprintsPresenterTest {
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
-        LibSimprintsPresenter(view, "", clientApiSessionEventsManager, mock()).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
+        val sessionId = UUID.randomUUID().toString()
+        wheneverOnSuspend(clientApiSessionEventsManager) { getCurrentSessionId() } thenOnBlockingReturn sessionId
+
+        LibSimprintsPresenter(
+            view,
+            "",
+            clientApiSessionEventsManager,
+            mock(),
+            mock()
+        ).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
+
         verifyOnce(view) {
-            returnErrorToClient(anyNotNull(), eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
+            returnErrorToClient(anyNotNull(), eq(RETURN_FOR_FLOW_COMPLETED_CHECK), eq(sessionId))
         }
         verifyCompletionCheckEventWasAdded()
     }
 
     private fun verifyCompletionCheckEventWasAdded() {
-        verifyOnce(clientApiSessionEventsManager) { runBlocking { addCompletionCheckEvent(eq(RETURN_FOR_FLOW_COMPLETED_CHECK)) } }
+        verifyOnce(clientApiSessionEventsManager) {
+            runBlocking {
+                addCompletionCheckEvent(eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
+            }
+        }
     }
 
     private fun mockSessionManagerToCreateSession() = mock<ClientApiSessionEventsManager>().apply {

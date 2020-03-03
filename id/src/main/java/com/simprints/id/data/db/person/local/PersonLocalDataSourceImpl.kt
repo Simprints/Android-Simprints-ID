@@ -9,7 +9,7 @@ import com.simprints.id.data.db.person.local.models.fromDbToDomain
 import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.tools.extensions.await
@@ -28,7 +28,7 @@ import java.io.Serializable
 
 @FlowPreview
 class PersonLocalDataSourceImpl(private val appContext: Context,
-                                val secureDataManager: SecureDataManager,
+                                val secureDataManager: SecureLocalDbKeyProvider,
                                 val loginInfoManager: LoginInfoManager) : PersonLocalDataSource {
     companion object {
         const val SYNC_ID_FIELD = "syncGroupId"
@@ -101,9 +101,13 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
         }
     }
 
-    override fun count(query: PersonLocalDataSource.Query): Int =
-        Realm.getInstance(config).use { realm ->
-            realm.buildRealmQueryForPerson(query).count().toInt()
+    override suspend fun count(query: PersonLocalDataSource.Query): Int =
+        withContext(Dispatchers.Main) {
+            Realm.getInstance(config).use { realm ->
+                realm.buildRealmQueryForPerson(query)
+                    .await()
+                    ?.size ?: 0
+            }
         }
 
     private fun Realm.buildRealmQueryForPerson(query: PersonLocalDataSource.Query?): RealmQuery<DbPerson> =

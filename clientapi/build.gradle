@@ -83,6 +83,9 @@ dependencies {
     implementation deps.androidx.core
     implementation deps.androidx.multidex
 
+    // RootBeer (root detection)
+    implementation deps.rootbeer.core
+
     // Unit Tests
     testImplementation project(':testtools')
     testImplementation deps.testing.junit

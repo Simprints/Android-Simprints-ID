@@ -23,6 +23,8 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManagerImpl
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManagerImpl
+import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
+import com.simprints.fingerprint.controllers.core.image.FingerprintImageManagerImpl
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManagerImpl
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
@@ -86,12 +88,13 @@ object KoinInjector {
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
         factory<FingerprintAndroidResourcesHelper> { FingerprintAndroidResourcesHelperImpl(get()) }
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
+        factory<FingerprintImageManager> { FingerprintImageManagerImpl(get(), get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
         single<BluetoothComponentAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
-        single<ScannerFactory> { ScannerFactoryImpl(get(), get()) }
+        single<ScannerFactory> { ScannerFactoryImpl(get(), get(), get(), get()) }
         single<ScannerManager> { ScannerManagerImpl(get(), get()) }
 
         factory { FinalResultBuilder() }
@@ -103,14 +106,14 @@ object KoinInjector {
             AlertPresenter(view, get(), get(), get(), fingerprintAlert)
         }
         factory<CollectFingerprintsContract.Presenter> { (context: Context, view: CollectFingerprintsContract.View, request: CollectFingerprintsTaskRequest) ->
-            CollectFingerprintsPresenter(context, view, request, get(), get(), get(), get(), get(), get(), get())
+            CollectFingerprintsPresenter(context, view, request, get(), get(), get(), get(), get(), get(), get(), get())
         }
         factory<RefusalContract.Presenter> { (view: RefusalContract.View) ->
             RefusalPresenter(view, get(), get(), get())
         }
 
-        viewModel { OrchestratorViewModel(get()) }
+        viewModel { OrchestratorViewModel(get(), get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
-        viewModel { MatchingViewModel(get(), get(), get(), get(), get(), get()) }
+        viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
     }
 }

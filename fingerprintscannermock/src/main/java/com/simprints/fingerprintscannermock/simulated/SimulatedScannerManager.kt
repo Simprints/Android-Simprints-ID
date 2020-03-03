@@ -1,11 +1,14 @@
 package com.simprints.fingerprintscannermock.simulated
 
-import com.simprints.fingerprintscannermock.simulated.common.ScannerState
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedFinger
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedScanner
+import com.simprints.fingerprintscannermock.simulated.common.SimulatedScannerState
+import com.simprints.fingerprintscannermock.simulated.common.SimulationSpeedBehaviour
 import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothDevice
 import com.simprints.fingerprintscannermock.simulated.tools.OutputStreamInterceptor
+import com.simprints.fingerprintscannermock.simulated.v1.SimulatedScannerStateV1
 import com.simprints.fingerprintscannermock.simulated.v1.SimulatedScannerV1
+import com.simprints.fingerprintscannermock.simulated.v2.SimulatedScannerStateV2
 import com.simprints.fingerprintscannermock.simulated.v2.SimulatedScannerV2
 import io.reactivex.Observer
 import io.reactivex.observers.DisposableObserver
@@ -14,8 +17,9 @@ import java.io.PipedOutputStream
 import java.util.concurrent.atomic.AtomicInteger
 
 class SimulatedScannerManager(
-    simulationMode: SimulationMode,
-    scannerState: ScannerState = ScannerState(),
+    val simulationMode: SimulationMode,
+    val initialScannerState: SimulatedScannerState? = null,
+    val simulationSpeedBehaviour: SimulationSpeedBehaviour = SimulationSpeedBehaviour.INSTANT,
     private val simulatedFingers: Array<SimulatedFinger> = SimulatedFinger.person1TwoFingersGoodScan,
     private val pairedScannerAddresses: Set<String> = setOf(DEFAULT_MAC_ADDRESS),
     var isAdapterNull: Boolean = false,
@@ -24,11 +28,7 @@ class SimulatedScannerManager(
     var deviceName: String = "",
     var outgoingStreamObservers: Set<Observer<ByteArray>> = setOf()) {
 
-    private val simulatedScanner: SimulatedScanner =
-        when (simulationMode) {
-            SimulationMode.V1 -> SimulatedScannerV1(this, scannerState)
-            SimulationMode.V2 -> SimulatedScannerV2(this, scannerState)
-        }
+    private var simulatedScanner: SimulatedScanner? = null
 
     private val mockFingerIndex = AtomicInteger(0)
     fun currentMockFinger() = simulatedFingers[mockFingerIndex.get()]
@@ -66,6 +66,12 @@ class SimulatedScannerManager(
         refreshStreams()
         streamFromAppToScanner.observers.add(appToScannerObserver)
         outgoingStreamObservers.forEach { streamFromAppToScanner.observers.add(it) }
+        simulatedScanner = when (simulationMode) {
+            SimulationMode.V1 -> SimulatedScannerV1(this, initialScannerState as? SimulatedScannerStateV1
+                ?: SimulatedScannerStateV1())
+            SimulationMode.V2 -> SimulatedScannerV2(this, initialScannerState as? SimulatedScannerStateV2
+                ?: SimulatedScannerStateV2())
+        }
     }
 
     private val appToScannerObserver = object : DisposableObserver<ByteArray>() {
@@ -80,13 +86,14 @@ class SimulatedScannerManager(
     }
 
     private fun handleAppToScannerEvent(bytes: ByteArray) {
-        simulatedScanner.handleAppToScannerEvent(bytes, fakeScannerStream)
+        simulatedScanner?.handleAppToScannerEvent(bytes, fakeScannerStream)
     }
 
     fun close() {
         fakeScannerStream.close()
         streamFromScannerToApp.close()
         streamFromAppToScanner.close()
+        simulatedScanner?.disconnect()
     }
 
     companion object {

@@ -2,23 +2,22 @@ package com.simprints.id.orchestrator
 
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.orchestrator.modality.ModalityFlow
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.verifyOnce
+import io.mockk.MockKAnnotations
+import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 
 class ModalityFlowFactoryImplTest {
 
     private lateinit var modalityFlowFactory: ModalityFlowFactory
-    @Mock lateinit var enrolFlow: ModalityFlow
-    @Mock lateinit var identifyFlow: ModalityFlow
-    @Mock lateinit var verifyFlow: ModalityFlow
+    @MockK lateinit var enrolFlow: ModalityFlow
+    @MockK lateinit var identifyFlow: ModalityFlow
+    @MockK lateinit var verifyFlow: ModalityFlow
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
+        MockKAnnotations.init(this)
 
         modalityFlowFactory = ModalityFlowFactoryImpl(enrolFlow, verifyFlow, identifyFlow)
     }
@@ -42,6 +41,6 @@ class ModalityFlowFactoryImplTest {
     }
 
     private fun verifyModalityFlowStarted(modalityFlow: ModalityFlow) {
-        verifyOnce(modalityFlow) { startFlow(anyNotNull(), anyNotNull()) }
+        verify(exactly = 1) { modalityFlow.startFlow(any(), any()) }
     }
 }

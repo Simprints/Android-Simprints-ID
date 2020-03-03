@@ -2,12 +2,13 @@ package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
+import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
@@ -22,9 +23,9 @@ open class ProjectAuthenticator(component: AppComponent,
                                 private val safetyNetClient: SafetyNetClient,
                                 secureApiClient: SecureApiInterface,
                                 private val attestationManager: AttestationManager = AttestationManager(),
-                                private val authenticationDataManager:AuthenticationDataManager = AuthenticationDataManager(secureApiClient)) {
+                                private val authenticationDataManager: AuthenticationDataManager = AuthenticationDataManager(secureApiClient)) {
 
-    @Inject lateinit var secureDataManager: SecureDataManager
+    @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var projectRemoteDataSource: ProjectRemoteDataSource
     @Inject lateinit var signerManager: SignerManager
@@ -35,7 +36,7 @@ open class ProjectAuthenticator(component: AppComponent,
     internal val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
     private val authManager = AuthManager(secureApiClient)
 
- 	init {
+    init {
         component.inject(this)
     }
 
@@ -53,7 +54,7 @@ open class ProjectAuthenticator(component: AppComponent,
             .fetchProjectRemoteConfigSettings(nonceScope.projectId)
             .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
             .fetchProjectLongConsentTexts()
-    
+
     private fun Completable.prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> =
         andThen(buildAuthRequestParameters(nonceScope, projectSecret))
 
@@ -69,17 +70,16 @@ open class ProjectAuthenticator(component: AppComponent,
         authenticationDataManager.requestAuthenticationData(projectId, userId)
 
     private fun getEncryptedProjectSecret(projectSecret: String, authenticationData: AuthenticationData): Single<String> =
-            Single.just(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret,
-                authenticationData.publicKeyString))
+        Single.just(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret,
+            authenticationData.publicKeyString))
 
     private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationData: AuthenticationData): Single<AttestToken> =
-            attestationManager.requestAttestation(safetyNetClient, authenticationData.nonce)
+        attestationManager.requestAttestation(safetyNetClient, authenticationData.nonce)
 
     private fun zipAuthRequestParameters(encryptedProjectSecretSingle: Single<String>,
                                          googleAttestationSingle: Single<AttestToken>,
                                          nonceScope: NonceScope): Single<AuthRequest> =
-        Singles.zip(encryptedProjectSecretSingle, googleAttestationSingle) {
-            encryptedProjectSecret: String, googleAttestation: AttestToken ->
+        Singles.zip(encryptedProjectSecretSingle, googleAttestationSingle) { encryptedProjectSecret: String, googleAttestation: AttestToken ->
             AuthRequest(nonceScope.projectId, nonceScope.userId, AuthRequestBody(encryptedProjectSecret, googleAttestation.value))
         }
 
@@ -99,7 +99,7 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private fun Completable.fetchProjectRemoteConfigSettings(projectId: String): Single<JsonElement> =
         andThen(
-            projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(projectId)
+            singleWithSuspend { projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(projectId) }
         )
 
     private fun Single<out JsonElement>.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(): Single<Array<String>> =

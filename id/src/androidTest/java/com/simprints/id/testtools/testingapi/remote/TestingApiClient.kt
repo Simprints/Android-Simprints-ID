@@ -7,7 +7,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class TestingApiClient<T>(service: Class<T>, endpoint: String)
-    : SimApiClient<T>(service, endpoint, null) {
+    : SimApiClient<T>(service, endpoint, "") {
 
     override val retrofit: Retrofit by lazy {
         Retrofit.Builder()

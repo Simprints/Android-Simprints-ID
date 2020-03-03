@@ -10,28 +10,32 @@ import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOn
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.id.tools.device.DeviceManager
+import com.simprints.id.tools.extensions.just
 import com.simprints.testtools.common.livedata.testObserver
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.whenever
-import com.simprints.testtools.common.syntax.wheneverOnSuspend
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import io.mockk.MockKAnnotations
+import io.mockk.Runs
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
 import retrofit2.HttpException
+import retrofit2.Response
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class FetchGuidViewModelTest {
 
-    @Mock private  lateinit var personRepository: PersonRepository
-    @Mock private lateinit var simNetworkUtils: SimNetworkUtils
-    @Mock private lateinit var sessionEventsManager: SessionEventsManager
-    @Mock private lateinit var timeHelper: TimeHelper
+    @MockK private lateinit var personRepository: PersonRepository
+    @MockK private lateinit var deviceManager: DeviceManager
+    @MockK private lateinit var sessionEventsManager: SessionEventsManager
+    @MockK private lateinit var timeHelper: TimeHelper
 
     companion object {
         private const val PROJECT_ID = "project_id"
@@ -44,19 +48,20 @@ class FetchGuidViewModelTest {
             .rescheduleRxMainThread()
             .coroutinesMainThread()
 
-        MockitoAnnotations.initMocks(this)
+        MockKAnnotations.init(this)
         configureMocks()
     }
 
     private fun configureMocks() {
-        whenever(sessionEventsManager) { addEventInBackground(anyNotNull()) } thenDoNothing {}
+        every { sessionEventsManager.addEventInBackground(any()) } just Runs
+        every { timeHelper.now() } returns Date().time
     }
 
     @Test
     fun fetchGuidSucceedsFromLocal_shouldReturnCorrectPersonSource() {
-        wheneverOnSuspend(personRepository) { loadFromRemoteIfNeeded(anyNotNull(), anyNotNull()) } thenOnBlockingReturn PersonFetchResult(PeopleGeneratorUtils.getRandomPerson(), PersonFetchResult.PersonSource.LOCAL)
+        coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } returns PersonFetchResult(PeopleGeneratorUtils.getRandomPerson(), PersonFetchResult.PersonSource.LOCAL)
 
-        val viewModel = FetchGuidViewModel(personRepository, simNetworkUtils, sessionEventsManager, timeHelper)
+        val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionEventsManager, timeHelper)
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
         val testObserver = viewModel.personFetch.testObserver()
@@ -66,9 +71,9 @@ class FetchGuidViewModelTest {
 
     @Test
     fun fetchGuidSucceedsFromRemote_shouldReturnCorrectPersonSource() {
-        wheneverOnSuspend(personRepository) { loadFromRemoteIfNeeded(anyNotNull(), anyNotNull()) } thenOnBlockingReturn PersonFetchResult(PeopleGeneratorUtils.getRandomPerson(), PersonFetchResult.PersonSource.REMOTE)
+        coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } returns PersonFetchResult(PeopleGeneratorUtils.getRandomPerson(), PersonFetchResult.PersonSource.REMOTE)
 
-        val viewModel = FetchGuidViewModel(personRepository, simNetworkUtils, sessionEventsManager, timeHelper)
+        val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionEventsManager, timeHelper)
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
         val testObserver = viewModel.personFetch.testObserver()
@@ -78,10 +83,10 @@ class FetchGuidViewModelTest {
 
     @Test
     fun fetchGuidFailsFromLocalOffline_shouldReturnFailedOfflinePersonSource() {
-        whenever(simNetworkUtils) { isConnected() } thenReturn false
-        wheneverOnSuspend(personRepository) { loadFromRemoteIfNeeded(anyNotNull(), anyNotNull()) } thenOnBlockingThrow HttpException::class.java
+        coEvery { deviceManager.isConnected() } returns false
+        coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } throws HttpException(Response.error<String>(404, "".toResponseBody(null)))
 
-        val viewModel = FetchGuidViewModel(personRepository, simNetworkUtils, sessionEventsManager, timeHelper)
+        val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionEventsManager, timeHelper)
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
         val testObserver = viewModel.personFetch.testObserver()
@@ -91,10 +96,10 @@ class FetchGuidViewModelTest {
 
     @Test
     fun fetchGuidFailsFromLocalAndRemoteOnline_shouldReturnNotFoundPersonSource() {
-        whenever(simNetworkUtils) { isConnected() } thenReturn true
-        wheneverOnSuspend(personRepository) { loadFromRemoteIfNeeded(anyNotNull(), anyNotNull()) } thenOnBlockingThrow DownloadingAPersonWhoDoesntExistOnServerException::class.java
+        coEvery { deviceManager.isConnected() } returns true
+        coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } throws DownloadingAPersonWhoDoesntExistOnServerException("")
 
-        val viewModel = FetchGuidViewModel(personRepository, simNetworkUtils, sessionEventsManager, timeHelper)
+        val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionEventsManager, timeHelper)
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
         val testObserver = viewModel.personFetch.testObserver()

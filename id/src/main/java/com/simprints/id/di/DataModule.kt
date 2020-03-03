@@ -1,7 +1,11 @@
 package com.simprints.id.di
 
 import android.content.Context
+import com.simprints.core.images.repository.ImageRepository
+import com.simprints.core.images.repository.ImageRepositoryImpl
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.PersonRepositoryImpl
 import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
@@ -15,14 +19,12 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSourceImpl
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
-import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
-import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSourceImpl
-import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.FlowPreview
 import javax.inject.Singleton
 
 @Module
@@ -30,45 +32,70 @@ open class DataModule {
 
     @Provides
     @Singleton
-    open fun providePersonRemoteDataSource(remoteDbManager: RemoteDbManager): PersonRemoteDataSource = PersonRemoteDataSourceImpl(remoteDbManager)
-
-
-    @Provides
-    open fun provideSyncInfoLocalDataSource(ctx: Context,
-                                            secureDataManager: SecureDataManager,
-                                            loginInfoManager: LoginInfoManager): SyncInfoLocalDataSource =
-        SyncInfoLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+    open fun providePersonRemoteDataSource(
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory
+    ): PersonRemoteDataSource = PersonRemoteDataSourceImpl(remoteDbManager, simApiClientFactory)
 
     @Provides
-    open fun provideProjectLocalDataSource(ctx: Context,
-                                           secureDataManager: SecureDataManager,
-                                           loginInfoManager: LoginInfoManager): ProjectLocalDataSource =
-        ProjectLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+    @FlowPreview
+    open fun provideProjectLocalDataSource(
+        ctx: Context,
+        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
+        loginInfoManager: LoginInfoManager
+    ): ProjectLocalDataSource = ProjectLocalDataSourceImpl(
+        ctx,
+        secureLocalDbKeyProvider,
+        loginInfoManager
+    )
 
     @Provides
-    open fun provideProjectRemoteDataSource(remoteDbManager: RemoteDbManager): ProjectRemoteDataSource =
-        ProjectRemoteDataSourceImpl(remoteDbManager)
+    @Singleton
+    open fun provideProjectRemoteDataSource(
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory
+    ): ProjectRemoteDataSource = ProjectRemoteDataSourceImpl(remoteDbManager, simApiClientFactory)
 
     @Provides
-    open fun provideProjectRepository(projectLocalDataSource: ProjectLocalDataSource,
-                                      projectRemoteDataSource: ProjectRemoteDataSource): ProjectRepository =
-        ProjectRepositoryImpl(projectLocalDataSource, projectRemoteDataSource)
+    open fun provideProjectRepository(
+        projectLocalDataSource: ProjectLocalDataSource,
+        projectRemoteDataSource: ProjectRemoteDataSource
+    ): ProjectRepository = ProjectRepositoryImpl(projectLocalDataSource, projectRemoteDataSource)
 
     @Provides
-    open fun providePersonRepository(personLocalDataSource: PersonLocalDataSource,
-                                     personRemoteDataSource: PersonRemoteDataSource,
-                                     peopleUpSyncMaster: PeopleUpSyncMaster,
-                                     syncStatusDatabase: SyncStatusDatabase): PersonRepository =
-        PersonRepositoryImpl(personRemoteDataSource, personLocalDataSource, peopleUpSyncMaster, syncStatusDatabase.downSyncDao)
-
+    open fun providePersonRepository(
+        personRemoteDataSource: PersonRemoteDataSource,
+        personLocalDataSource: PersonLocalDataSource,
+        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
+        peopleUpSyncExecutor: PeopleUpSyncExecutor
+    ): PersonRepository = PersonRepositoryImpl(
+        personRemoteDataSource,
+        personLocalDataSource,
+        peopleDownSyncScopeRepository,
+        peopleUpSyncExecutor
+    )
 
     @Provides
-    open fun providePersonLocalDataSource(ctx: Context,
-                                          secureDataManager: SecureDataManager,
-                                          loginInfoManager: LoginInfoManager): PersonLocalDataSource =
-        PersonLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+    @Singleton
+    @FlowPreview
+    open fun providePersonLocalDataSource(
+        ctx: Context,
+        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
+        loginInfoManager: LoginInfoManager
+    ): PersonLocalDataSource = PersonLocalDataSourceImpl(
+        ctx,
+        secureLocalDbKeyProvider,
+        loginInfoManager
+    )
 
     @Provides
-    open fun provideFingerprintRecordLocalDataSource(personLocalDataSource: PersonLocalDataSource): FingerprintIdentityLocalDataSource =
-        personLocalDataSource
+    open fun provideFingerprintRecordLocalDataSource(
+        personLocalDataSource: PersonLocalDataSource
+    ): FingerprintIdentityLocalDataSource = personLocalDataSource
+
+    @Provides
+    open fun provideImageRepository(
+        context: Context
+    ): ImageRepository = ImageRepositoryImpl(context)
+
 }

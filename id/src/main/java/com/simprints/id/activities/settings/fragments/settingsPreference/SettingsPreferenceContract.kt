@@ -13,15 +13,15 @@ interface SettingsPreferenceContract {
 
         fun getPreferenceForLanguage(): Preference
 
-        fun getPreferenceForSelectModules(): Preference
-
         fun getPreferenceForDefaultFingers(): Preference
 
         fun getPreferenceForAbout(): Preference
 
-        fun getKeyForLanguagePreference(): String
+        fun getPreferenceForSyncInformation(): Preference
 
-        fun getKeyForSelectModulesPreference(): String
+        fun getKeyForSyncInfoPreference(): String
+
+        fun getKeyForLanguagePreference(): String
 
         fun getKeyForDefaultFingersPreference(): String
 
@@ -29,15 +29,13 @@ interface SettingsPreferenceContract {
 
         fun setSelectModulePreferenceEnabled(enabled: Boolean)
 
-        fun showToastForNoModulesSelected()
-
-        fun showToastForTooManyModulesSelected(maxModules: Int)
-
         fun showToastForInvalidSelectionOfFingers()
 
         fun openSettingAboutActivity()
 
-        fun openModuleSelectionActivity()
+        fun openSyncInfoActivity()
+
+        fun clearActivityStackAndRelaunchApp()
     }
 
     interface Presenter : BasePresenter

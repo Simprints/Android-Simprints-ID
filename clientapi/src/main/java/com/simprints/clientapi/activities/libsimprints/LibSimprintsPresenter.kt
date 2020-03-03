@@ -8,6 +8,7 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
+import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -17,12 +18,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
-class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
-                            private val action: String?,
-                            private val sessionEventsManager: ClientApiSessionEventsManager,
-                            private val crashReportManager: ClientApiCrashReportManager) :
-    RequestPresenter(view, sessionEventsManager), LibSimprintsContract.Presenter {
+class LibSimprintsPresenter(
+    private val view: LibSimprintsContract.View,
+    private val action: String?,
+    private val sessionEventsManager: ClientApiSessionEventsManager,
+    deviceManager: DeviceManager,
+    crashReportManager: ClientApiCrashReportManager
+) : RequestPresenter(
+    view,
+    sessionEventsManager,
+    deviceManager,
+    crashReportManager
+), LibSimprintsContract.Presenter {
 
     override suspend fun start() {
         if (action != SIMPRINTS_SELECT_GUID_INTENT) {
@@ -30,12 +37,14 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
 
-        when (action) {
-            SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
-            SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
-            SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
-            SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentityRequest()
-            else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+        runIfDeviceIsNotRooted {
+            when (action) {
+                SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
+                SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
+                SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
+                SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentityRequest()
+                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+            }
         }
     }
 
@@ -43,7 +52,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnErrorToClient(errorResponse, flowCompletedCheck)
+            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -51,7 +60,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(Registration(enroll.guid), flowCompletedCheck)
+            view.returnRegistration(Registration(enroll.guid), getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
 
@@ -78,7 +87,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                     matchResult.confidence,
                     matchResult.tier.fromDomainToLibsimprintsTier(),
                     matchResult.guidFound)
-                view.returnVerification(verification, flowCompletedCheck)
+                view.returnVerification(verification, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
             }
         }
     }
@@ -87,9 +96,12 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra), flowCompletedCheck)
+            view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra),
+                getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
+
+    private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId() ?: ""
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
@@ -98,7 +110,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnConfirmation(flowCompletedCheck)
+            view.returnConfirmation(flowCompletedCheck, getCurrentSessionIdOrEmpty())
         }
     }
 }

@@ -17,15 +17,19 @@ import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMana
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
-import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import io.mockk.MockKAnnotations
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.spyk
+import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 
@@ -33,22 +37,24 @@ import org.robolectric.shadows.ShadowLog
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionEventsManagerImplTest {
 
-    private val sessionEventsSyncManagerMock: SessionEventsSyncManager = mock()
-    private val sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager = mock()
-    private val preferencesManagerMock: PreferencesManager = mock()
-    private val timeHelper: TimeHelper = TimeHelperImpl()
-    private val crashReportManagerMock: CrashReportManager = mock()
-    private val sessionsEventsManagerSpy: SessionEventsManager =
-        spy(SessionEventsManagerImpl(
-            "deviceID",
-            "com.simprints.id",
-            sessionEventsSyncManagerMock, sessionEventsLocalDbManagerMock, preferencesManagerMock, timeHelper, crashReportManagerMock))
+    val timeHelper: TimeHelper = TimeHelperImpl()
+    @MockK private lateinit var sessionEventsSyncManagerMock: SessionEventsSyncManager
+    @MockK private lateinit var sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager
+    @MockK private lateinit var preferencesManagerMock: PreferencesManager
+    @MockK private lateinit var crashReportManagerMock: CrashReportManager
+    private lateinit var sessionsEventsManagerSpy: SessionEventsManager
 
     private var sessionsInFakeDb = mutableListOf<SessionEvents>()
 
     @Before
     fun setUp() {
         ShadowLog.stream = System.out
+        MockKAnnotations.init(this, relaxed = true)
+
+        sessionsEventsManagerSpy = spyk(SessionEventsManagerImpl(
+            "deviceID",
+            "com.simprints.id",
+            sessionEventsSyncManagerMock, sessionEventsLocalDbManagerMock, preferencesManagerMock, timeHelper, crashReportManagerMock))
 
         sessionsInFakeDb.clear()
         mockSessionEventsManager(sessionEventsLocalDbManagerMock, sessionsInFakeDb)
@@ -56,17 +62,17 @@ class SessionEventsManagerImplTest {
     }
 
     private fun mockPreferenceManagerInfo() {
-        whenever(preferencesManagerMock.language).thenReturn("language")
+        every { preferencesManagerMock.language } returns "language"
     }
 
     @Test
     fun signOut_shouldDeleteSessionsAndStopWorkers() {
-        Mockito.doReturn(Completable.complete()).`when`(sessionsEventsManagerSpy).deleteSessions()
+        every { sessionsEventsManagerSpy.deleteSessions() } returns Completable.complete()
 
         sessionsEventsManagerSpy.signOut()
 
-        verifyOnce(sessionsEventsManagerSpy) { deleteSessions(null, null, null, null) }
-        verifyOnce(sessionEventsSyncManagerMock) { cancelSyncWorkers() }
+        verify(exactly = 1) { sessionsEventsManagerSpy.deleteSessions(null, null, false, null) }
+        verify(exactly = 1) { sessionEventsSyncManagerMock.cancelSyncWorkers() }
     }
 
     @Test
@@ -96,16 +102,16 @@ class SessionEventsManagerImplTest {
         assertThat(oldOpenSession?.isClosed()).isTrue()
         assertThat(oldOpenSession?.events?.filterIsInstance(ArtificialTerminationEvent::class.java)).hasSize(1)
 
-        verifyOnce(sessionEventsSyncManagerMock) { scheduleSessionsSync() }
+        verify(exactly = 1) { sessionEventsSyncManagerMock.scheduleSessionsSync() }
     }
 
     @Test
     fun closeLastSessionsIfPending_shouldSwallowException() {
-        whenever(sessionEventsLocalDbManagerMock.loadSessions(anyOrNull(), anyOrNull())).thenReturn(Single.error(Throwable("error_reading_db")))
+        every { sessionEventsLocalDbManagerMock.loadSessions(any(), any()) } returns (Single.error(Throwable("error_reading_db")))
 
         sessionsEventsManagerSpy.createSession("").blockingGet()
 
-        verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
+        verify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
         assertThat(sessionsInFakeDb.size).isEqualTo(1)
     }
 
@@ -124,7 +130,7 @@ class SessionEventsManagerImplTest {
     fun updateSession_shouldSwallowException() {
         val tester = sessionsEventsManagerSpy.updateSession { it.projectId = "new_project" }.test()
         tester.awaitAndAssertSuccess()
-        verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
+        verify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
     }
 
     @Test

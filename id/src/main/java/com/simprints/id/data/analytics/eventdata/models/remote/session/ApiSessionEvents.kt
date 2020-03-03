@@ -24,7 +24,9 @@ open class ApiSessionEvents(var appVersionName: String,
     constructor(sessionDomain: SessionEvents) :
         this(sessionDomain.appVersionName,
             sessionDomain.libVersionName,
-            sessionDomain.language,
+            // We are sending what we have in preference Manager as language
+            // but that is not a BCP 47 standard
+            sessionDomain.language.replace("-r", "-"),
             ApiDevice(sessionDomain.device),
             sessionDomain.startTime,
             sessionDomain.id,

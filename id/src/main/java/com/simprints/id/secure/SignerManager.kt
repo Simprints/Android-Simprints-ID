@@ -6,5 +6,5 @@ import io.reactivex.Completable
 interface SignerManager {
 
     fun signIn(projectId: String, userId: String, token: Token): Completable
-    fun signOut()
+    suspend fun signOut()
 }
