@@ -5,8 +5,9 @@ import com.simprints.id.activities.dashboard.cards.daily_activity.repository.Das
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.session.domain.SessionEventsManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
@@ -148,14 +149,16 @@ class OrchestratorModule {
         orchestratorManager: OrchestratorManager,
         orchestratorEventsHelper: OrchestratorEventsHelper,
         preferenceManager: PreferencesManager,
-        sessionEventsManager: SessionEventsManager
+        sessionEventsManager: SessionEventsManager,
+        crashReportManager: CrashReportManager
     ): OrchestratorViewModelFactory {
         return OrchestratorViewModelFactory(
             orchestratorManager,
             orchestratorEventsHelper,
             preferenceManager.modalities,
             sessionEventsManager,
-            DomainToModuleApiAppResponse
+            DomainToModuleApiAppResponse,
+            crashReportManager
         )
     }
 

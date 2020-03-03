@@ -81,4 +81,8 @@
     <string name="scanner_error_turn_scanner_on_title">እስካነሩን ያብሩ</string>
     <string name="settings_label">የስልክ ማስተካከያ</string>
     <string name="privacy_notice_text"><u>የደህንነት ማሳታወቂያ</u></string>
+    <string name="connect_scanner_finished">ተገናኝቷል</string>
+    <string name="scan">"እስካን "</string>
+    <string name="transfering_data">መረጃ በማስተላለፍ ላይ ነው</string>
+    <string name="please_wait_button">እባክዎትን ይጠብቁ</string>
 </resources>

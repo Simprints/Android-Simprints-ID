@@ -12,8 +12,11 @@ import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
+import com.simprints.fingerprint.scanner.ScannerManager
+import io.reactivex.schedulers.Schedulers
 
-class OrchestratorViewModel(private val orchestrator: Orchestrator) : ViewModel() {
+class OrchestratorViewModel(private val orchestrator: Orchestrator,
+                            private val scannerManager: ScannerManager) : ViewModel() {
 
     val nextActivityCall = MutableLiveData<ActivityCall>()
     val finishedResult = MutableLiveData<ActivityResult>()
@@ -72,4 +75,9 @@ class OrchestratorViewModel(private val orchestrator: Orchestrator) : ViewModel(
     }
 
     private fun FinalResult.toActivityResult() = ActivityResult(resultCode, resultData)
+
+    override fun onCleared() {
+        super.onCleared()
+        scannerManager.scanner { disconnect() }.onErrorComplete().subscribeOn(Schedulers.io()).subscribe()
+    }
 }

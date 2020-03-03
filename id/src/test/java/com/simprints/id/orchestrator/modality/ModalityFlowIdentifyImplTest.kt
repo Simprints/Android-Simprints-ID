@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.domain.SessionEventsManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER

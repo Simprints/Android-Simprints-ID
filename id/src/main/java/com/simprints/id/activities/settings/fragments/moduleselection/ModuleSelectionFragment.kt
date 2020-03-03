@@ -54,9 +54,17 @@ class ModuleSelectionFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        configureRecyclerView()
         application.component.inject(this)
+
+        configureRecyclerView()
+        configureTextViews()
         fetchData()
+    }
+
+    private fun configureTextViews() {
+        txtSelectedModules.text = androidResourcesHelper.getString(R.string.selected_modules)
+        txtNoModulesSelected.text = androidResourcesHelper.getString(R.string.no_modules_selected)
+        txtNoResults.text = androidResourcesHelper.getString(R.string.no_results)
     }
 
     override fun onModuleSelected(module: Module) {
@@ -70,7 +78,7 @@ class ModuleSelectionFragment(
         }
     }
 
-    private fun refreshSyncWorkers(){
+    private fun refreshSyncWorkers() {
         with(peopleSyncManager) {
             stop()
             sync()
@@ -105,6 +113,7 @@ class ModuleSelectionFragment(
 
     private fun configureSearchView() {
         configureSearchViewEditText()
+        searchView.queryHint = androidResourcesHelper.getString(R.string.hint_search_modules)
         val queryListener = ModuleSelectionQueryListener(modules.getUnselected())
         searchView.setOnQueryTextListener(queryListener)
         observeSearchResults(queryListener)
@@ -230,7 +239,7 @@ class ModuleSelectionFragment(
     private fun notifyTooManyModulesSelected(maxAllowed: Int) {
         Toast.makeText(
             application,
-            String.format(application.getString(R.string.settings_too_many_modules_toast), maxAllowed),
+            androidResourcesHelper.getString(R.string.settings_too_many_modules_toast, arrayOf(maxAllowed)),
             Toast.LENGTH_SHORT
         ).show()
     }
