@@ -6,35 +6,23 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.remote.RemoteSessionsManager
-import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
-import com.simprints.id.tools.TimeHelper
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.inject.Inject
 
 class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
-    @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
 
     override suspend fun doWork(): Result {
         Timber.d("SessionEventsMasterWorker doWork()")
         injectDependencies()
 
         return try {
-            val task = SessionEventsSyncMasterTask(
-                loginInfoManager.getSignedInProjectIdOrEmpty(),
-                sessionRepository,
-                timeHelper,
-                remoteSessionsManager.getSessionsApiClient(),
-                crashReportManager
-            )
-            task.execute().blockingAwait()
+            runBlocking { sessionRepository.startUploadingSessions() }
             Result.success()
         } catch (e: NoSessionsFoundException) {
             Timber.d("No sessions found")
