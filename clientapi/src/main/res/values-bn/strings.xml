@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Client API</string>
-    <string name="configuration_error_message">একটি কনফিগারেশন ত্রুটি পাওয়া গেছে (%1$s), আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
     <string name="configuration_error_title">কনফিগারেশন সমস্যা</string>
     <string name="guid_selection_data_sent">তথ্য পাঠানো হয়েছে</string>
     <string name="guid_selection_result_sent">রেজাল্ট পাঠানো হয়েছে</string>
     <string name="close">বন্ধ করুন</string>
+    <string name="invalid_intentAction_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ এন্ট্রি),আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
+    <string name="invalid_metadata_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ মেটাডাটা),আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
+    <string name="rooted_device_message">\"১। আপনার সুপারভাইসর এর সাথে যোগাযোগ করুন- rooted device detected। ২। বন্ধ করুন।\"</string>
+    <string name="rooted_device_title">রুটেড ডিভাইস সনাক্ত হয়েছে</string>
+
 </resources>

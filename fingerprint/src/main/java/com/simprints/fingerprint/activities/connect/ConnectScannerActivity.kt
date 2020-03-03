@@ -12,16 +12,19 @@ import com.simprints.fingerprint.activities.connect.confirmscannererror.ConfirmS
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForConnectScannerActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate.vibrate
 import kotlinx.android.synthetic.main.activity_connect_scanner.*
+import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class ConnectScannerActivity : FingerprintActivity() {
 
     private val viewModel: ConnectScannerViewModel by viewModel()
+    private val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
 
     private var scannerErrorConfirmationDialog: AlertDialog? = null
 
@@ -35,22 +38,35 @@ class ConnectScannerActivity : FingerprintActivity() {
             this.intent.extras?.getParcelable(ConnectScannerTaskRequest.BUNDLE_KEY) as ConnectScannerTaskRequest?
                 ?: throw InvalidRequestForConnectScannerActivityException()
 
+        viewModel.start()
+    }
+
+    override fun onResume() {
+        super.onResume()
         observeScannerEvents()
         observeLifecycleEvents()
-
-        viewModel.start()
     }
 
     private fun observeScannerEvents() {
         viewModel.progress.observe(this, Observer { connectScannerProgressBar.progress = it })
-        viewModel.message.observe(this, Observer { connectScannerInfoTextView.setText(it) })
-        viewModel.vibrate.observe(this, Observer { vibrate(this) })
-        viewModel.showScannerErrorDialogWithScannerId.observe(this, Observer { showDialogForScannerErrorConfirmation(it) })
+        viewModel.message.observe(this, Observer { connectScannerInfoTextView.text = androidResourcesHelper.getString(it) })
+        viewModel.vibrate.observe(this, Observer { it?.let { vibrate(this) } })
+        viewModel.showScannerErrorDialogWithScannerId.observe(this, Observer { it?.let { showDialogForScannerErrorConfirmation(it) } })
     }
 
     private fun observeLifecycleEvents() {
-        viewModel.launchAlert.observe(this, Observer { launchAlert(this, it) })
-        viewModel.finish.observe(this, Observer { continueToNextActivity() })
+        viewModel.launchAlert.observe(this, Observer { it?.let { launchAlert(this, it) } })
+        viewModel.finish.observe(this, Observer { it?.let { continueToNextActivity() } })
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.progress.removeObservers(this)
+        viewModel.message.removeObservers(this)
+        viewModel.vibrate.removeObservers(this)
+        viewModel.showScannerErrorDialogWithScannerId.removeObservers(this)
+        viewModel.launchAlert.removeObservers(this)
+        viewModel.finish.removeObservers(this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -93,7 +109,7 @@ class ConnectScannerActivity : FingerprintActivity() {
     private fun buildConfirmScannerErrorAlertDialog(scannerId: String) =
         ConfirmScannerErrorBuilder()
             .build(
-                this, scannerId,
+                this, androidResourcesHelper, scannerId,
                 onYes = { viewModel.handleScannerDisconnectedYesClick() },
                 onNo = { viewModel.handleScannerDisconnectedNoClick() }
             )

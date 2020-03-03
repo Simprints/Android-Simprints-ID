@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
 
-
 class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: SessionEventsManager,
                                         private val timeHelper: ClientApiTimeHelper) :
     ClientApiSessionEventsManager {
@@ -60,6 +59,15 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: Se
     private fun addEvent(event: Event): Completable =
         coreSessionEventsManager.addEvent(event)
 
+    override suspend fun getCurrentSessionId(): String? =
+        suspendCancellableCoroutine { cont ->
+            CoroutineScope(Dispatchers.IO).launch {
+                coreSessionEventsManager.getCurrentSession().subscribeBy(
+                    onSuccess = { cont.resumeSafely(it.id) },
+                    onError = { cont.resumeSafely(null) }
+                )
+            }
+        }
 }
 
 fun ClientApiAlert.fromAlertToAlertTypeEvent(): CoreAlertScreenEventType =
@@ -72,4 +80,5 @@ fun ClientApiAlert.fromAlertToAlertTypeEvent(): CoreAlertScreenEventType =
         ClientApiAlert.INVALID_SESSION_ID -> CoreAlertScreenEventType.INVALID_SESSION_ID
         ClientApiAlert.INVALID_USER_ID -> CoreAlertScreenEventType.INVALID_USER_ID
         ClientApiAlert.INVALID_VERIFY_ID -> CoreAlertScreenEventType.INVALID_VERIFY_ID
+        ClientApiAlert.ROOTED_DEVICE -> CoreAlertScreenEventType.UNEXPECTED_ERROR
     }

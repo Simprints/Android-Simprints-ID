@@ -1,57 +1,81 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
+import com.simprints.core.images.repository.ImageRepository
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
-import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.testtools.common.di.DependencyRule
+import kotlinx.coroutines.FlowPreview
 
-class TestDataModule(private val syncInfoLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
-                     private val projectLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
-                     private val projectRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
-                     private val projectRepositoryRule: DependencyRule = DependencyRule.RealRule,
-                     private val personLocalDataSource: DependencyRule = DependencyRule.RealRule,
-                     private val personRepositoryRule: DependencyRule = DependencyRule.RealRule) : DataModule() {
+class TestDataModule(
+    private val projectLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val projectRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val projectRepositoryRule: DependencyRule = DependencyRule.RealRule,
+    private val personRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val personLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val personRepositoryRule: DependencyRule = DependencyRule.RealRule,
+    private val imageRepositoryRule: DependencyRule = DependencyRule.RealRule
+) : DataModule() {
 
-    override fun provideSyncInfoLocalDataSource(ctx: Context,
-                                                secureDataManager: SecureDataManager,
-                                                loginInfoManager: LoginInfoManager): SyncInfoLocalDataSource =
-        syncInfoLocalDataSourceRule.resolveDependency { super.provideSyncInfoLocalDataSource(ctx, secureDataManager, loginInfoManager) }
-
+    @FlowPreview
     override fun provideProjectLocalDataSource(ctx: Context,
-                                               secureDataManager: SecureDataManager,
+                                               secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
                                                loginInfoManager: LoginInfoManager): ProjectLocalDataSource =
-        projectLocalDataSourceRule.resolveDependency { super.provideProjectLocalDataSource(ctx, secureDataManager, loginInfoManager) }
+        projectLocalDataSourceRule.resolveDependency { super.provideProjectLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager) }
 
-    override fun provideProjectRemoteDataSource(remoteDbManager: RemoteDbManager): ProjectRemoteDataSource =
-        projectRemoteDataSourceRule.resolveDependency { super.provideProjectRemoteDataSource(remoteDbManager) }
+    override fun provideProjectRemoteDataSource(
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory
+    ): ProjectRemoteDataSource = projectRemoteDataSourceRule.resolveDependency {
+        super.provideProjectRemoteDataSource(remoteDbManager, simApiClientFactory)
+    }
 
+    override fun provideProjectRepository(
+        projectLocalDataSource: ProjectLocalDataSource,
+        projectRemoteDataSource: ProjectRemoteDataSource
+    ): ProjectRepository = projectRepositoryRule.resolveDependency {
+        super.provideProjectRepository(projectLocalDataSource, projectRemoteDataSource)
+    }
 
-    override fun provideProjectRepository(projectLocalDataSource: ProjectLocalDataSource,
-                                          projectRemoteDataSource: ProjectRemoteDataSource): ProjectRepository =
-        projectRepositoryRule.resolveDependency { super.provideProjectRepository(projectLocalDataSource, projectRemoteDataSource) }
+    override fun providePersonRepository(
+        personRemoteDataSource: PersonRemoteDataSource,
+        personLocalDataSource: PersonLocalDataSource,
+        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
+        peopleUpSyncExecutor: PeopleUpSyncExecutor
+    ): PersonRepository = personRepositoryRule.resolveDependency {
+        super.providePersonRepository(
+            personRemoteDataSource,
+            personLocalDataSource,
+            peopleDownSyncScopeRepository,
+            peopleUpSyncExecutor
+        )
+    }
 
-    override fun providePersonRepository(personLocalDataSource: PersonLocalDataSource,
-                                         personRemoteDataSource: PersonRemoteDataSource,
-                                         peopleUpSyncMaster: PeopleUpSyncMaster,
-                                         syncStatusDatabase: SyncStatusDatabase): PersonRepository =
-        personRepositoryRule.resolveDependency {
-            super.providePersonRepository(personLocalDataSource, personRemoteDataSource, peopleUpSyncMaster, syncStatusDatabase)
-        }
+    override fun provideImageRepository(
+        context: Context
+    ): ImageRepository = imageRepositoryRule.resolveDependency {
+        super.provideImageRepository(context)
+    }
 
+    override fun providePersonRemoteDataSource(remoteDbManager: RemoteDbManager,
+                                               simApiClientFactory: SimApiClientFactory): PersonRemoteDataSource =
+        personRemoteDataSourceRule.resolveDependency { super.providePersonRemoteDataSource(remoteDbManager, simApiClientFactory) }
 
+    @FlowPreview
     override fun providePersonLocalDataSource(ctx: Context,
-                                              secureDataManager: SecureDataManager,
+                                              secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
                                               loginInfoManager: LoginInfoManager): PersonLocalDataSource =
-        personLocalDataSource.resolveDependency { super.providePersonLocalDataSource(ctx, secureDataManager, loginInfoManager) }
+        personLocalDataSourceRule.resolveDependency { super.providePersonLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager) }
+
 }

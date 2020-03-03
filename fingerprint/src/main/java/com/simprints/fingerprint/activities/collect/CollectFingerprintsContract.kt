@@ -35,7 +35,7 @@ interface CollectFingerprintsContract {
         // Scanning
         var scanButton: Button
         var progressBar: ProgressBar
-        var timeoutBar: com.simprints.fingerprint.activities.collect.views.TimeoutBar
+        var timeoutBar: com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar
         var un20WakeupDialog: ProgressDialog
 
         // Indicators
@@ -76,5 +76,6 @@ interface CollectFingerprintsContract {
         fun fingerHasSatisfiedTerminalCondition(finger: Finger): Boolean
         fun handleCaptureSuccess()
         fun handleScannerButtonPressed()
+        fun tooManyBadScans(finger: Finger): Boolean
     }
 }

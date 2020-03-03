@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/DashboardCardStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        style="@style/DashboardCardStyleRoot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/dashboard_sync_card_title"
+            style="@style/DashboardCardStyleTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Placeholder - Sync card title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/dashboard_sync_card_select_no_modules_message"
+            style="@style/SimprintsStyle.TextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:singleLine="false"
+            android:text="Placeholder - Select modules"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/dashboard_sync_card_select_no_modules_button"
+            app:layout_constraintEnd_toStartOf="@+id/dashboard_sync_card_select_no_modules_button"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/dashboard_sync_card_select_no_modules_button"
+            app:layout_constraintVertical_bias="0.5"
+            tools:ignore="HardcodedText" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/dashboard_sync_card_select_no_modules_button"
+            style="@style/SimprintsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/activity_dashboard_card_space_below_title"
+            android:background="@drawable/button_rounded_corners_gray"
+            android:elevation="2dp"
+            android:stateListAnimator="@null"
+            android:text="Placeholder - MODULES"
+            android:translationZ="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dashboard_sync_card_title"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/dashboard_sync_card_last_sync"
+            style="@style/DashboardCardStyleLastSync"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_dashboard_card_sync_space_above_last_sync"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dashboard_sync_card_select_no_modules_button" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

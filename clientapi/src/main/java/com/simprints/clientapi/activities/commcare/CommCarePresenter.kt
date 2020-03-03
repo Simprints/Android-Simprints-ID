@@ -9,6 +9,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
+import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
@@ -16,13 +17,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
-class CommCarePresenter(private val view: CommCareContract.View,
-                        private val action: String?,
-                        private val sessionEventsManager: ClientApiSessionEventsManager,
-                        private val crashReportManager: ClientApiCrashReportManager,
-                        private val sharedPreferencesManager: SharedPreferencesManager)
-    : RequestPresenter(view, sessionEventsManager), CommCareContract.Presenter {
+class CommCarePresenter(
+    private val view: CommCareContract.View,
+    private val action: String?,
+    private val sessionEventsManager: ClientApiSessionEventsManager,
+    private val sharedPreferencesManager: SharedPreferencesManager,
+    deviceManager: DeviceManager,
+    crashReportManager: ClientApiCrashReportManager
+) : RequestPresenter(
+    view,
+    sessionEventsManager,
+    deviceManager,
+    crashReportManager
+), CommCareContract.Presenter {
 
     companion object {
         private const val PACKAGE_NAME = "com.simprints.commcare"
@@ -38,12 +45,14 @@ class CommCarePresenter(private val view: CommCareContract.View,
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
 
-        when (action) {
-            ACTION_REGISTER -> processEnrollRequest()
-            ACTION_IDENTIFY -> processIdentifyRequest()
-            ACTION_VERIFY -> processVerifyRequest()
-            ACTION_CONFIRM_IDENTITY -> checkAndProcessSessionId()
-            else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+        runIfDeviceIsNotRooted {
+            when (action) {
+                ACTION_REGISTER -> processEnrollRequest()
+                ACTION_IDENTIFY -> processIdentifyRequest()
+                ACTION_VERIFY -> processVerifyRequest()
+                ACTION_CONFIRM_IDENTITY -> checkAndProcessSessionId()
+                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+            }
         }
     }
 
@@ -51,7 +60,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(enroll.guid, flowCompletedCheck)
+            view.returnRegistration(enroll.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
 
@@ -69,7 +78,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnErrorToClient(errorResponse, flowCompletedCheck)
+            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -81,6 +90,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
                 verify.matchResult.confidence,
                 Tier.valueOf(verify.matchResult.tier.name),
                 verify.matchResult.guidFound,
+                getCurrentSessionIdOrEmpty(),
                 flowCompletedCheck
             )
         }
@@ -90,9 +100,12 @@ class CommCarePresenter(private val view: CommCareContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnExitForms(refusalForm.reason, refusalForm.extra, flowCompletedCheck)
+            view.returnExitForms(refusalForm.reason, refusalForm.extra,
+                getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
+
+    private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId() ?: ""
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
@@ -101,7 +114,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnConfirmation(flowCompletedCheck)
+            view.returnConfirmation(flowCompletedCheck, getCurrentSessionIdOrEmpty())
         }
     }
 

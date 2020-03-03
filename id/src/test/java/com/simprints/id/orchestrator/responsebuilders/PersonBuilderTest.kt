@@ -11,14 +11,14 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptur
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.tools.TimeHelper
-import com.simprints.testtools.common.syntax.assertThrows
-import com.simprints.testtools.common.syntax.mock
+import io.kotlintest.shouldThrow
+import io.mockk.mockk
 import org.junit.Test
 
 class PersonBuilderTest {
 
     private val personBuilder = AppResponseBuilderForEnrol.PersonBuilder
-    private val timeHelper: TimeHelper = mock()
+    private val timeHelper: TimeHelper = mockk(relaxed = true)
 
     @Test
     fun withFingerprintResponse_shouldBuildPerson() {
@@ -107,7 +107,7 @@ class PersonBuilderTest {
     fun withNoResponses_shouldThrowException() {
         val request = mockRequest()
 
-        assertThrows<Throwable> {
+        shouldThrow<Throwable> {
             personBuilder.buildPerson(request, null, null, timeHelper)
         }
     }

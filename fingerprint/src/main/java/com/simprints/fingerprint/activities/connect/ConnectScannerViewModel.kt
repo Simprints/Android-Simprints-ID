@@ -14,11 +14,14 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprintscanner.v1.ScannerUtils.convertAddressToSerial
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 
 class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashReportManager,
                               private val scannerManager: ScannerManager,
@@ -29,12 +32,12 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
 
     val progress: MutableLiveData<Int> = MutableLiveData(0)
     val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
-    val vibrate = MutableLiveData<Unit>()
+    val vibrate = MutableLiveData<Unit?>(null)
 
-    val launchAlert = MutableLiveData<FingerprintAlert>()
-    val finish = MutableLiveData<Unit>()
+    val launchAlert = MutableLiveData<FingerprintAlert?>(null)
+    val finish = MutableLiveData<Unit?>(null)
 
-    val showScannerErrorDialogWithScannerId = MutableLiveData<String>()
+    val showScannerErrorDialogWithScannerId = MutableLiveData<String?>(null)
 
     private var setupFlow: Disposable? = null
 
@@ -44,6 +47,12 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
 
     @SuppressLint("CheckResult")
     private fun startSetup() {
+        progress.value = 0
+        message.value = R.string.connect_scanner_bt_connect
+        vibrate.value = null
+        launchAlert.value = null
+        finish.value = null
+        showScannerErrorDialogWithScannerId.value = null
         setupFlow?.dispose()
         setupFlow = disconnectVero()
             .andThen(checkIfBluetoothIsEnabled())
@@ -51,7 +60,8 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
             .andThen(connectToVero())
             .andThen(resetVeroUI())
             .andThen(wakeUpVero())
-            .subscribeBy(onError = { it.printStackTrace() }, onComplete = {
+            .subscribeOn(Schedulers.io())
+            .subscribeBy(onError = { manageVeroErrors(it) }, onComplete = {
                 handleSetupFinished()
             })
     }
@@ -82,7 +92,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
 
     private fun updateBluetoothConnectivityEventWithVeroInfo() {
         scannerManager.let {
-            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.onScanner { versionInformation }.firmwareVersion.toString())
+            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.onScanner { versionInformation() }.firmwareVersion.toString())
         }
     }
 
@@ -94,15 +104,16 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
         }
             .andThen(task)
             .andThen(Completable.fromAction { callback?.invoke() })
-            .doOnError { manageVeroErrors(it) }
             .doOnComplete {
                 logMessageForCrashReport(crashReportMessage)
             }
 
     private fun manageVeroErrors(it: Throwable) {
-        it.printStackTrace()
+        Timber.d(it)
         launchScannerAlertOrShowDialog(scannerManager.getAlertType(it))
-        crashReportManager.logExceptionOrSafeException(it)
+        if (it !is FingerprintSafeException) {
+            crashReportManager.logExceptionOrSafeException(it)
+        }
     }
 
     private fun launchScannerAlertOrShowDialog(alert: FingerprintAlert) {
@@ -119,7 +130,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
         vibrate.postValue(Unit)
         preferencesManager.lastScannerUsed = convertAddressToSerial(scannerManager.lastPairedMacAddress
             ?: "")
-        preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation }.firmwareVersion.toString()
+        preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.firmwareVersion.toString()
         analyticsManager.logScannerProperties(scannerManager.lastPairedMacAddress
             ?: "", scannerManager.lastPairedScannerId ?: "")
         finish.postValue(Unit)
@@ -145,7 +156,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
                     ScannerConnectionEvent.ScannerInfo(
                         lastPairedScannerId ?: "",
                         lastPairedMacAddress ?: "",
-                        onScanner { versionInformation }.toString())))
+                        onScanner { versionInformation() }.toString())))
         }
     }
 

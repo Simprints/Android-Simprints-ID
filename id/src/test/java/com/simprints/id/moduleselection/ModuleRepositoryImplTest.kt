@@ -2,13 +2,13 @@ package com.simprints.id.moduleselection
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.verify
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,8 +18,8 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class)
 class ModuleRepositoryImplTest {
 
-    private val preferencesManager: PreferencesManager = mock()
-    private val crashReportManager: CrashReportManager = mock()
+    private val preferencesManager: PreferencesManager = mockk(relaxed = true)
+    private val crashReportManager: CrashReportManager = mockk(relaxed = true)
     private var repository = ModuleRepositoryImpl(preferencesManager, crashReportManager)
 
     @Before
@@ -37,9 +37,9 @@ class ModuleRepositoryImplTest {
             Module("5", true)
         )
 
-        repository.updateModules(selectedModules)
+        repository.saveModules(selectedModules)
 
-        verify(crashReportManager).setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
+        verify(atLeast = 1) { crashReportManager.setModuleIdsCrashlyticsKey(any()) }
     }
 
     @Test
@@ -53,7 +53,7 @@ class ModuleRepositoryImplTest {
 
         val actual = repository.getModules()
 
-        assertThat(actual.value).isEqualTo(expected)
+        assertThat(actual).isEqualTo(expected)
     }
 
     @Test
@@ -63,27 +63,28 @@ class ModuleRepositoryImplTest {
             Module("c", true)
         )
 
-        val actual = repository.getModules().value?.filter { it.isSelected }
+        val actual = repository.getModules().filter { it.isSelected }
 
         assertThat(actual).isEqualTo(expected)
     }
 
     @Test
     fun shouldFetchMaxNumberOfModulesFromRemoteConfig() {
-        whenever {
+        every {
             repository.preferencesManager.maxNumberOfModules
-        } thenReturn 10
+        } returns 10
 
         assertThat(repository.getMaxNumberOfModules()).isEqualTo(10)
     }
 
     private fun configureMock() {
-        whenever {
+        every {
             preferencesManager.moduleIdOptions
-        } thenReturn setOf("a", "b", "c", "d")
-        whenever {
+        } returns setOf("a", "b", "c", "d")
+
+        every {
             preferencesManager.selectedModules
-        } thenReturn setOf("b", "c")
+        } returns setOf("b", "c")
     }
 
 }

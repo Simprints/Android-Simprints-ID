@@ -29,7 +29,8 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
         GUID_NOT_FOUND_ONLINE,
         LOGIN_NOT_COMPLETE,
         UNEXPECTED_ERROR,
-        BLUETOOTH_NOT_SUPPORTED;
+        BLUETOOTH_NOT_SUPPORTED,
+        ROOTED_DEVICE;
 
         companion object {
 
@@ -41,6 +42,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
                     IAppErrorReason.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
                     IAppErrorReason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                     IAppErrorReason.LOGIN_NOT_COMPLETE -> LOGIN_NOT_COMPLETE
+                    IAppErrorReason.ROOTED_DEVICE -> ROOTED_DEVICE
                 }
 
             fun fromAlertTypeToDomain(clientApiAlert: ClientApiAlert): Reason =
@@ -53,6 +55,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
                     ClientApiAlert.INVALID_SESSION_ID -> INVALID_SESSION_ID
                     ClientApiAlert.INVALID_USER_ID -> INVALID_USER_ID
                     ClientApiAlert.INVALID_VERIFY_ID -> INVALID_VERIFY_ID
+                    ClientApiAlert.ROOTED_DEVICE -> ROOTED_DEVICE
                 }
         }
     }

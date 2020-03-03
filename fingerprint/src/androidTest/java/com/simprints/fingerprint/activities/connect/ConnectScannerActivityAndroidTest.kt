@@ -9,10 +9,12 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SmallTest
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityViewModel
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
+import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.fingerprint.commontesttools.scanner.DEFAULT_MAC_ADDRESS
 import com.simprints.fingerprint.commontesttools.scanner.DEFAULT_SCANNER_ID
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
@@ -58,6 +60,8 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
     @Before
     fun setUp() {
+        AndroidTestConfig().initRxIdler()
+
         acquireFingerprintKoinModules()
         declare {
             single { scannerManagerSpy }
@@ -207,7 +211,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
     private fun makeConnectToVeroStepSucceeding() {
         whenever(scannerWrapperMock) { connect() } then {
-            whenever(scannerWrapperMock) { versionInformation } thenReturn mock()
+            whenever(scannerWrapperMock) { versionInformation() } thenReturn mock()
             Completable.complete()
         }
     }

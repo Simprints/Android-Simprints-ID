@@ -8,7 +8,7 @@ import com.google.common.truth.Truth
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.commontesttools.DefaultTestConstants
+import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
@@ -30,7 +30,7 @@ import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.testtools.AndroidTestConfig
@@ -46,6 +46,7 @@ import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.observers.TestObserver
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -74,7 +75,7 @@ class SessionEventsUploaderTaskAndroidTest {
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var secureDataManagerSpy: SecureDataManager
+    @Inject lateinit var secureLocalDbKeyProviderSpy: SecureLocalDbKeyProvider
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
 
     private val remoteTestingManager: RemoteTestingManager = RemoteTestingManager.create()
@@ -86,7 +87,7 @@ class SessionEventsUploaderTaskAndroidTest {
     private val module by lazy {
         TestAppModule(
             app,
-            remoteDbManagerRule = DependencyRule.SpyRule,
+            remoteDbManagerRule = DependencyRule.SpykRule,
             randomGeneratorRule = DependencyRule.ReplaceRule { mock<RandomGenerator>().apply { setupRandomGeneratorToGenerateKey(this) } },
             secureDataManagerRule = DependencyRule.SpyRule
         )
@@ -94,7 +95,7 @@ class SessionEventsUploaderTaskAndroidTest {
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, module, preferencesModule).fullSetup()
+        AndroidTestConfig(this, module, preferencesModule = preferencesModule).fullSetup()
 
         whenever(settingsPreferencesManagerSpy.fingerStatus).thenReturn(hashMapOf(
             FingerIdentifier.LEFT_THUMB to true,
@@ -105,7 +106,7 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     @Test
-    fun closeSessions_shouldGetUploaded() {
+    fun closeSessions_shouldGetUploaded() = runBlockingTest {
         mockBeingSignedIn()
 
         val nSession = BATCH_SIZE + 1
@@ -124,7 +125,7 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     @Test
-    fun closeSession_withAllEvents_shouldGetUploaded() {
+    fun closeSession_withAllEvents_shouldGetUploaded() = runBlockingTest {
         mockBeingSignedIn()
 
         createClosedSessions(1).first().apply {
@@ -290,11 +291,11 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
 
-    private fun executeUpload(): TestObserver<Void> {
+    private suspend fun executeUpload(): TestObserver<Void> {
         val syncTask = SessionEventsUploaderTask(
             sessionEventsManager,
             timeHelper,
-            remoteSessionsManager.getSessionsApiClient().blockingGet())
+            remoteSessionsManager.getSessionsApiClient())
 
         return syncTask.execute(
             testProject.id,
@@ -314,14 +315,14 @@ class SessionEventsUploaderTaskAndroidTest {
         val token = remoteTestingManager.generateFirebaseToken(testProject.id, SIGNED_ID_USER)
         LoginStateMocker.setupLoginStateFullyToBeSignedIn(
             app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE),
-            secureDataManagerSpy,
+            secureLocalDbKeyProviderSpy,
             remoteDbManagerSpy,
             testProject.id,
             SIGNED_ID_USER,
             testProject.secret,
             LocalDbKey(
                 testProject.id,
-                DefaultTestConstants.DEFAULT_REALM_KEY),
+                DEFAULT_REALM_KEY),
             token.token)
     }
 }
