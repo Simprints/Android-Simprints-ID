@@ -1,10 +1,6 @@
 package com.simprints.id.activities.qrcapture.tools
 
-import android.util.Size
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageAnalysisConfig
-import androidx.camera.core.Preview
-import androidx.camera.core.PreviewConfig
+import androidx.camera.core.*
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import java.util.concurrent.Executors
@@ -14,9 +10,8 @@ class QrCaptureHelperImpl : QrCaptureHelper, OnSuccessListener<List<FirebaseVisi
     private lateinit var qrCaptureListener: QrCaptureListener
 
     override fun buildPreview(): Preview {
-        val resolution = Size(1280, 720)
         val previewConfig = PreviewConfig.Builder()
-            .setTargetResolution(resolution)
+            .setTargetAspectRatio(AspectRatio.RATIO_16_9)
             .build()
 
         return Preview(previewConfig)
