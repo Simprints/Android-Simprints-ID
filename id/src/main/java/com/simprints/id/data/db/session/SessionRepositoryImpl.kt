@@ -13,12 +13,17 @@ import com.simprints.id.data.db.session.domain.models.events.ScannerConnectionEv
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.local.SessionLocalDataSource.Query
+import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.extensions.bufferedChunks
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 
 // Class to manage the current activeSession
@@ -26,7 +31,9 @@ open class SessionRepositoryImpl(private val deviceId: String,
                                  private val appVersionName: String,
                                  private val sessionEventsSyncManager: SessionEventsSyncManager,
                                  private val sessionLocalDataSource: SessionLocalDataSource,
+                                 private val sessionRemoteDataSource: SessionRemoteDataSource,
                                  private val preferencesManager: PreferencesManager,
+                                 private val loginInfoManager: LoginInfoManager,
                                  private val timeHelper: TimeHelper,
                                  private val crashReportManager: CrashReportManager) :
 
@@ -35,6 +42,7 @@ open class SessionRepositoryImpl(private val deviceId: String,
 
     companion object {
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
+        const val SESSION_BATCH_SIZE = 20
     }
 
     // as default, the manager tries to load the last open activeSession
@@ -69,6 +77,38 @@ open class SessionRepositoryImpl(private val deviceId: String,
                 timeHelper.now(),
                 extractCaptureEventIdsBasedOnPersonTemplate(currentSession, fingerprintSamples.map { EncodingUtils.byteArrayToBase64(it.template) })
             ))
+        }
+    }
+
+    override suspend fun startUploadingSessions() {
+        createBatchesFromLocalAndUploadSessions()
+    }
+
+    private suspend fun createBatchesFromLocalAndUploadSessions() {
+        loadSessionsToUpload()
+            .createBatches()
+            .startUploadingSessions()
+            .deleteSessionsFromDb()
+    }
+
+    private suspend fun loadSessionsToUpload() =
+        sessionLocalDataSource.load(Query(projectId = loginInfoManager.getSignedInProjectIdOrEmpty()))
+
+    private suspend fun Flow<SessionEvents>.createBatches() =
+        this.bufferedChunks(SESSION_BATCH_SIZE)
+
+    private suspend fun Flow<List<SessionEvents>>.startUploadingSessions(): Flow<List<SessionEvents>> {
+        this.collect {
+            sessionRemoteDataSource.uploadSessions(loginInfoManager.getSignedInProjectIdOrEmpty(), it)
+        }
+        return this
+    }
+
+    private suspend fun Flow<List<SessionEvents>>.deleteSessionsFromDb() {
+        this.collect {sessions ->
+            sessions.forEach {
+                sessionLocalDataSource.delete(Query(id = it.id, openSession = false))
+            }
         }
     }
 

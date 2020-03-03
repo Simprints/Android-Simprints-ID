@@ -7,14 +7,13 @@ import com.simprints.id.data.db.session.remote.session.ApiSessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.tools.utils.retrySimNetworkCalls
 
-class SessionsRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
-                                   private val simApiClientFactory: SimApiClientFactory) : SessionsRemoteDataSource {
+class SessionRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
+                                  private val simApiClientFactory: SimApiClientFactory) : SessionRemoteDataSource {
     override suspend fun uploadSessions(projectId: String,
                                         sessions: List<SessionEvents>) {
 
         sessions.filterClosedSessions()
             .uploadClosedSessionsOrThrowIfNoSessions(projectId)
-            //Deletion in the repository
     }
 
     private fun List<SessionEvents>.filterClosedSessions() =

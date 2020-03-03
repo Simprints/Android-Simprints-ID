@@ -36,6 +36,8 @@ import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl
 import com.simprints.id.data.db.session.remote.RemoteSessionsManager
 import com.simprints.id.data.db.session.remote.RemoteSessionsManagerImpl
+import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
+import com.simprints.id.data.db.session.remote.SessionRemoteDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -212,11 +214,20 @@ open class AppModule {
 
     @Provides
     @Singleton
+    open fun provideSessionEventsRemoteDbManager(
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory
+    ): SessionRemoteDataSource = SessionRemoteDataSourceImpl(remoteDbManager, simApiClientFactory)
+
+    @Provides
+    @Singleton
     open fun provideSessionEventsManager(
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
         sessionLocalDataSource: SessionLocalDataSource,
+        sessionRemoteDataSource: SessionRemoteDataSource,
         preferencesManager: PreferencesManager,
+        loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         crashReportManager: CrashReportManager
     ): SessionRepository =
@@ -225,7 +236,9 @@ open class AppModule {
             ctx.packageVersionName,
             sessionEventsSyncManager,
             sessionLocalDataSource,
+            sessionRemoteDataSource,
             preferencesManager,
+            loginInfoManager,
             timeHelper,
             crashReportManager
         )

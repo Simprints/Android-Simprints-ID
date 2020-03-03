@@ -16,6 +16,8 @@ interface SessionRepository : SessionLocalDataSource {
     suspend fun addPersonCreationEventInBackground(fingerprintSamples: List<FingerprintSample>)
     suspend fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
 
+    suspend fun startUploadingSessions()
+
     companion object {
         fun build(app: Application): SessionRepository =
             app.component.getSessionEventsManager()
