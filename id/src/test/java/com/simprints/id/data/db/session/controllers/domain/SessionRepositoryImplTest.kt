@@ -12,6 +12,8 @@ import com.simprints.id.data.db.session.domain.models.events.ArtificialTerminati
 import com.simprints.id.data.db.session.domain.models.events.callback.IdentificationCallbackEvent
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
+import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.session.SessionDataSourceException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
@@ -27,6 +29,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyString
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 
@@ -37,6 +40,8 @@ class SessionRepositoryImplTest {
     val timeHelper: TimeHelper = TimeHelperImpl()
     @MockK private lateinit var sessionEventsSyncManagerMock: SessionEventsSyncManager
     @MockK private lateinit var sessionLocalDataSourceMock: SessionLocalDataSource
+    @MockK private lateinit var sessionRemoteDataSource: SessionRemoteDataSource
+    @MockK private lateinit var loginInfoManager: LoginInfoManager
     @MockK private lateinit var preferencesManagerMock: PreferencesManager
     @MockK private lateinit var crashReportManagerMock: CrashReportManager
     private lateinit var sessionsRepositorySpy: SessionRepository
@@ -51,7 +56,8 @@ class SessionRepositoryImplTest {
         sessionsRepositorySpy = spyk(SessionRepositoryImpl(
             "deviceID",
             "com.simprints.id",
-            sessionEventsSyncManagerMock, sessionLocalDataSourceMock, preferencesManagerMock, timeHelper, crashReportManagerMock))
+            "projectId",
+            sessionEventsSyncManagerMock, sessionLocalDataSourceMock, sessionRemoteDataSource, preferencesManagerMock, timeHelper, crashReportManagerMock))
 
         sessionsInFakeDb.clear()
         mockSessionEventsManager(sessionLocalDataSourceMock, sessionsInFakeDb)
@@ -157,5 +163,19 @@ class SessionRepositoryImplTest {
             sessionsRepositorySpy.addGuidSelectionEvent("selected_guid", "some_session_id")
         }
     }
+
+    @Test
+    fun uploadSessions_shouldDeleteAfterUploading() {
+        runBlockingTest {
+            sessionsRepositorySpy.createSession("")
+            every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns "project_id"
+
+            sessionsRepositorySpy.startUploadingSessions()
+
+            coVerify(exactly = 1) { sessionRemoteDataSource.uploadSessions(anyString(), any()) }
+            coVerify(exactly = 1) { sessionLocalDataSourceMock.delete(any()) }
+        }
+    }
+
 
 }

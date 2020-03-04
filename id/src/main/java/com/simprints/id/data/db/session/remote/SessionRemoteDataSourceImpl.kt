@@ -9,17 +9,17 @@ import com.simprints.id.tools.utils.retrySimNetworkCalls
 
 class SessionRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                                   private val simApiClientFactory: SimApiClientFactory) : SessionRemoteDataSource {
+
     override suspend fun uploadSessions(projectId: String,
                                         sessions: List<SessionEvents>) {
-
         sessions.filterClosedSessions()
             .uploadClosedSessionsOrThrowIfNoSessions(projectId)
     }
 
-    private fun List<SessionEvents>.filterClosedSessions() =
+    internal fun List<SessionEvents>.filterClosedSessions() =
         filter { it.isClosed() }
 
-    private suspend fun List<SessionEvents>.uploadClosedSessionsOrThrowIfNoSessions(projectId: String) {
+    internal suspend fun List<SessionEvents>.uploadClosedSessionsOrThrowIfNoSessions(projectId: String) {
         if (isEmpty()) {
             throw NoSessionsFoundException()
         }
@@ -31,7 +31,7 @@ class SessionRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
     private suspend fun <T> makeNetworkRequest(block: suspend (client: SessionsRemoteInterface) -> T, traceName: String): T =
         retrySimNetworkCalls(getSessionsApiClient(), block, traceName)
 
-    private suspend fun getSessionsApiClient(): SessionsRemoteInterface {
+    internal suspend fun getSessionsApiClient(): SessionsRemoteInterface {
         val token = remoteDbManager.getCurrentToken()
         return simApiClientFactory.build<SessionsRemoteInterface>(token).api
     }
