@@ -10,13 +10,11 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
 import io.mockk.coEvery
 import io.mockk.every
 import io.reactivex.Completable
-import io.reactivex.Single
 import java.math.BigInteger
 
 object RobolectricTestMocker {
@@ -62,12 +60,6 @@ object RobolectricTestMocker {
         editor.putBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, logged)
         editor.putString(LegacyLocalDbKeyProviderImpl.SHARED_PREFS_KEY_FOR_REALM_KEY + projectId, if (logged) realmKey else "")
         editor.commit()
-        return this
-    }
-
-    fun setupSessionEventsManagerToAvoidRealmCall(sessionLocalDataSourceMock: SessionLocalDataSource): RobolectricTestMocker {
-        every { sessionLocalDataSourceMock.loadSessions(any(), any()) } returns Single.error(IllegalStateException())
-        every { sessionLocalDataSourceMock.insertOrUpdateSessionEvents(any()) } returns Completable.complete()
         return this
     }
 }
