@@ -25,7 +25,6 @@ import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCa
 import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
 import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.remote.RemoteSessionsManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager

@@ -21,14 +21,11 @@ import com.simprints.id.tools.TimeHelper
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 open class SessionLocalDataSourceImpl(private val appContext: Context,
                                       private val secureDataManager: SecureLocalDbKeyProvider,
@@ -115,16 +112,6 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         }
     }
 
-    override fun addEventToCurrentSessionInBackground(event: Event) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                addEventToCurrentSession(event)
-            } catch (t: Throwable) {
-                Timber.d(t)
-            }
-        }
-    }
-
     override suspend fun addEventToCurrentSession(event: Event) {
         updateCurrentSession {
             it.events.add(event)
@@ -143,7 +130,6 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
     private suspend fun updateFirstSession(query: SessionQuery, updateBlock: (SessionEvents) -> Unit) {
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                realm.refresh()
                 realm.executeTransaction {
                     val session = addQueryParams(query).findFirst() ?: throw NoSessionsFoundException()
                     val domainSession = session.toDomain()
@@ -229,12 +215,4 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         } catch (t: Throwable) {
             throw SessionDataSourceException(t)
         }
-
-    override suspend fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents) {
-        withContext(Dispatchers.IO) {
-            realm.executeTransaction {
-                it.insertOrUpdate(DbSession(sessionEvents))
-            }
-        }
-    }
 }

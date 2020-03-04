@@ -2,31 +2,27 @@ package com.simprints.id.data.db.session.controllers.domain
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
-import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.commontesttools.state.mockSessionEventsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.SessionRepositoryImpl
+import com.simprints.id.data.db.session.domain.models.SessionQuery
 import com.simprints.id.data.db.session.domain.models.events.ArtificialTerminationEvent
 import com.simprints.id.data.db.session.domain.models.events.callback.IdentificationCallbackEvent
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.exceptions.unexpected.InvalidSessionForGuidSelectionEvent
+import com.simprints.id.exceptions.safe.session.SessionDataSourceException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.kotlintest.shouldThrow
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.spyk
-import io.mockk.verify
-import io.reactivex.Completable
-import io.reactivex.Single
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
@@ -68,113 +64,98 @@ class SessionRepositoryImplTest {
 
     @Test
     fun signOut_shouldDeleteSessionsAndStopWorkers() {
-        every { sessionsRepositorySpy.deleteSessions() } returns Completable.complete()
+        runBlockingTest {
+            sessionsRepositorySpy.signOut()
 
-        sessionsRepositorySpy.signOut()
-
-        verify(exactly = 1) { sessionsRepositorySpy.deleteSessions(null, null, false, null) }
-        verify(exactly = 1) { sessionEventsSyncManagerMock.cancelSyncWorkers() }
+            coVerify(exactly = 1) { sessionLocalDataSourceMock.delete(SessionQuery(openSession = false)) }
+            coVerify(exactly = 1) { sessionEventsSyncManagerMock.cancelSyncWorkers() }
+        }
     }
 
     @Test
     fun createSession_shouldCreateASession() {
+        runBlockingTest {
+            sessionsRepositorySpy.createSession("")
 
-        sessionsRepositorySpy.createSession("").blockingGet()
-
-        assertThat(sessionsInFakeDb.size).isEqualTo(1)
-        val createdSession = sessionsInFakeDb.first()
-        assertNotNull(createdSession)
-        assertThat(createdSession.isOpen()).isTrue()
+            assertThat(sessionsInFakeDb.size).isEqualTo(1)
+            val createdSession = sessionsInFakeDb.first()
+            assertNotNull(createdSession)
+            assertThat(createdSession.isOpen()).isTrue()
+        }
     }
 
     @Test
     fun createSession_shouldCloseAnyOpenSession() {
-        val openSession = createFakeOpenSession(timeHelper, "projectId", "old_session_id")
-        sessionsInFakeDb.add(openSession)
-        assertThat(openSession.isOpen()).isTrue()
+        runBlockingTest {
+            val openSession = createFakeOpenSession(timeHelper, "projectId", "old_session_id")
+            sessionsInFakeDb.add(openSession)
+            assertThat(openSession.isOpen()).isTrue()
 
-        sessionsRepositorySpy.createSession("").blockingGet()
+            sessionsRepositorySpy.createSession("")
 
-        assertThat(sessionsInFakeDb.size).isEqualTo(2)
-        val newCreatedSession = sessionsInFakeDb.find { it.id != "old_session_id" }
-        assertThat(newCreatedSession?.isOpen()).isTrue()
-        assertThat(newCreatedSession?.events).hasSize(0)
-        val oldOpenSession = sessionsInFakeDb.find { it.id == "old_session_id" }
-        assertThat(oldOpenSession?.isClosed()).isTrue()
-        assertThat(oldOpenSession?.events?.filterIsInstance(ArtificialTerminationEvent::class.java)).hasSize(1)
+            assertThat(sessionsInFakeDb.size).isEqualTo(2)
+            val newCreatedSession = sessionsInFakeDb.find { it.id != "old_session_id" }
+            assertThat(newCreatedSession?.isOpen()).isTrue()
+            assertThat(newCreatedSession?.events).hasSize(0)
+            val oldOpenSession = sessionsInFakeDb.find { it.id == "old_session_id" }
+            assertThat(oldOpenSession?.isClosed()).isTrue()
+            assertThat(oldOpenSession?.events?.filterIsInstance(ArtificialTerminationEvent::class.java)).hasSize(1)
 
-        verify(exactly = 1) { sessionEventsSyncManagerMock.scheduleSessionsSync() }
+            verify(exactly = 1) { sessionEventsSyncManagerMock.scheduleSessionsSync() }
+        }
     }
 
     @Test
     fun closeLastSessionsIfPending_shouldSwallowException() {
-        every { sessionLocalDataSourceMock.loadSessions(any(), any()) } returns (Single.error(Throwable("error_reading_db")))
+        runBlockingTest {
+            coEvery { sessionLocalDataSourceMock.load(any()) } throws Throwable("error_reading_db")
 
-        sessionsRepositorySpy.createSession("").blockingGet()
+            sessionsRepositorySpy.createSession("")
 
-        verify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
-        assertThat(sessionsInFakeDb.size).isEqualTo(1)
+            verify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
+            assertThat(sessionsInFakeDb.size).isEqualTo(1)
+        }
     }
 
     @Test
     fun updateSession_shouldUpdateSession() {
-        sessionsRepositorySpy.createSession("").blockingGet()
-        sessionsRepositorySpy.update {
-            it.projectId = "new_project"
-        }.blockingAwait()
+        runBlockingTest {
+            sessionsRepositorySpy.createSession("")
+            sessionsRepositorySpy.updateCurrentSession {
+                it.projectId = "new_project"
+            }
 
-        assertThat(sessionsInFakeDb.size).isEqualTo(1)
-        assertThat(sessionsInFakeDb.first().projectId).isEqualTo("new_project")
+            assertThat(sessionsInFakeDb.size).isEqualTo(1)
+            assertThat(sessionsInFakeDb.first().projectId).isEqualTo("new_project")
+        }
     }
 
     @Test
     fun updateSession_shouldSwallowException() {
-        val tester = sessionsRepositorySpy.update { it.projectId = "new_project" }.test()
-        tester.awaitAndAssertSuccess()
-        verify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
+        runBlockingTest {
+            sessionsRepositorySpy.updateCurrentSession { it.projectId = "new_project" }
+            verify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
+        }
     }
 
     @Test
     fun getCurrentSessionWithNoOpenSession_shouldThrowException() {
-        val tester = sessionsRepositorySpy
-            .getCurrentSession()
-            .test()
-
-        tester.awaitTerminalEvent()
-        assertThat(tester.errorCount()).isEqualTo(1)
-    }
-
-    @Test
-    fun addGuidEventForANoIdentificationSession_shouldThrowException() {
-        sessionsInFakeDb.add(createFakeSession(id = "some_session_id"))
-        addGuidEventAndVerifyErrorResult()
-    }
-
-    @Test
-    fun addGuidEventForACloseSession_shouldThrowException() {
-        sessionsInFakeDb.add(createFakeClosedSession(timeHelper = timeHelper, id = "some_session_id"))
-        addGuidEventAndVerifyErrorResult()
-    }
-
-    private fun addGuidEventAndVerifyErrorResult() {
-        val tester = sessionsRepositorySpy
-            .addGuidSelectionEvent("selected_guid", "some_session_id")
-            .test()
-
-        tester.awaitTerminalEvent()
-        assertThat(tester.errorCount()).isEqualTo(1)
-        assertThat(tester.errors().first()).isInstanceOf(InvalidSessionForGuidSelectionEvent::class.java)
+        runBlockingTest {
+            shouldThrow<SessionDataSourceException> {
+                sessionsRepositorySpy.getCurrentSession()
+            }
+        }
     }
 
     @Test
     fun addGuidEventForIdentificationSession_shouldAddBeAdded() {
-        sessionsInFakeDb.add(createFakeOpenSession(timeHelper = timeHelper, id = "some_session_id").apply {
-            this.addEvent(IdentificationCallbackEvent(0, "some_session_id", emptyList()))
-        })
-        val tester = sessionsRepositorySpy
-            .addGuidSelectionEvent("selected_guid", "some_session_id")
-            .test()
+        runBlockingTest {
+            sessionsInFakeDb.add(createFakeOpenSession(timeHelper = timeHelper, id = "some_session_id").apply {
+                this.events.add(IdentificationCallbackEvent(0, "some_session_id", emptyList()))
+            })
 
-        tester.awaitAndAssertSuccess()
+            sessionsRepositorySpy.addGuidSelectionEvent("selected_guid", "some_session_id")
+        }
     }
+
 }

@@ -121,9 +121,12 @@ class TestAppModule(
         )
     }
 
-    override fun provideSessionEventsLocalDbManager(ctx: Context,
-                                                    secureDataManager: SecureLocalDbKeyProvider): SessionLocalDataSource =
-        sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager) }
+    override fun provideSessionEventsLocalDbManager(
+        ctx: Context,
+        secureDataManager: SecureLocalDbKeyProvider,
+        timeHelper: TimeHelper
+    ): SessionLocalDataSource =
+        sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager, timeHelper) }
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }

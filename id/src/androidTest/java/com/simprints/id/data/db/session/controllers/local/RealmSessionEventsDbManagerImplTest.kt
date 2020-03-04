@@ -4,7 +4,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl
-import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.testtools.AndroidTestConfig

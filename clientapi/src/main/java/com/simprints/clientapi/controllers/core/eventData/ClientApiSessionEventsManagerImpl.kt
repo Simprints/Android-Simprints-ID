@@ -4,11 +4,9 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.libsimprints.BuildConfig
-import io.reactivex.Completable
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
@@ -22,36 +20,26 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionRepository: Sessi
             coreSessionRepository.createSession(BuildConfig.VERSION_NAME)
         }
 
-        coreSessionRepository.updateCurrentSession { currentSession ->
-            currentSession.events.add(IntentParsingEvent(timeHelper.now(), integration.fromDomainToCore()))
-        }
+        coreSessionRepository.addEventToCurrentSessionInBackground(IntentParsingEvent(timeHelper.now(), integration.fromDomainToCore()))
+
         return coreSessionRepository.getCurrentSession().id
     }
 
-    override fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert): Completable = completableWithSuspend {
-        coreSessionRepository.updateCurrentSession { currentSession ->
-            currentSession.events.add(AlertScreenEvent(timeHelper.now(), clientApiAlertType.fromAlertToAlertTypeEvent()))
-        }
+    override suspend fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert) {
+        coreSessionRepository.addEventToCurrentSessionInBackground(AlertScreenEvent(timeHelper.now(), clientApiAlertType.fromAlertToAlertTypeEvent()))
     }
 
-    override suspend fun addCompletionCheckEvent(complete: Boolean) =
-        coreSessionRepository.updateCurrentSession { currentSession ->
-            currentSession.events.add(CompletionCheckEvent(timeHelper.now(), complete))
-        }
+    override suspend fun addCompletionCheckEvent(complete: Boolean) {
+        coreSessionRepository.addEventToCurrentSessionInBackground(CompletionCheckEvent(timeHelper.now(), complete))
+    }
 
-    override fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>): Completable =
-        completableWithSuspend {
-            coreSessionRepository.updateCurrentSession { currentSession ->
-                currentSession.events.add(SuspiciousIntentEvent(timeHelper.now(), unexpectedExtras))
-            }
-        }
+    override suspend fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>) {
+        coreSessionRepository.addEventToCurrentSessionInBackground(SuspiciousIntentEvent(timeHelper.now(), unexpectedExtras))
+    }
 
-    override fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>): Completable =
-        completableWithSuspend {
-            coreSessionRepository.updateCurrentSession { currentSession ->
-                currentSession.events.add(InvalidIntentEvent(timeHelper.now(), action, extras))
-            }
-        }
+    override suspend fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>) {
+        coreSessionRepository.addEventToCurrentSessionInBackground(InvalidIntentEvent(timeHelper.now(), action, extras))
+    }
 
     //StopShip Remove nullability - throw exceptions
     override suspend fun getCurrentSessionId(): String? =

@@ -17,7 +17,7 @@ interface ErrorContract {
     }
 
     interface Presenter : BasePresenter {
-        fun start(clientApiAlert: ClientApiAlert)
+        suspend fun start(clientApiAlert: ClientApiAlert)
         fun handleCloseOrBackClick()
     }
 

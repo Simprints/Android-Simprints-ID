@@ -11,6 +11,7 @@ import com.simprints.clientapi.activities.errors.request.AlertActRequest
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_error.*
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.anko.backgroundColor
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
@@ -32,9 +33,11 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
             .extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.clientApiAlert
             ?: ClientApiAlert.INVALID_CLIENT_REQUEST
 
-        presenter.start(clientApiAlertType)
-
         textView_close_button.setOnClickListener { presenter.handleCloseOrBackClick() }
+
+        runBlocking {
+            presenter.start(clientApiAlertType)
+        }
     }
 
     private fun setTextInLayout() {
