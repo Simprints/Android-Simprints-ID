@@ -8,7 +8,7 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.graphics.Matrix
 import android.os.Bundle
 import android.view.Surface
-import android.view.ViewGroup
+import android.view.TextureView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraX
 import com.simprints.id.Application
@@ -55,14 +55,16 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture), QrCap
 
     private fun startCamera() {
         val preview = qrCaptureHelper.buildPreview().apply {
-            setOnPreviewOutputUpdateListener {
-                with(cameraPreview.parent as ViewGroup) {
+            setOnPreviewOutputUpdateListener { previewOutput ->
+                with(qrCaptureRoot) {
                     removeView(cameraPreview)
                     addView(cameraPreview, 0)
                 }
 
-                cameraPreview.surfaceTexture = it.surfaceTexture
-                updateTransform()
+                with(cameraPreview) {
+                    surfaceTexture = previewOutput.surfaceTexture
+                    updateTransform()
+                }
             }
         }
 
@@ -71,11 +73,11 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture), QrCap
         CameraX.bindToLifecycle(this, preview, useCase)
     }
 
-    private fun updateTransform() {
-        val centreX = cameraPreview.x / 2
-        val centreY = cameraPreview.y / 2
+    private fun TextureView.updateTransform() {
+        val centreX = x / 2
+        val centreY = y / 2
 
-        val rotationDegrees = when (cameraPreview.display.rotation) {
+        val rotationDegrees = when (display.rotation) {
             Surface.ROTATION_0 -> 0f
             Surface.ROTATION_90 -> 90f
             Surface.ROTATION_180 -> 180f
@@ -87,7 +89,7 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture), QrCap
             postRotate(-rotationDegrees, centreX, centreY)
         }
 
-        cameraPreview.setTransform(matrix)
+        setTransform(matrix)
     }
 
     companion object {
