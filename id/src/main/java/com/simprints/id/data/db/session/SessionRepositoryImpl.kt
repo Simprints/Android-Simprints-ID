@@ -10,24 +10,25 @@ import com.simprints.id.data.db.session.domain.models.events.EventType.GUID_SELE
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
-import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.extensions.bufferedChunks
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 // Class to manage the current activeSession
 open class SessionRepositoryImpl(private val deviceId: String,
                                  private val appVersionName: String,
+                                 private val projectId: String,
                                  private val sessionEventsSyncManager: SessionEventsSyncManager,
                                  private val sessionLocalDataSource: SessionLocalDataSource,
                                  private val sessionRemoteDataSource: SessionRemoteDataSource,
                                  private val preferencesManager: PreferencesManager,
-                                 private val loginInfoManager: LoginInfoManager,
                                  private val timeHelper: TimeHelper,
                                  private val crashReportManager: CrashReportManager) : SessionRepository {
 
@@ -97,14 +98,14 @@ open class SessionRepositoryImpl(private val deviceId: String,
     }
 
     private suspend fun loadSessionsToUpload() =
-        sessionLocalDataSource.load(SessionQuery(projectId = loginInfoManager.getSignedInProjectIdOrEmpty()))
+        sessionLocalDataSource.load(SessionQuery(projectId = projectId))
 
     private suspend fun Flow<SessionEvents>.createBatches() =
         this.bufferedChunks(SESSION_BATCH_SIZE)
 
     private suspend fun Flow<List<SessionEvents>>.startUploadingSessions(): Flow<List<SessionEvents>> {
         this.collect {
-            sessionRemoteDataSource.uploadSessions(loginInfoManager.getSignedInProjectIdOrEmpty(), it)
+            sessionRemoteDataSource.uploadSessions(projectId, it)
         }
         return this
     }
@@ -116,7 +117,6 @@ open class SessionRepositoryImpl(private val deviceId: String,
             }
         }
     }
-
 
     override suspend fun updateCurrentSession(updateBlock: (SessionEvents) -> Unit) {
         reportAndRethrowException {

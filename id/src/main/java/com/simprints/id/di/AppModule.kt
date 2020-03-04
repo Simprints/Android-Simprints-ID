@@ -234,11 +234,11 @@ open class AppModule {
         SessionRepositoryImpl(
             ctx.deviceId,
             ctx.packageVersionName,
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
             sessionEventsSyncManager,
             sessionLocalDataSource,
             sessionRemoteDataSource,
             preferencesManager,
-            loginInfoManager,
             timeHelper,
             crashReportManager
         )
