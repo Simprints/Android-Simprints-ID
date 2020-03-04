@@ -268,8 +268,7 @@ class SyncInformationActivity : AppCompatActivity() {
         val upSyncStates = upSyncWorkersInfo
         val allSyncStates = downSyncStates + upSyncStates
         return allSyncStates.any {
-            it.state is PeopleSyncWorkerState.Running ||
-                it.state is PeopleSyncWorkerState.Enqueued
+            it.state is PeopleSyncWorkerState.Running || it.state is PeopleSyncWorkerState.Enqueued
         }
     }
 
