@@ -88,17 +88,16 @@ class LoginPresenter(val view: LoginContract.View,
                 })
     }
 
-    fun handleSignInSuccess(suppliedProjectId: String,
+    private fun handleSignInSuccess(suppliedProjectId: String,
                             suppliedUserId: String) {
         logMessageForCrashReportWithNetworkTrigger("Sign in success")
-        addAuthenticatedEventAndUpdateProjectIdIfRequired(AuthenticationEvent.Result.AUTHENTICATED, suppliedProjectId, suppliedUserId)
+        addAuthenticatedEventAndUpdateProjectIdIfRequired(AUTHENTICATED, suppliedProjectId, suppliedUserId)
         view.handleSignInSuccess()
     }
 
     private fun addAuthenticatedEventAndUpdateProjectIdIfRequired(result: AuthenticationEvent.Result,
                                                                   suppliedProjectId: String,
                                                                   suppliedUserId: String) {
-
         sessionEventsManager.addEventInBackground(
             AuthenticationEvent(
                 startTimeLogin,
