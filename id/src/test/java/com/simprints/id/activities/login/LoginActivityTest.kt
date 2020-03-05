@@ -14,7 +14,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SEC
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
-import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
@@ -71,7 +71,7 @@ class LoginActivityTest {
     @Test
     fun loginSuccesses_shouldReturnSuccessResultCode() {
         val controller = createRoboLoginActivity(getIntentForLoginAct()).start().resume().visible()
-        val projectAuthenticator = mockk<ProjectAuthenticator>()
+        val projectAuthenticator = mockk<ProjectAuthenticatorImpl>()
         every { projectAuthenticator.authenticate(any(), any()) } returns Completable.complete()
 
         val loginAct = controller.get().apply {

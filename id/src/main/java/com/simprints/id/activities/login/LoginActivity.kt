@@ -4,9 +4,10 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.gms.safetynet.SafetyNet
+import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
@@ -16,17 +17,17 @@ import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
 import com.simprints.id.activities.login.viewmodel.LoginViewModel
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
+import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.View {
@@ -39,13 +40,10 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
     }
 
     override lateinit var viewPresenter: LoginContract.Presenter
-    @Inject lateinit var preferences: PreferencesManager
-    @Inject lateinit var secureApiInterface: SecureApiInterface
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
-    private val app by lazy {
-        application as Application
-    }
+    @Inject lateinit var preferences: PreferencesManager
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var viewModelFactory: LoginViewModelFactory
 
     private val loginActRequest: LoginActivityRequest by lazy {
         intent.extras?.getParcelable<LoginActivityRequest>(LoginActivityRequest.BUNDLE_KEY)
@@ -57,26 +55,10 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (application as Application).component.inject(this)
 
-        val component = app.component.also {
-            it.inject(this)
-        }
-
-        val projectAuthenticator = ProjectAuthenticator(
-            component,
-            SafetyNet.getClient(this),
-            secureApiInterface
-        )
-
-        initViewModel(projectAuthenticator)
-        initUI()
-
-        viewPresenter = LoginPresenter(this, component, projectAuthenticator)
-    }
-
-    private fun initViewModel(projectAuthenticator: ProjectAuthenticator) {
-        val viewModelFactory = LoginViewModelFactory(projectAuthenticator)
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
+        initUI()
     }
 
     private fun setTextInLayout() {
@@ -95,11 +77,11 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
         progressDialog = SimProgressDialog(this)
         loginEditTextUserId.setText(loginActRequest.userIdFromIntent)
         loginButtonScanQr.setOnClickListener {
-            viewPresenter.logMessageForCrashReportWithUITrigger("Scan QR button clicked")
-            viewPresenter.openScanQRApp()
+            //viewPresenter.logMessageForCrashReportWithUITrigger("Scan QR button clicked")
+            //viewPresenter.openScanQRApp()
         }
         loginButtonSignIn.setOnClickListener {
-            viewPresenter.logMessageForCrashReportWithUITrigger("Login button clicked")
+            //viewPresenter.logMessageForCrashReportWithUITrigger("Login button clicked")
             handleSignInStart()
         }
     }
@@ -120,10 +102,22 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
 
     private fun handleSignInStart() {
         progressDialog.show()
-        val userId = loginEditTextUserId.text.toString()
         val projectId = loginEditTextProjectId.text.toString()
+        val userId = loginEditTextUserId.text.toString()
         val projectSecret = loginEditTextProjectSecret.text.toString()
-        viewPresenter.signIn(userId, projectId, projectSecret, loginActRequest.projectIdFromIntent)
+        
+        if (!areMandatoryCredentialsPresent(projectId, projectSecret, userId)) {
+            handleMissingCredentials()
+        } else if (projectId != loginActRequest.projectIdFromIntent) {
+            handleSignInFailedProjectIdIntentMismatch()
+        } else {
+            lifecycleScope.launch {
+                val result = viewModel.signIn(projectId, userId, projectSecret)
+                Log.d("TEST_ALAN", "Result = $result")
+                handleSignInResult(result)
+            }
+        }
+        //viewPresenter.signIn(userId, projectId, projectSecret, loginActRequest.projectIdFromIntent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -145,14 +139,36 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
             val scannedText = data.getStringExtra(QR_RESULT_KEY)
 
             if (resultCode == Activity.RESULT_OK) {
-                viewPresenter.processQRScannerAppResponse(scannedText)
+                //viewPresenter.processQRScannerAppResponse(scannedText)
             } else {
                 showErrorForQRCodeFailed()
             }
         }
 
+    private fun areMandatoryCredentialsPresent(
+        possibleProjectId: String,
+        possibleProjectSecret: String,
+        possibleUserId: String
+    ): Boolean {
+        return possibleProjectId.isNotEmpty()
+            && possibleProjectSecret.isNotEmpty()
+            && possibleUserId.isNotEmpty()
+    }
+
     private fun showErrorForQRCodeFailed() {
         showToast(androidResourcesHelper, R.string.login_qr_code_scanning_problem)
+    }
+
+    private fun handleSignInResult(result: AuthenticationEvent.Result) {
+        when (result) {
+            AuthenticationEvent.Result.AUTHENTICATED -> handleSignInSuccess()
+            AuthenticationEvent.Result.OFFLINE -> handleSignInFailedNoConnection()
+            AuthenticationEvent.Result.BAD_CREDENTIALS -> handleSignInFailedInvalidCredentials()
+            AuthenticationEvent.Result.TECHNICAL_FAILURE -> handleSignInFailedServerError()
+            AuthenticationEvent.Result.SAFETYNET_INVALID_CLAIM,
+            AuthenticationEvent.Result.SAFETYNET_UNAVAILABLE -> handleSafetyNetDownError()
+            AuthenticationEvent.Result.UNKNOWN -> handleSignInFailedUnknownReason()
+        }
     }
 
     override fun showErrorForInvalidQRCode() {
@@ -209,7 +225,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
     }
 
     override fun onBackPressed() {
-        viewPresenter.handleBackPressed()
+        //viewPresenter.handleBackPressed()
     }
 
     override fun setErrorResponseInActivityResultAndFinish(appErrorResponse: AppErrorResponse) {
@@ -218,5 +234,5 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
         })
         finish()
     }
-    
+
 }
