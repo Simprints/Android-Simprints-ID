@@ -32,6 +32,8 @@ class AuthenticationHelperImpl(
             AUTHENTICATED
         } catch (t: Throwable) {
             Timber.e(t)
+            crashReportManager.logExceptionOrSafeException(t)
+
             extractResultFromException(t).also { signInResult ->
                 logMessageForCrashReportWithNetworkTrigger("Sign in reason - $signInResult")
             }

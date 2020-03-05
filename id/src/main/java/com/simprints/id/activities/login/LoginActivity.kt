@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -78,7 +77,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
         loginEditTextUserId.setText(loginActRequest.userIdFromIntent)
         loginButtonScanQr.setOnClickListener {
             //viewPresenter.logMessageForCrashReportWithUITrigger("Scan QR button clicked")
-            //viewPresenter.openScanQRApp()
+            openScanQRApp()
         }
         loginButtonSignIn.setOnClickListener {
             //viewPresenter.logMessageForCrashReportWithUITrigger("Login button clicked")
@@ -86,7 +85,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
         }
     }
 
-    override fun handleOpenScanQRApp() {
+    private fun openScanQRApp() {
         val intent = packageManager.scannerAppIntent()
         if (intent.resolveActivity(packageManager) != null) {
             startActivityForResult(intent, QR_REQUEST_CODE)
@@ -113,11 +112,9 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
         } else {
             lifecycleScope.launch {
                 val result = viewModel.signIn(projectId, userId, projectSecret)
-                Log.d("TEST_ALAN", "Result = $result")
                 handleSignInResult(result)
             }
         }
-        //viewPresenter.signIn(userId, projectId, projectSecret, loginActRequest.projectIdFromIntent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -188,47 +185,48 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
         showToast(androidResourcesHelper, R.string.login_missing_credentials)
     }
 
-    override fun handleSignInSuccess() {
+    private fun handleSignInSuccess() {
         progressDialog.dismiss()
         setResult(RESULT_CODE_LOGIN_SUCCEED)
         finish()
     }
 
-    override fun handleSignInFailedNoConnection() {
+    private fun handleSignInFailedNoConnection() {
         progressDialog.dismiss()
         showToast(androidResourcesHelper, R.string.login_no_network)
     }
 
-    override fun handleSignInFailedServerError() {
+    private fun handleSignInFailedServerError() {
         progressDialog.dismiss()
         showToast(androidResourcesHelper, R.string.login_server_error)
     }
 
-    override fun handleSignInFailedInvalidCredentials() {
+    private fun handleSignInFailedInvalidCredentials() {
         progressDialog.dismiss()
         showToast(androidResourcesHelper, R.string.login_invalid_credentials)
     }
 
-    override fun handleSignInFailedProjectIdIntentMismatch() {
+    private fun handleSignInFailedProjectIdIntentMismatch() {
         progressDialog.dismiss()
         showToast(androidResourcesHelper, R.string.login_project_id_intent_mismatch)
     }
 
-    override fun handleSignInFailedUnknownReason() {
+    private fun handleSignInFailedUnknownReason() {
         progressDialog.dismiss()
         launchAlert(this, AlertType.UNEXPECTED_ERROR)
     }
 
-    override fun handleSafetyNetDownError() {
+    private fun handleSafetyNetDownError() {
         progressDialog.dismiss()
         launchAlert(this, AlertType.SAFETYNET_ERROR)
     }
 
     override fun onBackPressed() {
-        //viewPresenter.handleBackPressed()
+        val response = AppErrorResponse(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE)
+        setErrorResponseInActivityResultAndFinish(response)
     }
 
-    override fun setErrorResponseInActivityResultAndFinish(appErrorResponse: AppErrorResponse) {
+    private fun setErrorResponseInActivityResultAndFinish(appErrorResponse: AppErrorResponse) {
         setResult(Activity.RESULT_OK, Intent().apply {
             putExtra(LoginActivityResponse.BUNDLE_KEY, appErrorResponse)
         })
