@@ -24,7 +24,7 @@ class LoginRepositoryImpl(
         return authenticationHelper.authenticateSafely (authBlock = {
             loginStartTime = timeHelper.now()
             val nonceScope = NonceScope(projectId, userId)
-            projectAuthenticator.coAuthenticate(nonceScope, projectSecret)
+            projectAuthenticator.authenticate(nonceScope, projectSecret)
         }, after = {
             addEventAndUpdateProjectIdIfRequired(it, projectId, userId)
         })

@@ -11,8 +11,6 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
-import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
-import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.secure.models.*
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -23,44 +21,26 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
-import java.io.IOException
-import javax.inject.Inject
 
 class ProjectAuthenticatorImpl(
+    secureApiClient: SecureApiInterface,
+    loginInfoManager: LoginInfoManager,
     private val safetyNetClient: SafetyNetClient,
-    secureApiClient: SecureApiInterface
+    private val secureDataManager: SecureLocalDbKeyProvider,
+    private val projectRemoteDataSource: ProjectRemoteDataSource,
+    private val signerManager: SignerManager,
+    private val remoteConfigWrapper: RemoteConfigWrapper,
+    private val longConsentManager: LongConsentManager,
+    private val preferencesManager: PreferencesManager
 ) : ProjectAuthenticator {
+
+    internal val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
 
     private val attestationManager = AttestationManager()
     private val authenticationDataManager = AuthenticationDataManager(secureApiClient)
-
-    @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var projectRemoteDataSource: ProjectRemoteDataSource
-    @Inject lateinit var signerManager: SignerManager
-    @Inject lateinit var remoteConfigWrapper: RemoteConfigWrapper
-    @Inject lateinit var longConsentManager: LongConsentManager
-    @Inject lateinit var preferencesManager: PreferencesManager
-
-    internal val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
     private val authManager = AuthManager(secureApiClient)
 
-    /**
-     * @throws IOException
-     * @throws AuthRequestInvalidCredentialsException
-     * @throws SimprintsInternalServerException
-     * @throws com.simprints.id.exceptions.safe.secure.SafetyNetException
-     */
-    fun authenticate(nonceScope: NonceScope, projectSecret: String): Completable =
-        createLocalDbKeyForProject(nonceScope.projectId)
-            .prepareAuthRequestParameters(nonceScope, projectSecret)
-            .makeAuthRequest()
-            .signIn(nonceScope.projectId, nonceScope.userId)
-            .fetchProjectRemoteConfigSettings(nonceScope.projectId)
-            .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
-            .fetchProjectLongConsentTexts()
-
-    override suspend fun coAuthenticate(nonceScope: NonceScope, projectSecret: String) {
+    override suspend fun authenticate(nonceScope: NonceScope, projectSecret: String) {
         suspendCancellableCoroutine<Unit> { continuation ->
             CoroutineScope(Dispatchers.IO).launch {
                 createLocalDbKeyForProject(nonceScope.projectId)

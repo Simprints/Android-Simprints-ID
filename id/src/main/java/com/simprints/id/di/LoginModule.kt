@@ -9,11 +9,17 @@ import com.simprints.id.activities.login.tools.AuthenticationHelper
 import com.simprints.id.activities.login.tools.AuthenticationHelperImpl
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.consent.LongConsentManager
+import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.session.domain.SessionEventsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.RemoteConfigWrapper
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.secure.SignerManager
 import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
@@ -41,11 +47,26 @@ class LoginModule {
 
     @Provides
     fun provideProjectAuthenticator(
+        secureApiClient: SecureApiInterface,
+        loginInfoManager: LoginInfoManager,
         safetyNetClient: SafetyNetClient,
-        secureApiClient: SecureApiInterface
-    ) : ProjectAuthenticator {
-        return ProjectAuthenticatorImpl(safetyNetClient, secureApiClient)
-    }
+        secureDataManager: SecureLocalDbKeyProvider,
+        projectRemoteDataSource: ProjectRemoteDataSource,
+        signerManager: SignerManager,
+        remoteConfigWrapper: RemoteConfigWrapper,
+        longConsentManager: LongConsentManager,
+        preferencesManager: PreferencesManager
+    ) : ProjectAuthenticator = ProjectAuthenticatorImpl(
+        secureApiClient,
+        loginInfoManager,
+        safetyNetClient,
+        secureDataManager,
+        projectRemoteDataSource,
+        signerManager,
+        remoteConfigWrapper,
+        longConsentManager,
+        preferencesManager
+    )
 
     @Provides
     fun provideAuthenticationHelper(
