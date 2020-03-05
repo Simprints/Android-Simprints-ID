@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -13,6 +14,8 @@ import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
+import com.simprints.id.activities.login.viewmodel.LoginViewModel
+import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
@@ -26,7 +29,7 @@ import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_login.*
 import javax.inject.Inject
 
-class LoginActivity : AppCompatActivity(), LoginContract.View {
+class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.View {
 
     companion object {
         const val QR_REQUEST_CODE: Int = 0
@@ -40,36 +43,40 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     @Inject lateinit var secureApiInterface: SecureApiInterface
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
-    val app by lazy {
+    private val app by lazy {
         application as Application
     }
 
+    private val loginActRequest: LoginActivityRequest by lazy {
+        intent.extras?.getParcelable<LoginActivityRequest>(LoginActivityRequest.BUNDLE_KEY)
+            ?: throw InvalidAppRequest()
+    }
+
     private lateinit var progressDialog: SimProgressDialog
-    private lateinit var loginActRequest: LoginActivityRequest
+    private lateinit var viewModel: LoginViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
-        app.component.inject(this)
-        title = androidResourcesHelper.getString(R.string.login_title)
 
-        setTextInLayout()
-
-        loginActRequest = this.intent.extras?.getParcelable(LoginActivityRequest.BUNDLE_KEY)
-            ?: throw InvalidAppRequest()
-
-        val component = (application as Application).component
-        component.inject(this)
-
-        initUI()
+        val component = app.component.also {
+            it.inject(this)
+        }
 
         val projectAuthenticator = ProjectAuthenticator(
             component,
             SafetyNet.getClient(this),
-            secureApiInterface)
+            secureApiInterface
+        )
+
+        initViewModel(projectAuthenticator)
+        initUI()
 
         viewPresenter = LoginPresenter(this, component, projectAuthenticator)
-        viewPresenter.start()
+    }
+
+    private fun initViewModel(projectAuthenticator: ProjectAuthenticator) {
+        val viewModelFactory = LoginViewModelFactory(projectAuthenticator)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
     }
 
     private fun setTextInLayout() {
@@ -84,6 +91,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     private fun initUI() {
+        setTextInLayout()
         progressDialog = SimProgressDialog(this)
         loginEditTextUserId.setText(loginActRequest.userIdFromIntent)
         loginButtonScanQr.setOnClickListener {
@@ -101,8 +109,12 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         if (intent.resolveActivity(packageManager) != null) {
             startActivityForResult(intent, QR_REQUEST_CODE)
         } else {
-            startActivity(Intent(Intent.ACTION_VIEW,
-                Uri.parse(GOOGLE_PLAY_LINK_FOR_QR_APP)))
+            startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(GOOGLE_PLAY_LINK_FOR_QR_APP)
+                )
+            )
         }
     }
 
@@ -206,4 +218,5 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         })
         finish()
     }
+    
 }
