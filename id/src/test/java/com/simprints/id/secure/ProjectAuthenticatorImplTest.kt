@@ -46,7 +46,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class ProjectAuthenticatorTest {
+class ProjectAuthenticatorImplTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
@@ -97,7 +97,7 @@ class ProjectAuthenticatorTest {
     @Test
     fun successfulResponse_userShouldSignIn() {
 
-        val authenticator = ProjectAuthenticator(
+        val authenticator = ProjectAuthenticatorImpl(
             app.component,
             SafetyNet.getClient(app),
             SecureApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
@@ -119,7 +119,7 @@ class ProjectAuthenticatorTest {
 
         val nonceScope = NonceScope(projectId, userId)
 
-        val testObserver = ProjectAuthenticator(
+        val testObserver = ProjectAuthenticatorImpl(
             app.component,
             SafetyNet.getClient(app),
             createMockServiceToFailRequests(apiClient.retrofit))
@@ -135,7 +135,7 @@ class ProjectAuthenticatorTest {
     @Test
     fun getAuthenticationData_invokeAuthenticationDataManagerCorrectly() {
         val authenticationDataManager = mockk<AuthenticationDataManager>(relaxed = true)
-        val projectAuthenticator = ProjectAuthenticator(app.component, mockk(), mockk(), mockk(), authenticationDataManager)
+        val projectAuthenticator = ProjectAuthenticatorImpl(app.component, mockk(), mockk(), mockk(), authenticationDataManager)
         projectAuthenticator.getAuthenticationData(projectId, userId)
 
         verify(exactly = 1) { authenticationDataManager.requestAuthenticationData(projectId, userId) }
@@ -154,7 +154,7 @@ class ProjectAuthenticatorTest {
         mockWebServer.enqueue(mockResponseForAuthenticationData())
         mockWebServer.enqueue(mockResponseForApiToken())
 
-        val authenticator = spyk(ProjectAuthenticator(
+        val authenticator = spyk(ProjectAuthenticatorImpl(
             app.component,
             SafetyNet.getClient(app),
             SimApiClientFactory("deviceId", mockWebServer.url("/").toString()).build<SecureApiInterface>().api,
@@ -178,7 +178,7 @@ class ProjectAuthenticatorTest {
             attestationManager.requestAttestation(any(), any())
         } throws (SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
 
-        val testObserver = ProjectAuthenticator(
+        val testObserver = ProjectAuthenticatorImpl(
             app.component,
             SafetyNet.getClient(app),
             SecureApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),

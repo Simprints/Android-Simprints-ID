@@ -15,7 +15,7 @@ import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
-import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.trace
@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 class LoginPresenter(val view: LoginContract.View,
                      component: AppComponent,
-                     override var projectAuthenticator: ProjectAuthenticator) : LoginContract.Presenter {
+                     override var projectAuthenticator: ProjectAuthenticatorImpl) : LoginContract.Presenter {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var crashReportManager: CrashReportManager

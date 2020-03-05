@@ -1,20 +1,19 @@
 package com.simprints.id.activities.login.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.secure.models.NonceScope
-import kotlinx.coroutines.launch
+import com.simprints.id.activities.login.repository.LoginRepository
+import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
 
-class LoginViewModel(private val projectAuthenticator: ProjectAuthenticator) : ViewModel() {
+class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
 
-    fun signIn(suppliedProjectId: String,
-               suppliedUserId: String,
-               suppliedProjectSecret: String) {
-        viewModelScope.launch {
-            val nonceScope = NonceScope(suppliedProjectId, suppliedUserId)
-            projectAuthenticator.authenticate2(nonceScope, suppliedProjectSecret)
-        }
-    }
+    suspend fun signIn(
+        suppliedProjectId: String,
+        suppliedUserId: String,
+        suppliedProjectSecret: String
+    ): AuthenticationEvent.Result = loginRepository.authenticate(
+        suppliedProjectId,
+        suppliedUserId,
+        suppliedProjectSecret
+    )
 
 }

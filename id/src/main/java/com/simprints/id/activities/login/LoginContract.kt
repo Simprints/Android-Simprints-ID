@@ -3,7 +3,7 @@ package com.simprints.id.activities.login
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
-import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.secure.ProjectAuthenticatorImpl
 
 interface LoginContract {
 
@@ -30,7 +30,7 @@ interface LoginContract {
     }
 
     interface Presenter : BasePresenter {
-        var projectAuthenticator: ProjectAuthenticator
+        var projectAuthenticator: ProjectAuthenticatorImpl
 
         fun signIn(suppliedUserId: String,
                    suppliedProjectId: String,
