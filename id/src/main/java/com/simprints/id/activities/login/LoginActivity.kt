@@ -16,8 +16,10 @@ import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
 import com.simprints.id.activities.login.viewmodel.LoginViewModel
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -27,21 +29,24 @@ import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.launch
+import org.json.JSONException
+import org.json.JSONObject
 import javax.inject.Inject
 
-class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.View {
+class LoginActivity : AppCompatActivity(R.layout.activity_login) {
 
     companion object {
         const val QR_REQUEST_CODE: Int = 0
         const val QR_RESULT_KEY = "SCAN_RESULT"
         const val GOOGLE_PLAY_LINK_FOR_QR_APP =
             "https://play.google.com/store/apps/details?id=com.google.zxing.client.android"
+
+        private const val PROJECT_ID_JSON_KEY = "projectId"
+        private const val PROJECT_SECRET_JSON_KEY = "projectSecret"
     }
 
-    override lateinit var viewPresenter: LoginContract.Presenter
-
-    @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var viewModelFactory: LoginViewModelFactory
 
     private val loginActRequest: LoginActivityRequest by lazy {
@@ -76,11 +81,11 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
         progressDialog = SimProgressDialog(this)
         loginEditTextUserId.setText(loginActRequest.userIdFromIntent)
         loginButtonScanQr.setOnClickListener {
-            //viewPresenter.logMessageForCrashReportWithUITrigger("Scan QR button clicked")
+            logMessageForCrashReportWithUITrigger("Scan QR button clicked")
             openScanQRApp()
         }
         loginButtonSignIn.setOnClickListener {
-            //viewPresenter.logMessageForCrashReportWithUITrigger("Login button clicked")
+            logMessageForCrashReportWithUITrigger("Login button clicked")
             handleSignInStart()
         }
     }
@@ -119,8 +124,8 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         val potentialAlertScreenResponse = extractPotentialAlertScreenResponse(data)
+
         if (potentialAlertScreenResponse != null) {
             setResult(resultCode, data)
             finish()
@@ -131,16 +136,34 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
         }
     }
 
-    fun handleScannerAppResult(resultCode: Int, data: Intent) =
+    private fun handleScannerAppResult(resultCode: Int, data: Intent) =
         runOnUiThread {
             val scannedText = data.getStringExtra(QR_RESULT_KEY)
 
-            if (resultCode == Activity.RESULT_OK) {
-                //viewPresenter.processQRScannerAppResponse(scannedText)
-            } else {
+            if (resultCode == Activity.RESULT_OK)
+                processQRScannerAppResponse(scannedText)
+            else
                 showErrorForQRCodeFailed()
-            }
         }
+
+    /**
+     * Valid Scanned Text Format:
+     * {"projectId":"someProjectId","projectSecret":"someSecret"}
+     **/
+    private fun processQRScannerAppResponse(scannedText: String) {
+        try {
+            with(JSONObject(scannedText)) {
+                val potentialProjectId = getString(PROJECT_ID_JSON_KEY)
+                val potentialProjectSecret = getString(PROJECT_SECRET_JSON_KEY)
+                updateProjectInfoOnTextFields(potentialProjectId, potentialProjectSecret)
+            }
+
+            logMessageForCrashReportWithUITrigger("QR scanning successful")
+        } catch (e: JSONException) {
+            showErrorForInvalidQRCode()
+            logMessageForCrashReportWithUITrigger("QR scanning unsuccessful")
+        }
+    }
 
     private fun areMandatoryCredentialsPresent(
         possibleProjectId: String,
@@ -156,6 +179,14 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
         showToast(androidResourcesHelper, R.string.login_qr_code_scanning_problem)
     }
 
+    private fun logMessageForCrashReportWithUITrigger(message: String) {
+        crashReportManager.logMessageForCrashReport(
+            CrashReportTag.LOGIN,
+            CrashReportTrigger.UI,
+            message = message
+        )
+    }
+
     private fun handleSignInResult(result: AuthenticationEvent.Result) {
         when (result) {
             AuthenticationEvent.Result.AUTHENTICATED -> handleSignInSuccess()
@@ -168,19 +199,16 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), LoginContract.
         }
     }
 
-    override fun showErrorForInvalidQRCode() {
+    private fun showErrorForInvalidQRCode() {
         showToast(androidResourcesHelper, R.string.login_invalid_qr_code)
     }
 
-    override fun updateProjectSecretInTextView(projectSecret: String) {
+    private fun updateProjectInfoOnTextFields(projectId: String, projectSecret: String) {
+        loginEditTextProjectId.setText(projectId)
         loginEditTextProjectSecret.setText(projectSecret)
     }
 
-    override fun updateProjectIdInTextView(projectId: String) {
-        loginEditTextProjectId.setText(projectId)
-    }
-
-    override fun handleMissingCredentials() {
+    private fun handleMissingCredentials() {
         progressDialog.dismiss()
         showToast(androidResourcesHelper, R.string.login_missing_credentials)
     }
