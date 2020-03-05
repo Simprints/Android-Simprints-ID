@@ -25,7 +25,6 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.SimProgressDialog
-import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.launch
@@ -56,20 +55,13 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     }
 
     private fun initUI() {
-        setTextInLayout()
+        setUpTexts()
+        setUpButtons()
         progressDialog = SimProgressDialog(this)
         loginEditTextUserId.setText(loginActRequest.userIdFromIntent)
-        loginButtonScanQr.setOnClickListener {
-            logMessageForCrashReport("Scan QR button clicked")
-            openScanQRApp()
-        }
-        loginButtonSignIn.setOnClickListener {
-            logMessageForCrashReport("Login button clicked")
-            signIn()
-        }
     }
 
-    private fun setTextInLayout() {
+    private fun setUpTexts() {
         with(androidResourcesHelper) {
             loginEditTextUserId.hint = getString(R.string.login_user_id_hint)
             loginEditTextProjectSecret.hint = getString(R.string.login_secret_hint)
@@ -80,18 +72,38 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         }
     }
 
-    private fun openScanQRApp() {
-        val intent = packageManager.scannerAppIntent()
-        if (intent.resolveActivity(packageManager) != null) {
-            startActivityForResult(intent, QR_REQUEST_CODE)
-        } else {
-            startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(GOOGLE_PLAY_LINK_FOR_QR_APP)
-                )
-            )
+    private fun setUpButtons() {
+        loginButtonScanQr.setOnClickListener {
+            logMessageForCrashReport("Scan QR button clicked")
+            openScannerApp()
         }
+
+        loginButtonSignIn.setOnClickListener {
+            logMessageForCrashReport("Login button clicked")
+            signIn()
+        }
+    }
+
+    private fun openScannerApp() {
+        val scannerAppIntent = getIntentForScannerApp()
+        val isScannerAppInstalled = scannerAppIntent.resolveActivity(packageManager) != null
+
+        if (isScannerAppInstalled)
+            startActivityForResult(scannerAppIntent, QR_REQUEST_CODE)
+        else
+            openScannerAppOnPlayStore()
+    }
+
+    private fun getIntentForScannerApp(): Intent {
+        return Intent(QR_SCAN_ACTION)
+            .putExtra("SAVE_HISTORY", false)
+            .putExtra("SCAN_MODE", "QR_CODE_MODE")
+    }
+
+    private fun openScannerAppOnPlayStore() {
+        startActivity(
+            Intent(Intent.ACTION_VIEW, Uri.parse(GOOGLE_PLAY_LINK_FOR_QR_APP))
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -253,6 +265,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     private companion object {
         const val QR_REQUEST_CODE = 0
         const val QR_RESULT_KEY = "SCAN_RESULT"
+        const val QR_SCAN_ACTION = "com.google.zxing.client.android.SCAN"
         const val GOOGLE_PLAY_LINK_FOR_QR_APP =
             "https://play.google.com/store/apps/details?id=com.google.zxing.client.android"
         const val PROJECT_ID_JSON_KEY = "projectId"
