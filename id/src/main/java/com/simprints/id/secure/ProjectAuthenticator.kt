@@ -2,6 +2,8 @@ package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
+import com.simprints.core.tools.extentions.resumeSafely
+import com.simprints.core.tools.extentions.resumeWithExceptionSafely
 import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
@@ -16,6 +18,12 @@ import com.simprints.id.secure.models.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
@@ -58,6 +66,28 @@ class ProjectAuthenticator(
             .fetchProjectRemoteConfigSettings(nonceScope.projectId)
             .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
             .fetchProjectLongConsentTexts()
+
+    // TODO: rename
+    suspend fun authenticate2(nonceScope: NonceScope, projectSecret: String) {
+        suspendCancellableCoroutine<Unit> { continuation ->
+            CoroutineScope(Dispatchers.IO).launch {
+                createLocalDbKeyForProject(nonceScope.projectId)
+                    .prepareAuthRequestParameters(nonceScope, projectSecret)
+                    .makeAuthRequest()
+                    .signIn(nonceScope.projectId, nonceScope.userId)
+                    .fetchProjectRemoteConfigSettings(nonceScope.projectId)
+                    .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
+                    .fetchProjectLongConsentTexts()
+                    .subscribeBy(
+                        onComplete = { continuation.resumeSafely(Unit) },
+                        onError = {
+                            Timber.e(it)
+                            continuation.resumeWithExceptionSafely(it)
+                        }
+                    )
+            }
+        }
+    }
 
     private fun Completable.prepareAuthRequestParameters(
         nonceScope: NonceScope,
