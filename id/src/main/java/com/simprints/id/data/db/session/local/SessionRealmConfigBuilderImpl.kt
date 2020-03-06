@@ -2,9 +2,9 @@ package com.simprints.id.data.db.session.local
 
 import io.realm.RealmConfiguration
 
-class SessionRealmConfigBuilderImpl  {
+class SessionRealmConfigBuilderImpl : SessionRealmConfigBuilder {
 
-    fun get(databaseName: String, key: ByteArray): RealmConfiguration = RealmConfiguration
+    override fun build(databaseName: String, key: ByteArray): RealmConfiguration = RealmConfiguration
         .Builder()
         .name("$databaseName.realm")
         .schemaVersion(SessionRealmMigration.REALM_SCHEMA_VERSION)
