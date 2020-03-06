@@ -1,6 +1,6 @@
 package com.simprints.id.activities.consent
 
-import android.Manifest
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Paint.UNDERLINE_TEXT_FLAG
@@ -11,24 +11,38 @@ import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.db.session.domain.SessionEventsManager
 import com.simprints.id.data.db.session.domain.models.events.ConsentEvent
+import com.simprints.id.data.db.session.domain.models.session.Location
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.ConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
+import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreResponseCode
 import com.simprints.id.tools.AndroidResourcesHelper
+import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.extensions.getNotGrantedPermissions
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import kotlinx.android.synthetic.main.activity_consent.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 class ConsentActivity : AppCompatActivity() {
@@ -42,7 +56,10 @@ class ConsentActivity : AppCompatActivity() {
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var exitFormHelper: ExitFormHelper
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var locationManager: LocationManager
+    @Inject lateinit var crashReportManager: CrashReportManager
 
     private var startConsentEventTime: Long = 0
 
@@ -80,12 +97,16 @@ class ConsentActivity : AppCompatActivity() {
     }
 
     private fun requestLocationPermission() {
-        requestPermissionsIfRequired(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+        val requestingPermissions = requestPermissionsIfRequired(arrayOf(ACCESS_FINE_LOCATION),
             LOCATION_PERMISSION_REQUEST_CODE)
+
+        if (!requestingPermissions) {
+            storeUserLocationIntoCurrentSession()
+        }
     }
 
     private fun setupTextInUi() {
-        with (androidResourcesHelper) {
+        with(androidResourcesHelper) {
             consentDeclineButton.text = getString(R.string.launch_consent_decline_button)
             consentAcceptButton.text = getString(R.string.launch_consent_accept_button)
             privacyNoticeText.text = getString(R.string.privacy_notice_text)
@@ -136,7 +157,7 @@ class ConsentActivity : AppCompatActivity() {
         })
     }
 
-    fun handleConsentAcceptClick(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun handleConsentAcceptClick(@Suppress("UNUSED_PARAMETER") view: View) {
         viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.ACCEPTED))
         setResult(CoreResponseCode.CONSENT.value, Intent().apply {
             putExtra(CORE_STEP_BUNDLE, AskConsentResponse(ConsentResponse.ACCEPTED))
@@ -144,19 +165,19 @@ class ConsentActivity : AppCompatActivity() {
         finish()
     }
 
-    fun handleConsentDeclineClick(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun handleConsentDeclineClick(@Suppress("UNUSED_PARAMETER") view: View) {
         viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.DECLINED))
         startExitFormActivity()
     }
 
-    fun handlePrivacyNoticeClick(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun handlePrivacyNoticeClick(@Suppress("UNUSED_PARAMETER") view: View) {
         startPrivacyNoticeActivity()
     }
 
     private fun buildConsentEventForResult(consentResult: ConsentEvent.Result) =
         ConsentEvent(startConsentEventTime, timeHelper.now(), getCurrentConsentTab(), consentResult)
 
-    private fun getCurrentConsentTab() = when(tabHost.currentTabTag) {
+    private fun getCurrentConsentTab() = when (tabHost.currentTabTag) {
         GENERAL_CONSENT_TAB_TAG -> ConsentEvent.Type.INDIVIDUAL
         PARENTAL_CONSENT_TAB_TAG -> ConsentEvent.Type.PARENTAL
         else -> throw IllegalStateException("Invalid consent tab selected")
@@ -182,6 +203,33 @@ class ConsentActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         exitFormHelper.buildExitFormResponseForCore(data)?.let {
             setResultAndFinish(it)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && getNotGrantedPermissions(arrayOf(ACCESS_FINE_LOCATION)).isEmpty()) {
+            storeUserLocationIntoCurrentSession()
+        }
+    }
+
+    private fun storeUserLocationIntoCurrentSession() {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val locationRequest = LocationRequest().apply {
+                    priority = PRIORITY_HIGH_ACCURACY
+                }
+                val locationsFlow = locationManager.requestLocation(locationRequest).take(1)
+                locationsFlow.collect { locations ->
+                    val lastLocation = locations.last()
+                    sessionEventsManager.updateSessionInBackground {
+                        Timber.d("Saving user's location into the current session")
+                        it.location = Location(lastLocation.latitude, lastLocation.longitude)
+                    }
+                }
+            } catch (t: Throwable) {
+                crashReportManager.logExceptionOrSafeException(FailedToRetrieveUserLocation(t))
+            }
         }
     }
 
