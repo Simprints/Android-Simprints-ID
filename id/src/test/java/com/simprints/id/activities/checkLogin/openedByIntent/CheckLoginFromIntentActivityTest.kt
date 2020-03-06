@@ -87,7 +87,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 //    fun invalidParams_shouldAlertActComeUp() {
 //
 //        val controller = createRoboCheckLoginFromIntentViewActivity(Intent()).start()
-//        val activity = controller.get() as CheckLoginFromIntentActivity
+//        val activity = controller.build() as CheckLoginFromIntentActivity
 //        controller.visible()
 //
 //        assertActivityStarted(AlertActivity::class.java, activity)
@@ -151,7 +151,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 //        setUserLogInState(false, sharedPrefs)
 //        val loginIntent = defaultRequest.toIntent()
 //        val controller = createRoboCheckLoginFromIntentViewActivity(loginIntent).start()
-//        val activity = controller.get() as CheckLoginFromIntentActivity
+//        val activity = controller.build() as CheckLoginFromIntentActivity
 //        controller.resume().visible()
 //        val sActivity = shadowOf(activity)
 //
@@ -176,7 +176,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 //        setUserLogInState(false, sharedPrefs)
 //        val loginIntent = defaultRequest.toIntent()
 //        val controller = createRoboCheckLoginFromIntentViewActivity(loginIntent).start()
-//        val activity = controller.get() as CheckLoginFromIntentActivity
+//        val activity = controller.build() as CheckLoginFromIntentActivity
 //        controller.resume().visible()
 //        val sActivity = shadowOf(activity)
 //
@@ -196,7 +196,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 //    private fun startCheckLoginFromIntentActivity(intent: Intent): CheckLoginFromIntentActivity {
 //
 //        val controller = createRoboCheckLoginFromIntentViewActivity(intent).start()
-//        val activity = controller.get() as CheckLoginFromIntentActivity
+//        val activity = controller.build() as CheckLoginFromIntentActivity
 //        controller.resume().visible()
 //        return activity
 //    }

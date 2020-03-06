@@ -27,7 +27,7 @@ open class ComplexPreference<T : Any>(val prefs: ImprovedSharedPreferences,
     }
 
     /**
-     * when we deserialize an Enum, sometimes we get MismatchedTypeException in Fabric.
+     * when we deserialize an Enum, sometimes we build MismatchedTypeException in Fabric.
      * That is because in the SharedPreference an integer (enum index) instead of a String (enum name) is stored.
      * It can happen when we changed the type stored in the SharedPref between versions
      * without a migration process (as we do for Realm). So tentatively we try to

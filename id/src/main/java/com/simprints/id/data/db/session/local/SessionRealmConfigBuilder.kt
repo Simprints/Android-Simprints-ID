@@ -3,7 +3,7 @@ package com.simprints.id.data.db.session.local
 import com.simprints.id.data.db.session.local.SessionRealmMigration.Companion.REALM_SCHEMA_VERSION
 import io.realm.RealmConfiguration
 
-object SessionRealmConfig {
+class SessionRealmConfig {
 
     fun get(databaseName: String, key: ByteArray): RealmConfiguration = RealmConfiguration
         .Builder()

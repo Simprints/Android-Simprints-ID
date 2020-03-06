@@ -8,7 +8,6 @@ import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.libsimprints.BuildConfig
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
 
 class ClientApiSessionEventsManagerImpl(private val coreSessionRepository: SessionRepository,
@@ -41,14 +40,7 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionRepository: Sessi
         coreSessionRepository.addEventToCurrentSessionInBackground(InvalidIntentEvent(timeHelper.now(), action, extras))
     }
 
-    //StopShip Remove nullability - throw exceptions
-    override suspend fun getCurrentSessionId(): String? =
-        try {
-            coreSessionRepository.getCurrentSession().id
-        } catch (t: Throwable) {
-            Timber.e(t)
-            null
-        }
+    override suspend fun getCurrentSessionId(): String = coreSessionRepository.getCurrentSession().id
 }
 
 fun ClientApiAlert.fromAlertToAlertTypeEvent(): CoreAlertScreenEventType =

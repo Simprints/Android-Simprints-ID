@@ -73,20 +73,6 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         }
     }
 
-    private fun closeAnyOpenSession(reamInTrans: Realm) {
-        wrapExceptionIfNeeded {
-            val currentSession = addQueryParams(SessionQuery(openSession = true)).findAll()
-            currentSession.forEach {
-                val updatedSession = it.toDomain()
-                val artificialTerminationEvent = ArtificialTerminationEvent(timeHelper.now(), ArtificialTerminationEvent.Reason.NEW_SESSION)
-                updatedSession.events.add(artificialTerminationEvent)
-                updatedSession.closeIfRequired(timeHelper)
-
-                reamInTrans.insertOrUpdate(DbSession(updatedSession))
-            }
-        }
-    }
-
     override suspend fun load(query: SessionQuery): Flow<SessionEvents> =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
@@ -177,6 +163,20 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         }
     }
 
+    private fun closeAnyOpenSession(reamInTrans: Realm) {
+        wrapExceptionIfNeeded {
+            val currentSession = addQueryParams(SessionQuery(openSession = true)).findAll()
+            currentSession.forEach {
+                val updatedSession = it.toDomain()
+                val artificialTerminationEvent = ArtificialTerminationEvent(timeHelper.now(), ArtificialTerminationEvent.Reason.NEW_SESSION)
+                updatedSession.events.add(artificialTerminationEvent)
+                updatedSession.closeIfRequired(timeHelper)
+
+                reamInTrans.insertOrUpdate(DbSession(updatedSession))
+            }
+        }
+    }
+    
     private fun getRealmInstance(): Realm {
         initDbIfRequired()
         return realmConfig?.let {

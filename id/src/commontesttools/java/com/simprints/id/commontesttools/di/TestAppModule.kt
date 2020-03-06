@@ -12,6 +12,7 @@ import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
+import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.session.remote.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -124,9 +125,10 @@ class TestAppModule(
     override fun provideSessionEventsLocalDbManager(
         ctx: Context,
         secureDataManager: SecureLocalDbKeyProvider,
-        timeHelper: TimeHelper
+        timeHelper: TimeHelper,
+        sessionRealmConfigBuilder: SessionRealmConfigBuilder
     ): SessionLocalDataSource =
-        sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager, timeHelper) }
+        sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder) }
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
