@@ -12,6 +12,7 @@ import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.ignoreException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -33,14 +34,17 @@ open class SessionRepositoryImpl(private val deviceId: String,
     // as default, the manager tries to load the last open activeSession
     //
     override suspend fun getCurrentSession(): SessionEvents =
-        reportAndRethrowException { sessionLocalDataSource.load(SessionQuery(openSession = true)).first() }
+        reportExceptionIfNeeded { sessionLocalDataSource.load(SessionQuery(openSession = true)).first() }
 
     override suspend fun createSession(libSimprintsVersionName: String) {
-        reportAndSilentException { sessionLocalDataSource.create(appVersionName, libSimprintsVersionName, preferencesManager.language, deviceId) }
+        reportExceptionIfNeeded {
+            sessionLocalDataSource.create(appVersionName, libSimprintsVersionName, preferencesManager.language, deviceId)
+        }
     }
 
+
     override suspend fun addGuidSelectionEvent(selectedGuid: String, sessionId: String) {
-        reportAndSilentException {
+        reportExceptionIfNeeded {
             sessionLocalDataSource.updateCurrentSession { currentSession ->
                 if (currentSession.hasEvent(GUID_SELECTION) &&
                     currentSession.hasEvent(CALLBACK_IDENTIFICATION)) {
@@ -53,7 +57,7 @@ open class SessionRepositoryImpl(private val deviceId: String,
     }
 
     override suspend fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
-        reportAndSilentException {
+        reportExceptionIfNeeded {
             sessionLocalDataSource.updateCurrentSession { currentSession ->
                 val scannerConnectivityEvents = currentSession.events.filterIsInstance(ScannerConnectionEvent::class.java)
                 scannerConnectivityEvents.forEach { it.scannerInfo.hardwareVersion = hardwareVersion }
@@ -62,7 +66,7 @@ open class SessionRepositoryImpl(private val deviceId: String,
     }
 
     override suspend fun addPersonCreationEvent(fingerprintSamples: List<FingerprintSample>) {
-        reportAndSilentException {
+        reportExceptionIfNeeded {
             sessionLocalDataSource.updateCurrentSession { currentSession ->
                 currentSession.events.add(PersonCreationEvent(
                     timeHelper.now(),
@@ -74,14 +78,16 @@ open class SessionRepositoryImpl(private val deviceId: String,
 
     override fun addEventToCurrentSessionInBackground(event: Event) {
         CoroutineScope(Dispatchers.IO).launch {
-            reportAndSilentException {
-                sessionLocalDataSource.addEventToCurrentSession(event)
+            ignoreException {
+                reportExceptionIfNeeded {
+                    sessionLocalDataSource.addEventToCurrentSession(event)
+                }
             }
         }
     }
 
     override suspend fun updateCurrentSession(updateBlock: (SessionEvents) -> Unit) {
-        reportAndRethrowException {
+        reportExceptionIfNeeded {
             sessionLocalDataSource.updateCurrentSession(updateBlock)
         }
     }
@@ -99,20 +105,11 @@ open class SessionRepositoryImpl(private val deviceId: String,
             .filter { it.fingerprint?.template in personTemplates && it.result != FingerprintCaptureEvent.Result.SKIPPED }
             .map { it.id }
 
-    private suspend fun <T> reportAndSilentException(block: suspend () -> T): T? =
-        try {
-            block()
-        } catch (t: Throwable) {
-            crashReportManager.logExceptionOrSafeException(t)
-            null
-        }
-
-    private suspend fun <T> reportAndRethrowException(block: suspend () -> T): T =
+    private suspend fun <T> reportExceptionIfNeeded(block: suspend () -> T): T =
         try {
             block()
         } catch (t: Throwable) {
             crashReportManager.logExceptionOrSafeException(t)
             throw t
         }
-
 }

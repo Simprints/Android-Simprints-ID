@@ -34,6 +34,8 @@ import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.SessionRepositoryImpl
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl
+import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
+import com.simprints.id.data.db.session.local.SessionRealmConfigBuilderImpl
 import com.simprints.id.data.db.session.remote.RemoteSessionsManager
 import com.simprints.id.data.db.session.remote.RemoteSessionsManagerImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -202,13 +204,18 @@ open class AppModule {
     }
 
     @Provides
+    open fun provideSessionRealmConfigBuilder(): SessionRealmConfigBuilder =
+        SessionRealmConfigBuilderImpl()
+
+    @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(
         ctx: Context,
         secureDataManager: SecureLocalDbKeyProvider,
-        timeHelper: TimeHelper
+        timeHelper: TimeHelper,
+        sessionRealmConfigBuilder: SessionRealmConfigBuilder
     ): SessionLocalDataSource =
-        SessionLocalDataSourceImpl(ctx, secureDataManager, timeHelper)
+        SessionLocalDataSourceImpl(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder)
 
     @Provides
     @Singleton

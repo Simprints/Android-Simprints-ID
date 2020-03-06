@@ -78,8 +78,8 @@
 //                assertThat(size).isEqualTo(2)
 //                assertThat(first().isClosed()).isFalse()
 //                assertThat(first().relativeEndTime).isEqualTo(0)
-//                assertThat(get(1).isClosed()).isTrue()
-//                assertThat(get(1).relativeUploadTime).isNotEqualTo(0)
+//                assertThat(build(1).isClosed()).isTrue()
+//                assertThat(build(1).relativeUploadTime).isNotEqualTo(0)
 //            }
 //        }
 //    }

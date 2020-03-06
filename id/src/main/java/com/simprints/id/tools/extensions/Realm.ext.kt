@@ -8,7 +8,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 inline fun <reified T> List<T>.toRealmList(): RealmList<T> =
     RealmList(*this.toTypedArray())
 
-// Strong reference to query results otherwise they may get garbage collected while we are
+// Strong reference to query results otherwise they may build garbage collected while we are
 // waiting for the listeners to deliver the results
 private val firstAsyncQueriesResult = mutableListOf<RealmObject>()
 private val findAllQueriesResult = mutableListOf<RealmResults<RealmObject>>()

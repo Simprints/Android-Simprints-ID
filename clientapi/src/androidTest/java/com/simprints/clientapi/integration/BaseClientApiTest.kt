@@ -11,9 +11,11 @@ import com.simprints.clientapi.di.KoinInjector
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.moduleapi.app.responses.IAppResponse
-import com.simprints.testtools.common.syntax.*
-import io.reactivex.Completable
-import io.reactivex.Single
+import com.simprints.testtools.common.syntax.key
+import com.simprints.testtools.common.syntax.value
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.After
 import org.junit.Before
 import org.koin.test.KoinTest
@@ -64,16 +66,13 @@ open class BaseClientApiTest : KoinTest {
         }
     }
 
-    private fun buildDummySessionEventsManagerMock(): SessionRepository =
-        mock<SessionRepository>().apply {
-            val sessionMock = mock<SessionEvents>().apply {
-                whenever(this) { id } thenReturn ""
-            }
-
-            whenever(this) { createSession(anyNotNull()) } thenReturn Single.just(sessionMock)
-            whenever(this) { addEvent(anyNotNull()) } thenReturn Completable.complete()
-            whenever(this) { getCurrentSession() } thenReturn Single.just(sessionMock)
-        }
+    private fun buildDummySessionEventsManagerMock(): SessionRepository {
+        val sessionMock = mockk<SessionEvents>()
+        every { sessionMock.id } returns ""
+        val repo = mockk<SessionRepository>()
+        coEvery { repo.getCurrentSession() } returns sessionMock
+        return repo
+    }
 
     protected fun mockAppModuleResponse(appResponse: IAppResponse,
                                         action: String) {

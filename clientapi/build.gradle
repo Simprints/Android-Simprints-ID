@@ -40,11 +40,6 @@ android {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
         animationsDisabled = true
     }
-
-    // https://github.com/mockito/mockito/issues/1376
-    packagingOptions {
-        pickFirst 'mockito-extensions/org.mockito.plugins.MockMaker'
-    }
 }
 
 repositories {
@@ -123,6 +118,8 @@ dependencies {
     androidTestImplementation deps.testing.androidx.core
     androidTestImplementation deps.testing.androidx.ext_junit
     androidTestImplementation deps.testing.androidx.runner
+    androidTestImplementation deps.testing.mockk.core
+    androidTestImplementation deps.testing.mockk.android
     androidTestUtil deps.testing.androidx.orchestrator
 
     androidTestImplementation deps.testing.androidx.rules

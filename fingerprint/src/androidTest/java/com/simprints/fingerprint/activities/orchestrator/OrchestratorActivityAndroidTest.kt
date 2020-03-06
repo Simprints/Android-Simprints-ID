@@ -35,7 +35,7 @@ import org.koin.test.mock.declare
 class OrchestratorActivityAndroidTest : KoinTest {
 
     private val orchestratorMock = mock<Orchestrator>()
-    private val orchestratorViewModel = spy(OrchestratorViewModel(orchestratorMock))
+    private val orchestratorViewModel = spy(OrchestratorViewModel(orchestratorMock, mock()))
 
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
 
