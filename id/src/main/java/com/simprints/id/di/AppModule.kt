@@ -354,6 +354,9 @@ open class AppModule {
     open fun provideConnectivityHelper(ctx: Context): ConnectivityHelper = ConnectivityHelperImpl(ctx)
 
     @Provides
+    open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)
+
+    @Provides
     open fun provideQrCaptureHelper(): QrCaptureHelper = QrCaptureHelperImpl()
 
 }
