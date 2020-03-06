@@ -14,8 +14,7 @@ import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
-import com.simprints.id.activities.login.tools.areMandatoryCredentialsPresent
-import com.simprints.id.activities.login.tools.areSuppliedProjectIdAndProjectIdFromIntentEqual
+import com.simprints.id.activities.login.tools.CredentialsHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModel
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -31,7 +30,6 @@ import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.launch
 import org.json.JSONException
-import org.json.JSONObject
 import javax.inject.Inject
 
 class LoginActivity : AppCompatActivity(R.layout.activity_login) {
@@ -39,6 +37,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     @Inject lateinit var viewModelFactory: LoginViewModelFactory
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var credentialsHelper: CredentialsHelper
 
     private val loginActRequest: LoginActivityRequest by lazy {
         intent.extras?.getParcelable<LoginActivityRequest>(LoginActivityRequest.BUNDLE_KEY)
@@ -131,18 +130,13 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
             showErrorForQRCodeFailed()
     }
 
-    /**
-     * Valid Scanned Text Format:
-     * {"projectId":"someProjectId","projectSecret":"someSecret"}
-     **/
     private fun processScannerAppResponse(scannedText: String) {
         try {
-            with(JSONObject(scannedText)) {
-                val potentialProjectId = getString(PROJECT_ID_JSON_KEY)
-                val potentialProjectSecret = getString(PROJECT_SECRET_JSON_KEY)
-                updateProjectInfoOnTextFields(potentialProjectId, potentialProjectSecret)
-            }
+            val credentialsResponse = credentialsHelper.tryParseQrCodeResponse(scannedText)
+            val projectId = credentialsResponse.projectId
+            val projectSecret = credentialsResponse.projectSecret
 
+            updateProjectInfoOnTextFields(projectId, projectSecret)
             logMessageForCrashReport("QR scanning successful")
         } catch (e: JSONException) {
             showErrorForInvalidQRCode()
@@ -178,9 +172,9 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         val projectSecret = loginEditTextProjectSecret.text.toString()
         val projectIdFromIntent = loginActRequest.projectIdFromIntent
 
-        if (!areMandatoryCredentialsPresent(projectId, projectSecret, userId)) {
+        if (!credentialsHelper.areMandatoryCredentialsPresent(projectId, projectSecret, userId)) {
             handleMissingCredentials()
-        } else if (!areSuppliedProjectIdAndProjectIdFromIntentEqual(projectId, projectIdFromIntent)) {
+        } else if (!credentialsHelper.areSuppliedProjectIdAndProjectIdFromIntentEqual(projectId, projectIdFromIntent)) {
             handleSignInFailedProjectIdIntentMismatch()
         } else {
             lifecycleScope.launch {
@@ -261,8 +255,6 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         const val QR_SCAN_ACTION = "com.google.zxing.client.android.SCAN"
         const val GOOGLE_PLAY_LINK_FOR_QR_APP =
             "https://play.google.com/store/apps/details?id=com.google.zxing.client.android"
-        const val PROJECT_ID_JSON_KEY = "projectId"
-        const val PROJECT_SECRET_JSON_KEY = "projectSecret"
     }
 
 }
