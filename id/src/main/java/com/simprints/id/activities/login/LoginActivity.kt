@@ -14,6 +14,8 @@ import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
+import com.simprints.id.activities.login.tools.areMandatoryCredentialsPresent
+import com.simprints.id.activities.login.tools.areSuppliedProjectIdAndProjectIdFromIntentEqual
 import com.simprints.id.activities.login.viewmodel.LoginViewModel
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -174,10 +176,11 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         val projectId = loginEditTextProjectId.text.toString()
         val userId = loginEditTextUserId.text.toString()
         val projectSecret = loginEditTextProjectSecret.text.toString()
+        val projectIdFromIntent = loginActRequest.projectIdFromIntent
 
         if (!areMandatoryCredentialsPresent(projectId, projectSecret, userId)) {
             handleMissingCredentials()
-        } else if (projectId != loginActRequest.projectIdFromIntent) {
+        } else if (!areSuppliedProjectIdAndProjectIdFromIntentEqual(projectId, projectIdFromIntent)) {
             handleSignInFailedProjectIdIntentMismatch()
         } else {
             lifecycleScope.launch {
@@ -185,16 +188,6 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
                 handleSignInResult(result)
             }
         }
-    }
-
-    private fun areMandatoryCredentialsPresent(
-        possibleProjectId: String,
-        possibleProjectSecret: String,
-        possibleUserId: String
-    ): Boolean {
-        return possibleProjectId.isNotEmpty()
-            && possibleProjectSecret.isNotEmpty()
-            && possibleUserId.isNotEmpty()
     }
 
     private fun handleMissingCredentials() {
