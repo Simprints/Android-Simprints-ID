@@ -14,6 +14,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SEC
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.di.TestLoginModule
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.id.commontesttools.state.replaceSecureApiClientWithFailingClientProvider
 import com.simprints.id.commontesttools.state.setupFakeKeyStore
@@ -30,7 +31,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
 class LoginActivityAndroidTest : BaseAssertions() {
 
@@ -38,16 +38,30 @@ class LoginActivityAndroidTest : BaseAssertions() {
 
     private var secureApiInterfaceRule: DependencyRule = DependencyRule.RealRule
 
-    private val module
-        get() = TestAppModule(app,
-            randomGeneratorRule = DependencyRule.ReplaceRule { mock<RandomGenerator>().apply { setupRandomGeneratorToGenerateKey(this) } },
-            keystoreManagerRule = DependencyRule.ReplaceRule { mockk<KeystoreManager>().apply { setupFakeKeyStore(this) } },
-            secureApiInterfaceRule = secureApiInterfaceRule
-        )
+    private val appModule = TestAppModule(
+        app,
+        randomGeneratorRule = DependencyRule.ReplaceRule {
+            mock<RandomGenerator>().apply {
+                setupRandomGeneratorToGenerateKey(
+                    this
+                )
+            }
+        },
+        keystoreManagerRule = DependencyRule.ReplaceRule {
+            mockk<KeystoreManager>().apply {
+                setupFakeKeyStore(
+                    this
+                )
+            }
+        },
+        secureApiInterfaceRule = secureApiInterfaceRule
+    )
+
+    private val loginModule = TestLoginModule(safetyNetClientRule = DependencyRule.MockkRule)
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, module).fullSetup()
+        AndroidTestConfig(this, appModule, loginModule = loginModule).fullSetup()
     }
 
     @Test
@@ -96,8 +110,9 @@ class LoginActivityAndroidTest : BaseAssertions() {
 
     @Test
     fun validCredentialsWithoutInternet_shouldFailWithToast() {
-        secureApiInterfaceRule = DependencyRule.ReplaceRule { replaceSecureApiClientWithFailingClientProvider() }
-        AndroidTestConfig(this, module).initAndInjectComponent()
+        secureApiInterfaceRule =
+            DependencyRule.ReplaceRule { replaceSecureApiClientWithFailingClientProvider() }
+        AndroidTestConfig(this, appModule).initAndInjectComponent()
 
         launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
         enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
@@ -118,7 +133,8 @@ class LoginActivityAndroidTest : BaseAssertions() {
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
 
         result.resultData.setExtrasClassLoader(AppErrorResponse::class.java.classLoader)
-        val response = result.resultData.getParcelableExtra<AppErrorResponse>(LoginActivityResponse.BUNDLE_KEY)
+        val response =
+            result.resultData.getParcelableExtra<AppErrorResponse>(LoginActivityResponse.BUNDLE_KEY)
 
         assertThat(response.reason).isEqualTo(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE)
     }
@@ -127,8 +143,10 @@ class LoginActivityAndroidTest : BaseAssertions() {
         private val invalidCredentials = TestCalloutCredentials(
             "beefdeadbeefdeadbeef",
             DEFAULT_MODULE_ID,
-            DEFAULT_USER_ID)
+            DEFAULT_USER_ID
+        )
 
-        private const val invalidSecret = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+        private const val invalidSecret =
+            "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
     }
 }
