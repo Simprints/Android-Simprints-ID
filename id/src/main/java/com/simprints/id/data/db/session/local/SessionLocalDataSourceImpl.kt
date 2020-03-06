@@ -29,7 +29,8 @@ import kotlinx.coroutines.withContext
 
 open class SessionLocalDataSourceImpl(private val appContext: Context,
                                       private val secureDataManager: SecureLocalDbKeyProvider,
-                                      private val timeHelper: TimeHelper) : SessionLocalDataSource {
+                                      private val timeHelper: TimeHelper,
+                                      private val realmConfigBuilder: SessionRealmConfigBuilder) : SessionLocalDataSource {
     companion object {
         const val PROJECT_ID = "projectId"
         const val END_TIME = "relativeEndTime"
@@ -176,7 +177,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
             }
         }
     }
-    
+
     private fun getRealmInstance(): Realm {
         initDbIfRequired()
         return realmConfig?.let {
@@ -188,7 +189,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         if (this.localDbKey == null || realmConfig == null) {
             Realm.init(appContext)
             val localKey = generateDbKeyIfRequired()
-            realmConfig = SessionRealmConfig.get(localKey.projectId, localKey.value)
+            realmConfig = realmConfigBuilder.build(localKey.projectId, localKey.value)
             this.localDbKey = localKey
         }
     }
