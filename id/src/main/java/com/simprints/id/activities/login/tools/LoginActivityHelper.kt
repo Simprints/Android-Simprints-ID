@@ -1,8 +1,10 @@
 package com.simprints.id.activities.login.tools
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import com.simprints.id.activities.login.CredentialsResponse
 
-interface CredentialsHelper {
+interface LoginActivityHelper {
 
     fun areMandatoryCredentialsPresent(
         projectId: String,
@@ -15,10 +17,12 @@ interface CredentialsHelper {
         projectIdFromIntent: String
     ): Boolean
 
+    fun getScannerAppIntent(packageManager: PackageManager): Intent?
+
     /**
      * Valid Scanned Text Format:
      * {"projectId":"someProjectId","projectSecret":"someSecret"}
      **/
-    fun tryParseQrCodeResponse(qrValue: String): CredentialsResponse
+    fun tryParseQrCodeResponse(response: Intent): CredentialsResponse
 
 }

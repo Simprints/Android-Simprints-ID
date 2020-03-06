@@ -7,8 +7,8 @@ import com.simprints.id.activities.login.repository.LoginRepository
 import com.simprints.id.activities.login.repository.LoginRepositoryImpl
 import com.simprints.id.activities.login.tools.AuthenticationHelper
 import com.simprints.id.activities.login.tools.AuthenticationHelperImpl
-import com.simprints.id.activities.login.tools.CredentialsHelper
-import com.simprints.id.activities.login.tools.CredentialsHelperImpl
+import com.simprints.id.activities.login.tools.LoginActivityHelper
+import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.LongConsentManager
@@ -30,7 +30,7 @@ import dagger.Provides
 open class LoginModule {
 
     @Provides
-    open fun provideCredentialsHelper(): CredentialsHelper = CredentialsHelperImpl()
+    open fun provideLoginActivityHelper(): LoginActivityHelper = LoginActivityHelperImpl()
 
     @Provides
     open fun provideLoginViewModelFactory(loginRepository: LoginRepository): LoginViewModelFactory {
