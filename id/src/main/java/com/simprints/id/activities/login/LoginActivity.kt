@@ -124,7 +124,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         val scannedText = data.getStringExtra(QR_RESULT_KEY)
 
         if (resultCode == Activity.RESULT_OK)
-            processQRScannerAppResponse(scannedText)
+            processScannerAppResponse(scannedText)
         else
             showErrorForQRCodeFailed()
     }
@@ -133,7 +133,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
      * Valid Scanned Text Format:
      * {"projectId":"someProjectId","projectSecret":"someSecret"}
      **/
-    private fun processQRScannerAppResponse(scannedText: String) {
+    private fun processScannerAppResponse(scannedText: String) {
         try {
             with(JSONObject(scannedText)) {
                 val potentialProjectId = getString(PROJECT_ID_JSON_KEY)
