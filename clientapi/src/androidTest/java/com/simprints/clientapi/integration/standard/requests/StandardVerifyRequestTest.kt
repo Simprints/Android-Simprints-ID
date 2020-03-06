@@ -11,11 +11,10 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.integration.AppVerifyRequest
+import com.simprints.clientapi.integration.key
+import com.simprints.clientapi.integration.value
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
-import com.simprints.testtools.android.bundleDataMatcherForParcelable
-import com.simprints.testtools.common.syntax.key
-import com.simprints.testtools.common.syntax.value
 import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.Test

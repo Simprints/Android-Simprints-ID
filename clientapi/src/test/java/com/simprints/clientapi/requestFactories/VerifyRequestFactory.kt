@@ -7,9 +7,8 @@ import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.VerifyRequest
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
-
+import io.mockk.every
+import io.mockk.mockk
 
 object VerifyRequestFactory : RequestFactory() {
 
@@ -30,9 +29,9 @@ object VerifyRequestFactory : RequestFactory() {
         VerifyValidator(extractor as VerifyExtractor)
 
     override fun getMockExtractor(): VerifyExtractor {
-        val mockVerifyExtractor = mock<VerifyExtractor>()
+        val mockVerifyExtractor = mockk<VerifyExtractor>()
         setMockDefaultExtractor(mockVerifyExtractor)
-        whenever(mockVerifyExtractor) { getVerifyGuid() } thenReturn MOCK_VERIFY_GUID
+        every { mockVerifyExtractor.getVerifyGuid() } returns MOCK_VERIFY_GUID
         return mockVerifyExtractor
     }
 
