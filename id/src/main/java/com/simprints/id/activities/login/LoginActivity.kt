@@ -85,7 +85,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     }
 
     private fun openScannerApp() {
-        val scannerAppIntent = getIntentForScannerApp()
+        val scannerAppIntent = getScannerAppIntent()
         val isScannerAppInstalled = scannerAppIntent.resolveActivity(packageManager) != null
 
         if (isScannerAppInstalled)
@@ -94,7 +94,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
             openScannerAppOnPlayStore()
     }
 
-    private fun getIntentForScannerApp(): Intent {
+    private fun getScannerAppIntent(): Intent {
         return Intent(QR_SCAN_ACTION)
             .putExtra("SAVE_HISTORY", false)
             .putExtra("SCAN_MODE", "QR_CODE_MODE")
