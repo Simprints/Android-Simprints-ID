@@ -27,18 +27,18 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class LoginModule {
+open class LoginModule {
 
     @Provides
-    fun provideCredentialsHelper(): CredentialsHelper = CredentialsHelperImpl()
+    open fun provideCredentialsHelper(): CredentialsHelper = CredentialsHelperImpl()
 
     @Provides
-    fun provideLoginViewModelFactory(loginRepository: LoginRepository): LoginViewModelFactory {
+    open fun provideLoginViewModelFactory(loginRepository: LoginRepository): LoginViewModelFactory {
         return LoginViewModelFactory(loginRepository)
     }
 
     @Provides
-    fun provideLoginRepository(
+    open fun provideLoginRepository(
         projectAuthenticator: ProjectAuthenticator,
         authenticationHelper: AuthenticationHelper,
         sessionEventsManager: SessionEventsManager,
@@ -51,7 +51,7 @@ class LoginModule {
     )
 
     @Provides
-    fun provideProjectAuthenticator(
+    open fun provideProjectAuthenticator(
         secureApiClient: SecureApiInterface,
         loginInfoManager: LoginInfoManager,
         safetyNetClient: SafetyNetClient,
@@ -74,7 +74,7 @@ class LoginModule {
     )
 
     @Provides
-    fun provideAuthenticationHelper(
+    open fun provideAuthenticationHelper(
         crashReportManager: CrashReportManager,
         loginInfoManager: LoginInfoManager
     ): AuthenticationHelper {
@@ -82,6 +82,8 @@ class LoginModule {
     }
 
     @Provides
-    fun provideSafetyNetClient(context: Context): SafetyNetClient = SafetyNet.getClient(context)
+    open fun provideSafetyNetClient(
+        context: Context
+    ): SafetyNetClient = SafetyNet.getClient(context)
 
 }
