@@ -1,0 +1,7 @@
+<vector android:height="200dp" android:viewportHeight="512"
+    android:viewportWidth="512" android:width="200dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="@color/simprints_green" android:pathData="M177.592,0H20.105C9,0 0,9 0,20.105v156.817c0,11.104 9,20.105 20.105,20.105c11.104,0 20.105,-9 20.105,-20.105V40.209h137.382c11.104,0 20.105,-9 20.105,-20.105C197.696,9 188.696,0 177.592,0z"/>
+    <path android:fillColor="@color/simprints_green" android:pathData="M176.921,471.12H40.209V334.408c0,-11.104 -9,-20.105 -20.105,-20.105C9,314.304 0,323.304 0,334.408v156.817c0,11.104 9,20.105 20.105,20.105h156.817c11.104,0 20.105,-9 20.105,-20.105S188.026,471.12 176.921,471.12z"/>
+    <path android:fillColor="@color/simprints_green" android:pathData="M491.225,314.304c-11.104,0 -20.105,9 -20.105,20.105v137.382H334.408c-11.104,0 -20.105,9 -20.105,20.105s9,20.105 20.105,20.105h156.817c11.104,0 20.105,-8.994 20.105,-20.105V334.408C511.33,323.304 502.33,314.304 491.225,314.304z"/>
+    <path android:fillColor="@color/simprints_green" android:pathData="M491.895,0H334.408c-11.104,0 -20.105,9 -20.105,20.105c0,11.104 9,20.105 20.105,20.105h137.382v137.382c0,11.104 9,20.105 20.105,20.105c11.111,0 20.105,-9 20.105,-20.105V20.105C512,9 503,0 491.895,0z"/>
+</vector>
