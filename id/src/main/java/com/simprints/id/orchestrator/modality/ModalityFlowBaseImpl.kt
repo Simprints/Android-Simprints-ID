@@ -17,6 +17,7 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
+import com.simprints.id.tools.ignoreException
 
 abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProcessor,
                                     private val fingerprintStepProcessor: FingerprintStepProcessor,
@@ -103,6 +104,6 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         }
 
     private suspend fun addPersonCreationEventForFingerprintSamples(fingerprintSamples: List<FingerprintSample>) {
-        sessionRepository.addPersonCreationEvent(fingerprintSamples)
+        ignoreException { sessionRepository.addPersonCreationEvent(fingerprintSamples) }
     }
 }

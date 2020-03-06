@@ -62,7 +62,7 @@
 //            with(testObserver.values()) {
 //                assertThat(size).isEqualTo(2)
 //                assertThat(first().size).isEqualTo(BATCH_SIZE)
-//                assertThat(get(1).size).isEqualTo(1)
+//                assertThat(build(1).size).isEqualTo(1)
 //            }
 //        }
 //    }
