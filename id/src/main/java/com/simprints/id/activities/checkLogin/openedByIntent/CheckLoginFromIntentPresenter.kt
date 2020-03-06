@@ -24,6 +24,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.tools.ignoreException
 import com.simprints.id.tools.utils.SimNetworkUtils
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -70,10 +71,12 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     internal suspend fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
-        sessionRepository.updateCurrentSession { currentSession ->
-            currentSession.events.apply {
-                add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
-                add(buildRequestEvent(timeHelper.now(), appRequest))
+        ignoreException {
+            sessionRepository.updateCurrentSession { currentSession ->
+                currentSession.events.apply {
+                    add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
+                    add(buildRequestEvent(timeHelper.now(), appRequest))
+                }
             }
         }
     }
@@ -173,13 +176,15 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         loginInfoManager.signedInUserId = appRequest.userId
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
-        val peopleInDb = personLocalDataSource.count()
-        sessionRepository.updateCurrentSession { currentSession ->
-            currentSession.events.apply {
-                buildAuthorizationEvent(AuthorizationEvent.Result.AUTHORIZED)
+        ignoreException {
+            val peopleInDb = personLocalDataSource.count()
+            sessionRepository.updateCurrentSession { currentSession ->
+                currentSession.events.apply {
+                    buildAuthorizationEvent(AuthorizationEvent.Result.AUTHORIZED)
+                }
+                currentSession.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+                currentSession.databaseInfo.recordCount = peopleInDb
             }
-            currentSession.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-            currentSession.databaseInfo.recordCount = peopleInDb
         }
 
         view.openOrchestratorActivity(appRequest)
@@ -197,16 +202,17 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     internal suspend fun addAnalyticsInfoAndProjectId() {
-        val analyticsId = analyticsManager.getAnalyticsId()
-        sessionRepository.updateCurrentSession { currentSession ->
-            val signedInProject = loginInfoManager.getSignedInProjectIdOrEmpty()
-            if (signedInProject.isNotEmpty()) {
-                currentSession.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        ignoreException {
+            val analyticsId = analyticsManager.getAnalyticsId()
+            sessionRepository.updateCurrentSession { currentSession ->
+                val signedInProject = loginInfoManager.getSignedInProjectIdOrEmpty()
+                if (signedInProject.isNotEmpty()) {
+                    currentSession.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+                }
+                currentSession.analyticsId = analyticsId
             }
-            currentSession.analyticsId = analyticsId
         }
     }
-
 
     private fun buildAuthorizationEvent(result: AuthorizationEvent.Result) =
         AuthorizationEvent(
@@ -222,10 +228,8 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     @SuppressLint("CheckResult")
     private suspend fun setSessionIdCrashlyticsKey() {
-        try {
-            crashReportManager.setSessionIdCrashlyticsKey(sessionRepository.getCurrentSession()?.id ?: "")
-        } catch (t: Throwable) {
-            Timber.d("Error setting sessionId in Crashlytics")
+        ignoreException {
+            crashReportManager.setSessionIdCrashlyticsKey(sessionRepository.getCurrentSession().id)
         }
     }
 }

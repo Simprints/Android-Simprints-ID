@@ -29,7 +29,7 @@ open class SessionEvents(var projectId: String,
     var location: Location? = null
     var analyticsId: String? = null
 
-    // Function and not kotlin properties to avoid them to get serialised/deserialised
+    // Function and not kotlin properties to avoid them to build serialised/deserialised
     fun isClosed(): Boolean = relativeEndTime > 0
     fun isOpen(): Boolean = !isClosed()
 
