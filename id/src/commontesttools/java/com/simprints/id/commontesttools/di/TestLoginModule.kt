@@ -4,7 +4,7 @@ import android.content.Context
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.activities.login.repository.LoginRepository
 import com.simprints.id.activities.login.tools.AuthenticationHelper
-import com.simprints.id.activities.login.tools.CredentialsHelper
+import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.LongConsentManager
@@ -23,7 +23,7 @@ import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
 
 class TestLoginModule(
-    private val credentialsHelperRule: DependencyRule = RealRule,
+    private val loginActivityHelperRule: DependencyRule = RealRule,
     private val loginViewModelFactoryRule: DependencyRule = RealRule,
     private val loginRepositoryRule: DependencyRule = RealRule,
     private val projectAuthenticatorRule: DependencyRule = RealRule,
@@ -31,9 +31,9 @@ class TestLoginModule(
     private val safetyNetClientRule: DependencyRule = RealRule
 ) : LoginModule() {
 
-    override fun provideCredentialsHelper(): CredentialsHelper {
-        return credentialsHelperRule.resolveDependency {
-            super.provideCredentialsHelper()
+    override fun provideLoginActivityHelper(): LoginActivityHelper {
+        return loginActivityHelperRule.resolveDependency {
+            super.provideLoginActivityHelper()
         }
     }
 

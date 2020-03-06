@@ -14,7 +14,7 @@ import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
-import com.simprints.id.activities.login.tools.CredentialsHelper
+import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModel
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -37,7 +37,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     @Inject lateinit var viewModelFactory: LoginViewModelFactory
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var credentialsHelper: CredentialsHelper
+    @Inject lateinit var loginActivityHelper: LoginActivityHelper
 
     private val loginActRequest: LoginActivityRequest by lazy {
         intent.extras?.getParcelable<LoginActivityRequest>(LoginActivityRequest.BUNDLE_KEY)
@@ -86,19 +86,9 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     }
 
     private fun openScannerApp() {
-        val scannerAppIntent = getScannerAppIntent()
-        val isScannerAppInstalled = scannerAppIntent.resolveActivity(packageManager) != null
-
-        if (isScannerAppInstalled)
+        loginActivityHelper.getScannerAppIntent(packageManager)?.let { scannerAppIntent ->
             startActivityForResult(scannerAppIntent, QR_REQUEST_CODE)
-        else
-            openScannerAppOnPlayStore()
-    }
-
-    private fun getScannerAppIntent(): Intent {
-        return Intent(QR_SCAN_ACTION)
-            .putExtra("SAVE_HISTORY", false)
-            .putExtra("SCAN_MODE", "QR_CODE_MODE")
+        } ?: openScannerAppOnPlayStore()
     }
 
     private fun openScannerAppOnPlayStore() {
@@ -122,17 +112,15 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     }
 
     private fun handleScannerAppResult(resultCode: Int, data: Intent) {
-        val scannedText = data.getStringExtra(QR_RESULT_KEY)
-
         if (resultCode == Activity.RESULT_OK)
-            processScannerAppResponse(scannedText)
+            processScannerAppResponse(data)
         else
             showErrorForQRCodeFailed()
     }
 
-    private fun processScannerAppResponse(scannedText: String) {
+    private fun processScannerAppResponse(response: Intent) {
         try {
-            val credentialsResponse = credentialsHelper.tryParseQrCodeResponse(scannedText)
+            val credentialsResponse = loginActivityHelper.tryParseQrCodeResponse(response)
             val projectId = credentialsResponse.projectId
             val projectSecret = credentialsResponse.projectSecret
 
@@ -172,9 +160,13 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         val projectSecret = loginEditTextProjectSecret.text.toString()
         val projectIdFromIntent = loginActRequest.projectIdFromIntent
 
-        if (!credentialsHelper.areMandatoryCredentialsPresent(projectId, projectSecret, userId)) {
+        if (!loginActivityHelper.areMandatoryCredentialsPresent(projectId, projectSecret, userId)) {
             handleMissingCredentials()
-        } else if (!credentialsHelper.areSuppliedProjectIdAndProjectIdFromIntentEqual(projectId, projectIdFromIntent)) {
+        } else if (!loginActivityHelper.areSuppliedProjectIdAndProjectIdFromIntentEqual(
+                projectId,
+                projectIdFromIntent
+            )
+        ) {
             handleSignInFailedProjectIdIntentMismatch()
         } else {
             lifecycleScope.launch {
@@ -251,8 +243,6 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
 
     private companion object {
         const val QR_REQUEST_CODE = 0
-        const val QR_RESULT_KEY = "SCAN_RESULT"
-        const val QR_SCAN_ACTION = "com.google.zxing.client.android.SCAN"
         const val GOOGLE_PLAY_LINK_FOR_QR_APP =
             "https://play.google.com/store/apps/details?id=com.google.zxing.client.android"
     }
