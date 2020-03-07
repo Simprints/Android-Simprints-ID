@@ -21,6 +21,7 @@ import com.simprints.id.tools.TimeHelper
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
+import io.realm.Sort
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -134,7 +135,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
             addQueryParamForOpenSession(query.openSession, this)
             addQueryParamForSessionId(query.id, this)
             addQueryParamForStartTime(query.startedBefore, this)
-        }
+        }.sort(START_TIME, Sort.DESCENDING)
 
     private fun addQueryParamForProjectId(projectId: String?, query: RealmQuery<DbSession>) {
         projectId?.let {
@@ -214,6 +215,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         try {
             block()
         } catch (t: Throwable) {
+            t.printStackTrace()
             throw SessionDataSourceException(t)
         }
 }
