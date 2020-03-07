@@ -46,7 +46,7 @@ open class SessionRepositoryImpl(private val deviceId: String,
     override suspend fun addGuidSelectionEvent(selectedGuid: String, sessionId: String) {
         reportExceptionIfNeeded {
             sessionLocalDataSource.updateCurrentSession { currentSession ->
-                if (currentSession.hasEvent(GUID_SELECTION) &&
+                if (!currentSession.hasEvent(GUID_SELECTION) &&
                     currentSession.hasEvent(CALLBACK_IDENTIFICATION)) {
 
                     val guidEvent = GuidSelectionEvent(timeHelper.now(), selectedGuid)
@@ -102,7 +102,9 @@ open class SessionRepositoryImpl(private val deviceId: String,
     private fun extractCaptureEventIdsBasedOnPersonTemplate(sessionEvents: SessionEvents, personTemplates: List<String>): List<String> =
         sessionEvents.events
             .filterIsInstance(FingerprintCaptureEvent::class.java)
-            .filter { it.fingerprint?.template in personTemplates && it.result != FingerprintCaptureEvent.Result.SKIPPED }
+            .filter {
+                it.fingerprint?.template in personTemplates && it.result != FingerprintCaptureEvent.Result.SKIPPED
+            }
             .map { it.id }
 
     private suspend fun <T> reportExceptionIfNeeded(block: suspend () -> T): T =
