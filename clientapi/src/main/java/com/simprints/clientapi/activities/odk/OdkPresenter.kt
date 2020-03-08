@@ -36,7 +36,7 @@ class OdkPresenter(
 
     override suspend fun start() {
         if (action != ACTION_CONFIRM_IDENTITY) {
-            val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
+            val sessionId = sessionEventsManager.createSession(IntegrationInfo.ODK)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
 
