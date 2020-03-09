@@ -76,9 +76,8 @@ class SessionRemoteDataSourceImplTest {
     @Test
     fun failedResponseThenSuccessfulResponse_shouldTryAgainAndSucceed() {
         runBlocking {
-            mockServer.enqueue(MockResponse()
-                .setResponseCode(400)
-                .setResponseCode(200))
+            mockServer.enqueue(MockResponse().setResponseCode(400))
+            mockServer.enqueue(MockResponse().setResponseCode(200))
 
             val sessions = listOf(
                 createFakeClosedSession(timeHelper),
@@ -86,7 +85,7 @@ class SessionRemoteDataSourceImplTest {
             )
 
             sessionRemoteDataSourceSpy.uploadSessions("projectId", sessions)
-            assertThat(mockServer.requestCount).isEqualTo(1)
+            assertThat(mockServer.requestCount).isEqualTo(2)
         }
     }
 
