@@ -26,6 +26,10 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture), QrCap
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         if (hasPermission(CAMERA))
             startCamera()
