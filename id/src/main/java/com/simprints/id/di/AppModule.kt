@@ -32,6 +32,8 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.SessionRepositoryImpl
+import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
+import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilderImpl
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl
 import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
@@ -207,15 +209,23 @@ open class AppModule {
     open fun provideSessionRealmConfigBuilder(): SessionRealmConfigBuilder =
         SessionRealmConfigBuilderImpl()
 
+
+    @Provides
+    @Singleton
+    open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsBuilder =
+        SessionEventValidatorsBuilderImpl()
+
+
     @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(
         ctx: Context,
         secureDataManager: SecureLocalDbKeyProvider,
         timeHelper: TimeHelper,
-        sessionRealmConfigBuilder: SessionRealmConfigBuilder
+        sessionRealmConfigBuilder: SessionRealmConfigBuilder,
+        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
     ): SessionLocalDataSource =
-        SessionLocalDataSourceImpl(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder)
+        SessionLocalDataSourceImpl(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder, sessionEventValidatorsBuilder.build())
 
     @Provides
     @Singleton
@@ -224,7 +234,6 @@ open class AppModule {
         sessionEventsSyncManager: SessionEventsSyncManager,
         sessionLocalDataSource: SessionLocalDataSource,
         preferencesManager: PreferencesManager,
-        timeHelper: TimeHelper,
         crashReportManager: CrashReportManager
     ): SessionRepository =
         SessionRepositoryImpl(
@@ -233,7 +242,6 @@ open class AppModule {
             sessionEventsSyncManager,
             sessionLocalDataSource,
             preferencesManager,
-            timeHelper,
             crashReportManager
         )
 

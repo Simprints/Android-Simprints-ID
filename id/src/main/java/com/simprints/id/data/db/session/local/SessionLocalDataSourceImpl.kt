@@ -3,6 +3,7 @@ package com.simprints.id.data.db.session.local
 import android.content.Context
 import android.os.Build
 import com.simprints.id.data.db.session.SessionRepositoryImpl
+import com.simprints.id.data.db.session.domain.models.SessionEventValidator
 import com.simprints.id.data.db.session.domain.models.SessionQuery
 import com.simprints.id.data.db.session.domain.models.events.ArtificialTerminationEvent
 import com.simprints.id.data.db.session.domain.models.events.Event
@@ -31,7 +32,8 @@ import kotlinx.coroutines.withContext
 open class SessionLocalDataSourceImpl(private val appContext: Context,
                                       private val secureDataManager: SecureLocalDbKeyProvider,
                                       private val timeHelper: TimeHelper,
-                                      private val realmConfigBuilder: SessionRealmConfigBuilder) : SessionLocalDataSource {
+                                      private val realmConfigBuilder: SessionRealmConfigBuilder,
+                                      private val sessionEventsValidators: Array<SessionEventValidator>) : SessionLocalDataSource {
     companion object {
         const val PROJECT_ID = "projectId"
         const val END_TIME = "relativeEndTime"
@@ -122,6 +124,8 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
                     val session = addQueryParams(query).findFirst() ?: throw NoSessionsFoundException()
                     val domainSession = session.toDomain()
                     updateBlock(domainSession)
+                    sessionEventsValidators.forEach { it.validate((domainSession)) }
+
                     it.insertOrUpdate(DbSession(domainSession))
                 }
             }
@@ -216,6 +220,10 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
             block()
         } catch (t: Throwable) {
             t.printStackTrace()
-            throw SessionDataSourceException(t)
+            throw if (t is SessionDataSourceException) {
+                t
+            } else {
+                SessionDataSourceException(t)
+            }
         }
 }

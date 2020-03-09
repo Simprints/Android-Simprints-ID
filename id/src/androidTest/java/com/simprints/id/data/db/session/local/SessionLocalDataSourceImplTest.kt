@@ -7,6 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.isValidGuid
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
+import com.simprints.id.data.db.session.domain.models.SessionEventValidator
 import com.simprints.id.data.db.session.domain.models.SessionQuery
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType.DIFFERENT_PROJECT_ID
@@ -20,6 +21,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import io.mockk.verify
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.Sort
@@ -49,12 +51,13 @@ class SessionLocalDataSourceImplTest {
 
     @MockK lateinit var sessionLocalDataSource: SessionLocalDataSource
     @MockK lateinit var realmConfigBuilder: SessionRealmConfigBuilder
+    @MockK lateinit var fakeValidator: SessionEventValidator
 
     @Before
     fun setup() {
-        MockKAnnotations.init(this)
+        MockKAnnotations.init(this, relaxed = true)
         Realm.init(ctx)
-        sessionLocalDataSource = SessionLocalDataSourceImpl(ctx, mockk(relaxed = true), TimeHelperImpl(), realmConfigBuilder)
+        sessionLocalDataSource = SessionLocalDataSourceImpl(ctx, mockk(relaxed = true), TimeHelperImpl(), realmConfigBuilder, arrayOf(fakeValidator))
         every { realmConfigBuilder.build(any(), any()) } returns configForTest
         runBlockingInIO {
             Realm.deleteRealm(configForTest)
@@ -89,7 +92,7 @@ class SessionLocalDataSourceImplTest {
             sessionLocalDataSource.create(APP_VERSION_NAME, LIB_SIMPRINTS_VERSION_NAME, LANGUAGE, DEVICE_ID)
 
             val session = realmForTest.where(DbSession::class.java).findAll().sort(START_TIME, Sort.DESCENDING).first()
-            validateNewSession(session)
+            assertNewSession(session)
         }
     }
 
@@ -232,6 +235,37 @@ class SessionLocalDataSourceImplTest {
     }
 
     @Test
+    fun update_shouldValidateTheNewSession() {
+        runBlockingInIO {
+            val session = createFakeOpenSession(TimeHelperImpl())
+            saveFakeSessions(realmForTest, listOf(session))
+
+            sessionLocalDataSource.update(session.id) {
+                it.language = "fr"
+            }
+
+            verify(exactly = 1) { fakeValidator.validate(any()) }
+        }
+    }
+
+    @Test
+    fun update_shouldThrowIfValidationFails() {
+        runBlockingInIO {
+            val session = createFakeOpenSession(TimeHelperImpl())
+            saveFakeSessions(realmForTest, listOf(session))
+            every { fakeValidator.validate(any()) } throws Throwable("Invalid session")
+
+            checkException<SessionDataSourceException> {
+                sessionLocalDataSource.update(session.id) {
+                    it.language = "fr"
+                }
+            }
+
+            verify(exactly = 1) { fakeValidator.validate(any()) }
+        }
+    }
+
+    @Test
     fun update_shouldWrapAnyException() {
         runBlockingInIO {
             every { realmConfigBuilder.build(any(), any()) } throws Throwable("Missing config")
@@ -305,7 +339,7 @@ class SessionLocalDataSourceImplTest {
         }
     }
 
-    private fun validateNewSession(session: DbSession?) {
+    private fun assertNewSession(session: DbSession?) {
         with(session!!.toDomain()) {
             assertThat(id.isValidGuid()).isTrue()
             assertThat(projectId).isEqualTo("NOT_SIGNED_IN")
