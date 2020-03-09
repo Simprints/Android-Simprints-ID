@@ -1,7 +1,11 @@
 package com.simprints.id.activities.qrcapture.tools
 
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import android.media.Image
 
 interface QrCodeDetector {
-    fun detectInImage(image: FirebaseVisionImage, qrCaptureListener: QrCaptureListener)
+    fun detectInImage(
+        image: Image,
+        rotation: Int,
+        qrCaptureListener: QrCaptureListener
+    )
 }

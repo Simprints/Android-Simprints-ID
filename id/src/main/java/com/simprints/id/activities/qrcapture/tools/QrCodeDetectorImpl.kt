@@ -1,22 +1,38 @@
 package com.simprints.id.activities.qrcapture.tools
 
+import android.media.Image
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 
 class QrCodeDetectorImpl : QrCodeDetector {
 
-    override fun detectInImage(image: FirebaseVisionImage, qrCaptureListener: QrCaptureListener) {
+    override fun detectInImage(
+        image: Image,
+        rotation: Int,
+        qrCaptureListener: QrCaptureListener
+    ) {
+        val firebaseRotation = degreesToFirebaseRotation(rotation)
+        val firebaseImage = FirebaseVisionImage.fromMediaImage(image, firebaseRotation)
         val firebaseDetector = buildFirebaseDetector()
 
-        firebaseDetector.detectInImage(image).addOnSuccessListener { qrCodes ->
+        firebaseDetector.detectInImage(firebaseImage).addOnSuccessListener { qrCodes ->
             if (!qrCodes.isNullOrEmpty()) {
                 val qrCode = qrCodes.first { !it.rawValue.isNullOrEmpty() }
                 qrCode.rawValue?.let(qrCaptureListener::onQrCodeCaptured)
             }
         }
+    }
+
+    private fun degreesToFirebaseRotation(degrees: Int): Int = when (degrees) {
+        0 -> FirebaseVisionImageMetadata.ROTATION_0
+        90 -> FirebaseVisionImageMetadata.ROTATION_90
+        180 -> FirebaseVisionImageMetadata.ROTATION_180
+        270 -> FirebaseVisionImageMetadata.ROTATION_270
+        else -> throw Throwable("Rotation must be 0, 90, 180 or 270")
     }
 
     private fun buildFirebaseDetector(): FirebaseVisionBarcodeDetector {
