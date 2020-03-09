@@ -1,3 +1,4 @@
+/*
 package com.simprints.id.secure
 
 import androidx.test.core.app.ApplicationProvider
@@ -211,3 +212,4 @@ class ProjectAuthenticatorImplTest {
         it.setBody(JsonHelper.toJson(ApiToken("firebaseCustomToken")))
     }
 }
+*/

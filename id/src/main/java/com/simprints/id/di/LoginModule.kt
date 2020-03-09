@@ -6,7 +6,6 @@ import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.activities.login.repository.LoginRepository
 import com.simprints.id.activities.login.repository.LoginRepositoryImpl
 import com.simprints.id.activities.login.tools.AuthenticationHelper
-import com.simprints.id.activities.login.tools.AuthenticationHelperImpl
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
@@ -78,7 +77,7 @@ open class LoginModule {
         crashReportManager: CrashReportManager,
         loginInfoManager: LoginInfoManager
     ): AuthenticationHelper {
-        return AuthenticationHelperImpl(crashReportManager, loginInfoManager)
+        return AuthenticationHelper(crashReportManager, loginInfoManager)
     }
 
     @Provides

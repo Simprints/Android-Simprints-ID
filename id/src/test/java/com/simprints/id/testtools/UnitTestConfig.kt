@@ -6,23 +6,23 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.firebase.FirebaseApp
-import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.di.TestDataModule
-import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.commontesttools.di.TestSyncModule
+import com.simprints.id.commontesttools.di.*
 import com.simprints.id.testtools.di.AppComponentForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.injectClassFromComponent
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.fabric.sdk.android.Fabric
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class UnitTestConfig<T : Any>(
     private val test: T,
     private val appModule: TestAppModule? = null,
     private val preferencesModule: TestPreferencesModule? = null,
     private val dataModule: TestDataModule? = null,
-    private val syncModule: TestSyncModule? = null
+    private val syncModule: TestSyncModule? = null,
+    private val loginModule: TestLoginModule? = null
     ): BaseUnitTestConfig() {
 
     private val defaultAppModuleWithoutRealm by lazy {
@@ -40,6 +40,7 @@ class UnitTestConfig<T : Any>(
 
     private lateinit var testAppComponent: AppComponentForTests
 
+    @ExperimentalCoroutinesApi
     fun fullSetup() =
         rescheduleRxMainThread()
             .coroutinesMainThread()
@@ -48,10 +49,12 @@ class UnitTestConfig<T : Any>(
             .setupCrashlytics()
             .initAndInjectComponent()
 
+    @ExperimentalCoroutinesApi
     override fun rescheduleRxMainThread() = also {
         super.rescheduleRxMainThread()
     }
 
+    @ExperimentalCoroutinesApi
     override fun coroutinesMainThread() = also {
         super.coroutinesMainThread()
     }
@@ -76,13 +79,13 @@ class UnitTestConfig<T : Any>(
         initComponent().inject()
 
     private fun initComponent() = also {
-
         testAppComponent = DaggerAppComponentForTests.builder()
             .application(app)
             .appModule(appModule ?: defaultAppModuleWithoutRealm)
             .preferencesModule(preferencesModule ?: TestPreferencesModule())
             .dataModule(dataModule ?: TestDataModule())
             .syncModule(syncModule ?: TestSyncModule())
+            .loginModule(loginModule ?: TestLoginModule())
             .build()
 
         app.component = testAppComponent
