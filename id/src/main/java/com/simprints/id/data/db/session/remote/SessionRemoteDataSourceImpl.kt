@@ -19,7 +19,7 @@ class SessionRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
     internal fun List<SessionEvents>.filterClosedSessions() =
         filter { it.isClosed() }
 
-    internal suspend fun List<SessionEvents>.uploadClosedSessionsOrThrowIfNoSessions(projectId: String) {
+    private suspend fun List<SessionEvents>.uploadClosedSessionsOrThrowIfNoSessions(projectId: String) {
         if (isEmpty()) {
             throw NoSessionsFoundException()
         }

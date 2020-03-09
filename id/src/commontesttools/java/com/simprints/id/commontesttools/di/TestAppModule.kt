@@ -13,7 +13,6 @@ import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
-import com.simprints.id.data.db.session.remote.RemoteSessionsManager
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -145,10 +144,6 @@ class TestAppModule(
 
     override fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager): LongConsentManager =
         longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager, crashReportManager) }
-
-    override fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager,
-                                              factory: SimApiClientFactory): RemoteSessionsManager =
-        remoteSessionsManagerRule.resolveDependency { super.provideRemoteSessionsManager(remoteDbManager, factory) }
 
     override fun provideSyncStatusDatabase(ctx: Context): PeopleSyncStatusDatabase =
         syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase(ctx) }

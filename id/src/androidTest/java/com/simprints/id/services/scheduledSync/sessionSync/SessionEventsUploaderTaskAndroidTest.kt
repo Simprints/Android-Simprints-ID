@@ -345,6 +345,7 @@ import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.session.SessionRepositoryImpl.Companion.SESSION_BATCH_SIZE
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.callback.*
 import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
@@ -353,13 +354,12 @@ import com.simprints.id.data.db.session.domain.models.events.callout.Identificat
 import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
-import com.simprints.id.data.db.session.remote.RemoteSessionsManager
+import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
@@ -400,7 +400,7 @@ class SessionEventsUploaderTaskAndroidTest {
     @Inject lateinit var realmSessionManager: SessionLocalDataSource
     @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
-    @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
+    @Inject lateinit var remoteSessionsManager: SessionRemoteDataSource
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var secureLocalDbKeyProviderSpy: SecureLocalDbKeyProvider
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
@@ -436,7 +436,7 @@ class SessionEventsUploaderTaskAndroidTest {
     fun closeSessions_shouldGetUploaded() = runBlockingTest {
         mockBeingSignedIn()
 
-        val nSession = BATCH_SIZE + 1
+        val nSession = SESSION_BATCH_SIZE + 1
         createClosedSessions(nSession).forEach {
             it.addAlertScreenEvents()
             realmSessionManager.insertOrUpdateSessionEvents(it).blockingAwait()
