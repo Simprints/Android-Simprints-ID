@@ -36,8 +36,6 @@ import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl
 import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.session.local.SessionRealmConfigBuilderImpl
-import com.simprints.id.data.db.session.remote.RemoteSessionsManager
-import com.simprints.id.data.db.session.remote.RemoteSessionsManagerImpl
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -266,12 +264,6 @@ open class AppModule {
         preferencesManager: PreferencesManager,
         crashReportManager: CrashReportManager
     ): ModuleRepository = ModuleRepositoryImpl(preferencesManager, crashReportManager)
-
-    @Provides
-    @Singleton
-    open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager,
-                                          simApiClientFactory: SimApiClientFactory): RemoteSessionsManager =
-        RemoteSessionsManagerImpl(remoteDbManager, simApiClientFactory)
 
     @Provides
     open fun provideGuidSelectionManager(

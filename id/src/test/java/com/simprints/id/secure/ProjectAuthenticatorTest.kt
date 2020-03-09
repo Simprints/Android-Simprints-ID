@@ -14,7 +14,6 @@ import com.simprints.id.commontesttools.state.setupFakeKeyStore
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.db.session.remote.RemoteSessionsManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
@@ -23,7 +22,6 @@ import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.ApiToken
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
@@ -32,7 +30,10 @@ import com.simprints.testtools.common.di.DependencyRule.ReplaceRule
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.getSharedPreferences
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import io.reactivex.Single
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -56,8 +57,6 @@ class ProjectAuthenticatorTest {
     private val projectLocalDAtaSourceMock: ProjectLocalDataSource = mockk()
 
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
-    @Inject lateinit var remoteSessionsManagerMock: RemoteSessionsManager
-    @Inject lateinit var peopleSyncManagerMock: PeopleSyncManager
 
     private val projectId = "project_id"
     private val userId = "user_id"
@@ -88,8 +87,6 @@ class ProjectAuthenticatorTest {
                 .mockLoadProject(projectRemoteDataSourceMock, projectLocalDAtaSourceMock)
 
         }
-
-        coEvery { remoteSessionsManagerMock.getSessionsApiClient() } throws IllegalStateException()
 
         apiClient = SimApiClientFactory("deviceId", endpoint = BASE_URL).build()
     }
