@@ -9,15 +9,9 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 
-class QrCodeDetectorImpl(
-    private val crashReportManager: CrashReportManager
-) : QrCodeDetector {
+class QrCodeDetectorImpl(private val crashReportManager: CrashReportManager) : QrCodeDetector {
 
-    override fun detectInImage(
-        image: Image,
-        rotation: Int,
-        qrCaptureListener: QrCaptureListener
-    ) {
+    override fun detectInImage(image: Image, rotation: Int, qrCaptureListener: QrCaptureListener) {
         val firebaseRotation = degreesToFirebaseRotation(rotation)
         val firebaseImage = FirebaseVisionImage.fromMediaImage(image, firebaseRotation)
         val firebaseDetector = buildFirebaseDetector()
