@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.Instrumentation
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -14,7 +13,6 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SEC
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.di.TestLoginModule
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.id.commontesttools.state.replaceSecureApiClientWithFailingClientProvider
 import com.simprints.id.commontesttools.state.setupFakeKeyStore
@@ -29,9 +27,7 @@ import com.simprints.testtools.common.syntax.mock
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
 class LoginActivityAndroidTest : BaseAssertions() {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
@@ -42,26 +38,20 @@ class LoginActivityAndroidTest : BaseAssertions() {
         app,
         randomGeneratorRule = DependencyRule.ReplaceRule {
             mock<RandomGenerator>().apply {
-                setupRandomGeneratorToGenerateKey(
-                    this
-                )
+                setupRandomGeneratorToGenerateKey(this)
             }
         },
         keystoreManagerRule = DependencyRule.ReplaceRule {
             mockk<KeystoreManager>().apply {
-                setupFakeKeyStore(
-                    this
-                )
+                setupFakeKeyStore(this)
             }
         },
         secureApiInterfaceRule = secureApiInterfaceRule
     )
 
-    private val loginModule = TestLoginModule(safetyNetClientRule = DependencyRule.MockkRule)
-
     @Before
     fun setUp() {
-        AndroidTestConfig(this, appModule, loginModule = loginModule).fullSetup()
+        AndroidTestConfig(this, appModule).fullSetup()
     }
 
     @Test
@@ -149,4 +139,5 @@ class LoginActivityAndroidTest : BaseAssertions() {
         private const val invalidSecret =
             "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
     }
+
 }
