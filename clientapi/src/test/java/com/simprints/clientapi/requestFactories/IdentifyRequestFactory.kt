@@ -4,11 +4,10 @@ import com.simprints.clientapi.clientrequests.builders.IdentifyBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
+import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.IdentifyRequest
-import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.testtools.common.syntax.mock
-
+import io.mockk.mockk
 
 object IdentifyRequestFactory : RequestFactory() {
 
@@ -28,7 +27,7 @@ object IdentifyRequestFactory : RequestFactory() {
         IdentifyBuilder(extractor as IdentifyExtractor, getValidator(extractor))
 
     override fun getMockExtractor(): IdentifyExtractor {
-        val mockIdentifyExtractor = mock<IdentifyExtractor>()
+        val mockIdentifyExtractor = mockk<IdentifyExtractor>()
         setMockDefaultExtractor(mockIdentifyExtractor)
         return mockIdentifyExtractor
     }

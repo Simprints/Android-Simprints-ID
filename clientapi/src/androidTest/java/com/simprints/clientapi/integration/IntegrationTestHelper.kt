@@ -84,3 +84,6 @@ internal data class AppIdentityConfirmationRequest(
     override val sessionId: String,
     override val selectedGuid: String
 ) : IAppIdentityConfirmationRequest
+
+fun Pair<String, String>.key() = first
+fun Pair<String, String>.value() = second
