@@ -11,9 +11,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:translationZ="1dp"
         android:src="@drawable/ic_camera_focus"
-        android:importantForAccessibility="no"/>
+        android:importantForAccessibility="no"
+        tools:translationZ="1dp"/>
 
     <TextureView
         android:id="@+id/cameraPreview"
