@@ -11,8 +11,8 @@ import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.integration.AppIdentityConfirmationRequest
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.moduleapi.app.requests.confirmations.IAppConfirmation
-import com.simprints.testtools.android.bundleDataMatcherForParcelable
-import com.simprints.testtools.common.syntax.value
+import com.simprints.clientapi.integration.key
+import com.simprints.clientapi.integration.value
 import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.Test

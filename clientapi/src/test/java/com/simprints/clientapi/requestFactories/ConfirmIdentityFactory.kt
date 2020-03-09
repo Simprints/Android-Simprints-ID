@@ -7,8 +7,8 @@ import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidato
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.requests.confirmations.IdentityConfirmation
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
+import io.mockk.mockk
 
 object ConfirmIdentityFactory : RequestFactory() {
 
@@ -27,10 +27,10 @@ object ConfirmIdentityFactory : RequestFactory() {
         ConfirmIdentifyBuilder(extractor as ConfirmIdentityExtractor, getValidator(extractor))
 
     override fun getMockExtractor(): ConfirmIdentityExtractor {
-        val mockConfirmIdentifyExtractor = mock<ConfirmIdentityExtractor>()
+        val mockConfirmIdentifyExtractor = mockk<ConfirmIdentityExtractor>()
         setMockDefaultExtractor(mockConfirmIdentifyExtractor)
-        whenever(mockConfirmIdentifyExtractor) { getSessionId() } thenReturn MOCK_SESSION_ID
-        whenever(mockConfirmIdentifyExtractor) { getSelectedGuid() } thenReturn MOCK_SELECTED_GUID
+        every { mockConfirmIdentifyExtractor.getSessionId() } returns MOCK_SESSION_ID
+        every { mockConfirmIdentifyExtractor.getSelectedGuid() } returns MOCK_SELECTED_GUID
         return mockConfirmIdentifyExtractor
     }
 }
