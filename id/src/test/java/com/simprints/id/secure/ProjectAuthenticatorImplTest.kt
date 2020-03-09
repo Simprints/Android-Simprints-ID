@@ -1,10 +1,11 @@
-/*
+@file:Suppress("DEPRECATION")
+
 package com.simprints.id.secure
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.simprints.core.network.NetworkConstants.Companion.BASE_URL
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
@@ -12,11 +13,16 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.commontesttools.state.setupFakeKeyStore
+import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.session.remote.RemoteSessionsManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.data.prefs.RemoteConfigWrapper
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
@@ -24,7 +30,6 @@ import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.ApiToken
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
@@ -35,7 +40,9 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.getSharedPreferences
 import io.mockk.*
 import io.reactivex.Single
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Before
@@ -47,23 +54,24 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@ExperimentalCoroutinesApi
 class ProjectAuthenticatorImplTest {
-
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
-
-    private lateinit var apiClient: SimApiClient<SecureApiInterface>
-
-    private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mockk()
-    private val projectLocalDAtaSourceMock: ProjectLocalDataSource = mockk()
 
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var remoteSessionsManagerMock: RemoteSessionsManager
-    @Inject lateinit var peopleSyncManagerMock: PeopleSyncManager
+    @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var projectRemoteDataSource: ProjectRemoteDataSource
+    @Inject lateinit var signerManager: SignerManager
+    @Inject lateinit var remoteConfigWrapper: RemoteConfigWrapper
+    @Inject lateinit var longConsentManager: LongConsentManager
+    @Inject lateinit var preferencesManager: PreferencesManager
 
-    private val projectId = "project_id"
-    private val userId = "user_id"
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+    private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mockk()
+    private val projectLocalDAtaSourceMock: ProjectLocalDataSource = mockk()
 
-    private val module by lazy {
+    private val appModule by lazy {
         TestAppModule(
             app,
             remoteDbManagerRule = MockkRule,
@@ -79,9 +87,11 @@ class ProjectAuthenticatorImplTest {
         )
     }
 
+    private lateinit var apiClient: SimApiClient<SecureApiInterface>
+
     @Before
     fun setUp() {
-        UnitTestConfig(this, module, dataModule = dataModule).fullSetup()
+        UnitTestConfig(this, appModule, dataModule = dataModule).fullSetup()
 
         runBlocking {
             RobolectricTestMocker
@@ -97,119 +107,153 @@ class ProjectAuthenticatorImplTest {
 
     @Test
     fun successfulResponse_userShouldSignIn() {
-
         val authenticator = ProjectAuthenticatorImpl(
-            app.component,
-            SafetyNet.getClient(app),
             SecureApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
-            getMockAttestationManager())
+            loginInfoManager,
+            SafetyNet.getClient(app),
+            secureDataManager,
+            projectRemoteDataSourceMock,
+            signerManager,
+            remoteConfigWrapper,
+            longConsentManager,
+            preferencesManager,
+            getMockAttestationManager()
+        )
 
-        val testObserver = authenticator
-            .authenticate(NonceScope(projectId, userId), "encrypted_project_secret")
-            .test()
-
-        testObserver.awaitTerminalEvent()
-
-        testObserver
-            .assertNoErrors()
-            .assertComplete()
+        runBlockingTest {
+            authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET)
+        }
     }
 
-    @Test
+    @Test(expected = IOException::class)
     fun offline_authenticationShouldThrowException() {
+        val nonceScope = NonceScope(PROJECT_ID, USER_ID)
 
-        val nonceScope = NonceScope(projectId, userId)
-
-        val testObserver = ProjectAuthenticatorImpl(
-            app.component,
+        val authenticator = ProjectAuthenticatorImpl(
+            createMockServiceToFailRequests(apiClient.retrofit),
+            loginInfoManager,
             SafetyNet.getClient(app),
-            createMockServiceToFailRequests(apiClient.retrofit))
-            .authenticate(nonceScope, "encrypted_project_secret")
-            .test()
+            secureDataManager,
+            projectRemoteDataSource,
+            signerManager,
+            remoteConfigWrapper,
+            longConsentManager,
+            preferencesManager
+        )
 
-        testObserver.awaitTerminalEvent()
-
-        testObserver
-            .assertError(IOException::class.java)
+        runBlockingTest {
+            authenticator.authenticate(nonceScope, PROJECT_SECRET)
+        }
     }
 
     @Test
     fun getAuthenticationData_invokeAuthenticationDataManagerCorrectly() {
-        val authenticationDataManager = mockk<AuthenticationDataManager>(relaxed = true)
-        val projectAuthenticator = ProjectAuthenticatorImpl(app.component, mockk(), mockk(), mockk(), authenticationDataManager)
-        projectAuthenticator.getAuthenticationData(projectId, userId)
+        val mockAuthenticationDataManager = mockk<AuthenticationDataManager>(relaxed = true)
 
-        verify(exactly = 1) { authenticationDataManager.requestAuthenticationData(projectId, userId) }
+        val authenticator = ProjectAuthenticatorImpl(
+            mockk(),
+            loginInfoManager,
+            mockk(),
+            secureDataManager,
+            projectRemoteDataSource,
+            signerManager,
+            remoteConfigWrapper,
+            longConsentManager,
+            preferencesManager,
+            authenticationDataManager = mockAuthenticationDataManager
+        )
+
+        authenticator.getAuthenticationData(PROJECT_ID, USER_ID)
+
+        verify(exactly = 1) { mockAuthenticationDataManager.requestAuthenticationData(PROJECT_ID, USER_ID) }
     }
 
     @Test
     fun authenticate_shouldAuthenticateWithRightRequestsToSecureApiInterface() {
-
         val mockWebServer = MockWebServer()
         val mockProjectSecretManager: ProjectSecretManager = mockk()
 
         every {
             mockProjectSecretManager.encryptAndStoreAndReturnProjectSecret(any(), any())
-        } returns "encrypted_project_secret"
+        } returns PROJECT_SECRET
 
-        mockWebServer.enqueue(mockResponseForAuthenticationData())
-        mockWebServer.enqueue(mockResponseForApiToken())
+        with(mockWebServer) {
+            enqueue(mockResponseForAuthenticationData())
+            enqueue(mockResponseForApiToken())
+        }
 
-        val authenticator = spyk(ProjectAuthenticatorImpl(
-            app.component,
-            SafetyNet.getClient(app),
+        val authenticatorSpy = spyk(ProjectAuthenticatorImpl(
             SimApiClientFactory("deviceId", mockWebServer.url("/").toString()).build<SecureApiInterface>().api,
-            getMockAttestationManager()))
+            loginInfoManager,
+            SafetyNet.getClient(app),
+            secureDataManager,
+            projectRemoteDataSource,
+            signerManager,
+            remoteConfigWrapper,
+            longConsentManager,
+            preferencesManager,
+            getMockAttestationManager()
+        ))
 
-        every { authenticator.projectSecretManager } returns mockProjectSecretManager
+        every { authenticatorSpy.projectSecretManager } returns mockProjectSecretManager
 
-        val testObserver = authenticator.authenticate(NonceScope(projectId, userId), "encrypted_project_secret").test()
+        runBlockingTest {
+            authenticatorSpy.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET)
+        }
 
-        testObserver.awaitTerminalEvent()
-        testObserver.assertNoErrors()
-        Truth.assertThat(mockWebServer.requestCount).isEqualTo(2)
+        assertThat(mockWebServer.requestCount).isEqualTo(2)
     }
 
-    @Test
+    @Test(expected = SafetyNetException::class)
     fun safetyNetFailed_shouldThrowRightException() {
-        val attestationManager = mockk<AttestationManager>()
-        val nonceScope = NonceScope(projectId, userId)
+        val mockAttestationManager = mockk<AttestationManager>()
+        val nonceScope = NonceScope(PROJECT_ID, USER_ID)
 
         every {
-            attestationManager.requestAttestation(any(), any())
+            mockAttestationManager.requestAttestation(any(), any())
         } throws (SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
 
-        val testObserver = ProjectAuthenticatorImpl(
-            app.component,
-            SafetyNet.getClient(app),
+        val authenticator = ProjectAuthenticatorImpl(
             SecureApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
-            attestationManager)
-            .authenticate(nonceScope, projectId)
-            .test()
+            loginInfoManager,
+            SafetyNet.getClient(app),
+            secureDataManager,
+            projectRemoteDataSource,
+            signerManager,
+            remoteConfigWrapper,
+            longConsentManager,
+            preferencesManager,
+            mockAttestationManager
+        )
 
-        testObserver.awaitTerminalEvent()
-
-        testObserver
-            .assertError(SafetyNetException::class.java)
+        runBlockingTest {
+            authenticator.authenticate(nonceScope, PROJECT_SECRET)
+        }
     }
 
     private fun getMockAttestationManager(): AttestationManager {
-        val attestationManager = mockk<AttestationManager>()
+        val mockAttestationManager = mockk<AttestationManager>()
         every {
-            attestationManager.requestAttestation(any(), any())
+            mockAttestationManager.requestAttestation(any(), any())
         } returns Single.just(AttestToken("google_attestation"))
 
-        return attestationManager
+        return mockAttestationManager
     }
 
-    private fun mockResponseForAuthenticationData() = MockResponse().let {
-        it.setResponseCode(200)
-        it.setBody(JsonHelper.toJson(ApiAuthenticationData("nonce", "publicKeyString")))
+    private fun mockResponseForAuthenticationData() = with(MockResponse()) {
+        setResponseCode(200)
+        setBody(JsonHelper.toJson(ApiAuthenticationData("nonce", "publicKeyString")))
     }
 
-    private fun mockResponseForApiToken() = MockResponse().let {
-        it.setResponseCode(200)
-        it.setBody(JsonHelper.toJson(ApiToken("firebaseCustomToken")))
+    private fun mockResponseForApiToken() = with(MockResponse()) {
+        setResponseCode(200)
+        setBody(JsonHelper.toJson(ApiToken("firebaseCustomToken")))
     }
+
+    private companion object {
+        const val PROJECT_ID = "project_id"
+        const val USER_ID = "user_id"
+        const val PROJECT_SECRET = "encrypted_project_secret"
+    }
+
 }
-*/

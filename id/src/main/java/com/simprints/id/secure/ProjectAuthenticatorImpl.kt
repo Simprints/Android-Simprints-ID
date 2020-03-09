@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import androidx.annotation.VisibleForTesting
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
 import com.simprints.core.tools.extentions.resumeSafely
@@ -16,9 +17,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 
@@ -31,56 +30,66 @@ class ProjectAuthenticatorImpl(
     private val signerManager: SignerManager,
     private val remoteConfigWrapper: RemoteConfigWrapper,
     private val longConsentManager: LongConsentManager,
-    private val preferencesManager: PreferencesManager
+    private val preferencesManager: PreferencesManager,
+    private val attestationManager: AttestationManager = AttestationManager(),
+    private val authenticationDataManager: AuthenticationDataManager = AuthenticationDataManager(secureApiClient)
 ) : ProjectAuthenticator {
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
 
-    private val attestationManager = AttestationManager()
-    private val authenticationDataManager = AuthenticationDataManager(secureApiClient)
     private val authManager = AuthManager(secureApiClient)
 
     override suspend fun authenticate(nonceScope: NonceScope, projectSecret: String) {
         suspendCancellableCoroutine<Unit> { continuation ->
-            CoroutineScope(Dispatchers.IO).launch {
-                createLocalDbKeyForProject(nonceScope.projectId)
-                    .prepareAuthRequestParameters(nonceScope, projectSecret)
-                    .makeAuthRequest()
-                    .signIn(nonceScope.projectId, nonceScope.userId)
-                    .fetchProjectRemoteConfigSettings(nonceScope.projectId)
-                    .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
-                    .fetchProjectLongConsentTexts()
-                    .subscribeBy(
-                        onComplete = { continuation.resumeSafely(Unit) },
-                        onError = {
-                            Timber.e(it)
-                            continuation.resumeWithExceptionSafely(it)
-                        }
-                    )
-            }
+            createLocalDbKeyForProject(nonceScope.projectId)
+                .prepareAuthRequestParameters(nonceScope, projectSecret)
+                .makeAuthRequest()
+                .signIn(nonceScope.projectId, nonceScope.userId)
+                .fetchProjectRemoteConfigSettings(nonceScope.projectId)
+                .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
+                .fetchProjectLongConsentTexts()
+                .subscribeOn(Schedulers.io())
+                .subscribeBy(
+                    onComplete = {
+                        println("TEST_ALAN - onComplete")
+                        continuation.resumeSafely(Unit)
+                    },
+                    onError = {
+                        Timber.e(it)
+                        println("TEST_ALAN - onError")
+                        continuation.resumeWithExceptionSafely(it)
+                    }
+                )
         }
     }
 
     private fun Completable.prepareAuthRequestParameters(
         nonceScope: NonceScope,
         projectSecret: String
-    ): Single<AuthRequest> =
-        andThen(buildAuthRequestParameters(nonceScope, projectSecret))
+    ): Single<AuthRequest> {
+        println("TEST_ALAN - prepareAuthRequestParameters")
+        return andThen(buildAuthRequestParameters(nonceScope, projectSecret))
+    }
 
     private fun buildAuthRequestParameters(
         nonceScope: NonceScope,
         projectSecret: String
-    ): Single<AuthRequest> = getAuthenticationData(
-        nonceScope.projectId,
-        nonceScope.userId
-    ).flatMap { authenticationData ->
-        zipAuthRequestParameters(
-            getEncryptedProjectSecret(projectSecret, authenticationData),
-            getGoogleAttestation(safetyNetClient, authenticationData),
-            nonceScope
-        )
+    ): Single<AuthRequest> {
+        return getAuthenticationData(
+            nonceScope.projectId,
+            nonceScope.userId
+        ).flatMap { authenticationData ->
+            println("TEST_ALAN - buildAuthRequestParameters")
+            zipAuthRequestParameters(
+                getEncryptedProjectSecret(projectSecret, authenticationData),
+                getGoogleAttestation(safetyNetClient, authenticationData),
+                nonceScope
+            )
+        }
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun getAuthenticationData(projectId: String, userId: String) =
         authenticationDataManager.requestAuthenticationData(projectId, userId)
 
@@ -115,14 +124,19 @@ class ProjectAuthenticatorImpl(
         )
     }
 
-    private fun Single<out AuthRequest>.makeAuthRequest(): Single<Token> = flatMap { authRequest ->
-        authManager.requestAuthToken(authRequest)
+    private fun Single<out AuthRequest>.makeAuthRequest(): Single<Token> {
+        return flatMap { authRequest ->
+            println("TEST_ALAN - makeAuthRequest")
+            authManager.requestAuthToken(authRequest)
+        }
     }
 
-    private fun Single<out Token>.signIn(projectId: String, userId: String): Completable =
-        flatMapCompletable { tokens ->
+    private fun Single<out Token>.signIn(projectId: String, userId: String): Completable {
+        return flatMapCompletable { tokens ->
+            println("TEST_ALAN - signIn")
             signerManager.signIn(projectId, userId, tokens)
         }
+    }
 
     private fun createLocalDbKeyForProject(projectId: String) = Completable.fromAction {
         secureDataManager.setLocalDatabaseKey(projectId)
@@ -130,21 +144,29 @@ class ProjectAuthenticatorImpl(
 
     private fun Completable.fetchProjectRemoteConfigSettings(
         projectId: String
-    ): Single<JsonElement> = andThen(singleWithSuspend {
-        projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(
-            projectId
-        )
-    })
-
-    private fun Single<out JsonElement>.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(
-    ): Single<Array<String>> = flatMap {
-        remoteConfigWrapper.projectSettingsJsonString = it.toString()
-        Single.just(preferencesManager.projectLanguages)
+    ): Single<JsonElement> {
+        return andThen(singleWithSuspend {
+            println("TEST_ALAN - fetchProjectRemoteConfigSettings")
+            projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(
+                projectId
+            )
+        })
     }
 
-    private fun Single<out Array<String>>.fetchProjectLongConsentTexts(): Completable =
-        flatMapCompletable { languages ->
+    private fun Single<out JsonElement>.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(
+    ): Single<Array<String>> {
+        return flatMap {
+            println("TEST_ALAN - storeProjectRemoteConfigSettingsAndReturnProjectLanguages")
+            remoteConfigWrapper.projectSettingsJsonString = it.toString()
+            Single.just(preferencesManager.projectLanguages)
+        }
+    }
+
+    private fun Single<out Array<String>>.fetchProjectLongConsentTexts(): Completable {
+        return flatMapCompletable { languages ->
+            println("TEST_ALAN - fetchProjectLongConsentTexts")
             longConsentManager.downloadAllLongConsents(languages)
         }
+    }
 
 }
