@@ -7,8 +7,11 @@ import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 
-class QrCodeDetectorImpl : QrCodeDetector {
+class QrCodeDetectorImpl(
+    private val crashReportManager: CrashReportManager
+) : QrCodeDetector {
 
     override fun detectInImage(
         image: Image,
@@ -24,6 +27,8 @@ class QrCodeDetectorImpl : QrCodeDetector {
                 val qrCode = qrCodes.first { !it.rawValue.isNullOrEmpty() }
                 qrCode.rawValue?.let(qrCaptureListener::onQrCodeCaptured)
             }
+        }.addOnFailureListener {
+            crashReportManager.logExceptionOrSafeException(it)
         }
     }
 
