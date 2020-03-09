@@ -31,7 +31,10 @@ class FingerprintSessionEventsManagerImpl(private val sessionRepository: Session
     override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
         runBlocking {
             ignoreException {
-                sessionRepository.updateHardwareVersionInScannerConnectivityEvent(hardwareVersion)
+                sessionRepository.updateCurrentSession {
+                    val scannerConnectivityEvents = it.events.filterIsInstance(ScannerConnectionEvent::class.java)
+                    scannerConnectivityEvents.forEach { it.scannerInfo.hardwareVersion = hardwareVersion }
+                }
             }
         }
     }

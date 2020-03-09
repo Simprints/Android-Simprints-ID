@@ -2,25 +2,17 @@ package com.simprints.id.data.db.session.controllers.domain
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.person.domain.FingerIdentifier.RIGHT_THUMB
-import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.SessionRepositoryImpl
 import com.simprints.id.data.db.session.domain.models.SessionQuery
-import com.simprints.id.data.db.session.domain.models.events.*
-import com.simprints.id.data.db.session.domain.models.events.FingerprintCaptureEvent.Fingerprint
-import com.simprints.id.data.db.session.domain.models.events.FingerprintCaptureEvent.Result.GOOD_SCAN
-import com.simprints.id.data.db.session.domain.models.events.FingerprintCaptureEvent.Result.SKIPPED
-import com.simprints.id.data.db.session.domain.models.events.callback.IdentificationCallbackEvent
+import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.kotlintest.shouldThrow
@@ -39,7 +31,6 @@ import org.robolectric.shadows.ShadowLog
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionRepositoryImplTest {
 
-    private val timeHelper: TimeHelper = TimeHelperImpl()
     @MockK private lateinit var sessionEventsSyncManagerMock: SessionEventsSyncManager
     @MockK private lateinit var sessionLocalDataSourceMock: SessionLocalDataSource
     @MockK private lateinit var preferencesManagerMock: PreferencesManager
@@ -54,7 +45,7 @@ class SessionRepositoryImplTest {
         sessionsRepository = SessionRepositoryImpl(
             DEVICE_ID,
             APP_VERSION_NAME,
-            sessionEventsSyncManagerMock, sessionLocalDataSourceMock, preferencesManagerMock, timeHelper, crashReportManagerMock)
+            sessionEventsSyncManagerMock, sessionLocalDataSourceMock, preferencesManagerMock, crashReportManagerMock)
         mockPreferenceManagerInfo()
     }
 
@@ -81,132 +72,6 @@ class SessionRepositoryImplTest {
                 sessionsRepository.createSession("")
             }
 
-            coVerify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
-        }
-    }
-
-    @Test
-    fun addGuidSelectionEvent_shouldAddBeAdded() {
-        runBlockingTest {
-            val session = createFakeOpenSession(TimeHelperImpl()).apply {
-                this.events.add(IdentificationCallbackEvent(0, id, emptyList()))
-            }
-            coEvery { sessionLocalDataSourceMock.updateCurrentSession(any()) } answers {
-                val block = (args.first() as (SessionEvents) -> Unit)
-                block(session)
-            }
-
-            sessionsRepository.addGuidSelectionEvent("selected_guid", session.id)
-
-            assertThat(session.events.last()).isInstanceOf(GuidSelectionEvent::class.java)
-        }
-    }
-
-    @Test
-    fun addGuidSelectionEventInANotIdentificationSession_shouldNotBeAdded() {
-        runBlockingTest {
-            val session = createFakeOpenSession(TimeHelperImpl()).apply {
-                this.events.addAll(listOf(
-                    IdentificationCallbackEvent(0, id, emptyList()),
-                    GuidSelectionEvent(0, id))
-                )
-            }
-            coEvery { sessionLocalDataSourceMock.updateCurrentSession(any()) } answers {
-                val block = (args.first() as (SessionEvents) -> Unit)
-                block(session)
-            }
-
-            sessionsRepository.addGuidSelectionEvent("selected_guid", session.id)
-
-            assertThat(session.events.count()).isEqualTo(2)
-        }
-    }
-
-    @Test
-    fun addGuidSelectionEventInASessionWithGuidSelectionEvent_shouldNotBeAdded() {
-        runBlockingTest {
-            val session = createFakeOpenSession(TimeHelperImpl())
-            coEvery { sessionLocalDataSourceMock.updateCurrentSession(any()) } answers {
-                val block = (args.first() as (SessionEvents) -> Unit)
-                block(session)
-            }
-
-            sessionsRepository.addGuidSelectionEvent("selected_guid", session.id)
-
-            assertThat(session.events.count()).isEqualTo(0)
-        }
-    }
-
-    @Test
-    fun addGuidSelectionEventInASessionWithGuidSelectionEvent_shouldReportExceptionAndThrow() {
-        runBlockingTest {
-            coEvery { sessionLocalDataSourceMock.updateCurrentSession(any()) } throws Throwable("Error")
-            shouldThrow<Throwable> {
-                sessionsRepository.addGuidSelectionEvent("selected_guid", "session_id")
-            }
-            coVerify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
-        }
-    }
-
-    @Test
-    fun addPersonCreationEvent() {
-        runBlockingTest {
-            val session = createFakeOpenSession(TimeHelperImpl())
-            val goodScanEvent = FingerprintCaptureEvent(0, 0, RIGHT_THUMB, 10, GOOD_SCAN, Fingerprint(RIGHT_THUMB, 50, "good\n"))
-            val badScanEvent = FingerprintCaptureEvent(0, 0, RIGHT_THUMB, 10, SKIPPED, Fingerprint(RIGHT_THUMB, 50, "bad\n"))
-            session.events.addAll(arrayListOf<Event>(goodScanEvent, badScanEvent))
-            coEvery { sessionLocalDataSourceMock.updateCurrentSession(any()) } answers {
-                val block = (args.first() as (SessionEvents) -> Unit)
-                block(session)
-            }
-
-            sessionsRepository.addPersonCreationEvent(listOf(
-                FingerprintSample(RIGHT_THUMB, EncodingUtils.base64ToBytes("good"), 50)
-            ))
-
-            with(session.events.last() as PersonCreationEvent) {
-                assertThat(fingerprintCaptureIds.first()).isEqualTo(goodScanEvent.id)
-                assertThat(fingerprintCaptureIds.count()).isEqualTo(1)
-            }
-        }
-    }
-
-    @Test
-    fun addPersonCreationEvent_shouldReportExceptionAndThrow() {
-        runBlockingTest {
-            coEvery { sessionLocalDataSourceMock.updateCurrentSession(any()) } throws Throwable("Error")
-            shouldThrow<Throwable> {
-                sessionsRepository.addPersonCreationEvent(listOf())
-            }
-            coVerify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
-        }
-    }
-
-    @Test
-    fun updateHardwareVersionInScannerConnectivityEvent() {
-        runBlockingTest {
-            val session = createFakeOpenSession(TimeHelperImpl())
-            session.events.add(ScannerConnectionEvent(0, ScannerConnectionEvent.ScannerInfo("scannerId", "macAddress", "")))
-            coEvery { sessionLocalDataSourceMock.updateCurrentSession(any()) } answers {
-                val block = (args.first() as (SessionEvents) -> Unit)
-                block(session)
-            }
-
-            sessionsRepository.updateHardwareVersionInScannerConnectivityEvent("hardwareVersion")
-
-            with(session.events.last() as ScannerConnectionEvent) {
-                assertThat(this.scannerInfo.hardwareVersion).isEqualTo("hardwareVersion")
-            }
-        }
-    }
-
-    @Test
-    fun updateHardwareVersionInScannerConnectivityEvent_shouldReportExceptionAndThrow() {
-        runBlockingTest {
-            coEvery { sessionLocalDataSourceMock.updateCurrentSession(any()) } throws Throwable("Error")
-            shouldThrow<Throwable> {
-                sessionsRepository.updateHardwareVersionInScannerConnectivityEvent("hardwareVersion")
-            }
             coVerify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
         }
     }

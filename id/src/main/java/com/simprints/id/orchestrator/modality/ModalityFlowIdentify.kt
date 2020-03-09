@@ -19,14 +19,16 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFace
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
+import com.simprints.id.tools.TimeHelper
 
 class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
                                private val faceStepProcessor: FaceStepProcessor,
                                private val coreStepProcessor: CoreStepProcessor,
                                private val matchGroup: GROUP,
+                               timeHelper: TimeHelper,
                                sessionRepository: SessionRepository,
                                consentRequired: Boolean) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, sessionRepository, consentRequired) {
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired) {
 
     override val steps: MutableList<Step> = mutableListOf()
 
@@ -57,7 +59,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
         }
 
         completeAllStepsIfExitFormHappened(requestCode, resultCode, data)
-        
+
         val stepRequested = steps.firstOrNull { it.requestCode == requestCode }
         stepRequested?.setResult(result)
 
@@ -79,12 +81,12 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
 
     private fun buildQuery(appRequest: AppIdentifyRequest, matchGroup: GROUP): Query =
         with(appRequest) {
-        when (matchGroup) {
-            GROUP.GLOBAL -> Query(projectId)
-            GROUP.USER -> Query(projectId, userId = userId)
-            GROUP.MODULE -> Query(projectId, moduleId = moduleId)
+            when (matchGroup) {
+                GROUP.GLOBAL -> Query(projectId)
+                GROUP.USER -> Query(projectId, userId = userId)
+                GROUP.MODULE -> Query(projectId, moduleId = moduleId)
+            }
         }
-    }
 
     private fun addMatchingStepForFinger(probeSamples: List<FingerprintCaptureSample>, query: Query) {
         steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query))
