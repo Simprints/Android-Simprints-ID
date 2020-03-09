@@ -366,7 +366,9 @@ open class AppModule {
     ): QrCodeAnalyser = QrCodeAnalyserImpl(qrCodeDetector)
 
     @Provides
-    open fun provideQrCodeDetector(): QrCodeDetector = QrCodeDetectorImpl()
+    open fun provideQrCodeDetector(
+        crashReportManager: CrashReportManager
+    ): QrCodeDetector = QrCodeDetectorImpl(crashReportManager)
 
 }
 
