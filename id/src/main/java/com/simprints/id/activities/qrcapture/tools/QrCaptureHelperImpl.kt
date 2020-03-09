@@ -35,9 +35,7 @@ class QrCaptureHelperImpl : QrCaptureHelper, OnSuccessListener<List<FirebaseVisi
     override fun onSuccess(qrCodes: List<FirebaseVisionBarcode>?) {
         if (!qrCodes.isNullOrEmpty()) {
             val qrCode = qrCodes.first { !it.rawValue.isNullOrEmpty() }
-            qrCode.rawValue?.let {
-                qrCaptureListener.onQrCodeCaptured(it)
-            }
+            qrCode.rawValue?.let(qrCaptureListener::onQrCodeCaptured)
         }
     }
 
