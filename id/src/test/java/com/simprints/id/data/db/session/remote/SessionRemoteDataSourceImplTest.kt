@@ -16,6 +16,7 @@ import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,16 +29,18 @@ class SessionRemoteDataSourceImplTest {
     private val timeHelper: TimeHelper = TimeHelperImpl()
     private val mockServer = MockWebServer()
 
-
     private val sessionRemoteDataSourceSpy = spyk(buildRemoteDataSource())
 
-    private val sessionRemoteInterface =
-        SimApiClientFactory("deviceId", endpoint = mockServer.url("/").toString()).build<SessionsRemoteInterface>().api
+    private lateinit var sessionsRemoteInterface: SessionsRemoteInterface
 
     @Before
     fun setUp() {
         UnitTestConfig(this).setupFirebase()
-        coEvery { sessionRemoteDataSourceSpy.getSessionsApiClient() } returns sessionRemoteInterface
+
+        mockServer.start()
+        sessionsRemoteInterface = SimApiClientFactory("deviceId", endpoint = mockServer.url("/").toString()).build<SessionsRemoteInterface>().api
+
+        coEvery { sessionRemoteDataSourceSpy.getSessionsApiClient() } returns sessionsRemoteInterface
     }
 
     @Test
@@ -87,6 +90,12 @@ class SessionRemoteDataSourceImplTest {
             sessionRemoteDataSourceSpy.uploadSessions("projectId", sessions)
             assertThat(mockServer.requestCount).isEqualTo(2)
         }
+    }
+
+    @After
+    @Throws
+    fun tearDown() {
+        mockServer.shutdown()
     }
 
     private fun buildRemoteDataSource() =

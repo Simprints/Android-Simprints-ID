@@ -42,7 +42,6 @@ import io.mockk.mockk
 class TestAppModule(
     app: Application,
     private val remoteDbManagerRule: DependencyRule = RealRule,
-    private val remoteSessionsManagerRule: DependencyRule = RealRule,
     private val dbManagerRule: DependencyRule = RealRule,
     private val secureDataManagerRule: DependencyRule = RealRule,
     private val loginInfoManagerRule: DependencyRule = RealRule,

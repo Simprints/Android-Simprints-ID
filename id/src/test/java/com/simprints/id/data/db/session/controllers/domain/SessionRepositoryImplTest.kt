@@ -2,6 +2,7 @@ package com.simprints.id.data.db.session.controllers.domain
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
@@ -11,7 +12,6 @@ import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
-import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.testtools.TestApplication
@@ -26,7 +26,6 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyString
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 
@@ -36,11 +35,11 @@ class SessionRepositoryImplTest {
 
     @MockK private lateinit var sessionEventsSyncManagerMock: SessionEventsSyncManager
     @MockK private lateinit var sessionLocalDataSourceMock: SessionLocalDataSource
-    @MockK private lateinit var sessionRemoteDataSource: SessionRemoteDataSource
-    @MockK private lateinit var loginInfoManager: LoginInfoManager
+    @MockK private lateinit var sessionRemoteDataSourceMock: SessionRemoteDataSource
     @MockK private lateinit var preferencesManagerMock: PreferencesManager
     @MockK private lateinit var crashReportManagerMock: CrashReportManager
     private lateinit var sessionsRepository: SessionRepository
+    private val timeHelper = TimeHelperImpl()
 
     @Before
     fun setUp() {
@@ -50,7 +49,9 @@ class SessionRepositoryImplTest {
         sessionsRepository = SessionRepositoryImpl(
             DEVICE_ID,
             APP_VERSION_NAME,
-            sessionEventsSyncManagerMock, sessionLocalDataSourceMock, preferencesManagerMock, crashReportManagerMock)
+            PROJECT_ID,
+            sessionEventsSyncManagerMock, sessionLocalDataSourceMock, sessionRemoteDataSourceMock,
+            preferencesManagerMock, crashReportManagerMock)
         mockPreferenceManagerInfo()
     }
 
@@ -84,7 +85,7 @@ class SessionRepositoryImplTest {
     @Test
     fun getCurrentSession_shouldReturnCurrentSession() {
         runBlockingTest {
-            val session = createFakeOpenSession(TimeHelperImpl())
+            val session = createFakeOpenSession(timeHelper)
             coEvery { sessionLocalDataSourceMock.load(any()) } returns flowOf(session)
 
             val currentSession = sessionsRepository.getCurrentSession()
@@ -139,6 +140,7 @@ class SessionRepositoryImplTest {
         runBlockingTest {
             coEvery { sessionLocalDataSourceMock.addEventToCurrentSession(any()) } throws Throwable("Error")
             sessionsRepository.addEventToCurrentSessionInBackground(mockk())
+
             coVerify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
         }
     }
@@ -157,12 +159,11 @@ class SessionRepositoryImplTest {
     @Test
     fun uploadSessions_shouldDeleteAfterUploading() {
         runBlockingTest {
-            sessionsRepositorySpy.createSession("")
-            every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns "project_id"
+            coEvery { sessionLocalDataSourceMock.load(any()) } returns flowOf(createFakeClosedSession(timeHelper))
 
-            sessionsRepositorySpy.startUploadingSessions()
+            sessionsRepository.startUploadingSessions()
 
-            coVerify(exactly = 1) { sessionRemoteDataSource.uploadSessions(anyString(), any()) }
+            coVerify(exactly = 1) { sessionRemoteDataSourceMock.uploadSessions(PROJECT_ID, any()) }
             coVerify(exactly = 1) { sessionLocalDataSourceMock.delete(any()) }
         }
     }
@@ -173,5 +174,6 @@ class SessionRepositoryImplTest {
         private const val APP_VERSION_NAME = "v1"
         private const val LIB_VERSION_NAME = "v1"
         private const val LANGUAGE = "en"
+        private const val PROJECT_ID = "projectId"
     }
 }
