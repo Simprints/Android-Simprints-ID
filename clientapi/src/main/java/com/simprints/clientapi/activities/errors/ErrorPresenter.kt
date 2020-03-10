@@ -8,8 +8,8 @@ class ErrorPresenter(val view: ErrorContract.View,
     : ErrorContract.Presenter {
 
     override suspend fun start(clientApiAlert: ClientApiAlert) {
-        sessionEventsManager.addAlertScreenEvent(clientApiAlert)
         setUpView(clientApiAlert)
+        sessionEventsManager.addAlertScreenEvent(clientApiAlert)
     }
 
     private fun setUpView(clientApiAlert: ClientApiAlert) {

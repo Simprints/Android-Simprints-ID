@@ -230,7 +230,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
             visibility = VISIBLE
         }
 
-    // I couldn't find a way to build from Android SDK the default text color (in line with the theme).
+    // I couldn't find a way to get from Android SDK the default text color (in line with the theme).
     // So I change a color for a TextView, then I can't set back to the default.
     // The card's title has always the same color - the default one.
     // Hacky way to extract the color from the title and use for the other TextViews
