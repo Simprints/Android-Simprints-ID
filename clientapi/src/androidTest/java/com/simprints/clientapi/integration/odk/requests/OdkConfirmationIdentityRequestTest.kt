@@ -10,9 +10,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.integration.AppIdentityConfirmationRequest
 import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
+import com.simprints.clientapi.integration.value
 import com.simprints.moduleapi.app.requests.confirmations.IAppConfirmation
-import com.simprints.testtools.android.bundleDataMatcherForParcelable
-import com.simprints.testtools.common.syntax.value
 import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.Test

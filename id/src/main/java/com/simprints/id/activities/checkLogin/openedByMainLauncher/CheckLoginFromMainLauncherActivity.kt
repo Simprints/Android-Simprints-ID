@@ -3,6 +3,7 @@ package com.simprints.id.activities.checkLogin.openedByMainLauncher
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
@@ -11,6 +12,7 @@ import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.tools.AndroidResourcesHelper
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.startActivity
 import javax.inject.Inject
 
@@ -34,7 +36,9 @@ open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginF
 
     override fun onResume() {
         super.onResume()
-        viewPresenter.start()
+        lifecycleScope.launch {
+            viewPresenter.start()
+        }
     }
 
     override fun openAlertActivityForError(alertType: AlertType) {

@@ -19,7 +19,7 @@ data class ApiFingerprintSample(var finger: FingerIdentifier,
 fun FingerprintSample.fromDomainToApi(): ApiFingerprintSample =
     ApiFingerprintSample(
         finger = fingerIdentifier,
-        template = EncodingUtils.byteArrayToBase64(template), // TODO: get rid of double bang
+        template = EncodingUtils.byteArrayToBase64(template), // TODO: build rid of double bang
         quality = templateQualityScore
     )
 

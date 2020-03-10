@@ -12,7 +12,7 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.extensions.just
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.*
-import io.reactivex.Single
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,28 +37,29 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun givenCheckLoginFromIntentPresenter_setupIsCalled_shouldAddCalloutEvent() {
-        val checkLoginFromIntentPresenter = spyk(CheckLoginFromIntentPresenter(viewMock, "device_id", mockk(relaxed = true))).apply {
+        runBlockingTest {
+            val checkLoginFromIntentPresenter = spyk(CheckLoginFromIntentPresenter(viewMock, "device_id", mockk(relaxed = true))).apply {
 
-            every { viewMock.parseRequest() } returns mockk(relaxed = true)
-            remoteConfigFetcher = mockk()
-            analyticsManager = mockk()
-            personLocalDataSource = mockk()
-            preferencesManager = mockk()
+                coEvery { viewMock.parseRequest() } returns mockk(relaxed = true)
+                remoteConfigFetcher = mockk()
+                analyticsManager = mockk()
+                personLocalDataSource = mockk()
+                preferencesManager = mockk()
 
-            analyticsManager = mockk()
-            every { analyticsManager.analyticsId } returns Single.just("analyticsId")
+                analyticsManager = mockk()
+                coEvery { analyticsManager.getAnalyticsId() } returns "analyticsId"
 
-            crashReportManager = mockk()
-            every { crashReportManager.setSessionIdCrashlyticsKey(any()) } just Runs
+                crashReportManager = mockk()
+                coEvery { crashReportManager.setSessionIdCrashlyticsKey(any()) } just Runs
 
-            sessionRepository = mockk(relaxed = true)
-            every { sessionRepository.createSession("") } returns Single.just(createFakeSession())
-            every { sessionRepository.getCurrentSession() } returns Single.just(createFakeSession())
+                sessionRepository = mockk(relaxed = true)
+                coEvery { sessionRepository.getCurrentSession() } returns createFakeSession()
+            }
+
+            checkLoginFromIntentPresenter.setup()
+
+            coVerify(exactly = 1) { checkLoginFromIntentPresenter.addCalloutAndConnectivityEventsInSession(any()) }
         }
-
-        checkLoginFromIntentPresenter.setup()
-
-        verify(exactly = 1) { checkLoginFromIntentPresenter.addCalloutAndConnectivityEventsInSession(any()) }
     }
 
     @Test
@@ -113,35 +114,33 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun givenCheckLoginFromIntentPresenter_setupIsCalled_shouldAddInfoToSession() {
+        runBlockingTest {
+            val checkLoginFromIntentPresenter = spyk(CheckLoginFromIntentPresenter(viewMock, "device_id", mockk(relaxed = true))).apply {
 
-        val checkLoginFromIntentPresenter = spyk(CheckLoginFromIntentPresenter(viewMock, "device_id", mockk(relaxed = true))).apply {
+                every { view.parseRequest() } returns mockk<AppEnrolRequest>()
 
-            every { view.parseRequest() } returns mockk<AppEnrolRequest>()
+                remoteConfigFetcher = mockk()
+                analyticsManager = mockk()
+                preferencesManager = mockk()
 
-            remoteConfigFetcher = mockk()
-            analyticsManager = mockk()
-            preferencesManager = mockk()
-
-            personLocalDataSource = mockk()
-            coEvery { personLocalDataSource.count() } returns 0
-
-
-            crashReportManager = mockk()
-            every { crashReportManager.setSessionIdCrashlyticsKey(any()) } just runs
+                personLocalDataSource = mockk()
+                coEvery { personLocalDataSource.count() } returns 0
 
 
-            sessionRepository = mockk(relaxed = true)
-            every { sessionRepository.createSession("") } returns Single.just(createFakeSession())
-            every { sessionRepository.getCurrentSession() } returns Single.just(createFakeSession())
-            every { sessionRepository.getSessionCount() } returns Single.just(0)
+                crashReportManager = mockk()
+                every { crashReportManager.setSessionIdCrashlyticsKey(any()) } just runs
 
-            analyticsManager = mockk()
-            every { analyticsManager.analyticsId } returns Single.just("analyticsId")
+                sessionRepository = mockk(relaxed = true)
+                coEvery { sessionRepository.getCurrentSession() } returns createFakeSession()
+
+                analyticsManager = mockk()
+                coEvery { analyticsManager.getAnalyticsId() } returns "analyticsId"
+            }
+
+            checkLoginFromIntentPresenter.setup()
+
+            coVerify(exactly = 1) { checkLoginFromIntentPresenter.addAnalyticsInfoAndProjectId() }
         }
-
-        checkLoginFromIntentPresenter.setup()
-
-        verify(exactly = 1) { checkLoginFromIntentPresenter.addAnalyticsInfoAndProjectId() }
     }
 
 }

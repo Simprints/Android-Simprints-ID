@@ -11,7 +11,9 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
+import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.session.remote.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -106,24 +108,27 @@ class TestAppModule(
     override fun provideSessionEventsManager(
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
-        sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+        sessionLocalDataSource: SessionLocalDataSource,
         preferencesManager: PreferencesManager,
-        timeHelper: TimeHelper,
         crashReportManager: CrashReportManager
     ): SessionRepository = sessionEventsManagerRule.resolveDependency {
         super.provideSessionEventsManager(
             ctx,
             sessionEventsSyncManager,
-            sessionEventsLocalDbManager,
+            sessionLocalDataSource,
             preferencesManager,
-            timeHelper,
             crashReportManager
         )
     }
 
-    override fun provideSessionEventsLocalDbManager(ctx: Context,
-                                                    secureDataManager: SecureLocalDbKeyProvider): SessionEventsLocalDbManager =
-        sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager) }
+    override fun provideSessionEventsLocalDbManager(
+        ctx: Context,
+        secureDataManager: SecureLocalDbKeyProvider,
+        timeHelper: TimeHelper,
+        sessionRealmConfigBuilder: SessionRealmConfigBuilder,
+        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
+    ): SessionLocalDataSource =
+        sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder, sessionEventValidatorsBuilder) }
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }

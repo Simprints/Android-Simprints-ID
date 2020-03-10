@@ -12,8 +12,8 @@ import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Verification
 import com.simprints.moduleapi.app.responses.IAppMatchResult
 import com.simprints.moduleapi.app.responses.IAppResponseTier
-import com.simprints.testtools.common.syntax.key
-import com.simprints.testtools.common.syntax.value
+import com.simprints.clientapi.integration.value
+import com.simprints.clientapi.integration.key
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*

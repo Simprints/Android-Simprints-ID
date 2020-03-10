@@ -10,7 +10,7 @@ class FingerprintExitFormViewModel(private val sessionRepository: SessionReposit
 
     fun addExitFormEvent(startTime: Long, endTime: Long, otherText: String,
                          fingerprintExitFormReason: FingerprintExitFormReason) {
-        sessionRepository.addEventInBackground(RefusalEvent(startTime, endTime,
+        sessionRepository.addEventToCurrentSessionInBackground(RefusalEvent(startTime, endTime,
             fingerprintExitFormReason.toRefusalEventAnswer(), otherText))
     }
 }

@@ -2,7 +2,6 @@ package com.simprints.clientapi.controllers.core.eventData
 
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import io.reactivex.Completable
 
 
 interface ClientApiSessionEventsManager {
@@ -11,11 +10,11 @@ interface ClientApiSessionEventsManager {
 
     suspend fun addCompletionCheckEvent(complete: Boolean)
 
-    fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>): Completable
+    suspend fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>)
 
-    fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert): Completable
+    suspend fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert)
 
-    fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>): Completable
+    suspend fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>)
 
-    suspend fun getCurrentSessionId(): String?
+    suspend fun getCurrentSessionId(): String
 }

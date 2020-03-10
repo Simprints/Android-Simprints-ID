@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
@@ -23,6 +24,7 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.parseAppRequest
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
@@ -42,8 +44,10 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         title = androidResourcesHelper.getString(R.string.title_activity_front)
         viewPresenter = CheckLoginFromIntentPresenter(this, deviceId, component)
 
-        viewPresenter.setup()
-        viewPresenter.start()
+        lifecycleScope.launchWhenCreated {
+            viewPresenter.setup()
+            viewPresenter.start()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -55,7 +59,9 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         when {
             potentialAlertScreenResponse != null -> viewPresenter.onAlertScreenReturn(potentialAlertScreenResponse)
             appErrorResponseForLoginScreen != null -> viewPresenter.onLoginScreenErrorReturn(appErrorResponseForLoginScreen)
-            else -> viewPresenter.checkSignedInStateIfPossible()
+            else -> lifecycleScope.launch {
+                viewPresenter.checkSignedInStateIfPossible()
+            }
         }
     }
 

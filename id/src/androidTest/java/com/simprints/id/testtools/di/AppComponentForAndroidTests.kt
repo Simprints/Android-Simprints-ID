@@ -4,12 +4,10 @@ import com.simprints.id.Application
 import com.simprints.id.activities.dashboard.DashboardActivityAndroidTest
 import com.simprints.id.activities.login.LoginActivityAndroidTest
 import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
-import com.simprints.id.data.db.session.controllers.local.RealmSessionEventsDbManagerImplTest
 import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImplTest
 import com.simprints.id.di.*
 import com.simprints.id.services.people.PeopleSyncIntegrationTest
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImplAndroidTest
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderTaskAndroidTest
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -34,10 +32,8 @@ interface AppComponentForAndroidTests : AppComponent {
         fun build(): AppComponentForAndroidTests
     }
 
-    fun inject(sessionEventsUploaderTaskAndroidTest: SessionEventsUploaderTaskAndroidTest)
     fun inject(loginActivityAndroidTest: LoginActivityAndroidTest)
     fun inject(legacyLocalDbKeyProviderImplTest: LegacyLocalDbKeyProviderImplTest)
-    fun inject(localSessionEventsManagerImplTest: RealmSessionEventsDbManagerImplTest)
     fun inject(sessionEventsSyncManagerImplTest: SessionEventsSyncManagerImplAndroidTest)
     fun inject(moduleSelectionActivityAndroidTest: ModuleSelectionActivityAndroidTest)
     fun inject(peopleSyncIntegrationTest: PeopleSyncIntegrationTest)

@@ -1,7 +1,6 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
-import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
@@ -12,7 +11,6 @@ import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
 import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
 import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
@@ -26,11 +24,8 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.tools.ignoreException
 import com.simprints.id.tools.utils.SimNetworkUtils
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -55,7 +50,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         component.inject(this)
     }
 
-    override fun setup() {
+    override suspend fun setup() {
         try {
             addAnalyticsInfoAndProjectId()
             parseAppRequest()
@@ -75,11 +70,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         appRequest = view.parseRequest()
     }
 
-    internal fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
-        sessionRepository.updateSessionInBackground {
-            it.events.apply {
-                add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
-                add(buildRequestEvent(timeHelper.now(), appRequest))
+    internal suspend fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
+        ignoreException {
+            sessionRepository.updateCurrentSession { currentSession ->
+                currentSession.events.apply {
+                    add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
+                    add(buildRequestEvent(timeHelper.now(), appRequest))
+                }
             }
         }
     }
@@ -118,11 +115,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         preferencesManager.lastUserUsed = appRequest.userId
     }
 
-    override fun start() {
+    override suspend fun start() {
         checkSignedInStateIfPossible()
     }
 
-    override fun checkSignedInStateIfPossible() {
+    override suspend fun checkSignedInStateIfPossible() {
         if (!setupFailed) {
             checkSignedInStateAndMoveOn()
         }
@@ -144,9 +141,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
 
     override fun handleNotSignedInUser() {
-        sessionRepository.updateSessionInBackground {
-            addAuthorizationEvent(it, AuthorizationEvent.Result.NOT_AUTHORIZED)
-        }
+        sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(AuthorizationEvent.Result.NOT_AUTHORIZED))
 
         if (!loginAlreadyTried.get()) {
             loginAlreadyTried.set(true)
@@ -175,31 +170,24 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         loginInfoManager.getSignedInUserIdOrEmpty().isNotEmpty()
 
     @SuppressLint("CheckResult")
-    override fun handleSignedInUser() {
+    override suspend fun handleSignedInUser() {
         /** Hack to support multiple users: If all login checks success, then we consider
          *  the userId in the Intent as new signed User */
         loginInfoManager.signedInUserId = appRequest.userId
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
-        fetchPeopleCountInLocalDatabase().flatMapCompletable { recordCount ->
-            sessionRepository.updateSession {
-                it.events.apply {
-                    addAuthorizationEvent(it, AuthorizationEvent.Result.AUTHORIZED)
+        ignoreException {
+            val peopleInDb = personLocalDataSource.count()
+            sessionRepository.updateCurrentSession { currentSession ->
+                currentSession.events.apply {
+                    buildAuthorizationEvent(AuthorizationEvent.Result.AUTHORIZED)
                 }
-                it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-                it.databaseInfo.recordCount = recordCount
+                currentSession.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+                currentSession.databaseInfo.recordCount = peopleInDb
             }
         }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onComplete = {
-                Timber.d("Session updated")
-            }, onError = {
-                it.printStackTrace()
-            })
 
         view.openOrchestratorActivity(appRequest)
-
         initOrUpdateAnalyticsKeys()
     }
 
@@ -213,25 +201,21 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    internal fun addAnalyticsInfoAndProjectId() =
-        fetchAnalyticsId()
-            .flatMapCompletable { gaId ->
-                sessionRepository.updateSession {
-                    val signedInProject = loginInfoManager.getSignedInProjectIdOrEmpty()
-                    if (signedInProject.isNotEmpty()) {
-                        it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-                    }
-                    it.analyticsId = gaId
+    internal suspend fun addAnalyticsInfoAndProjectId() {
+        ignoreException {
+            val analyticsId = analyticsManager.getAnalyticsId()
+            sessionRepository.updateCurrentSession { currentSession ->
+                val signedInProject = loginInfoManager.getSignedInProjectIdOrEmpty()
+                if (signedInProject.isNotEmpty()) {
+                    currentSession.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
                 }
-            }.subscribeBy(onError = { it.printStackTrace() })
+                currentSession.analyticsId = analyticsId
+            }
+        }
+    }
 
-    private fun fetchAnalyticsId() =
-        analyticsManager.analyticsId.onErrorReturn { "" }
-
-    private fun fetchPeopleCountInLocalDatabase(): Single<Int> = singleWithSuspend { personLocalDataSource.count() }
-
-    private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
-        session.addEvent(AuthorizationEvent(
+    private fun buildAuthorizationEvent(result: AuthorizationEvent.Result) =
+        AuthorizationEvent(
             timeHelper.now(),
             result,
             if (result == AuthorizationEvent.Result.AUTHORIZED) {
@@ -239,16 +223,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             } else {
                 null
             }
-        ))
-    }
+        )
+
 
     @SuppressLint("CheckResult")
-    private fun setSessionIdCrashlyticsKey() {
-        sessionRepository.getCurrentSession()
-            .subscribeBy(onSuccess = {
-                crashReportManager.setSessionIdCrashlyticsKey(it.id)
-            }, onError = {
-                it.printStackTrace()
-            })
+    private suspend fun setSessionIdCrashlyticsKey() {
+        ignoreException {
+            crashReportManager.setSessionIdCrashlyticsKey(sessionRepository.getCurrentSession().id)
+        }
     }
 }

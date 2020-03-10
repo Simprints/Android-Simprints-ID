@@ -21,7 +21,6 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.testtools.UnitTestConfig
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.reactivex.Single
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -62,7 +61,7 @@ class OrchestratorViewModelTest {
 
     private fun configureMocks() {
         every { domainToModuleApiConverter.fromDomainModuleApiAppResponse(any()) } returns mockk()
-        every { sessionRepositoryMock.getCurrentSession() } returns Single.just(fakeSession)
+        coEvery { sessionRepositoryMock.getCurrentSession() } returns fakeSession
         every { orchestratorManagerMock.appResponse } returns liveDataAppResponse
         every { orchestratorManagerMock.ongoingStep } returns liveDataNextIntent
     }

@@ -64,7 +64,7 @@
 //
 //    private val app = applicationprovider.getapplicationcontext<application>()
 //
-//    @get:rule val simprintsactiontestrule = checkloginfromintentactivitytestrule()
+//    @build:rule val simprintsactiontestrule = checkloginfromintentactivitytestrule()
 //
 //    @inject lateinit var randomgeneratormock: randomgenerator
 //    @inject lateinit var realmsessioneventsmanager: sessioneventslocaldbmanager
@@ -95,10 +95,10 @@
 //
 //    private lateinit var mockbluetoothadapter: mockbluetoothadapter
 //    private val realmfordataevent
-//        get() = (realmsessioneventsmanager as realmsessioneventsdbmanagerimpl).getrealminstance().blockingget()
+//        build() = (realmsessioneventsmanager as realmsessioneventsdbmanagerimpl).getrealminstance().blockingget()
 //
 //    private val mostrecentsessionindb: sessionevents
-//        get() {
+//        build() {
 //            realmfordataevent.refresh()
 //            return realmfordataevent
 //                .where(dbsession::class.java)

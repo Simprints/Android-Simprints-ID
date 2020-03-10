@@ -8,7 +8,6 @@ import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
@@ -16,7 +15,6 @@ import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.common.di.DependencyRule.SpykRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -38,7 +36,6 @@ class ConsentActivityTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject lateinit var preferencesManagerSpy: PreferencesManager
-    @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
     private val preferencesModule by lazy {
         TestPreferencesModule(
@@ -56,8 +53,6 @@ class ConsentActivityTest {
     @Before
     fun setUp() {
         UnitTestConfig(this, module, preferencesModule).fullSetup()
-
-        RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManager)
     }
 
     @Test

@@ -9,7 +9,7 @@ import kotlinx.android.parcel.Parcelize
  * Constructor for the Finger class
  * @param id            The ISO number of the finger (0-9)
  * @param isActive      Whether the finger is the current finger
- * @param priority      The order in which fingers get auto-added (based on research) (0-9)
+ * @param priority      The order in which fingers build auto-added (based on research) (0-9)
  * @param order         The order in which fingers appear in the list and the workflow (0-9)
  */
 @Parcelize
