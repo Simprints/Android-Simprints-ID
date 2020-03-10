@@ -21,11 +21,13 @@ import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
+import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.testtools.android.getCurrentActivity
+import io.mockk.every
 import io.mockk.verify
 import org.hamcrest.CoreMatchers.not
 
@@ -47,12 +49,17 @@ fun LoginActivityAndroidTest.loginActivity(
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
     val activityScenario = ActivityScenario.launch<LoginActivity>(intent)
 
-    return LoginActivityRobot(activityScenario, mockCrashReportManager).apply(block)
+    return LoginActivityRobot(
+        activityScenario,
+        mockCrashReportManager,
+        mockLoginActivityHelper
+    ).apply(block)
 }
 
 class LoginActivityRobot(
     private val activityScenario: ActivityScenario<LoginActivity>,
-    private val mockCrashReportManager: CrashReportManager
+    private val mockCrashReportManager: CrashReportManager,
+    private val mockLoginActivityHelper: LoginActivityHelper
 ) {
 
     fun typeProjectId(projectId: String) {
@@ -64,6 +71,52 @@ class LoginActivityRobot(
     fun typeProjectSecret(projectSecret: String) {
         typeText(projectSecret) {
             id(R.id.loginEditTextProjectSecret)
+        }
+    }
+
+    fun withMandatoryCredentialsPresent() {
+        shouldHaveMandatoryCredentials(true)
+    }
+
+    fun withMandatoryCredentialsMissing() {
+        shouldHaveMandatoryCredentials(false)
+    }
+
+    fun withSuppliedProjectIdAndIntentProjectIdMatching() {
+        shouldMatchSuppliedProjectIdAndIntentProjectId(true)
+    }
+
+    fun withSuppliedProjectIdAndIntentProjectIdNotMatching() {
+        shouldMatchSuppliedProjectIdAndIntentProjectId(false)
+    }
+
+    fun withScannerAppInstalled() {
+        val scannerAppIntent = Intent("SCANNER_APP")
+        every { mockLoginActivityHelper.getScannerAppIntent(any()) } returns scannerAppIntent
+    }
+
+    fun withScannerAppNotInstalled() {
+        every { mockLoginActivityHelper.getScannerAppIntent(any()) } returns null
+    }
+
+    fun receiveValidQrCodeResponse() {
+        val response = JsonHelper.toJson(
+            CredentialsResponse(VALID_PROJECT_ID, VALID_PROJECT_SECRET)
+        )
+
+        stubScannerAppIntent(response)
+    }
+
+    fun receiveInvalidQrCodeResponse() {
+        stubScannerAppIntent("invalid_json")
+    }
+
+    fun receiveErrorFromScannerApp() {
+        stubIntent {
+            respondWith {
+                canceled()
+                customCode(0)
+            }
         }
     }
 
@@ -89,43 +142,31 @@ class LoginActivityRobot(
         assert(assertion)
     }
 
-    infix fun receiveValidQrCodeResponse(assertion: LoginActivityAssertions.() -> Unit) {
+    infix fun assert(assertion: LoginActivityAssertions.() -> Unit) {
+        LoginActivityAssertions(activityScenario, mockCrashReportManager).apply(assertion)
+    }
+
+    private fun shouldHaveMandatoryCredentials(result: Boolean) {
+        every {
+            mockLoginActivityHelper.areMandatoryCredentialsPresent(any(), any(), any())
+        } returns result
+    }
+
+    private fun shouldMatchSuppliedProjectIdAndIntentProjectId(result: Boolean) {
+        every {
+            mockLoginActivityHelper.areSuppliedProjectIdAndProjectIdFromIntentEqual(any(), any())
+        } returns result
+    }
+
+    private fun stubScannerAppIntent(response: String) {
         stubIntent {
             respondWith {
-                val response = JsonHelper.toJson(CredentialsResponse(VALID_PROJECT_ID, VALID_PROJECT_SECRET))
                 val data = Intent().putExtra(EXTRA_SCAN_RESULT, response)
                 ok()
                 data(data)
+                customCode(0)
             }
         }
-
-        assert(assertion)
-    }
-
-    infix fun receiveInvalidQrCodeResponse(assertion: LoginActivityAssertions.() -> Unit) {
-        stubIntent {
-            respondWith {
-                val data = Intent().putExtra(EXTRA_SCAN_RESULT, "invalid_json")
-                ok()
-                data(data)
-            }
-        }
-
-        assert(assertion)
-    }
-
-    infix fun receiveErrorFromScannerApp(assertion: LoginActivityAssertions.() -> Unit) {
-        stubIntent {
-            respondWith {
-                canceled()
-            }
-        }
-
-        assert(assertion)
-    }
-
-    infix fun assert(assertion: LoginActivityAssertions.() -> Unit) {
-        LoginActivityAssertions(activityScenario, mockCrashReportManager).apply(assertion)
     }
 
 }
