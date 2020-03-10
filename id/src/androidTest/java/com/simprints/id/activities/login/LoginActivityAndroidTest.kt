@@ -64,9 +64,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun typeValidCredentials_clickSignIn_shouldBeAuthenticated() {
-        coEvery {
-            mockRepository.authenticate(any(), any(), any())
-        } returns AuthenticationEvent.Result.AUTHENTICATED
+        mockAuthenticationResult(AuthenticationEvent.Result.AUTHENTICATED)
 
         loginActivity {
             typeProjectId(VALID_PROJECT_ID)
@@ -78,9 +76,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun whenOffline_clickSignIn_shouldShowToast() {
-        coEvery {
-            mockRepository.authenticate(any(), any(), any())
-        } returns AuthenticationEvent.Result.OFFLINE
+        mockAuthenticationResult(AuthenticationEvent.Result.OFFLINE)
 
         loginActivity {
             typeProjectId(VALID_PROJECT_ID)
@@ -92,9 +88,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun typeInvalidCredentials_clickSignIn_shouldShowToast() {
-        coEvery {
-            mockRepository.authenticate(any(), any(), any())
-        } returns AuthenticationEvent.Result.BAD_CREDENTIALS
+        mockAuthenticationResult(AuthenticationEvent.Result.BAD_CREDENTIALS)
 
         loginActivity {
             typeProjectId(VALID_PROJECT_ID)
@@ -106,9 +100,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withServerError_clickSignIn_shouldShowToast() {
-        coEvery {
-            mockRepository.authenticate(any(), any(), any())
-        } returns AuthenticationEvent.Result.TECHNICAL_FAILURE
+        mockAuthenticationResult(AuthenticationEvent.Result.TECHNICAL_FAILURE)
 
         loginActivity {
             typeProjectId(VALID_PROJECT_ID)
@@ -120,9 +112,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withInvalidSafetyNetClaims_clickSignIn_shouldLaunchAlertScreen() {
-        coEvery {
-            mockRepository.authenticate(any(), any(), any())
-        } returns AuthenticationEvent.Result.SAFETYNET_INVALID_CLAIM
+        mockAuthenticationResult(AuthenticationEvent.Result.SAFETYNET_INVALID_CLAIM)
 
         loginActivity {
             typeProjectId(VALID_PROJECT_ID)
@@ -134,9 +124,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withSafetyNetUnavailable_clickSignIn_shouldLaunchAlertScreen() {
-        coEvery {
-            mockRepository.authenticate(any(), any(), any())
-        } returns AuthenticationEvent.Result.SAFETYNET_UNAVAILABLE
+        mockAuthenticationResult(AuthenticationEvent.Result.SAFETYNET_UNAVAILABLE)
 
         loginActivity {
             typeProjectId(VALID_PROJECT_ID)
@@ -148,9 +136,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withUnknownError_clickSignIn_shouldLaunchAlertScreen() {
-        coEvery {
-            mockRepository.authenticate(any(), any(), any())
-        } returns AuthenticationEvent.Result.UNKNOWN
+        mockAuthenticationResult(AuthenticationEvent.Result.UNKNOWN)
 
         loginActivity {
             typeProjectId(VALID_PROJECT_ID)
@@ -163,6 +149,10 @@ class LoginActivityAndroidTest {
     @After
     fun tearDown() {
         Intents.release()
+    }
+
+    private fun mockAuthenticationResult(result: AuthenticationEvent.Result) {
+        coEvery { mockRepository.authenticate(any(), any(), any()) } returns result
     }
 
 }
