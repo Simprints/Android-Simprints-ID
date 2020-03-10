@@ -1,143 +1,168 @@
 package com.simprints.id.activities.login
 
-import android.app.Activity
-import android.app.Instrumentation
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso
-import com.google.common.truth.Truth.assertThat
-import com.simprints.id.Application
-import com.simprints.id.R
-import com.simprints.id.activities.login.response.LoginActivityResponse
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.models.TestCalloutCredentials
-import com.simprints.id.commontesttools.state.replaceSecureApiClientWithFailingClientProvider
-import com.simprints.id.commontesttools.state.setupFakeKeyStore
-import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
-import com.simprints.id.data.secure.keystore.KeystoreManager
-import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
+import androidx.test.espresso.intent.Intents
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.id.activities.login.repository.LoginRepository
+import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
+import com.simprints.id.commontesttools.di.TestLoginModule
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
 import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.tools.RandomGenerator
-import com.simprints.testtools.android.BaseAssertions
 import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.common.syntax.mock
-import io.mockk.mockk
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.impl.annotations.MockK
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
-class LoginActivityAndroidTest : BaseAssertions() {
+@RunWith(AndroidJUnit4::class)
+class LoginActivityAndroidTest {
 
-    private val app = ApplicationProvider.getApplicationContext<Application>()
+    @MockK lateinit var mockCrashReportManager: CrashReportManager
+    @MockK lateinit var mockRepository: LoginRepository
 
-    private var secureApiInterfaceRule: DependencyRule = DependencyRule.RealRule
-
-    private val appModule = TestAppModule(
-        app,
-        randomGeneratorRule = DependencyRule.ReplaceRule {
-            mock<RandomGenerator>().apply {
-                setupRandomGeneratorToGenerateKey(this)
-            }
-        },
-        keystoreManagerRule = DependencyRule.ReplaceRule {
-            mockk<KeystoreManager>().apply {
-                setupFakeKeyStore(this)
-            }
-        },
-        secureApiInterfaceRule = secureApiInterfaceRule
-    )
+    private val loginModule by lazy {
+        TestLoginModule(loginViewModelFactoryRule = DependencyRule.ReplaceRule {
+            LoginViewModelFactory(mockRepository)
+        })
+    }
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, appModule).fullSetup()
+        MockKAnnotations.init(this, relaxed = true)
+        AndroidTestConfig(this, loginModule = loginModule).initAndInjectComponent()
+        Intents.init()
     }
 
     @Test
-    fun validCredentials_shouldSucceed() {
-        val scenario = launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
-        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
-        pressSignIn()
-        ensureSignInSuccess(scenario)
+    fun userIdFieldShouldBeFilledInWithValueProvidedThroughIntent() {
+        loginActivity {
+        } assert {
+            assertUserIdFieldHasText(USER_ID)
+        }
     }
 
     @Test
-    fun invalidIntentProjectIdAndInvalidSubmittedProjectId_shouldFailWithToast() {
-        launchLoginActivity(invalidCredentials)
-        enterCredentialsDirectly(invalidCredentials, DEFAULT_PROJECT_SECRET)
-        pressSignIn()
-
-        assertToastMessageIs(R.string.login_invalid_credentials)
+    fun withMissingCredentials_clickSignIn_shouldShowToast() {
+        loginActivity {
+        } clickSignIn {
+            assertMissingCredentialsToastIsDisplayed()
+        }
     }
 
     @Test
-    fun validIntentProjectIdAndInvalidSubmittedProjectId_shouldFailWithToast() {
-        launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
-        enterCredentialsDirectly(invalidCredentials, DEFAULT_PROJECT_SECRET)
-        pressSignIn()
-
-        assertToastMessageIs(R.string.login_project_id_intent_mismatch)
+    fun typeProjectIdDifferentFromProvidedThroughIntent_clickSignIn_shouldShowToast() {
+        loginActivity {
+            typeProjectId("invalid_project_id")
+            typeProjectSecret(VALID_PROJECT_SECRET)
+        } clickSignIn {
+            assertProjectIdMismatchToastIsDisplayed()
+        }
     }
 
     @Test
-    fun validProjectIdAndInvalidSecret_shouldFailWithToast() {
-        launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
-        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, invalidSecret)
-        pressSignIn()
+    fun typeValidCredentials_clickSignIn_shouldBeAuthenticated() {
+        coEvery {
+            mockRepository.authenticate(any(), any(), any())
+        } returns AuthenticationEvent.Result.AUTHENTICATED
 
-        assertToastMessageIs(R.string.login_invalid_credentials)
+        loginActivity {
+            typeProjectId(VALID_PROJECT_ID)
+            typeProjectSecret(VALID_PROJECT_SECRET)
+        } clickSignIn {
+            assertUserIsSignedIn()
+        }
     }
 
     @Test
-    fun invalidCredentials_shouldFailWithToast() {
-        launchLoginActivity(invalidCredentials)
-        enterCredentialsDirectly(invalidCredentials, invalidSecret)
-        pressSignIn()
+    fun whenOffline_clickSignIn_shouldShowToast() {
+        coEvery {
+            mockRepository.authenticate(any(), any(), any())
+        } returns AuthenticationEvent.Result.OFFLINE
 
-        assertToastMessageIs(R.string.login_invalid_credentials)
+        loginActivity {
+            typeProjectId(VALID_PROJECT_ID)
+            typeProjectSecret(VALID_PROJECT_SECRET)
+        } clickSignIn {
+            assertOfflineToastIsDisplayed()
+        }
     }
 
     @Test
-    fun validCredentialsWithoutInternet_shouldFailWithToast() {
-        secureApiInterfaceRule =
-            DependencyRule.ReplaceRule { replaceSecureApiClientWithFailingClientProvider() }
-        AndroidTestConfig(this, appModule).initAndInjectComponent()
+    fun typeInvalidCredentials_clickSignIn_shouldShowToast() {
+        coEvery {
+            mockRepository.authenticate(any(), any(), any())
+        } returns AuthenticationEvent.Result.BAD_CREDENTIALS
 
-        launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
-        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
-        pressSignIn()
-
-        assertToastMessageIs(R.string.login_no_network)
+        loginActivity {
+            typeProjectId(VALID_PROJECT_ID)
+            typeProjectSecret(VALID_PROJECT_SECRET)
+        } clickSignIn {
+            assertInvalidCredentialsToastIsDisplayed()
+        }
     }
 
     @Test
-    fun pressBack_shouldFinishWithRightResult() {
-        val activityScenario = launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
-        Espresso.pressBackUnconditionally()
+    fun withServerError_clickSignIn_shouldShowToast() {
+        coEvery {
+            mockRepository.authenticate(any(), any(), any())
+        } returns AuthenticationEvent.Result.TECHNICAL_FAILURE
 
-        verifyIntentReturnedForLoginNotComplete(activityScenario.result)
+        loginActivity {
+            typeProjectId(VALID_PROJECT_ID)
+            typeProjectSecret(VALID_PROJECT_SECRET)
+        } clickSignIn {
+            assertServerErrorToastIsDisplayed()
+        }
     }
 
-    private fun verifyIntentReturnedForLoginNotComplete(result: Instrumentation.ActivityResult) {
-        assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
+    @Test
+    fun withInvalidSafetyNetClaims_clickSignIn_shouldLaunchAlertScreen() {
+        coEvery {
+            mockRepository.authenticate(any(), any(), any())
+        } returns AuthenticationEvent.Result.SAFETYNET_INVALID_CLAIM
 
-        result.resultData.setExtrasClassLoader(AppErrorResponse::class.java.classLoader)
-        val response =
-            result.resultData.getParcelableExtra<AppErrorResponse>(LoginActivityResponse.BUNDLE_KEY)
-
-        assertThat(response.reason).isEqualTo(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE)
+        loginActivity {
+            typeProjectId(VALID_PROJECT_ID)
+            typeProjectSecret(VALID_PROJECT_SECRET)
+        } clickSignIn {
+            assertAlertScreenIsLaunched()
+        }
     }
 
-    companion object {
-        private val invalidCredentials = TestCalloutCredentials(
-            "beefdeadbeefdeadbeef",
-            DEFAULT_MODULE_ID,
-            DEFAULT_USER_ID
-        )
+    @Test
+    fun withSafetyNetUnavailable_clickSignIn_shouldLaunchAlertScreen() {
+        coEvery {
+            mockRepository.authenticate(any(), any(), any())
+        } returns AuthenticationEvent.Result.SAFETYNET_UNAVAILABLE
 
-        private const val invalidSecret =
-            "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+        loginActivity {
+            typeProjectId(VALID_PROJECT_ID)
+            typeProjectSecret(VALID_PROJECT_SECRET)
+        } clickSignIn {
+            assertAlertScreenIsLaunched()
+        }
+    }
+
+    @Test
+    fun withUnknownError_clickSignIn_shouldLaunchAlertScreen() {
+        coEvery {
+            mockRepository.authenticate(any(), any(), any())
+        } returns AuthenticationEvent.Result.UNKNOWN
+
+        loginActivity {
+            typeProjectId(VALID_PROJECT_ID)
+            typeProjectSecret(VALID_PROJECT_SECRET)
+        } clickSignIn {
+            assertAlertScreenIsLaunched()
+        }
+    }
+
+    @After
+    fun tearDown() {
+        Intents.release()
     }
 
 }

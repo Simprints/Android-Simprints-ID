@@ -190,7 +190,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         if (!areMandatoryCredentialsPresent)
             handleMissingCredentials()
         else if (!areSuppliedProjectIdAndProjectIdFromIntentEqual)
-            handleSignInFailedProjectIdIntentMismatch()
+            handleProjectIdMismatch()
         else
             viewModel.signIn(projectId, userId, projectSecret)
     }
@@ -200,7 +200,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         showToast(androidResourcesHelper, R.string.login_missing_credentials)
     }
 
-    private fun handleSignInFailedProjectIdIntentMismatch() {
+    private fun handleProjectIdMismatch() {
         progressDialog.dismiss()
         showToast(androidResourcesHelper, R.string.login_project_id_intent_mismatch)
     }

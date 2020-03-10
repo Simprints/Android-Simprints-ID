@@ -9,6 +9,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.platform.app.InstrumentationRegistry
 import br.com.concretesolutions.kappuccino.actions.ClickActions.click
 import br.com.concretesolutions.kappuccino.actions.TextActions.typeText
 import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.displayed
@@ -17,6 +18,7 @@ import br.com.concretesolutions.kappuccino.custom.intent.IntentMatcherInteractio
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.R
+import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -33,11 +35,16 @@ const val VALID_PROJECT_SECRET = "encrypted_project_secret"
 
 private const val EXTRA_SCAN_RESULT = "SCAN_RESULT"
 
-fun LoginActivityAndroidTest2.loginActivity(
+fun LoginActivityAndroidTest.loginActivity(
     block: LoginActivityRobot.() -> Unit
 ): LoginActivityRobot {
     val request = LoginActivityRequest(VALID_PROJECT_ID, USER_ID)
-    val intent = Intent().putExtra(LoginActivityRequest.BUNDLE_KEY, request)
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+    val intent = Intent(context, LoginActivity::class.java)
+        .putExtra(LoginActivityRequest.BUNDLE_KEY, request)
+
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
     val activityScenario = ActivityScenario.launch<LoginActivity>(intent)
 
     return LoginActivityRobot(activityScenario, mockCrashReportManager).apply(block)
@@ -128,6 +135,52 @@ class LoginActivityAssertions(
     private val mockCrashReportManager: CrashReportManager
 ) {
 
+    fun assertUserIdFieldHasText(text: String) {
+        displayed {
+            allOf {
+                id(R.id.loginEditTextUserId)
+                text(text)
+            }
+        }
+    }
+
+    fun assertMissingCredentialsToastIsDisplayed() {
+        assertToastIsDisplayed(
+            "Missing credentials. Please check the User ID, Project ID, and key, and try again."
+        )
+    }
+
+    fun assertProjectIdMismatchToastIsDisplayed() {
+        assertToastIsDisplayed(
+            "Project ID different from that supplied in intent. Please contact your system administrator."
+        )
+    }
+
+    fun assertUserIsSignedIn() {
+        val result = activityScenario.result
+        assertThat(result.resultCode).isEqualTo(LoginActivityResponse.RESULT_CODE_LOGIN_SUCCEED)
+    }
+
+    fun assertInvalidCredentialsToastIsDisplayed() {
+        assertToastIsDisplayed("Invalid credentials. Please check the Project ID and key")
+    }
+
+    fun assertOfflineToastIsDisplayed() {
+        assertToastIsDisplayed("Currently offline. Please check your internet connection.")
+    }
+
+    fun assertServerErrorToastIsDisplayed() {
+        assertToastIsDisplayed(
+            "A problem occurred trying to contact the server. Please try again later."
+        )
+    }
+
+    fun assertAlertScreenIsLaunched() {
+        sentIntent {
+            className(AlertActivity::class.java.name)
+        }
+    }
+
     fun assertScannerAppIsLaunched() {
         sentIntent {
             action("com.google.zxing.client.android.SCAN")
@@ -141,46 +194,12 @@ class LoginActivityAssertions(
         }
     }
 
-    fun assertUserIsSignedIn() {
-        val result = activityScenario.result
-        assertThat(result.resultCode).isEqualTo(LoginActivityResponse.RESULT_CODE_LOGIN_SUCCEED)
-    }
-
-    fun assertInvalidCredentialsToastIsDisplayed() {
-        assertToastIsDisplayed("Invalid credentials. Please check the Project ID and key")
-    }
-
-    fun assertProjectIdMismatchToastIsDisplayed() {
-        assertToastIsDisplayed("Project ID different from that supplied in intent. Please contact your system administrator.")
-    }
-
-    fun assertInvalidProjectSecretToastIsDisplayed() {
-        assertToastIsDisplayed("Project ID different from that supplied in intent. Please contact your system administrator.")
-    }
-
-    fun assertOfflineToastIsDisplayed() {
-        assertToastIsDisplayed("Currently offline. Please check your internet connection.")
-    }
-
     fun assertInvalidQrCodeToastIsDisplayed() {
         assertToastIsDisplayed("The scanned QR code is invalid.")
     }
 
     fun assertQrCodeErrorToastIsDisplayed() {
         assertToastIsDisplayed("A problem occurred while scanning the QR code")
-    }
-
-    fun assertServerErrorToastIsDisplayed() {
-        assertToastIsDisplayed("A problem occurred trying to contact the server. Please try again later.")
-    }
-
-    fun assertUserIdFieldHasText(text: String) {
-        displayed {
-            allOf {
-                id(R.id.loginEditTextUserId)
-                text(text)
-            }
-        }
     }
 
     fun assertProjectIdFieldHasText(text: String) {
