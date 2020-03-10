@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.Application
-import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.activities.qrcapture.tools.QrCodeDetector
+import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.LongConsentManager
@@ -38,6 +38,7 @@ import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class TestAppModule(
     app: Application,
@@ -60,7 +61,8 @@ class TestAppModule(
     private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) },
     private val qrCaptureHelperRule: DependencyRule = RealRule,
     private val qrCodeAnalyserRule: DependencyRule = RealRule,
-    private val qrCodeDetectorRule: DependencyRule = RealRule
+    private val qrCodeDetectorRule: DependencyRule = RealRule,
+    private val qrCodeProducerRule: DependencyRule = RealRule
 ) : AppModule() {
 
     override fun provideCrashManager(): CrashReportManager =
@@ -161,15 +163,13 @@ class TestAppModule(
         }
     }
 
-    override fun provideQrCaptureHelper(qrCodeAnalyser: QrCodeAnalyser): QrCodeProducer {
-        return qrCaptureHelperRule.resolveDependency {
-            super.provideQrCaptureHelper(qrCodeAnalyser)
-        }
-    }
-
-    override fun provideQrCodeAnalyser(qrCodeDetector: QrCodeDetector): QrCodeAnalyser {
-        return qrCodeAnalyserRule.resolveDependency {
-            super.provideQrCodeAnalyser(qrCodeDetector)
+    @ExperimentalCoroutinesApi
+    override fun provideQrCodeProducer(
+        qrCodeDetector: QrCodeDetector,
+        crashReportManager: CrashReportManager
+    ): QrCodeProducer {
+        return qrCodeProducerRule.resolveDependency {
+            super.provideQrCodeProducer(qrCodeDetector, crashReportManager)
         }
     }
 

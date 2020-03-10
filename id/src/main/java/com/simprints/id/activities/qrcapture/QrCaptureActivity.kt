@@ -34,9 +34,8 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
 
         preview = buildPreview()
 
-        if (hasPermission(CAMERA)) {
+        if (hasPermission(CAMERA))
             startCamera()
-        }
     }
 
     override fun onResume() {
