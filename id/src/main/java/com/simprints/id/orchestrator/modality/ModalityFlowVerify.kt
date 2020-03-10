@@ -21,13 +21,15 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFace
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
+import com.simprints.id.tools.TimeHelper
 
 class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
                              private val faceStepProcessor: FaceStepProcessor,
                              private val coreStepProcessor: CoreStepProcessor,
+                             timeHelper: TimeHelper,
                              sessionRepository: SessionRepository,
                              consentRequired: Boolean) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, sessionRepository, consentRequired) {
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired) {
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppVerifyRequest)

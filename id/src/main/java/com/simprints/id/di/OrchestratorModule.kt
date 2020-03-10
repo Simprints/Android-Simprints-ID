@@ -67,6 +67,7 @@ class OrchestratorModule {
         fingerprintStepProcessor: FingerprintStepProcessor,
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
+        timeHelper: TimeHelper,
         sessionRepository: SessionRepository,
         preferenceManager: PreferencesManager
     ): ModalityFlow =
@@ -74,6 +75,7 @@ class OrchestratorModule {
             fingerprintStepProcessor,
             faceStepProcessor,
             coreStepProcessor,
+            timeHelper,
             sessionRepository,
             preferenceManager.consentRequired
         )
@@ -84,6 +86,7 @@ class OrchestratorModule {
         fingerprintStepProcessor: FingerprintStepProcessor,
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
+        timeHelper: TimeHelper,
         sessionRepository: SessionRepository,
         preferenceManager: PreferencesManager
     ): ModalityFlow =
@@ -91,6 +94,7 @@ class OrchestratorModule {
             fingerprintStepProcessor,
             faceStepProcessor,
             coreStepProcessor,
+            timeHelper,
             sessionRepository,
             preferenceManager.consentRequired
         )
@@ -101,12 +105,13 @@ class OrchestratorModule {
         fingerprintStepProcessor: FingerprintStepProcessor,
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
+        timeHelper: TimeHelper,
         prefs: PreferencesManager,
         sessionRepository: SessionRepository
     ): ModalityFlow =
         ModalityFlowIdentifyImpl(
             fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, prefs.matchGroup, sessionRepository, prefs.consentRequired
+            coreStepProcessor, prefs.matchGroup, timeHelper, sessionRepository, prefs.consentRequired
         )
 
     // Orchestration

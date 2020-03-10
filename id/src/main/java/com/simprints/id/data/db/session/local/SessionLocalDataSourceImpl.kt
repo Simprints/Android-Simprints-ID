@@ -3,6 +3,7 @@ package com.simprints.id.data.db.session.local
 import android.content.Context
 import android.os.Build
 import com.simprints.id.data.db.session.SessionRepositoryImpl
+import com.simprints.id.data.db.session.domain.models.SessionEventValidator
 import com.simprints.id.data.db.session.domain.models.SessionQuery
 import com.simprints.id.data.db.session.domain.models.events.ArtificialTerminationEvent
 import com.simprints.id.data.db.session.domain.models.events.Event
@@ -21,6 +22,7 @@ import com.simprints.id.tools.TimeHelper
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
+import io.realm.Sort
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -30,7 +32,8 @@ import kotlinx.coroutines.withContext
 open class SessionLocalDataSourceImpl(private val appContext: Context,
                                       private val secureDataManager: SecureLocalDbKeyProvider,
                                       private val timeHelper: TimeHelper,
-                                      private val realmConfigBuilder: SessionRealmConfigBuilder) : SessionLocalDataSource {
+                                      private val realmConfigBuilder: SessionRealmConfigBuilder,
+                                      private val sessionEventsValidators: Array<SessionEventValidator>) : SessionLocalDataSource {
     companion object {
         const val PROJECT_ID = "projectId"
         const val END_TIME = "relativeEndTime"
@@ -121,6 +124,8 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
                     val session = addQueryParams(query).findFirst() ?: throw NoSessionsFoundException()
                     val domainSession = session.toDomain()
                     updateBlock(domainSession)
+                    sessionEventsValidators.forEach { it.validate((domainSession)) }
+
                     it.insertOrUpdate(DbSession(domainSession))
                 }
             }
@@ -134,7 +139,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
             addQueryParamForOpenSession(query.openSession, this)
             addQueryParamForSessionId(query.id, this)
             addQueryParamForStartTime(query.startedBefore, this)
-        }
+        }.sort(START_TIME, Sort.DESCENDING)
 
     private fun addQueryParamForProjectId(projectId: String?, query: RealmQuery<DbSession>) {
         projectId?.let {
@@ -214,6 +219,11 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         try {
             block()
         } catch (t: Throwable) {
-            throw SessionDataSourceException(t)
+            t.printStackTrace()
+            throw if (t is SessionDataSourceException) {
+                t
+            } else {
+                SessionDataSourceException(t)
+            }
         }
 }

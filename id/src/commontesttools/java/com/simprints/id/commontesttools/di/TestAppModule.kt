@@ -11,6 +11,7 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
@@ -131,9 +132,10 @@ class TestAppModule(
         ctx: Context,
         secureDataManager: SecureLocalDbKeyProvider,
         timeHelper: TimeHelper,
-        sessionRealmConfigBuilder: SessionRealmConfigBuilder
+        sessionRealmConfigBuilder: SessionRealmConfigBuilder,
+        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
     ): SessionLocalDataSource =
-        sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder) }
+        sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder, sessionEventValidatorsBuilder) }
 
     override fun provideSessionEventsRemoteDbManager(remoteDbManager: RemoteDbManager,
                                                      simApiClientFactory: SimApiClientFactory): SessionRemoteDataSource =

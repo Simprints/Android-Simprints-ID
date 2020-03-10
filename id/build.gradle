@@ -251,6 +251,7 @@ dependencies {
     androidTestImplementation deps.testing.mockk.android
     androidTestImplementation deps.testing.mockwebserver
     androidTestImplementation deps.testing.coroutines_test
+
     androidTestImplementation(deps.testing.awaitility) {
         exclude group: "org.hamcrest"
     }

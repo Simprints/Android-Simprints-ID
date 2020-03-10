@@ -33,7 +33,7 @@ class LibSimprintsPresenter(
 
     override suspend fun start() {
         if (action != SIMPRINTS_SELECT_GUID_INTENT) {
-            val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
+            val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
 
