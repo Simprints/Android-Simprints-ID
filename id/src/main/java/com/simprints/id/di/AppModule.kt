@@ -76,6 +76,7 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -359,7 +360,11 @@ open class AppModule {
     open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)
 
     @Provides
-    open fun provideRawImageProducer(qrCodeDetector: QrCodeDetector): QrCodeProducer = QrCodeProducerImpl(qrCodeDetector)
+    @ExperimentalCoroutinesApi
+    open fun provideQrCodeProducer(
+        qrCodeDetector: QrCodeDetector,
+        crashReportManager: CrashReportManager
+    ): QrCodeProducer = QrCodeProducerImpl(qrCodeDetector, crashReportManager)
 
     @Provides
     open fun provideQrCodeDetector(
