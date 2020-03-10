@@ -11,6 +11,7 @@ import android.view.Surface
 import android.view.TextureView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraX
+import androidx.camera.core.Preview
 import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -24,20 +25,24 @@ import javax.inject.Inject
 
 class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
 
+    private lateinit var preview: Preview
     @Inject lateinit var qrCodeProducer: QrCodeProducer
     @Inject lateinit var qrCodeDetector: QrCodeDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
+
+        preview = buildPreview()
+        if(hasPermission(CAMERA)){
+            startCamera()
+        }
     }
 
     override fun onResume() {
         super.onResume()
 
-        if (hasPermission(CAMERA))
-            startCamera()
-        else
+        if (!hasPermission(CAMERA))
             requestPermissions(arrayOf(CAMERA), REQUEST_CODE_CAMERA)
     }
 
@@ -48,30 +53,28 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_CAMERA && grantResults.all { it == PERMISSION_GRANTED }) {
-            lifecycleScope.launch {
-                startCamera()
-            }
+            startCamera()
         } else {
             setResult(Activity.RESULT_CANCELED)
             finish()
         }
     }
 
-    private fun startCamera() {
-        val preview = QrPreviewBuilder().buildPreview().apply {
-            setOnPreviewOutputUpdateListener { previewOutput ->
-                with(qrCaptureRoot) {
-                    removeView(cameraPreview)
-                    addView(cameraPreview, 0)
-                }
+    private fun buildPreview() = QrPreviewBuilder().buildPreview().apply {
+        setOnPreviewOutputUpdateListener { previewOutput ->
+            with(qrCaptureRoot) {
+                removeView(cameraPreview)
+                addView(cameraPreview, 0)
+            }
 
-                with(cameraPreview) {
-                    surfaceTexture = previewOutput.surfaceTexture
-                    updateTransform()
-                }
+            with(cameraPreview) {
+                surfaceTexture = previewOutput.surfaceTexture
+                updateTransform()
             }
         }
+    }
 
+    private fun startCamera() {
         CameraX.bindToLifecycle(this, preview, qrCodeProducer.imageAnalyser)
 
         lifecycleScope.launch {
