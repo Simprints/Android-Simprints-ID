@@ -15,7 +15,6 @@ interface SessionRepository {
 
     suspend fun signOut()
 
-
     suspend fun startUploadingSessions()
 
     companion object {

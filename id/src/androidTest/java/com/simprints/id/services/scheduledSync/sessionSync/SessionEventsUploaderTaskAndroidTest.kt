@@ -1,3 +1,4 @@
+/*
 //package com.simprints.id.services.scheduledSync.sessionSync
 //
 //import android.net.NetworkInfo
@@ -559,21 +560,21 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     private fun SessionEvents.addInvalidIntentEvent() {
-        addEvent(InvalidIntentEvent(0, "some_action", emptyMap()))
+        addEvent()
     }
 
     private fun SessionEvents.addOneToManyMatchEvent() {
         OneToManyMatchEvent.MatchPoolType.values().forEach {
-            addEvent(OneToManyMatchEvent(0, 0, OneToManyMatchEvent.MatchPool(it, 0), emptyList()))
+            addEvent()
         }
     }
 
     private fun SessionEvents.addOneToOneMatchEvent() {
-        addEvent(OneToOneMatchEvent(0, 0, RANDOM_GUID, MatchEntry(RANDOM_GUID, 0F)))
+        addEvent()
     }
 
     private fun SessionEvents.addPersonCreationEvent() {
-        addEvent(PersonCreationEvent(0, listOf(RANDOM_GUID, RANDOM_GUID)))
+        addEvent()
     }
 
     private fun SessionEvents.addRefusalEvent() {
@@ -583,38 +584,25 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     private fun SessionEvents.addScannerConnectionEvent() {
-        addEvent(ScannerConnectionEvent(0, ScannerConnectionEvent.ScannerInfo("scanner_id", "macAddress", "hardware")))
+        addEvent()
     }
 
     private fun SessionEvents.addSuspiciousIntentEvent() {
-        addEvent(SuspiciousIntentEvent(0, mapOf("some_extra_key" to "value")))
+        addEvent()
     }
 
     private fun SessionEvents.addCompletionCheckEvent() {
-        addEvent(CompletionCheckEvent(0, true))
+        addEvent()
     }
 
     private fun SessionEvents.addCallbackEvent() {
-        addEvent(EnrolmentCallbackEvent(0, RANDOM_GUID))
+        addEvent()
 
-        ErrorCallbackEvent.Reason.values().forEach {
-            addEvent(ErrorCallbackEvent(0, it))
-        }
 
-        Tier.values().forEach {
-            addEvent(IdentificationCallbackEvent(0, RANDOM_GUID, listOf(CallbackComparisonScore(RANDOM_GUID, 0, it))))
-        }
-
-        addEvent(RefusalCallbackEvent(0, "reason", "other_text"))
-        addEvent(VerificationCallbackEvent(0, CallbackComparisonScore(RANDOM_GUID, 0, Tier.TIER_1)))
-        addEvent(ConfirmationCallbackEvent(0, true))
     }
 
     private fun SessionEvents.addCalloutEvent() {
-        addEvent(EnrolmentCalloutEvent(1, "project_id", "user_id", "module_id", "metadata"))
-        addEvent(ConfirmationCalloutEvent(10, "projectId", RANDOM_GUID, RANDOM_GUID))
-        addEvent(IdentificationCalloutEvent(0, "project_id", "user_id", "module_id", "metadata"))
-        addEvent(VerificationCalloutEvent(2, "project_id", "user_id", "module_id", RANDOM_GUID, "metadata"))
+
     }
 
 
@@ -653,3 +641,4 @@ class SessionEventsUploaderTaskAndroidTest {
             token.token)
     }
 }
+*/
