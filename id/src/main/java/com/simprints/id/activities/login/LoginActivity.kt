@@ -5,8 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
@@ -28,7 +28,6 @@ import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.coroutines.launch
 import org.json.JSONException
 import javax.inject.Inject
 
@@ -53,6 +52,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
         initUI()
+        observeSignInResult()
     }
 
     private fun initUI() {
@@ -82,6 +82,24 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         loginButtonSignIn.setOnClickListener {
             logMessageForCrashReport("Login button clicked")
             signIn()
+        }
+    }
+
+    private fun observeSignInResult() {
+        viewModel.getSignInResult().observe(this, Observer {
+            handleSignInResult(it)
+        })
+    }
+
+    private fun handleSignInResult(result: AuthenticationEvent.Result) {
+        when (result) {
+            AuthenticationEvent.Result.AUTHENTICATED -> handleSignInSuccess()
+            AuthenticationEvent.Result.OFFLINE -> handleSignInFailedNoConnection()
+            AuthenticationEvent.Result.BAD_CREDENTIALS -> handleSignInFailedInvalidCredentials()
+            AuthenticationEvent.Result.TECHNICAL_FAILURE -> handleSignInFailedServerError()
+            AuthenticationEvent.Result.SAFETYNET_INVALID_CLAIM,
+            AuthenticationEvent.Result.SAFETYNET_UNAVAILABLE -> handleSafetyNetDownError()
+            AuthenticationEvent.Result.UNKNOWN -> handleSignInFailedUnknownReason()
         }
     }
 
@@ -160,20 +178,21 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         val projectSecret = loginEditTextProjectSecret.text.toString()
         val projectIdFromIntent = loginActRequest.projectIdFromIntent
 
-        if (!loginActivityHelper.areMandatoryCredentialsPresent(projectId, projectSecret, userId)) {
-            handleMissingCredentials()
-        } else if (!loginActivityHelper.areSuppliedProjectIdAndProjectIdFromIntentEqual(
-                projectId,
-                projectIdFromIntent
+        val areMandatoryCredentialsPresent = loginActivityHelper.areMandatoryCredentialsPresent(
+            projectId, projectSecret, userId
+        )
+
+        val areSuppliedProjectIdAndProjectIdFromIntentEqual =
+            loginActivityHelper.areSuppliedProjectIdAndProjectIdFromIntentEqual(
+                projectId, projectIdFromIntent
             )
-        ) {
+
+        if (!areMandatoryCredentialsPresent)
+            handleMissingCredentials()
+        else if (!areSuppliedProjectIdAndProjectIdFromIntentEqual)
             handleSignInFailedProjectIdIntentMismatch()
-        } else {
-            lifecycleScope.launch {
-                val result = viewModel.signIn(projectId, userId, projectSecret)
-                handleSignInResult(result)
-            }
-        }
+        else
+            viewModel.signIn(projectId, userId, projectSecret)
     }
 
     private fun handleMissingCredentials() {
@@ -184,18 +203,6 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     private fun handleSignInFailedProjectIdIntentMismatch() {
         progressDialog.dismiss()
         showToast(androidResourcesHelper, R.string.login_project_id_intent_mismatch)
-    }
-
-    private fun handleSignInResult(result: AuthenticationEvent.Result) {
-        when (result) {
-            AuthenticationEvent.Result.AUTHENTICATED -> handleSignInSuccess()
-            AuthenticationEvent.Result.OFFLINE -> handleSignInFailedNoConnection()
-            AuthenticationEvent.Result.BAD_CREDENTIALS -> handleSignInFailedInvalidCredentials()
-            AuthenticationEvent.Result.TECHNICAL_FAILURE -> handleSignInFailedServerError()
-            AuthenticationEvent.Result.SAFETYNET_INVALID_CLAIM,
-            AuthenticationEvent.Result.SAFETYNET_UNAVAILABLE -> handleSafetyNetDownError()
-            AuthenticationEvent.Result.UNKNOWN -> handleSignInFailedUnknownReason()
-        }
     }
 
     private fun handleSignInSuccess() {
