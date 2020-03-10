@@ -1,6 +1,6 @@
 package com.simprints.id.services
 
-//TODO: Test only GuidSelectionManager. Currently it's testing SessionEventsLocalDbManager.
+//TODO: Test only GuidSelectionManager. Currently it's testing SessionLocalDataSource.
 //@RunWith(AndroidJUnit4::class)
 //@LargeTest
 //class GuidSelectionManagerTest {
@@ -18,7 +18,7 @@ package com.simprints.id.services
 //
 //    @Inject lateinit var sessionRepository: SessionRepository
 //    @Inject lateinit var loginInfoManager: LoginInfoManager
-//    @Inject lateinit var realmSessionEventsManagerMock: SessionEventsLocalDbManager
+//    @Inject lateinit var realmSessionEventsManagerMock: SessionLocalDataSource
 //    @Inject lateinit var guidSelectionManager: GuidSelectionManager
 //    @Inject lateinit var secureDataManagerSpy: SecureDataManager
 //    @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
@@ -48,7 +48,7 @@ package com.simprints.id.services
 //    fun testWithStartedService() {
 //        var session = sessionRepository.createSession("").blockingGet()
 //
-//        sessionRepository.updateSession {
+//        sessionRepository.update {
 //            it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
 //        }.blockingGet()
 //

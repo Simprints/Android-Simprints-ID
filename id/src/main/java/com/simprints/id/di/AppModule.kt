@@ -32,8 +32,12 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.SessionRepositoryImpl
-import com.simprints.id.data.db.session.local.RealmSessionEventsDbManagerImpl
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
+import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
+import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilderImpl
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
+import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl
+import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
+import com.simprints.id.data.db.session.local.SessionRealmConfigBuilderImpl
 import com.simprints.id.data.db.session.remote.RemoteSessionsManager
 import com.simprints.id.data.db.session.remote.RemoteSessionsManagerImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -202,30 +206,42 @@ open class AppModule {
     }
 
     @Provides
+    open fun provideSessionRealmConfigBuilder(): SessionRealmConfigBuilder =
+        SessionRealmConfigBuilderImpl()
+
+
+    @Provides
+    @Singleton
+    open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsBuilder =
+        SessionEventValidatorsBuilderImpl()
+
+
+    @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(
         ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider
-    ): SessionEventsLocalDbManager =
-        RealmSessionEventsDbManagerImpl(ctx, secureDataManager)
+        secureDataManager: SecureLocalDbKeyProvider,
+        timeHelper: TimeHelper,
+        sessionRealmConfigBuilder: SessionRealmConfigBuilder,
+        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
+    ): SessionLocalDataSource =
+        SessionLocalDataSourceImpl(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder, sessionEventValidatorsBuilder.build())
 
     @Provides
     @Singleton
     open fun provideSessionEventsManager(
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
-        sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+        sessionLocalDataSource: SessionLocalDataSource,
         preferencesManager: PreferencesManager,
-        timeHelper: TimeHelper,
         crashReportManager: CrashReportManager
     ): SessionRepository =
         SessionRepositoryImpl(
             ctx.deviceId,
             ctx.packageVersionName,
             sessionEventsSyncManager,
-            sessionEventsLocalDbManager,
+            sessionLocalDataSource,
             preferencesManager,
-            timeHelper,
             crashReportManager
         )
 

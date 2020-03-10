@@ -53,7 +53,7 @@ class FetchGuidViewModelTest {
     }
 
     private fun configureMocks() {
-        every { sessionRepository.addEventInBackground(any()) } just Runs
+        every { sessionRepository.addEventToCurrentSessionInBackground(any()) } just Runs
         every { timeHelper.now() } returns Date().time
     }
 

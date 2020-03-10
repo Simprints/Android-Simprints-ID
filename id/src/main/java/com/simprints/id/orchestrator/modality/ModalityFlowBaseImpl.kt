@@ -1,8 +1,9 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.person.domain.FingerprintSample
+import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequestType
@@ -17,12 +18,15 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
+import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.ignoreException
 
 abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProcessor,
                                     private val fingerprintStepProcessor: FingerprintStepProcessor,
                                     private val faceStepProcessor: FaceStepProcessor,
+                                    private val timeHelper: TimeHelper,
                                     private val sessionRepository: SessionRepository,
-                                    private val consentRequired: Boolean): ModalityFlow {
+                                    private val consentRequired: Boolean) : ModalityFlow {
 
     override val steps: MutableList<Step> = mutableListOf()
 
@@ -89,7 +93,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         steps.forEach { it.setStatus(Step.Status.COMPLETED) }
     }
 
-    fun extractFingerprintAndAddPersonCreationEvent(fingerprintCaptureResponse: FingerprintCaptureResponse) {
+    suspend fun extractFingerprintAndAddPersonCreationEvent(fingerprintCaptureResponse: FingerprintCaptureResponse) {
         val fingerprintSamples = extractFingerprintSamples(fingerprintCaptureResponse)
         addPersonCreationEventForFingerprintSamples(fingerprintSamples)
     }
@@ -102,7 +106,11 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
             }
         }
 
-    private fun addPersonCreationEventForFingerprintSamples(fingerprintSamples: List<FingerprintSample>) {
-        sessionRepository.addPersonCreationEventInBackground(fingerprintSamples)
+    private suspend fun addPersonCreationEventForFingerprintSamples(fingerprintSamples: List<FingerprintSample>) {
+        ignoreException {
+            sessionRepository.updateCurrentSession {
+                it.events.add(PersonCreationEvent.build(timeHelper, it, fingerprintSamples))
+            }
+        }
     }
 }

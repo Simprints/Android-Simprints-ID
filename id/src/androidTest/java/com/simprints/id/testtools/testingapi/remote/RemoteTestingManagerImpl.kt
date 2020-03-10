@@ -37,18 +37,18 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
     override fun generateFirebaseToken(testFirebaseTokenParameters: TestFirebaseTokenParameters): TestFirebaseToken =
         remoteTestingApi.generateFirebaseToken(testFirebaseTokenParameters)
             .retry(RETRY_ATTEMPTS)
-            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to get firebase token", it) }
+            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to build firebase token", it) }
 
     override fun getSessionSignatures(projectId: String): List<TestSessionSignature> =
         remoteTestingApi.getSessionSignatures(projectId)
             .retry(RETRY_ATTEMPTS)
             .toList()
-            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to get session signatures", it) }
+            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to build session signatures", it) }
 
     override fun getSessionCount(projectId: String): TestSessionCount =
         remoteTestingApi.getSessionCount(projectId)
             .retry(RETRY_ATTEMPTS)
-            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to get session count") }
+            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to build session count") }
 
     private inline fun <reified T> Single<T>.blockingGetOnDifferentThread(wrapError: (Throwable) -> Throwable): T =
         try {

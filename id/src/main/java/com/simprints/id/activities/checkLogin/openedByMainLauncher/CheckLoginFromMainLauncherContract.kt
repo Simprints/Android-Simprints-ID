@@ -1,6 +1,5 @@
 package com.simprints.id.activities.checkLogin.openedByMainLauncher
 
-import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.activities.checkLogin.CheckLoginContract
 
@@ -11,5 +10,7 @@ interface CheckLoginFromMainLauncherContract {
         fun openRequestLoginActivity()
     }
 
-    interface Presenter : BasePresenter
+    interface Presenter {
+        suspend fun start()
+    }
 }

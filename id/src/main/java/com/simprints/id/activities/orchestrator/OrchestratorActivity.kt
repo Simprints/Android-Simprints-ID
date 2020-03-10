@@ -15,6 +15,7 @@ import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.Companion.BUNDLE_KEY as APP_REQUEST_BUNDLE_KEY
 
@@ -62,7 +63,10 @@ class OrchestratorActivity : AppCompatActivity() {
         appRequest = this.intent.extras?.getParcelable(APP_REQUEST_BUNDLE_KEY)
             ?: throw InvalidAppRequest()
 
-        vm.startModalityFlow(appRequest)
+        runBlocking {
+            vm.startModalityFlow(appRequest)
+        }
+
         syncManager.scheduleBackgroundSyncs()
     }
 

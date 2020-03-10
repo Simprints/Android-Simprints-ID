@@ -16,6 +16,6 @@ class ConsentViewModel(askConsentRequest: AskConsentRequest,
     val  parentalConsentExists = consentTextManager.parentalConsentExists()
 
     fun addConsentEvent(consentEvent: ConsentEvent) {
-        sessionRepository.addEventInBackground(consentEvent)
+        sessionRepository.addEventToCurrentSessionInBackground(consentEvent)
     }
 }

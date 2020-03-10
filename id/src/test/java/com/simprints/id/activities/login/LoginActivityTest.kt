@@ -13,11 +13,9 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -35,15 +33,12 @@ import org.junit.runner.RunWith
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowToast
-import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class LoginActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
-
-    @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
     private val module by lazy {
         TestAppModule(app,
@@ -55,8 +50,6 @@ class LoginActivityTest {
     @Before
     fun setUp() {
         UnitTestConfig(this, module).fullSetup()
-
-        setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManager)
     }
 
     @Test

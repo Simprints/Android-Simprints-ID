@@ -152,7 +152,7 @@ class SettingsAboutPresenterTest {
 
         presenter.logout()
 
-        verify(exactly = 1) { presenter.sessionEventManager.signOut() }
+        coVerify(exactly = 1) { presenter.sessionEventManager.signOut() }
     }
 
     private fun mockDepsForLogout(presenter: SettingsAboutPresenter) {

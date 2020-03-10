@@ -10,6 +10,7 @@ import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CONSENT_ACTIVITY_NAME
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
+import com.simprints.id.tools.TimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -29,6 +30,7 @@ class ModalityFlowEnrolImplTest {
     }
 
     private lateinit var modalityFlowEnrol: ModalityFlowEnrolImpl
+    private val timeHelper = TimeHelperImpl()
     @MockK lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @MockK lateinit var faceStepProcessor: FaceStepProcessor
     @MockK lateinit var coreStepProcessor: CoreStepProcessor
@@ -137,6 +139,6 @@ class ModalityFlowEnrolImplTest {
 
     private fun buildModalityFlowEnrol(consentRequired: Boolean) {
         modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, sessionRepository, consentRequired)
+            coreStepProcessor, timeHelper, sessionRepository, consentRequired)
     }
 }

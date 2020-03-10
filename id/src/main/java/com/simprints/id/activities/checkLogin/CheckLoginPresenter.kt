@@ -33,7 +33,7 @@ abstract class CheckLoginPresenter(
         component.inject(this)
     }
 
-    protected fun checkSignedInStateAndMoveOn() {
+    protected suspend fun checkSignedInStateAndMoveOn() {
         try {
             checkSignedInOrThrow()
             handleSignedInUser()
@@ -55,7 +55,7 @@ abstract class CheckLoginPresenter(
         }
     }
 
-    abstract fun handleSignedInUser()
+    abstract suspend fun handleSignedInUser()
     abstract fun handleNotSignedInUser()
 
     /**
