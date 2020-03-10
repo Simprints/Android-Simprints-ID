@@ -31,7 +31,7 @@ class QrCodeDetectorImpl(private val crashReportManager: CrashReportManager) : Q
         90 -> FirebaseVisionImageMetadata.ROTATION_90
         180 -> FirebaseVisionImageMetadata.ROTATION_180
         270 -> FirebaseVisionImageMetadata.ROTATION_270
-        else -> throw Throwable("Rotation must be 0, 90, 180 or 270")
+        else -> throw IllegalArgumentException("Rotation must be 0, 90, 180 or 270")
     }
 
     private fun buildFirebaseDetector(): FirebaseVisionBarcodeDetector {
