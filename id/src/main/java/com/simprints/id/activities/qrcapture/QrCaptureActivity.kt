@@ -15,7 +15,6 @@ import androidx.camera.core.Preview
 import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.qrcapture.tools.QrCodeDetector
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
 import com.simprints.id.tools.extensions.hasPermission
@@ -25,16 +24,17 @@ import javax.inject.Inject
 
 class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
 
-    private lateinit var preview: Preview
     @Inject lateinit var qrCodeProducer: QrCodeProducer
-    @Inject lateinit var qrCodeDetector: QrCodeDetector
+
+    private lateinit var preview: Preview
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
 
         preview = buildPreview()
-        if(hasPermission(CAMERA)){
+
+        if (hasPermission(CAMERA)) {
             startCamera()
         }
     }
@@ -75,7 +75,7 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
     }
 
     private fun startCamera() {
-        CameraX.bindToLifecycle(this, preview, qrCodeProducer.imageAnalyser)
+        CameraX.bindToLifecycle(this, preview, qrCodeProducer.useCase)
 
         lifecycleScope.launch {
             val qrCode = qrCodeProducer.qrCodeChannel.receive()

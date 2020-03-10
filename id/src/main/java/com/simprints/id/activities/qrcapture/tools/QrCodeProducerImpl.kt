@@ -1,12 +1,20 @@
 package com.simprints.id.activities.qrcapture.tools
 
-import android.media.Image
-import androidx.camera.core.*
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageAnalysisConfig
+import androidx.camera.core.ImageProxy
+import com.simprints.id.activities.qrcapture.model.RawImage
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.Executors
 
-class QrCodeProducerImpl(private var qrCodeDetector: QrCodeDetector) : QrCodeProducer, ImageAnalysis.Analyzer {
+@ExperimentalCoroutinesApi
+class QrCodeProducerImpl(
+    private val qrCodeDetector: QrCodeDetector,
+    private val crashReportManager: CrashReportManager
+) : QrCodeProducer, ImageAnalysis.Analyzer {
 
     private val analysisConfig by lazy {
         ImageAnalysisConfig.Builder()
@@ -14,7 +22,7 @@ class QrCodeProducerImpl(private var qrCodeDetector: QrCodeDetector) : QrCodePro
             .build()
     }
 
-    override val imageAnalyser: UseCase by lazy {
+    override val useCase by lazy {
         ImageAnalysis(analysisConfig).apply {
             setAnalyzer(Executors.newSingleThreadExecutor(), this@QrCodeProducerImpl)
         }
@@ -26,29 +34,20 @@ class QrCodeProducerImpl(private var qrCodeDetector: QrCodeDetector) : QrCodePro
         imageProxy?.image?.let { mediaImage ->
             runBlocking {
                 try {
-                    val qrCode = qrCodeDetector.detectInImage(RawImage(mediaImage, rotationDegrees))
-                    qrCode?.let {
+                    val image = RawImage(mediaImage, rotationDegrees)
+                    qrCodeDetector.detectInImage(image)?.let { qrCode ->
                         if (!qrCodeChannel.isClosedForSend) {
-                            qrCodeChannel.send(it)
-                            qrCodeChannel.close()
+                            with(qrCodeChannel) {
+                                send(qrCode)
+                                close()
+                            }
                         }
                     }
                 } catch (t: Throwable) {
-                    t.printStackTrace()
+                    crashReportManager.logExceptionOrSafeException(t)
                 }
             }
         }
     }
-}
 
-data class RawImage(val image: Image, val rotationDegrees: Int)
-
-class QrPreviewBuilder {
-    fun buildPreview(): Preview {
-        val previewConfig = PreviewConfig.Builder()
-            .setTargetAspectRatio(AspectRatio.RATIO_16_9)
-            .build()
-
-        return Preview(previewConfig)
-    }
 }
