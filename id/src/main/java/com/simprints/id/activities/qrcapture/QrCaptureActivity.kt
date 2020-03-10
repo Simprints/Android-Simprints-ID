@@ -80,7 +80,7 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
         }
     }
 
-    fun onQrCodeCaptured(qrCodeValue: String) {
+    private fun onQrCodeCaptured(qrCodeValue: String) {
         val data = Intent().putExtra(QR_RESULT_KEY, qrCodeValue)
         setResult(Activity.RESULT_OK, data)
         finish()

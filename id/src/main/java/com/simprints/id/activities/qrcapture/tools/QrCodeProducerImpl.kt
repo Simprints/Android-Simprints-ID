@@ -6,14 +6,18 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.Executors
 
-class QrCodeProducerImpl(var qrCodeDetector: QrCodeDetector) : QrCodeProducer, ImageAnalysis.Analyzer {
+class QrCodeProducerImpl(private var qrCodeDetector: QrCodeDetector) : QrCodeProducer, ImageAnalysis.Analyzer {
 
-    private val analysisConfig = ImageAnalysisConfig.Builder()
-        .setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
-        .build()
+    private val analysisConfig by lazy {
+        ImageAnalysisConfig.Builder()
+            .setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
+            .build()
+    }
 
-    override val imageAnalyser = ImageAnalysis(analysisConfig).also { analysis ->
-        analysis.setAnalyzer(Executors.newSingleThreadExecutor(), this)
+    override val imageAnalyser: UseCase by lazy {
+        ImageAnalysis(analysisConfig).apply {
+            setAnalyzer(Executors.newSingleThreadExecutor(), this@QrCodeProducerImpl)
+        }
     }
 
     override val qrCodeChannel = Channel<String>(Channel.CONFLATED)
@@ -21,12 +25,16 @@ class QrCodeProducerImpl(var qrCodeDetector: QrCodeDetector) : QrCodeProducer, I
     override fun analyze(imageProxy: ImageProxy?, rotationDegrees: Int) {
         imageProxy?.image?.let { mediaImage ->
             runBlocking {
-                val qrCode = qrCodeDetector.detectInImage(RawImage(mediaImage, rotationDegrees))
-                qrCode?.let {
-                    if (!qrCodeChannel.isClosedForSend) {
-                        qrCodeChannel.send(it)
-                        qrCodeChannel.close()
+                try {
+                    val qrCode = qrCodeDetector.detectInImage(RawImage(mediaImage, rotationDegrees))
+                    qrCode?.let {
+                        if (!qrCodeChannel.isClosedForSend) {
+                            qrCodeChannel.send(it)
+                            qrCodeChannel.close()
+                        }
                     }
+                } catch (t: Throwable) {
+                    t.printStackTrace()
                 }
             }
         }
