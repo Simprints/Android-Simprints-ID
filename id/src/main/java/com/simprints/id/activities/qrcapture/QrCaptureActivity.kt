@@ -11,17 +11,21 @@ import android.view.Surface
 import android.view.TextureView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraX
+import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.qrcapture.tools.QrCaptureHelper
-import com.simprints.id.activities.qrcapture.tools.QrCaptureListener
+import com.simprints.id.activities.qrcapture.tools.QrCodeDetector
+import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
+import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
 import com.simprints.id.tools.extensions.hasPermission
 import kotlinx.android.synthetic.main.activity_qr_capture.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture), QrCaptureListener {
+class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
 
-    @Inject lateinit var qrCaptureHelper: QrCaptureHelper
+    @Inject lateinit var qrCodeProducer: QrCodeProducer
+    @Inject lateinit var qrCodeDetector: QrCodeDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,21 +48,17 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture), QrCap
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_CAMERA && grantResults.all { it == PERMISSION_GRANTED }) {
-            startCamera()
+            lifecycleScope.launch {
+                startCamera()
+            }
         } else {
             setResult(Activity.RESULT_CANCELED)
             finish()
         }
     }
 
-    override fun onQrCodeCaptured(qrCodeValue: String) {
-        val data = Intent().putExtra(QR_RESULT_KEY, qrCodeValue)
-        setResult(Activity.RESULT_OK, data)
-        finish()
-    }
-
     private fun startCamera() {
-        val preview = qrCaptureHelper.buildPreview().apply {
+        val preview = QrPreviewBuilder().buildPreview().apply {
             setOnPreviewOutputUpdateListener { previewOutput ->
                 with(qrCaptureRoot) {
                     removeView(cameraPreview)
@@ -72,10 +72,20 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture), QrCap
             }
         }
 
-        val useCase = qrCaptureHelper.buildUseCase(qrCaptureListener = this)
+        CameraX.bindToLifecycle(this, preview, qrCodeProducer.imageAnalyser)
 
-        CameraX.bindToLifecycle(this, preview, useCase)
+        lifecycleScope.launch {
+            val qrCode = qrCodeProducer.qrCodeChannel.receive()
+            onQrCodeCaptured(qrCode)
+        }
     }
+
+    fun onQrCodeCaptured(qrCodeValue: String) {
+        val data = Intent().putExtra(QR_RESULT_KEY, qrCodeValue)
+        setResult(Activity.RESULT_OK, data)
+        finish()
+    }
+
 
     private fun TextureView.updateTransform() {
         val centreX = x / 2

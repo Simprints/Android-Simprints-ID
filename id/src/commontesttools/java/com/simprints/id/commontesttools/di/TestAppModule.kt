@@ -4,8 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.Application
-import com.simprints.id.activities.qrcapture.tools.QrCaptureHelper
-import com.simprints.id.activities.qrcapture.tools.QrCodeAnalyser
+import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.activities.qrcapture.tools.QrCodeDetector
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -162,7 +161,7 @@ class TestAppModule(
         }
     }
 
-    override fun provideQrCaptureHelper(qrCodeAnalyser: QrCodeAnalyser): QrCaptureHelper {
+    override fun provideQrCaptureHelper(qrCodeAnalyser: QrCodeAnalyser): QrCodeProducer {
         return qrCaptureHelperRule.resolveDependency {
             super.provideQrCaptureHelper(qrCodeAnalyser)
         }
