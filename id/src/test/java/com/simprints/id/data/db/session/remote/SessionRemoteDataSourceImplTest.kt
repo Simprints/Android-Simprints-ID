@@ -5,16 +5,18 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
+import com.simprints.id.data.db.session.remote.session.ApiSessionEvents
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.testtools.unit.mockserver.mockSuccessfulResponse
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
-import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Before
@@ -38,14 +40,10 @@ class SessionRemoteDataSourceImplTest {
         UnitTestConfig(this).setupFirebase()
 
         mockServer.start()
-        sessionsRemoteInterface = SimApiClientFactory("deviceId", endpoint = mockServer.url("/").toString()).build<SessionsRemoteInterface>().api
-
-        coEvery { sessionRemoteDataSourceSpy.getSessionsApiClient() } returns sessionsRemoteInterface
     }
 
     @Test
     fun closedSessions_shouldBeFilteredOutToBeUploaded() {
-
         sessionRemoteDataSourceSpy.apply {
             val sessions = listOf(
                 createFakeOpenSession(timeHelper),
@@ -64,7 +62,9 @@ class SessionRemoteDataSourceImplTest {
     @Test
     fun successfulResponseOnUpload() {
         runBlocking {
-            mockServer.enqueue(MockResponse().setResponseCode(200))
+            sessionsRemoteInterface = SimApiClientFactory("deviceId", endpoint = mockServer.url("/").toString()).build<SessionsRemoteInterface>().api
+            coEvery { sessionRemoteDataSourceSpy.getSessionsApiClient() } returns sessionsRemoteInterface
+            mockServer.enqueue(mockSuccessfulResponse())
 
             val sessions = listOf(
                 createFakeClosedSession(timeHelper),
@@ -79,16 +79,18 @@ class SessionRemoteDataSourceImplTest {
     @Test
     fun failedResponseThenSuccessfulResponse_shouldTryAgainAndSucceed() {
         runBlocking {
-            mockServer.enqueue(MockResponse().setResponseCode(400))
-            mockServer.enqueue(MockResponse().setResponseCode(200))
+            val sessionsRemoteInterface = buildSessionApiToThrowFirstThenCall()
+            coEvery { sessionRemoteDataSourceSpy.getSessionsApiClient() } returns sessionsRemoteInterface
+            mockServer.enqueue(mockSuccessfulResponse())
 
             val sessions = listOf(
                 createFakeClosedSession(timeHelper),
                 createFakeClosedSession(timeHelper)
             )
-
             sessionRemoteDataSourceSpy.uploadSessions("projectId", sessions)
-            assertThat(mockServer.requestCount).isEqualTo(2)
+
+            assertThat(mockServer.requestCount).isEqualTo(1)
+            coVerify(exactly = 2) { sessionsRemoteInterface.uploadSessions(any(), any()) }
         }
     }
 
@@ -100,4 +102,16 @@ class SessionRemoteDataSourceImplTest {
 
     private fun buildRemoteDataSource() =
         SessionRemoteDataSourceImpl(mockk(), mockk())
+
+    private fun buildSessionApiToThrowFirstThenCall(): SessionsRemoteInterface {
+        val api = SimApiClientFactory("deviceId", endpoint = mockServer.url("/").toString()).build<SessionsRemoteInterface>().api
+        return mockk {
+            coEvery { uploadSessions(any(), any()) } throws Throwable("Network issue") coAndThen {
+                api.uploadSessions(
+                    args[0] as String,
+                    args[1] as HashMap<String, Array<ApiSessionEvents>>
+                    )
+            }
+        }
+    }
 }
