@@ -20,6 +20,7 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.kotlintest.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
@@ -159,15 +160,49 @@ class SessionRepositoryImplTest {
     @Test
     fun uploadSessions_shouldDeleteAfterUploading() {
         runBlockingTest {
-            coEvery { sessionLocalDataSourceMock.load(any()) } returns flowOf(createFakeClosedSession(timeHelper))
+            val closedSession = createFakeClosedSession(timeHelper)
+            coEvery { sessionLocalDataSourceMock.load(any()) } returns flowOf(closedSession)
 
-            sessionsRepository.startUploadingSessions()
+            sessionsRepository.uploadSessions()
 
-            coVerify(exactly = 1) { sessionRemoteDataSourceMock.uploadSessions(PROJECT_ID, any()) }
-            coVerify(exactly = 1) { sessionLocalDataSourceMock.delete(any()) }
+            coVerify(exactly = 1) { sessionRemoteDataSourceMock.uploadSessions(PROJECT_ID, listOf(closedSession)) }
+            coVerify(exactly = 1) { sessionLocalDataSourceMock.delete(SessionQuery(openSession = false)) }
         }
     }
 
+    @Test
+    fun closedSessions_shouldBeFilteredOutToBeUploaded() {
+        runBlockingTest {
+            val fakeClosedSession = createFakeClosedSession(timeHelper)
+            val sessions = flowOf(
+                createFakeOpenSession(timeHelper),
+                fakeClosedSession
+            )
+            coEvery { sessionLocalDataSourceMock.load(any()) } returns sessions
+
+            sessionsRepository.uploadSessions()
+
+            coVerify(exactly = 1) { sessionRemoteDataSourceMock.uploadSessions(PROJECT_ID, listOf(fakeClosedSession)) }
+        }
+    }
+
+    @Test
+    fun closedSessionsToUpload_shouldCreateBatches() {
+        runBlockingTest {
+            val sessions = createClosedSessions()
+            coEvery { sessionLocalDataSourceMock.load(any()) } returns sessions
+
+            sessionsRepository.uploadSessions()
+
+            coVerify(exactly = 3) { sessionRemoteDataSourceMock.uploadSessions(PROJECT_ID, any()) }
+        }
+    }
+
+    private fun createClosedSessions() = flow {
+        for(i in 1..59) {
+            emit(createFakeClosedSession(timeHelper))
+        }
+    }
 
     companion object {
         private const val DEVICE_ID = "deviceId"

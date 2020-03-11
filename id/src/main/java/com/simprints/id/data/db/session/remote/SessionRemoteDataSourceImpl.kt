@@ -12,19 +12,11 @@ class SessionRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
 
     override suspend fun uploadSessions(projectId: String,
                                         sessions: List<SessionEvents>) {
-        sessions.filterClosedSessions()
-            .uploadClosedSessionsOrThrowIfNoSessions(projectId)
-    }
-
-    internal fun List<SessionEvents>.filterClosedSessions() =
-        filter { it.isClosed() }
-
-    private suspend fun List<SessionEvents>.uploadClosedSessionsOrThrowIfNoSessions(projectId: String) {
-        if (isEmpty()) {
+        if (sessions.isEmpty()) {
             throw NoSessionsFoundException()
         }
         makeNetworkRequest({ sessionsRemoteInterface ->
-            sessionsRemoteInterface.uploadSessions(projectId, hashMapOf("sessions" to map { ApiSessionEvents(it) }.toTypedArray()))
+            sessionsRemoteInterface.uploadSessions(projectId, hashMapOf("sessions" to sessions.map { ApiSessionEvents(it) }.toTypedArray()))
         }, "uploadSessionsBatch")
     }
 

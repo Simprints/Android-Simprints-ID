@@ -50,7 +50,7 @@ import com.simprints.id.services.scheduledSync.people.master.workers.PeopleStart
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
+import com.simprints.id.services.scheduledSync.sessionSync.UpSessionEventsWorker
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import dagger.BindsInstance
@@ -96,7 +96,7 @@ interface AppComponent {
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(privacyNoticePresenter: PrivacyNoticePresenter)
     fun inject(syncSchedulerHelper: SyncSchedulerImpl)
-    fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
+    fun inject(sessionsSyncWorkerUp: UpSessionEventsWorker)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
     fun inject(moduleSelectionActivity: ModuleSelectionActivity)
     fun inject(moduleSelectionActivity: ModuleSelectionFragment)
