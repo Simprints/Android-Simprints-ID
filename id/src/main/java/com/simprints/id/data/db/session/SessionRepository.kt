@@ -15,7 +15,7 @@ interface SessionRepository {
 
     suspend fun signOut()
 
-    suspend fun startUploadingSessions()
+    suspend fun uploadSessions()
 
     companion object {
         fun build(app: Application): SessionRepository =

@@ -50,7 +50,7 @@ class SessionEventsSyncManagerImplAndroidTest {
     @Test
     fun sessionEventsSyncManagerImpl_enqueuesANewWorkerMaster_shouldDeleteOldNotVersionedWorkers() {
 
-        val oldWorkerUUID = PeriodicWorkRequestBuilder<SessionEventsMasterWorker>(6L, TimeUnit.HOURS)
+        val oldWorkerUUID = PeriodicWorkRequestBuilder<UpSessionEventsWorker>(6L, TimeUnit.HOURS)
             .addTag(SessionEventsSyncManagerImpl.MASTER_WORKER_TAG)
             .build().let {
                 WorkManager.getInstance().enqueueUniquePeriodicWork(

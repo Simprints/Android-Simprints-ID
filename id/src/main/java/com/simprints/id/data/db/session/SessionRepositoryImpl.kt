@@ -14,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -52,12 +53,13 @@ open class SessionRepositoryImpl(private val deviceId: String,
             }
         }
     }
-    override suspend fun startUploadingSessions() {
+    override suspend fun uploadSessions() {
         createBatchesFromLocalAndUploadSessions()
     }
 
     private suspend fun createBatchesFromLocalAndUploadSessions() {
         loadSessionsToUpload()
+            .filterClosedSessions()
             .createBatches()
             .startUploadingSessions()
             .deleteSessionsFromDb()
@@ -65,6 +67,9 @@ open class SessionRepositoryImpl(private val deviceId: String,
 
     private suspend fun loadSessionsToUpload() =
         sessionLocalDataSource.load(SessionQuery(projectId = projectId))
+
+    private fun Flow<SessionEvents>.filterClosedSessions() =
+        filter { it.isClosed() }
 
     private suspend fun Flow<SessionEvents>.createBatches() =
         this.bufferedChunks(SESSION_BATCH_SIZE)
@@ -79,7 +84,7 @@ open class SessionRepositoryImpl(private val deviceId: String,
     private suspend fun Flow<List<SessionEvents>>.deleteSessionsFromDb() {
         this.collect {sessions ->
             sessions.forEach {
-                sessionLocalDataSource.delete(SessionQuery(id = it.id, openSession = false))
+                sessionLocalDataSource.delete(SessionQuery(openSession = false))
             }
         }
     }
