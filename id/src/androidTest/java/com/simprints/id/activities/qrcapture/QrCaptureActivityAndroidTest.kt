@@ -10,8 +10,12 @@ import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.syntax.mock
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import kotlinx.coroutines.channels.Channel
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -20,7 +24,7 @@ class QrCaptureActivityAndroidTest {
 
     @get:Rule var grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(CAMERA)
 
-    @MockK lateinit var mockCameraBinder: CameraBinder
+    var mockCameraBinder: CameraBinder = mock()
     @MockK lateinit var mockQrPreviewBuilder: QrPreviewBuilder
     @MockK lateinit var mockQrCodeProducer: QrCodeProducer
 
