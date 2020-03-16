@@ -2,26 +2,23 @@ package com.simprints.id.activities.qrcapture
 
 import android.Manifest.permission.CAMERA
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
+import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.CameraBinder
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 
-@RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class)
-class QrCaptureActivityTest {
+@ExperimentalCoroutinesApi
+class QrCaptureActivityAndroidTest {
 
     @get:Rule var grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(CAMERA)
 
@@ -30,7 +27,7 @@ class QrCaptureActivityTest {
     @MockK lateinit var mockQrCodeProducer: QrCodeProducer
 
     private val appModule by lazy {
-        val app = ApplicationProvider.getApplicationContext<TestApplication>()
+        val app = ApplicationProvider.getApplicationContext<Application>()
 
         TestAppModule(
             app,
@@ -49,7 +46,7 @@ class QrCaptureActivityTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        UnitTestConfig(this, appModule).initAndInjectComponent()
+        AndroidTestConfig(this, appModule).initAndInjectComponent()
     }
 
     @Test
