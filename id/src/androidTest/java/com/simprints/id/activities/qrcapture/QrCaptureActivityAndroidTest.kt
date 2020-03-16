@@ -36,7 +36,11 @@ class QrCaptureActivityAndroidTest {
                 mockQrPreviewBuilder
             },
             qrCodeProducerRule = DependencyRule.ReplaceRule {
-                mockQrCodeProducer
+                mockQrCodeProducer.apply {
+                    val channel = mockk<Channel<String>>()
+                    coEvery { channel.receive() } returns "some_qr_code"
+                    coEvery { qrCodeChannel } returns channel
+                }
             }
         )
     }
