@@ -2,6 +2,7 @@ package com.simprints.id.data.db.session.controllers.domain
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
@@ -10,6 +11,7 @@ import com.simprints.id.data.db.session.domain.models.SessionQuery
 import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
+import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.testtools.TestApplication
@@ -18,6 +20,7 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.kotlintest.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
@@ -33,9 +36,11 @@ class SessionRepositoryImplTest {
 
     @MockK private lateinit var sessionEventsSyncManagerMock: SessionEventsSyncManager
     @MockK private lateinit var sessionLocalDataSourceMock: SessionLocalDataSource
+    @MockK private lateinit var sessionRemoteDataSourceMock: SessionRemoteDataSource
     @MockK private lateinit var preferencesManagerMock: PreferencesManager
     @MockK private lateinit var crashReportManagerMock: CrashReportManager
     private lateinit var sessionsRepository: SessionRepository
+    private val timeHelper = TimeHelperImpl()
 
     @Before
     fun setUp() {
@@ -45,7 +50,9 @@ class SessionRepositoryImplTest {
         sessionsRepository = SessionRepositoryImpl(
             DEVICE_ID,
             APP_VERSION_NAME,
-            sessionEventsSyncManagerMock, sessionLocalDataSourceMock, preferencesManagerMock, crashReportManagerMock)
+            PROJECT_ID,
+            sessionEventsSyncManagerMock, sessionLocalDataSourceMock, sessionRemoteDataSourceMock,
+            preferencesManagerMock, crashReportManagerMock)
         mockPreferenceManagerInfo()
     }
 
@@ -79,7 +86,7 @@ class SessionRepositoryImplTest {
     @Test
     fun getCurrentSession_shouldReturnCurrentSession() {
         runBlockingTest {
-            val session = createFakeOpenSession(TimeHelperImpl())
+            val session = createFakeOpenSession(timeHelper)
             coEvery { sessionLocalDataSourceMock.load(any()) } returns flowOf(session)
 
             val currentSession = sessionsRepository.getCurrentSession()
@@ -134,6 +141,7 @@ class SessionRepositoryImplTest {
         runBlockingTest {
             coEvery { sessionLocalDataSourceMock.addEventToCurrentSession(any()) } throws Throwable("Error")
             sessionsRepository.addEventToCurrentSessionInBackground(mockk())
+
             coVerify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
         }
     }
@@ -149,10 +157,58 @@ class SessionRepositoryImplTest {
         }
     }
 
+    @Test
+    fun uploadSessions_shouldDeleteAfterUploading() {
+        runBlockingTest {
+            val closedSession = createFakeClosedSession(timeHelper)
+            coEvery { sessionLocalDataSourceMock.load(any()) } returns flowOf(closedSession)
+
+            sessionsRepository.uploadSessions()
+
+            coVerify(exactly = 1) { sessionRemoteDataSourceMock.uploadSessions(PROJECT_ID, listOf(closedSession)) }
+            coVerify(exactly = 1) { sessionLocalDataSourceMock.delete(SessionQuery(openSession = false)) }
+        }
+    }
+
+    @Test
+    fun closedSessions_shouldBeFilteredOutToBeUploaded() {
+        runBlockingTest {
+            val fakeClosedSession = createFakeClosedSession(timeHelper)
+            val sessions = flowOf(
+                createFakeOpenSession(timeHelper),
+                fakeClosedSession
+            )
+            coEvery { sessionLocalDataSourceMock.load(any()) } returns sessions
+
+            sessionsRepository.uploadSessions()
+
+            coVerify(exactly = 1) { sessionRemoteDataSourceMock.uploadSessions(PROJECT_ID, listOf(fakeClosedSession)) }
+        }
+    }
+
+    @Test
+    fun closedSessionsToUpload_shouldCreateBatches() {
+        runBlockingTest {
+            val sessions = createClosedSessions()
+            coEvery { sessionLocalDataSourceMock.load(any()) } returns sessions
+
+            sessionsRepository.uploadSessions()
+
+            coVerify(exactly = 3) { sessionRemoteDataSourceMock.uploadSessions(PROJECT_ID, any()) }
+        }
+    }
+
+    private fun createClosedSessions() = flow {
+        for(i in 1..59) {
+            emit(createFakeClosedSession(timeHelper))
+        }
+    }
+
     companion object {
         private const val DEVICE_ID = "deviceId"
         private const val APP_VERSION_NAME = "v1"
         private const val LIB_VERSION_NAME = "v1"
         private const val LANGUAGE = "en"
+        private const val PROJECT_ID = "projectId"
     }
 }

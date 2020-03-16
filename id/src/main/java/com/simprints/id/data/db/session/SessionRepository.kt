@@ -15,6 +15,8 @@ interface SessionRepository {
 
     suspend fun signOut()
 
+    suspend fun uploadSessions()
+
     companion object {
         fun build(app: Application): SessionRepository =
             app.component.getSessionEventsManager()

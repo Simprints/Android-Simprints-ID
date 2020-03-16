@@ -19,7 +19,7 @@ open class SessionEventsSyncManagerImpl(private val workManager: WorkManager) : 
         cancelPreviousVersionedWorkerMaster()
 
         val uniqueName = getMasterWorkerUniqueName(version)
-        return PeriodicWorkRequestBuilder<SessionEventsMasterWorker>(time, unit)
+        return PeriodicWorkRequestBuilder<UpSessionEventsWorker>(time, unit)
             .setConstraints(getConstraints())
             .addTag(tag)
             .build().let {
