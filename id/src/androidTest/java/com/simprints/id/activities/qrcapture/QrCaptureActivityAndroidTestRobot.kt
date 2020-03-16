@@ -11,11 +11,9 @@ import com.simprints.id.activities.qrcapture.tools.CameraBinder
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import io.mockk.coEvery
 import io.mockk.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 private const val QR_SCAN_RESULT = "mock_qr_code"
 
-@ExperimentalCoroutinesApi
 fun QrCaptureActivityAndroidTest.qrCaptureActivity(
     block: QrCaptureActivityAndroidTestRobot.() -> Unit
 ): QrCaptureActivityAndroidTestRobot {

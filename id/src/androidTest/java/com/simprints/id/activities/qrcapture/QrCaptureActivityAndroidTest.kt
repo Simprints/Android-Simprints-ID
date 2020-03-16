@@ -12,12 +12,10 @@ import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class QrCaptureActivityAndroidTest {
 
     @get:Rule var grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(CAMERA)
@@ -26,9 +24,9 @@ class QrCaptureActivityAndroidTest {
     @MockK lateinit var mockQrPreviewBuilder: QrPreviewBuilder
     @MockK lateinit var mockQrCodeProducer: QrCodeProducer
 
-    private val appModule by lazy {
-        val app = ApplicationProvider.getApplicationContext<Application>()
+    private val app = ApplicationProvider.getApplicationContext<Application>()
 
+    private val appModule by lazy {
         TestAppModule(
             app,
             cameraBinderRule = DependencyRule.ReplaceRule {
