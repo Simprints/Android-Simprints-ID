@@ -6,6 +6,7 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivityTest
 import com.simprints.id.activities.consent.ConsentActivityTest
 import com.simprints.id.activities.login.LoginActivityTest
+import com.simprints.id.activities.qrcapture.QrCaptureActivityTest
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelTest
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragmentTest
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenterTest
@@ -54,6 +55,7 @@ interface AppComponentForTests : AppComponent {
     fun inject(peopleDownSyncDownloaderTaskImplTest: PeopleDownSyncDownloaderTaskImplTest)
     fun inject(checkLoginFromIntentPresenterTest: CheckLoginFromIntentPresenterTest)
     fun inject(settingsPreferencePresenterTest: SettingsPreferencePresenterTest)
+    fun inject(qrCaptureActivityTest: QrCaptureActivityTest)
 
     @ExperimentalCoroutinesApi
     fun inject(imageUpSyncWorkerTest: ImageUpSyncWorkerTest)

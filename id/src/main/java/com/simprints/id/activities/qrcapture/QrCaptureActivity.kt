@@ -9,12 +9,13 @@ import android.graphics.Matrix
 import android.os.Bundle
 import android.view.Surface
 import android.view.TextureView
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.CameraX
 import androidx.camera.core.Preview
 import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.qrcapture.tools.CameraBinder
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
 import com.simprints.id.tools.extensions.hasPermission
@@ -24,6 +25,8 @@ import javax.inject.Inject
 
 class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
 
+    @Inject lateinit var cameraBinder: CameraBinder
+    @Inject lateinit var qrPreviewBuilder: QrPreviewBuilder
     @Inject lateinit var qrCodeProducer: QrCodeProducer
 
     private lateinit var preview: Preview
@@ -59,7 +62,8 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
         }
     }
 
-    private fun buildPreview() = QrPreviewBuilder().buildPreview().apply {
+    private fun buildPreview() = qrPreviewBuilder.buildPreview().apply {
+        val qrCaptureRoot = cameraPreview.parent as ViewGroup
         setOnPreviewOutputUpdateListener { previewOutput ->
             with(qrCaptureRoot) {
                 removeView(cameraPreview)
@@ -74,7 +78,7 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
     }
 
     private fun startCamera() {
-        CameraX.bindToLifecycle(this, preview, qrCodeProducer.useCase)
+        cameraBinder.bindToLifecycle(this, preview, qrCodeProducer.useCase)
 
         lifecycleScope.launch {
             val qrCode = qrCodeProducer.qrCodeChannel.receive()
@@ -87,7 +91,6 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
         setResult(Activity.RESULT_OK, data)
         finish()
     }
-
 
     private fun TextureView.updateTransform() {
         val centreX = x / 2
