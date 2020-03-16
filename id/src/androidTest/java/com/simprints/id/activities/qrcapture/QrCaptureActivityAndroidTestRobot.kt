@@ -6,11 +6,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.pressBackUnconditionally
 import com.google.common.truth.Truth.assertThat
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.verify
 import com.simprints.id.activities.qrcapture.QrCaptureActivity.Companion.QR_RESULT_KEY
 import com.simprints.id.activities.qrcapture.tools.CameraBinder
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import io.mockk.coEvery
-import io.mockk.verify
 
 private const val QR_SCAN_RESULT = "mock_qr_code"
 
@@ -56,7 +57,7 @@ class QrCaptureActivityAndroidTestAssertions(
 ) {
 
     fun cameraIsStarted() {
-        verify { mockCameraBinder.bindToLifecycle(any(), any(), any()) }
+        verify(mockCameraBinder).bindToLifecycle(any(), any(), any())
     }
 
     fun resultIsOk() {
