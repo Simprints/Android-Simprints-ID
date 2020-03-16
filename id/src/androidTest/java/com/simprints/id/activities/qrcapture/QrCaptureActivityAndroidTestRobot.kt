@@ -11,46 +11,48 @@ import com.simprints.id.activities.qrcapture.tools.CameraBinder
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import io.mockk.coEvery
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 private const val QR_SCAN_RESULT = "mock_qr_code"
 
-fun QrCaptureActivityTest.qrCaptureActivity(
-    block: QrCaptureActivityRobot.() -> Unit
-): QrCaptureActivityRobot {
+@ExperimentalCoroutinesApi
+fun QrCaptureActivityAndroidTest.qrCaptureActivity(
+    block: QrCaptureActivityAndroidTestRobot.() -> Unit
+): QrCaptureActivityAndroidTestRobot {
     val activityScenario = ActivityScenario.launch(QrCaptureActivity::class.java)
 
-    return QrCaptureActivityRobot(
+    return QrCaptureActivityAndroidTestRobot(
         activityScenario,
         mockCameraBinder,
         mockQrCodeProducer
     ).apply(block)
 }
 
-class QrCaptureActivityRobot(
+class QrCaptureActivityAndroidTestRobot(
     private val activityScenario: ActivityScenario<QrCaptureActivity>,
     private val mockCameraBinder: CameraBinder,
     private val mockQrCodeProducer: QrCodeProducer
 ) {
 
-    infix fun scanQrCode(assertion: QrCaptureActivityAssertions.() -> Unit) {
+    infix fun scanQrCode(assertion: QrCaptureActivityAndroidTestAssertions.() -> Unit) {
         coEvery { mockQrCodeProducer.qrCodeChannel.receive() } returns QR_SCAN_RESULT
 
         assert(assertion)
     }
 
-    infix fun pressBack(assertion: QrCaptureActivityAssertions.() -> Unit) {
+    infix fun pressBack(assertion: QrCaptureActivityAndroidTestAssertions.() -> Unit) {
         pressBackUnconditionally()
 
         assert(assertion)
     }
 
-    infix fun assert(assertion: QrCaptureActivityAssertions.() -> Unit) {
-        QrCaptureActivityAssertions(activityScenario, mockCameraBinder).run(assertion)
+    infix fun assert(assertion: QrCaptureActivityAndroidTestAssertions.() -> Unit) {
+        QrCaptureActivityAndroidTestAssertions(activityScenario, mockCameraBinder).run(assertion)
     }
 
 }
 
-class QrCaptureActivityAssertions(
+class QrCaptureActivityAndroidTestAssertions(
     private val activityScenario: ActivityScenario<QrCaptureActivity>,
     private val mockCameraBinder: CameraBinder
 ) {
