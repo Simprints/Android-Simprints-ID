@@ -14,7 +14,7 @@ import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
-import com.simprints.id.data.db.session.remote.RemoteSessionsManager
+import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
@@ -42,7 +42,6 @@ import io.mockk.mockk
 class TestAppModule(
     app: Application,
     private val remoteDbManagerRule: DependencyRule = RealRule,
-    private val remoteSessionsManagerRule: DependencyRule = RealRule,
     private val dbManagerRule: DependencyRule = RealRule,
     private val secureDataManagerRule: DependencyRule = RealRule,
     private val loginInfoManagerRule: DependencyRule = RealRule,
@@ -51,6 +50,7 @@ class TestAppModule(
     private val crashReportManagerRule: DependencyRule = RealRule,
     private val sessionEventsManagerRule: DependencyRule = RealRule,
     private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
+    private val sessionEventsRemoteDbManagerRule: DependencyRule = RealRule,
     private val simNetworkUtilsRule: DependencyRule = RealRule,
     private val secureApiInterfaceRule: DependencyRule = RealRule,
     private val longConsentManagerRule: DependencyRule = RealRule,
@@ -109,14 +109,20 @@ class TestAppModule(
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
         sessionLocalDataSource: SessionLocalDataSource,
+        sessionRemoteDataSource: SessionRemoteDataSource,
         preferencesManager: PreferencesManager,
+        loginInfoManager: LoginInfoManager,
+        timeHelper: TimeHelper,
         crashReportManager: CrashReportManager
     ): SessionRepository = sessionEventsManagerRule.resolveDependency {
         super.provideSessionEventsManager(
             ctx,
             sessionEventsSyncManager,
             sessionLocalDataSource,
+            sessionRemoteDataSource,
             preferencesManager,
+            loginInfoManager,
+            timeHelper,
             crashReportManager
         )
     }
@@ -130,15 +136,15 @@ class TestAppModule(
     ): SessionLocalDataSource =
         sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder, sessionEventValidatorsBuilder) }
 
+    override fun provideSessionEventsRemoteDbManager(remoteDbManager: RemoteDbManager,
+                                                     simApiClientFactory: SimApiClientFactory): SessionRemoteDataSource =
+        sessionEventsRemoteDbManagerRule.resolveDependency { super.provideSessionEventsRemoteDbManager(remoteDbManager, simApiClientFactory) }
+
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
 
     override fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager): LongConsentManager =
         longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager, crashReportManager) }
-
-    override fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager,
-                                              factory: SimApiClientFactory): RemoteSessionsManager =
-        remoteSessionsManagerRule.resolveDependency { super.provideRemoteSessionsManager(remoteDbManager, factory) }
 
     override fun provideSyncStatusDatabase(ctx: Context): PeopleSyncStatusDatabase =
         syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase(ctx) }
