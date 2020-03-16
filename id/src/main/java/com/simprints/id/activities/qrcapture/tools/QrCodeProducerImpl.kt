@@ -28,7 +28,7 @@ class QrCodeProducerImpl(
         }
     }
 
-    override val qrCodeChannel = Channel<String>(Channel.CONFLATED)
+    override var qrCodeChannel = Channel<String>(Channel.CONFLATED)
 
     override fun analyze(imageProxy: ImageProxy?, rotationDegrees: Int) {
         imageProxy?.image?.let { mediaImage ->
