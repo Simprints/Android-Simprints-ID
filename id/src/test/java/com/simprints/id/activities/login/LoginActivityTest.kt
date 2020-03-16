@@ -47,8 +47,6 @@ class LoginActivityTest {
             dbManagerRule = MockkRule,
             sessionEventsLocalDbManagerRule = MockkRule,
             crashReportManagerRule = MockkRule,
-            qrCaptureHelperRule = MockkRule,
-            qrCodeAnalyserRule = MockkRule,
             qrCodeDetectorRule = MockkRule
         )
     }

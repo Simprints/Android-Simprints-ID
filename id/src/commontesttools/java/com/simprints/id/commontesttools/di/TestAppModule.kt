@@ -4,8 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.Application
+import com.simprints.id.activities.qrcapture.tools.CameraBinder
 import com.simprints.id.activities.qrcapture.tools.QrCodeDetector
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
+import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.LongConsentManager
@@ -59,8 +61,8 @@ class TestAppModule(
     private val deviceManagerRule: DependencyRule = RealRule,
     private val recentEventsPreferencesManagerRule: DependencyRule = RealRule,
     private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) },
-    private val qrCaptureHelperRule: DependencyRule = RealRule,
-    private val qrCodeAnalyserRule: DependencyRule = RealRule,
+    private val cameraBinderRule: DependencyRule = RealRule,
+    private val qrPreviewBuilderRule: DependencyRule = RealRule,
     private val qrCodeDetectorRule: DependencyRule = RealRule,
     private val qrCodeProducerRule: DependencyRule = RealRule
 ) : AppModule() {
@@ -160,6 +162,18 @@ class TestAppModule(
     override fun provideRecentEventsPreferencesManager(prefs: ImprovedSharedPreferences): RecentEventsPreferencesManager {
         return recentEventsPreferencesManagerRule.resolveDependency {
             super.provideRecentEventsPreferencesManager(prefs)
+        }
+    }
+
+    override fun provideCameraBinder(): CameraBinder {
+        return cameraBinderRule.resolveDependency {
+            super.provideCameraBinder()
+        }
+    }
+
+    override fun provideQrPreviewBuilder(): QrPreviewBuilder {
+        return qrPreviewBuilderRule.resolveDependency {
+            super.provideQrPreviewBuilder()
         }
     }
 

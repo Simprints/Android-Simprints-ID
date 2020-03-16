@@ -10,10 +10,7 @@ import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
-import com.simprints.id.activities.qrcapture.tools.QrCodeDetector
-import com.simprints.id.activities.qrcapture.tools.QrCodeDetectorImpl
-import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
-import com.simprints.id.activities.qrcapture.tools.QrCodeProducerImpl
+import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -358,6 +355,12 @@ open class AppModule {
 
     @Provides
     open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)
+
+    @Provides
+    open fun provideCameraBinder(): CameraBinder = CameraBinderImpl()
+
+    @Provides
+    open fun provideQrPreviewBuilder(): QrPreviewBuilder = QrPreviewBuilderImpl()
 
     @Provides
     @ExperimentalCoroutinesApi
