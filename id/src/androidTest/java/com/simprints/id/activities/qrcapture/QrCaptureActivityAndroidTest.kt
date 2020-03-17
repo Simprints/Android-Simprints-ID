@@ -14,7 +14,6 @@ import com.simprints.testtools.common.syntax.mock
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.channels.Channel
 import org.junit.Before
 import org.junit.Rule
@@ -24,10 +23,11 @@ class QrCaptureActivityAndroidTest {
 
     @get:Rule var grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(CAMERA)
 
+    var mockCameraBinder: CameraBinder = mock()
+
     @MockK lateinit var mockQrPreviewBuilder: QrPreviewBuilder
     @MockK lateinit var mockQrCodeProducer: QrCodeProducer
-
-    var mockCameraBinder: CameraBinder = mock()
+    @MockK lateinit var mockChannel: Channel<String>
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
@@ -42,9 +42,7 @@ class QrCaptureActivityAndroidTest {
             },
             qrCodeProducerRule = DependencyRule.ReplaceRule {
                 mockQrCodeProducer.apply {
-                    val channel = mockk<Channel<String>>()
-                    coEvery { channel.receive() } returns "mock_qr_code"
-                    coEvery { qrCodeChannel } returns channel
+                    coEvery { qrCodeChannel } returns mockChannel
                 }
             }
         )
@@ -58,6 +56,8 @@ class QrCaptureActivityAndroidTest {
 
     @Test
     fun shouldStartCamera() {
+        coEvery { mockChannel.receive() } returns VALID_QR_SCAN_RESULT
+
         qrCaptureActivity {
         } assert {
             cameraIsStarted()
@@ -66,6 +66,8 @@ class QrCaptureActivityAndroidTest {
 
     @Test
     fun whenQrCodeIsScanned_shouldReturnOkResult() {
+        coEvery { mockChannel.receive() } returns VALID_QR_SCAN_RESULT
+
         qrCaptureActivity {
         } assert {
             resultIsOk()
@@ -74,6 +76,8 @@ class QrCaptureActivityAndroidTest {
 
     @Test
     fun whenQrCodeIsScanned_shouldSendValueInResult() {
+        coEvery { mockChannel.receive() } returns VALID_QR_SCAN_RESULT
+
         qrCaptureActivity {
         } assert {
             qrScanResultIsSent()
@@ -81,15 +85,9 @@ class QrCaptureActivityAndroidTest {
     }
 
     @Test
-    fun pressBack_shouldSendCancelledResult() {
-        qrCaptureActivity {
-        } pressBack {
-            resultIsCancelled()
-        }
-    }
-
-    @Test
     fun whenQrCodeIsScanned_shouldFinishActivity() {
+        coEvery { mockChannel.receive() } returns VALID_QR_SCAN_RESULT
+
         qrCaptureActivity {
         } assert {
             activityIsFinished()
@@ -97,7 +95,19 @@ class QrCaptureActivityAndroidTest {
     }
 
     @Test
+    fun pressBack_shouldSendCancelledResult() {
+        coEvery { mockChannel.receive() } returns INVALID_QR_SCAN_RESULT
+
+        qrCaptureActivity {
+        } pressBack {
+            resultIsCancelled()
+        }
+    }
+
+    @Test
     fun pressBack_shouldFinishActivity() {
+        coEvery { mockChannel.receive() } returns INVALID_QR_SCAN_RESULT
+
         qrCaptureActivity {
         } pressBack {
             activityIsFinished()

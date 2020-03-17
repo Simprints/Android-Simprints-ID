@@ -87,9 +87,11 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
     }
 
     private fun onQrCodeCaptured(qrCodeValue: String) {
-        val data = Intent().putExtra(QR_RESULT_KEY, qrCodeValue)
-        setResult(Activity.RESULT_OK, data)
-        finish()
+        if (qrCodeValue.isNotEmpty()) {
+            val data = Intent().putExtra(QR_RESULT_KEY, qrCodeValue)
+            setResult(Activity.RESULT_OK, data)
+            finish()
+        }
     }
 
     private fun TextureView.updateTransform() {
