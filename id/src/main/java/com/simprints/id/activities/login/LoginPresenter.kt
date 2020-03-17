@@ -18,10 +18,7 @@ import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.extensions.trace
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.runBlocking
 import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
@@ -72,20 +69,29 @@ class LoginPresenter(val view: LoginContract.View,
         loginInfoManager.cleanCredentials()
         startTimeLogin = timeHelper.now()
 
-        projectAuthenticator.authenticate(
-            NonceScope(suppliedProjectId, suppliedUserId),
-            suppliedProjectSecret)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .trace("doAuthenticate")
-            .subscribeBy(
-                onComplete = {
-                    handleSignInSuccess(suppliedProjectId, suppliedUserId)
-                },
-                onError = { e ->
-                    Timber.e(e)
-                    handleSignInError(e, suppliedProjectId, suppliedUserId)
-                })
+        runBlocking {
+            try {
+                projectAuthenticator.authenticate(NonceScope(suppliedProjectId, suppliedUserId),
+                    suppliedProjectSecret)
+                handleSignInSuccess(suppliedProjectId, suppliedUserId)
+            } catch (t: Throwable) {
+                handleSignInError(t, suppliedProjectId, suppliedUserId)
+            }
+        }
+//        projectAuthenticator.authenticate(
+//            NonceScope(suppliedProjectId, suppliedUserId),
+//            suppliedProjectSecret)
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .trace("doAuthenticate")
+//            .subscribeBy(
+//                onComplete = {
+//                    handleSignInSuccess(suppliedProjectId, suppliedUserId)
+//                },
+//                onError = { e ->
+//                    Timber.e(e)
+//                    handleSignInError(e, suppliedProjectId, suppliedUserId)
+//                })
     }
 
     fun handleSignInSuccess(suppliedProjectId: String,
