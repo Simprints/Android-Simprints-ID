@@ -44,6 +44,7 @@ open class ProjectAuthenticator(component: AppComponent,
      */
     suspend fun authenticate(nonceScope: NonceScope, projectSecret: String) {
         createLocalDbKeyForProject(nonceScope.projectId)
+
         prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
             .signIn(nonceScope.projectId, nonceScope.userId)

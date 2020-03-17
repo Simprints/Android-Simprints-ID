@@ -2,6 +2,7 @@ package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.simprints.core.network.NetworkConstants.Companion.BASE_URL
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
@@ -10,10 +11,9 @@ import com.simprints.id.secure.SecureApiInterface.Companion.apiKey
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.PublicKeyString
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.retrofit.FakeResponseInterceptor
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import com.simprints.testtools.common.syntax.assertThrows
+import kotlinx.coroutines.test.runBlockingTest
 import okhttp3.OkHttpClient
 import org.junit.After
 import org.junit.Before
@@ -48,45 +48,35 @@ class AuthenticationDataManagerTest {
     }
 
     @Test
-    fun successfulResponse_shouldObtainValidAuthenticationData() {
-        UnitTestConfig(this).rescheduleRxMainThread()
+    fun successfulResponse_shouldObtainValidAuthenticationData() = runBlockingTest {
 
         forceOkHttpToReturnSuccessfulResponse(apiClient.okHttpClientConfig)
 
-        val testObserver = makeTestRequestForAuthenticationData(apiClient.api)
-        testObserver.awaitTerminalEvent()
+        val actualAuthenticationData = makeTestRequestForAuthenticationData(apiClient.api)
 
-        testObserver.assertNoErrors()
-            .assertValue {
-                it == expectedAuthenticationData
-            }
+        assertThat(actualAuthenticationData).isEqualTo(expectedAuthenticationData)
     }
 
     @Test
-    fun offline_shouldThrowAnException() {
+    fun offline_shouldThrowAnException() = runBlockingTest {
         val apiServiceMock = createMockServiceToFailRequests(apiClient.retrofit)
 
-        val testObserver = makeTestRequestForAuthenticationData(apiServiceMock)
-        testObserver.awaitTerminalEvent()
-
-        testObserver.assertError(IOException::class.java)
+        assertThrows<IOException> {
+            makeTestRequestForAuthenticationData(apiServiceMock)
+        }
     }
 
     @Test
-    fun receivingAnErrorFromServer_shouldThrowAnException() {
+    fun receivingAnErrorFromServer_shouldThrowAnException() = runBlockingTest {
         apiClient.okHttpClientConfig.addInterceptor(FakeResponseInterceptor(500, validateUrl = validateUrl))
 
-        val testObserver = makeTestRequestForAuthenticationData(apiClient.api)
-        testObserver.awaitTerminalEvent()
-
-        testObserver.assertError(SimprintsInternalServerException::class.java)
+        assertThrows<SimprintsInternalServerException> {
+            makeTestRequestForAuthenticationData(apiClient.api)
+        }
     }
 
-    private fun makeTestRequestForAuthenticationData(secureApiInterfaceMock: SecureApiInterface) =
+    private suspend fun makeTestRequestForAuthenticationData(secureApiInterfaceMock: SecureApiInterface) =
         AuthenticationDataManager(secureApiInterfaceMock).requestAuthenticationData(PROJECT_ID, USER_ID)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .test()
 
     private fun forceOkHttpToReturnSuccessfulResponse(okHttpClientConfig: OkHttpClient.Builder) {
         okHttpClientConfig.addInterceptor(FakeResponseInterceptor(200, validAuthenticationJsonResponse, validateUrl = validateUrl))

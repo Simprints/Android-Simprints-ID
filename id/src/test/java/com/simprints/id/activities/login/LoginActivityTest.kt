@@ -22,10 +22,8 @@ import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createActivity
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*
 import org.junit.Assert
 import org.junit.Assert.*
@@ -72,7 +70,6 @@ class LoginActivityTest {
     fun loginSuccesses_shouldReturnSuccessResultCode() {
         val controller = createRoboLoginActivity(getIntentForLoginAct()).start().resume().visible()
         val projectAuthenticator = mockk<ProjectAuthenticator>()
-        every { projectAuthenticator.authenticate(any(), any()) } returns Completable.complete()
 
         val loginAct = controller.get().apply {
             viewPresenter.projectAuthenticator = projectAuthenticator

@@ -1,6 +1,5 @@
 package com.simprints.id.secure
 
-import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.common.RemoteDbManager
@@ -11,12 +10,9 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.tools.extensions.trace
-import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
+import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.reactivex.Completable
-import io.reactivex.observers.TestObserver
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
@@ -48,29 +44,26 @@ class SignerManagerTest {
         )
 
         mockkStatic("com.simprints.id.tools.extensions.PerformanceMonitoring_extKt")
-        every { any<Completable>().trace(any()) }.answers { this.value }
     }
 
     @Test
-    fun signIn_shouldSignInToRemoteDb() {
+    fun signIn_shouldSignInToRemoteDb() = runBlockingTest {
         mockRemoteSignedIn()
 
         signIn()
 
-        verify { remoteDbManager.signIn(token.value) }
+        coVerify { remoteDbManager.signIn(token.value) }
     }
 
     @Test
-    fun signInToRemoteFails_signInShouldFail() {
+    fun signInToRemoteFails_signInShouldFail() = runBlockingTest {
         mockRemoteSignedIn(true)
 
-        val tester = signIn()
-
-        verifySignedInFailed(tester)
+        assertThrows<Throwable> { signIn() }
     }
 
     @Test
-    fun signIn_shouldStoreCredentialsLocally() {
+    fun signIn_shouldStoreCredentialsLocally() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
 
@@ -80,17 +73,15 @@ class SignerManagerTest {
     }
 
     @Test
-    fun storeCredentialsFails_signInShouldFail() {
+    fun storeCredentialsFails_signInShouldFail() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally(true)
 
-        val tester = signIn()
-
-        verifySignedInFailed(tester)
+        assertThrows<Throwable> { signIn() }
     }
 
     @Test
-    fun signIn_shouldFetchProjectInfo() {
+    fun signIn_shouldFetchProjectInfo() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInto()
@@ -101,26 +92,22 @@ class SignerManagerTest {
     }
 
     @Test
-    fun loadAndRefreshCacheFails_signInShouldFail() {
+    fun loadAndRefreshCacheFails_signInShouldFail() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInto(true)
 
-        val tester = signIn()
-
-        verifySignedInFailed(tester)
+        assertThrows<Throwable> { signIn() }
     }
 
     @Test
-    fun signIn_shouldSucceed() {
+    fun signIn_shouldSucceed() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInto()
         mockResumePeopleSync()
 
-        val tester = signIn()
-
-        tester.awaitAndAssertSuccess()
+        signIn()
     }
 
     @Test
@@ -136,7 +123,7 @@ class SignerManagerTest {
         verifyAllSharedPreferencesExceptRealmKeysGotCleared()
     }
 
-    private fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, token).test()
+    private suspend fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, token)
 
     private fun mockStoreCredentialsLocally(error: Boolean = false) =
         every { loginInfoManager.storeCredentials(DEFAULT_PROJECT_ID, DEFAULT_USER_ID) }.apply {
@@ -148,13 +135,12 @@ class SignerManagerTest {
         }
 
     private fun mockRemoteSignedIn(error: Boolean = false) =
-        every { remoteDbManager.signIn(token.value) }.apply {
+        coEvery { remoteDbManager.signIn(token.value) }.apply {
             this.returns(
-                if (!error) {
-                    Completable.complete()
-                } else {
-                    Completable.error(Throwable("Failed to remote sign in"))
-                })
+                if(!error) {
+                    throw Throwable("Failed to remote sign in")
+                }  else {}
+            )
         }
 
     private fun mockFetchingProjectInto(error: Boolean = false) =
@@ -180,8 +166,4 @@ class SignerManagerTest {
     private fun verifyRemoteManagerGotSignedOut() = verify { remoteDbManager.signOut() }
     private fun verifyLastSyncInfoGotDeleted() = coVerify { peopleSyncManager.deleteSyncInfo() }
     private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() = verify { preferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
-
-    private fun verifySignedInFailed(it: TestObserver<Void>) {
-        assertThat(it.errorCount()).isEqualTo(1)
-    }
 }

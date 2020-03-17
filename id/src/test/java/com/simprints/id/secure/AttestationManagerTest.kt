@@ -9,13 +9,13 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason.INVALID_CLAIMS
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason.SERVICE_UNAVAILABLE
-import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
+import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.spyk
-import io.reactivex.observers.TestObserver
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,14 +41,11 @@ class AttestationManagerTest : AutoCloseKoinTest() {
     }
 
     @Test
-    fun validAttestation_shouldSucceed() {
+    fun validAttestation_shouldSucceed() = runBlockingTest {
         mockSafetyNetResponseResult(VALID_JWS_RESULT)
         mockAttestationManagerToReturnSafetyNetResponse(safetyNetAttestationResponseMock)
 
-        with(requestSafetyNetAttestation(attestationManagerSpy)) {
-
-            assertNoErrors()
-        }
+        attestationManagerSpy.requestAttestation(safetyNetClientMock, nonce)
     }
 
     @Test
@@ -56,11 +53,9 @@ class AttestationManagerTest : AutoCloseKoinTest() {
         mockSafetyNetResponseResult(ERROR_JWS_RESULT)
         mockAttestationManagerToReturnSafetyNetResponse(safetyNetAttestationResponseMock)
 
-        with(requestSafetyNetAttestation(attestationManagerSpy)) {
-
-            assertError(SafetyNetException::class.java)
-            assertThat((errors()[0] as SafetyNetException).reason).isEqualTo(INVALID_CLAIMS)
-        }
+        assertThat(
+            assertThrows<SafetyNetException> { attestationManagerSpy.requestAttestation(safetyNetClientMock, nonce) }
+        ).isEqualTo(INVALID_CLAIMS)
     }
 
     @Test
@@ -69,17 +64,11 @@ class AttestationManagerTest : AutoCloseKoinTest() {
             Throwable("Google SafetyNet CANCELED result",
                 ApiException(Status.RESULT_CANCELED))
 
-        with(requestSafetyNetAttestation(attestationManagerSpy)) {
-
-            assertError(SafetyNetException::class.java)
-            assertThat((errors()[0] as SafetyNetException).reason).isEqualTo(SERVICE_UNAVAILABLE)
-        }
+        assertThat(
+            assertThrows<SafetyNetException> { attestationManagerSpy.requestAttestation(safetyNetClientMock, nonce) }
+        ).isEqualTo(SERVICE_UNAVAILABLE)
     }
 
-    private fun requestSafetyNetAttestation(attestationManager: AttestationManager): TestObserver<AttestToken> =
-        attestationManager.requestAttestation(safetyNetClientMock, nonce).test().also {
-            it.awaitTerminalEvent()
-        }
 
     private fun mockAttestationManagerToReturnSafetyNetResponse(safetyNetAttestationResponseMock: SafetyNetApi.AttestationResponse) {
         every { attestationManagerSpy.getSafetyNetAttestationResponse(safetyNetClientMock, nonce) } returns safetyNetAttestationResponseMock
