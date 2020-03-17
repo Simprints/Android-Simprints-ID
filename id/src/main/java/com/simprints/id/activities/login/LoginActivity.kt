@@ -2,7 +2,6 @@ package com.simprints.id.activities.login
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -104,15 +103,13 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     }
 
     private fun openScannerApp() {
-        loginActivityHelper.getScannerAppIntent(packageManager)?.let { scannerAppIntent ->
+        loginActivityHelper.tryGetScannerAppIntent(packageManager)?.let { scannerAppIntent ->
             startActivityForResult(scannerAppIntent, QR_REQUEST_CODE)
-        } ?: openScannerAppOnPlayStore()
+        } ?: openScannerAppOnPlayStore(loginActivityHelper.getIntentForScannerAppOnPlayStore())
     }
 
-    private fun openScannerAppOnPlayStore() {
-        startActivity(
-            Intent(Intent.ACTION_VIEW, Uri.parse(GOOGLE_PLAY_LINK_FOR_QR_APP))
-        )
+    private fun openScannerAppOnPlayStore(intent: Intent) {
+        startActivity(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -250,8 +247,6 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
 
     private companion object {
         const val QR_REQUEST_CODE = 0
-        const val GOOGLE_PLAY_LINK_FOR_QR_APP =
-            "https://play.google.com/store/apps/details?id=com.google.zxing.client.android"
     }
 
 }

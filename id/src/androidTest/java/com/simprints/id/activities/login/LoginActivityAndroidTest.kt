@@ -60,7 +60,7 @@ class LoginActivityAndroidTest {
     fun userIdFieldShouldBeFilledInWithValueProvidedThroughIntent() {
         loginActivity {
         } assert {
-            assertUserIdFieldHasText(USER_ID)
+            userIdFieldHasText(USER_ID)
         }
     }
 
@@ -69,7 +69,7 @@ class LoginActivityAndroidTest {
         loginActivity {
             withMandatoryCredentialsMissing()
         } clickSignIn {
-            assertMissingCredentialsToastIsDisplayed()
+            missingCredentialsToastIsDisplayed()
         }
     }
 
@@ -81,7 +81,7 @@ class LoginActivityAndroidTest {
             typeProjectId("invalid_project_id")
             typeProjectSecret(VALID_PROJECT_SECRET)
         } clickSignIn {
-            assertProjectIdMismatchToastIsDisplayed()
+            projectIdMismatchToastIsDisplayed()
         }
     }
 
@@ -95,7 +95,7 @@ class LoginActivityAndroidTest {
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
         } clickSignIn {
-            assertUserIsSignedIn()
+            userIsSignedIn()
         }
     }
 
@@ -109,7 +109,7 @@ class LoginActivityAndroidTest {
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
         } clickSignIn {
-            assertOfflineToastIsDisplayed()
+            offlineToastIsDisplayed()
         }
     }
 
@@ -123,7 +123,7 @@ class LoginActivityAndroidTest {
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
         } clickSignIn {
-            assertInvalidCredentialsToastIsDisplayed()
+            invalidCredentialsToastIsDisplayed()
         }
     }
 
@@ -137,7 +137,7 @@ class LoginActivityAndroidTest {
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
         } clickSignIn {
-            assertServerErrorToastIsDisplayed()
+            serverErrorToastIsDisplayed()
         }
     }
 
@@ -151,7 +151,7 @@ class LoginActivityAndroidTest {
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
         } clickSignIn {
-            assertAlertScreenIsLaunched()
+            alertScreenIsLaunched()
         }
     }
 
@@ -165,7 +165,7 @@ class LoginActivityAndroidTest {
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
         } clickSignIn {
-            assertAlertScreenIsLaunched()
+            alertScreenIsLaunched()
         }
     }
 
@@ -179,7 +179,7 @@ class LoginActivityAndroidTest {
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
         } clickSignIn {
-            assertAlertScreenIsLaunched()
+            alertScreenIsLaunched()
         }
     }
 
@@ -188,7 +188,7 @@ class LoginActivityAndroidTest {
         loginActivity {
             withScannerAppInstalled()
         } clickScanQr {
-            assertScannerAppIsLaunched()
+            scannerAppIsLaunched()
         }
     }
 
@@ -197,7 +197,7 @@ class LoginActivityAndroidTest {
         loginActivity {
             withScannerAppNotInstalled()
         } clickScanQr {
-            assertScannerAppPlayStorePageIsOpened()
+            scannerAppPlayStorePageIsOpened()
         }
     }
 
@@ -207,8 +207,8 @@ class LoginActivityAndroidTest {
             withScannerAppInstalled()
             receiveValidQrCodeResponse()
         } clickScanQr {
-            assertProjectIdFieldHasText(VALID_PROJECT_ID)
-            assertProjectSecretFieldHasText(VALID_PROJECT_SECRET)
+            projectIdFieldHasText(VALID_PROJECT_ID)
+            projectSecretFieldHasText(VALID_PROJECT_SECRET)
         }
     }
 
@@ -218,7 +218,7 @@ class LoginActivityAndroidTest {
             withScannerAppInstalled()
             receiveInvalidQrCodeResponse()
         } clickScanQr {
-            assertInvalidQrCodeToastIsDisplayed()
+            invalidQrCodeToastIsDisplayed()
         }
     }
 
@@ -228,7 +228,7 @@ class LoginActivityAndroidTest {
             withScannerAppInstalled()
             receiveErrorFromScannerApp()
         } clickScanQr {
-            assertQrCodeErrorToastIsDisplayed()
+            qrCodeErrorToastIsDisplayed()
         }
     }
 
@@ -236,7 +236,7 @@ class LoginActivityAndroidTest {
     fun pressBack_shouldReturnIntentWithLoginNotCompleted() {
         loginActivity {
         } pressBack {
-            assertLoginNotCompleteIntentIsReturned()
+            loginNotCompleteIntentIsReturned()
         }
     }
 
@@ -244,7 +244,7 @@ class LoginActivityAndroidTest {
     fun clickScanQrButton_shouldLogToCrashReport() {
         loginActivity {
         } clickScanQr {
-            assertMessageIsLoggedToCrashReport("Scan QR button clicked")
+            messageIsLoggedToCrashReport("Scan QR button clicked")
         }
     }
 
@@ -252,7 +252,7 @@ class LoginActivityAndroidTest {
     fun clickSignInButton_shouldLogToCrashReport() {
         loginActivity {
         } clickSignIn {
-            assertMessageIsLoggedToCrashReport("Login button clicked")
+            messageIsLoggedToCrashReport("Login button clicked")
         }
     }
 
@@ -262,7 +262,7 @@ class LoginActivityAndroidTest {
             withScannerAppInstalled()
             receiveValidQrCodeResponse()
         } clickScanQr {
-            assertMessageIsLoggedToCrashReport("QR scanning successful")
+            messageIsLoggedToCrashReport("QR scanning successful")
         }
     }
 
@@ -272,7 +272,7 @@ class LoginActivityAndroidTest {
             withScannerAppInstalled()
             receiveInvalidQrCodeResponse()
         } clickScanQr {
-            assertMessageIsLoggedToCrashReport("QR scanning unsuccessful")
+            messageIsLoggedToCrashReport("QR scanning unsuccessful")
         }
     }
 
