@@ -1,11 +1,9 @@
 package com.simprints.id.secure
 
-import com.simprints.id.secure.models.*
+import com.simprints.id.secure.models.AuthRequestBody
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.ApiToken
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
-import io.reactivex.Single
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.mock.BehaviorDelegate
@@ -15,10 +13,10 @@ import retrofit2.mock.Calls
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class SecureApiServiceMock(private val delegate: BehaviorDelegate<SecureApiInterface>) : SecureApiInterface {
 
-    override fun requestAuthenticationData(projectId: String, userId: String, key: String): Single<Response<ApiAuthenticationData>> =
+    override suspend fun requestAuthenticationData(projectId: String, userId: String, key: String): Response<ApiAuthenticationData> =
         delegate.returning(buildSuccessResponseWith(getApiAuthenticationData())).requestAuthenticationData(projectId, userId, key)
 
-    override fun requestCustomTokens(projectId: String, userId: String, credentials: AuthRequestBody, key: String): Single<Response<ApiToken>> =
+    override suspend fun requestCustomTokens(projectId: String, userId: String, credentials: AuthRequestBody, key: String): Response<ApiToken> =
         delegate.returning(buildSuccessResponseWith(getApiToken())).requestCustomTokens(projectId, userId, credentials)
 
     private fun getApiAuthenticationData() = ApiAuthenticationData("nonce_from_server",

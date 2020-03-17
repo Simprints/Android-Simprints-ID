@@ -43,7 +43,6 @@ object RobolectricTestMocker {
         }
 
         coEvery { remoteDbManagerMock.getCurrentToken() } returns ""
-        every { remoteDbManagerMock.signIn(any()) } returns Completable.complete()
         return this
     }
 
