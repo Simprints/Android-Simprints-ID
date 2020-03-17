@@ -24,9 +24,10 @@ class QrCaptureActivityAndroidTest {
 
     @get:Rule var grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(CAMERA)
 
-    var mockCameraBinder: CameraBinder = mock()
     @MockK lateinit var mockQrPreviewBuilder: QrPreviewBuilder
     @MockK lateinit var mockQrCodeProducer: QrCodeProducer
+
+    var mockCameraBinder: CameraBinder = mock()
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
@@ -42,7 +43,7 @@ class QrCaptureActivityAndroidTest {
             qrCodeProducerRule = DependencyRule.ReplaceRule {
                 mockQrCodeProducer.apply {
                     val channel = mockk<Channel<String>>()
-                    coEvery { channel.receive() } returns "some_qr_code"
+                    coEvery { channel.receive() } returns "mock_qr_code"
                     coEvery { qrCodeChannel } returns channel
                 }
             }
@@ -66,7 +67,7 @@ class QrCaptureActivityAndroidTest {
     @Test
     fun whenQrCodeIsScanned_shouldReturnOkResult() {
         qrCaptureActivity {
-        } scanQrCode {
+        } assert {
             resultIsOk()
         }
     }
@@ -74,7 +75,7 @@ class QrCaptureActivityAndroidTest {
     @Test
     fun whenQrCodeIsScanned_shouldSendValueInResult() {
         qrCaptureActivity {
-        } scanQrCode {
+        } assert {
             qrScanResultIsSent()
         }
     }
@@ -90,7 +91,7 @@ class QrCaptureActivityAndroidTest {
     @Test
     fun whenQrCodeIsScanned_shouldFinishActivity() {
         qrCaptureActivity {
-        } scanQrCode {
+        } assert {
             activityIsFinished()
         }
     }
