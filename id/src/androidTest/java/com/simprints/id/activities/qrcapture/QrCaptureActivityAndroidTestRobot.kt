@@ -1,43 +1,31 @@
 package com.simprints.id.activities.qrcapture
 
 import android.app.Activity
-import android.content.Intent
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.pressBackUnconditionally
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
 import com.simprints.id.activities.qrcapture.QrCaptureActivity.Companion.QR_RESULT_KEY
 import com.simprints.id.activities.qrcapture.tools.CameraBinder
-import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
-import io.mockk.coEvery
 
 private const val QR_SCAN_RESULT = "mock_qr_code"
 
 fun QrCaptureActivityAndroidTest.qrCaptureActivity(
     block: QrCaptureActivityAndroidTestRobot.() -> Unit
 ): QrCaptureActivityAndroidTestRobot {
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
     val activityScenario = ActivityScenario.launch(QrCaptureActivity::class.java)
 
-    return QrCaptureActivityAndroidTestRobot(
-        activityScenario,
-        mockCameraBinder,
-        mockQrCodeProducer
-    ).apply(block)
+    return QrCaptureActivityAndroidTestRobot(activityScenario, mockCameraBinder).apply(block)
 }
 
 class QrCaptureActivityAndroidTestRobot(
     private val activityScenario: ActivityScenario<QrCaptureActivity>,
-    private val mockCameraBinder: CameraBinder,
-    private val mockQrCodeProducer: QrCodeProducer
+    private val mockCameraBinder: CameraBinder
 ) {
-
-    infix fun scanQrCode(assertion: QrCaptureActivityAndroidTestAssertions.() -> Unit) {
-        coEvery { mockQrCodeProducer.qrCodeChannel.receive() } returns QR_SCAN_RESULT
-
-        assert(assertion)
-    }
 
     infix fun pressBack(assertion: QrCaptureActivityAndroidTestAssertions.() -> Unit) {
         pressBackUnconditionally()
@@ -69,8 +57,10 @@ class QrCaptureActivityAndroidTestAssertions(
     }
 
     fun qrScanResultIsSent() {
-        val expectedResultData = Intent().putExtra(QR_RESULT_KEY, QR_SCAN_RESULT)
-        assertThat(activityScenario.result.resultData).isEqualTo(expectedResultData)
+        with(activityScenario.result.resultData) {
+            assertThat(hasExtra(QR_RESULT_KEY)).isTrue()
+            assertThat(getStringExtra(QR_RESULT_KEY)).isEqualTo(QR_SCAN_RESULT)
+        }
     }
 
     fun activityIsFinished() {
