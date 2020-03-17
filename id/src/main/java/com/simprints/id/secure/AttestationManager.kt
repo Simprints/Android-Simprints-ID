@@ -12,20 +12,17 @@ import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason.SERVICE_
 import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
-import io.reactivex.Single
 
 open class AttestationManager {
 
-    fun requestAttestation(safetyNetClient: SafetyNetClient, nonce: Nonce): Single<AttestToken> {
-        return Single.fromCallable<AttestToken> {
+    fun requestAttestation(safetyNetClient: SafetyNetClient, nonce: Nonce): AttestToken {
 
             val result = getSafetyNetAttestationResponse(safetyNetClient, nonce)
 
-            result.let {
+            return result.let {
                 checkForErrorClaimAndThrow(it)
                 AttestToken(it.jwsResult)
             }
-        }
     }
 
     internal fun getSafetyNetAttestationResponse(safetyNetClient: SafetyNetClient, nonce: Nonce): SafetyNetApi.AttestationResponse {

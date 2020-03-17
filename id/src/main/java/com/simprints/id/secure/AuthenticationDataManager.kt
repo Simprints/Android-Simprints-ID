@@ -4,19 +4,15 @@ import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.remote.toDomainAuthData
-import com.simprints.id.tools.extensions.handleResponse
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
+import com.simprints.id.tools.utils.retrySimNetworkCalls
 import retrofit2.HttpException
 
 class AuthenticationDataManager(val client: SecureApiInterface) {
-    fun requestAuthenticationData(projectId: String, userId: String): Single<AuthenticationData> {
-        return client.requestAuthenticationData(
-            projectId,
-            userId)
-            .handleResponse(::handleResponseError)
-            .map { it.toDomainAuthData() }
-            .subscribeOn(Schedulers.io())
+    suspend fun requestAuthenticationData(projectId: String, userId: String): AuthenticationData {
+        val response = makeNetworkRequest({
+            it.requestAuthenticationData(projectId, userId)
+        }, "requestAuthData")
+        return response.body()!!.toDomainAuthData()
     }
 
     private fun handleResponseError(e: HttpException): Nothing =
@@ -25,4 +21,7 @@ class AuthenticationDataManager(val client: SecureApiInterface) {
             in 500..599 -> throw SimprintsInternalServerException()
             else -> throw e
         }
+
+    private suspend fun <T> makeNetworkRequest(block: suspend (client: SecureApiInterface) -> T, traceName: String): T =
+        retrySimNetworkCalls(client, block, traceName)
 }
