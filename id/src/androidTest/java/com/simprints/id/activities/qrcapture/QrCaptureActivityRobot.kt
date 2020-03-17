@@ -1,42 +1,32 @@
 package com.simprints.id.activities.qrcapture
 
 import android.app.Activity
-import android.content.Intent
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.pressBackUnconditionally
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.verify
 import com.simprints.id.activities.qrcapture.QrCaptureActivity.Companion.QR_RESULT_KEY
 import com.simprints.id.activities.qrcapture.tools.CameraBinder
-import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
-import io.mockk.coEvery
-import io.mockk.verify
 
-private const val QR_SCAN_RESULT = "mock_qr_code"
+const val VALID_QR_SCAN_RESULT = "mock_qr_code"
+const val INVALID_QR_SCAN_RESULT = ""
 
-fun QrCaptureActivityTest.qrCaptureActivity(
+fun QrCaptureActivityAndroidTest.qrCaptureActivity(
     block: QrCaptureActivityRobot.() -> Unit
 ): QrCaptureActivityRobot {
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
     val activityScenario = ActivityScenario.launch(QrCaptureActivity::class.java)
 
-    return QrCaptureActivityRobot(
-        activityScenario,
-        mockCameraBinder,
-        mockQrCodeProducer
-    ).apply(block)
+    return QrCaptureActivityRobot(activityScenario, mockCameraBinder).apply(block)
 }
 
 class QrCaptureActivityRobot(
     private val activityScenario: ActivityScenario<QrCaptureActivity>,
-    private val mockCameraBinder: CameraBinder,
-    private val mockQrCodeProducer: QrCodeProducer
+    private val mockCameraBinder: CameraBinder
 ) {
-
-    infix fun scanQrCode(assertion: QrCaptureActivityAssertions.() -> Unit) {
-        coEvery { mockQrCodeProducer.qrCodeChannel.receive() } returns QR_SCAN_RESULT
-
-        assert(assertion)
-    }
 
     infix fun pressBack(assertion: QrCaptureActivityAssertions.() -> Unit) {
         pressBackUnconditionally()
@@ -56,7 +46,7 @@ class QrCaptureActivityAssertions(
 ) {
 
     fun cameraIsStarted() {
-        verify { mockCameraBinder.bindToLifecycle(any(), any(), any()) }
+        verify(mockCameraBinder).bindToLifecycle(any(), any(), any())
     }
 
     fun resultIsOk() {
@@ -68,8 +58,10 @@ class QrCaptureActivityAssertions(
     }
 
     fun qrScanResultIsSent() {
-        val expectedResultData = Intent().putExtra(QR_RESULT_KEY, QR_SCAN_RESULT)
-        assertThat(activityScenario.result.resultData).isEqualTo(expectedResultData)
+        with(activityScenario.result.resultData) {
+            assertThat(hasExtra(QR_RESULT_KEY)).isTrue()
+            assertThat(getStringExtra(QR_RESULT_KEY)).isEqualTo(VALID_QR_SCAN_RESULT)
+        }
     }
 
     fun activityIsFinished() {
