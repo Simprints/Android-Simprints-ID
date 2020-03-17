@@ -16,26 +16,26 @@ import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.displ
 import br.com.concretesolutions.kappuccino.custom.intent.IntentMatcherInteractions.sentIntent
 import br.com.concretesolutions.kappuccino.custom.intent.IntentMatcherInteractions.stubIntent
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.testtools.android.getCurrentActivity
 import io.mockk.every
 import io.mockk.verify
 import org.hamcrest.CoreMatchers.not
+import org.json.JSONException
 
 const val USER_ID = "user_id"
 const val VALID_PROJECT_ID = "project_id"
 const val VALID_PROJECT_SECRET = "encrypted_project_secret"
 
 private const val EXTRA_SCAN_RESULT = "SCAN_RESULT"
+private const val SCANNER_APP_INTENT = "mock_scanner_app_intent"
+private const val PLAY_STORE_INTENT = "mock_play_store_intent"
 
 fun LoginActivityAndroidTest.loginActivity(
     block: LoginActivityRobot.() -> Unit
@@ -45,6 +45,10 @@ fun LoginActivityAndroidTest.loginActivity(
 
     val intent = Intent(context, LoginActivity::class.java)
         .putExtra(LoginActivityRequest.BUNDLE_KEY, request)
+
+    every {
+        mockLoginActivityHelper.getIntentForScannerAppOnPlayStore()
+    } returns Intent(PLAY_STORE_INTENT)
 
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
     val activityScenario = ActivityScenario.launch<LoginActivity>(intent)
@@ -91,31 +95,30 @@ class LoginActivityRobot(
     }
 
     fun withScannerAppInstalled() {
-        val scannerAppIntent = Intent("SCANNER_APP")
-        every { mockLoginActivityHelper.getScannerAppIntent(any()) } returns scannerAppIntent
+        val scannerAppIntent = Intent(SCANNER_APP_INTENT)
+        every { mockLoginActivityHelper.tryGetScannerAppIntent(any()) } returns scannerAppIntent
     }
 
     fun withScannerAppNotInstalled() {
-        every { mockLoginActivityHelper.getScannerAppIntent(any()) } returns null
+        every { mockLoginActivityHelper.tryGetScannerAppIntent(any()) } returns null
     }
 
     fun receiveValidQrCodeResponse() {
-        val response = JsonHelper.toJson(
-            CredentialsResponse(VALID_PROJECT_ID, VALID_PROJECT_SECRET)
-        )
-
-        stubScannerAppIntent(response)
+        every {
+            mockLoginActivityHelper.tryParseQrCodeResponse(any())
+        } returns CredentialsResponse(VALID_PROJECT_ID, VALID_PROJECT_SECRET)
+        stubScannerAppIntent()
     }
 
     fun receiveInvalidQrCodeResponse() {
-        stubScannerAppIntent("invalid_json")
+        every { mockLoginActivityHelper.tryParseQrCodeResponse(any()) } throws JSONException("")
+        stubScannerAppIntent()
     }
 
     fun receiveErrorFromScannerApp() {
         stubIntent {
             respondWith {
                 canceled()
-                customCode(0)
             }
         }
     }
@@ -158,13 +161,12 @@ class LoginActivityRobot(
         } returns result
     }
 
-    private fun stubScannerAppIntent(response: String) {
+    private fun stubScannerAppIntent() {
         stubIntent {
             respondWith {
-                val data = Intent().putExtra(EXTRA_SCAN_RESULT, response)
+                val data = Intent().putExtra(EXTRA_SCAN_RESULT, "mock_qr_code")
                 ok()
                 data(data)
-                customCode(0)
             }
         }
     }
@@ -176,7 +178,7 @@ class LoginActivityAssertions(
     private val mockCrashReportManager: CrashReportManager
 ) {
 
-    fun assertUserIdFieldHasText(text: String) {
+    fun userIdFieldHasText(text: String) {
         displayed {
             allOf {
                 id(R.id.loginEditTextUserId)
@@ -185,65 +187,64 @@ class LoginActivityAssertions(
         }
     }
 
-    fun assertMissingCredentialsToastIsDisplayed() {
+    fun missingCredentialsToastIsDisplayed() {
         assertToastIsDisplayed(
             "Missing credentials. Please check the User ID, Project ID, and key, and try again."
         )
     }
 
-    fun assertProjectIdMismatchToastIsDisplayed() {
+    fun projectIdMismatchToastIsDisplayed() {
         assertToastIsDisplayed(
             "Project ID different from that supplied in intent. Please contact your system administrator."
         )
     }
 
-    fun assertUserIsSignedIn() {
+    fun userIsSignedIn() {
         val result = activityScenario.result
         assertThat(result.resultCode).isEqualTo(LoginActivityResponse.RESULT_CODE_LOGIN_SUCCEED)
     }
 
-    fun assertInvalidCredentialsToastIsDisplayed() {
+    fun invalidCredentialsToastIsDisplayed() {
         assertToastIsDisplayed("Invalid credentials. Please check the Project ID and key")
     }
 
-    fun assertOfflineToastIsDisplayed() {
+    fun offlineToastIsDisplayed() {
         assertToastIsDisplayed("Currently offline. Please check your internet connection.")
     }
 
-    fun assertServerErrorToastIsDisplayed() {
+    fun serverErrorToastIsDisplayed() {
         assertToastIsDisplayed(
             "A problem occurred trying to contact the server. Please try again later."
         )
     }
 
-    fun assertAlertScreenIsLaunched() {
+    fun alertScreenIsLaunched() {
         sentIntent {
             className(AlertActivity::class.java.name)
         }
     }
 
-    fun assertScannerAppIsLaunched() {
+    fun scannerAppIsLaunched() {
         sentIntent {
-            action("com.google.zxing.client.android.SCAN")
+            action(SCANNER_APP_INTENT)
         }
     }
 
-    fun assertScannerAppPlayStorePageIsOpened() {
+    fun scannerAppPlayStorePageIsOpened() {
         sentIntent {
-            action(Intent.ACTION_VIEW)
-            url("https://play.google.com/store/apps/details?id=com.google.zxing.client.android")
+            action(PLAY_STORE_INTENT)
         }
     }
 
-    fun assertInvalidQrCodeToastIsDisplayed() {
+    fun invalidQrCodeToastIsDisplayed() {
         assertToastIsDisplayed("The scanned QR code is invalid.")
     }
 
-    fun assertQrCodeErrorToastIsDisplayed() {
+    fun qrCodeErrorToastIsDisplayed() {
         assertToastIsDisplayed("A problem occurred while scanning the QR code")
     }
 
-    fun assertProjectIdFieldHasText(text: String) {
+    fun projectIdFieldHasText(text: String) {
         displayed {
             allOf {
                 id(R.id.loginEditTextProjectId)
@@ -252,7 +253,7 @@ class LoginActivityAssertions(
         }
     }
 
-    fun assertProjectSecretFieldHasText(text: String) {
+    fun projectSecretFieldHasText(text: String) {
         displayed {
             allOf {
                 id(R.id.loginEditTextProjectSecret)
@@ -261,7 +262,7 @@ class LoginActivityAssertions(
         }
     }
 
-    fun assertLoginNotCompleteIntentIsReturned() {
+    fun loginNotCompleteIntentIsReturned() {
         val result = activityScenario.result
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
 
@@ -272,11 +273,11 @@ class LoginActivityAssertions(
         assertThat(response.reason).isEqualTo(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE)
     }
 
-    fun assertMessageIsLoggedToCrashReport(message: String) {
+    fun messageIsLoggedToCrashReport(message: String) {
         verify {
             mockCrashReportManager.logMessageForCrashReport(
-                CrashReportTag.LOGIN,
-                CrashReportTrigger.UI,
+                any(),
+                any(),
                 message = message
             )
         }

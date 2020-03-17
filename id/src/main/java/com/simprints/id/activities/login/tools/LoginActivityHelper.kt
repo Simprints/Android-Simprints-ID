@@ -17,7 +17,9 @@ interface LoginActivityHelper {
         projectIdFromIntent: String
     ): Boolean
 
-    fun getScannerAppIntent(packageManager: PackageManager): Intent?
+    fun tryGetScannerAppIntent(packageManager: PackageManager): Intent?
+
+    fun getIntentForScannerAppOnPlayStore(): Intent
 
     /**
      * Valid Scanned Text Format:
