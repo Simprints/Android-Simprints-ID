@@ -13,6 +13,7 @@ import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.mock
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.Channel
 import org.junit.Before
@@ -42,7 +43,7 @@ class QrCaptureActivityAndroidTest {
             },
             qrCodeProducerRule = DependencyRule.ReplaceRule {
                 mockQrCodeProducer.apply {
-                    coEvery { qrCodeChannel } returns mockChannel
+                    every { qrCodeChannel } returns mockChannel
                 }
             }
         )
