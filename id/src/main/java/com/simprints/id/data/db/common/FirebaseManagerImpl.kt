@@ -6,7 +6,6 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import com.simprints.id.tools.extensions.awaitTask
-import io.reactivex.Completable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -17,12 +16,11 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
         FirebaseAuth.getInstance()
     }
 
-    override fun signIn(token: String): Completable =
-        Completable.fromAction {
-            cacheTokenClaims(token)
-            val result = Tasks.await(firebaseAuth.signInWithCustomToken(token))
-            Timber.d(result.user.uid)
-        }
+    override suspend fun signIn(token: String) {
+        cacheTokenClaims(token)
+        val result = Tasks.await(firebaseAuth.signInWithCustomToken(token))
+        Timber.d(result.user.uid)
+    }
 
     override fun signOut() {
         clearCachedTokenClaims()
