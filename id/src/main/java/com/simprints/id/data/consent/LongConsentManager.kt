@@ -1,15 +1,14 @@
 package com.simprints.id.data.consent
 
-import io.reactivex.Completable
-import io.reactivex.Flowable
+import kotlinx.coroutines.flow.Flow
 
 interface LongConsentManager {
 
-    fun downloadAllLongConsents(languages: Array<String>): Completable
+    suspend fun downloadAllLongConsents(languages: Array<String>)
 
-    fun downloadLongConsentWithProgress(language: String): Flowable<Int>
+    suspend fun downloadLongConsentWithProgress(language: String): Flow<Int>
 
-    fun checkIfLongConsentExists(language: String): Boolean
+    fun checkIfLongConsentExistsInLocal(language: String): Boolean
 
     fun getLongConsentText(language: String): String
 

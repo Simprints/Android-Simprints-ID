@@ -6,7 +6,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_privacy_notice.*
@@ -14,7 +13,6 @@ import javax.inject.Inject
 
 class PrivacyNoticeActivity : AppCompatActivity(), PrivacyNoticeContract.View {
 
-    @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     override lateinit var viewPresenter: PrivacyNoticeContract.Presenter

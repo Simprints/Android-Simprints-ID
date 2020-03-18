@@ -2,6 +2,7 @@ package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
+import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
@@ -110,6 +111,6 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private fun Single<out Array<String>>.fetchProjectLongConsentTexts(): Completable =
         flatMapCompletable { languages ->
-            longConsentManager.downloadAllLongConsents(languages)
+            completableWithSuspend { longConsentManager.downloadAllLongConsents(languages) }
         }
 }
