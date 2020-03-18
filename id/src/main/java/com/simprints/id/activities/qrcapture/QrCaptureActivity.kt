@@ -11,7 +11,6 @@ import android.view.Surface
 import android.view.TextureView
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.Preview
 import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -29,13 +28,9 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
     @Inject lateinit var qrPreviewBuilder: QrPreviewBuilder
     @Inject lateinit var qrCodeProducer: QrCodeProducer
 
-    private lateinit var preview: Preview
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
-
-        preview = buildPreview()
 
         if (hasPermission(CAMERA))
             startCamera()
@@ -78,6 +73,7 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
     }
 
     private fun startCamera() {
+        val preview = buildPreview()
         cameraBinder.bindToLifecycle(this, preview, qrCodeProducer.useCase)
 
         lifecycleScope.launch {
@@ -98,19 +94,25 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
         val centreX = x / 2
         val centreY = y / 2
 
-        val rotationDegrees = when (display.rotation) {
-            Surface.ROTATION_0 -> 0f
-            Surface.ROTATION_90 -> 90f
-            Surface.ROTATION_180 -> 180f
-            Surface.ROTATION_270 -> 270f
-            else -> return
-        }
+        val previewDisplay = display
 
-        val matrix = Matrix().apply {
-            postRotate(-rotationDegrees, centreX, centreY)
-        }
+        if (previewDisplay != null) {
+            val rotationDegrees = when (display.rotation) {
+                Surface.ROTATION_0 -> 0f
+                Surface.ROTATION_90 -> 90f
+                Surface.ROTATION_180 -> 180f
+                Surface.ROTATION_270 -> 270f
+                else -> return
+            }
 
-        setTransform(matrix)
+            val matrix = Matrix().apply {
+                postRotate(-rotationDegrees, centreX, centreY)
+            }
+
+            setTransform(matrix)
+        } else {
+            return
+        }
     }
 
     companion object {
