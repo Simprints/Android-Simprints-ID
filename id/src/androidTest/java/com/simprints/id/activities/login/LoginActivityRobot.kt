@@ -21,6 +21,7 @@ import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.tools.LoginActivityHelper
+import com.simprints.id.activities.qrcapture.QrCaptureActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.testtools.android.getCurrentActivity
@@ -34,8 +35,6 @@ const val VALID_PROJECT_ID = "project_id"
 const val VALID_PROJECT_SECRET = "encrypted_project_secret"
 
 private const val EXTRA_SCAN_RESULT = "SCAN_RESULT"
-private const val SCANNER_APP_INTENT = "mock_scanner_app_intent"
-private const val PLAY_STORE_INTENT = "mock_play_store_intent"
 
 fun LoginActivityAndroidTest.loginActivity(
     block: LoginActivityRobot.() -> Unit
@@ -45,10 +44,6 @@ fun LoginActivityAndroidTest.loginActivity(
 
     val intent = Intent(context, LoginActivity::class.java)
         .putExtra(LoginActivityRequest.BUNDLE_KEY, request)
-
-    every {
-        mockLoginActivityHelper.getIntentForScannerAppOnPlayStore()
-    } returns Intent(PLAY_STORE_INTENT)
 
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
     val activityScenario = ActivityScenario.launch<LoginActivity>(intent)
@@ -94,28 +89,19 @@ class LoginActivityRobot(
         shouldMatchSuppliedProjectIdAndIntentProjectId(false)
     }
 
-    fun withScannerAppInstalled() {
-        val scannerAppIntent = Intent(SCANNER_APP_INTENT)
-        every { mockLoginActivityHelper.tryGetScannerAppIntent(any()) } returns scannerAppIntent
-    }
-
-    fun withScannerAppNotInstalled() {
-        every { mockLoginActivityHelper.tryGetScannerAppIntent(any()) } returns null
-    }
-
     fun receiveValidQrCodeResponse() {
         every {
             mockLoginActivityHelper.tryParseQrCodeResponse(any())
         } returns CredentialsResponse(VALID_PROJECT_ID, VALID_PROJECT_SECRET)
-        stubScannerAppIntent()
+        stubQrScanIntent()
     }
 
     fun receiveInvalidQrCodeResponse() {
         every { mockLoginActivityHelper.tryParseQrCodeResponse(any()) } throws JSONException("")
-        stubScannerAppIntent()
+        stubQrScanIntent()
     }
 
-    fun receiveErrorFromScannerApp() {
+    fun receiveQrScanError() {
         stubIntent {
             respondWith {
                 canceled()
@@ -161,7 +147,7 @@ class LoginActivityRobot(
         } returns result
     }
 
-    private fun stubScannerAppIntent() {
+    private fun stubQrScanIntent() {
         stubIntent {
             respondWith {
                 val data = Intent().putExtra(EXTRA_SCAN_RESULT, "mock_qr_code")
@@ -224,15 +210,9 @@ class LoginActivityAssertions(
         }
     }
 
-    fun scannerAppIsLaunched() {
+    fun qrCaptureActivityIsOpened() {
         sentIntent {
-            action(SCANNER_APP_INTENT)
-        }
-    }
-
-    fun scannerAppPlayStorePageIsOpened() {
-        sentIntent {
-            action(PLAY_STORE_INTENT)
+            className(QrCaptureActivity::class.java.name)
         }
     }
 
