@@ -152,6 +152,8 @@ dependencies {
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
     implementation deps.androidx.security
+    implementation deps.androidx.camerax.core
+    implementation deps.androidx.camerax.camera2
     implementation deps.support.material
     implementation deps.arch_components.work
     implementation deps.playservices.location
@@ -164,12 +166,16 @@ dependencies {
     api deps.firebase.config
     api deps.firebase.perf
     api deps.firebase.storage
+    api deps.firebase.mlkit
+    api deps.firebase.mlkit_barcode
+
     implementation(deps.crashlytics.core) {
         transitive = true
     }
     implementation(deps.crashlytics.ndk) {
         transitive = true
     }
+
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter
     implementation deps.retrofit.convertergson

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.app.ActivityCompat.requestPermissions
-import androidx.core.content.ContextCompat.checkSelfPermission
 import com.simprints.id.tools.AndroidResourcesHelper
 
 fun Activity.runOnUiThreadIfStillRunning(then: () -> Unit) {
@@ -36,6 +35,10 @@ fun Activity.hideKeyboard() {
     inputMethodManager.hideSoftInputFromWindow(focusedView.windowToken, flags)
 }
 
+fun Activity.hasPermission(permission: String): Boolean {
+    return checkSelfPermission(permission) == PERMISSION_GRANTED
+}
+
 fun Activity.requestPermissionsIfRequired(permissions: Array<String>, permissionsRequestCode: Int): Boolean {
     val permissionsToAsk = getNotGrantedPermissions(permissions)
 
@@ -48,6 +51,4 @@ fun Activity.requestPermissionsIfRequired(permissions: Array<String>, permission
 }
 
 fun Activity.getNotGrantedPermissions(permissions: Array<String>) =
-    permissions.filter {
-        checkSelfPermission(this, it) != PERMISSION_GRANTED
-    }.toTypedArray()
+    permissions.filterNot { hasPermission(it) }.toTypedArray()
