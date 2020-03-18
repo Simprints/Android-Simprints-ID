@@ -2,7 +2,6 @@ package com.simprints.id.activities.login
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.activities.login.repository.LoginRepository
 import com.simprints.id.activities.login.tools.LoginActivityHelper
@@ -19,10 +18,8 @@ import io.mockk.impl.annotations.MockK
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import javax.inject.Inject
 
-@RunWith(AndroidJUnit4::class)
 class LoginActivityAndroidTest {
 
     @Inject lateinit var mockCrashReportManager: CrashReportManager
@@ -184,28 +181,16 @@ class LoginActivityAndroidTest {
     }
 
     @Test
-    fun scannerAppIsInstalled_clickScanQr_shouldOpenScannerApp() {
+    fun clickScanQr_shouldOpenQrCaptureActivity() {
         loginActivity {
-            withScannerAppInstalled()
-            receiveValidQrCodeResponse()
         } clickScanQr {
-            scannerAppIsLaunched()
-        }
-    }
-
-    @Test
-    fun scannerAppNotInstalled_clickScanQr_shouldOpenScannerAppPlayStorePage() {
-        loginActivity {
-            withScannerAppNotInstalled()
-        } clickScanQr {
-            scannerAppPlayStorePageIsOpened()
+            qrCaptureActivityIsOpened()
         }
     }
 
     @Test
     fun receiveValidQrCodeResponse_shouldFillProjectIdAndProjectSecretFields() {
         loginActivity {
-            withScannerAppInstalled()
             receiveValidQrCodeResponse()
         } clickScanQr {
             projectIdFieldHasText(VALID_PROJECT_ID)
@@ -216,7 +201,6 @@ class LoginActivityAndroidTest {
     @Test
     fun receiveInvalidQrCodeResponse_shouldShowToast() {
         loginActivity {
-            withScannerAppInstalled()
             receiveInvalidQrCodeResponse()
         } clickScanQr {
             invalidQrCodeToastIsDisplayed()
@@ -226,8 +210,7 @@ class LoginActivityAndroidTest {
     @Test
     fun receiveErrorFromScannerApp_shouldShowToast() {
         loginActivity {
-            withScannerAppInstalled()
-            receiveErrorFromScannerApp()
+            receiveQrScanError()
         } clickScanQr {
             qrCodeErrorToastIsDisplayed()
         }
@@ -244,8 +227,6 @@ class LoginActivityAndroidTest {
     @Test
     fun clickScanQrButton_shouldLogToCrashReport() {
         loginActivity {
-            withScannerAppInstalled()
-            receiveValidQrCodeResponse()
         } clickScanQr {
             messageIsLoggedToCrashReport("Scan QR button clicked")
         }
@@ -262,7 +243,6 @@ class LoginActivityAndroidTest {
     @Test
     fun receiveValidQrCodeResponse_shouldLogToCrashReport() {
         loginActivity {
-            withScannerAppInstalled()
             receiveValidQrCodeResponse()
         } clickScanQr {
             messageIsLoggedToCrashReport("QR scanning successful")
@@ -272,7 +252,6 @@ class LoginActivityAndroidTest {
     @Test
     fun receiveInvalidQrCodeResponse_shouldLogToCrashReport() {
         loginActivity {
-            withScannerAppInstalled()
             receiveInvalidQrCodeResponse()
         } clickScanQr {
             messageIsLoggedToCrashReport("QR scanning unsuccessful")
