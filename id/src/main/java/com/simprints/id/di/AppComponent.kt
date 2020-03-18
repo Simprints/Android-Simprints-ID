@@ -20,6 +20,7 @@ import com.simprints.id.activities.guidselection.GuidSelectionActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticePresenter
+import com.simprints.id.activities.qrcapture.QrCaptureActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsAboutActivity
@@ -129,6 +130,7 @@ interface AppComponent {
     fun inject(syncInformationActivity: SyncInformationActivity)
     fun inject(peopleEndSyncReporterWorker: PeopleEndSyncReporterWorker)
     fun inject(peopleStartSyncWorker: PeopleStartSyncReporterWorker)
+    fun inject(qrCaptureActivity: QrCaptureActivity)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager

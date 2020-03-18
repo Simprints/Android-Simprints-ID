@@ -16,6 +16,7 @@ def dagger = [
 
 def androidx_lifecycle_version = "2.2.0-rc03"
 def androidx_room_version = "2.1.0-alpha04"
+def androidx_camerax_version = '1.0.0-alpha06'
 def androidx = [
     core     : "androidx.core:core-ktx:1.0.2",
     multidex : "androidx.multidex:multidex:2.0.1",
@@ -41,7 +42,11 @@ def androidx = [
         fragment        : "androidx.fragment:fragment:1.1.0-alpha04",
         preference      : "androidx.preference:preference:1.1.0-alpha03"
     ],
-    security : ['androidx.security:security-crypto:1.0.0-alpha02']
+    security : ['androidx.security:security-crypto:1.0.0-alpha02'],
+    camerax: [
+        core: "androidx.camera:camera-core:$androidx_camerax_version",
+        camera2: "androidx.camera:camera-camera2:$androidx_camerax_version"
+    ]
 ]
 
 def support = [
@@ -61,12 +66,14 @@ def playservices = [
 ]
 
 def firebase = [
-    database: "com.google.firebase:firebase-database:16.0.6",
-    core    : "com.google.firebase:firebase-core:16.0.7",
-    auth    : "com.google.firebase:firebase-auth:16.1.0",
-    config  : "com.google.firebase:firebase-config:16.3.0",
-    perf    : "com.google.firebase:firebase-perf:16.2.3",
-    storage : "com.google.firebase:firebase-storage:16.0.5",
+    database     : "com.google.firebase:firebase-database:16.0.6",
+    core         : "com.google.firebase:firebase-core:16.0.7",
+    auth         : "com.google.firebase:firebase-auth:19.2.0",
+    config       : "com.google.firebase:firebase-config:16.3.0",
+    perf         : "com.google.firebase:firebase-perf:16.2.3",
+    storage      : "com.google.firebase:firebase-storage:16.0.5",
+    mlkit        : "com.google.firebase:firebase-ml-vision:24.0.1",
+    mlkit_barcode: "com.google.firebase:firebase-ml-vision-barcode-model:16.0.2"
 ]
 
 def crashlytics = [

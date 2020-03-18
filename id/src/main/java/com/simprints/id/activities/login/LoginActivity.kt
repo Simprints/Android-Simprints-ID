@@ -16,6 +16,7 @@ import com.simprints.id.activities.login.response.LoginActivityResponse.Companio
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModel
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
+import com.simprints.id.activities.qrcapture.QrCaptureActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -75,7 +76,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     private fun setUpButtons() {
         loginButtonScanQr.setOnClickListener {
             logMessageForCrashReport("Scan QR button clicked")
-            openScannerApp()
+            scanQrCode()
         }
 
         loginButtonSignIn.setOnClickListener {
@@ -102,14 +103,9 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         }
     }
 
-    private fun openScannerApp() {
-        loginActivityHelper.tryGetScannerAppIntent(packageManager)?.let { scannerAppIntent ->
-            startActivityForResult(scannerAppIntent, QR_REQUEST_CODE)
-        } ?: openScannerAppOnPlayStore(loginActivityHelper.getIntentForScannerAppOnPlayStore())
-    }
-
-    private fun openScannerAppOnPlayStore(intent: Intent) {
-        startActivity(intent)
+    private fun scanQrCode() {
+        val intent = QrCaptureActivity.getIntent(this)
+        startActivityForResult(intent, QR_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -121,19 +117,19 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
             finish()
         } else if (requestCode == QR_REQUEST_CODE) {
             data?.let {
-                handleScannerAppResult(resultCode, it)
-            }
+                handleQrScanResult(resultCode, it)
+            } ?: showErrorForQRCodeFailed()
         }
     }
 
-    private fun handleScannerAppResult(resultCode: Int, data: Intent) {
+    private fun handleQrScanResult(resultCode: Int, data: Intent) {
         if (resultCode == Activity.RESULT_OK)
-            processScannerAppResponse(data)
+            processQrScanResponse(data)
         else
             showErrorForQRCodeFailed()
     }
 
-    private fun processScannerAppResponse(response: Intent) {
+    private fun processQrScanResponse(response: Intent) {
         try {
             val credentialsResponse = loginActivityHelper.tryParseQrCodeResponse(response)
             val projectId = credentialsResponse.projectId
