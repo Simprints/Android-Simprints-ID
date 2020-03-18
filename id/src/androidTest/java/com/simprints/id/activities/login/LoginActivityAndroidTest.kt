@@ -187,6 +187,7 @@ class LoginActivityAndroidTest {
     fun scannerAppIsInstalled_clickScanQr_shouldOpenScannerApp() {
         loginActivity {
             withScannerAppInstalled()
+            receiveValidQrCodeResponse()
         } clickScanQr {
             scannerAppIsLaunched()
         }
@@ -243,6 +244,8 @@ class LoginActivityAndroidTest {
     @Test
     fun clickScanQrButton_shouldLogToCrashReport() {
         loginActivity {
+            withScannerAppInstalled()
+            receiveValidQrCodeResponse()
         } clickScanQr {
             messageIsLoggedToCrashReport("Scan QR button clicked")
         }
