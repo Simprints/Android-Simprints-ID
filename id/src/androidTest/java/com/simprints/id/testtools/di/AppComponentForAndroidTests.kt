@@ -3,6 +3,7 @@ package com.simprints.id.testtools.di
 import com.simprints.id.Application
 import com.simprints.id.activities.dashboard.DashboardActivityAndroidTest
 import com.simprints.id.activities.login.LoginActivityAndroidTest
+import com.simprints.id.activities.qrcapture.QrCaptureActivityAndroidTest
 import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
 import com.simprints.id.data.db.session.controllers.local.RealmSessionEventsDbManagerImplTest
 import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImplTest
@@ -42,4 +43,5 @@ interface AppComponentForAndroidTests : AppComponent {
     fun inject(moduleSelectionActivityAndroidTest: ModuleSelectionActivityAndroidTest)
     fun inject(peopleSyncIntegrationTest: PeopleSyncIntegrationTest)
     fun inject(dashboardActivityAndroidTest: DashboardActivityAndroidTest)
+    fun inject(qrCaptureActivityAndroidTest: QrCaptureActivityAndroidTest)
 }
