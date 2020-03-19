@@ -21,7 +21,10 @@ class CameraHelperImpl(
         val useCase = qrCodeProducer.useCase
 
         cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase, preview).let {
-            cameraFocusManager.setUpFocusOnTap(cameraPreview, it)
+            with(cameraFocusManager) {
+                setUpFocusOnTap(cameraPreview, it)
+                setUpAutoFocus(cameraPreview, it)
+            }
         }
     }
 
