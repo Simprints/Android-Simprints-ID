@@ -3,7 +3,7 @@ package com.simprints.id.data.analytics.crashreport
 import android.util.Log
 import com.simprints.id.Application
 import com.simprints.id.data.db.person.domain.FingerIdentifier
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
 
 interface CrashReportManager: CoreCrashReportManager {
     fun logExceptionOrSafeException(throwable: Throwable)
@@ -23,7 +23,7 @@ interface CoreCrashReportManager {
     fun setProjectIdCrashlyticsKey(projectId: String)
     fun setUserIdCrashlyticsKey(userId: String)
     fun setModuleIdsCrashlyticsKey(moduleIds: Set<String>?)
-    fun setDownSyncTriggersCrashlyticsKey(peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>)
+    fun setDownSyncTriggersCrashlyticsKey(peopleDownSyncSetting: PeopleDownSyncSetting)
     fun setSessionIdCrashlyticsKey(sessionId: String)
     fun setFingersSelectedCrashlyticsKey(fingersSelected: Map<FingerIdentifier, Boolean>)
 
