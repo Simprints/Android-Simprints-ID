@@ -1,5 +1,6 @@
 package com.simprints.id.activities.qrcapture.tools
 
+import android.util.Log
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
@@ -35,16 +36,20 @@ class QrCodeProducerImpl(
                 try {
                     val rotationDegrees = imageProxy.imageInfo.rotationDegrees
                     val image = RawImage(mediaImage, rotationDegrees)
+                    Log.d("TEST_ALAN", "Raw image: $image")
                     qrCodeDetector.detectInImage(image)?.let { qrCode ->
+                        Log.d("TEST_ALAN", "QR code: $qrCode")
                         if (!qrCodeChannel.isClosedForSend) {
                             with(qrCodeChannel) {
                                 send(qrCode)
                                 close()
                             }
                         }
-                    }
+                    } ?: Log.d("TEST_ALAN", "Nothing found")
                 } catch (t: Throwable) {
                     crashReportManager.logExceptionOrSafeException(t)
+                } finally {
+                    mediaImage.close()
                 }
             }
         }

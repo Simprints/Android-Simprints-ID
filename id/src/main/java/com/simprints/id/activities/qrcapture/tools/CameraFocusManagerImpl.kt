@@ -7,18 +7,19 @@ import android.view.ViewTreeObserver
 import androidx.camera.core.*
 import androidx.camera.view.PreviewView
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class CameraFocusManagerImpl : CameraFocusManager {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun setUpFocusOnTap(cameraPreview: PreviewView, camera: Camera) {
         cameraPreview.afterMeasured {
-            cameraPreview.setOnTouchListener { view, event ->
+            it.setOnTouchListener { view, event ->
                 return@setOnTouchListener when (event.action) {
                     MotionEvent.ACTION_DOWN -> true
 
                     MotionEvent.ACTION_UP -> {
-                        val focusPoint = getFocusPoint(view, event)
+                        val focusPoint = getFocusOnTapPoint(view, event)
 
                         try {
                             camera.cameraControl.startFocusAndMetering(
@@ -41,23 +42,55 @@ class CameraFocusManagerImpl : CameraFocusManager {
         }
     }
 
-    private inline fun PreviewView.afterMeasured(crossinline block: () -> Unit) {
+    override fun setUpAutoFocus(cameraPreview: PreviewView, camera: Camera) {
+        cameraPreview.afterMeasured {
+            val autoFocusPoint = getAutoFocusPoint(it)
+
+            try {
+                camera.cameraControl.startFocusAndMetering(
+                    FocusMeteringAction.Builder(
+                        autoFocusPoint,
+                        FocusMeteringAction.FLAG_AF
+                    ).apply {
+                        setAutoCancelDuration(1, TimeUnit.SECONDS)
+                    }.build()
+                )
+            } catch (e: CameraInfoUnavailableException) {
+                Timber.e(e, "Cannot access camera")
+            }
+        }
+    }
+
+    private inline fun PreviewView.afterMeasured(
+        crossinline block: (previewView: PreviewView) -> Unit
+    ) {
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 if (measuredWidth > 0 && measuredHeight > 0) {
                     viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    block()
+                    block(this@afterMeasured)
                 }
             }
         })
     }
 
-    private fun getFocusPoint(view: View, event: MotionEvent): MeteringPoint {
+    private fun getFocusOnTapPoint(view: View, event: MotionEvent): MeteringPoint {
         val factory: MeteringPointFactory = SurfaceOrientedMeteringPointFactory(
             view.width.toFloat(), view.height.toFloat()
         )
 
         return factory.createPoint(event.x, event.y)
+    }
+
+    private fun getAutoFocusPoint(view: View): MeteringPoint {
+        val width = view.width.toFloat()
+        val height = view.height.toFloat()
+
+        val factory: MeteringPointFactory = SurfaceOrientedMeteringPointFactory(width, height)
+        val centreWidth = width / 2
+        val centreHeight = height / 2
+
+        return factory.createPoint(centreWidth, centreHeight)
     }
 
 }
