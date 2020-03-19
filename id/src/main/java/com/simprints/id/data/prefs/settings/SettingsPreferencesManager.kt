@@ -7,7 +7,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintIm
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
 
@@ -31,7 +31,7 @@ interface SettingsPreferencesManager {
     var consentRequired: Boolean
 
     var modalities: List<Modality>
-    var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
+    var peopleDownSyncSetting: PeopleDownSyncSetting
 
     var fingerImagesExist: Boolean
     var captureFingerprintStrategy: CaptureFingerprintStrategy
