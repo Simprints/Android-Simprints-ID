@@ -1,7 +1,7 @@
 package com.simprints.id.activities.settings.fragments.settingsAbout
 
 import android.preference.Preference
-import com.simprints.id.data.consent.LongConsentManager
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.session.domain.SessionEventsManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
@@ -20,7 +20,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var sessionEventManager: SessionEventsManager
     @Inject lateinit var recentEventsManager: RecentEventsPreferencesManager
-    @Inject lateinit var longConsentManager: LongConsentManager
+    @Inject lateinit var longConsentRepository: LongConsentRepository
 
     init {
         component.inject(this)
@@ -87,7 +87,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     override suspend fun logout() {
         signerManager.signOut()
         syncManager.cancelBackgroundSyncs()
-        longConsentManager.deleteLongConsents()
+        longConsentRepository.deleteLongConsents()
         sessionEventManager.signOut()
 
         view.finishSettings()

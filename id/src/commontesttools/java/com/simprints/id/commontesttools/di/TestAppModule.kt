@@ -6,7 +6,6 @@ import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository

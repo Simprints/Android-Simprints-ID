@@ -1,6 +1,5 @@
 package com.simprints.id.data.consent.longconsent
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
@@ -20,14 +19,22 @@ class LongConsentRepositoryImpl(private val longConsentLocalDataSource: LongCons
     }
 
     private val firebaseStorage by lazy { FirebaseStorage.getInstance() }
-    private val downloadProgress = MutableLiveData<Int>()
-    private val isDownloadSuccessful = MutableLiveData<Boolean>(false)
+    private var language = DEFAULT_LANGUAGE
+
+    override val downloadProgress = MutableLiveData<Int>()
+    override val isDownloadSuccessful = MutableLiveData<Boolean>()
+    override val longConsentText = MutableLiveData<String>()
+
+    override fun setLanguage(language: String) {
+        this.language = language
+        updateLongConsentText()
+    }
 
     override suspend fun downloadLongConsentForLanguages(languages: Array<String>) {
         languages.forEach { language ->
             if (!checkIfLongConsentExistsInLocal(language))
                 try {
-                    downloadLongConsentWithProgress(language)
+                    downloadLongConsentWithoutProgress(language)
                 } catch (t: Throwable) {
                     crashReportManager.logExceptionOrSafeException(t)
                 }
@@ -35,20 +42,28 @@ class LongConsentRepositoryImpl(private val longConsentLocalDataSource: LongCons
     }
 
     private fun checkIfLongConsentExistsInLocal(language: String) =
-        longConsentLocalDataSource.checkIfLongConsentExistsInLocal(language)
+        longConsentLocalDataSource.isLongConsentPresentInLocal(language)
 
-    override suspend fun downloadLongConsentWithProgress(language: String): LiveData<Int> {
+    private fun downloadLongConsentWithoutProgress(language: String) {
+        firebaseStorage.maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
+        val file = longConsentLocalDataSource.createFileForLanguage(language)
+        getFileDownloadTask(language, file).resume()
+    }
+
+    override suspend fun downloadLongConsentWithProgress() {
         firebaseStorage.maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
         val file = longConsentLocalDataSource.createFileForLanguage(language)
         getFileDownloadTask(language, file)
-            .addOnSuccessListener {
-                isDownloadSuccessful.postValue(true)
-            }
             .addOnProgressListener {
                 downloadProgress.postValue(((it.bytesTransferred.toDouble() / it.totalByteCount.toDouble()) * 100).toInt())
             }
-
-        return downloadProgress
+            .addOnFailureListener {
+                isDownloadSuccessful.postValue(false)
+            }
+            .addOnSuccessListener {
+                isDownloadSuccessful.postValue(true)
+                updateLongConsentText()
+            }.resume()
     }
 
     private fun getFileDownloadTask(language: String, file: File): FileDownloadTask =
@@ -57,8 +72,9 @@ class LongConsentRepositoryImpl(private val longConsentLocalDataSource: LongCons
             .child("$language.${FILE_TYPE}")
             .getFile(file)
 
-    override fun getLongConsentText(language: String) =
-        longConsentLocalDataSource.getLongConsentText(language)
+    private fun updateLongConsentText() {
+        longConsentText.value = longConsentLocalDataSource.getLongConsentText(language)
+    }
 
     override fun deleteLongConsents() {
         longConsentLocalDataSource.deleteLongConsents()

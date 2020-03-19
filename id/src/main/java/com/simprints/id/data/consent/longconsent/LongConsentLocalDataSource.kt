@@ -4,7 +4,7 @@ import java.io.File
 
 interface LongConsentLocalDataSource {
 
-    fun checkIfLongConsentExistsInLocal(language: String): Boolean
+    fun isLongConsentPresentInLocal(language: String): Boolean
 
     fun createFileForLanguage(language: String): File
 

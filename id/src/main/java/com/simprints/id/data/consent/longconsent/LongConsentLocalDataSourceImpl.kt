@@ -18,7 +18,7 @@ class LongConsentLocalDataSourceImpl(absolutePath: String,
         createLocalFilePath(baseFilePath.absolutePath)
     }
 
-    override fun checkIfLongConsentExistsInLocal(language: String): Boolean {
+    override fun isLongConsentPresentInLocal(language: String): Boolean {
         val fileName = if (language.isEmpty()) {
             "${DEFAULT_LANGUAGE}.${FILE_TYPE}"
         } else {
@@ -63,15 +63,17 @@ class LongConsentLocalDataSourceImpl(absolutePath: String,
         baseFile.listFiles().forEach { it.delete() }
     }
 
-    override fun getLongConsentText(language: String): String {
+    override fun getLongConsentText(language: String) =
+        if (isLongConsentPresentInLocal(language)) {
+            val br: BufferedReader = createFileForLanguage(language).bufferedReader()
+            val fileContent = StringBuffer("")
 
-        val br: BufferedReader = createFileForLanguage(language).bufferedReader()
-        val fileContent = StringBuffer("")
+            br.forEachLine {
+                fileContent.append(it + "\n")
+            }
 
-        br.forEachLine {
-            fileContent.append(it + "\n")
+            fileContent.toString()
+        } else {
+            ""
         }
-
-        return fileContent.toString()
-    }
 }
