@@ -357,7 +357,15 @@ open class AppModule {
     open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)
 
     @Provides
-    open fun provideCameraBinder(): CameraBinder = CameraBinderImpl()
+    open fun provideCameraHelper(
+        context: Context,
+        previewBuilder: QrPreviewBuilder,
+        cameraFocusManager: CameraFocusManager,
+        qrCodeProducer: QrCodeProducer
+    ): CameraHelper = CameraHelperImpl(context, previewBuilder, cameraFocusManager, qrCodeProducer)
+
+    @Provides
+    open fun provideCameraFocusManager(): CameraFocusManager = CameraFocusManagerImpl()
 
     @Provides
     open fun provideQrPreviewBuilder(): QrPreviewBuilder = QrPreviewBuilderImpl()

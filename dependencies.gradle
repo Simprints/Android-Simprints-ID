@@ -16,7 +16,7 @@ def dagger = [
 
 def androidx_lifecycle_version = "2.2.0-rc03"
 def androidx_room_version = "2.1.0-alpha04"
-def androidx_camerax_version = '1.0.0-alpha06'
+def androidx_camerax_version = '1.0.0-beta01'
 def androidx = [
     core     : "androidx.core:core-ktx:1.0.2",
     multidex : "androidx.multidex:multidex:2.0.1",
@@ -43,9 +43,11 @@ def androidx = [
         preference      : "androidx.preference:preference:1.1.0-alpha03"
     ],
     security : ['androidx.security:security-crypto:1.0.0-alpha02'],
-    camerax: [
-        core: "androidx.camera:camera-core:$androidx_camerax_version",
-        camera2: "androidx.camera:camera-camera2:$androidx_camerax_version"
+    camerax  : [
+        core     : "androidx.camera:camera-core:$androidx_camerax_version",
+        camera2  : "androidx.camera:camera-camera2:$androidx_camerax_version",
+        lifecycle: "androidx.camera:camera-lifecycle:$androidx_camerax_version",
+        view     : "androidx.camera:camera-view:1.0.0-alpha08"
     ]
 ]
 
