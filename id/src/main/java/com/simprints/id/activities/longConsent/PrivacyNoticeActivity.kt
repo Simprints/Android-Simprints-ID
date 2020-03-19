@@ -51,14 +51,7 @@ class PrivacyNoticeActivity : AppCompatActivity() {
         initActionBar()
         viewModel.start()
 
-        longConsent_downloadButton.setOnClickListener {
-            if(deviceManager.isConnected()) {
-                viewModel.downloadLongConsent()
-            } else {
-                showUserOfflineToast()
-            }
-        }
-
+        setupClickListener()
         initTextInUi()
         observeUi()
     }
@@ -69,6 +62,16 @@ class PrivacyNoticeActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.title = androidResourcesHelper.getString(R.string.privacy_notice_title)
+    }
+
+    private fun setupClickListener() {
+        longConsent_downloadButton.setOnClickListener {
+            if(deviceManager.isConnected()) {
+                viewModel.downloadLongConsent()
+            } else {
+                showUserOfflineToast()
+            }
+        }
     }
 
     private fun initTextInUi() {

@@ -5,6 +5,8 @@ import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class LongConsentRepositoryImpl(private val longConsentLocalDataSource: LongConsentLocalDataSource,
@@ -53,17 +55,19 @@ class LongConsentRepositoryImpl(private val longConsentLocalDataSource: LongCons
     override suspend fun downloadLongConsentWithProgress() {
         firebaseStorage.maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
         val file = longConsentLocalDataSource.createFileForLanguage(language)
-        getFileDownloadTask(language, file)
-            .addOnProgressListener {
-                downloadProgress.postValue(((it.bytesTransferred.toDouble() / it.totalByteCount.toDouble()) * 100).toInt())
-            }
-            .addOnFailureListener {
-                isDownloadSuccessful.postValue(false)
-            }
-            .addOnSuccessListener {
-                isDownloadSuccessful.postValue(true)
-                updateLongConsentText()
-            }.resume()
+        withContext(Dispatchers.IO) {
+            getFileDownloadTask(language, file)
+                .addOnProgressListener {
+                    downloadProgress.postValue(((it.bytesTransferred.toDouble() / it.totalByteCount.toDouble()) * 100).toInt())
+                }
+                .addOnFailureListener {
+                    isDownloadSuccessful.postValue(false)
+                }
+                .addOnSuccessListener {
+                    isDownloadSuccessful.postValue(true)
+                    updateLongConsentText()
+                }.resume()
+        }
     }
 
     private fun getFileDownloadTask(language: String, file: File): FileDownloadTask =
