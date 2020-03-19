@@ -4,10 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.Application
-import com.simprints.id.activities.qrcapture.tools.CameraBinder
-import com.simprints.id.activities.qrcapture.tools.QrCodeDetector
-import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
-import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
+import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.LongConsentManager
@@ -60,18 +57,29 @@ class TestAppModule(
     private val syncStatusDatabaseRule: DependencyRule = RealRule,
     private val deviceManagerRule: DependencyRule = RealRule,
     private val recentEventsPreferencesManagerRule: DependencyRule = RealRule,
-    private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) },
-    private val cameraBinderRule: DependencyRule = RealRule,
+    private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule {
+        setupFakeEncryptedSharedPreferences(
+            app
+        )
+    },
+    private val cameraHelperRule: DependencyRule = RealRule,
     private val qrPreviewBuilderRule: DependencyRule = RealRule,
     private val qrCodeDetectorRule: DependencyRule = RealRule,
-    private val qrCodeProducerRule: DependencyRule = RealRule
+    private val qrCodeProducerRule: DependencyRule = RealRule,
+    private val cameraFocusManagerRule: DependencyRule = RealRule
 ) : AppModule() {
 
     override fun provideCrashManager(): CrashReportManager =
         crashReportManagerRule.resolveDependency { super.provideCrashManager() }
 
-    override fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager =
-        loginInfoManagerRule.resolveDependency { super.provideLoginInfoManager(improvedSharedPreferences) }
+    override fun provideLoginInfoManager(
+        improvedSharedPreferences: ImprovedSharedPreferences
+    ): LoginInfoManager =
+        loginInfoManagerRule.resolveDependency {
+            super.provideLoginInfoManager(
+                improvedSharedPreferences
+            )
+        }
 
     override fun provideRandomGenerator(): RandomGenerator =
         randomGeneratorRule.resolveDependency { super.provideRandomGenerator() }
@@ -97,20 +105,40 @@ class TestAppModule(
         )
     }
 
-    override fun provideSecureLocalDbKeyProvider(builder: EncryptedSharedPreferencesBuilder,
-                                                 randomGenerator: RandomGenerator,
-                                                 unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
-        secureDataManagerRule.resolveDependency { super.provideSecureLocalDbKeyProvider(builder, randomGenerator, unsecuredLocalDbKeyProvider) }
+    override fun provideSecureLocalDbKeyProvider(
+        builder: EncryptedSharedPreferencesBuilder,
+        randomGenerator: RandomGenerator,
+        unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider
+    ): SecureLocalDbKeyProvider =
+        secureDataManagerRule.resolveDependency {
+            super.provideSecureLocalDbKeyProvider(
+                builder,
+                randomGenerator,
+                unsecuredLocalDbKeyProvider
+            )
+        }
 
-    override fun provideLegacyLocalDbKeyProvider(preferencesManager: PreferencesManager,
-                                                 keystoreManager: KeystoreManager): LegacyLocalDbKeyProvider =
-        secureDataManagerRule.resolveDependency { super.provideLegacyLocalDbKeyProvider(preferencesManager, keystoreManager) }
+    override fun provideLegacyLocalDbKeyProvider(
+        preferencesManager: PreferencesManager,
+        keystoreManager: KeystoreManager
+    ): LegacyLocalDbKeyProvider =
+        secureDataManagerRule.resolveDependency {
+            super.provideLegacyLocalDbKeyProvider(
+                preferencesManager,
+                keystoreManager
+            )
+        }
 
     override fun provideKeystoreManager(): KeystoreManager =
         keystoreManagerRule.resolveDependency { super.provideKeystoreManager() }
 
-    override fun provideSecureApiInterface(simApiClientFactory: SimApiClientFactory): SecureApiInterface =
-        secureApiInterfaceRule.resolveDependency { super.provideSecureApiInterface(simApiClientFactory) }
+    override fun provideSecureApiInterface(
+        simApiClientFactory: SimApiClientFactory
+    ): SecureApiInterface = secureApiInterfaceRule.resolveDependency {
+        super.provideSecureApiInterface(
+            simApiClientFactory
+        )
+    }
 
     override fun provideSessionEventsManager(
         ctx: Context,
@@ -130,45 +158,86 @@ class TestAppModule(
         )
     }
 
-    override fun provideSessionEventsLocalDbManager(ctx: Context,
-                                                    secureDataManager: SecureLocalDbKeyProvider): SessionEventsLocalDbManager =
-        sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager) }
+    override fun provideSessionEventsLocalDbManager(
+        ctx: Context,
+        secureDataManager: SecureLocalDbKeyProvider
+    ): SessionEventsLocalDbManager =
+        sessionEventsLocalDbManagerRule.resolveDependency {
+            super.provideSessionEventsLocalDbManager(
+                ctx,
+                secureDataManager
+            )
+        }
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
 
-    override fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager): LongConsentManager =
-        longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager, crashReportManager) }
+    override fun provideLongConsentManager(
+        ctx: Context,
+        loginInfoManager: LoginInfoManager,
+        crashReportManager: CrashReportManager
+    ): LongConsentManager =
+        longConsentManagerRule.resolveDependency {
+            super.provideLongConsentManager(
+                ctx,
+                loginInfoManager,
+                crashReportManager
+            )
+        }
 
-    override fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager,
-                                              factory: SimApiClientFactory): RemoteSessionsManager =
-        remoteSessionsManagerRule.resolveDependency { super.provideRemoteSessionsManager(remoteDbManager, factory) }
+    override fun provideRemoteSessionsManager(
+        remoteDbManager: RemoteDbManager,
+        factory: SimApiClientFactory
+    ): RemoteSessionsManager =
+        remoteSessionsManagerRule.resolveDependency {
+            super.provideRemoteSessionsManager(
+                remoteDbManager,
+                factory
+            )
+        }
 
     override fun provideSyncStatusDatabase(ctx: Context): PeopleSyncStatusDatabase =
         syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase(ctx) }
 
     // Android keystore is not available in unit tests - so it returns a mock that builds the standard shared prefs.
-    override fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =
-        mockk<EncryptedSharedPreferencesBuilder>().apply {
-            every { this@apply.buildEncryptedSharedPreferences(any()) } answers { app.getSharedPreferences(args[0] as String, Context.MODE_PRIVATE) }
-        }
-
-    override fun provideEncryptedSharedPreferences(builder: EncryptedSharedPreferencesBuilder): SharedPreferences =
-        encryptedSharedPreferencesRule.resolveDependency { super.provideEncryptedSharedPreferences(builder) }
-
-    override fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager =
-        deviceManagerRule.resolveDependency { super.provideDeviceManager(connectivityHelper) }
-
-    override fun provideRecentEventsPreferencesManager(prefs: ImprovedSharedPreferences): RecentEventsPreferencesManager {
-        return recentEventsPreferencesManagerRule.resolveDependency {
-            super.provideRecentEventsPreferencesManager(prefs)
+    override fun provideEncryptedSharedPreferencesBuilder(
+        app: Application
+    ): EncryptedSharedPreferencesBuilder = mockk<EncryptedSharedPreferencesBuilder>().apply {
+        every { this@apply.buildEncryptedSharedPreferences(any()) } answers {
+            app.getSharedPreferences(
+                args[0] as String,
+                Context.MODE_PRIVATE
+            )
         }
     }
 
-    override fun provideCameraBinder(): CameraBinder {
-        return cameraBinderRule.resolveDependency {
-            super.provideCameraBinder()
-        }
+    override fun provideEncryptedSharedPreferences(
+        builder: EncryptedSharedPreferencesBuilder
+    ): SharedPreferences = encryptedSharedPreferencesRule.resolveDependency {
+        super.provideEncryptedSharedPreferences(
+            builder
+        )
+    }
+
+    override fun provideDeviceManager(
+        connectivityHelper: ConnectivityHelper
+    ): DeviceManager = deviceManagerRule.resolveDependency {
+        super.provideDeviceManager(connectivityHelper)
+    }
+
+    override fun provideRecentEventsPreferencesManager(
+        prefs: ImprovedSharedPreferences
+    ): RecentEventsPreferencesManager = recentEventsPreferencesManagerRule.resolveDependency {
+        super.provideRecentEventsPreferencesManager(prefs)
+    }
+
+    override fun provideCameraHelper(
+        context: Context,
+        previewBuilder: QrPreviewBuilder,
+        cameraFocusManager: CameraFocusManager,
+        qrCodeProducer: QrCodeProducer
+    ): CameraHelper = cameraHelperRule.resolveDependency {
+        super.provideCameraHelper(context, previewBuilder, cameraFocusManager, qrCodeProducer)
     }
 
     override fun provideQrPreviewBuilder(): QrPreviewBuilder {
@@ -181,16 +250,14 @@ class TestAppModule(
     override fun provideQrCodeProducer(
         qrCodeDetector: QrCodeDetector,
         crashReportManager: CrashReportManager
-    ): QrCodeProducer {
-        return qrCodeProducerRule.resolveDependency {
-            super.provideQrCodeProducer(qrCodeDetector, crashReportManager)
-        }
+    ): QrCodeProducer = qrCodeProducerRule.resolveDependency {
+        super.provideQrCodeProducer(qrCodeDetector, crashReportManager)
     }
 
-    override fun provideQrCodeDetector(crashReportManager: CrashReportManager): QrCodeDetector {
-        return qrCodeDetectorRule.resolveDependency {
-            super.provideQrCodeDetector(crashReportManager)
-        }
+    override fun provideQrCodeDetector(
+        crashReportManager: CrashReportManager
+    ): QrCodeDetector = qrCodeDetectorRule.resolveDependency {
+        super.provideQrCodeDetector(crashReportManager)
     }
 
 }

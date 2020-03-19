@@ -25,30 +25,32 @@ class QrCodeProducerImplTest {
         qrCodeProducer = QrCodeProducerImpl(mockQrCodeDetector, mockCrashReportManager).apply {
             qrCodeChannel = mockQrCodeChannel
         }
-        every { mockImageProxy.image } returns mockk()
     }
 
     @Test
     fun withNoImagesObtained_shouldNotTriggerDetector() {
-        qrCodeProducer.analyze(null, 90)
+        every { mockImageProxy.image } returns null
+        qrCodeProducer.analyze(mockImageProxy)
 
         coVerify(exactly = 0) { mockQrCodeDetector.detectInImage(any()) }
     }
 
     @Test
     fun shouldSendQrCodeValueThroughChannel() {
+        every { mockImageProxy.image } returns mockk()
         coEvery { mockQrCodeDetector.detectInImage(any()) } returns "mock_value"
 
-        qrCodeProducer.analyze(mockImageProxy, 90)
+        qrCodeProducer.analyze(mockImageProxy)
 
         coVerify { mockQrCodeChannel.send("mock_value") }
     }
 
     @Test
     fun whenDetectorThrowsException_shouldLogToCrashReport() {
+        every { mockImageProxy.image } returns mockk()
         coEvery { mockQrCodeDetector.detectInImage(any()) } throws Throwable()
 
-        qrCodeProducer.analyze(mockImageProxy, 90)
+        qrCodeProducer.analyze(mockImageProxy)
 
         coVerify { mockCrashReportManager.logExceptionOrSafeException(any()) }
     }

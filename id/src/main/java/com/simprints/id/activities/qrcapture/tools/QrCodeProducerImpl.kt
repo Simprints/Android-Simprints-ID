@@ -1,7 +1,8 @@
 package com.simprints.id.activities.qrcapture.tools
 
+import androidx.camera.core.AspectRatio
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageAnalysisConfig
 import androidx.camera.core.ImageProxy
 import com.simprints.id.activities.qrcapture.model.RawImage
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -16,24 +17,23 @@ class QrCodeProducerImpl(
     private val crashReportManager: CrashReportManager
 ) : QrCodeProducer, ImageAnalysis.Analyzer {
 
-    private val analysisConfig by lazy {
-        ImageAnalysisConfig.Builder()
-            .setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
-            .build()
-    }
-
     override val useCase by lazy {
-        ImageAnalysis(analysisConfig).apply {
-            setAnalyzer(Executors.newSingleThreadExecutor(), this@QrCodeProducerImpl)
-        }
+        ImageAnalysis.Builder()
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .setTargetAspectRatio(AspectRatio.RATIO_16_9)
+            .build().apply {
+                setAnalyzer(Executors.newSingleThreadExecutor(), this@QrCodeProducerImpl)
+            }
     }
 
     override var qrCodeChannel = Channel<String>(Channel.CONFLATED)
 
-    override fun analyze(imageProxy: ImageProxy?, rotationDegrees: Int) {
-        imageProxy?.image?.let { mediaImage ->
+    @ExperimentalGetImage
+    override fun analyze(imageProxy: ImageProxy) {
+        imageProxy.image?.let { mediaImage ->
             runBlocking {
                 try {
+                    val rotationDegrees = imageProxy.imageInfo.rotationDegrees
                     val image = RawImage(mediaImage, rotationDegrees)
                     qrCodeDetector.detectInImage(image)?.let { qrCode ->
                         if (!qrCodeChannel.isClosedForSend) {
