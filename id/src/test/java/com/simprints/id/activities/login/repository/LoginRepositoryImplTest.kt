@@ -1,7 +1,7 @@
 package com.simprints.id.activities.login.repository
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.activities.login.tools.AuthenticationHelper
+import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger

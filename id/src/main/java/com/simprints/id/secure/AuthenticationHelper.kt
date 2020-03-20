@@ -1,4 +1,4 @@
-package com.simprints.id.activities.login.tools
+package com.simprints.id.secure
 
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
