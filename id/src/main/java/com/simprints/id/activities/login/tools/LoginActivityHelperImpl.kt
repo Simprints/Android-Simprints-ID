@@ -2,7 +2,7 @@ package com.simprints.id.activities.login.tools
 
 import android.content.Intent
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.activities.login.CredentialsResponse
+import com.simprints.id.activities.login.response.CredentialsResponse
 
 class LoginActivityHelperImpl : LoginActivityHelper {
 
