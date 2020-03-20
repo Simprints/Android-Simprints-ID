@@ -47,7 +47,7 @@ class QrCaptureActivityAssertions(
 
     fun cameraIsStarted() {
         verifyBlocking(mockCameraHelper) {
-            startCamera(any(), any())
+            startCamera(any(), any(), any())
         }
     }
 

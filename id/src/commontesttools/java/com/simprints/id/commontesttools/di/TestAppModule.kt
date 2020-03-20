@@ -234,10 +234,9 @@ class TestAppModule(
     override fun provideCameraHelper(
         context: Context,
         previewBuilder: QrPreviewBuilder,
-        cameraFocusManager: CameraFocusManager,
-        qrCodeProducer: QrCodeProducer
+        cameraFocusManager: CameraFocusManager
     ): CameraHelper = cameraHelperRule.resolveDependency {
-        super.provideCameraHelper(context, previewBuilder, cameraFocusManager, qrCodeProducer)
+        super.provideCameraHelper(context, previewBuilder, cameraFocusManager)
     }
 
     override fun provideQrPreviewBuilder(): QrPreviewBuilder {

@@ -360,9 +360,8 @@ open class AppModule {
     open fun provideCameraHelper(
         context: Context,
         previewBuilder: QrPreviewBuilder,
-        cameraFocusManager: CameraFocusManager,
-        qrCodeProducer: QrCodeProducer
-    ): CameraHelper = CameraHelperImpl(context, previewBuilder, cameraFocusManager, qrCodeProducer)
+        cameraFocusManager: CameraFocusManager
+    ): CameraHelper = CameraHelperImpl(context, previewBuilder, cameraFocusManager)
 
     @Provides
     open fun provideCameraFocusManager(): CameraFocusManager = CameraFocusManagerImpl()
