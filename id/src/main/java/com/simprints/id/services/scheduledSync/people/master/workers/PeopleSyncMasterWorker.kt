@@ -7,7 +7,8 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.common.*
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.EXTRA
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.ON
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -84,17 +85,17 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
         }
 
     private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
-        val backgroundOnForPeriodicSync = preferenceManager.peopleDownSyncSetting == PeopleDownSyncSetting.ON ||
-            preferenceManager.peopleDownSyncSetting == PeopleDownSyncSetting.EXTRA
-        val manualDownSyncAllowed = backgroundOnForPeriodicSync  && isOneTimeMasterWorker
-
-        val downSyncChainRequired = manualDownSyncAllowed || backgroundOnForPeriodicSync
+        val downSyncChainRequired = isPeopleDownSyncAllowed() && isOneTimeMasterWorker
 
         return if (downSyncChainRequired) {
             downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncID)
         } else {
             emptyList()
         }
+    }
+
+    private fun isPeopleDownSyncAllowed() = with(preferenceManager) {
+        peopleDownSyncSetting == ON || peopleDownSyncSetting == EXTRA
     }
 
     private fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =
