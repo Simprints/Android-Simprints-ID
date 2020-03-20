@@ -52,9 +52,6 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
         UUID.randomUUID().toString()
     }
 
-    private val isOneTimeMasterWorker
-        get() = tags.contains(MASTER_SYNC_SCHEDULER_ONE_TIME)
-
     override suspend fun doWork(): Result =
         withContext(Dispatchers.IO) {
             try {
@@ -85,7 +82,7 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
         }
 
     private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
-        val downSyncChainRequired = isPeopleDownSyncAllowed() && isOneTimeMasterWorker
+        val downSyncChainRequired = isPeopleDownSyncAllowed()
 
         return if (downSyncChainRequired) {
             downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncID)
