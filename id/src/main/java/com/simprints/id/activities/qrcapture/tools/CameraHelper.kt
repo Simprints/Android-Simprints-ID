@@ -4,5 +4,11 @@ import androidx.camera.view.PreviewView
 import androidx.lifecycle.LifecycleOwner
 
 interface CameraHelper {
-    suspend fun startCamera(lifecycleOwner: LifecycleOwner, cameraPreview: PreviewView)
+
+    suspend fun startCamera(
+        lifecycleOwner: LifecycleOwner,
+        cameraPreview: PreviewView,
+        qrCodeProducer: QrCodeProducer
+    )
+
 }

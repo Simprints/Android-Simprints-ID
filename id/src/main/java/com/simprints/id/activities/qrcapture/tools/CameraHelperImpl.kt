@@ -10,11 +10,14 @@ import androidx.work.await
 class CameraHelperImpl(
     private val context: Context,
     private val previewBuilder: QrPreviewBuilder,
-    private val cameraFocusManager: CameraFocusManager,
-    private val qrCodeProducer: QrCodeProducer
+    private val cameraFocusManager: CameraFocusManager
 ) : CameraHelper {
 
-    override suspend fun startCamera(lifecycleOwner: LifecycleOwner, cameraPreview: PreviewView) {
+    override suspend fun startCamera(
+        lifecycleOwner: LifecycleOwner,
+        cameraPreview: PreviewView,
+        qrCodeProducer: QrCodeProducer
+    ) {
         val cameraProvider = ProcessCameraProvider.getInstance(context).await()
         val preview = previewBuilder.buildPreview(cameraPreview)
         val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA

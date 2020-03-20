@@ -53,7 +53,12 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
 
     private fun startCamera() {
         lifecycleScope.launch {
-            cameraHelper.startCamera(this@QrCaptureActivity, cameraPreview)
+            cameraHelper.startCamera(
+                this@QrCaptureActivity,
+                cameraPreview,
+                qrCodeProducer
+            )
+
             val qrCode = qrCodeProducer.qrCodeChannel.receive()
             onQrCodeCaptured(qrCode)
         }
