@@ -3,7 +3,7 @@ package com.simprints.id.commontesttools.di
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.activities.login.repository.LoginRepository
-import com.simprints.id.activities.login.tools.AuthenticationHelper
+import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager

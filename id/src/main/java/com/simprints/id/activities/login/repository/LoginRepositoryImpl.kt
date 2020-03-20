@@ -1,6 +1,6 @@
 package com.simprints.id.activities.login.repository
 
-import com.simprints.id.activities.login.tools.AuthenticationHelper
+import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.data.db.session.domain.SessionEventsManager
 import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
 import com.simprints.id.secure.ProjectAuthenticator
