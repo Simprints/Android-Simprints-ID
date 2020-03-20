@@ -6,6 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
+import android.view.Gravity
+import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
@@ -59,9 +62,25 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
                 qrCodeProducer
             )
 
+            addFocusDrawable()
+
             val qrCode = qrCodeProducer.qrCodeChannel.receive()
             onQrCodeCaptured(qrCode)
         }
+    }
+
+    private fun addFocusDrawable() {
+        val img = ImageView(this@QrCaptureActivity).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+            ).also {
+                it.gravity = Gravity.CENTER
+            }
+            setImageResource(R.drawable.ic_camera_focus)
+            translationZ = 1f
+        }
+        previewRoot.addView(img)
     }
 
     private fun onQrCodeCaptured(qrCodeValue: String) {
