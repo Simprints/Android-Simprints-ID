@@ -21,15 +21,13 @@ class CameraFocusManagerImpl : CameraFocusManager {
                     MotionEvent.ACTION_UP -> {
                         val focusPoint = getFocusOnTapPoint(view, event)
 
+                        val focusAction = FocusMeteringAction.Builder(
+                            focusPoint,
+                            FocusMeteringAction.FLAG_AF
+                        ).disableAutoCancel().build()
+
                         try {
-                            camera.cameraControl.startFocusAndMetering(
-                                FocusMeteringAction.Builder(
-                                    focusPoint,
-                                    FocusMeteringAction.FLAG_AF
-                                ).apply {
-                                    disableAutoCancel()
-                                }.build()
-                            )
+                            camera.cameraControl.startFocusAndMetering(focusAction)
                         } catch (e: CameraInfoUnavailableException) {
                             Timber.e(e, "Cannot access camera")
                         }
@@ -44,17 +42,15 @@ class CameraFocusManagerImpl : CameraFocusManager {
 
     override fun setUpAutoFocus(cameraPreview: PreviewView, camera: Camera) {
         cameraPreview.afterMeasured {
-            val autoFocusPoint = getAutoFocusPoint(it)
+            val focusPoint = getAutoFocusPoint(it)
+
+            val focusAction = FocusMeteringAction.Builder(
+                focusPoint,
+                FocusMeteringAction.FLAG_AF
+            ).setAutoCancelDuration(1, TimeUnit.SECONDS).build()
 
             try {
-                camera.cameraControl.startFocusAndMetering(
-                    FocusMeteringAction.Builder(
-                        autoFocusPoint,
-                        FocusMeteringAction.FLAG_AF
-                    ).apply {
-                        setAutoCancelDuration(1, TimeUnit.SECONDS)
-                    }.build()
-                )
+                camera.cameraControl.startFocusAndMetering(focusAction)
             } catch (e: CameraInfoUnavailableException) {
                 Timber.e(e, "Cannot access camera")
             }
@@ -64,14 +60,15 @@ class CameraFocusManagerImpl : CameraFocusManager {
     private inline fun PreviewView.afterMeasured(
         crossinline block: (previewView: PreviewView) -> Unit
     ) {
-        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                if (measuredWidth > 0 && measuredHeight > 0) {
-                    viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    block(this@afterMeasured)
+        viewTreeObserver.addOnGlobalLayoutListener(
+            object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    if (measuredWidth > 0 && measuredHeight > 0) {
+                        viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        block(this@afterMeasured)
+                    }
                 }
-            }
-        })
+            })
     }
 
     private fun getFocusOnTapPoint(view: View, event: MotionEvent): MeteringPoint {
