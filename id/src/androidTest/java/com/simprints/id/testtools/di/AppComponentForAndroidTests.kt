@@ -16,7 +16,17 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class, DataModule::class, SyncModule::class, DashboardActivityModule::class])
+@Component(
+    modules = [
+        AppModule::class,
+        PreferencesModule::class,
+        SerializerModule::class,
+        LoginModule::class,
+        DataModule::class,
+        SyncModule::class,
+        DashboardActivityModule::class
+    ]
+)
 interface AppComponentForAndroidTests : AppComponent {
 
     @Component.Builder
@@ -31,6 +41,7 @@ interface AppComponentForAndroidTests : AppComponent {
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun syncModule(syncModule: SyncModule): Builder
         fun dashboardActivityModule(dashboardActivityModule: DashboardActivityModule): Builder
+        fun loginModule(loginModule: LoginModule): Builder
 
         fun build(): AppComponentForAndroidTests
     }
