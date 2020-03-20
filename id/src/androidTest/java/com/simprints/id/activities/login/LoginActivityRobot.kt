@@ -19,6 +19,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
+import com.simprints.id.activities.login.response.CredentialsResponse
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.qrcapture.QrCaptureActivity
@@ -92,7 +93,10 @@ class LoginActivityRobot(
     fun receiveValidQrCodeResponse() {
         every {
             mockLoginActivityHelper.tryParseQrCodeResponse(any())
-        } returns CredentialsResponse(VALID_PROJECT_ID, VALID_PROJECT_SECRET)
+        } returns CredentialsResponse(
+            VALID_PROJECT_ID,
+            VALID_PROJECT_SECRET
+        )
         stubQrScanIntent()
     }
 
