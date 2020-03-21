@@ -91,6 +91,9 @@ dependencies {
     }
 
     // Koin
+    implementation deps.koin.core
+    implementation deps.koin.android
+    implementation deps.koin.viewmodel
     androidTestImplementation deps.koin.core_ext
     androidTestImplementation deps.testing.koin
 
