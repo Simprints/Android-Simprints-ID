@@ -1,9 +1,160 @@
----
-format_version: '6'
+format_version: "6"
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: android
+app:
+  envs:
+  - PROJECT_LOCATION: .
+    opts:
+      is_expand: false
+  - MODULE: id
+    opts:
+      is_expand: false
+  - MODULE_CLIENTAPI: clientapi
+    opts:
+      is_expand: false
+  - MODULE_APP: id
+    opts:
+      is_expand: false
+  - MODULE_FACE: face
+    opts:
+      is_expand: false
+  - MODULE_FINGERPRINT: fingerprint
+    opts:
+      is_expand: false
+trigger_map:
+- push_branch: bitrise_config
+  workflow: run_from_repo
+- push_branch: develop
+  workflow: id
+- push_branch: master
+  workflow: id
+- pull_request_source_branch: '*'
+  pull_request_target_branch: develop
+  workflow: id
 workflows:
+  clientapi_test:
+    after_run:
+    - step_prepare_build
+    - step_android_test_df
+    steps:
+    - set-env-var@0.9.1:
+        title: Set module
+        inputs:
+        - destination_keys: MODULE
+        - value: clientapi
+    - build-router-start@0.11.3:
+        inputs:
+        - workflows: clientapi_unit_test
+        - access_token: $bitrise_key_to_run_auto_workflow
+  clientapi_unit_test:
+    before_run:
+    - step_prepare_build
+    after_run:
+    - step_test_df
+    steps:
+    - set-env-var@0.9.1:
+        title: Set module
+        inputs:
+        - destination_keys: MODULE
+        - value: clientapi
+  experiments:
+    steps:
+    - script@1.1.5:
+        inputs:
+        - content: "\nexport DIRECTORY=$HOME\nexport DIRECTORY_GCLOUD=$DIRECTORY\"/google-cloud-sdk\"\nexport
+            DIRECTORY_GCLOUD_BIN=$DIRECTORY_GCLOUD\"/bin\"\nexport GCLOUD_SERVICE_AUTH=$DIRECTORY/service.json\necho
+            $BITRISEIO_SIMPRINTSID_FIREBASE_TEST_LAB_URL\nwget $BITRISEIO_SIMPRINTSID_FIREBASE_TEST_LAB_URL
+            -O $GCLOUD_SERVICE_AUTH\n\nexport PROJECT=simprints-dev\nexport TEST_APK=/Users/fabiotuzza/Downloads/clientapi-debug-androidTest-bitrise-signed_1.apk\nexport
+            UNIVERSAL_APK=/Users/fabiotuzza/Downloads/universal-bitrise-signed_1.apk\n\nif
+            [ ! -d \"$DIRECTORY_GCLOUD\" ]; then\n    # Control will enter here if
+            $DIRECTORY doesn't exist.\n\tcd $DIRECTORY\n\twget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.zip
+            -O google-cloud-sdk.zip\n\tunzip -o google-cloud-sdk.zip -d $DIRECTORY\n\t$DIRECTORY_GCLOUD/install.sh\nfi\n\nexport
+            PATH=$DIRECTORY_GCLOUD_BIN:$PATH\n\ngcloud --quiet components update\ngcloud
+            --quiet components install beta\n\ngcloud auth activate-service-account
+            --key-file $GCLOUD_SERVICE_AUTH\ngcloud config set project simprints-dev\n\ngcloud
+            firebase test android run --type instrumentation --app $UNIVERSAL_APK
+            --test $TEST_APK --device model=walleye,version=28,locale=en,orientation=portrait
+            --timeout 20m --use-orchestrator"
+  face_test:
+    after_run:
+    - step_prepare_build
+    - step_android_test_df
+    steps:
+    - set-env-var@0.9.1:
+        title: Set module
+        inputs:
+        - destination_keys: MODULE
+        - value: face
+    - build-router-start@0.11.3:
+        inputs:
+        - workflows: face_unit_test
+        - access_token: $bitrise_key_to_run_auto_workflow
+    - set-env-var@0.9.1:
+        title: Set Slack Channel
+        inputs:
+        - destination_keys: slack_dev_channel
+        - value: '#ci_face'
+  face_unit_test:
+    before_run:
+    - step_prepare_build
+    after_run:
+    - step_test_df
+    steps:
+    - set-env-var@0.9.1:
+        title: Set module
+        inputs:
+        - destination_keys: MODULE
+        - value: face
+    - set-env-var:
+        title: Set Slack Channel
+        inputs:
+        - destination_keys: slack_dev_channel
+        - value: '#ci_face'
+  fingerprint_test:
+    after_run:
+    - step_prepare_build
+    - step_android_test_df
+    steps:
+    - set-env-var@0.9.1:
+        title: Set module
+        inputs:
+        - destination_keys: MODULE
+        - value: fingerprint
+    - build-router-start@0.11.3:
+        title: Start Unit Test
+        inputs:
+        - workflows: fingerprint_unit_test
+        - access_token: $bitrise_key_to_run_auto_workflow
+    - set-env-var@0.9.1:
+        title: Set Slack Channel
+        inputs:
+        - destination_keys: slack_dev_channel
+        - value: '#ci_fingerprint'
+  fingerprint_unit_test:
+    before_run:
+    - step_prepare_build
+    after_run:
+    - update_cache
+    steps:
+    - android-unit-test:
+        title: Fingerprint Unit Test
+        inputs:
+        - variant: Debug
+        - arguments: --build-cache
+        - cache_level: all
+        - module: fingerprint
+    - android-unit-test:
+        title: Fingerprint Scanner Unit Test
+        inputs:
+        - variant: Debug
+        - arguments: --build-cache
+        - cache_level: all
+        - module: fingerprintscanner
+    - deploy-to-bitrise-io@1.9.5: {}
   id:
+    before_run:
+    - id_trigger_submodules
+    - step_prepare_build
     steps:
     - set-env-var@0.9.1:
         title: Set module
@@ -11,16 +162,16 @@ workflows:
         - destination_keys: MODULE
         - value: id
     - gradle-runner:
-        inputs:
-        - gradlew_path: "$PROJECT_LOCATION/gradlew"
-        - gradle_options: "--stacktrace"
-        - gradle_task: ":id:bundleDebug"
         title: Bundle debug
+        inputs:
+        - gradlew_path: $PROJECT_LOCATION/gradlew
+        - gradle_options: --stacktrace
+        - gradle_task: :id:bundleDebug
     - android-unit-test:
         title: Unit tests
         inputs:
         - variant: debug
-        - module: "$MODULE"
+        - module: $MODULE
     - script:
         title: Create universal APK
         inputs:
@@ -44,7 +195,7 @@ workflows:
             envman add --key BITRISE_UNIVERSAL_APK_PATH --value /bitrise/deploy/universal.apk
     - sign-apk:
         inputs:
-        - android_app: "$BITRISE_UNIVERSAL_APK_PATH"
+        - android_app: $BITRISE_UNIVERSAL_APK_PATH
     - script@1.1.5:
         title: Move signed APK
         inputs:
@@ -58,13 +209,14 @@ workflows:
             envman add --key SIGNED_UNIVERSAL_APK_PATH --value $BITRISE_SIGNED_APK_PATH
     - android-build-for-ui-testing@0.1.1:
         inputs:
-        - module: "$MODULE"
+        - module: $MODULE
         - variant: debug
     - sign-apk:
         title: Sign test APK
         inputs:
-        - android_app: "$BITRISE_TEST_APK_PATH"
+        - android_app: $BITRISE_TEST_APK_PATH
     - script@1.1.5:
+        title: Run Android Tests
         inputs:
         - content: "export DIRECTORY=$HOME\nexport DIRECTORY_GCLOUD=$DIRECTORY\"/google-cloud-sdk\"\nexport
             DIRECTORY_GCLOUD_BIN=$DIRECTORY_GCLOUD\"/bin\"\nexport GCLOUD_SERVICE_AUTH=$DIRECTORY/service.json\necho
@@ -81,13 +233,13 @@ workflows:
             firebase test android run --type instrumentation --app $SIGNED_UNIVERSAL_APK_PATH
             --test $BITRISE_SIGNED_APK_PATH --device model=walleye,version=28,locale=en,orientation=portrait
             --timeout 20m --use-orchestrator"
-        title: Run Android Tests
     - deploy-to-bitrise-io:
         title: Deploy to Bitrise
     - cache-push:
         title: Update cache
         is_always_run: true
     - script@1.1.5:
+        title: Fix BITRISE_PUBLIC_INSTALL_PAGE_URL_MAP
         inputs:
         - content: |-
             #bash step
@@ -109,8 +261,8 @@ workflows:
                 else
                     echo "Could not found signed release APK in URL map."
             fi
-        title: Fix BITRISE_PUBLIC_INSTALL_PAGE_URL_MAP
     - script@1.1.5:
+        title: Display APK paths
         inputs:
         - content: |
             #!/usr/bin/env bash
@@ -127,17 +279,16 @@ workflows:
             echo $BITRISE_PUBLIC_INSTALL_PAGE_URL_MAP_DEBUG
             echo $BITRISE_PUBLIC_INSTALL_PAGE_URL_MAP_SIGNED_RELEASE
             ls $BITRISE_DEPLOY_DIR
-        title: Display APK paths
     - build-router-wait:
         inputs:
-        - access_token: "$bitrise_key_to_run_auto_workflow"
+        - access_token: $bitrise_key_to_run_auto_workflow
     - slack:
         inputs:
-        - channel: "$slack_dev_channel"
-        - webhook_url: "$slack_notify_key"
+        - channel: $slack_dev_channel
+        - webhook_url: $slack_notify_key
         - from_username: SimprintsID CI
-        - pretext: ":rocket: *Build&Tests Succeeded!* :tada:"
-        - pretext_on_error: ":face_palm: *Build&Tests Failed!* :face_with_symbols_on_mouth:"
+        - pretext: ':rocket: *Build&Tests Succeeded!* :tada:'
+        - pretext_on_error: ':face_palm: *Build&Tests Failed!* :face_with_symbols_on_mouth:'
         - from_username_on_error: SimprintsID CI
         - fields: |
             Branch|${BITRISE_GIT_BRANCH}
@@ -146,19 +297,171 @@ workflows:
             View Build|${BITRISE_BUILD_URL}
             Debug Apk|${BITRISE_PUBLIC_INSTALL_PAGE_URL_MAP_DEBUG}
         - footer_icon: https://github.com/SimPrints.png?size=20
-        - text: ''
-        - emoji: ''
-        - title_link: ''
-        - image_url: ''
-        - thumb_url: ''
+        - text: ""
+        - emoji: ""
+        - title_link: ""
+        - image_url: ""
+        - thumb_url: ""
         - footer: SimprintsID
         - icon_url: https://github.com/SimPrints.png
-        - channel_on_error: "$slack_dev_channel"
+        - channel_on_error: $slack_dev_channel
         - icon_url_on_error: https://github.com/SimPrints.png
-        - api_token: ''
-    before_run:
-    - id_trigger_submodules
-    - step_prepare_build
+        - api_token: ""
+  id_trigger_submodules:
+    steps:
+    - build-router-start@0.11.3:
+        title: Build submodules
+        is_always_run: true
+        inputs:
+        - access_token: $bitrise_key_to_run_auto_workflow
+        - workflows: |-
+            clientapi_test
+            fingerprint_test
+            face_test
+            test_workflow
+  run_from_repo:
+    steps:
+    - activate-ssh-key@4.0.3:
+        title: Activate SSH key
+    - script@1.1.5:
+        title: Delete source code
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -e
+            # debug log
+            set -x
+
+            projectDir=${PWD##*/}
+            cd ..
+            # Remove contents from project dir if dir is not empty
+            if [ "$(ls -A $projectDir)" ]; then
+                printf 'Removing source code located at %s/...\n' $projectDir
+                rm -rf $projectDir/*
+            fi
+            echo 'Done'
+    - git-clone@4.0.17:
+        title: Clone repository
+        inputs:
+        - reset_repository: "Yes"
+    - bitrise-run@0.9.1:
+        title: Bitrise Run id workflow from repo
+        inputs:
+        - workflow_id: id
+  step_android_test_df:
+    steps:
+    - gradle-runner@1.9.0:
+        title: Bundle debug
+        inputs:
+        - gradlew_path: $PROJECT_LOCATION/gradlew
+        - gradle_options: --stacktrace
+        - cache_level: all
+        - gradle_task: :id:bundleDebug
+    - script@1.1.5:
+        title: Create universal APK
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -e
+            # debug log
+            set -x
+
+            wget "https://github.com/google/bundletool/releases/download/0.10.2/bundletool-all-0.10.2.jar"
+            pwd
+
+            echo $BITRISE_AAB_PATH
+            echo $BITRISE_AAB_PATH_LIST
+
+            java -jar bundletool-all-0.10.2.jar build-apks --bundle $BITRISE_AAB_PATH --output universal.apks --overwrite --mode=UNIVERSAL
+            mv universal.apks universal.zip
+            unzip universal.zip
+            mv universal.apk /bitrise/deploy/
+
+            envman add --key BITRISE_UNIVERSAL_APK_PATH --value /bitrise/deploy/universal.apk
+    - sign-apk:
+        inputs:
+        - android_app: $BITRISE_UNIVERSAL_APK_PATH
+    - script@1.1.5:
+        title: Move signed APK
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -e
+            # debug log
+            set -x
+
+            envman add --key SIGNED_UNIVERSAL_APK_PATH --value $BITRISE_SIGNED_APK_PATH
+    - gradle-runner:
+        title: Build test apk
+        inputs:
+        - app_file_include_filter: |
+            */build/outputs/apk/*.apk
+        - gradlew_path: $PROJECT_LOCATION/gradlew
+        - gradle_task: :$MODULE:assembleDebugAndroidTest
+    - sign-apk:
+        title: Sign test APK
+        inputs:
+        - android_app: $BITRISE_TEST_APK_PATH
+    - script@1.1.5:
+        title: Run Android  Tests
+        inputs:
+        - content: "export DIRECTORY=$HOME\nexport DIRECTORY_GCLOUD=$DIRECTORY\"/google-cloud-sdk\"\nexport
+            DIRECTORY_GCLOUD_BIN=$DIRECTORY_GCLOUD\"/bin\"\nexport GCLOUD_SERVICE_AUTH=$DIRECTORY/service.json\n\necho
+            $BITRISEIO_SIMPRINTSID_FIREBASE_TEST_LAB_URL\nwget $BITRISEIO_SIMPRINTSID_FIREBASE_TEST_LAB_URL
+            -O $GCLOUD_SERVICE_AUTH\n\nexport PROJECT=simprints-android-ci\nexport
+            TEST_APK=/Users/fabiotuzza/Downloads/clientapi-debug-androidTest-bitrise-signed_1.apk\nexport
+            UNIVERSAL_APK=/Users/fabiotuzza/Downloads/universal-bitrise-signed_1.apk\n\nif
+            [ ! -d \"$DIRECTORY_GCLOUD\" ]; then\n    # Control will enter here if
+            $DIRECTORY doesn't exist.\n\tcd $DIRECTORY\n\twget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.zip
+            -O google-cloud-sdk.zip\n\tunzip -o google-cloud-sdk.zip -d $DIRECTORY\n\t$DIRECTORY_GCLOUD/install.sh\nfi\n\nexport
+            PATH=$DIRECTORY_GCLOUD_BIN:$PATH\n\ngcloud --quiet components update\ngcloud
+            --quiet components install beta\n\ngcloud auth activate-service-account
+            --key-file $GCLOUD_SERVICE_AUTH\ngcloud config set project $PROJECT\n\ngcloud
+            firebase test android run --type instrumentation --app $SIGNED_UNIVERSAL_APK_PATH
+            --test $BITRISE_SIGNED_APK_PATH --device model=walleye,version=28,locale=en,orientation=portrait
+            --timeout 20m --use-orchestrator"
+    - cache-push@2.2.0:
+        title: Update cache
+        is_always_run: true
+        inputs:
+        - ignore_check_on_paths: |-
+            $HOME/.gradle/caches/*.lock
+            $HOME/.gradle/caches/*.bin
+            ./.gradle/*.lock
+            ./.gradle/*.bin
+        - cache_paths: |
+            $BITRISE_CACHE_DIR
+            $HOME/.gradle
+            ./.gradle
+    - slack:
+        inputs:
+        - channel: $slack_dev_channel
+        - webhook_url: $slack_notify_key
+        - from_username: SimprintsID CI
+        - pretext: ':rocket: *Build&Tests Succeeded!* :tada:'
+        - pretext_on_error: ':face_palm: *Build&Tests Failed!* :face_with_symbols_on_mouth:'
+        - from_username_on_error: SimprintsID CI
+        - fields: |
+            Branch|${BITRISE_GIT_BRANCH}
+            Workflow|${BITRISE_TRIGGERED_WORKFLOW_ID}
+        - buttons: |
+            View Build|${BITRISE_BUILD_URL}
+            Debug Apk|${BITRISE_PUBLIC_INSTALL_PAGE_URL_MAP_DEBUG}
+            Release Apk|${BITRISE_PUBLIC_INSTALL_PAGE_URL_MAP_SIGNED_RELEASE}
+        - footer_icon: https://github.com/SimPrints.png?size=20
+        - text: ""
+        - emoji: ""
+        - title_link: ""
+        - image_url: ""
+        - thumb_url: ""
+        - footer: SimprintsID
+        - icon_url: https://github.com/SimPrints.png
+        - channel_on_error: $slack_dev_channel
+        - icon_url_on_error: https://github.com/SimPrints.png
+        - api_token: ""
   step_prepare_build:
     steps:
     - cache-pull:
@@ -186,8 +489,9 @@ workflows:
     - git-clone@4.0.17:
         title: Clone repository
         inputs:
-        - reset_repository: 'Yes'
+        - reset_repository: "Yes"
     - script@1.1.5:
+        title: Set artifactory and NDK params
         inputs:
         - content: |-
             #!/usr/bin/env bash
@@ -199,168 +503,56 @@ workflows:
             echo "SIMPRINTS_ARTIFACTORY_USERNAME=$artifactory_username" >> gradle.properties
             echo "SIMPRINTS_ARTIFACTORY_PASSWORD=$artifactory_password" >> gradle.properties
             echo "ndk.dir=$ANDROID_NDK_HOME" >> local.properties
-        title: Set artifactory and NDK params
     - change-android-versioncode-and-versionname@1.1.1:
         inputs:
-        - build_gradle_path: "$BITRISE_SOURCE_DIR/$MODULE/build.gradle"
+        - build_gradle_path: $BITRISE_SOURCE_DIR/$MODULE/build.gradle
   step_publish:
+    before_run:
+    - id
     steps:
     - file-downloader:
-        inputs:
-        - destination: "$HOME/google-play-service-upload-key.json"
-        - source: "$BITRISEIO_SIMPRINTSID_PUBLISH_KEY_FILE_URL"
         title: Download Google Play Service upload key
+        inputs:
+        - destination: $HOME/google-play-service-upload-key.json
+        - source: $BITRISEIO_SIMPRINTSID_PUBLISH_KEY_FILE_URL
     - gradle-runner@1.8.3:
         inputs:
-        - apk_file_include_filter: "*.aab"
-        - gradlew_path: "./gradlew"
-        - gradle_task: "$MODULE:bundleRelease"
+        - apk_file_include_filter: '*.aab'
+        - gradlew_path: ./gradlew
+        - gradle_task: $MODULE:bundleRelease
         outputs:
         - BITRISE_APK_PATH: BITRISE_UNSIGNED_RELEASE_AAB_PATH
+          opts: {}
     - sign-apk@1.2.4:
         run_if: '{{getenv "BITRISEIO_ANDROID_KEYSTORE_URL" | ne ""}}'
         inputs:
-        - apk_path: "$BITRISE_UNSIGNED_RELEASE_AAB_PATH"
+        - apk_path: $BITRISE_UNSIGNED_RELEASE_AAB_PATH
         outputs:
         - BITRISE_APK_PATH: BITRISE_SIGNED_RELEASE_AAB_PATH
+          opts: {}
     - google-play-deploy@1.5.1:
         inputs:
         - track: internal
         - package_name: com.simprints.id
-        - apk_path: "$BITRISE_SIGNED_RELEASE_AAB_PATH"
-        - service_account_json_key_path: "$BITRISEIO_SIMPRINTSID_PUBLISH_KEY_FILE_URL"
+        - apk_path: $BITRISE_SIGNED_RELEASE_AAB_PATH
+        - service_account_json_key_path: $BITRISEIO_SIMPRINTSID_PUBLISH_KEY_FILE_URL
     - slack@3.1.1:
         inputs:
-        - channel: "$slack_dev_channel"
-        - webhook_url: "$slack_notify_key"
+        - channel: $slack_dev_channel
+        - webhook_url: $slack_notify_key
         - from_username: SimprintsId CI
-        - pretext: ":rocket: *Publish Succeeded!* :tada:"
+        - pretext: ':rocket: *Publish Succeeded!* :tada:'
         - title_link: https://play.google.com/store/apps/details?id=com.simprints.id&hl=en
-        - image_url: ''
-        - thumb_url: ''
+        - image_url: ""
+        - thumb_url: ""
         - icon_url: https://github.com/SimPrints.png
         - footer: SimprintsId
         - footer_icon: https://github.com/SimPrints.png?size=20
-        - channel_on_error: "$slack_dev_channel"
-        - pretext_on_error: ":face_palm: *Publish Failed!* :face_with_symbols_on_mouth:"
+        - channel_on_error: $slack_dev_channel
+        - pretext_on_error: ':face_palm: *Publish Failed!* :face_with_symbols_on_mouth:'
         - buttons: View Build|${BITRISE_BUILD_URL}
         - fields: Tag|${BITRISE_GIT_TAG}
         - icon_url_on_error: https://github.com/SimPrints.png
-    before_run:
-    - id
-  step_android_test_df:
-    steps:
-    - gradle-runner@1.9.0:
-        inputs:
-        - gradlew_path: "$PROJECT_LOCATION/gradlew"
-        - gradle_options: "--stacktrace"
-        - cache_level: all
-        - gradle_task: ":id:bundleDebug"
-        title: Bundle debug
-    - script@1.1.5:
-        title: Create universal APK
-        inputs:
-        - content: |-
-            #!/usr/bin/env bash
-            # fail if any commands fails
-            set -e
-            # debug log
-            set -x
-
-            wget "https://github.com/google/bundletool/releases/download/0.10.2/bundletool-all-0.10.2.jar"
-            pwd
-
-            echo $BITRISE_AAB_PATH
-            echo $BITRISE_AAB_PATH_LIST
-
-            java -jar bundletool-all-0.10.2.jar build-apks --bundle $BITRISE_AAB_PATH --output universal.apks --overwrite --mode=UNIVERSAL
-            mv universal.apks universal.zip
-            unzip universal.zip
-            mv universal.apk /bitrise/deploy/
-
-            envman add --key BITRISE_UNIVERSAL_APK_PATH --value /bitrise/deploy/universal.apk
-    - sign-apk:
-        inputs:
-        - android_app: "$BITRISE_UNIVERSAL_APK_PATH"
-    - script@1.1.5:
-        title: Move signed APK
-        inputs:
-        - content: |-
-            #!/usr/bin/env bash
-            # fail if any commands fails
-            set -e
-            # debug log
-            set -x
-
-            envman add --key SIGNED_UNIVERSAL_APK_PATH --value $BITRISE_SIGNED_APK_PATH
-    - gradle-runner:
-        inputs:
-        - app_file_include_filter: "*/build/outputs/apk/*.apk\n"
-        - gradlew_path: "$PROJECT_LOCATION/gradlew"
-        - gradle_task: ":$MODULE:assembleDebugAndroidTest"
-        title: Build test apk
-    - sign-apk:
-        title: Sign test APK
-        inputs:
-        - android_app: "$BITRISE_TEST_APK_PATH"
-    - script@1.1.5:
-        title: Run Android  Tests
-        inputs:
-        - content: "export DIRECTORY=$HOME\nexport DIRECTORY_GCLOUD=$DIRECTORY\"/google-cloud-sdk\"\nexport
-            DIRECTORY_GCLOUD_BIN=$DIRECTORY_GCLOUD\"/bin\"\nexport GCLOUD_SERVICE_AUTH=$DIRECTORY/service.json\n\necho
-            $BITRISEIO_SIMPRINTSID_FIREBASE_TEST_LAB_URL\nwget $BITRISEIO_SIMPRINTSID_FIREBASE_TEST_LAB_URL
-            -O $GCLOUD_SERVICE_AUTH\n\nexport PROJECT=simprints-android-ci\nexport
-            TEST_APK=/Users/fabiotuzza/Downloads/clientapi-debug-androidTest-bitrise-signed_1.apk\nexport
-            UNIVERSAL_APK=/Users/fabiotuzza/Downloads/universal-bitrise-signed_1.apk\n\nif
-            [ ! -d \"$DIRECTORY_GCLOUD\" ]; then\n    # Control will enter here if
-            $DIRECTORY doesn't exist.\n\tcd $DIRECTORY\n\twget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.zip
-            -O google-cloud-sdk.zip\n\tunzip -o google-cloud-sdk.zip -d $DIRECTORY\n\t$DIRECTORY_GCLOUD/install.sh\nfi\n\nexport
-            PATH=$DIRECTORY_GCLOUD_BIN:$PATH\n\ngcloud --quiet components update\ngcloud
-            --quiet components install beta\n\ngcloud auth activate-service-account
-            --key-file $GCLOUD_SERVICE_AUTH\ngcloud config set project $PROJECT\n\ngcloud
-            firebase test android run --type instrumentation --app $SIGNED_UNIVERSAL_APK_PATH
-            --test $BITRISE_SIGNED_APK_PATH --device model=walleye,version=28,locale=en,orientation=portrait
-            --timeout 20m --use-orchestrator"
-    - cache-push@2.2.0:
-        title: Update cache
-        inputs:
-        - ignore_check_on_paths: |-
-            $HOME/.gradle/caches/*.lock
-            $HOME/.gradle/caches/*.bin
-            ./.gradle/*.lock
-            ./.gradle/*.bin
-        - cache_paths: |
-            $BITRISE_CACHE_DIR
-            $HOME/.gradle
-            ./.gradle
-        is_always_run: true
-    - slack:
-        inputs:
-        - channel: "$slack_dev_channel"
-        - webhook_url: "$slack_notify_key"
-        - from_username: SimprintsID CI
-        - pretext: ":rocket: *Build&Tests Succeeded!* :tada:"
-        - pretext_on_error: ":face_palm: *Build&Tests Failed!* :face_with_symbols_on_mouth:"
-        - from_username_on_error: SimprintsID CI
-        - fields: |
-            Branch|${BITRISE_GIT_BRANCH}
-            Workflow|${BITRISE_TRIGGERED_WORKFLOW_ID}
-        - buttons: |
-            View Build|${BITRISE_BUILD_URL}
-            Debug Apk|${BITRISE_PUBLIC_INSTALL_PAGE_URL_MAP_DEBUG}
-            Release Apk|${BITRISE_PUBLIC_INSTALL_PAGE_URL_MAP_SIGNED_RELEASE}
-        - footer_icon: https://github.com/SimPrints.png?size=20
-        - text: ''
-        - emoji: ''
-        - title_link: ''
-        - image_url: ''
-        - thumb_url: ''
-        - footer: SimprintsID
-        - icon_url: https://github.com/SimPrints.png
-        - channel_on_error: "$slack_dev_channel"
-        - icon_url_on_error: https://github.com/SimPrints.png
-        - api_token: ''
-    before_run: []
   step_test_df:
     steps:
     - android-unit-test:
@@ -368,11 +560,12 @@ workflows:
         inputs:
         - variant: Debug
         - cache_level: all
-        - arguments: "--build-cache"
-        - module: "$MODULE"
+        - arguments: --build-cache
+        - module: $MODULE
     - deploy-to-bitrise-io: {}
     - cache-push:
         title: Update cache
+        is_always_run: true
         inputs:
         - ignore_check_on_paths: |-
             $HOME/.gradle/caches/*.lock
@@ -383,143 +576,15 @@ workflows:
             $BITRISE_CACHE_DIR
             $HOME/.gradle
             ./.gradle
-        is_always_run: true
-    before_run: []
-  id_trigger_submodules:
+  test_workflow:
     steps:
-    - build-router-start@0.11.3:
-        title: Build submodules
-        inputs:
-        - access_token: "$bitrise_key_to_run_auto_workflow"
-        - workflows: |-
-            clientapi_test
-            fingerprint_test
-            face_test
-        is_always_run: true
-    before_run: []
-  fingerprint_unit_test:
-    before_run:
-    - step_prepare_build
-    after_run:
-    - update_cache
-    steps:
-    - android-unit-test:
-        inputs:
-        - variant: Debug
-        - arguments: "--build-cache"
-        - cache_level: all
-        - module: fingerprint
-        title: Fingerprint Unit Test
-    - android-unit-test:
-        inputs:
-        - variant: Debug
-        - arguments: "--build-cache"
-        - cache_level: all
-        - module: fingerprintscanner
-        title: Fingerprint Scanner Unit Test
-    - deploy-to-bitrise-io@1.9.5: {}
-  fingerprint_test:
-    steps:
-    - set-env-var@0.9.1:
-        title: Set module
-        inputs:
-        - destination_keys: MODULE
-        - value: fingerprint
-    - build-router-start@0.11.3:
-        inputs:
-        - workflows: fingerprint_unit_test
-        - access_token: "$bitrise_key_to_run_auto_workflow"
-        title: Start Unit Test
-    - set-env-var@0.9.1:
-        title: Set Slack Channel
-        inputs:
-        - destination_keys: slack_dev_channel
-        - value: "#ci_fingerprint"
-    after_run:
-    - step_prepare_build
-    - step_android_test_df
-  clientapi_unit_test:
-    before_run:
-    - step_prepare_build
-    steps:
-    - set-env-var@0.9.1:
-        title: Set module
-        inputs:
-        - destination_keys: MODULE
-        - value: clientapi
-    after_run:
-    - step_test_df
-  clientapi_test:
-    steps:
-    - set-env-var@0.9.1:
-        title: Set module
-        inputs:
-        - destination_keys: MODULE
-        - value: clientapi
-    - build-router-start@0.11.3:
-        inputs:
-        - workflows: clientapi_unit_test
-        - access_token: "$bitrise_key_to_run_auto_workflow"
-    after_run:
-    - step_prepare_build
-    - step_android_test_df
-  face_unit_test:
-    before_run:
-    - step_prepare_build
-    steps:
-    - set-env-var@0.9.1:
-        title: Set module
-        inputs:
-        - destination_keys: MODULE
-        - value: face
-    - set-env-var:
-        inputs:
-        - destination_keys: slack_dev_channel
-        - value: "#ci_face"
-        title: Set Slack Channel
-    after_run:
-    - step_test_df
-  face_test:
-    steps:
-    - set-env-var@0.9.1:
-        title: Set module
-        inputs:
-        - destination_keys: MODULE
-        - value: face
-    - build-router-start@0.11.3:
-        inputs:
-        - workflows: face_unit_test
-        - access_token: "$bitrise_key_to_run_auto_workflow"
-    - set-env-var@0.9.1:
-        inputs:
-        - destination_keys: slack_dev_channel
-        - value: "#ci_face"
-        title: Set Slack Channel
-    after_run:
-    - step_prepare_build
-    - step_android_test_df
-  experiments:
-    steps:
-    - script@1.1.5:
-        inputs:
-        - content: "\nexport DIRECTORY=$HOME\nexport DIRECTORY_GCLOUD=$DIRECTORY\"/google-cloud-sdk\"\nexport
-            DIRECTORY_GCLOUD_BIN=$DIRECTORY_GCLOUD\"/bin\"\nexport GCLOUD_SERVICE_AUTH=$DIRECTORY/service.json\necho
-            $BITRISEIO_SIMPRINTSID_FIREBASE_TEST_LAB_URL\nwget $BITRISEIO_SIMPRINTSID_FIREBASE_TEST_LAB_URL
-            -O $GCLOUD_SERVICE_AUTH\n\nexport PROJECT=simprints-dev\nexport TEST_APK=/Users/fabiotuzza/Downloads/clientapi-debug-androidTest-bitrise-signed_1.apk\nexport
-            UNIVERSAL_APK=/Users/fabiotuzza/Downloads/universal-bitrise-signed_1.apk\n\nif
-            [ ! -d \"$DIRECTORY_GCLOUD\" ]; then\n    # Control will enter here if
-            $DIRECTORY doesn't exist.\n\tcd $DIRECTORY\n\twget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.zip
-            -O google-cloud-sdk.zip\n\tunzip -o google-cloud-sdk.zip -d $DIRECTORY\n\t$DIRECTORY_GCLOUD/install.sh\nfi\n\nexport
-            PATH=$DIRECTORY_GCLOUD_BIN:$PATH\n\ngcloud --quiet components update\ngcloud
-            --quiet components install beta\n\ngcloud auth activate-service-account
-            --key-file $GCLOUD_SERVICE_AUTH\ngcloud config set project simprints-dev\n\ngcloud
-            firebase test android run --type instrumentation --app $UNIVERSAL_APK
-            --test $TEST_APK --device model=walleye,version=28,locale=en,orientation=portrait
-            --timeout 20m --use-orchestrator"
+    - script@1.1.6:
+        title: Test Script
   update_cache:
     steps:
     - cache-push:
         title: Update cache
+        is_always_run: true
         inputs:
         - ignore_check_on_paths: |-
             $HOME/.gradle/caches/*.lock
@@ -530,65 +595,3 @@ workflows:
             $BITRISE_CACHE_DIR
             $HOME/.gradle
             ./.gradle
-        is_always_run: true
-    before_run: []
-  run_from_repo:
-    steps:
-    - activate-ssh-key@4.0.3:
-        title: Activate SSH key
-    - script@1.1.5:
-        title: Delete source code
-        inputs:
-        - content: |-
-            #!/usr/bin/env bash
-            # fail if any commands fails
-            set -e
-            # debug log
-            set -x
-
-            projectDir=${PWD##*/}
-            cd ..
-            # Remove contents from project dir if dir is not empty
-            if [ "$(ls -A $projectDir)" ]; then
-                printf 'Removing source code located at %s/...\n' $projectDir
-                rm -rf $projectDir/*
-            fi
-            echo 'Done'
-    - git-clone@4.0.17:
-        title: Clone repository
-        inputs:
-        - reset_repository: 'Yes'
-    - bitrise-run@0.9.1:
-        inputs:
-        - workflow_id: id
-        title: Bitrise Run id workflow from repo
-app:
-  envs:
-  - opts:
-      is_expand: false
-    PROJECT_LOCATION: "."
-  - opts:
-      is_expand: false
-    MODULE: id
-  - opts:
-      is_expand: false
-    MODULE_CLIENTAPI: clientapi
-  - opts:
-      is_expand: false
-    MODULE_APP: id
-  - opts:
-      is_expand: false
-    MODULE_FACE: face
-  - opts:
-      is_expand: false
-    MODULE_FINGERPRINT: fingerprint
-trigger_map:
-- push_branch: bitrise_config
-  workflow: run_from_repo
-- push_branch: develop
-  workflow: id
-- push_branch: master
-  workflow: id
-- pull_request_source_branch: "*"
-  pull_request_target_branch: develop
-  workflow: id
