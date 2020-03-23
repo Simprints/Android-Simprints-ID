@@ -318,7 +318,6 @@ workflows:
             clientapi_test
             fingerprint_test
             face_test
-            test_workflow
   run_from_repo:
     steps:
     - activate-ssh-key@4.0.3:
