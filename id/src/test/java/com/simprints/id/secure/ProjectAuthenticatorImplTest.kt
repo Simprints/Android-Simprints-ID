@@ -39,7 +39,6 @@ import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.getSharedPreferences
 import io.mockk.*
-import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
@@ -69,7 +68,7 @@ class ProjectAuthenticatorImplTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mockk()
-    private val projectLocalDAtaSourceMock: ProjectLocalDataSource = mockk()
+    private val projectLocalDataSourceMock: ProjectLocalDataSource = mockk()
 
     private val appModule by lazy {
         TestAppModule(
@@ -82,7 +81,7 @@ class ProjectAuthenticatorImplTest {
 
     private val dataModule by lazy {
         TestDataModule(
-            projectLocalDataSourceRule = ReplaceRule { projectLocalDAtaSourceMock },
+            projectLocalDataSourceRule = ReplaceRule { projectLocalDataSourceMock },
             projectRemoteDataSourceRule = ReplaceRule { projectRemoteDataSourceMock }
         )
     }
@@ -96,7 +95,7 @@ class ProjectAuthenticatorImplTest {
         runBlocking {
             RobolectricTestMocker
                 .initLogInStateMock(getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
-                .mockLoadProject(projectRemoteDataSourceMock, projectLocalDAtaSourceMock)
+                .mockLoadProject(projectRemoteDataSourceMock, projectLocalDataSourceMock)
 
         }
 
@@ -148,24 +147,28 @@ class ProjectAuthenticatorImplTest {
 
     @Test
     fun getAuthenticationData_invokeAuthenticationDataManagerCorrectly() {
-        val mockAuthenticationDataManager = mockk<AuthenticationDataManager>(relaxed = true)
+        runBlocking {
+            val mockAuthenticationDataManager = mockk<AuthenticationDataManager>(relaxed = true)
 
-        val authenticator = ProjectAuthenticatorImpl(
-            mockk(),
-            loginInfoManager,
-            mockk(),
-            secureDataManager,
-            projectRemoteDataSource,
-            signerManager,
-            remoteConfigWrapper,
-            longConsentRepository,
-            preferencesManager,
-            authenticationDataManager = mockAuthenticationDataManager
-        )
+            val authenticator = ProjectAuthenticatorImpl(
+                mockk(),
+                loginInfoManager,
+                mockk(),
+                secureDataManager,
+                projectRemoteDataSource,
+                signerManager,
+                remoteConfigWrapper,
+                longConsentRepository,
+                preferencesManager,
+                authenticationDataManager = mockAuthenticationDataManager
+            )
 
-        authenticator.getAuthenticationData(PROJECT_ID, USER_ID)
+            runBlockingTest {
+                authenticator.getAuthenticationData(PROJECT_ID, USER_ID)
+            }
 
-        verify(exactly = 1) { mockAuthenticationDataManager.requestAuthenticationData(PROJECT_ID, USER_ID) }
+            coVerify(exactly = 1) { mockAuthenticationDataManager.requestAuthenticationData(PROJECT_ID, USER_ID) }
+        }
     }
 
     @Test
@@ -235,7 +238,7 @@ class ProjectAuthenticatorImplTest {
         val mockAttestationManager = mockk<AttestationManager>()
         every {
             mockAttestationManager.requestAttestation(any(), any())
-        } returns Single.just(AttestToken("google_attestation"))
+        } returns AttestToken("google_attestation")
 
         return mockAttestationManager
     }
