@@ -18,8 +18,8 @@ import com.simprints.id.activities.fetchguid.FetchGuidActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.activities.guidselection.GuidSelectionActivity
 import com.simprints.id.activities.login.LoginActivity
-import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
+import com.simprints.id.activities.qrcapture.QrCaptureActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsAboutActivity
@@ -39,7 +39,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.guidselection.GuidSelectionWorker
-import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
@@ -56,7 +56,17 @@ import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
-@Component(modules = [AppModule::class, DataModule::class, PreferencesModule::class, SerializerModule::class, SyncModule::class, DashboardActivityModule::class])
+@Component(
+    modules = [
+        AppModule::class,
+        DataModule::class,
+        LoginModule::class,
+        PreferencesModule::class,
+        SerializerModule::class,
+        SyncModule::class,
+        DashboardActivityModule::class
+    ]
+)
 @Singleton
 interface AppComponent {
 
@@ -68,6 +78,7 @@ interface AppComponent {
         fun appModule(appModule: AppModule): Builder
         fun dataModule(dataModule: DataModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
+        fun loginModule(loginModule: LoginModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun syncModule(syncModule: SyncModule): Builder
         fun dashboardActivityModule(dashboardActivityModule: DashboardActivityModule): Builder
@@ -88,9 +99,8 @@ interface AppComponent {
     fun inject(checkLoginPresenter: CheckLoginPresenter)
     fun inject(checkLoginFromIntentPresenter: CheckLoginFromIntentPresenter)
     fun inject(checkLoginFromMainLauncherPresenter: CheckLoginFromMainLauncherPresenter)
-    fun inject(loginPresenter: LoginPresenter)
     fun inject(requestLoginActivity: RequestLoginActivity)
-    fun inject(projectAuthenticator: ProjectAuthenticator)
+    fun inject(projectAuthenticator: ProjectAuthenticatorImpl)
     fun inject(alertPresenter: AlertPresenter)
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(syncSchedulerHelper: SyncSchedulerImpl)
@@ -118,6 +128,7 @@ interface AppComponent {
     fun inject(syncInformationActivity: SyncInformationActivity)
     fun inject(peopleEndSyncReporterWorker: PeopleEndSyncReporterWorker)
     fun inject(peopleStartSyncWorker: PeopleStartSyncReporterWorker)
+    fun inject(qrCaptureActivity: QrCaptureActivity)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager
