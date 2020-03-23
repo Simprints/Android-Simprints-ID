@@ -7,7 +7,8 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.common.*
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.EXTRA
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.ON
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -51,9 +52,6 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
         UUID.randomUUID().toString()
     }
 
-    private val isOneTimeMasterWorker
-        get() = tags.contains(MASTER_SYNC_SCHEDULER_ONE_TIME)
-
     override suspend fun doWork(): Result =
         withContext(Dispatchers.IO) {
             try {
@@ -84,16 +82,17 @@ open class PeopleSyncMasterWorker(private val appContext: Context,
         }
 
     private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
-        val backgroundOnForPeriodicSync = preferenceManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.PERIODIC_BACKGROUND] == true
-        val manualDownSyncAllowed = preferenceManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL] == true && isOneTimeMasterWorker
-
-        val downSyncChainRequired = manualDownSyncAllowed || backgroundOnForPeriodicSync
+        val downSyncChainRequired = isPeopleDownSyncAllowed()
 
         return if (downSyncChainRequired) {
             downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncID)
         } else {
             emptyList()
         }
+    }
+
+    private fun isPeopleDownSyncAllowed() = with(preferenceManager) {
+        peopleDownSyncSetting == ON || peopleDownSyncSetting == EXTRA
     }
 
     private fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =
