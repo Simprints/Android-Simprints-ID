@@ -40,4 +40,5 @@ fun AuthenticationEvent.Result.toApiAuthenticationEventResult() =
         AuthenticationEvent.Result.TECHNICAL_FAILURE -> ApiAuthenticationEvent.ApiResult.TECHNICAL_FAILURE
         AuthenticationEvent.Result.SAFETYNET_UNAVAILABLE -> ApiAuthenticationEvent.ApiResult.SAFETYNET_UNAVAILABLE
         AuthenticationEvent.Result.SAFETYNET_INVALID_CLAIM -> ApiAuthenticationEvent.ApiResult.SAFETYNET_INVALID_CLAIM
+        AuthenticationEvent.Result.UNKNOWN -> ApiAuthenticationEvent.ApiResult.TECHNICAL_FAILURE
     }

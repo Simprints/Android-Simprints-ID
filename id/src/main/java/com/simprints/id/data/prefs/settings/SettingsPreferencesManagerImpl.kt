@@ -15,7 +15,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
 
@@ -26,7 +26,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           modalitySerializer: Serializer<List<Modality>>,
                                           languagesStringArraySerializer: Serializer<Array<String>>,
                                           moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-                                          peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>,
+                                          peopleDownSyncSettingSerializer: Serializer<PeopleDownSyncSetting>,
                                           captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
                                           saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
                                           scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>)
@@ -84,12 +84,8 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val CONSENT_REQUIRED_KEY = "ConsentRequired"
         const val CONSENT_REQUIRED_DEFAULT = true
 
-        const val PEOPLE_DOWN_SYNC_TRIGGERS_KEY = "PeopleDownSyncTriggers"
-        val PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT = mapOf(
-            PeopleDownSyncTrigger.MANUAL to true,
-            PeopleDownSyncTrigger.PERIODIC_BACKGROUND to true,
-            PeopleDownSyncTrigger.ON_LAUNCH_CALLOUT to false
-        )
+        const val PEOPLE_DOWN_SYNC_SETTING_KEY = "DownSyncSetting"
+        val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = PeopleDownSyncSetting.ON
 
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"
@@ -161,9 +157,8 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var modalities: List<Modality>
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MODALITY_KEY, MODALITY_DEFAULT, modalitySerializer)
 
-
-    override var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
-        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PEOPLE_DOWN_SYNC_TRIGGERS_KEY, PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT, peopleDownSyncTriggerToSerializer)
+    override var peopleDownSyncSetting: PeopleDownSyncSetting
+       by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PEOPLE_DOWN_SYNC_SETTING_KEY, PEOPLE_DOWN_SYNC_SETTING_DEFAULT, peopleDownSyncSettingSerializer)
 
     override var fingerImagesExist: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, FINGER_IMAGES_EXIST_KEY, FINGER_IMAGES_EXIST_DEFAULT)
