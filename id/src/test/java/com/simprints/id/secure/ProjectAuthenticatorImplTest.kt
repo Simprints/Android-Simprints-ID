@@ -13,7 +13,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.commontesttools.state.setupFakeKeyStore
-import com.simprints.id.data.consent.LongConsentManager
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
@@ -64,7 +64,7 @@ class ProjectAuthenticatorImplTest {
     @Inject lateinit var projectRemoteDataSource: ProjectRemoteDataSource
     @Inject lateinit var signerManager: SignerManager
     @Inject lateinit var remoteConfigWrapper: RemoteConfigWrapper
-    @Inject lateinit var longConsentManager: LongConsentManager
+    @Inject lateinit var longConsentRepository: LongConsentRepository
     @Inject lateinit var preferencesManager: PreferencesManager
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
@@ -115,7 +115,7 @@ class ProjectAuthenticatorImplTest {
             projectRemoteDataSourceMock,
             signerManager,
             remoteConfigWrapper,
-            longConsentManager,
+            longConsentRepository,
             preferencesManager,
             getMockAttestationManager()
         )
@@ -137,7 +137,7 @@ class ProjectAuthenticatorImplTest {
             projectRemoteDataSource,
             signerManager,
             remoteConfigWrapper,
-            longConsentManager,
+            longConsentRepository,
             preferencesManager
         )
 
@@ -158,7 +158,7 @@ class ProjectAuthenticatorImplTest {
             projectRemoteDataSource,
             signerManager,
             remoteConfigWrapper,
-            longConsentManager,
+            longConsentRepository,
             preferencesManager,
             authenticationDataManager = mockAuthenticationDataManager
         )
@@ -190,7 +190,7 @@ class ProjectAuthenticatorImplTest {
             projectRemoteDataSource,
             signerManager,
             remoteConfigWrapper,
-            longConsentManager,
+            longConsentRepository,
             preferencesManager,
             getMockAttestationManager()
         ))
@@ -221,7 +221,7 @@ class ProjectAuthenticatorImplTest {
             projectRemoteDataSource,
             signerManager,
             remoteConfigWrapper,
-            longConsentManager,
+            longConsentRepository,
             preferencesManager,
             mockAttestationManager
         )
