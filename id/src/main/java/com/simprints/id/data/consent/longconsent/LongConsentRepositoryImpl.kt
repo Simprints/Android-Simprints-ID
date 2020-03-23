@@ -21,7 +21,7 @@ class LongConsentRepositoryImpl(private val longConsentLocalDataSource: LongCons
     }
 
     private val firebaseStorage by lazy { FirebaseStorage.getInstance() }
-    private var language = DEFAULT_LANGUAGE
+    internal var language = DEFAULT_LANGUAGE
 
     override val downloadProgress = MutableLiveData<Int>()
     override val isDownloadSuccessful = MutableLiveData<Boolean>()
