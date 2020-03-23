@@ -169,5 +169,4 @@ class ProjectAuthenticatorImpl(
             completableWithSuspend { longConsentRepository.downloadLongConsentForLanguages(languages) }
         }
     }
-
 }
