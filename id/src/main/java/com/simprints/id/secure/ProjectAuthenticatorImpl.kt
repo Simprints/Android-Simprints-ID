@@ -3,10 +3,11 @@ package com.simprints.id.secure
 import androidx.annotation.VisibleForTesting
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
+import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.core.tools.extentions.resumeSafely
 import com.simprints.core.tools.extentions.resumeWithExceptionSafely
 import com.simprints.core.tools.extentions.singleWithSuspend
-import com.simprints.id.data.consent.LongConsentManager
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -29,7 +30,7 @@ class ProjectAuthenticatorImpl(
     private val projectRemoteDataSource: ProjectRemoteDataSource,
     private val signerManager: SignerManager,
     private val remoteConfigWrapper: RemoteConfigWrapper,
-    private val longConsentManager: LongConsentManager,
+    private val longConsentRepository: LongConsentRepository,
     private val preferencesManager: PreferencesManager,
     private val attestationManager: AttestationManager = AttestationManager(),
     private val authenticationDataManager: AuthenticationDataManager = AuthenticationDataManager(secureApiClient)
@@ -165,7 +166,7 @@ class ProjectAuthenticatorImpl(
     private fun Single<out Array<String>>.fetchProjectLongConsentTexts(): Completable {
         return flatMapCompletable { languages ->
             println("TEST_ALAN - fetchProjectLongConsentTexts")
-            longConsentManager.downloadAllLongConsents(languages)
+            completableWithSuspend { longConsentRepository.downloadLongConsentForLanguages(languages) }
         }
     }
 
