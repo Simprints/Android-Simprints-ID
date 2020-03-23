@@ -3,6 +3,9 @@ package com.simprints.id.commontesttools.di
 import android.content.Context
 import com.simprints.core.images.repository.ImageRepository
 import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
@@ -24,6 +27,8 @@ class TestDataModule(
     private val projectRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val personRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val personLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val longConsentRepositoryRule: DependencyRule = DependencyRule.RealRule,
+    private val longConsentLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val personRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val imageRepositoryRule: DependencyRule = DependencyRule.RealRule
 ) : DataModule() {
@@ -71,6 +76,13 @@ class TestDataModule(
     override fun providePersonRemoteDataSource(remoteDbManager: RemoteDbManager,
                                                simApiClientFactory: SimApiClientFactory): PersonRemoteDataSource =
         personRemoteDataSourceRule.resolveDependency { super.providePersonRemoteDataSource(remoteDbManager, simApiClientFactory) }
+
+    override fun provideLongConsentLocalDataSource(context: Context, loginInfoManager: LoginInfoManager): LongConsentLocalDataSource =
+        longConsentLocalDataSourceRule.resolveDependency { super.provideLongConsentLocalDataSource(context, loginInfoManager) }
+
+    override fun provideLongConsentRepository(longConsentLocalDataSource: LongConsentLocalDataSource, loginInfoManager: LoginInfoManager,
+                                              crashReportManager: CrashReportManager): LongConsentRepository =
+        longConsentRepositoryRule.resolveDependency { super.provideLongConsentRepository(longConsentLocalDataSource, loginInfoManager, crashReportManager) }
 
     @FlowPreview
     override fun providePersonLocalDataSource(ctx: Context,
