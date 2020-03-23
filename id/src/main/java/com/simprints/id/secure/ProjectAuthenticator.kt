@@ -1,47 +1,19 @@
 package com.simprints.id.secure
 
-import com.google.android.gms.safetynet.SafetyNetClient
-import com.google.gson.JsonElement
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
-import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
-import com.simprints.id.secure.models.*
+import com.simprints.id.secure.models.NonceScope
 import java.io.IOException
-import javax.inject.Inject
 
-open class ProjectAuthenticator(component: AppComponent,
-                                private val safetyNetClient: SafetyNetClient,
-                                secureApiClient: SecureApiInterface,
-                                private val attestationManager: AttestationManager = AttestationManager(),
-                                private val authenticationDataManager: AuthenticationDataManager = AuthenticationDataManager(secureApiClient)) {
-
-    @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var projectRemoteDataSource: ProjectRemoteDataSource
-    @Inject lateinit var signerManager: SignerManager
-    @Inject lateinit var remoteConfigWrapper: RemoteConfigWrapper
-    @Inject lateinit var longConsentRepository: LongConsentRepository
-    @Inject lateinit var preferencesManager: PreferencesManager
-
-    internal val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
-    private val authManager = AuthManager(secureApiClient)
-
-    init {
-        component.inject(this)
-    }
+interface ProjectAuthenticator {
 
     /**
      * @throws IOException
      * @throws AuthRequestInvalidCredentialsException
      * @throws SimprintsInternalServerException
-     * @throws SafetyNetDownException
+     * @throws com.simprints.id.exceptions.safe.secure.SafetyNetException
      */
+    suspend fun authenticate(nonceScope: NonceScope, projectSecret: String)
     suspend fun authenticate(nonceScope: NonceScope, projectSecret: String) {
         createLocalDbKeyForProject(nonceScope.projectId)
 
