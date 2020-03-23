@@ -4,6 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.Application
+import com.simprints.id.activities.qrcapture.tools.CameraBinder
+import com.simprints.id.activities.qrcapture.tools.QrCodeDetector
+import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
+import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.LongConsentManager
@@ -38,6 +42,7 @@ import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class TestAppModule(
     app: Application,
@@ -57,7 +62,11 @@ class TestAppModule(
     private val syncStatusDatabaseRule: DependencyRule = RealRule,
     private val deviceManagerRule: DependencyRule = RealRule,
     private val recentEventsPreferencesManagerRule: DependencyRule = RealRule,
-    private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) }
+    private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) },
+    private val cameraBinderRule: DependencyRule = RealRule,
+    private val qrPreviewBuilderRule: DependencyRule = RealRule,
+    private val qrCodeDetectorRule: DependencyRule = RealRule,
+    private val qrCodeProducerRule: DependencyRule = RealRule
 ) : AppModule() {
 
     override fun provideCrashManager(): CrashReportManager =
@@ -164,6 +173,34 @@ class TestAppModule(
     override fun provideRecentEventsPreferencesManager(prefs: ImprovedSharedPreferences): RecentEventsPreferencesManager {
         return recentEventsPreferencesManagerRule.resolveDependency {
             super.provideRecentEventsPreferencesManager(prefs)
+        }
+    }
+
+    override fun provideCameraBinder(): CameraBinder {
+        return cameraBinderRule.resolveDependency {
+            super.provideCameraBinder()
+        }
+    }
+
+    override fun provideQrPreviewBuilder(): QrPreviewBuilder {
+        return qrPreviewBuilderRule.resolveDependency {
+            super.provideQrPreviewBuilder()
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    override fun provideQrCodeProducer(
+        qrCodeDetector: QrCodeDetector,
+        crashReportManager: CrashReportManager
+    ): QrCodeProducer {
+        return qrCodeProducerRule.resolveDependency {
+            super.provideQrCodeProducer(qrCodeDetector, crashReportManager)
+        }
+    }
+
+    override fun provideQrCodeDetector(crashReportManager: CrashReportManager): QrCodeDetector {
+        return qrCodeDetectorRule.resolveDependency {
+            super.provideQrCodeDetector(crashReportManager)
         }
     }
 

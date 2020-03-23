@@ -6,12 +6,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.scheduledSync.SyncManager
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
@@ -23,8 +25,9 @@ class OrchestratorActivity : AppCompatActivity() {
 
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var orchestratorViewModelFactory: OrchestratorViewModelFactory
-    @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var syncManager: SyncManager
+    @Inject lateinit var peopleSyncManager: PeopleSyncManager
+    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
 
     lateinit var appRequest: AppRequest
@@ -66,7 +69,13 @@ class OrchestratorActivity : AppCompatActivity() {
         runBlocking {
             vm.startModalityFlow(appRequest)
         }
+        scheduleAndStartSyncIfNecessary()
+    }
 
+    private fun scheduleAndStartSyncIfNecessary() {
+        if(preferencesManager.peopleDownSyncSetting == PeopleDownSyncSetting.EXTRA) {
+            peopleSyncManager.sync()
+        }
         syncManager.scheduleBackgroundSyncs()
     }
 

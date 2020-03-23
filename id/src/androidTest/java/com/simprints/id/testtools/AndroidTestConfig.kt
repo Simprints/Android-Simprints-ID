@@ -2,10 +2,7 @@ package com.simprints.id.testtools
 
 import androidx.test.core.app.ApplicationProvider
 import com.simprints.id.Application
-import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.di.TestDataModule
-import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.commontesttools.di.TestSyncModule
+import com.simprints.id.commontesttools.di.*
 import com.simprints.id.testtools.di.AppComponentForAndroidTests
 import com.simprints.id.testtools.di.DaggerAppComponentForAndroidTests
 import com.simprints.testtools.common.di.injectClassFromComponent
@@ -19,7 +16,8 @@ class AndroidTestConfig<T : Any>(
     private val appModule: TestAppModule? = null,
     private val dataModule: TestDataModule? = null,
     private val preferencesModule: TestPreferencesModule? = null,
-    private val syncModule: TestSyncModule? = null
+    private val syncModule: TestSyncModule? = null,
+    private val loginModule: TestLoginModule? = null
 ) {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
@@ -38,6 +36,7 @@ class AndroidTestConfig<T : Any>(
         .dataModule(dataModule ?: TestDataModule())
         .preferencesModule(preferencesModule ?: TestPreferencesModule())
         .syncModule(syncModule ?: TestSyncModule())
+        .loginModule(loginModule ?: TestLoginModule())
 
     private fun initRxIdler() = also {
         RxJavaPlugins.setInitComputationSchedulerHandler(Rx2Idler.create("RxJava 2.x Computation Scheduler"))
