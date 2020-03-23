@@ -10,11 +10,11 @@ import java.io.File
 class LongConsentLocalDataSourceImpl(absolutePath: String,
                                      val loginInfoManager: LoginInfoManager) : LongConsentLocalDataSource {
 
-    private val baseFilePath: File by lazy {
+    internal val baseFilePath: File by lazy {
         createBaseFilePath(absolutePath)
     }
 
-    private val filePathForProject: File by lazy {
+    internal val filePathForProject: File by lazy {
         createLocalFilePath(baseFilePath.absolutePath)
     }
 
