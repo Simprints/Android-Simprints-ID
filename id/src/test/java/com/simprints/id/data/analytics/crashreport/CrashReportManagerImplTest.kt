@@ -14,7 +14,7 @@ import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Compa
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.every
@@ -160,16 +160,12 @@ class CrashReportManagerImplTest : AutoCloseKoinTest() {
     fun setDownSyncTriggersCrashlyticsKey_shouldSetCorrectKeyValueInCrashlytics() {
         val crashReportManagerSpy = spyk(CrashReportManagerImpl())
         val crashlyticsInstanceMock: CrashlyticsCore = mockk()
-        val testDownSyncTriggers = mapOf(
-            PeopleDownSyncTrigger.MANUAL to true,
-            PeopleDownSyncTrigger.ON_LAUNCH_CALLOUT to false,
-            PeopleDownSyncTrigger.PERIODIC_BACKGROUND to true
-        )
+        val testDownSyncSetting = PeopleDownSyncSetting.EXTRA
 
         every { crashReportManagerSpy.crashlyticsInstance } returns crashlyticsInstanceMock
-        crashReportManagerSpy.setDownSyncTriggersCrashlyticsKey(testDownSyncTriggers)
+        crashReportManagerSpy.setDownSyncTriggersCrashlyticsKey(testDownSyncSetting)
 
-        verify(atLeast = 1) { crashlyticsInstanceMock.setString(PEOPLE_DOWN_SYNC_TRIGGERS, testDownSyncTriggers.toString()) }
+        verify(atLeast = 1) { crashlyticsInstanceMock.setString(PEOPLE_DOWN_SYNC_TRIGGERS, testDownSyncSetting.toString()) }
     }
 
     @Test

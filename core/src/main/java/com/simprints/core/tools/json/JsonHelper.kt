@@ -1,7 +1,7 @@
 package com.simprints.core.tools.json
 
-import com.google.gson.*
 import androidx.annotation.Keep
+import com.google.gson.*
 import com.simprints.libsimprints.FingerIdentifier
 import java.util.*
 
@@ -43,6 +43,10 @@ class JsonHelper {
 
         fun toJson(any: Any): String {
             return gson.toJson(any)
+        }
+
+        inline fun <reified T> fromJson(json: String): T {
+            return gson.fromJson(json, T::class.java)
         }
     }
 }
