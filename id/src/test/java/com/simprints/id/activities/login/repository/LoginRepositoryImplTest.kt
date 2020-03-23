@@ -1,7 +1,6 @@
 package com.simprints.id.activities.login.repository
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -12,6 +11,7 @@ import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
+import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.tools.TimeHelper
 import io.mockk.MockKAnnotations

@@ -19,7 +19,7 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
     override suspend fun signIn(token: String) {
         cacheTokenClaims(token)
         val result = Tasks.await(firebaseAuth.signInWithCustomToken(token))
-        Timber.d(result.user.uid)
+        Timber.d(result.user?.uid)
     }
 
     override fun signOut() {
