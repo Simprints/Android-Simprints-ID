@@ -10,6 +10,7 @@ import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
+import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -76,6 +77,7 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -374,7 +376,25 @@ open class AppModule {
     open fun provideConnectivityHelper(ctx: Context): ConnectivityHelper = ConnectivityHelperImpl(ctx)
 
     @Provides
-    open fun provideLocationManager(ctx: Context): LocationManager =
-        LocationManagerImpl(ctx)
+    open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)
+
+    @Provides
+    open fun provideCameraBinder(): CameraBinder = CameraBinderImpl()
+
+    @Provides
+    open fun provideQrPreviewBuilder(): QrPreviewBuilder = QrPreviewBuilderImpl()
+
+    @Provides
+    @ExperimentalCoroutinesApi
+    open fun provideQrCodeProducer(
+        qrCodeDetector: QrCodeDetector,
+        crashReportManager: CrashReportManager
+    ): QrCodeProducer = QrCodeProducerImpl(qrCodeDetector, crashReportManager)
+
+    @Provides
+    open fun provideQrCodeDetector(
+        crashReportManager: CrashReportManager
+    ): QrCodeDetector = QrCodeDetectorImpl(crashReportManager)
+
 }
 

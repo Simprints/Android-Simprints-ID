@@ -13,14 +13,14 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManager
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManagerImpl
-import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
-import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 import dagger.Module
 import dagger.Provides
@@ -74,7 +74,7 @@ open class PreferencesModule {
         @Named("GroupSerializer") groupSerializer: Serializer<GROUP>,
         @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
         @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-        @Named("PeopleDownSyncTriggerToBooleanSerializer") peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>,
+        @Named("PeopleDownSyncSettingSerializer") peopleDownSyncSettingSerializer: Serializer<PeopleDownSyncSetting>,
         @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
         @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         @Named("SaveFingerprintImagesStrategySerializer") saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
@@ -87,7 +87,7 @@ open class PreferencesModule {
             modalitiesSerializer,
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
-            peopleDownSyncTriggerToBooleanSerializer,
+            peopleDownSyncSettingSerializer,
             captureFingerprintStrategySerializer,
             saveFingerprintImagesStrategySerializer,
             scannerGenerationsSerializer)
