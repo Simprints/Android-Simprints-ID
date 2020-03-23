@@ -2,7 +2,7 @@ package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
-import com.simprints.id.data.consent.LongConsentManager
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -26,7 +26,7 @@ open class ProjectAuthenticator(component: AppComponent,
     @Inject lateinit var projectRemoteDataSource: ProjectRemoteDataSource
     @Inject lateinit var signerManager: SignerManager
     @Inject lateinit var remoteConfigWrapper: RemoteConfigWrapper
-    @Inject lateinit var longConsentManager: LongConsentManager
+    @Inject lateinit var longConsentRepository: LongConsentRepository
     @Inject lateinit var preferencesManager: PreferencesManager
 
     internal val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
@@ -97,6 +97,6 @@ open class ProjectAuthenticator(component: AppComponent,
         return preferencesManager.projectLanguages
     }
 
-    private fun Array<String>.fetchProjectLongConsentTexts() =
-         longConsentManager.downloadAllLongConsents(this)
+    private suspend fun Array<String>.fetchProjectLongConsentTexts() =
+         longConsentRepository.downloadLongConsentForLanguages(this)
 }

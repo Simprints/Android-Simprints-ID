@@ -20,7 +20,6 @@ import com.simprints.id.activities.guidselection.GuidSelectionActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
-import com.simprints.id.activities.longConsent.PrivacyNoticePresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsAboutActivity
@@ -94,7 +93,6 @@ interface AppComponent {
     fun inject(projectAuthenticator: ProjectAuthenticator)
     fun inject(alertPresenter: AlertPresenter)
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
-    fun inject(privacyNoticePresenter: PrivacyNoticePresenter)
     fun inject(syncSchedulerHelper: SyncSchedulerImpl)
     fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
