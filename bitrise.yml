@@ -2,45 +2,76 @@ format_version: "6"
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: android
 app:
-    envs:
-        - PROJECT_LOCATION: .
-          opts:
-              is_expand: false
-        - MODULE: id
-          opts:
-              is_expand: false
-        - MODULE_CLIENTAPI: clientapi
-          opts:
-              is_expand: false
-        - MODULE_APP: id
-          opts:
-              is_expand: false
-        - MODULE_FACE: face
-          opts:
-              is_expand: false
-        - MODULE_FINGERPRINT: fingerprint
-          opts:
-              is_expand: false
+  envs:
+  - PROJECT_LOCATION: .
+    opts:
+      is_expand: false
+  - MODULE: id
+    opts:
+      is_expand: false
+  - MODULE_CLIENTAPI: clientapi
+    opts:
+      is_expand: false
+  - MODULE_APP: id
+    opts:
+      is_expand: false
+  - MODULE_FACE: face
+    opts:
+      is_expand: false
+  - MODULE_FINGERPRINT: fingerprint
+    opts:
+      is_expand: false
 workflows:
-    full_ci:
-        steps:
-            - script:
-                  inputs:
-                      - content: |-
-                            #!/bin/bash
-                            set -e
-                            set -v
-                            env
-            - timestamp:
-                  outputs:
-                      - UNIX_TIMESTAMP:
-                      - ISO_DATETIME:
-            - script:
-                  title: Hello Bitrise!
-                  inputs:
-                      - content: |-
-                            #!/bin/bash
-                            echo "Welcome to Bitrise!"
-                            echo "Current time is: ${ISO_DATETIME}"
-                            echo
-                            echo "Your specified Project Title is: ${BITRISE_APP_TITLE}"
+  full_ci:
+    steps:
+    - build-router-start@0.11.3:
+        inputs:
+        - workflows: some_other_workflow
+    - script:
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -e
+            set -v
+            env
+    - timestamp:
+        outputs:
+        - UNIX_TIMESTAMP: null
+          opts: {}
+        - ISO_DATETIME: null
+          opts: {}
+    - script:
+        title: Hello Bitrise!
+        inputs:
+        - content: |-
+            #!/bin/bash
+            echo "Welcome to Bitrise!"
+            echo "Current time is: ${ISO_DATETIME}"
+            echo
+            echo "Your specified Project Title is: ${BITRISE_APP_TITLE}"
+  some_other_workflow:
+    steps:
+    - script:
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -e
+            set -v
+            env
+    - timestamp:
+        outputs:
+        - UNIX_TIMESTAMP: null
+          opts: {}
+        - ISO_DATETIME: null
+          opts: {}
+    - script:
+        title: Hello Bitrise!
+        inputs:
+        - content: |-
+            #!/bin/bash
+            echo "Welcome to Bitrise!"
+            echo "Current time is: ${ISO_DATETIME}"
+            echo
+            echo "Your specified Project Title is: ${BITRISE_APP_TITLE}"
+            echo
+            echo "Some other workflow!"
