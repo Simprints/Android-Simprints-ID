@@ -136,19 +136,19 @@ class SignerManagerTest {
 
     private fun mockRemoteSignedIn(error: Boolean = false) =
         coEvery { remoteDbManager.signIn(token.value) }.apply {
-            this.returns(
-                if(!error) {
-                    throw Throwable("Failed to remote sign in")
-                }  else {}
-            )
+            if(error) {
+                this.throws(Throwable("Failed to store credentials"))
+            } else {
+                this.returns(Unit)
+            }
         }
 
     private fun mockFetchingProjectInto(error: Boolean = false) =
         coEvery { projectRepository.loadFromRemoteAndRefreshCache(any()) }.apply {
-            if (!error) {
-                this.returns(Project(DEFAULT_PROJECT_ID, "local", "",  ""))
-            } else {
+            if (error) {
                 this.throws(Throwable("Failed to fetch project info"))
+            } else {
+                this.returns(Project(DEFAULT_PROJECT_ID, "local", "",  ""))
             }
         }
 

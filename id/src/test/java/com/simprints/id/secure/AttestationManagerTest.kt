@@ -54,7 +54,7 @@ class AttestationManagerTest : AutoCloseKoinTest() {
         mockAttestationManagerToReturnSafetyNetResponse(safetyNetAttestationResponseMock)
 
         assertThat(
-            assertThrows<SafetyNetException> { attestationManagerSpy.requestAttestation(safetyNetClientMock, nonce) }
+            assertThrows<SafetyNetException> { attestationManagerSpy.requestAttestation(safetyNetClientMock, nonce) }.reason
         ).isEqualTo(INVALID_CLAIMS)
     }
 
@@ -65,7 +65,7 @@ class AttestationManagerTest : AutoCloseKoinTest() {
                 ApiException(Status.RESULT_CANCELED))
 
         assertThat(
-            assertThrows<SafetyNetException> { attestationManagerSpy.requestAttestation(safetyNetClientMock, nonce) }
+            assertThrows<SafetyNetException> { attestationManagerSpy.requestAttestation(safetyNetClientMock, nonce) }.reason
         ).isEqualTo(SERVICE_UNAVAILABLE)
     }
 
