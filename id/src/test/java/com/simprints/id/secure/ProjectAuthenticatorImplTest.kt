@@ -10,9 +10,6 @@ import com.simprints.core.network.NetworkConstants.Companion.BASE_URL
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.di.TestDataModule
-import com.simprints.id.commontesttools.state.setupFakeKeyStore
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -23,7 +20,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
-import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.AttestToken
@@ -33,12 +29,11 @@ import com.simprints.id.secure.models.remote.ApiToken
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
-import com.simprints.testtools.common.di.DependencyRule.MockkRule
-import com.simprints.testtools.common.di.DependencyRule.ReplaceRule
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.getSharedPreferences
 import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -48,54 +43,33 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import java.io.IOException
-import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 @ExperimentalCoroutinesApi
 class ProjectAuthenticatorImplTest {
 
-    @Inject lateinit var remoteDbManagerMock: RemoteDbManager
-    @Inject lateinit var remoteSessionsManagerMock: RemoteSessionsManager
-    @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var projectRemoteDataSource: ProjectRemoteDataSource
-    @Inject lateinit var signerManager: SignerManager
-    @Inject lateinit var remoteConfigWrapper: RemoteConfigWrapper
-    @Inject lateinit var longConsentRepository: LongConsentRepository
-    @Inject lateinit var preferencesManager: PreferencesManager
-
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
-    private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mockk()
+    @MockK private lateinit var projectRemoteDataSourceMock: ProjectRemoteDataSource 
     private val projectLocalDataSourceMock: ProjectLocalDataSource = mockk()
-
-    private val appModule by lazy {
-        TestAppModule(
-            app,
-            remoteDbManagerRule = MockkRule,
-            loginInfoManagerRule = MockkRule,
-            keystoreManagerRule = ReplaceRule { mockk<KeystoreManager>().apply { setupFakeKeyStore(this) } }
-        )
-    }
-
-    private val dataModule by lazy {
-        TestDataModule(
-            projectLocalDataSourceRule = ReplaceRule { projectLocalDataSourceMock },
-            projectRemoteDataSourceRule = ReplaceRule { projectRemoteDataSourceMock }
-        )
-    }
+    private val longConsentRepositoryMock: LongConsentRepository = mockk()
+    private val secureDataManager: SecureLocalDbKeyProvider = mockk()
+    private val loginInfoManager: LoginInfoManager = mockk()
+    private val remoteDbManagerMock: RemoteDbManager = mockk()
+    private val remoteSessionsManagerMock: RemoteSessionsManager = mockk()
+    private val signerManager: SignerManager = mockk()
+    private val remoteConfigWrapper: RemoteConfigWrapper = mockk()
+    private val preferencesManager: PreferencesManager = mockk()
 
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
 
     @Before
     fun setUp() {
-        UnitTestConfig(this, appModule, dataModule = dataModule).fullSetup()
-
+        UnitTestConfig(this).setupFirebase().coroutinesMainThread()
         runBlocking {
             RobolectricTestMocker
                 .initLogInStateMock(getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
                 .mockLoadProject(projectRemoteDataSourceMock, projectLocalDataSourceMock)
-
         }
 
         coEvery { remoteSessionsManagerMock.getSessionsApiClient() } throws IllegalStateException()
@@ -114,12 +88,14 @@ class ProjectAuthenticatorImplTest {
                 projectRemoteDataSourceMock,
                 signerManager,
                 remoteConfigWrapper,
-                longConsentRepository,
+                longConsentRepositoryMock,
                 preferencesManager,
                 getMockAttestationManager()
             )
 
             authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET)
+
+
         }
     }
 
@@ -128,16 +104,16 @@ class ProjectAuthenticatorImplTest {
         runBlocking {
             val nonceScope = NonceScope(PROJECT_ID, USER_ID)
             val mockService = createMockServiceToFailRequests(apiClient.retrofit)
-            println("ProjectAuthenticator: Authenticator")
+            println("ProjectAuthenticator: Authenticator $mockService")
             val authenticator = ProjectAuthenticatorImpl(
-                createMockServiceToFailRequests(apiClient.retrofit),
+                mockService,
                 loginInfoManager,
                 SafetyNet.getClient(app),
                 secureDataManager,
-                projectRemoteDataSource,
+                projectRemoteDataSourceMock,
                 signerManager,
                 remoteConfigWrapper,
-                longConsentRepository,
+                longConsentRepositoryMock,
                 preferencesManager
             )
 
@@ -155,10 +131,10 @@ class ProjectAuthenticatorImplTest {
                 loginInfoManager,
                 mockk(),
                 secureDataManager,
-                projectRemoteDataSource,
+                projectRemoteDataSourceMock,
                 signerManager,
                 remoteConfigWrapper,
-                longConsentRepository,
+                longConsentRepositoryMock,
                 preferencesManager,
                 authenticationDataManager = mockAuthenticationDataManager
             )
@@ -188,10 +164,10 @@ class ProjectAuthenticatorImplTest {
                 loginInfoManager,
                 SafetyNet.getClient(app),
                 secureDataManager,
-                projectRemoteDataSource,
+                projectRemoteDataSourceMock,
                 signerManager,
                 remoteConfigWrapper,
-                longConsentRepository,
+                longConsentRepositoryMock,
                 preferencesManager,
                 getMockAttestationManager()
             ))
@@ -219,10 +195,10 @@ class ProjectAuthenticatorImplTest {
                 loginInfoManager,
                 SafetyNet.getClient(app),
                 secureDataManager,
-                projectRemoteDataSource,
+                projectRemoteDataSourceMock,
                 signerManager,
                 remoteConfigWrapper,
-                longConsentRepository,
+                longConsentRepositoryMock,
                 preferencesManager,
                 mockAttestationManager
             )
