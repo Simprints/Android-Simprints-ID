@@ -20,7 +20,7 @@ import java.util.*
 class FaceOrchestratorViewModel : ViewModel() {
     lateinit var faceRequest: FaceRequest
 
-    val startCapture: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val startCapture: MutableLiveData<LiveDataEventWithContent<FaceCaptureRequest>> = MutableLiveData()
     val startMatching: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
     val flowFinished: MutableLiveData<LiveDataEventWithContent<IFaceResponse>> = MutableLiveData()
@@ -28,19 +28,10 @@ class FaceOrchestratorViewModel : ViewModel() {
     fun start(iFaceRequest: IFaceRequest) {
         val request = FaceToDomainRequest.fromFaceToDomainRequest(iFaceRequest)
         when (request) {
-            is FaceCaptureRequest -> captureNeededPhotos(request)
-            is FaceMatchRequest -> startMatchingFaces(request)
+            is FaceCaptureRequest -> startCapture.send(request)
+            is FaceMatchRequest -> startMatching.send()
         }
         faceRequest = request
-    }
-
-    // TODO capture the correct number of photos the interface requests when integrating the face modality in full
-    private fun captureNeededPhotos(faceCaptureRequest: FaceCaptureRequest) {
-        startCapture.send()
-    }
-
-    private fun startMatchingFaces(request: FaceMatchRequest) {
-        startMatching.send()
     }
 
     fun captureFinished() {
