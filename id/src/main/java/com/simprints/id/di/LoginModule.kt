@@ -46,9 +46,13 @@ open class LoginModule {
     )
 
     @Provides
+    open fun provideSecreteManager(loginInfoManager: LoginInfoManager): ProjectSecretManager =
+        ProjectSecretManager(loginInfoManager)
+
+    @Provides
     open fun provideProjectAuthenticator(
         secureApiClient: SecureApiInterface,
-        loginInfoManager: LoginInfoManager,
+        projectSecretManager: ProjectSecretManager,
         safetyNetClient: SafetyNetClient,
         secureDataManager: SecureLocalDbKeyProvider,
         projectRemoteDataSource: ProjectRemoteDataSource,
@@ -58,7 +62,7 @@ open class LoginModule {
         preferencesManager: PreferencesManager
     ) : ProjectAuthenticator = ProjectAuthenticatorImpl(
         secureApiClient,
-        loginInfoManager,
+        projectSecretManager,
         safetyNetClient,
         secureDataManager,
         projectRemoteDataSource,
