@@ -6,7 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.id.activities.login.repository.LoginRepository
 import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
 
@@ -16,9 +18,10 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
 
     fun signIn(projectId: String, userId: String, projectSecret: String) {
         viewModelScope.launch {
-            val result = loginRepository.authenticate(projectId, userId, projectSecret)
-            signInResultLiveData.postValue(result)
+            withContext(Dispatchers.IO) {
+                val result = loginRepository.authenticate(projectId, userId, projectSecret)
+                signInResultLiveData.postValue(result)
+            }
         }
     }
-
 }
