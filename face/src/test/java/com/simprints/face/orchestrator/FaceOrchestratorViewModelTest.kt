@@ -1,4 +1,4 @@
-package com.simprints.face.activities.orchestrator
+package com.simprints.face.orchestrator
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth
