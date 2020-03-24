@@ -31,6 +31,7 @@ class ProjectAuthenticatorImpl(
     private val authManager = AuthManager(secureApiClient)
 
     override suspend fun authenticate(nonceScope: NonceScope, projectSecret: String) {
+        System.out.println("ProjectAuthenticator: Authenticate")
         createLocalDbKeyForProject(nonceScope.projectId)
 
         prepareAuthRequestParameters(nonceScope, projectSecret)
