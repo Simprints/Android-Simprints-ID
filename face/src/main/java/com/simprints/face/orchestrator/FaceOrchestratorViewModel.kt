@@ -12,7 +12,7 @@ import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
-import com.simprints.face.data.moduleapi.face.responses.entities.*
+import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import java.util.*
@@ -34,24 +34,17 @@ class FaceOrchestratorViewModel : ViewModel() {
         faceRequest = request
     }
 
-    fun captureFinished() {
-        val fakeCaptureResponse = generateFakeCaptureResponse()
-        flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(fakeCaptureResponse))
+    fun captureFinished(faceCaptureResponse: FaceCaptureResponse?) {
+        if (faceCaptureResponse == null) {
+            flowFinished.value = null
+        } else {
+            flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(faceCaptureResponse))
+        }
     }
 
     fun matchFinished() {
         val fakeMatchResponse = generateFaceMatchResponse()
         flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(fakeMatchResponse))
-    }
-
-    private fun generateFakeCaptureResponse(): FaceCaptureResponse {
-        val securedImageRef = SecuredImageRef(
-            path = Path(arrayOf("file://someFile"))
-        )
-        val sample = FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef)
-        val result = FaceCaptureResult(0, sample)
-        val captureResults = listOf(result)
-        return FaceCaptureResponse(captureResults)
     }
 
     private fun generateFaceMatchResponse(): FaceMatchResponse {
