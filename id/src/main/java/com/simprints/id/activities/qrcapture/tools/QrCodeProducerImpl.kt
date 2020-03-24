@@ -30,24 +30,24 @@ class QrCodeProducerImpl(
 
     @ExperimentalGetImage
     override fun analyze(imageProxy: ImageProxy) {
-        imageProxy.image?.let { mediaImage ->
-            runBlocking {
-                try {
-                    val rotationDegrees = imageProxy.imageInfo.rotationDegrees
-                    val image = RawImage(mediaImage, rotationDegrees)
+        imageProxy.use {
+            it.image?.let { mediaImage ->
+                runBlocking {
+                    try {
+                        val rotationDegrees = imageProxy.imageInfo.rotationDegrees
+                        val image = RawImage(mediaImage, rotationDegrees)
 
-                    qrCodeDetector.detectInImage(image)?.let { qrCode ->
-                        if (!qrCodeChannel.isClosedForSend) {
-                            with(qrCodeChannel) {
-                                send(qrCode)
-                                close()
+                        qrCodeDetector.detectInImage(image)?.let { qrCode ->
+                            if (!qrCodeChannel.isClosedForSend) {
+                                with(qrCodeChannel) {
+                                    send(qrCode)
+                                    close()
+                                }
                             }
                         }
+                    } catch (t: Throwable) {
+                        crashReportManager.logExceptionOrSafeException(t)
                     }
-                } catch (t: Throwable) {
-                    crashReportManager.logExceptionOrSafeException(t)
-                } finally {
-                    imageProxy.close()
                 }
             }
         }
