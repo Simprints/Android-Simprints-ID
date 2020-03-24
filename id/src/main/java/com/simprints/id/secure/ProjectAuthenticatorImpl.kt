@@ -157,7 +157,7 @@ class ProjectAuthenticatorImpl(
 
     private fun Single<out Array<String>>.fetchProjectLongConsentTexts(): Completable {
         return flatMapCompletable { languages ->
-            longConsentManager.downloadAllLongConsents(languages)
+            completableWithSuspend { longConsentRepository.downloadLongConsentForLanguages(languages) }
         }
     }
 }
