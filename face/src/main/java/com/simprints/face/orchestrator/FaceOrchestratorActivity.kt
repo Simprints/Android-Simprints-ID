@@ -54,8 +54,11 @@ class FaceOrchestratorActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == CAPTURE_REQUEST) {
-                viewModel.captureFinished()
+                viewModel.captureFinished(data?.getParcelableExtra(IFaceResponse.BUNDLE_KEY))
             }
+        } else {
+            setResult(Activity.RESULT_CANCELED)
+            finish()
         }
     }
 
