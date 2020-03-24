@@ -65,7 +65,7 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
             addFocusDrawable()
 
             val qrCode = qrCodeProducer.qrCodeChannel.receive()
-            onQrCodeCaptured(qrCode)
+            sendQrCodeInResultIfNotEmpty(qrCode)
         }
     }
 
@@ -83,7 +83,7 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
         previewRoot.addView(img)
     }
 
-    private fun onQrCodeCaptured(qrCodeValue: String) {
+    private fun sendQrCodeInResultIfNotEmpty(qrCodeValue: String) {
         if (qrCodeValue.isNotEmpty()) {
             val data = Intent().putExtra(QR_RESULT_KEY, qrCodeValue)
             setResult(Activity.RESULT_OK, data)
