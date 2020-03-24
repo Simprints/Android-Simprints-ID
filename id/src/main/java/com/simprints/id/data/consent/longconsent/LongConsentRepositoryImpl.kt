@@ -1,8 +1,9 @@
 package com.simprints.id.data.consent.longconsent
 
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FileDownloadTask
-import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +21,7 @@ class LongConsentRepositoryImpl(private val longConsentLocalDataSource: LongCons
         private const val TIMEOUT_FAILURE_WINDOW_MILLIS = 1L
     }
 
-    private val firebaseStorage by lazy { FirebaseStorage.getInstance() }
+    private val firebaseStorage by lazy { Firebase.storage }
     internal var language = DEFAULT_LANGUAGE
 
     override val downloadProgress = MutableLiveData<Int>()
