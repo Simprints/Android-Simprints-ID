@@ -14,10 +14,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.LoginModule
-import com.simprints.id.secure.AuthenticationHelper
-import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.secure.SecureApiInterface
-import com.simprints.id.secure.SignerManager
+import com.simprints.id.secure.*
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
@@ -61,7 +58,7 @@ class TestLoginModule(
 
     override fun provideProjectAuthenticator(
         secureApiClient: SecureApiInterface,
-        loginInfoManager: LoginInfoManager,
+        projectSecretManager: ProjectSecretManager,
         safetyNetClient: SafetyNetClient,
         secureDataManager: SecureLocalDbKeyProvider,
         projectRemoteDataSource: ProjectRemoteDataSource,
@@ -73,7 +70,7 @@ class TestLoginModule(
         return projectAuthenticatorRule.resolveDependency {
             super.provideProjectAuthenticator(
                 secureApiClient,
-                loginInfoManager,
+                projectSecretManager,
                 safetyNetClient,
                 secureDataManager,
                 projectRemoteDataSource,

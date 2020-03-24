@@ -1,11 +1,9 @@
 package com.simprints.id.secure
 
-import androidx.annotation.VisibleForTesting
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
@@ -13,7 +11,7 @@ import com.simprints.id.secure.models.*
 
 class ProjectAuthenticatorImpl(
     secureApiClient: SecureApiInterface,
-    loginInfoManager: LoginInfoManager,
+    private val projectSecretManager: ProjectSecretManager,
     private val safetyNetClient: SafetyNetClient,
     private val secureDataManager: SecureLocalDbKeyProvider,
     private val projectRemoteDataSource: ProjectRemoteDataSource,
@@ -24,9 +22,6 @@ class ProjectAuthenticatorImpl(
     private val attestationManager: AttestationManager = AttestationManager(),
     private val authenticationDataManager: AuthenticationDataManager = AuthenticationDataManager(secureApiClient)
 ) : ProjectAuthenticator {
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
 
     private val authManager = AuthManager(secureApiClient)
 
@@ -101,7 +96,9 @@ class ProjectAuthenticatorImpl(
         }
     }
 
-    private fun createLocalDbKeyForProject(projectId: String) = secureDataManager.setLocalDatabaseKey(projectId)
+    private fun createLocalDbKeyForProject(projectId: String) {
+        secureDataManager.setLocalDatabaseKey(projectId)
+    }
 
     private suspend fun fetchProjectRemoteConfigSettings(projectId: String): JsonElement = try {
         projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(projectId)
