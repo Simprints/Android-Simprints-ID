@@ -1,6 +1,6 @@
 package com.simprints.face.di
 
-import com.simprints.face.activities.orchestrator.FaceOrchestratorViewModel
+import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.id.Application
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel

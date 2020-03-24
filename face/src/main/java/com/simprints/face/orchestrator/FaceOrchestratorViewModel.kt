@@ -1,4 +1,4 @@
-package com.simprints.face.activities.orchestrator
+package com.simprints.face.orchestrator
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
