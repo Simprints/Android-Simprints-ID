@@ -29,7 +29,6 @@ import com.simprints.testtools.android.getCurrentActivity
 import io.mockk.every
 import io.mockk.verify
 import org.hamcrest.CoreMatchers.not
-import org.json.JSONException
 
 const val USER_ID = "user_id"
 const val VALID_PROJECT_ID = "project_id"
@@ -101,7 +100,7 @@ class LoginActivityRobot(
     }
 
     fun receiveInvalidQrCodeResponse() {
-        every { mockLoginActivityHelper.tryParseQrCodeResponse(any()) } throws JSONException("")
+        every { mockLoginActivityHelper.tryParseQrCodeResponse(any()) } throws Throwable()
         stubQrScanIntent()
     }
 
