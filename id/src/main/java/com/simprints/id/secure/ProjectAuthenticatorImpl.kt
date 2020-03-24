@@ -31,7 +31,7 @@ class ProjectAuthenticatorImpl(
     private val authManager = AuthManager(secureApiClient)
 
     override suspend fun authenticate(nonceScope: NonceScope, projectSecret: String) {
-        System.out.println("ProjectAuthenticator: Authenticate")
+        println("ProjectAuthenticator: Authenticate")
         createLocalDbKeyForProject(nonceScope.projectId)
 
         prepareAuthRequestParameters(nonceScope, projectSecret)
@@ -43,8 +43,12 @@ class ProjectAuthenticatorImpl(
             .fetchProjectLongConsentTexts()
     }
 
-    private suspend fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): AuthRequest =
+    private suspend fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): AuthRequest = try {
         buildAuthRequestParameters(nonceScope, projectSecret)
+    } catch (t: Throwable) {
+        println("ProjectAuthenticator: $t")
+        throw t
+    }
 
     private suspend fun buildAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): AuthRequest {
         val authenticationData = getAuthenticationData(nonceScope.projectId, nonceScope.userId)
@@ -54,32 +58,57 @@ class ProjectAuthenticatorImpl(
             nonceScope)
     }
 
-    internal suspend fun getAuthenticationData(projectId: String, userId: String) =
+    internal suspend fun getAuthenticationData(projectId: String, userId: String) = try {
         authenticationDataManager.requestAuthenticationData(projectId, userId)
+    }  catch (t: Throwable) {
+        println("ProjectAuthenticator: $t")
+        throw t
+    }
 
-    private fun getEncryptedProjectSecret(projectSecret: String, authenticationData: AuthenticationData): String =
+    private fun getEncryptedProjectSecret(projectSecret: String, authenticationData: AuthenticationData): String = try {
         projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret,
             authenticationData.publicKeyString)
+    } catch (t: Throwable) {
+        println("ProjectAuthenticator: $t")
+        throw t
+    }
 
-    private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationData: AuthenticationData): AttestToken =
+    private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationData: AuthenticationData): AttestToken = try {
         attestationManager.requestAttestation(safetyNetClient, authenticationData.nonce)
+    } catch (t: Throwable) {
+        println("ProjectAuthenticator: $t")
+        throw t
+    }
 
     private fun buildAuthRequest(encryptedProjectSecret: String,
                                  googleAttestation: AttestToken,
                                  nonceScope: NonceScope): AuthRequest =
         AuthRequest(nonceScope.projectId, nonceScope.userId, AuthRequestBody(encryptedProjectSecret, googleAttestation.value))
 
-    private suspend fun AuthRequest.makeAuthRequest(): Token =
+    private suspend fun AuthRequest.makeAuthRequest(): Token = try {
         authManager.requestAuthToken(this)
+    } catch (t: Throwable) {
+        println("ProjectAuthenticator: $t")
+        throw t
+    }
 
     private suspend fun Token.signIn(projectId: String, userId: String) {
-        signerManager.signIn(projectId, userId, this)
+        try {
+            signerManager.signIn(projectId, userId, this)
+        } catch (t: Throwable) {
+            println("ProjectAuthenticator: $t")
+            throw t
+        }
     }
 
     private fun createLocalDbKeyForProject(projectId: String) = secureDataManager.setLocalDatabaseKey(projectId)
 
-    private suspend fun fetchProjectRemoteConfigSettings(projectId: String): JsonElement =
+    private suspend fun fetchProjectRemoteConfigSettings(projectId: String): JsonElement = try {
         projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(projectId)
+    } catch (t: Throwable) {
+        println("ProjectAuthenticator: $t")
+        throw t
+    }
 
     private fun JsonElement.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(): Array<String> {
         remoteConfigWrapper.projectSettingsJsonString = this.toString()
