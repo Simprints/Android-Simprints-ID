@@ -7,7 +7,7 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.simprints.uicomponents.R
-import com.simprints.uicomponents.extensions.dpToPx
+import com.simprints.core.tools.extentions.dpToPx
 
 /**
  * This is a variant of circular progress bar that have spaces between bars (as opposed to a filled
