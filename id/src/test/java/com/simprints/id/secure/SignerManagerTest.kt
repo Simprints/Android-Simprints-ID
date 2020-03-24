@@ -49,6 +49,7 @@ class SignerManagerTest {
     @Test
     fun signIn_shouldSignInToRemoteDb() = runBlockingTest {
         mockRemoteSignedIn()
+        mockFetchingProjectInto()
 
         signIn()
 
@@ -66,6 +67,7 @@ class SignerManagerTest {
     fun signIn_shouldStoreCredentialsLocally() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
+        mockFetchingProjectInto()
 
         signIn()
 

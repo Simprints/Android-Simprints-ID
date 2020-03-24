@@ -13,7 +13,7 @@ import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.retrofit.FakeResponseInterceptor
 import com.simprints.testtools.common.syntax.assertThrows
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import org.junit.After
 import org.junit.Before
@@ -49,30 +49,36 @@ class AuthenticationDataManagerTest {
     }
 
     @Test
-    fun successfulResponse_shouldObtainValidAuthenticationData() = runBlockingTest {
+    fun successfulResponse_shouldObtainValidAuthenticationData() {
+        runBlocking {
+            forceOkHttpToReturnSuccessfulResponse(apiClient.okHttpClientConfig)
 
-        forceOkHttpToReturnSuccessfulResponse(apiClient.okHttpClientConfig)
+            val actualAuthenticationData = makeTestRequestForAuthenticationData(apiClient.api)
 
-        val actualAuthenticationData = makeTestRequestForAuthenticationData(apiClient.api)
-
-        assertThat(actualAuthenticationData).isEqualTo(expectedAuthenticationData)
-    }
-
-    @Test
-    fun offline_shouldThrowAnException() = runBlockingTest {
-        val apiServiceMock = createMockServiceToFailRequests(apiClient.retrofit)
-
-        assertThrows<IOException> {
-            makeTestRequestForAuthenticationData(apiServiceMock)
+            assertThat(actualAuthenticationData).isEqualTo(expectedAuthenticationData)
         }
     }
 
     @Test
-    fun receivingAnErrorFromServer_shouldThrowAnException() = runBlockingTest {
-        apiClient.okHttpClientConfig.addInterceptor(FakeResponseInterceptor(500, validateUrl = validateUrl))
+    fun offline_shouldThrowAnException() {
+        runBlocking {
+            forceOkHttpToReturnSuccessfulResponse(apiClient.okHttpClientConfig)
+            val apiServiceMock = createMockServiceToFailRequests(apiClient.retrofit)
 
-        assertThrows<SimprintsInternalServerException> {
-            makeTestRequestForAuthenticationData(apiClient.api)
+            assertThrows<IOException> {
+                makeTestRequestForAuthenticationData(apiServiceMock)
+            }
+        }
+    }
+
+    @Test
+    fun receivingAnErrorFromServer_shouldThrowAnException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(FakeResponseInterceptor(500, validateUrl = validateUrl))
+
+            assertThrows<SimprintsInternalServerException> {
+                makeTestRequestForAuthenticationData(apiClient.api)
+            }
         }
     }
 
