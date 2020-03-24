@@ -26,6 +26,7 @@ workflows:
     steps:
     - build-router-start@0.11.3:
         inputs:
+        - access_token: $bitrise_key_to_run_auto_workflow
         - workflows: some_other_workflow
     - script:
         inputs:
