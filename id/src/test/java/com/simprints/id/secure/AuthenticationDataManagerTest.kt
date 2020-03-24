@@ -1,7 +1,6 @@
 package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.network.NetworkConstants.Companion.BASE_URL
 import com.simprints.core.network.SimApiClient
@@ -11,6 +10,7 @@ import com.simprints.id.secure.SecureApiInterface.Companion.apiKey
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.PublicKeyString
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.retrofit.FakeResponseInterceptor
 import com.simprints.testtools.common.syntax.assertThrows
 import kotlinx.coroutines.test.runBlockingTest
@@ -37,13 +37,14 @@ class AuthenticationDataManagerTest {
     private val expectedUrl = BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?key=$apiKey"
 
     private val validateUrl: (url: String) -> Unit  = {
-        Truth.assertThat(it).isEqualTo(expectedUrl)
+        assertThat(it).isEqualTo(expectedUrl)
     }
 
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
 
     @Before
     fun setUp() {
+        UnitTestConfig(this).setupFirebase().coroutinesMainThread()
         apiClient = SimApiClientFactory("deviceId", endpoint = BASE_URL).build()
     }
 
