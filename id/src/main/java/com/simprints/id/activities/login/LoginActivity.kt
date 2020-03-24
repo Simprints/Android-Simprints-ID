@@ -28,7 +28,6 @@ import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_login.*
-import org.json.JSONException
 import javax.inject.Inject
 
 class LoginActivity : AppCompatActivity(R.layout.activity_login) {
@@ -137,7 +136,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
 
             updateProjectInfoOnTextFields(projectId, projectSecret)
             logMessageForCrashReport("QR scanning successful")
-        } catch (e: JSONException) {
+        } catch (t: Throwable) {
             showErrorForInvalidQRCode()
             logMessageForCrashReport("QR scanning unsuccessful")
         }

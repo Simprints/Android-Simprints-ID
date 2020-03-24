@@ -53,12 +53,10 @@ class ProjectAuthenticatorImpl(
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(
                     onComplete = {
-                        println("TEST_ALAN - onComplete")
                         continuation.resumeSafely(Unit)
                     },
                     onError = {
                         Timber.e(it)
-                        println("TEST_ALAN - onError")
                         continuation.resumeWithExceptionSafely(it)
                     }
                 )
@@ -69,7 +67,6 @@ class ProjectAuthenticatorImpl(
         nonceScope: NonceScope,
         projectSecret: String
     ): Single<AuthRequest> {
-        println("TEST_ALAN - prepareAuthRequestParameters")
         return andThen(buildAuthRequestParameters(nonceScope, projectSecret))
     }
 
@@ -81,7 +78,6 @@ class ProjectAuthenticatorImpl(
             nonceScope.projectId,
             nonceScope.userId
         ).flatMap { authenticationData ->
-            println("TEST_ALAN - buildAuthRequestParameters")
             zipAuthRequestParameters(
                 getEncryptedProjectSecret(projectSecret, authenticationData),
                 getGoogleAttestation(safetyNetClient, authenticationData),
@@ -127,14 +123,12 @@ class ProjectAuthenticatorImpl(
 
     private fun Single<out AuthRequest>.makeAuthRequest(): Single<Token> {
         return flatMap { authRequest ->
-            println("TEST_ALAN - makeAuthRequest")
             authManager.requestAuthToken(authRequest)
         }
     }
 
     private fun Single<out Token>.signIn(projectId: String, userId: String): Completable {
         return flatMapCompletable { tokens ->
-            println("TEST_ALAN - signIn")
             signerManager.signIn(projectId, userId, tokens)
         }
     }
@@ -147,7 +141,6 @@ class ProjectAuthenticatorImpl(
         projectId: String
     ): Single<JsonElement> {
         return andThen(singleWithSuspend {
-            println("TEST_ALAN - fetchProjectRemoteConfigSettings")
             projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(
                 projectId
             )
@@ -157,7 +150,6 @@ class ProjectAuthenticatorImpl(
     private fun Single<out JsonElement>.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(
     ): Single<Array<String>> {
         return flatMap {
-            println("TEST_ALAN - storeProjectRemoteConfigSettingsAndReturnProjectLanguages")
             remoteConfigWrapper.projectSettingsJsonString = it.toString()
             Single.just(preferencesManager.projectLanguages)
         }
@@ -165,8 +157,7 @@ class ProjectAuthenticatorImpl(
 
     private fun Single<out Array<String>>.fetchProjectLongConsentTexts(): Completable {
         return flatMapCompletable { languages ->
-            println("TEST_ALAN - fetchProjectLongConsentTexts")
-            completableWithSuspend { longConsentRepository.downloadLongConsentForLanguages(languages) }
+            longConsentManager.downloadAllLongConsents(languages)
         }
     }
 }
