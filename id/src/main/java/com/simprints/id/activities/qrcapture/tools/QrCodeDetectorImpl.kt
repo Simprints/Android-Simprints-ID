@@ -1,6 +1,5 @@
 package com.simprints.id.activities.qrcapture.tools
 
-import android.util.Log
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector
@@ -22,7 +21,6 @@ class QrCodeDetectorImpl(private val crashReportManager: CrashReportManager) : Q
             val qrCodes = firebaseDetector.detectInImage(firebaseImage).awaitTask()
             return qrCodes?.firstOrNull { !it.rawValue.isNullOrEmpty() }?.rawValue
         } catch (t: Throwable) {
-            Log.e("TEST_ALAN", "Error scanning QR code", t)
             crashReportManager.logExceptionOrSafeException(t)
             null
         }
