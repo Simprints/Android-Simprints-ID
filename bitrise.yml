@@ -24,10 +24,6 @@ app:
 workflows:
   full_ci:
     steps:
-    - build-router-start@0.11.3:
-        inputs:
-        - access_token: $bitrise_key_to_run_auto_workflow
-        - workflows: some_other_workflow
     - script:
         inputs:
         - content: |-
@@ -50,29 +46,3 @@ workflows:
             echo "Current time is: ${ISO_DATETIME}"
             echo
             echo "Your specified Project Title is: ${BITRISE_APP_TITLE}"
-  some_other_workflow:
-    steps:
-    - script:
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -e
-            set -v
-            env
-    - timestamp:
-        outputs:
-        - UNIX_TIMESTAMP: null
-          opts: {}
-        - ISO_DATETIME: null
-          opts: {}
-    - script:
-        title: Hello Bitrise!
-        inputs:
-        - content: |-
-            #!/bin/bash
-            echo "Welcome to Bitrise!"
-            echo "Current time is: ${ISO_DATETIME}"
-            echo
-            echo "Your specified Project Title is: ${BITRISE_APP_TITLE}"
-            echo
-            echo "Some other workflow!"
