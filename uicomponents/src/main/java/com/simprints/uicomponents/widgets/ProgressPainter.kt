@@ -5,6 +5,14 @@ import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.graphics.RectF
 
+/**
+ * This is the brawl that paints the progress bar to the screen.
+ *
+ * [startAngle] is 270 meaning that the it starts on the top of the screen.
+ *
+ * Every time [setValue] is called, [plusAngle] is changed. On the next [draw], this Painter will
+ * created dashed lines up the angle defined.
+ */
 class ProgressPainter(
     progressColor: Int,
     var max: Int,
