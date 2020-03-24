@@ -494,30 +494,6 @@ workflows:
     steps:
     - cache-pull:
         title: Load cache
-    - activate-ssh-key@4.0.3:
-        title: Activate SSH key
-    - script@1.1.5:
-        title: Delete source code
-        inputs:
-        - content: |-
-            #!/usr/bin/env bash
-            # fail if any commands fails
-            set -e
-            # debug log
-            set -x
-
-            projectDir=${PWD##*/}
-            cd ..
-            # Remove contents from project dir if dir is not empty
-            if [ "$(ls -A $projectDir)" ]; then
-                printf 'Removing source code located at %s/...\n' $projectDir
-                rm -rf $projectDir/*
-            fi
-            echo 'Done'
-    - git-clone@4.0.17:
-        title: Clone repository
-        inputs:
-        - reset_repository: "Yes"
     - script@1.1.5:
         title: Set artifactory and NDK params
         inputs:
