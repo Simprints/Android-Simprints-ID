@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="capture_blue">#228BE6</color>
+    <color name="capture_green">#40C057</color>
+    <color name="capture_grey">#A9B5C2</color>
+    <color name="capture_grey_blue">#384553</color>
+    <color name="capture_grey_blue_capturing">#A2AFBD</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="translucent">#80000000</color>
+    <color name="white">#ffffff</color>
+</resources>
