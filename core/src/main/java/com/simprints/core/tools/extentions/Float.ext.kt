@@ -1,4 +1,4 @@
-package com.simprints.uicomponents.extensions
+package com.simprints.core.tools.extentions
 
 import android.content.Context
 import android.util.TypedValue
