@@ -22,11 +22,11 @@ import org.junit.runner.RunWith
 import org.koin.test.AutoCloseKoinTest
 
 @RunWith(AndroidJUnit4::class)
-class AttestationManagerTest : AutoCloseKoinTest() {
+class AttestationManagerImplTest : AutoCloseKoinTest() {
 
     @MockK lateinit var safetyNetClientMock: SafetyNetClient
     @MockK lateinit var safetyNetAttestationResponseMock: SafetyNetApi.AttestationResponse
-    private var attestationManagerSpy: AttestationManager = spyk(AttestationManager())
+    private var attestationManagerSpy = spyk(AttestationManagerImpl())
 
     private val nonce = Nonce("nonce")
 
