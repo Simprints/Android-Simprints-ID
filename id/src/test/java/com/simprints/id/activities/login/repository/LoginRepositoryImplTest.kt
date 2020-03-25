@@ -1,7 +1,6 @@
 package com.simprints.id.activities.login.repository
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -12,10 +11,13 @@ import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
+import com.simprints.id.secure.AuthenticationHelper
+import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.tools.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,6 +34,7 @@ class LoginRepositoryImplTest {
     @MockK lateinit var mockTimeHelper: TimeHelper
     @MockK lateinit var mockCrashReportManager: CrashReportManager
     @MockK lateinit var mockLoginInfoManager: LoginInfoManager
+    @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
 
     private lateinit var repository: LoginRepositoryImpl
 
@@ -44,11 +47,14 @@ class LoginRepositoryImplTest {
             mockLoginInfoManager
         )
 
+        every { mockBaseUrlProvider.getApiBaseUrl() } returns BASE_URL
+
         repository = LoginRepositoryImpl(
             mockProjectAuthenticator,
             authenticationHelper,
             mockSessionEventsManager,
-            mockTimeHelper
+            mockTimeHelper,
+            mockBaseUrlProvider
         )
     }
 
@@ -59,7 +65,8 @@ class LoginRepositoryImplTest {
         val result = repository.authenticate(
             "some_project_id",
             "some_user_id",
-            "some_project_secret"
+            "some_project_secret",
+            BASE_URL
         )
 
         assertThat(result).isEqualTo(AuthenticationEvent.Result.AUTHENTICATED)
@@ -72,7 +79,8 @@ class LoginRepositoryImplTest {
         val result = repository.authenticate(
             "some_project_id",
             "some_user_id",
-            "some_project_secret"
+            "some_project_secret",
+            BASE_URL
         )
 
         assertThat(result).isEqualTo(AuthenticationEvent.Result.OFFLINE)
@@ -87,7 +95,8 @@ class LoginRepositoryImplTest {
         val result = repository.authenticate(
             "invalid_project_id",
             "invalid_user_id",
-            "invalid_project_secret"
+            "invalid_project_secret",
+            BASE_URL
         )
 
         assertThat(result).isEqualTo(AuthenticationEvent.Result.BAD_CREDENTIALS)
@@ -102,7 +111,8 @@ class LoginRepositoryImplTest {
         val result = repository.authenticate(
             "some_project_id",
             "some_user_id",
-            "some_project_secret"
+            "some_project_secret",
+            BASE_URL
         )
 
         assertThat(result).isEqualTo(AuthenticationEvent.Result.TECHNICAL_FAILURE)
@@ -117,7 +127,8 @@ class LoginRepositoryImplTest {
         val result = repository.authenticate(
             "some_project_id",
             "some_user_id",
-            "some_project_secret"
+            "some_project_secret",
+            BASE_URL
         )
 
         assertThat(result).isEqualTo(AuthenticationEvent.Result.SAFETYNET_UNAVAILABLE)
@@ -132,7 +143,8 @@ class LoginRepositoryImplTest {
         val result = repository.authenticate(
             "some_project_id",
             "some_user_id",
-            "some_project_secret"
+            "some_project_secret",
+            BASE_URL
         )
 
         assertThat(result).isEqualTo(AuthenticationEvent.Result.SAFETYNET_INVALID_CLAIM)
@@ -147,7 +159,8 @@ class LoginRepositoryImplTest {
         val result = repository.authenticate(
             "some_project_id",
             "some_user_id",
-            "some_project_secret"
+            "some_project_secret",
+            BASE_URL
         )
 
         assertThat(result).isEqualTo(AuthenticationEvent.Result.UNKNOWN)
@@ -160,7 +173,8 @@ class LoginRepositoryImplTest {
         repository.authenticate(
             "some_project_id",
             "some_user_id",
-            "some_project_secret"
+            "some_project_secret",
+            BASE_URL
         )
 
         verify { mockSessionEventsManager.addEventInBackground(any()) }
@@ -175,7 +189,8 @@ class LoginRepositoryImplTest {
         repository.authenticate(
             "some_project_id",
             "some_user_id",
-            "some_project_secret"
+            "some_project_secret",
+            BASE_URL
         )
 
         verify { mockSessionEventsManager.addEventInBackground(any()) }
@@ -188,7 +203,8 @@ class LoginRepositoryImplTest {
         repository.authenticate(
             "some_project_id",
             "some_user_id",
-            "some_project_secret"
+            "some_project_secret",
+            BASE_URL
         )
 
         verify {
@@ -207,7 +223,8 @@ class LoginRepositoryImplTest {
         repository.authenticate(
             "some_project_id",
             "some_user_id",
-            "some_project_secret"
+            "some_project_secret",
+            BASE_URL
         )
 
         verify {
@@ -224,7 +241,8 @@ class LoginRepositoryImplTest {
         repository.authenticate(
             "some_project_id",
             "some_user_id",
-            "some_project_secret"
+            "some_project_secret",
+            BASE_URL
         )
 
         verify {
@@ -234,6 +252,10 @@ class LoginRepositoryImplTest {
                 message = "Making authentication request"
             )
         }
+    }
+
+    private companion object {
+        const val BASE_URL = "https://mock-url"
     }
 
 }

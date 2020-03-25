@@ -45,6 +45,8 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     private lateinit var progressDialog: SimProgressDialog
     private lateinit var viewModel: LoginViewModel
 
+    private var apiBaseUrl: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
@@ -133,6 +135,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
             val qrCodeResponse = loginActivityHelper.tryParseQrCodeResponse(response)
             val projectId = qrCodeResponse.projectId
             val projectSecret = qrCodeResponse.projectSecret
+            apiBaseUrl = qrCodeResponse.apiBaseUrl
 
             updateProjectInfoOnTextFields(projectId, projectSecret)
             logMessageForCrashReport("QR scanning successful")
@@ -184,7 +187,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         else if (!areSuppliedProjectIdAndProjectIdFromIntentEqual)
             handleProjectIdMismatch()
         else
-            viewModel.signIn(projectId, userId, projectSecret)
+            viewModel.signIn(projectId, userId, projectSecret, apiBaseUrl)
     }
 
     private fun handleMissingCredentials() {
