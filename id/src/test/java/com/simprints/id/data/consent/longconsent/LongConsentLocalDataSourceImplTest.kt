@@ -11,39 +11,41 @@ import org.junit.Test
 class LongConsentLocalDataSourceImplTest {
 
     companion object {
-        private const val EN = "EN"
+        private const val DEFAULT_LANGUAGE = "EN"
         private const val PROJECT_ID_TEST = "project_id_test"
         const val ABSOLUTE_PATH = "app_root_folder"
         private const val LONG_CONSENTS_PATH = "$ABSOLUTE_PATH/long-consents"
     }
 
     @MockK lateinit var loginInfoManagerMock: LoginInfoManager
+    private lateinit var longConsentLocalDataSource: LongConsentLocalDataSourceImpl
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
 
         every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns PROJECT_ID_TEST
+        longConsentLocalDataSource = LongConsentLocalDataSourceImpl(ABSOLUTE_PATH, loginInfoManagerMock)
     }
 
     @Test
     fun createBaseFilePath_shouldHaveTheRightPath() {
-        val longConsentLocalDataSource = LongConsentLocalDataSourceImpl(ABSOLUTE_PATH, loginInfoManagerMock)
+        val actualBaseFilePath = longConsentLocalDataSource.baseFilePath.toString()
 
-        assertThat(longConsentLocalDataSource.baseFilePath.toString()).isEqualTo(LONG_CONSENTS_PATH)
+        assertThat(actualBaseFilePath).isEqualTo(LONG_CONSENTS_PATH)
     }
 
     @Test
     fun createLocalFilePath_shouldHaveTheRightPath() {
-        val longConsentLocalDataSource = LongConsentLocalDataSourceImpl(ABSOLUTE_PATH, loginInfoManagerMock)
+        val actualFilePathForProject = longConsentLocalDataSource.filePathForProject.toString()
 
-        assertThat(longConsentLocalDataSource.filePathForProject.toString()).contains("${LONG_CONSENTS_PATH}/${PROJECT_ID_TEST}")
+        assertThat(actualFilePathForProject).contains("${LONG_CONSENTS_PATH}/${PROJECT_ID_TEST}")
     }
 
     @Test
     fun createFileForLanguage_shouldHaveTheRightPath() {
-        val longConsentLocalDataSourceSpy = (LongConsentLocalDataSourceImpl(ABSOLUTE_PATH, loginInfoManagerMock))
+        val actualFile = longConsentLocalDataSource.createFileForLanguage(DEFAULT_LANGUAGE).toString()
 
-        assertThat(longConsentLocalDataSourceSpy.createFileForLanguage(EN).toString()).contains("${LONG_CONSENTS_PATH}/${PROJECT_ID_TEST}/${EN}.txt")
+        assertThat(actualFile).contains("${LONG_CONSENTS_PATH}/${PROJECT_ID_TEST}/${DEFAULT_LANGUAGE}.txt")
     }
 }

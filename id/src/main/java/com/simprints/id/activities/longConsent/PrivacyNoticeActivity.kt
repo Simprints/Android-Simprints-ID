@@ -51,20 +51,22 @@ class PrivacyNoticeActivity : AppCompatActivity() {
         initActionBar()
         viewModel.start()
 
-        setupClickListener()
-        initTextInUi()
+        initInUi()
         observeUi()
     }
 
     private fun initActionBar() {
         setSupportActionBar(longConsentToolbar)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.title = androidResourcesHelper.getString(R.string.privacy_notice_title)
+        supportActionBar?.run {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
+            title = androidResourcesHelper.getString(R.string.privacy_notice_title)
+        }
     }
 
-    private fun setupClickListener() {
+    private fun initInUi() {
+        longConsent_downloadButton.text = androidResourcesHelper.getString(R.string.long_consent_download_button_text)
         longConsent_downloadButton.setOnClickListener {
             if(deviceManager.isConnected()) {
                 viewModel.downloadLongConsent()
@@ -74,19 +76,17 @@ class PrivacyNoticeActivity : AppCompatActivity() {
         }
     }
 
-    private fun initTextInUi() {
-        longConsent_downloadButton.text = androidResourcesHelper.getString(R.string.long_consent_download_button_text)
-    }
-
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
     }
 
     private fun observeUi() {
-        viewModel.longConsentText.observe(this, observerForLongConsentText)
-        viewModel.downloadProgress.observe(this, observerForDownloadProgress)
-        viewModel.isDownloadSuccessful.observe(this, observerForDownloadSuccess)
+        with(viewModel) {
+            longConsentTextLiveData.observe(this@PrivacyNoticeActivity, observerForLongConsentText)
+            downloadProgressLiveData.observe(this@PrivacyNoticeActivity, observerForDownloadProgress)
+            isDownloadSuccessfulLiveData.observe(this@PrivacyNoticeActivity, observerForDownloadSuccess)
+        }
     }
 
     private fun setLongConsentText(text: String) {
