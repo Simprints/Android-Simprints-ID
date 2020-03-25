@@ -205,18 +205,18 @@ class SyncInformationActivity : AppCompatActivity() {
     }
 
     private fun setupProgressOverlay() {
-        progressOverlayContainer.setOnTouchListener { _, _ -> true }
+        group_progress_overlay.setOnTouchListener { _, _ -> true }
         progress_sync_overlay.text = androidResourcesHelper.getString(R.string.progress_sync_overlay)
     }
 
-    private fun isProgressOverlayVisible() = progressOverlayContainer.visibility == View.VISIBLE
+    private fun isProgressOverlayVisible() = group_progress_overlay.visibility == View.VISIBLE
 
     private fun showProgressOverlay() {
-        progressOverlayContainer.visibility = View.VISIBLE
+        group_progress_overlay.visibility = View.VISIBLE
     }
 
     private fun hideProgressOverlay() {
-        progressOverlayContainer.visibility = View.GONE
+        group_progress_overlay.visibility = View.GONE
     }
 
     private fun addTotalRowAndSubmitList(
