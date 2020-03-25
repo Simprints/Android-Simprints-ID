@@ -108,6 +108,7 @@ class PrivacyNoticeActivity : AppCompatActivity() {
 
     private fun setDownloadProgress(progress: Int) {
         longConsent_downloadButton.isEnabled = false
+        longConsent_downloadProgressBar.visibility = View.VISIBLE
         longConsent_downloadProgressBar.progress = progress
     }
 
