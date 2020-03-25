@@ -23,7 +23,6 @@ import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncSt
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_sync_information.*
-import kotlinx.android.synthetic.main.progress_overlay.*
 import javax.inject.Inject
 
 class SyncInformationActivity : AppCompatActivity() {
