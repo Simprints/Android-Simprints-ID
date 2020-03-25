@@ -130,9 +130,9 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
 
     private fun processQrScanResponse(response: Intent) {
         try {
-            val credentialsResponse = loginActivityHelper.tryParseQrCodeResponse(response)
-            val projectId = credentialsResponse.projectId
-            val projectSecret = credentialsResponse.projectSecret
+            val qrCodeResponse = loginActivityHelper.tryParseQrCodeResponse(response)
+            val projectId = qrCodeResponse.projectId
+            val projectSecret = qrCodeResponse.projectSecret
 
             updateProjectInfoOnTextFields(projectId, projectSecret)
             logMessageForCrashReport("QR scanning successful")
