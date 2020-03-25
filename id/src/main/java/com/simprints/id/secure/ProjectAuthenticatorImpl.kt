@@ -10,7 +10,7 @@ import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.secure.models.*
 
 class ProjectAuthenticatorImpl(
-    secureApiClient: SecureApiInterface,
+    private val authManager: AuthManager,
     private val projectSecretManager: ProjectSecretManager,
     private val safetyNetClient: SafetyNetClient,
     private val secureDataManager: SecureLocalDbKeyProvider,
@@ -19,14 +19,11 @@ class ProjectAuthenticatorImpl(
     private val remoteConfigWrapper: RemoteConfigWrapper,
     private val longConsentRepository: LongConsentRepository,
     private val preferencesManager: PreferencesManager,
-    private val attestationManager: AttestationManager = AttestationManager(),
-    private val authenticationDataManager: AuthenticationDataManager = AuthenticationDataManager(secureApiClient)
+    private val attestationManager: AttestationManager,
+    private val authenticationDataManager: AuthenticationDataManager
 ) : ProjectAuthenticator {
 
-    private val authManager = AuthManager(secureApiClient)
-
     override suspend fun authenticate(nonceScope: NonceScope, projectSecret: String) {
-        println("ProjectAuthenticator: Authenticate")
         createLocalDbKeyForProject(nonceScope.projectId)
 
         prepareAuthRequestParameters(nonceScope, projectSecret)
@@ -38,12 +35,8 @@ class ProjectAuthenticatorImpl(
             .fetchProjectLongConsentTexts()
     }
 
-    private suspend fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): AuthRequest = try {
+    private suspend fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): AuthRequest =
         buildAuthRequestParameters(nonceScope, projectSecret)
-    } catch (t: Throwable) {
-        println("ProjectAuthenticator: $t")
-        throw t
-    }
 
     private suspend fun buildAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): AuthRequest {
         val authenticationData = getAuthenticationData(nonceScope.projectId, nonceScope.userId)
@@ -53,65 +46,41 @@ class ProjectAuthenticatorImpl(
             nonceScope)
     }
 
-    internal suspend fun getAuthenticationData(projectId: String, userId: String) = try {
+    private suspend fun getAuthenticationData(projectId: String, userId: String) =
         authenticationDataManager.requestAuthenticationData(projectId, userId)
-    }  catch (t: Throwable) {
-        println("ProjectAuthenticator: $t")
-        throw t
-    }
 
-    private fun getEncryptedProjectSecret(projectSecret: String, authenticationData: AuthenticationData): String = try {
+    private fun getEncryptedProjectSecret(projectSecret: String, authenticationData: AuthenticationData): String =
         projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret,
             authenticationData.publicKeyString)
-    } catch (t: Throwable) {
-        println("ProjectAuthenticator: $t")
-        throw t
-    }
 
-    private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationData: AuthenticationData): AttestToken = try {
+    private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationData: AuthenticationData): AttestToken =
         attestationManager.requestAttestation(safetyNetClient, authenticationData.nonce)
-    } catch (t: Throwable) {
-        println("ProjectAuthenticator: $t")
-        throw t
-    }
 
     private fun buildAuthRequest(encryptedProjectSecret: String,
                                  googleAttestation: AttestToken,
                                  nonceScope: NonceScope): AuthRequest =
         AuthRequest(nonceScope.projectId, nonceScope.userId, AuthRequestBody(encryptedProjectSecret, googleAttestation.value))
 
-    private suspend fun AuthRequest.makeAuthRequest(): Token = try {
+    private suspend fun AuthRequest.makeAuthRequest(): Token =
         authManager.requestAuthToken(this)
-    } catch (t: Throwable) {
-        println("ProjectAuthenticator: $t")
-        throw t
-    }
 
     private suspend fun Token.signIn(projectId: String, userId: String) {
-        try {
-            signerManager.signIn(projectId, userId, this)
-        } catch (t: Throwable) {
-            println("ProjectAuthenticator: $t")
-            throw t
-        }
+        signerManager.signIn(projectId, userId, this)
     }
 
     private fun createLocalDbKeyForProject(projectId: String) {
         secureDataManager.setLocalDatabaseKey(projectId)
     }
 
-    private suspend fun fetchProjectRemoteConfigSettings(projectId: String): JsonElement = try {
+    private suspend fun fetchProjectRemoteConfigSettings(projectId: String): JsonElement =
         projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(projectId)
-    } catch (t: Throwable) {
-        println("ProjectAuthenticator: $t")
-        throw t
-    }
 
     private fun JsonElement.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(): Array<String> {
         remoteConfigWrapper.projectSettingsJsonString = this.toString()
         return preferencesManager.projectLanguages
     }
 
-    private suspend fun Array<String>.fetchProjectLongConsentTexts() =
+    private suspend fun Array<String>.fetchProjectLongConsentTexts() {
         longConsentRepository.downloadLongConsentForLanguages(this)
+    }
 }

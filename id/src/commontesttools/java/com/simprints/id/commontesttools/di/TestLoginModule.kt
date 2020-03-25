@@ -57,7 +57,7 @@ class TestLoginModule(
     }
 
     override fun provideProjectAuthenticator(
-        secureApiClient: SecureApiInterface,
+        authManager: AuthManager,
         projectSecretManager: ProjectSecretManager,
         safetyNetClient: SafetyNetClient,
         secureDataManager: SecureLocalDbKeyProvider,
@@ -65,11 +65,13 @@ class TestLoginModule(
         signerManager: SignerManager,
         remoteConfigWrapper: RemoteConfigWrapper,
         longConsentRepository: LongConsentRepository,
-        preferencesManager: PreferencesManager
-    ): ProjectAuthenticator {
+        preferencesManager: PreferencesManager,
+        attestationManager: AttestationManager,
+        authenticationDataManager: AuthenticationDataManager
+    ) : ProjectAuthenticator {
         return projectAuthenticatorRule.resolveDependency {
             super.provideProjectAuthenticator(
-                secureApiClient,
+                authManager,
                 projectSecretManager,
                 safetyNetClient,
                 secureDataManager,
@@ -77,7 +79,9 @@ class TestLoginModule(
                 signerManager,
                 remoteConfigWrapper,
                 longConsentRepository,
-                preferencesManager
+                preferencesManager,
+                attestationManager,
+                authenticationDataManager
             )
         }
     }

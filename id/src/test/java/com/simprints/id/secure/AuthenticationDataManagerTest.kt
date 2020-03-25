@@ -13,17 +13,18 @@ import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.retrofit.FakeResponseInterceptor
 import com.simprints.testtools.common.syntax.assertThrows
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.stopKoin
+import org.koin.test.AutoCloseKoinTest
 import java.io.IOException
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
-class AuthenticationDataManagerTest {
+class AuthenticationDataManagerImplTest: AutoCloseKoinTest() {
 
     companion object {
         private const val PROJECT_ID = "projectId"
@@ -44,7 +45,7 @@ class AuthenticationDataManagerTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).setupFirebase().coroutinesMainThread()
+        UnitTestConfig(this).setupFirebase()
         apiClient = SimApiClientFactory("deviceId", endpoint = BASE_URL).build()
     }
 
@@ -83,14 +84,9 @@ class AuthenticationDataManagerTest {
     }
 
     private suspend fun makeTestRequestForAuthenticationData(secureApiInterfaceMock: SecureApiInterface) =
-        AuthenticationDataManager(secureApiInterfaceMock).requestAuthenticationData(PROJECT_ID, USER_ID)
+        AuthenticationDataManagerImpl(secureApiInterfaceMock).requestAuthenticationData(PROJECT_ID, USER_ID)
 
     private fun forceOkHttpToReturnSuccessfulResponse(okHttpClientConfig: OkHttpClient.Builder) {
         okHttpClientConfig.addInterceptor(FakeResponseInterceptor(200, validAuthenticationJsonResponse, validateUrl = validateUrl))
-    }
-
-    @After
-    fun tearDown() {
-        stopKoin()
     }
 }

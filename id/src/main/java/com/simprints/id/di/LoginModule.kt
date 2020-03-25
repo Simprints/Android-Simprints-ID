@@ -50,8 +50,18 @@ open class LoginModule {
         ProjectSecretManager(loginInfoManager)
 
     @Provides
+    open fun provideAuthManager(secureApiInterface: SecureApiInterface): AuthManager = AuthManagerImpl(secureApiInterface)
+
+    @Provides
+    open fun provideAuthenticationDataManager(secureApiInterface: SecureApiInterface): AuthenticationDataManager =
+        AuthenticationDataManagerImpl(secureApiInterface)
+
+    @Provides
+    open fun provideAttestationManager(): AttestationManager = AttestationManagerImpl()
+
+    @Provides
     open fun provideProjectAuthenticator(
-        secureApiClient: SecureApiInterface,
+        authManager: AuthManager,
         projectSecretManager: ProjectSecretManager,
         safetyNetClient: SafetyNetClient,
         secureDataManager: SecureLocalDbKeyProvider,
@@ -59,9 +69,11 @@ open class LoginModule {
         signerManager: SignerManager,
         remoteConfigWrapper: RemoteConfigWrapper,
         longConsentRepository: LongConsentRepository,
-        preferencesManager: PreferencesManager
+        preferencesManager: PreferencesManager,
+        attestationManager: AttestationManager,
+        authenticationDataManager: AuthenticationDataManager
     ) : ProjectAuthenticator = ProjectAuthenticatorImpl(
-        secureApiClient,
+        authManager,
         projectSecretManager,
         safetyNetClient,
         secureDataManager,
@@ -69,7 +81,9 @@ open class LoginModule {
         signerManager,
         remoteConfigWrapper,
         longConsentRepository,
-        preferencesManager
+        preferencesManager,
+        attestationManager,
+        authenticationDataManager
     )
 
     @Provides
