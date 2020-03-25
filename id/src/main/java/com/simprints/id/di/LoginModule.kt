@@ -5,7 +5,6 @@ import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.activities.login.repository.LoginRepository
 import com.simprints.id.activities.login.repository.LoginRepositoryImpl
-import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
@@ -17,10 +16,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
-import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.secure.ProjectAuthenticatorImpl
-import com.simprints.id.secure.SecureApiInterface
-import com.simprints.id.secure.SignerManager
+import com.simprints.id.secure.*
 import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
@@ -41,12 +37,14 @@ open class LoginModule {
         projectAuthenticator: ProjectAuthenticator,
         authenticationHelper: AuthenticationHelper,
         sessionEventsManager: SessionEventsManager,
-        timeHelper: TimeHelper
+        timeHelper: TimeHelper,
+        baseUrlProvider: BaseUrlProvider
     ): LoginRepository = LoginRepositoryImpl(
         projectAuthenticator,
         authenticationHelper,
         sessionEventsManager,
-        timeHelper
+        timeHelper,
+        baseUrlProvider
     )
 
     @Provides

@@ -7,7 +7,8 @@ interface LoginRepository {
     suspend fun authenticate(
         projectId: String,
         userId: String,
-        projectSecret: String
+        projectSecret: String,
+        apiBaseUrl: String?
     ): AuthenticationEvent.Result
 
 }

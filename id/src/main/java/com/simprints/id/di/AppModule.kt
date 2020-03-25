@@ -44,6 +44,7 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.*
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
 import com.simprints.id.data.secure.keystore.KeystoreManager
@@ -52,9 +53,7 @@ import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
-import com.simprints.id.secure.SecureApiInterface
-import com.simprints.id.secure.SignerManager
-import com.simprints.id.secure.SignerManagerImpl
+import com.simprints.id.secure.*
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
@@ -182,8 +181,16 @@ open class AppModule {
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
-    open fun provideSimApiClientFactory(ctx: Context) =
-        SimApiClientFactory(ctx.deviceId)
+    open fun provideBaseUrlProvider(
+        settingsPreferencesManager: SettingsPreferencesManager
+    ): BaseUrlProvider = BaseUrlProviderImpl(settingsPreferencesManager)
+
+    // FIXME: Base URL should not be set at compile time
+    @Provides
+    open fun provideSimApiClientFactory(
+        ctx: Context,
+        baseUrlProvider: BaseUrlProvider
+    ) = SimApiClientFactory(ctx.deviceId, baseUrlProvider.getApiBaseUrl())
 
     @Provides
     open fun provideSecureApiInterface(simApiClientFactory: SimApiClientFactory): SecureApiInterface =

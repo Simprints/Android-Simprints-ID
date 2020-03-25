@@ -18,11 +18,13 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
 import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
+import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
@@ -57,6 +59,7 @@ class TestAppModule(
     private val syncStatusDatabaseRule: DependencyRule = RealRule,
     private val deviceManagerRule: DependencyRule = RealRule,
     private val recentEventsPreferencesManagerRule: DependencyRule = RealRule,
+    private val baseUrlProviderRule: DependencyRule = RealRule,
     private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule {
         setupFakeEncryptedSharedPreferences(
             app
@@ -257,6 +260,12 @@ class TestAppModule(
         crashReportManager: CrashReportManager
     ): QrCodeDetector = qrCodeDetectorRule.resolveDependency {
         super.provideQrCodeDetector(crashReportManager)
+    }
+
+    override fun provideBaseUrlProvider(
+        settingsPreferencesManager: SettingsPreferencesManager
+    ): BaseUrlProvider = baseUrlProviderRule.resolveDependency {
+        super.provideBaseUrlProvider(settingsPreferencesManager)
     }
 
 }
