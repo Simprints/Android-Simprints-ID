@@ -11,10 +11,15 @@ class BaseUrlProviderImpl(
     override fun getApiBaseUrl(): String = settingsPreferencesManager.apiBaseUrl
 
     override fun setApiBaseUrl(apiBaseUrl: String?) {
-        val newValue = if (apiBaseUrl?.equals(DEFAULT_BASE_URL) == false)
-            "https://$apiBaseUrl$BASE_URL_SUFFIX"
-        else
+        val prefix = "https://"
+        val newValue = if (apiBaseUrl?.equals(DEFAULT_BASE_URL) == false) {
+            if (apiBaseUrl.startsWith(prefix))
+                "$apiBaseUrl$BASE_URL_SUFFIX"
+            else
+                "$prefix$apiBaseUrl$BASE_URL_SUFFIX"
+        } else {
             DEFAULT_BASE_URL
+        }
 
         settingsPreferencesManager.apiBaseUrl = newValue
     }
