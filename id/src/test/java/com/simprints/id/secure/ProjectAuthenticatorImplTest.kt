@@ -35,7 +35,6 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.common.di.DependencyRule.ReplaceRule
-import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.getSharedPreferences
 import io.mockk.*
@@ -110,39 +109,51 @@ class ProjectAuthenticatorImplTest {
 
     @Test
     fun successfulResponse_userShouldSignIn() {
+        val mockWebServer = MockWebServer()
+
+        with(mockWebServer) {
+            enqueue(mockResponseForAuthenticationData())
+            enqueue(mockResponseForApiToken())
+        }
+
+        every { baseUrlProviderMock.getApiBaseUrl() } returns mockWebServer.url("/").toString()
+
+        val mockProjectSecretManager: ProjectSecretManager = mockk()
+
         every {
-            simApiClientFactoryMock.build<SecureApiInterface>(any()).api
-        } returns SecureApiServiceMock(
-            createMockBehaviorService(
-                apiClient.retrofit,
-                0,
-                SecureApiInterface::class.java)
+            mockProjectSecretManager.encryptAndStoreAndReturnProjectSecret(any(), any())
+        } returns PROJECT_SECRET
+
+        val authenticatorSpy = spyk(
+            ProjectAuthenticatorImpl(
+                loginInfoManager,
+                SimApiClientFactory("deviceId"),
+                baseUrlProviderMock,
+                SafetyNet.getClient(app),
+                secureDataManager,
+                projectRemoteDataSourceMock,
+                signerManager,
+                remoteConfigWrapper,
+                longConsentManager,
+                preferencesManager,
+                getMockAttestationManager()
+            )
         )
 
-        val authenticator = ProjectAuthenticatorImpl(
-            loginInfoManager,
-            simApiClientFactoryMock,
-            baseUrlProviderMock,
-            SafetyNet.getClient(app),
-            secureDataManager,
-            projectRemoteDataSourceMock,
-            signerManager,
-            remoteConfigWrapper,
-            longConsentManager,
-            preferencesManager,
-            getMockAttestationManager()
-        )
+        every { authenticatorSpy.projectSecretManager } returns mockProjectSecretManager
 
         runBlockingTest {
-            authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET)
+            authenticatorSpy.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET)
         }
     }
 
     @Test(expected = IOException::class)
     fun offline_authenticationShouldThrowException() {
-        every {
-            simApiClientFactoryMock.build<SecureApiInterface>(any()).api
-        } returns createMockServiceToFailRequests(apiClient.retrofit)
+        val mockClient = mockk<SimApiClient<SecureApiInterface>>(relaxed = true)
+
+        every { mockClient.api } returns createMockServiceToFailRequests(apiClient.retrofit)
+        every { simApiClientFactoryMock.build<SecureApiInterface>(any()) } returns mockClient
+
         val nonceScope = NonceScope(PROJECT_ID, USER_ID)
 
         val authenticator = ProjectAuthenticatorImpl(
@@ -167,18 +178,20 @@ class ProjectAuthenticatorImplTest {
     fun getAuthenticationData_invokeAuthenticationDataManagerCorrectly() {
         val mockAuthenticationDataManager = mockk<AuthenticationDataManager>(relaxed = true)
 
-        val authenticatorSpy = spyk(ProjectAuthenticatorImpl(
-            loginInfoManager,
-            mockk(),
-            baseUrlProviderMock,
-            mockk(),
-            secureDataManager,
-            projectRemoteDataSource,
-            signerManager,
-            remoteConfigWrapper,
-            longConsentManager,
-            preferencesManager
-        ))
+        val authenticatorSpy = spyk(
+            ProjectAuthenticatorImpl(
+                loginInfoManager,
+                mockk(),
+                baseUrlProviderMock,
+                mockk(),
+                secureDataManager,
+                projectRemoteDataSource,
+                signerManager,
+                remoteConfigWrapper,
+                longConsentManager,
+                preferencesManager
+            )
+        )
 
         every { authenticatorSpy.authenticationDataManager } returns mockAuthenticationDataManager
 
@@ -206,19 +219,21 @@ class ProjectAuthenticatorImplTest {
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns mockWebServer.url("/").toString()
 
-        val authenticatorSpy = spyk(ProjectAuthenticatorImpl(
-            loginInfoManager,
-            SimApiClientFactory("deviceId"),
-            mockBaseUrlProvider,
-            SafetyNet.getClient(app),
-            secureDataManager,
-            projectRemoteDataSource,
-            signerManager,
-            remoteConfigWrapper,
-            longConsentManager,
-            preferencesManager,
-            getMockAttestationManager()
-        ))
+        val authenticatorSpy = spyk(
+            ProjectAuthenticatorImpl(
+                loginInfoManager,
+                SimApiClientFactory("deviceId"),
+                mockBaseUrlProvider,
+                SafetyNet.getClient(app),
+                secureDataManager,
+                projectRemoteDataSource,
+                signerManager,
+                remoteConfigWrapper,
+                longConsentManager,
+                preferencesManager,
+                getMockAttestationManager()
+            )
+        )
 
         every { authenticatorSpy.projectSecretManager } returns mockProjectSecretManager
 
@@ -238,31 +253,41 @@ class ProjectAuthenticatorImplTest {
             mockAttestationManager.requestAttestation(any(), any())
         } throws (SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
 
+        val mockWebServer = MockWebServer()
+
+        with(mockWebServer) {
+            enqueue(mockResponseForAuthenticationData())
+            enqueue(mockResponseForApiToken())
+        }
+
+        every { baseUrlProviderMock.getApiBaseUrl() } returns mockWebServer.url("/").toString()
+
+        val mockProjectSecretManager: ProjectSecretManager = mockk()
+
         every {
-            simApiClientFactoryMock.build<SecureApiInterface>(any()).api
-        } returns SecureApiServiceMock(
-            createMockBehaviorService(
-                apiClient.retrofit,
-                0,
-                SecureApiInterface::class.java)
+            mockProjectSecretManager.encryptAndStoreAndReturnProjectSecret(any(), any())
+        } returns PROJECT_SECRET
+
+        val authenticatorSpy = spyk(
+            ProjectAuthenticatorImpl(
+                loginInfoManager,
+                SimApiClientFactory("deviceId"),
+                baseUrlProviderMock,
+                SafetyNet.getClient(app),
+                secureDataManager,
+                projectRemoteDataSource,
+                signerManager,
+                remoteConfigWrapper,
+                longConsentManager,
+                preferencesManager,
+                mockAttestationManager
+            )
         )
 
-        val authenticator = ProjectAuthenticatorImpl(
-            loginInfoManager,
-            simApiClientFactoryMock,
-            baseUrlProviderMock,
-            SafetyNet.getClient(app),
-            secureDataManager,
-            projectRemoteDataSource,
-            signerManager,
-            remoteConfigWrapper,
-            longConsentManager,
-            preferencesManager,
-            mockAttestationManager
-        )
+        every { authenticatorSpy.projectSecretManager } returns mockProjectSecretManager
 
         runBlockingTest {
-            authenticator.authenticate(nonceScope, PROJECT_SECRET)
+            authenticatorSpy.authenticate(nonceScope, PROJECT_SECRET)
         }
     }
 
