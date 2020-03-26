@@ -54,7 +54,10 @@ class SessionEventsUploaderTaskTest {
 
         ShadowLog.stream = System.out
 
-        sessionsRemoteInterfaceSpy = spyk(SimApiClientFactory("deviceId", DEFAULT_BASE_URL).build<SessionsRemoteInterface>().api)
+        sessionsRemoteInterfaceSpy = spyk(
+            SimApiClientFactory("deviceId").build<SessionsRemoteInterface>(DEFAULT_BASE_URL)
+                .api
+        )
 
         every { sessionsEventsManagerMock.deleteSessions(any(), any(), any(), any()) } returns Completable.complete()
         every { sessionsEventsManagerMock.insertOrUpdateSessionEvents(any()) } returns Completable.complete()

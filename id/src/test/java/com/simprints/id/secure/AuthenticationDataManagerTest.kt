@@ -6,7 +6,7 @@ import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
-import com.simprints.id.secure.SecureApiInterface.Companion.apiKey
+import com.simprints.id.secure.SecureApiInterface.Companion.API_KEY
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.PublicKeyString
@@ -34,7 +34,7 @@ class AuthenticationDataManagerTest {
     private val publicKeyFromServer = "public_key_from_server"
     private val validAuthenticationJsonResponse = "{\"nonce\":\"$nonceFromServer\", \"publicKey\":\"$publicKeyFromServer\"}"
     private val expectedAuthenticationData = AuthenticationData(Nonce(nonceFromServer), PublicKeyString(publicKeyFromServer))
-    private val expectedUrl = DEFAULT_BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?key=$apiKey"
+    private val expectedUrl = DEFAULT_BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?key=$API_KEY"
 
     private val validateUrl: (url: String) -> Unit  = {
         Truth.assertThat(it).isEqualTo(expectedUrl)
@@ -44,7 +44,7 @@ class AuthenticationDataManagerTest {
 
     @Before
     fun setUp() {
-        apiClient = SimApiClientFactory("deviceId", endpoint = DEFAULT_BASE_URL).build()
+        apiClient = SimApiClientFactory("deviceId").build(baseUrl = DEFAULT_BASE_URL)
     }
 
     @Test
