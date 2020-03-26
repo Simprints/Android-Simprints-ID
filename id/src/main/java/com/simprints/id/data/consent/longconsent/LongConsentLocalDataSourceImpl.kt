@@ -2,14 +2,17 @@ package com.simprints.id.data.consent.longconsent
 
 import androidx.annotation.VisibleForTesting
 import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl.Companion.DEFAULT_LANGUAGE
-import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl.Companion.FILE_PATH
-import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl.Companion.FILE_TYPE
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import java.io.BufferedReader
 import java.io.File
 
 class LongConsentLocalDataSourceImpl(absolutePath: String,
                                      private val loginInfoManager: LoginInfoManager) : LongConsentLocalDataSource {
+
+    companion object {
+        const val FILE_PATH = "long-consents"
+        const val FILE_TYPE = "txt"
+    }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal val baseFilePath: File by lazy {

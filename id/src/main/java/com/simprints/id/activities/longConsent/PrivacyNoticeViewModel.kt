@@ -8,10 +8,10 @@ import kotlinx.coroutines.launch
 class PrivacyNoticeViewModel(private val longConsentRepository: LongConsentRepository,
                              private val language: String): ViewModel() {
 
-    val isDownloadSuccessfulLiveData = longConsentRepository.isDownloadSuccessful
-    val downloadProgressLiveData = longConsentRepository.downloadProgress
+    val isDownloadSuccessfulLiveData = longConsentRepository.isDownloadSuccessfulLiveData
+    val downloadProgressLiveData = longConsentRepository.downloadProgressLiveData
 
-    val longConsentTextLiveData = longConsentRepository.longConsentText
+    val longConsentTextLiveData = longConsentRepository.longConsentTextLiveData
 
     fun start() {
         longConsentRepository.setLanguage(language)

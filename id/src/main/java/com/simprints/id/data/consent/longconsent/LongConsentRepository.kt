@@ -4,11 +4,11 @@ import androidx.lifecycle.LiveData
 
 interface LongConsentRepository {
 
-    val downloadProgress: LiveData<Int>
+    val downloadProgressLiveData: LiveData<Int>
 
-    val isDownloadSuccessful: LiveData<Boolean>
+    val isDownloadSuccessfulLiveData: LiveData<Boolean>
 
-    val longConsentText: LiveData<String>
+    val longConsentTextLiveData: LiveData<String>
 
     suspend fun downloadLongConsentForLanguages(languages: Array<String>)
 
