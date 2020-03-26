@@ -149,28 +149,36 @@ class ProjectAuthenticatorImplTest {
 
     @Test(expected = IOException::class)
     fun offline_authenticationShouldThrowException() {
-        val mockClient = mockk<SimApiClient<SecureApiInterface>>(relaxed = true)
+        val mockWebServer = MockWebServer()
 
-        every { mockClient.api } returns createMockServiceToFailRequests(apiClient.retrofit)
-        every { simApiClientFactoryMock.build<SecureApiInterface>(any()) } returns mockClient
+        with(mockWebServer) {
+            enqueue(mockResponseForAuthenticationData())
+            enqueue(mockResponseForApiToken())
+        }
 
-        val nonceScope = NonceScope(PROJECT_ID, USER_ID)
+        every { baseUrlProviderMock.getApiBaseUrl() } returns mockWebServer.url("/").toString()
 
-        val authenticator = ProjectAuthenticatorImpl(
-            loginInfoManager,
-            simApiClientFactoryMock,
-            baseUrlProviderMock,
-            SafetyNet.getClient(app),
-            secureDataManager,
-            projectRemoteDataSource,
-            signerManager,
-            remoteConfigWrapper,
-            longConsentManager,
-            preferencesManager
+        val authenticator = spyk(
+            ProjectAuthenticatorImpl(
+                loginInfoManager,
+                simApiClientFactoryMock,
+                baseUrlProviderMock,
+                SafetyNet.getClient(app),
+                secureDataManager,
+                projectRemoteDataSource,
+                signerManager,
+                remoteConfigWrapper,
+                longConsentManager,
+                preferencesManager
+            )
         )
 
+        every {
+            authenticator.authenticationDataManager.requestAuthenticationData(any(), any())
+        } throws IOException()
+
         runBlockingTest {
-            authenticator.authenticate(nonceScope, PROJECT_SECRET)
+            authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET)
         }
     }
 
