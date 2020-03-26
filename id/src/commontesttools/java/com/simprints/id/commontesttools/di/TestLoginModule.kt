@@ -2,6 +2,7 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.activities.login.repository.LoginRepository
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
@@ -14,7 +15,10 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.LoginModule
-import com.simprints.id.secure.*
+import com.simprints.id.secure.AuthenticationHelper
+import com.simprints.id.secure.BaseUrlProvider
+import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.secure.SignerManager
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
@@ -59,8 +63,9 @@ class TestLoginModule(
     }
 
     override fun provideProjectAuthenticator(
-        secureApiClient: SecureApiInterface,
         loginInfoManager: LoginInfoManager,
+        simApiClientFactory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider,
         safetyNetClient: SafetyNetClient,
         secureDataManager: SecureLocalDbKeyProvider,
         projectRemoteDataSource: ProjectRemoteDataSource,
@@ -71,8 +76,9 @@ class TestLoginModule(
     ): ProjectAuthenticator {
         return projectAuthenticatorRule.resolveDependency {
             super.provideProjectAuthenticator(
-                secureApiClient,
                 loginInfoManager,
+                simApiClientFactory,
+                baseUrlProvider,
                 safetyNetClient,
                 secureDataManager,
                 projectRemoteDataSource,

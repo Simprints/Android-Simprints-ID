@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.activities.login.repository.LoginRepository
 import com.simprints.id.activities.login.repository.LoginRepositoryImpl
 import com.simprints.id.activities.login.tools.LoginActivityHelper
@@ -49,8 +50,9 @@ open class LoginModule {
 
     @Provides
     open fun provideProjectAuthenticator(
-        secureApiClient: SecureApiInterface,
         loginInfoManager: LoginInfoManager,
+        simApiClientFactory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider,
         safetyNetClient: SafetyNetClient,
         secureDataManager: SecureLocalDbKeyProvider,
         projectRemoteDataSource: ProjectRemoteDataSource,
@@ -59,8 +61,9 @@ open class LoginModule {
         longConsentManager: LongConsentManager,
         preferencesManager: PreferencesManager
     ) : ProjectAuthenticator = ProjectAuthenticatorImpl(
-        secureApiClient,
         loginInfoManager,
+        simApiClientFactory,
+        baseUrlProvider,
         safetyNetClient,
         secureDataManager,
         projectRemoteDataSource,

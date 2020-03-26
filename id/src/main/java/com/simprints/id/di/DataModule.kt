@@ -21,6 +21,7 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import dagger.Module
 import dagger.Provides
@@ -34,8 +35,13 @@ open class DataModule {
     @Singleton
     open fun providePersonRemoteDataSource(
         remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory
-    ): PersonRemoteDataSource = PersonRemoteDataSourceImpl(remoteDbManager, simApiClientFactory)
+        simApiClientFactory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider
+    ): PersonRemoteDataSource = PersonRemoteDataSourceImpl(
+        remoteDbManager,
+        simApiClientFactory,
+        baseUrlProvider
+    )
 
     @Provides
     @FlowPreview
@@ -53,8 +59,13 @@ open class DataModule {
     @Singleton
     open fun provideProjectRemoteDataSource(
         remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory
-    ): ProjectRemoteDataSource = ProjectRemoteDataSourceImpl(remoteDbManager, simApiClientFactory)
+        simApiClientFactory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider
+    ): ProjectRemoteDataSource = ProjectRemoteDataSourceImpl(
+        remoteDbManager,
+        simApiClientFactory,
+        baseUrlProvider
+    )
 
     @Provides
     open fun provideProjectRepository(

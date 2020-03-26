@@ -53,7 +53,10 @@ import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
-import com.simprints.id.secure.*
+import com.simprints.id.secure.BaseUrlProvider
+import com.simprints.id.secure.BaseUrlProviderImpl
+import com.simprints.id.secure.SignerManager
+import com.simprints.id.secure.SignerManagerImpl
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
@@ -150,9 +153,11 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSecureLocalDbKeyProvider(builder: EncryptedSharedPreferencesBuilder,
-                                             randomGenerator: RandomGenerator,
-                                             unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
+    open fun provideSecureLocalDbKeyProvider(
+        builder: EncryptedSharedPreferencesBuilder,
+        randomGenerator: RandomGenerator,
+        unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider
+    ): SecureLocalDbKeyProvider =
         SecureLocalDbKeyProviderImpl(
             builder.buildEncryptedSharedPreferences(FILENAME_FOR_REALM_KEY_SHARED_PREFS),
             randomGenerator,
@@ -185,16 +190,11 @@ open class AppModule {
         settingsPreferencesManager: SettingsPreferencesManager
     ): BaseUrlProvider = BaseUrlProviderImpl(settingsPreferencesManager)
 
-    // FIXME: Base URL should not be set at compile time
     @Provides
     open fun provideSimApiClientFactory(
         ctx: Context,
         baseUrlProvider: BaseUrlProvider
-    ) = SimApiClientFactory(ctx.deviceId, baseUrlProvider.getApiBaseUrl())
-
-    @Provides
-    open fun provideSecureApiInterface(simApiClientFactory: SimApiClientFactory): SecureApiInterface =
-        simApiClientFactory.build<SecureApiInterface>(null).api
+    ) = SimApiClientFactory(ctx.deviceId)
 
     @Provides
     @Singleton
@@ -257,9 +257,15 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager,
-                                          simApiClientFactory: SimApiClientFactory): RemoteSessionsManager =
-        RemoteSessionsManagerImpl(remoteDbManager, simApiClientFactory)
+    open fun provideRemoteSessionsManager(
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider
+    ): RemoteSessionsManager = RemoteSessionsManagerImpl(
+        remoteDbManager,
+        simApiClientFactory,
+        baseUrlProvider
+    )
 
     @Provides
     open fun provideGuidSelectionManager(
@@ -326,10 +332,12 @@ open class AppModule {
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
 
     @Provides
-    open fun provideFetchGuidViewModelFactory(personRepository: PersonRepository,
-                                              deviceManager: DeviceManager,
-                                              sessionEventsManager: SessionEventsManager,
-                                              timeHelper: TimeHelper) =
+    open fun provideFetchGuidViewModelFactory(
+        personRepository: PersonRepository,
+        deviceManager: DeviceManager,
+        sessionEventsManager: SessionEventsManager,
+        timeHelper: TimeHelper
+    ) =
         FetchGuidViewModelFactory(personRepository, deviceManager, sessionEventsManager, timeHelper)
 
     @Provides
@@ -355,10 +363,12 @@ open class AppModule {
         builder.buildEncryptedSharedPreferences()
 
     @Provides
-    open fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager = DeviceManagerImpl(connectivityHelper)
+    open fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager =
+        DeviceManagerImpl(connectivityHelper)
 
     @Provides
-    open fun provideConnectivityHelper(ctx: Context): ConnectivityHelper = ConnectivityHelperImpl(ctx)
+    open fun provideConnectivityHelper(ctx: Context): ConnectivityHelper =
+        ConnectivityHelperImpl(ctx)
 
     @Provides
     open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)

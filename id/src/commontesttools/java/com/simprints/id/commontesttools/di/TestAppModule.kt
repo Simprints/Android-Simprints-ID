@@ -25,7 +25,6 @@ import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.secure.BaseUrlProvider
-import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
@@ -135,14 +134,6 @@ class TestAppModule(
     override fun provideKeystoreManager(): KeystoreManager =
         keystoreManagerRule.resolveDependency { super.provideKeystoreManager() }
 
-    override fun provideSecureApiInterface(
-        simApiClientFactory: SimApiClientFactory
-    ): SecureApiInterface = secureApiInterfaceRule.resolveDependency {
-        super.provideSecureApiInterface(
-            simApiClientFactory
-        )
-    }
-
     override fun provideSessionEventsManager(
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
@@ -190,12 +181,14 @@ class TestAppModule(
 
     override fun provideRemoteSessionsManager(
         remoteDbManager: RemoteDbManager,
-        factory: SimApiClientFactory
+        factory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider
     ): RemoteSessionsManager =
         remoteSessionsManagerRule.resolveDependency {
             super.provideRemoteSessionsManager(
                 remoteDbManager,
-                factory
+                factory,
+                baseUrlProvider
             )
         }
 
