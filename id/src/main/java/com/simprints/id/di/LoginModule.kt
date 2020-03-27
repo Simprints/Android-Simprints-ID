@@ -3,9 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.id.activities.login.repository.LoginRepository
-import com.simprints.id.activities.login.repository.LoginRepositoryImpl
-import com.simprints.id.secure.AuthenticationHelper
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
@@ -17,10 +15,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
-import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.secure.ProjectAuthenticatorImpl
-import com.simprints.id.secure.SecureApiInterface
-import com.simprints.id.secure.SignerManager
+import com.simprints.id.secure.*
 import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
@@ -32,27 +27,17 @@ open class LoginModule {
     open fun provideLoginActivityHelper(): LoginActivityHelper = LoginActivityHelperImpl()
 
     @Provides
-    open fun provideLoginViewModelFactory(loginRepository: LoginRepository): LoginViewModelFactory {
-        return LoginViewModelFactory(loginRepository)
+    open fun provideLoginViewModelFactory(
+        authenticationHelper: AuthenticationHelper
+    ): LoginViewModelFactory {
+        return LoginViewModelFactory(authenticationHelper)
     }
 
     @Provides
-    open fun provideLoginRepository(
-        projectAuthenticator: ProjectAuthenticator,
-        authenticationHelper: AuthenticationHelper,
-        sessionEventsManager: SessionEventsManager,
-        timeHelper: TimeHelper
-    ): LoginRepository = LoginRepositoryImpl(
-        projectAuthenticator,
-        authenticationHelper,
-        sessionEventsManager,
-        timeHelper
-    )
-
-    @Provides
     open fun provideProjectAuthenticator(
-        secureApiClient: SecureApiInterface,
         loginInfoManager: LoginInfoManager,
+        simApiClientFactory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider,
         safetyNetClient: SafetyNetClient,
         secureDataManager: SecureLocalDbKeyProvider,
         projectRemoteDataSource: ProjectRemoteDataSource,
@@ -61,8 +46,9 @@ open class LoginModule {
         longConsentManager: LongConsentManager,
         preferencesManager: PreferencesManager
     ) : ProjectAuthenticator = ProjectAuthenticatorImpl(
-        secureApiClient,
         loginInfoManager,
+        simApiClientFactory,
+        baseUrlProvider,
         safetyNetClient,
         secureDataManager,
         projectRemoteDataSource,
@@ -75,11 +61,17 @@ open class LoginModule {
     @Provides
     open fun provideAuthenticationHelper(
         crashReportManager: CrashReportManager,
-        loginInfoManager: LoginInfoManager
+        loginInfoManager: LoginInfoManager,
+        timeHelper: TimeHelper,
+        projectAuthenticator: ProjectAuthenticator,
+        sessionEventsManager: SessionEventsManager
     ): AuthenticationHelper {
-        return AuthenticationHelper(
+        return AuthenticationHelperImpl(
             crashReportManager,
-            loginInfoManager
+            loginInfoManager,
+            timeHelper,
+            projectAuthenticator,
+            sessionEventsManager
         )
     }
 

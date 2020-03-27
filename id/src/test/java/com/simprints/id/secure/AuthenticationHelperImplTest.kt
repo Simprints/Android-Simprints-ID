@@ -1,7 +1,6 @@
-package com.simprints.id.activities.login.repository
+package com.simprints.id.secure
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -12,7 +11,6 @@ import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
-import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.tools.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -25,7 +23,7 @@ import org.junit.Test
 import java.io.IOException
 
 @ExperimentalCoroutinesApi
-class LoginRepositoryImplTest {
+class AuthenticationHelperImplTest {
 
     @MockK lateinit var mockProjectAuthenticator: ProjectAuthenticator
     @MockK lateinit var mockSessionEventsManager: SessionEventsManager
@@ -33,22 +31,18 @@ class LoginRepositoryImplTest {
     @MockK lateinit var mockCrashReportManager: CrashReportManager
     @MockK lateinit var mockLoginInfoManager: LoginInfoManager
 
-    private lateinit var repository: LoginRepositoryImpl
+    private lateinit var authenticationHelper: AuthenticationHelperImpl
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        val authenticationHelper = AuthenticationHelper(
+        authenticationHelper = AuthenticationHelperImpl(
             mockCrashReportManager,
-            mockLoginInfoManager
-        )
-
-        repository = LoginRepositoryImpl(
+            mockLoginInfoManager,
+            mockTimeHelper,
             mockProjectAuthenticator,
-            authenticationHelper,
-            mockSessionEventsManager,
-            mockTimeHelper
+            mockSessionEventsManager
         )
     }
 
@@ -56,9 +50,9 @@ class LoginRepositoryImplTest {
     fun withCorrectCredentials_shouldAuthenticate() = runBlockingTest {
         coEvery { mockProjectAuthenticator.authenticate(any(), any()) } returns Unit
 
-        val result = repository.authenticate(
-            "some_project_id",
+        val result = authenticationHelper.authenticateSafely(
             "some_user_id",
+            "some_project_id",
             "some_project_secret"
         )
 
@@ -69,9 +63,9 @@ class LoginRepositoryImplTest {
     fun whenAuthenticatorThrowsIOException_shouldReturnOfflineResult() = runBlockingTest {
         coEvery { mockProjectAuthenticator.authenticate(any(), any()) } throws IOException()
 
-        val result = repository.authenticate(
-            "some_project_id",
+        val result = authenticationHelper.authenticateSafely(
             "some_user_id",
+            "some_project_id",
             "some_project_secret"
         )
 
@@ -84,9 +78,9 @@ class LoginRepositoryImplTest {
             mockProjectAuthenticator.authenticate(any(), any())
         } throws AuthRequestInvalidCredentialsException()
 
-        val result = repository.authenticate(
-            "invalid_project_id",
+        val result = authenticationHelper.authenticateSafely(
             "invalid_user_id",
+            "invalid_project_id",
             "invalid_project_secret"
         )
 
@@ -99,9 +93,9 @@ class LoginRepositoryImplTest {
             mockProjectAuthenticator.authenticate(any(), any())
         } throws SimprintsInternalServerException()
 
-        val result = repository.authenticate(
-            "some_project_id",
+        val result = authenticationHelper.authenticateSafely(
             "some_user_id",
+            "some_project_id",
             "some_project_secret"
         )
 
@@ -114,9 +108,9 @@ class LoginRepositoryImplTest {
             mockProjectAuthenticator.authenticate(any(), any())
         } throws SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE)
 
-        val result = repository.authenticate(
-            "some_project_id",
+        val result = authenticationHelper.authenticateSafely(
             "some_user_id",
+            "some_project_id",
             "some_project_secret"
         )
 
@@ -129,9 +123,9 @@ class LoginRepositoryImplTest {
             mockProjectAuthenticator.authenticate(any(), any())
         } throws SafetyNetException(reason = SafetyNetExceptionReason.INVALID_CLAIMS)
 
-        val result = repository.authenticate(
-            "some_project_id",
+        val result = authenticationHelper.authenticateSafely(
             "some_user_id",
+            "some_project_id",
             "some_project_secret"
         )
 
@@ -144,9 +138,9 @@ class LoginRepositoryImplTest {
             mockProjectAuthenticator.authenticate(any(), any())
         } throws Throwable()
 
-        val result = repository.authenticate(
-            "some_project_id",
+        val result = authenticationHelper.authenticateSafely(
             "some_user_id",
+            "some_project_id",
             "some_project_secret"
         )
 
@@ -157,9 +151,9 @@ class LoginRepositoryImplTest {
     fun afterSuccessfulAuthentication_shouldAddSessionEvent() = runBlockingTest {
         coEvery { mockProjectAuthenticator.authenticate(any(), any()) } returns Unit
 
-        repository.authenticate(
-            "some_project_id",
+        authenticationHelper.authenticateSafely(
             "some_user_id",
+            "some_project_id",
             "some_project_secret"
         )
 
@@ -172,9 +166,9 @@ class LoginRepositoryImplTest {
             mockProjectAuthenticator.authenticate(any(), any())
         } throws Throwable()
 
-        repository.authenticate(
-            "some_project_id",
+        authenticationHelper.authenticateSafely(
             "some_user_id",
+            "some_project_id",
             "some_project_secret"
         )
 
@@ -185,9 +179,9 @@ class LoginRepositoryImplTest {
     fun withSuccessfulAuthentication_shouldLogToCrashReport() = runBlockingTest {
         coEvery { mockProjectAuthenticator.authenticate(any(), any()) } returns Unit
 
-        repository.authenticate(
-            "some_project_id",
+        authenticationHelper.authenticateSafely(
             "some_user_id",
+            "some_project_id",
             "some_project_secret"
         )
 
@@ -204,9 +198,9 @@ class LoginRepositoryImplTest {
     fun withUnsuccessfulAuthentication_shouldLogToCrashReport() = runBlockingTest {
         coEvery { mockProjectAuthenticator.authenticate(any(), any()) } throws IOException()
 
-        repository.authenticate(
-            "some_project_id",
+        authenticationHelper.authenticateSafely(
             "some_user_id",
+            "some_project_id",
             "some_project_secret"
         )
 
@@ -221,9 +215,9 @@ class LoginRepositoryImplTest {
 
     @Test
     fun beforeAttemptingToAuthenticate_shouldLogToCrashReport() = runBlockingTest {
-        repository.authenticate(
-            "some_project_id",
+        authenticationHelper.authenticateSafely(
             "some_user_id",
+            "some_project_id",
             "some_project_secret"
         )
 
