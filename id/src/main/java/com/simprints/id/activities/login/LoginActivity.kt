@@ -24,10 +24,12 @@ import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_login.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class LoginActivity : AppCompatActivity(R.layout.activity_login) {
@@ -36,6 +38,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var loginActivityHelper: LoginActivityHelper
+    @Inject lateinit var baseUrlProvider: BaseUrlProvider
 
     private val loginActRequest: LoginActivityRequest by lazy {
         intent.extras?.getParcelable<LoginActivityRequest>(LoginActivityRequest.BUNDLE_KEY)
@@ -45,12 +48,11 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     private lateinit var progressDialog: SimProgressDialog
     private lateinit var viewModel: LoginViewModel
 
-    private var apiBaseUrl: String? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
 
+        baseUrlProvider.resetApiBaseUrl()
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
         initUI()
         observeSignInResult()
@@ -133,9 +135,10 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     private fun processQrScanResponse(response: Intent) {
         try {
             val qrCodeResponse = loginActivityHelper.tryParseQrCodeResponse(response)
+            Timber.d("QR code response: $qrCodeResponse")
             val projectId = qrCodeResponse.projectId
             val projectSecret = qrCodeResponse.projectSecret
-            apiBaseUrl = qrCodeResponse.apiBaseUrl
+            baseUrlProvider.setApiBaseUrl(qrCodeResponse.apiBaseUrl)
 
             updateProjectInfoOnTextFields(projectId, projectSecret)
             logMessageForCrashReport("QR scanning successful")
@@ -187,7 +190,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         else if (!areSuppliedProjectIdAndProjectIdFromIntentEqual)
             handleProjectIdMismatch()
         else
-            viewModel.signIn(projectId, userId, projectSecret, apiBaseUrl)
+            viewModel.signIn(projectId, userId, projectSecret)
     }
 
     private fun handleMissingCredentials() {

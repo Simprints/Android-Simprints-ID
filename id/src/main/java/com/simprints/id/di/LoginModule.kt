@@ -38,14 +38,12 @@ open class LoginModule {
         projectAuthenticator: ProjectAuthenticator,
         authenticationHelper: AuthenticationHelper,
         sessionEventsManager: SessionEventsManager,
-        timeHelper: TimeHelper,
-        baseUrlProvider: BaseUrlProvider
+        timeHelper: TimeHelper
     ): LoginRepository = LoginRepositoryImpl(
         projectAuthenticator,
         authenticationHelper,
         sessionEventsManager,
-        timeHelper,
-        baseUrlProvider
+        timeHelper
     )
 
     @Provides

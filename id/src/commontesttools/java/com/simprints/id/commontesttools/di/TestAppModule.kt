@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
@@ -53,7 +55,6 @@ class TestAppModule(
     private val sessionEventsManagerRule: DependencyRule = RealRule,
     private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
     private val simNetworkUtilsRule: DependencyRule = RealRule,
-    private val secureApiInterfaceRule: DependencyRule = RealRule,
     private val longConsentManagerRule: DependencyRule = RealRule,
     private val syncStatusDatabaseRule: DependencyRule = RealRule,
     private val deviceManagerRule: DependencyRule = RealRule,
@@ -67,8 +68,7 @@ class TestAppModule(
     private val cameraHelperRule: DependencyRule = RealRule,
     private val qrPreviewBuilderRule: DependencyRule = RealRule,
     private val qrCodeDetectorRule: DependencyRule = RealRule,
-    private val qrCodeProducerRule: DependencyRule = RealRule,
-    private val cameraFocusManagerRule: DependencyRule = RealRule
+    private val qrCodeProducerRule: DependencyRule = RealRule
 ) : AppModule() {
 
     override fun provideCrashManager(): CrashReportManager =
@@ -181,13 +181,13 @@ class TestAppModule(
 
     override fun provideRemoteSessionsManager(
         remoteDbManager: RemoteDbManager,
-        factory: SimApiClientFactory,
+        simApiClientFactory: SimApiClientFactory,
         baseUrlProvider: BaseUrlProvider
     ): RemoteSessionsManager =
         remoteSessionsManagerRule.resolveDependency {
             super.provideRemoteSessionsManager(
                 remoteDbManager,
-                factory,
+                simApiClientFactory,
                 baseUrlProvider
             )
         }

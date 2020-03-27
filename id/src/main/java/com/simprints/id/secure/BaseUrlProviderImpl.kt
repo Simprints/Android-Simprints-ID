@@ -24,4 +24,8 @@ class BaseUrlProviderImpl(
         settingsPreferencesManager.apiBaseUrl = newValue
     }
 
+    override fun resetApiBaseUrl() {
+        settingsPreferencesManager.apiBaseUrl = DEFAULT_BASE_URL
+    }
+
 }
