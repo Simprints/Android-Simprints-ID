@@ -4,16 +4,13 @@ import android.graphics.RectF
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.otaliastudios.cameraview.frame.Frame
-import com.simprints.core.data.analytics.AnalyticsManager
-import com.simprints.core.data.preferences.CameraPreferences
-import com.simprints.core.extensions.set
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
 import com.simprints.face.models.FaceTarget
 import com.simprints.face.models.SymmetricTarget
-import com.simprints.uicomponents.extensions.area
+import com.simprints.core.tools.extentions.area
 import com.simprints.uicomponents.models.FloatRange
 import com.simprints.uicomponents.models.Size
 
@@ -27,8 +24,6 @@ class LiveFeedbackFragmentViewModel(
         SymmetricTarget(VALID_ROLL_DELTA),
         FloatRange(0.25f, 0.5f)
     )
-    // TODO: get correct information from SimprintsID managers
-//    private val analyticsManager: AnalyticsManager
 
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturing = MutableLiveData<CapturingState>(CapturingState.NOT_STARTED)
