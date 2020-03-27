@@ -1,5 +1,7 @@
 package com.simprints.id
 
+import androidx.camera.camera2.Camera2Config
+import androidx.camera.core.CameraXConfig
 import androidx.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
@@ -18,7 +20,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import timber.log.Timber
 
-open class Application : MultiDexApplication() {
+open class Application : MultiDexApplication(), CameraXConfig.Provider {
 
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
@@ -64,6 +66,8 @@ open class Application : MultiDexApplication() {
         initFabric()
         handleUndeliverableExceptionInRxJava()
     }
+
+    override fun getCameraXConfig(): CameraXConfig = Camera2Config.defaultConfig()
 
     private fun initFabric() {
         val crashlyticsKit = Crashlytics.Builder()

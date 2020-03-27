@@ -39,7 +39,7 @@ class LongConsentRepositoryImplTest {
         longConsentRepository.setLanguage(DEFAULT_LANGUAGE)
 
         assertThat(longConsentRepository.language).isEqualTo(DEFAULT_LANGUAGE)
-        assertThat(longConsentRepository.longConsentText.value).isEqualTo(LONG_CONSENT_TEXT)
+        assertThat(longConsentRepository.longConsentTextLiveData.value).isEqualTo(LONG_CONSENT_TEXT)
     }
 
     @Test
@@ -49,7 +49,7 @@ class LongConsentRepositoryImplTest {
         longConsentRepository.setLanguage(DEFAULT_LANGUAGE)
 
         assertThat(longConsentRepository.language).isEqualTo(DEFAULT_LANGUAGE)
-        assertThat(longConsentRepository.longConsentText.value).isEmpty()
+        assertThat(longConsentRepository.longConsentTextLiveData.value).isEmpty()
     }
 
     @Test

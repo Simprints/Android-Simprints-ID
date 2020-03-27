@@ -7,9 +7,9 @@ import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyBlocking
 import com.simprints.id.activities.qrcapture.QrCaptureActivity.Companion.QR_RESULT_KEY
-import com.simprints.id.activities.qrcapture.tools.CameraBinder
+import com.simprints.id.activities.qrcapture.tools.CameraHelper
 
 const val VALID_QR_SCAN_RESULT = "mock_qr_code"
 const val INVALID_QR_SCAN_RESULT = ""
@@ -20,12 +20,12 @@ fun QrCaptureActivityAndroidTest.qrCaptureActivity(
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
     val activityScenario = ActivityScenario.launch(QrCaptureActivity::class.java)
 
-    return QrCaptureActivityRobot(activityScenario, mockCameraBinder).apply(block)
+    return QrCaptureActivityRobot(activityScenario, mockCameraHelper).apply(block)
 }
 
 class QrCaptureActivityRobot(
     private val activityScenario: ActivityScenario<QrCaptureActivity>,
-    private val mockCameraBinder: CameraBinder
+    private val mockCameraHelper: CameraHelper
 ) {
 
     infix fun pressBack(assertion: QrCaptureActivityAssertions.() -> Unit) {
@@ -35,18 +35,20 @@ class QrCaptureActivityRobot(
     }
 
     infix fun assert(assertion: QrCaptureActivityAssertions.() -> Unit) {
-        QrCaptureActivityAssertions(activityScenario, mockCameraBinder).run(assertion)
+        QrCaptureActivityAssertions(activityScenario, mockCameraHelper).run(assertion)
     }
 
 }
 
 class QrCaptureActivityAssertions(
     private val activityScenario: ActivityScenario<QrCaptureActivity>,
-    private val mockCameraBinder: CameraBinder
+    private val mockCameraHelper: CameraHelper
 ) {
 
     fun cameraIsStarted() {
-        verify(mockCameraBinder).bindToLifecycle(any(), any(), any())
+        verifyBlocking(mockCameraHelper) {
+            startCamera(any(), any(), any())
+        }
     }
 
     fun resultIsOk() {
