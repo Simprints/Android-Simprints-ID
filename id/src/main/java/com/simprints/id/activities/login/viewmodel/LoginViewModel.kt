@@ -14,9 +14,9 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
 
     fun getSignInResult(): LiveData<AuthenticationEvent.Result> = signInResultLiveData
 
-    fun signIn(projectId: String, userId: String, projectSecret: String, apiBaseUrl: String?) {
+    fun signIn(projectId: String, userId: String, projectSecret: String) {
         viewModelScope.launch {
-            val result = loginRepository.authenticate(projectId, userId, projectSecret, apiBaseUrl)
+            val result = loginRepository.authenticate(projectId, userId, projectSecret)
             signInResultLiveData.postValue(result)
         }
     }

@@ -48,16 +48,14 @@ class TestLoginModule(
         projectAuthenticator: ProjectAuthenticator,
         authenticationHelper: AuthenticationHelper,
         sessionEventsManager: SessionEventsManager,
-        timeHelper: TimeHelper,
-        baseUrlProvider: BaseUrlProvider
+        timeHelper: TimeHelper
     ): LoginRepository {
         return loginRepositoryRule.resolveDependency {
             super.provideLoginRepository(
                 projectAuthenticator,
                 authenticationHelper,
                 sessionEventsManager,
-                timeHelper,
-                baseUrlProvider
+                timeHelper
             )
         }
     }
