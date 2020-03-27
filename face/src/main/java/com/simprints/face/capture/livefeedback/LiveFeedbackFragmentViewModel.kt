@@ -4,13 +4,13 @@ import android.graphics.RectF
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.otaliastudios.cameraview.frame.Frame
+import com.simprints.core.tools.extentions.area
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
 import com.simprints.face.models.FaceTarget
 import com.simprints.face.models.SymmetricTarget
-import com.simprints.core.tools.extentions.area
 import com.simprints.uicomponents.models.FloatRange
 import com.simprints.uicomponents.models.Size
 
@@ -88,10 +88,6 @@ class LiveFeedbackFragmentViewModel(
         }
 
         currentDetection.value = faceDetection
-    }
-
-    private fun checkCurrentFaceLag() = currentDetection.value?.detectionTime?.let {
-        if ((System.currentTimeMillis() - it) > READY_STATE_LAG_MS) currentDetection.value = null
     }
 
     fun startCapture() {

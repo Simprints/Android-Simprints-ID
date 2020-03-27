@@ -71,7 +71,7 @@ class FaceCaptureViewModel : ViewModel() {
         // TODO: add analytics for FlowFinished(SUCCESS) and EndSession
 
         val results = captures.value?.mapIndexed { index, detection ->
-            FaceCaptureResult(index, detection)
+            FaceCaptureResult(index, detection.toFaceSample())
         } ?: listOf()
 
         flowFinished.send(FaceCaptureResponse(results))
