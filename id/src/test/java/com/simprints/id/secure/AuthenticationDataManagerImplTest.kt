@@ -20,7 +20,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.AutoCloseKoinTest
-import java.io.IOException
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -57,18 +56,6 @@ class AuthenticationDataManagerImplTest: AutoCloseKoinTest() {
             val actualAuthenticationData = makeTestRequestForAuthenticationData(apiClient.api)
 
             assertThat(actualAuthenticationData).isEqualTo(expectedAuthenticationData)
-        }
-    }
-
-    @Test
-    fun offline_shouldThrowAnException() {
-        runBlocking {
-            forceOkHttpToReturnSuccessfulResponse(apiClient.okHttpClientConfig)
-            val apiServiceMock = createMockServiceToFailRequests(apiClient.retrofit)
-
-            assertThrows<IOException> {
-                makeTestRequestForAuthenticationData(apiServiceMock)
-            }
         }
     }
 
