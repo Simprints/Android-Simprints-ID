@@ -8,7 +8,7 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
-import com.simprints.tools.LanguageResourcesHelper
+import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
 import kotlinx.android.synthetic.main.fragment_confirmation.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -16,7 +16,7 @@ import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 class ConfirmationFragment : Fragment() {
 
     private val mainVM: FaceCaptureViewModel by sharedViewModel()
-    private val languageResourcesHelper: LanguageResourcesHelper by inject()
+    private val androidResourcesHelper: FaceAndroidResourcesHelper by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,7 +29,7 @@ class ConfirmationFragment : Fragment() {
     }
 
     private fun setTextInLayout() {
-        with(languageResourcesHelper) {
+        with(androidResourcesHelper) {
             face_confirm_title.text = getString(R.string.title_confirmation)
             confirmation_txt.text = getString(R.string.captured_successfully)
             confirmation_btn.text = getString(R.string.btn_finish)
