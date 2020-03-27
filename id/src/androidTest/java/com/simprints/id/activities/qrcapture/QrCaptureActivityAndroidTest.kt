@@ -4,7 +4,7 @@ import android.Manifest.permission.CAMERA
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.id.Application
-import com.simprints.id.activities.qrcapture.tools.CameraBinder
+import com.simprints.id.activities.qrcapture.tools.CameraHelper
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
 import com.simprints.id.commontesttools.di.TestAppModule
@@ -24,7 +24,7 @@ class QrCaptureActivityAndroidTest {
 
     @get:Rule var grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(CAMERA)
 
-    var mockCameraBinder: CameraBinder = mock()
+    var mockCameraHelper: CameraHelper = mock()
 
     @MockK lateinit var mockQrPreviewBuilder: QrPreviewBuilder
     @MockK lateinit var mockQrCodeProducer: QrCodeProducer
@@ -35,8 +35,8 @@ class QrCaptureActivityAndroidTest {
     private val appModule by lazy {
         TestAppModule(
             app,
-            cameraBinderRule = DependencyRule.ReplaceRule {
-                mockCameraBinder
+            cameraHelperRule = DependencyRule.ReplaceRule {
+                mockCameraHelper
             },
             qrPreviewBuilderRule = DependencyRule.ReplaceRule {
                 mockQrPreviewBuilder
@@ -45,7 +45,8 @@ class QrCaptureActivityAndroidTest {
                 mockQrCodeProducer.apply {
                     every { qrCodeChannel } returns mockChannel
                 }
-            }
+            },
+            cameraFocusManagerRule = DependencyRule.MockkRule
         )
     }
 

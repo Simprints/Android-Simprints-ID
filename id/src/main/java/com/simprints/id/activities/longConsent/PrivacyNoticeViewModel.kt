@@ -6,12 +6,12 @@ import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import kotlinx.coroutines.launch
 
 class PrivacyNoticeViewModel(private val longConsentRepository: LongConsentRepository,
-                             val language: String): ViewModel() {
+                             private val language: String): ViewModel() {
 
-    val isDownloadSuccessful = longConsentRepository.isDownloadSuccessful
-    val downloadProgress = longConsentRepository.downloadProgress
+    val isDownloadSuccessfulLiveData = longConsentRepository.isDownloadSuccessfulLiveData
+    val downloadProgressLiveData = longConsentRepository.downloadProgressLiveData
 
-    val longConsentText = longConsentRepository.longConsentText
+    val longConsentTextLiveData = longConsentRepository.longConsentTextLiveData
 
     fun start() {
         longConsentRepository.setLanguage(language)
