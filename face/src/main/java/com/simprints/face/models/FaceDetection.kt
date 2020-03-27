@@ -1,6 +1,5 @@
 package com.simprints.face.models
 
-import com.simprints.core.data.database.models.FaceCapture
 import com.simprints.face.detection.Face
 import com.simprints.uicomponents.models.PreviewFrame
 
@@ -20,11 +19,4 @@ data class FaceDetection(
         TOOFAR
     }
 
-    fun toFaceCapture(id: String) =
-        FaceCapture(
-            id,
-            "",
-            face?.template ?: ByteArray(0),
-            face?.quality ?: Float.NEGATIVE_INFINITY
-        )
 }
