@@ -2,8 +2,12 @@ package com.simprints.face.orchestrator
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.face.activities.FaceCaptureActivity
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
+import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
+import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
+import com.simprints.face.data.moduleapi.face.responses.entities.Path
+import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.moduleapi.face.requests.IFaceCaptureRequest
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
 import com.simprints.testtools.common.livedata.testObserver
@@ -12,6 +16,7 @@ import io.mockk.mockk
 import io.mockk.spyk
 import org.junit.Rule
 import org.junit.Test
+import java.util.*
 
 class FaceOrchestratorViewModelTest {
     private val viewModel = spyk(FaceOrchestratorViewModel())
@@ -31,7 +36,7 @@ class FaceOrchestratorViewModelTest {
 
     @Test
     fun `return the correct response on finish`() {
-        viewModel.captureFinished(FaceCaptureActivity.generateFakeCaptureResponse())
+        viewModel.captureFinished(generateFakeCaptureResponse())
 
         viewModel.flowFinished.value?.let { liveData ->
             (liveData.peekContent() as IFaceCaptureResponse).capturingResult[0].let {
@@ -47,4 +52,15 @@ class FaceOrchestratorViewModelTest {
     private fun generateCaptureRequest(captures: Int) = mockk<IFaceCaptureRequest> {
         every { nFaceSamplesToCapture } returns captures
     }
+
+    private fun generateFakeCaptureResponse(): FaceCaptureResponse {
+        val securedImageRef = SecuredImageRef(
+            path = Path(arrayOf("file://someFile"))
+        )
+        val sample = FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef)
+        val result = FaceCaptureResult(0, sample)
+        val captureResults = listOf(result)
+        return FaceCaptureResponse(captureResults)
+    }
+
 }
