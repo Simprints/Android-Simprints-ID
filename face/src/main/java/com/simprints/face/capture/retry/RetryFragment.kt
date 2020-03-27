@@ -9,8 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
-import com.simprints.tools.LanguageResourcesHelper
-import kotlinx.android.synthetic.main.fragment_preparation.*
+import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
 import kotlinx.android.synthetic.main.fragment_retry.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -18,7 +17,7 @@ import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 class RetryFragment : Fragment() {
 
     private val mainVM: FaceCaptureViewModel by sharedViewModel()
-    private val languageResourcesHelper: LanguageResourcesHelper by inject()
+    private val androidResourcesHelper: FaceAndroidResourcesHelper by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,7 +30,7 @@ class RetryFragment : Fragment() {
     }
 
     private fun setTextInLayout() {
-        with(languageResourcesHelper) {
+        with(androidResourcesHelper) {
             retry_confirmation_title.text = getString(R.string.title_confirmation)
             retry_txt.text = getString(R.string.captured_unsuccessful)
             retry_tips_text.text = getString(R.string.retry_tips)
@@ -48,7 +47,7 @@ class RetryFragment : Fragment() {
             mainVM.willRetry()
         } else {
             layout_retry_tips.isVisible = false
-            retry_btn.text = languageResourcesHelper.getString(R.string.btn_finish)
+            retry_btn.text = androidResourcesHelper.getString(R.string.btn_finish)
             retry_btn.setOnClickListener { mainVM.flowFinished() }
             mainVM.retryFailed()
         }

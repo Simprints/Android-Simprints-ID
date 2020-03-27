@@ -15,6 +15,7 @@ import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
 import com.simprints.core.tools.extentions.setCheckedWithLeftDrawable
+import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
 import com.simprints.uicomponents.models.Size
 import kotlinx.android.synthetic.main.fragment_live_feedback.*
 import kotlinx.coroutines.launch
@@ -27,7 +28,7 @@ import com.simprints.uicomponents.R as UCR
 class LiveFeedbackFragment : Fragment() {
     private val mainVm: FaceCaptureViewModel by sharedViewModel()
     private val vm: LiveFeedbackFragmentViewModel by viewModel { parametersOf(mainVm) }
-    private val languageResourcesHelper: LanguageResourcesHelper by inject()
+    private val androidResourcesHelper: FaceAndroidResourcesHelper by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +46,7 @@ class LiveFeedbackFragment : Fragment() {
     }
 
     private fun setTextInLayout() {
-        with(languageResourcesHelper) {
+        with(androidResourcesHelper) {
             capture_title.text = getString(R.string.title_confirmation)
             capture_feedback_txt_title.text = getString(R.string.capture_title_previewing)
         }
@@ -62,17 +63,17 @@ class LiveFeedbackFragment : Fragment() {
                 LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED -> {
                     capture_overlay.drawSemiTransparentTarget()
                     capture_title.text =
-                        languageResourcesHelper.getString(R.string.title_preparation)
+                        androidResourcesHelper.getString(R.string.title_preparation)
                     capture_feedback_txt_title.text =
-                        languageResourcesHelper.getString(R.string.capture_prep_begin_btn)
+                        androidResourcesHelper.getString(R.string.capture_prep_begin_btn)
                     toggleCaptureButtons(false)
                 }
                 LiveFeedbackFragmentViewModel.CapturingState.CAPTURING -> {
                     prepareCapturingStateColors()
                     capture_progress.isVisible = true
-                    capture_title.text = languageResourcesHelper.getString(R.string.title_capturing)
+                    capture_title.text = androidResourcesHelper.getString(R.string.title_capturing)
                     capture_feedback_txt_title.text =
-                        languageResourcesHelper.getString(R.string.capture_prep_begin_btn_capturing)
+                        androidResourcesHelper.getString(R.string.capture_prep_begin_btn_capturing)
                     toggleCaptureButtons(false)
                 }
                 LiveFeedbackFragmentViewModel.CapturingState.FINISHED -> {
@@ -133,7 +134,7 @@ class LiveFeedbackFragment : Fragment() {
     }
 
     private fun renderValidFace() {
-        capture_feedback_txt_title.text = languageResourcesHelper.getString(R.string.capture_ready)
+        capture_feedback_txt_title.text = androidResourcesHelper.getString(R.string.capture_ready)
         capture_feedback_txt_explanation.text = null
 
         capture_feedback_txt_title.setCheckedWithLeftDrawable(
@@ -144,7 +145,7 @@ class LiveFeedbackFragment : Fragment() {
     }
 
     private fun renderValidCapturingFace() {
-        with(languageResourcesHelper) {
+        with(androidResourcesHelper) {
             capture_feedback_txt_title.text = getString(R.string.capture_prep_begin_btn_capturing)
             capture_feedback_txt_explanation.text = getString(R.string.capture_hold)
         }
@@ -158,7 +159,7 @@ class LiveFeedbackFragment : Fragment() {
     }
 
     private fun renderFaceTooFar() {
-        with(languageResourcesHelper) {
+        with(androidResourcesHelper) {
             capture_feedback_txt_title.text = getString(R.string.capture_title_face_too_far)
             capture_feedback_txt_explanation.text = getString(R.string.capture_error_face_too_far)
         }
@@ -170,7 +171,7 @@ class LiveFeedbackFragment : Fragment() {
     }
 
     private fun renderFaceTooClose() {
-        with(languageResourcesHelper) {
+        with(androidResourcesHelper) {
             capture_feedback_txt_title.text = getString(R.string.capture_title_too_close)
             capture_feedback_txt_explanation.text = getString(R.string.capture_error_face_too_close)
         }
@@ -182,7 +183,7 @@ class LiveFeedbackFragment : Fragment() {
     }
 
     private fun renderNoFace() {
-        with(languageResourcesHelper) {
+        with(androidResourcesHelper) {
             capture_feedback_txt_title.text = getString(R.string.capture_title_no_face)
             capture_feedback_txt_explanation.text = getString(R.string.capture_error_no_face)
         }
@@ -194,7 +195,7 @@ class LiveFeedbackFragment : Fragment() {
     }
 
     private fun renderFaceNotStraight() {
-        with(languageResourcesHelper) {
+        with(androidResourcesHelper) {
             capture_feedback_txt_title.text = getString(R.string.capture_title_look_straight)
             capture_feedback_txt_explanation.text = getString(R.string.capture_error_look_straight)
         }

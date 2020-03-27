@@ -1,5 +1,7 @@
 package com.simprints.face.di
 
+import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
+import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelperImpl
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.id.Application
 import org.koin.android.ext.koin.androidApplication
@@ -39,7 +41,7 @@ object KoinInjector {
         }
 
     private fun Module.defineBuildersForFaceManagers() {
-
+        factory<FaceAndroidResourcesHelper> { FaceAndroidResourcesHelperImpl(get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
