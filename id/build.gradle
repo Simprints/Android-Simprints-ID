@@ -135,18 +135,18 @@ dependencies {
     implementation deps.kotlin.anko
     api deps.kotlin.coroutines_android
     api deps.kotlin.coroutines_play_services
-    implementation deps.androidx.core
+    api deps.androidx.core
     api deps.androidx.multidex
     api deps.androidx.appcompat
     implementation deps.androidx.legacy
     implementation deps.androidx.room.core
     implementation deps.androidx.room.coroutines
-    implementation deps.androidx.lifecycle.ktx
-    implementation deps.androidx.lifecycle.ext
-    implementation deps.androidx.lifecycle.livedata
-    implementation deps.androidx.lifecycle.viewmodel
-    implementation deps.androidx.lifecycle.scope
-    implementation deps.androidx.ui.constraintlayout
+    api deps.androidx.lifecycle.ktx
+    api deps.androidx.lifecycle.ext
+    api deps.androidx.lifecycle.livedata
+    api deps.androidx.lifecycle.viewmodel
+    api deps.androidx.lifecycle.scope
+    api deps.androidx.ui.constraintlayout
     implementation deps.androidx.ui.cardview
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
