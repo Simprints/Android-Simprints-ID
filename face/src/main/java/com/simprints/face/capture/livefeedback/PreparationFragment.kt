@@ -4,14 +4,12 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.simprints.core.data.analytics.AnalyticsManager
 import com.simprints.face.R
 import com.simprints.tools.LanguageResourcesHelper
 import kotlinx.android.synthetic.main.fragment_preparation.detection_onboarding_frame
-import kotlinx.android.synthetic.main.fragment_static_preparation.*
 import org.koin.android.ext.android.inject
 
-class PreparationFragment : Fragment(R.layout.fragment_static_preparation) {
+class PreparationFragment : Fragment(R.layout.fragment_preparation) {
     private val languageResourcesHelper: LanguageResourcesHelper by inject()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

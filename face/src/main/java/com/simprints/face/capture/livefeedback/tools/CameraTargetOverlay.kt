@@ -5,7 +5,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
-import com.simprints.uicomponents.extensions.dpToPx
+import com.simprints.core.tools.extentions.dpToPx
 
 class CameraTargetOverlay(
     context: Context,

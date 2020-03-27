@@ -14,8 +14,7 @@ import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
-import com.simprints.tools.LanguageResourcesHelper
-import com.simprints.uicomponents.extensions.setCheckedWithLeftDrawable
+import com.simprints.core.tools.extentions.setCheckedWithLeftDrawable
 import com.simprints.uicomponents.models.Size
 import kotlinx.android.synthetic.main.fragment_live_feedback.*
 import kotlinx.coroutines.launch
@@ -24,7 +23,6 @@ import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import com.simprints.uicomponents.R as UCR
-
 
 class LiveFeedbackFragment : Fragment() {
     private val mainVm: FaceCaptureViewModel by sharedViewModel()
