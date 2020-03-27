@@ -47,10 +47,12 @@ class LongConsentRepositoryImpl(private val longConsentLocalDataSource: LongCons
     private fun isLongConsentPresentInLocal(language: String) =
         longConsentLocalDataSource.isLongConsentPresentInLocal(language)
 
-    private fun downloadLongConsentWithoutProgress(language: String) {
+    private suspend fun downloadLongConsentWithoutProgress(language: String) {
         firebaseStorage.maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
         val file = longConsentLocalDataSource.createFileForLanguage(language)
-        getFileDownloadTask(language, file).resume()
+        withContext(Dispatchers.IO) {
+            getFileDownloadTask(language, file).resume()
+        }
     }
 
     override suspend fun downloadLongConsentWithProgress() {
