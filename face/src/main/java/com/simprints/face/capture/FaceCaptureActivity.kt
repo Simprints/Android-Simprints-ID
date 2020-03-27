@@ -6,18 +6,17 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.otaliastudios.cameraview.frame.Frame
-import com.simprints.core.Actions
+import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.metadata.BeneficiaryMetadata
 import com.simprints.face.R
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
+import kotlinx.android.synthetic.main.activity_face_capture.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import com.otaliastudios.cameraview.frame.FrameProcessor as CameraViewFrameProcessor
-
 
 class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
 
@@ -35,14 +34,11 @@ class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
     }
 
     private fun bindViewModel() {
-        vm.onboardingExperience.observe(this, LiveDataEventWithContentObserver {
-            if (it == FaceCaptureViewModel.OnboardingExperience.STATIC)
-                findNavController(R.id.capture_host_fragment).navigate(R.id.action_blankFragment_to_staticPreparationFragment)
-            else
-                findNavController(R.id.capture_host_fragment).navigate(R.id.action_blankFragment_to_preparationFragment)
+        vm.onboardingExperience.observe(this, LiveDataEventObserver {
+            findNavController(R.id.capture_host_fragment).navigate(R.id.action_blankFragment_to_preparationFragment)
         })
 
-        vm.startCamera.observe(this, LiveDataEventWithContentObserver { startCamera(it) })
+        vm.startCamera.observe(this, LiveDataEventObserver { startCamera() })
 
         vm.processFrames.observe(this, LiveDataEventWithContentObserver {
             if (it) {

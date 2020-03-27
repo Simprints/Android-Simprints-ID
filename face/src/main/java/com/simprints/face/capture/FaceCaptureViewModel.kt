@@ -4,74 +4,53 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.otaliastudios.cameraview.frame.Frame
-import com.simprints.core.Path
-import com.simprints.core.data.analytics.AnalyticsManager
-import com.simprints.core.data.analytics.AnalyticsManager.Events.FACE_FLOW_TIME
-import com.simprints.core.data.analytics.AnalyticsManager.Events.RETRY
-import com.simprints.core.data.analytics.AnalyticsManager.Events.RETRY_FAIL
-import com.simprints.core.data.analytics.AnalyticsManager.Events.SUCCESS
-import com.simprints.core.data.images.ImageStoreManager
-import com.simprints.core.data.preferences.CameraPreferences
-import com.simprints.core.extensions.set
+import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.core.metadata.BeneficiaryMetadata
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.face.data.moduleapi.face.responses.entities.toFaceSample
 import com.simprints.face.models.FaceDetection
-import com.simprints.uicomponents.models.CameraOptions
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.launch
+import java.util.*
 
-class FaceCaptureViewModel(
-    private val beneficiaryMetadata: BeneficiaryMetadata?,
-    private val projectId: String,
-    private val sessionId: String,
-    private val cameraPreferences: CameraPreferences,
-    private val imageStoreManager: ImageStoreManager,
-    private val analyticsManager: AnalyticsManager
-) : ViewModel() {
+class FaceCaptureViewModel : ViewModel() {
+    // TODO: get correct information from SimprintsID managers
+    private val projectId: String = UUID.randomUUID().toString()
+    private val sessionId: String = UUID.randomUUID().toString()
+//    private val imageStoreManager: ImageStoreManager
+//    private val analyticsManager: AnalyticsManager
+
     val captures = MutableLiveData<List<FaceDetection>>()
     val processFrames: MutableLiveData<LiveDataEventWithContent<Boolean>> = MutableLiveData()
 
     val frameChannel = Channel<Frame>(CONFLATED)
 
-    val startCamera: MutableLiveData<LiveDataEventWithContent<CameraOptions>> = MutableLiveData()
+    val startCamera: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
-    val onboardingExperience: MutableLiveData<LiveDataEventWithContent<OnboardingExperience>> =
-        MutableLiveData()
+    val onboardingExperience: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
     val flowFinished: MutableLiveData<LiveDataEventWithContent<FaceCaptureResponse>> =
         MutableLiveData()
 
     private var retriesUsed: Int = 0
+
+    // TODO: get correct information from SimprintsID managers - cameraPreferences.retries
     val canRetry: Boolean
-        get() = retriesUsed++ < cameraPreferences.retries
-    private val qualityThreshold = cameraPreferences.qualityThreshold
-    var samplesToCapture = 10
+        get() = retriesUsed++ < 2
+
+    // TODO: get correct information from SimprintsID managers - cameraPreferences.qualityThreshold
+    private val qualityThreshold = -1
+    var samplesToCapture = 1
 
     init {
-        startCamera.set(
-            LiveDataEventWithContent(
-                CameraOptions(
-                    cameraPreferences.getFacingFront(),
-                    cameraPreferences.useFlash
-                )
-            )
-        )
-        onboardingExperience.set(
-            if (cameraPreferences.useStaticOnboarding)
-                LiveDataEventWithContent(OnboardingExperience.STATIC)
-            else
-                LiveDataEventWithContent(OnboardingExperience.TIMED)
-        )
-        viewModelScope.launch {
-            startNewAnalyticsSession()
-        }
+        startCamera.send()
+        onboardingExperience.send()
+        viewModelScope.launch { startNewAnalyticsSession() }
     }
 
     fun setupCapture(faceRequest: FaceRequest) {
@@ -83,18 +62,17 @@ class FaceCaptureViewModel(
     }
 
     fun startFaceDetection() {
-        processFrames.set(LiveDataEventWithContent(true))
+        processFrames.send(true)
     }
 
     fun stopFaceDetection() {
-        processFrames.set(LiveDataEventWithContent(false))
+        processFrames.send(false)
     }
 
     fun handlePreviewFrame(frame: Frame) = frameChannel.offer(frame)
 
     fun flowFinished() {
-        analyticsManager.faceFlowFinished(SUCCESS)
-        analyticsManager.endSession()
+        // TODO: add analytics for FlowFinished(SUCCESS) and EndSession
 
         val results = captures.value?.mapIndexed { index, detection ->
             FaceCaptureResult(index, detection.toFaceCapture(sessionId).toFaceSample())
@@ -105,31 +83,28 @@ class FaceCaptureViewModel(
 
     fun captureFinished(captures: List<FaceDetection>) {
         stopFaceDetection()
-        this.captures.set(captures)
+        this.captures.value = captures
         saveCaptures()
     }
 
     fun willRetry() {
-        analyticsManager.faceFlowFinished(RETRY)
+        // TODO: add analytics for FlowFinished(RETRY)
     }
 
     fun retryFailed() {
-        analyticsManager.faceFlowFinished(RETRY_FAIL)
+        // TODO: add analytics for FlowFinished(RETRY_FAIL)
     }
 
     private fun startNewAnalyticsSession() {
-        analyticsManager.startSession(FACE_FLOW_TIME)
+        // TODO: add analytics for StartSession
     }
 
     private fun saveCaptures() {
-        captures.value?.forEachIndexed { index, capture ->
-            saveImage(capture, Path.pathForFaceImage(projectId, sessionId, index))
-        }
+        captures.value?.forEachIndexed { index, capture -> saveImage(capture) }
     }
 
-    private fun saveImage(capture: FaceDetection, path: Path) {
-        imageStoreManager.storeImageBitmap(capture.frame.toBitmap(), path)
+    private fun saveImage(capture: FaceDetection) {
+        // TODO: use image manager to store the images
     }
 
-    enum class OnboardingExperience { TIMED, STATIC }
 }
