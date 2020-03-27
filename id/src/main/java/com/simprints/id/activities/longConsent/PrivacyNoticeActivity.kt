@@ -108,8 +108,16 @@ class PrivacyNoticeActivity : AppCompatActivity() {
 
     private fun setDownloadProgress(progress: Int) {
         longConsent_downloadButton.isEnabled = false
-        longConsent_downloadProgressBar.visibility = View.VISIBLE
+        hideProgressBarIfNecessary(progress)
         longConsent_downloadProgressBar.progress = progress
+    }
+
+    private fun hideProgressBarIfNecessary(progress: Int) {
+        if(progress == PROGRESS_COMPLETE) {
+            longConsent_downloadProgressBar.visibility = View.INVISIBLE
+        } else {
+            longConsent_downloadProgressBar.visibility = View.VISIBLE
+        }
     }
 
     private fun showDownloadErrorToast() {
@@ -118,5 +126,9 @@ class PrivacyNoticeActivity : AppCompatActivity() {
 
     private fun showUserOfflineToast() {
         showToast(androidResourcesHelper, R.string.login_no_network)
+    }
+
+    companion object {
+        private const val PROGRESS_COMPLETE = 100
     }
 }
