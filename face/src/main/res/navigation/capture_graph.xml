@@ -3,18 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/capture_graph"
-    app:startDestination="@id/blankFragment">
-
-    <fragment
-        android:id="@+id/blankFragment"
-        android:name="com.simprints.face.capture.BlankFragment"
-        android:label="fragment_blank">
-        <action
-            android:id="@+id/action_blankFragment_to_preparationFragment"
-            app:destination="@id/preparationFragment"
-            app:popUpTo="@+id/capture_graph"
-            app:popUpToInclusive="true" />
-    </fragment>
+    app:startDestination="@id/preparationFragment">
 
     <fragment
         android:id="@+id/preparationFragment"

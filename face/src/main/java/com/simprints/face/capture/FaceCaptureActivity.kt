@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
 import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
@@ -34,10 +33,6 @@ class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
     }
 
     private fun bindViewModel() {
-        vm.onboardingExperience.observe(this, LiveDataEventObserver {
-            findNavController(R.id.capture_host_fragment).navigate(R.id.action_blankFragment_to_preparationFragment)
-        })
-
         vm.startCamera.observe(this, LiveDataEventObserver { startCamera() })
 
         vm.processFrames.observe(this, LiveDataEventWithContentObserver {

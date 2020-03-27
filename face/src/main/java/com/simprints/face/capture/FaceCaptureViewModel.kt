@@ -32,8 +32,6 @@ class FaceCaptureViewModel : ViewModel() {
 
     val startCamera: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
-    val onboardingExperience: MutableLiveData<LiveDataEvent> = MutableLiveData()
-
     val flowFinished: MutableLiveData<LiveDataEventWithContent<FaceCaptureResponse>> =
         MutableLiveData()
 
@@ -49,7 +47,6 @@ class FaceCaptureViewModel : ViewModel() {
 
     init {
         startCamera.send()
-        onboardingExperience.send()
         viewModelScope.launch { startNewAnalyticsSession() }
     }
 
