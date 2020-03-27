@@ -4,8 +4,6 @@ import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.core.network.SimApiClientFactory
-import com.simprints.id.activities.login.repository.LoginRepository
-import com.simprints.id.activities.login.repository.LoginRepositoryImpl
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
@@ -29,22 +27,11 @@ open class LoginModule {
     open fun provideLoginActivityHelper(): LoginActivityHelper = LoginActivityHelperImpl()
 
     @Provides
-    open fun provideLoginViewModelFactory(loginRepository: LoginRepository): LoginViewModelFactory {
-        return LoginViewModelFactory(loginRepository)
+    open fun provideLoginViewModelFactory(
+        authenticationHelper: AuthenticationHelper
+    ): LoginViewModelFactory {
+        return LoginViewModelFactory(authenticationHelper)
     }
-
-    @Provides
-    open fun provideLoginRepository(
-        projectAuthenticator: ProjectAuthenticator,
-        authenticationHelper: AuthenticationHelper,
-        sessionEventsManager: SessionEventsManager,
-        timeHelper: TimeHelper
-    ): LoginRepository = LoginRepositoryImpl(
-        projectAuthenticator,
-        authenticationHelper,
-        sessionEventsManager,
-        timeHelper
-    )
 
     @Provides
     open fun provideProjectAuthenticator(
@@ -74,11 +61,17 @@ open class LoginModule {
     @Provides
     open fun provideAuthenticationHelper(
         crashReportManager: CrashReportManager,
-        loginInfoManager: LoginInfoManager
+        loginInfoManager: LoginInfoManager,
+        timeHelper: TimeHelper,
+        projectAuthenticator: ProjectAuthenticator,
+        sessionEventsManager: SessionEventsManager
     ): AuthenticationHelper {
-        return AuthenticationHelper(
+        return AuthenticationHelperImpl(
             crashReportManager,
-            loginInfoManager
+            loginInfoManager,
+            timeHelper,
+            projectAuthenticator,
+            sessionEventsManager
         )
     }
 

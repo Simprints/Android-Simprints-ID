@@ -3,13 +3,13 @@ package com.simprints.id.activities.login
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
 import com.simprints.id.Application
-import com.simprints.id.activities.login.repository.LoginRepository
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestLoginModule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
+import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class LoginActivityAndroidTest {
 
     @Inject lateinit var mockCrashReportManager: CrashReportManager
-    @Inject lateinit var mockRepository: LoginRepository
+    @Inject lateinit var mockAuthenticationHelper: AuthenticationHelper
 
     @MockK lateinit var mockLoginActivityHelper: LoginActivityHelper
 
@@ -36,12 +36,12 @@ class LoginActivityAndroidTest {
     private val loginModule by lazy {
         TestLoginModule(
             loginViewModelFactoryRule = DependencyRule.ReplaceRule {
-                LoginViewModelFactory(mockRepository)
+                LoginViewModelFactory(mockAuthenticationHelper)
             },
             loginActivityHelperRule = DependencyRule.ReplaceRule {
                 mockLoginActivityHelper
             },
-            loginRepositoryRule = DependencyRule.MockkRule
+            authenticationHelperRule = DependencyRule.MockkRule
         )
     }
 
@@ -264,7 +264,7 @@ class LoginActivityAndroidTest {
     }
 
     private fun mockAuthenticationResult(result: AuthenticationEvent.Result) {
-        coEvery { mockRepository.authenticate(any(), any(), any()) } returns result
+        coEvery { mockAuthenticationHelper.authenticateSafely(any(), any(), any()) } returns result
     }
 
 }
