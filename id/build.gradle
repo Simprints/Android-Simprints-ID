@@ -137,7 +137,7 @@ dependencies {
     api deps.kotlin.coroutines_play_services
     implementation deps.androidx.core
     api deps.androidx.multidex
-    implementation deps.androidx.appcompat
+    api deps.androidx.appcompat
     implementation deps.androidx.legacy
     implementation deps.androidx.room.core
     implementation deps.androidx.room.coroutines
