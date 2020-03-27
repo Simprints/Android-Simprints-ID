@@ -20,8 +20,6 @@ import com.simprints.uicomponents.models.Size
 class LiveFeedbackFragmentViewModel(
     private val mainVM: FaceCaptureViewModel,
     private val faceDetector: FaceDetector,
-    private val cameraPreferences: CameraPreferences,
-    private val analyticsManager: AnalyticsManager,
     private val frameProcessor: FrameProcessor
 ) : ViewModel() {
     private val faceTarget = FaceTarget(
@@ -29,13 +27,16 @@ class LiveFeedbackFragmentViewModel(
         SymmetricTarget(VALID_ROLL_DELTA),
         FloatRange(0.25f, 0.5f)
     )
+    // TODO: get correct information from SimprintsID managers
+//    private val analyticsManager: AnalyticsManager
 
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturing = MutableLiveData<CapturingState>(CapturingState.NOT_STARTED)
 
     val captures = mutableListOf<FaceDetection>()
 
-    private val qualityThreshold = cameraPreferences.qualityThreshold
+    // TODO: get correct information from SimprintsID managers - cameraPreferences.qualityThreshold
+    private val qualityThreshold = -1
 
     suspend fun process(
         frame: Frame,
@@ -46,7 +47,7 @@ class LiveFeedbackFragmentViewModel(
             frame,
             faceRectF,
             size,
-            cameraPreferences.getFacingFront()
+            false
         )
 
         val potentialFace = faceDetector.analyze(previewFrame)
@@ -91,15 +92,15 @@ class LiveFeedbackFragmentViewModel(
             }
         }
 
-        currentDetection.set(faceDetection)
+        currentDetection.value = faceDetection
     }
 
     private fun checkCurrentFaceLag() = currentDetection.value?.detectionTime?.let {
-        if ((System.currentTimeMillis() - it) > READY_STATE_LAG_MS) currentDetection.set(null)
+        if ((System.currentTimeMillis() - it) > READY_STATE_LAG_MS) currentDetection.value = null
     }
 
     fun startCapture() {
-        capturing.set(CapturingState.CAPTURING)
+        capturing.value = CapturingState.CAPTURING
     }
 
     private fun captureFinished() {
@@ -109,9 +110,9 @@ class LiveFeedbackFragmentViewModel(
             .filter { it.status == FaceDetection.Status.VALID_CAPTURING }
 
         if (bestCaptures.isEmpty() || bestCaptures.first().face?.quality ?: Float.NEGATIVE_INFINITY < qualityThreshold) {
-            capturing.set(CapturingState.FINISHED_FAILED)
+            capturing.value = CapturingState.FINISHED_FAILED
         } else {
-            capturing.set(CapturingState.FINISHED)
+            capturing.value = CapturingState.FINISHED
         }
     }
 

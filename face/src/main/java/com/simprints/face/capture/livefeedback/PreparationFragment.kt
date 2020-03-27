@@ -12,7 +12,6 @@ import kotlinx.android.synthetic.main.fragment_static_preparation.*
 import org.koin.android.ext.android.inject
 
 class PreparationFragment : Fragment(R.layout.fragment_static_preparation) {
-    private val analyticsManager: AnalyticsManager by inject()
     private val languageResourcesHelper: LanguageResourcesHelper by inject()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
