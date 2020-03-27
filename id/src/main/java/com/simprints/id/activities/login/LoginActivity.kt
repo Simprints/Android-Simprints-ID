@@ -190,7 +190,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         else if (!areSuppliedProjectIdAndProjectIdFromIntentEqual)
             handleProjectIdMismatch()
         else
-            viewModel.signIn(projectId, userId, projectSecret)
+            viewModel.signIn(userId, projectId, projectSecret)
     }
 
     private fun handleMissingCredentials() {
