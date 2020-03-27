@@ -22,8 +22,3 @@ data class SymmetricTarget(val value: Float) : Target {
     override operator fun contains(actualValue: Float): Boolean =
         abs(actualValue) < value
 }
-
-data class AsymmetricTarget(val startValue: Float, val endValueInclusive: Float) : Target {
-    override fun contains(actualValue: Float): Boolean =
-        actualValue > startValue && actualValue <= endValueInclusive
-}

@@ -11,7 +11,6 @@ import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
-import com.simprints.face.data.moduleapi.face.responses.entities.toFaceSample
 import com.simprints.face.models.FaceDetection
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
@@ -72,7 +71,7 @@ class FaceCaptureViewModel : ViewModel() {
         // TODO: add analytics for FlowFinished(SUCCESS) and EndSession
 
         val results = captures.value?.mapIndexed { index, detection ->
-            FaceCaptureResult(index, detection.toFaceCapture(sessionId).toFaceSample())
+            FaceCaptureResult(index, detection)
         } ?: listOf()
 
         flowFinished.send(FaceCaptureResponse(results))
