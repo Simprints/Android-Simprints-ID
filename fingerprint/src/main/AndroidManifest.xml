@@ -14,11 +14,6 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.connectalert.turnonscanner.TurnOnScannerActivity" />
-        <activity android:name=".activities.connectalert.serialentrypair.SerialEntryActivity" />
-        <activity android:name=".activities.connectalert.nfcpair.NfcPairActivity" />
-        <activity android:name=".activities.connectalert.nfcoff.NfcOffActivity" />
-        <activity android:name=".activities.connectalert.bluetoothoff.BluetoothOffActivity" />
         <activity
             android:name=".activities.orchestrator.OrchestratorActivity"
             android:launchMode="singleTop"
