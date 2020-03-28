@@ -103,7 +103,9 @@ class PeopleSyncIntegrationTest {
         mockServer.start()
         mockServer.dispatcher = mockDispatcher
 
-        val remotePeopleApi = SimApiClientFactory("deviceId", mockServer.url("/").toString()).build<PeopleRemoteInterface>().api
+        val remotePeopleApi = SimApiClientFactory("deviceId").build<PeopleRemoteInterface>(
+            mockServer.url("/").toString()
+        ).api
 
         coEvery { personRemoteDataSourceSpy.getPeopleApiClient() } returns remotePeopleApi
         every { downSyncScopeRepositorySpy.getDownSyncScope() } returns projectSyncScope

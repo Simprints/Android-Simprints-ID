@@ -3,6 +3,7 @@ package com.simprints.id.secure
 import androidx.annotation.VisibleForTesting
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.extentions.resumeSafely
 import com.simprints.core.tools.extentions.resumeWithExceptionSafely
 import com.simprints.core.tools.extentions.singleWithSuspend
@@ -22,8 +23,9 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 
 class ProjectAuthenticatorImpl(
-    secureApiClient: SecureApiInterface,
     loginInfoManager: LoginInfoManager,
+    simApiClientFactory: SimApiClientFactory,
+    baseUrlProvider: BaseUrlProvider,
     private val safetyNetClient: SafetyNetClient,
     private val secureDataManager: SecureLocalDbKeyProvider,
     private val projectRemoteDataSource: ProjectRemoteDataSource,
@@ -31,14 +33,22 @@ class ProjectAuthenticatorImpl(
     private val remoteConfigWrapper: RemoteConfigWrapper,
     private val longConsentManager: LongConsentManager,
     private val preferencesManager: PreferencesManager,
-    private val attestationManager: AttestationManager = AttestationManager(),
-    private val authenticationDataManager: AuthenticationDataManager = AuthenticationDataManager(secureApiClient)
+    private val attestationManager: AttestationManager = AttestationManager()
 ) : ProjectAuthenticator {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
 
-    private val authManager = AuthManager(secureApiClient)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal val authenticationDataManager by lazy {
+        AuthenticationDataManager(
+            simApiClientFactory.build<SecureApiInterface>(baseUrlProvider.getApiBaseUrl()).api
+        )
+    }
+
+    private val authManager = AuthManager(
+        simApiClientFactory.build<SecureApiInterface>(baseUrlProvider.getApiBaseUrl()).api
+    )
 
     override suspend fun authenticate(nonceScope: NonceScope, projectSecret: String) {
         suspendCancellableCoroutine<Unit> { continuation ->
