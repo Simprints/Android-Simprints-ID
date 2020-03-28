@@ -4,14 +4,14 @@ import java.io.IOException
 import java.util.*
 
 
-interface BluetoothComponentDevice {
+interface ComponentBluetoothDevice {
 
     val name: String
 
     fun isBonded(): Boolean
 
     @Throws(IOException::class)
-    fun createRfcommSocketToServiceRecord(uuid: UUID): BluetoothComponentSocket
+    fun createRfcommSocketToServiceRecord(uuid: UUID): ComponentBluetoothSocket
 
     val address: String
 }

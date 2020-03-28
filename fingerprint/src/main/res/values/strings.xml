@@ -29,6 +29,11 @@
     <string name="connect_scanner_wake_un20">Waking up UN20…</string>
     <string name="connect_scanner_setup">Setting up Vero…</string>
     <string name="connect_scanner_finished">Connected</string>
+    <!-- Scanner issue text -->
+    <!-- BluetoothOffFragment -->
+    <string name="bluetooth_off">Bluetooth off</string>
+    <string name="turn_on_bluetooth">Turn on Bluetooth</string>
+    <string name="bluetooth_on">✓ Bluetooth on</string>
 
 
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
