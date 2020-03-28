@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.connect.issuefragments.turnonscanner
+package com.simprints.fingerprint.activities.connect.issues.serialentrypair
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.simprints.fingerprint.R
 
-class TurnOnScannerFragment : Fragment() {
+class SerialEntryFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_turn_on_scanner, container, false)
+        inflater.inflate(R.layout.fragment_serial_entry, container, false)
 }

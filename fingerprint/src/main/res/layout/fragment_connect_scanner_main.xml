@@ -7,8 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/simprints_blue"
     android:orientation="vertical"
-    tools:context="com.simprints.fingerprint.activities.connect.ConnectScannerActivity"
-    tools:layout_editor_absoluteY="25dp">
+    tools:context="com.simprints.fingerprint.activities.connect.ConnectScannerActivity">
 
     <TextView
         android:id="@+id/connectScannerInfoTextView"

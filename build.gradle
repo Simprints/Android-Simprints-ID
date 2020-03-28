@@ -36,6 +36,10 @@ buildscript {
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.0"
         classpath "io.realm:realm-gradle-plugin:6.0.2"
+
+        // Android X Navigation components
+        def androidx_navigation_version = "2.3.0-alpha04"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$androidx_navigation_version"
     }
 }
 

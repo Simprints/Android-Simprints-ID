@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.connect.issuefragments.bluetoothoff
+package com.simprints.fingerprint.activities.connect.issues.nfcoff
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.simprints.fingerprint.R
 
-class BluetoothOffFragment : Fragment() {
+class NfcOffFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_bluetooth_off, container, false)
+        inflater.inflate(R.layout.fragment_nfc_off, container, false)
 }

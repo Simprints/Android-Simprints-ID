@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
+import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
@@ -16,6 +18,8 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprintscanner.v1.ScannerUtils.convertAddressToSerial
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
@@ -23,17 +27,20 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
-class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashReportManager,
-                              private val scannerManager: ScannerManager,
-                              private val timeHelper: FingerprintTimeHelper,
-                              private val sessionEventsManager: FingerprintSessionEventsManager,
-                              private val preferencesManager: FingerprintPreferencesManager,
-                              private val analyticsManager: FingerprintAnalyticsManager) : ViewModel() {
+class ConnectScannerViewModel(
+    private val crashReportManager: FingerprintCrashReportManager,
+    private val scannerManager: ScannerManager,
+    private val timeHelper: FingerprintTimeHelper,
+    private val sessionEventsManager: FingerprintSessionEventsManager,
+    private val preferencesManager: FingerprintPreferencesManager,
+    private val analyticsManager: FingerprintAnalyticsManager,
+    private val nfcAdapter: ComponentNfcAdapter) : ViewModel() {
 
     val progress: MutableLiveData<Int> = MutableLiveData(0)
     val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
     val vibrate = MutableLiveData<Unit?>(null)
 
+    val connectScannerIssue = MutableLiveData<ConnectScannerIssue?>(null)
     val launchAlert = MutableLiveData<FingerprintAlert?>(null)
     val finish = MutableLiveData<Unit?>(null)
 
@@ -50,6 +57,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
         progress.value = 0
         message.value = R.string.connect_scanner_bt_connect
         vibrate.value = null
+        connectScannerIssue.value = null
         launchAlert.value = null
         finish.value = null
         showScannerErrorDialogWithScannerId.value = null
@@ -110,17 +118,34 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
 
     private fun manageVeroErrors(it: Throwable) {
         Timber.d(it)
-        launchScannerAlertOrShowDialog(scannerManager.getAlertType(it))
+        launchAlertOrScannerIssueOrShowDialog(scannerManager.getAlertType(it))
         if (it !is FingerprintSafeException) {
             crashReportManager.logExceptionOrSafeException(it)
         }
     }
 
-    private fun launchScannerAlertOrShowDialog(alert: FingerprintAlert) {
-        if (alert == FingerprintAlert.DISCONNECTED) {
-            showScannerErrorDialogWithScannerId.postValue(scannerManager.lastPairedScannerId)
+    private fun launchAlertOrScannerIssueOrShowDialog(alert: FingerprintAlert) {
+        when (alert) {
+            BLUETOOTH_NOT_ENABLED -> connectScannerIssue.postValue(ConnectScannerIssue.BLUETOOTH_OFF)
+            NOT_PAIRED, MULTIPLE_PAIRED_SCANNERS -> launchAppropriatePairScannerIssue()
+            DISCONNECTED -> showScannerErrorDialogWithScannerId.postValue(scannerManager.lastPairedScannerId)
+            BLUETOOTH_NOT_SUPPORTED, LOW_BATTERY, UNEXPECTED_ERROR -> launchAlert.postValue(alert)
+        }
+    }
+
+    private fun launchAppropriatePairScannerIssue() {
+        val couldNotBeVero1 = !preferencesManager.scannerGenerations.contains(ScannerGeneration.VERO_1)
+        val deviceHasNfcAdapter = !nfcAdapter.isNull()
+        val nfcAdapterIsEnabled = !nfcAdapter.isNull() && nfcAdapter.isEnabled()
+
+        if (couldNotBeVero1 && deviceHasNfcAdapter) {
+            if (nfcAdapterIsEnabled) {
+                connectScannerIssue.postValue(ConnectScannerIssue.NFC_PAIR)
+            } else {
+                connectScannerIssue.postValue(ConnectScannerIssue.NFC_OFF)
+            }
         } else {
-            launchAlert.postValue(alert)
+            connectScannerIssue.postValue(ConnectScannerIssue.SERIAL_ENTRY_PAIR)
         }
     }
 
@@ -141,11 +166,11 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
     }
 
     fun handleScannerDisconnectedYesClick() {
-        launchAlert.postValue(FingerprintAlert.DISCONNECTED)
+        connectScannerIssue.postValue(ConnectScannerIssue.TURN_ON_SCANNER)
     }
 
     fun handleScannerDisconnectedNoClick() {
-        launchAlert.postValue(FingerprintAlert.NOT_PAIRED)
+        launchAppropriatePairScannerIssue()
     }
 
     private fun addBluetoothConnectivityEvent() {
