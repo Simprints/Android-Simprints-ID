@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.activities.connectalert.base
 
 import android.content.Intent
-import android.os.Bundle
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
