@@ -7,12 +7,12 @@ import com.simprints.fingerprint.scanner.exceptions.unexpected.NullScannerExcept
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.v1.ScannerUtils
 import io.reactivex.Completable
 import io.reactivex.Single
 
-class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAdapter,
+class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter,
                          private val scannerFactory: ScannerFactory) : ScannerManager {
 
     override var scanner: ScannerWrapper? = null

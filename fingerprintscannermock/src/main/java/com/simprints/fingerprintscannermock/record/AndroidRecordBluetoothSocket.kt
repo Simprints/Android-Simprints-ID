@@ -1,7 +1,7 @@
 package com.simprints.fingerprintscannermock.record
 
 import android.bluetooth.BluetoothSocket
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
 import org.apache.commons.io.input.TeeInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -9,7 +9,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 class AndroidRecordBluetoothSocket(private val socket: BluetoothSocket,
-                                   private val fileWithFakeBytes: String?): BluetoothComponentSocket {
+                                   private val fileWithFakeBytes: String?): ComponentBluetoothSocket {
 
     override fun connect() = socket.connect()
 

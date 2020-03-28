@@ -2,9 +2,9 @@ package com.simprints.fingerprintscanner.v1;
 
 import androidx.annotation.NonNull;
 
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter;
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentDevice;
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket;
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter;
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice;
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,13 +21,13 @@ class BluetoothConnection extends Thread {
     private final ScannerCallback callback;
     private String scannerId;
     private volatile MessageDispatcher msgDispatcher;
-    private volatile BluetoothComponentAdapter bluetoothAdapter;
-    private volatile BluetoothComponentSocket socket;
+    private volatile ComponentBluetoothAdapter bluetoothAdapter;
+    private volatile ComponentBluetoothSocket socket;
     private volatile boolean open;
 
     BluetoothConnection(@NonNull String macAddress,
                         @NonNull ScannerCallback callback,
-                        @NonNull BluetoothComponentAdapter bluetoothAdapter)
+                        @NonNull ComponentBluetoothAdapter bluetoothAdapter)
     {
         this.bluetoothAdapter = bluetoothAdapter;
         this.macAddress = macAddress;
@@ -51,7 +51,7 @@ class BluetoothConnection extends Thread {
             return;
         }
 
-        BluetoothComponentDevice device = bluetoothAdapter.getRemoteDevice(macAddress);
+        ComponentBluetoothDevice device = bluetoothAdapter.getRemoteDevice(macAddress);
         scannerId = device.getName();
 
         // Make sure the scanner is bonded to the phone

@@ -1,7 +1,7 @@
 package com.simprints.fingerprintscanner.v1
 
 import android.util.Log
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import java.math.BigInteger
 import java.util.regex.Pattern
 
@@ -83,7 +83,7 @@ object ScannerUtils {
 
 
         @JvmStatic
-        fun isBluetoothEnabled(bluetoothAdapter: BluetoothComponentAdapter): Boolean =
+        fun isBluetoothEnabled(bluetoothAdapter: ComponentBluetoothAdapter): Boolean =
             bluetoothAdapter.isEnabled()
 
         /**
@@ -92,7 +92,7 @@ object ScannerUtils {
          * @return a list of paired Simprint's scanners
          */
         @JvmStatic
-        fun getPairedScanners(bluetoothAdapter: BluetoothComponentAdapter): List<String> {
+        fun getPairedScanners(bluetoothAdapter: ComponentBluetoothAdapter): List<String> {
             val pairedScanners = arrayListOf<String>()
 
             for (device in bluetoothAdapter.getBondedDevices()) {
