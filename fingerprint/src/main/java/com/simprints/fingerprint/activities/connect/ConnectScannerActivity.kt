@@ -75,7 +75,7 @@ class ConnectScannerActivity : FingerprintActivity() {
                 ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
                 ResultCode.OK -> {
                     scannerErrorConfirmationDialog?.dismiss()
-                    viewModel.tryAgainFromErrorOrRefusal()
+                    viewModel.retryConnect()
                 }
             }
         }
