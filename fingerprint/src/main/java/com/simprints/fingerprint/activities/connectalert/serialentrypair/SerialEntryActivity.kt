@@ -8,6 +8,6 @@ class SerialEntryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_serial_entry)
+        setContentView(R.layout.fragment_serial_entry)
     }
 }

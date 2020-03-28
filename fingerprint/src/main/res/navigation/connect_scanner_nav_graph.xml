@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/connect_scanner_nav_graph"
+    app:startDestination="@id/connectScannerMainFragment">
+
+    <fragment
+        android:id="@+id/connectScannerMainFragment"
+        android:name="com.simprints.fingerprint.activities.connect.ConnectScannerMainFragment"
+        android:label="ConnectScannerMainFragment" />
+</navigation>

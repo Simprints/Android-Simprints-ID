@@ -8,6 +8,6 @@ class NfcPairActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_nfc_pair)
+        setContentView(R.layout.fragment_nfc_pair)
     }
 }

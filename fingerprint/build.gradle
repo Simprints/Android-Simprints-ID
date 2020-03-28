@@ -114,6 +114,11 @@ dependencies {
     implementation deps.androidx.ui.fragment
     implementation deps.arch_components.work
 
+    // Android X navigation components
+    implementation deps.androidx.navigation.fragment
+    implementation deps.androidx.navigation.ui
+    implementation deps.androidx.navigation.dynamicfeatures
+
     // RxJava
     implementation deps.rxjava2.permissions
     implementation deps.rxjava2.location
@@ -178,6 +183,9 @@ dependencies {
     androidTestImplementation deps.testing.androidx.rules
     androidTestUtil deps.testing.androidx.orchestrator
     androidTestImplementation deps.testing.live_data
+
+    // Android X navigation components
+    androidTestImplementation deps.testing.androidx.navigation
 
     // Mockito
     androidTestImplementation deps.testing.mockito.core

@@ -8,6 +8,6 @@ class TurnOnScannerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_turn_on_scanner)
+        setContentView(R.layout.fragment_turn_on_scanner)
     }
 }

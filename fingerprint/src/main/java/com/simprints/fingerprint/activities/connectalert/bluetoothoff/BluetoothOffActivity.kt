@@ -8,6 +8,6 @@ class BluetoothOffActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_bluetooth_off)
+        setContentView(R.layout.fragment_bluetooth_off)
     }
 }

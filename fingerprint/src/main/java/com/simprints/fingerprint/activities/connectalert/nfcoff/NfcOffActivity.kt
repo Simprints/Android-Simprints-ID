@@ -8,6 +8,6 @@ class NfcOffActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_nfc_off)
+        setContentView(R.layout.fragment_nfc_off)
     }
 }
