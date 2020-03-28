@@ -12,14 +12,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import kotlinx.android.synthetic.main.fragment_bluetooth_off.*
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class BluetoothOffFragment : Fragment() {
 
     private val bluetoothAdapter: ComponentBluetoothAdapter by inject()
+    private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
 
     private val bluetoothOnReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -74,7 +77,12 @@ class BluetoothOffFragment : Fragment() {
         turnOnBluetoothButton.isEnabled = false
         turnOnBluetoothButton.setText(R.string.bluetooth_on)
         turnOnBluetoothButton.setBackgroundColor(resources.getColor(R.color.simprints_green, null))
-        Handler().postDelayed({ findNavController().popBackStack() }, FINISHED_TIME_DELAY_MS)
+        Handler().postDelayed({ retryConnectAndFinishFragment() }, FINISHED_TIME_DELAY_MS)
+    }
+
+    private fun retryConnectAndFinishFragment() {
+        connectScannerViewModel.retryConnect()
+        findNavController().popBackStack()
     }
 
     companion object {

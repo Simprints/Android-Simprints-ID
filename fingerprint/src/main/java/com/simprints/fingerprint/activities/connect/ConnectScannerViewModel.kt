@@ -161,7 +161,7 @@ class ConnectScannerViewModel(
         finish.postValue(Unit)
     }
 
-    fun tryAgainFromErrorOrRefusal() {
+    fun retryConnect() {
         startSetup()
     }
 
