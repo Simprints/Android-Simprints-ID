@@ -2,11 +2,53 @@
 <navigation
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/connect_scanner_nav_graph"
     app:startDestination="@id/connectScannerMainFragment">
 
     <fragment
         android:id="@+id/connectScannerMainFragment"
         android:name="com.simprints.fingerprint.activities.connect.ConnectScannerMainFragment"
-        android:label="ConnectScannerMainFragment" />
+        android:label="ConnectScannerMainFragment" >
+        <action
+            android:id="@+id/action_connectScannerMainFragment_to_bluetoothOffFragment"
+            app:destination="@id/bluetoothOffFragment" />
+        <action
+            android:id="@+id/action_connectScannerMainFragment_to_nfcOffFragment"
+            app:destination="@id/nfcOffFragment" />
+        <action
+            android:id="@+id/action_connectScannerMainFragment_to_nfcPairFragment"
+            app:destination="@id/nfcPairFragment" />
+        <action
+            android:id="@+id/action_connectScannerMainFragment_to_turnOnScannerFragment"
+            app:destination="@id/turnOnScannerFragment" />
+        <action
+            android:id="@+id/action_connectScannerMainFragment_to_serialEntryFragment"
+            app:destination="@id/serialEntryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/bluetoothOffFragment"
+        android:name="com.simprints.fingerprint.activities.connect.issues.bluetoothoff.BluetoothOffFragment"
+        android:label="fragment_bluetooth_off"
+        tools:layout="@layout/fragment_bluetooth_off" />
+    <fragment
+        android:id="@+id/nfcOffFragment"
+        android:name="com.simprints.fingerprint.activities.connect.issues.nfcoff.NfcOffFragment"
+        android:label="fragment_nfc_off"
+        tools:layout="@layout/fragment_nfc_off" />
+    <fragment
+        android:id="@+id/nfcPairFragment"
+        android:name="com.simprints.fingerprint.activities.connect.issues.nfcpair.NfcPairFragment"
+        android:label="fragment_nfc_pair"
+        tools:layout="@layout/fragment_nfc_pair" />
+    <fragment
+        android:id="@+id/turnOnScannerFragment"
+        android:name="com.simprints.fingerprint.activities.connect.issues.turnonscanner.TurnOnScannerFragment"
+        android:label="fragment_turn_on_scanner"
+        tools:layout="@layout/fragment_turn_on_scanner" />
+    <fragment
+        android:id="@+id/serialEntryFragment"
+        android:name="com.simprints.fingerprint.activities.connect.issues.serialentrypair.SerialEntryFragment"
+        android:label="fragment_serial_entry"
+        tools:layout="@layout/fragment_serial_entry" />
 </navigation>

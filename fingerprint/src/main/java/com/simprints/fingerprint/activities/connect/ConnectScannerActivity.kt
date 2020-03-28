@@ -5,9 +5,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
+import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
@@ -41,8 +43,13 @@ class ConnectScannerActivity : FingerprintActivity() {
     }
 
     private fun observeLifecycleEvents() {
+        viewModel.connectScannerIssue.observe(this, Observer { it?.let { navigateToScannerIssueFragment(it) } })
         viewModel.launchAlert.observe(this, Observer { it?.let { launchAlert(this, it) } })
         viewModel.finish.observe(this, Observer { it?.let { continueToNextActivity() } })
+    }
+
+    private fun navigateToScannerIssueFragment(issue: ConnectScannerIssue) {
+        findNavController(R.id.nav_host_fragment).navigate(issue.navActionId)
     }
 
     override fun onPause() {

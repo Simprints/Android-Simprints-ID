@@ -2,6 +2,7 @@ package com.simprints.fingerprint.di
 
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
+import android.nfc.NfcAdapter
 import com.simprints.fingerprint.activities.alert.AlertContract
 import com.simprints.fingerprint.activities.alert.AlertPresenter
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
@@ -38,6 +39,8 @@ import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
+import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
+import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
 import org.koin.android.viewmodel.dsl.viewModel
@@ -97,6 +100,8 @@ object KoinInjector {
         single<ScannerFactory> { ScannerFactoryImpl(get(), get(), get(), get()) }
         single<ScannerManager> { ScannerManagerImpl(get(), get()) }
 
+        single<ComponentNfcAdapter> { AndroidNfcAdapter(NfcAdapter.getDefaultAdapter(get())) }
+
         factory { FinalResultBuilder() }
         factory { Orchestrator(get()) }
     }
@@ -113,7 +118,7 @@ object KoinInjector {
         }
 
         viewModel { OrchestratorViewModel(get(), get()) }
-        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
+        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
     }
 }
