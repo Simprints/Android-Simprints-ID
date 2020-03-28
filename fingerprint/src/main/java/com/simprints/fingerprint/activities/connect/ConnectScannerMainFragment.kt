@@ -13,11 +13,11 @@ import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAn
 import com.simprints.fingerprint.tools.Vibrate.vibrate
 import kotlinx.android.synthetic.main.fragment_connect_scanner_main.*
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class ConnectScannerMainFragment : Fragment() {
 
-    private val viewModel: ConnectScannerViewModel by viewModel()
+    private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
     private val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
 
     private var scannerErrorConfirmationDialog: AlertDialog? = null
@@ -31,24 +31,24 @@ class ConnectScannerMainFragment : Fragment() {
     }
 
     private fun observeScannerEvents() {
-        viewModel.progress.observe(this, Observer { connectScannerProgressBar.progress = it })
-        viewModel.message.observe(this, Observer { connectScannerInfoTextView.text = androidResourcesHelper.getString(it) })
-        viewModel.vibrate.observe(this, Observer { it?.let { vibrate(context!!) } })
-        viewModel.showScannerErrorDialogWithScannerId.observe(this, Observer { it?.let { showDialogForScannerErrorConfirmation(it) } })
+        connectScannerViewModel.progress.observe(this, Observer { connectScannerProgressBar.progress = it })
+        connectScannerViewModel.message.observe(this, Observer { connectScannerInfoTextView.text = androidResourcesHelper.getString(it) })
+        connectScannerViewModel.vibrate.observe(this, Observer { it?.let { vibrate(context!!) } })
+        connectScannerViewModel.showScannerErrorDialogWithScannerId.observe(this, Observer { it?.let { showDialogForScannerErrorConfirmation(it) } })
     }
 
     override fun onPause() {
         super.onPause()
-        viewModel.progress.removeObservers(this)
-        viewModel.message.removeObservers(this)
-        viewModel.vibrate.removeObservers(this)
-        viewModel.showScannerErrorDialogWithScannerId.removeObservers(this)
+        connectScannerViewModel.progress.removeObservers(this)
+        connectScannerViewModel.message.removeObservers(this)
+        connectScannerViewModel.vibrate.removeObservers(this)
+        connectScannerViewModel.showScannerErrorDialogWithScannerId.removeObservers(this)
     }
 
     private fun showDialogForScannerErrorConfirmation(scannerId: String) {
         scannerErrorConfirmationDialog = buildConfirmScannerErrorAlertDialog(scannerId).also {
             it.show()
-            viewModel.logScannerErrorDialogShownToCrashReport()
+            connectScannerViewModel.logScannerErrorDialogShownToCrashReport()
         }
     }
 
@@ -56,7 +56,7 @@ class ConnectScannerMainFragment : Fragment() {
         ConfirmScannerErrorBuilder()
             .build(
                 context!!, androidResourcesHelper, scannerId,
-                onYes = { viewModel.handleScannerDisconnectedYesClick() },
-                onNo = { viewModel.handleScannerDisconnectedNoClick() }
+                onYes = { connectScannerViewModel.handleScannerDisconnectedYesClick() },
+                onNo = { connectScannerViewModel.handleScannerDisconnectedNoClick() }
             )
 }

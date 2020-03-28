@@ -126,7 +126,7 @@ def fuzzywuzzy = [
 ]
 
 // Koin, Service Location
-def koin_version = "2.0.1"
+def koin_version = "2.1.5"
 def koin = [
     core     : "org.koin:koin-core:$koin_version",
     core_ext : "org.koin:koin-core-ext:$koin_version",

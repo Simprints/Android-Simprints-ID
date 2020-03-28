@@ -117,7 +117,6 @@ dependencies {
     // Android X navigation components
     implementation deps.androidx.navigation.fragment
     implementation deps.androidx.navigation.ui
-    implementation deps.androidx.navigation.dynamicfeatures
 
     // RxJava
     implementation deps.rxjava2.permissions
