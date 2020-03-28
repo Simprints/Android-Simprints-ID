@@ -49,11 +49,19 @@ class ConnectScannerActivity : FingerprintActivity() {
     }
 
     private fun navigateToScannerIssueFragment(issue: ConnectScannerIssue) {
-        findNavController(R.id.nav_host_fragment).navigate(issue.navActionId)
+        val action = when (issue) {
+            ConnectScannerIssue.BLUETOOTH_OFF -> R.id.action_connectScannerMainFragment_to_bluetoothOffFragment
+            ConnectScannerIssue.NFC_OFF -> R.id.action_connectScannerMainFragment_to_nfcOffFragment
+            ConnectScannerIssue.NFC_PAIR -> R.id.action_connectScannerMainFragment_to_nfcPairFragment
+            ConnectScannerIssue.SERIAL_ENTRY_PAIR -> R.id.action_connectScannerMainFragment_to_serialEntryFragment
+            ConnectScannerIssue.TURN_ON_SCANNER -> R.id.action_connectScannerMainFragment_to_turnOnScannerFragment
+        }
+        findNavController(R.id.nav_host_fragment).navigate(action)
     }
 
     override fun onPause() {
         super.onPause()
+        viewModel.connectScannerIssue.removeObservers(this)
         viewModel.launchAlert.removeObservers(this)
         viewModel.finish.removeObservers(this)
     }
