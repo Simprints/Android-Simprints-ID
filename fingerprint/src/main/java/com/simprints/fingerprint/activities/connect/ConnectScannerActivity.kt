@@ -10,17 +10,21 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
+import com.simprints.fingerprint.activities.connect.issues.nfcoff.NfcOffFragment
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForConnectScannerActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
+import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class ConnectScannerActivity : FingerprintActivity() {
 
     private val viewModel: ConnectScannerViewModel by viewModel()
+    private val nfcAdapter: ComponentNfcAdapter by inject()
 
     private var scannerErrorConfirmationDialog: AlertDialog? = null
 
@@ -43,7 +47,10 @@ class ConnectScannerActivity : FingerprintActivity() {
     }
 
     private fun observeLifecycleEvents() {
-        viewModel.connectScannerIssue.observe(this, Observer { it?.let { navigateToScannerIssueFragment(it) } })
+        viewModel.connectScannerIssue.observe(this, Observer { it?.let {
+            viewModel.connectScannerIssue.value = null
+            navigateToScannerIssueFragment(it)
+        } })
         viewModel.launchAlert.observe(this, Observer { it?.let { launchAlert(this, it) } })
         viewModel.finish.observe(this, Observer { it?.let { continueToNextActivity() } })
     }
@@ -78,6 +85,12 @@ class ConnectScannerActivity : FingerprintActivity() {
                     viewModel.retryConnect()
                 }
             }
+        } else if (requestCode == NfcOffFragment.REQUEST_ENABLE_NFC) {
+//            if (nfcAdapter.isEnabled()) {
+//                findNavController(R.id.nav_host_fragment).navigate(R.id.action_connectScannerMainFragment_to_nfcPairFragment)
+//            } else {
+//                findNavController(R.id.nav_host_fragment).navigate(R.id.action_connectScannerMainFragment_to_nfcOffFragment)
+//            }
         }
     }
 

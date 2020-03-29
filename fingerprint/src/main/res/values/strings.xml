@@ -34,6 +34,10 @@
     <string name="bluetooth_off">Bluetooth off</string>
     <string name="turn_on_bluetooth">Turn on Bluetooth</string>
     <string name="bluetooth_on">✓ Bluetooth on</string>
+    <!-- NfcOffFragment -->
+    <string name="nfc_off">NFC off</string>
+    <string name="turn_on_nfc">Turn on NFC</string>
+    <string name="nfc_on">✓ NFC on</string>
 
 
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
