@@ -13,11 +13,7 @@ class SerialEntryPairViewModel(
 
     fun startPairing(serialNumber: String) {
         val macAddress = scannerPairingManager.convertSerialNumberToAddress(serialNumber)
-        val couldStartPairing = scannerPairingManager.pairOnlyToDevice(macAddress)
-        if (couldStartPairing) {
-            isAwaitingPairSerialNumber.postValue(macAddress)
-        } else {
-            toastMessage.postValue("Could not pair to device. Please pair manually.")
-        }
+        scannerPairingManager.pairOnlyToDevice(macAddress)
+        isAwaitingPairSerialNumber.postValue(macAddress)
     }
 }
