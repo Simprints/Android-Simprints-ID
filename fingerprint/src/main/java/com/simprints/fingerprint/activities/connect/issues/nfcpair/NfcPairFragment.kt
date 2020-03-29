@@ -1,8 +1,5 @@
 package com.simprints.fingerprint.activities.connect.issues.nfcpair
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Paint
 import android.os.Bundle
@@ -27,27 +24,16 @@ import org.koin.android.viewmodel.ext.android.viewModel
 
 class NfcPairFragment : Fragment() {
 
-    private val bluetoothPairStateChangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
-            if (intent.action == ComponentBluetoothDevice.ACTION_BOND_STATE_CHANGED) {
-                val bondState = intent.getIntExtra(ComponentBluetoothDevice.EXTRA_BOND_STATE, ComponentBluetoothDevice.BOND_NONE)
-                val reason = intent.getIntExtra(ComponentBluetoothDevice.EXTRA_REASON, ComponentBluetoothDevice.BOND_SUCCESS)
-                val pairSucceeded = bondState == ComponentBluetoothDevice.BOND_BONDED
-                val pairingFailed = bondState == ComponentBluetoothDevice.BOND_NONE && reason != ComponentBluetoothDevice.BOND_SUCCESS
-                if (pairSucceeded) {
-                    checkIfNowBondedToSingleScannerThenProceed()
-                } else if (pairingFailed) {
-                    handlePairingAttemptFailed()
-                }
-            }
-        }
-    }
-
     private val nfcAdapter: ComponentNfcAdapter by inject()
     private val scannerPairingManager: ScannerPairingManager by inject()
 
     private val viewModel: NfcPairViewModel by viewModel()
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
+
+    private val bluetoothPairStateChangeReceiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
+        onPairSuccess = ::checkIfNowBondedToSingleScannerThenProceed,
+        onPairFailed = ::handlePairingAttemptFailed
+    )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_nfc_pair, container, false)
@@ -55,10 +41,13 @@ class NfcPairFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        activity?.registerReceiver(bluetoothPairStateChangeReceiver, IntentFilter(ComponentBluetoothDevice.ACTION_BOND_STATE_CHANGED))
-
         couldNotPairTextView.paintFlags = couldNotPairTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         couldNotPairTextView.setOnClickListener { goToSerialEntryPair() }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        activity?.registerReceiver(bluetoothPairStateChangeReceiver, IntentFilter(ComponentBluetoothDevice.ACTION_BOND_STATE_CHANGED))
     }
 
     override fun onResume() {
@@ -87,8 +76,8 @@ class NfcPairFragment : Fragment() {
         viewModel.isAwaitingPairMacAddress.removeObservers(this)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onStop() {
+        super.onStop()
         activity?.unregisterReceiver(bluetoothPairStateChangeReceiver)
     }
 

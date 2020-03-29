@@ -27,13 +27,15 @@
 
     <EditText
         android:id="@+id/serialEntryEditText"
-        android:layout_width="160dp"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="30dp"
+        android:layout_marginEnd="50dp"
         android:ems="10"
+        android:imeOptions="actionDone"
         android:inputType="numberSigned"
         android:textColor="@color/simprints_white"
         android:textSize="26sp"
+        android:maxLength="6"
         app:layout_constraintBottom_toBottomOf="@id/serialEntryOkButton"
         app:layout_constraintEnd_toStartOf="@id/serialEntryOkButton"
         app:layout_constraintHorizontal_bias="0.5"
@@ -42,7 +44,7 @@
         tools:ignore="Autofill,LabelFor" />
 
     <ProgressBar
-        android:id="@+id/turnOnScannerProgressBar"
+        android:id="@+id/serialEntryPairProgressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -68,7 +70,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/serialEntryPairTitleTextView"
-        app:layout_constraintVertical_weight="0.1" />
+        app:layout_constraintVertical_weight="0.3" />
 
     <TextView
         android:id="@+id/serialEntryPairTitleTextView"
@@ -124,6 +126,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.4" />
+        app:layout_constraintGuide_percent="0.45" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
