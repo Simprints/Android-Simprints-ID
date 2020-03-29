@@ -23,8 +23,8 @@
             android:id="@+id/action_connectScannerMainFragment_to_turnOnScannerFragment"
             app:destination="@id/turnOnScannerFragment" />
         <action
-            android:id="@+id/action_connectScannerMainFragment_to_serialEntryFragment"
-            app:destination="@id/serialEntryFragment" />
+            android:id="@+id/action_connectScannerMainFragment_to_serialEntryPairFragment"
+            app:destination="@id/serialEntryPairFragment" />
     </fragment>
     <fragment
         android:id="@+id/bluetoothOffFragment"
@@ -41,8 +41,8 @@
         android:label="fragment_nfc_off"
         tools:layout="@layout/fragment_nfc_off" >
         <action
-            android:id="@+id/action_nfcOffFragment_to_serialEntryFragment"
-            app:destination="@id/serialEntryFragment" />
+            android:id="@+id/action_nfcOffFragment_to_serialEntryPairFragment"
+            app:destination="@id/serialEntryPairFragment" />
         <action
             android:id="@+id/action_nfcOffFragment_to_nfcPairFragment"
             app:destination="@id/nfcPairFragment" />
@@ -55,6 +55,9 @@
         <action
             android:id="@+id/action_nfcPairFragment_to_connectScannerMainFragment"
             app:destination="@id/connectScannerMainFragment" />
+        <action
+            android:id="@+id/action_nfcPairFragment_to_serialEntryPairFragment"
+            app:destination="@id/serialEntryPairFragment" />
     </fragment>
     <fragment
         android:id="@+id/turnOnScannerFragment"
@@ -62,12 +65,12 @@
         android:label="fragment_scanner_off"
         tools:layout="@layout/fragment_scanner_off" />
     <fragment
-        android:id="@+id/serialEntryFragment"
-        android:name="com.simprints.fingerprint.activities.connect.issues.serialentrypair.SerialEntryFragment"
-        android:label="fragment_serial_entry"
-        tools:layout="@layout/fragment_serial_entry" >
+        android:id="@+id/serialEntryPairFragment"
+        android:name="com.simprints.fingerprint.activities.connect.issues.serialentrypair.SerialEntryPairFragment"
+        android:label="fragment_serial_entry_pair"
+        tools:layout="@layout/fragment_serial_entry_pair" >
         <action
-            android:id="@+id/action_serialEntryFragment_to_connectScannerMainFragment"
+            android:id="@+id/action_serialEntryPairFragment_to_connectScannerMainFragment"
             app:destination="@id/connectScannerMainFragment" />
     </fragment>
 </navigation>
