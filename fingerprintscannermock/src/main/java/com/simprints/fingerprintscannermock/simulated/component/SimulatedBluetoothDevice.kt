@@ -9,7 +9,7 @@ import java.util.*
 class SimulatedBluetoothDevice(private val simulatedScannerManager: SimulatedScannerManager,
                                macAddress: String) : ComponentBluetoothDevice {
 
-    override var name: String = simulatedScannerManager.deviceName
+    override var name: String? = simulatedScannerManager.deviceName
 
     override fun isBonded(): Boolean = simulatedScannerManager.isDeviceBonded
 

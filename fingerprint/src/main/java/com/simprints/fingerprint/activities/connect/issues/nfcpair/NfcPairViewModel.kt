@@ -19,10 +19,11 @@ class NfcPairViewModel(
     fun handleNfcTagDetected(tag: ComponentNfcTag?) {
         try {
             val mifare = nfcAdapter.getMifareUltralight(tag)
-            val scannerMacAddress = mifare?.readScannerMacAddress() ?: throw IllegalArgumentException("Empty tag")
-            val couldStartPairing = scannerPairingManager.pairOnlyToDevice(scannerMacAddress)
+            val macAddress = mifare?.readScannerMacAddress() ?: throw IllegalArgumentException("Empty tag")
+            val couldStartPairing = scannerPairingManager.pairOnlyToDevice(macAddress)
             if (couldStartPairing) {
-                isAwaitingPairScannerSerialNumber.postValue(scannerMacAddress)
+                val serialNumber = scannerPairingManager.convertAddressToSerialNumber(macAddress)
+                isAwaitingPairScannerSerialNumber.postValue(serialNumber)
             } else {
                 toastMessage.postValue("Could not pair to device. Please pair manually.")
             }

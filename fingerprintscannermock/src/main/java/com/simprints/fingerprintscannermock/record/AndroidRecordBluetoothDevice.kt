@@ -8,7 +8,7 @@ import java.util.*
 class AndroidRecordBluetoothDevice(private val device: BluetoothDevice,
                                    private val fileWithFakeBytes: String?) : ComponentBluetoothDevice {
 
-    override val name: String = device.name
+    override val name: String? = device.name
 
     override fun isBonded(): Boolean = device.bondState == BluetoothDevice.BOND_BONDED
 

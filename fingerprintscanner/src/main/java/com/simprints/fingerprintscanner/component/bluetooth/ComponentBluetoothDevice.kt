@@ -6,7 +6,7 @@ import java.util.*
 
 interface ComponentBluetoothDevice {
 
-    val name: String
+    val name: String?
 
     fun isBonded(): Boolean
 
