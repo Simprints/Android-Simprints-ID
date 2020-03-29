@@ -42,6 +42,7 @@ class ConnectScannerViewModel(
 
     val connectScannerIssue = MutableLiveData<ConnectScannerIssue?>(null)
     val launchAlert = MutableLiveData<FingerprintAlert?>(null)
+    val scannerConnected = MutableLiveData<Boolean?>(null)
     val finish = MutableLiveData<Unit?>(null)
 
     val showScannerErrorDialogWithScannerId = MutableLiveData<String?>(null)
@@ -59,6 +60,7 @@ class ConnectScannerViewModel(
         vibrate.value = null
         connectScannerIssue.value = null
         launchAlert.value = null
+        scannerConnected.value = null
         finish.value = null
         showScannerErrorDialogWithScannerId.value = null
         setupFlow?.dispose()
@@ -158,7 +160,7 @@ class ConnectScannerViewModel(
         preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.firmwareVersion.toString()
         analyticsManager.logScannerProperties(scannerManager.lastPairedMacAddress
             ?: "", scannerManager.lastPairedScannerId ?: "")
-        finish.postValue(Unit)
+        scannerConnected.postValue(true)
     }
 
     fun retryConnect() {
@@ -166,7 +168,7 @@ class ConnectScannerViewModel(
     }
 
     fun handleScannerDisconnectedYesClick() {
-        connectScannerIssue.postValue(ConnectScannerIssue.TURN_ON_SCANNER)
+        connectScannerIssue.postValue(ConnectScannerIssue.SCANNER_OFF)
     }
 
     fun handleScannerDisconnectedNoClick() {

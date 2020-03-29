@@ -5,5 +5,5 @@ enum class ConnectScannerIssue {
     NFC_OFF,
     NFC_PAIR,
     SERIAL_ENTRY_PAIR,
-    TURN_ON_SCANNER
+    SCANNER_OFF
 }

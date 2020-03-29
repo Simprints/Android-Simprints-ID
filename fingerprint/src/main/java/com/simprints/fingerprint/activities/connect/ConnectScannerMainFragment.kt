@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.connect.confirmscannererror.ConfirmScannerErrorBuilder
+import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.tools.Vibrate.vibrate
 import kotlinx.android.synthetic.main.fragment_connect_scanner_main.*
@@ -27,7 +29,23 @@ class ConnectScannerMainFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        observeLifecycleEvents()
         observeScannerEvents()
+    }
+
+    private fun observeLifecycleEvents() {
+        connectScannerViewModel.connectScannerIssue.observe(this, Observer {
+            it?.let {
+                // Set to null so it is cleared when we return to this fragment
+                connectScannerViewModel.connectScannerIssue.value = null
+                navigateToScannerIssueFragment(it)
+            }
+        })
+        connectScannerViewModel.scannerConnected.observe(this, Observer {
+            if (it == true) {
+                connectScannerViewModel.finish.postValue(Unit)
+            }
+        })
     }
 
     private fun observeScannerEvents() {
@@ -39,10 +57,23 @@ class ConnectScannerMainFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
+        connectScannerViewModel.connectScannerIssue.removeObservers(this)
+        connectScannerViewModel.scannerConnected.removeObservers(this)
         connectScannerViewModel.progress.removeObservers(this)
         connectScannerViewModel.message.removeObservers(this)
         connectScannerViewModel.vibrate.removeObservers(this)
         connectScannerViewModel.showScannerErrorDialogWithScannerId.removeObservers(this)
+    }
+
+    private fun navigateToScannerIssueFragment(issue: ConnectScannerIssue) {
+        val action = when (issue) {
+            ConnectScannerIssue.BLUETOOTH_OFF -> R.id.action_connectScannerMainFragment_to_bluetoothOffFragment
+            ConnectScannerIssue.NFC_OFF -> R.id.action_connectScannerMainFragment_to_nfcOffFragment
+            ConnectScannerIssue.NFC_PAIR -> R.id.action_connectScannerMainFragment_to_nfcPairFragment
+            ConnectScannerIssue.SERIAL_ENTRY_PAIR -> R.id.action_connectScannerMainFragment_to_serialEntryFragment
+            ConnectScannerIssue.SCANNER_OFF -> R.id.action_connectScannerMainFragment_to_turnOnScannerFragment
+        }
+        findNavController().navigate(action)
     }
 
     private fun showDialogForScannerErrorConfirmation(scannerId: String) {
