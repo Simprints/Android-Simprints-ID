@@ -13,6 +13,16 @@ class SimulatedBluetoothDevice(private val simulatedScannerManager: SimulatedSca
 
     override fun isBonded(): Boolean = simulatedScannerManager.isDeviceBonded
 
+    override fun createBond(): Boolean {
+        simulatedScannerManager.isDeviceBonded = true
+        return true
+    }
+
+    override fun removeBond(): Boolean {
+        simulatedScannerManager.isDeviceBonded = false
+        return true
+    }
+
     override fun createRfcommSocketToServiceRecord(uuid: UUID): ComponentBluetoothSocket =
         SimulatedBluetoothSocket(simulatedScannerManager)
 

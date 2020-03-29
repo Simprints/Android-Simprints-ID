@@ -10,6 +10,7 @@ import com.simprints.fingerprint.activities.collect.CollectFingerprintsContract
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
+import com.simprints.fingerprint.activities.connect.issues.nfcpair.NfcPairViewModel
 import com.simprints.fingerprint.activities.matching.MatchingViewModel
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorViewModel
 import com.simprints.fingerprint.activities.refusal.RefusalContract
@@ -36,6 +37,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBu
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.ScannerPairingManager
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
@@ -97,8 +99,9 @@ object KoinInjector {
     private fun Module.defineBuildersForDomainClasses() {
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
+        single { ScannerPairingManager(get()) }
         single<ScannerFactory> { ScannerFactoryImpl(get(), get(), get(), get()) }
-        single<ScannerManager> { ScannerManagerImpl(get(), get()) }
+        single<ScannerManager> { ScannerManagerImpl(get(), get(), get()) }
 
         single<ComponentNfcAdapter> { AndroidNfcAdapter(NfcAdapter.getDefaultAdapter(get())) }
 
@@ -120,5 +123,6 @@ object KoinInjector {
         viewModel { OrchestratorViewModel(get(), get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
+        viewModel { NfcPairViewModel(get(), get()) }
     }
 }

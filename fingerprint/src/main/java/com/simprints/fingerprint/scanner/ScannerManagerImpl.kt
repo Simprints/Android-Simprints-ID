@@ -8,12 +8,12 @@ import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIss
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
-import com.simprints.fingerprintscanner.v1.ScannerUtils
 import io.reactivex.Completable
 import io.reactivex.Single
 
 class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter,
-                         private val scannerFactory: ScannerFactory) : ScannerManager {
+                         private val scannerFactory: ScannerFactory,
+                         private val pairingManager: ScannerPairingManager) : ScannerManager {
 
     override var scanner: ScannerWrapper? = null
     override var lastPairedScannerId: String? = null
@@ -32,7 +32,7 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
         scanner?.method() ?: throw NullScannerException()
 
     override fun initScanner(): Completable = Completable.create {
-        val pairedScanners = ScannerUtils.getPairedScanners(bluetoothAdapter)
+        val pairedScanners = pairingManager.getPairedScannerAddresses()
         when {
             pairedScanners.isEmpty() -> it.onError(ScannerNotPairedException())
             pairedScanners.size > 1 -> it.onError(MultipleScannersPairedException())
@@ -40,7 +40,7 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
                 val macAddress = pairedScanners[0]
                 scanner = scannerFactory.create(macAddress)
                 lastPairedMacAddress = macAddress
-                lastPairedScannerId = ScannerUtils.convertAddressToSerial(macAddress)
+                lastPairedScannerId = pairingManager.convertAddressToSerialNumber(macAddress)
                 it.onComplete()
             }
         }
@@ -54,7 +54,7 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
         }
     }
 
-    private fun bluetoothIsEnabled() = ScannerUtils.isBluetoothEnabled(bluetoothAdapter)
+    private fun bluetoothIsEnabled() = bluetoothAdapter.isEnabled()
 
     override fun getAlertType(e: Throwable): FingerprintAlert =
         when (e) {

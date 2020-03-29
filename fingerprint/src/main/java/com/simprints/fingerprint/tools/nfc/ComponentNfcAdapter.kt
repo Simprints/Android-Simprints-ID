@@ -1,5 +1,8 @@
 package com.simprints.fingerprint.tools.nfc
 
+import android.app.Activity
+import android.os.Bundle
+
 interface ComponentNfcAdapter {
 
     /**
@@ -9,4 +12,17 @@ interface ComponentNfcAdapter {
 
     fun isEnabled(): Boolean
 
+    fun enableReaderMode(activity: Activity,
+                         callback: (tag: ComponentNfcTag?) -> Unit,
+                         flags: Int,
+                         extras: Bundle?)
+
+    fun disableReaderMode(activity: Activity)
+
+    fun getMifareUltralight(tag: ComponentNfcTag?): ComponentMifareUltralight?
+
+    companion object {
+        const val FLAG_READER_NFC_A = 1
+        const val FLAG_READER_SKIP_NDEF_CHECK = 128
+    }
 }
