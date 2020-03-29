@@ -49,7 +49,12 @@
     <string name="cannot_connect_devices">Cannot connect devices</string>
     <string name="nfc_pairing_in_progress">Found scanner %1$s</string>
     <string name="nfc_pairing_try_again_instruction">Please ensure scanner %1$s is turned on and try again.</string>
-
+    <!-- SerialEntryPairFragment -->
+    <string name="serial_entry_pair_title">Scanner not connected</string>
+    <string name="enter_scanner_number">Enter scanner number</string>
+    <string name="enter_scanner_number_detail">This is found on the bottom of the scanner</string>
+    <string name="serial_entry_pair_failed">Please ensure scanner %1$s is turned on and try again.</string>
+    <string name="sp" translatable="false">SP</string>
 
 
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
