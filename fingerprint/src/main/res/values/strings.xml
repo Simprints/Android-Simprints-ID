@@ -47,6 +47,7 @@
     <string name="nfc_pair_title">Scanner not connected</string>
     <string name="nfc_pair_instructions">Tap back of scanner to back of phone</string>
     <string name="cannot_connect_devices">Cannot connect devices</string>
+    <string name="nfc_pairing_in_progress">Found device $1%s</string>
 
 
 

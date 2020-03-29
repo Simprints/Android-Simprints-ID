@@ -70,6 +70,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_weight="0.4" />
 
+    <ProgressBar
+        android:id="@+id/nfcPairingProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:progressTint="@color/simprints_white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@id/couldNotPairTextView"
+        app:layout_constraintEnd_toEndOf="@id/couldNotPairTextView"
+        app:layout_constraintStart_toStartOf="@id/couldNotPairTextView"
+        app:layout_constraintTop_toTopOf="@id/couldNotPairTextView" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/nfcPairEndGuideline"
         android:layout_width="wrap_content"

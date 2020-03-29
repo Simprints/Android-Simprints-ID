@@ -70,7 +70,7 @@ class ConnectScannerMainFragment : Fragment() {
             ConnectScannerIssue.BLUETOOTH_OFF -> R.id.action_connectScannerMainFragment_to_bluetoothOffFragment
             ConnectScannerIssue.NFC_OFF -> R.id.action_connectScannerMainFragment_to_nfcOffFragment
             ConnectScannerIssue.NFC_PAIR -> R.id.action_connectScannerMainFragment_to_nfcPairFragment
-            ConnectScannerIssue.SERIAL_ENTRY_PAIR -> R.id.action_connectScannerMainFragment_to_serialEntryFragment
+            ConnectScannerIssue.SERIAL_ENTRY_PAIR -> R.id.action_connectScannerMainFragment_to_serialEntryPairFragment
             ConnectScannerIssue.SCANNER_OFF -> R.id.action_connectScannerMainFragment_to_turnOnScannerFragment
         }
         findNavController().navigate(action)

@@ -67,7 +67,7 @@ class NfcOffFragment : Fragment() {
     }
 
     private fun continueToSerialEntryPair() {
-        findNavController().navigate(R.id.action_nfcOffFragment_to_serialEntryFragment)
+        findNavController().navigate(R.id.action_nfcOffFragment_to_serialEntryPairFragment)
     }
 
     companion object {
