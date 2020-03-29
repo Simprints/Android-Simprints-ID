@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.connect.issues.nfcpair
 import android.content.IntentFilter
 import android.graphics.Paint
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +35,10 @@ class NfcPairFragment : Fragment() {
         onPairSuccess = ::checkIfNowBondedToSingleScannerThenProceed,
         onPairFailed = ::handlePairingAttemptFailed
     )
+
+    // Sometimes the BOND_BONDED state is never sent, so we need to check after a timeout whether the devices are paired
+    private val handler = Handler()
+    private val determineWhetherPairingWasSuccessful = ::checkIfNowBondedToSingleScannerThenProceed
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_nfc_pair, container, false)
@@ -91,19 +96,19 @@ class NfcPairFragment : Fragment() {
         couldNotPairTextView.visibility = View.GONE
         nfcPairingProgressBar.visibility = View.VISIBLE
         nfcPairInstructionsTextView.text = getString(R.string.nfc_pairing_in_progress, scannerPairingManager.convertAddressToSerialNumber(macAddress))
-    }
-
-    private fun goToSerialEntryPair() {
-        findNavController().navigate(R.id.action_nfcPairFragment_to_serialEntryPairFragment)
+        handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
     }
 
     private fun checkIfNowBondedToSingleScannerThenProceed() {
         if (scannerPairingManager.isOnlyPairedToOneScanner()) {
             retryConnectAndFinishFragment()
+        } else {
+            handlePairingAttemptFailed()
         }
     }
 
     private fun handlePairingAttemptFailed() {
+        handler.removeCallbacks(determineWhetherPairingWasSuccessful)
         viewModel.isAwaitingPairMacAddress.value?.let { macAddress ->
             couldNotPairTextView.visibility = View.GONE
             nfcPairingProgressBar.visibility = View.INVISIBLE
@@ -114,7 +119,16 @@ class NfcPairFragment : Fragment() {
     }
 
     private fun retryConnectAndFinishFragment() {
+        handler.removeCallbacks(determineWhetherPairingWasSuccessful)
         connectScannerViewModel.retryConnect()
         findNavController().navigate(R.id.action_nfcPairFragment_to_connectScannerMainFragment)
+    }
+
+    private fun goToSerialEntryPair() {
+        findNavController().navigate(R.id.action_nfcPairFragment_to_serialEntryPairFragment)
+    }
+
+    companion object {
+        private const val PAIRING_WAIT_TIMEOUT = 4000L
     }
 }

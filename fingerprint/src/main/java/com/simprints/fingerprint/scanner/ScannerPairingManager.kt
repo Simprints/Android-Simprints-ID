@@ -37,19 +37,19 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
     }
 
     /**
-     * Un-pairs all other devices that follow Simprints' MAC address format
-     * @return True if pairing is about to begin, False could not start pairing
+     * Un-pairs all other devices that follow Simprints' MAC address format, and begins pairing to
+     * the given address
      */
-    fun pairOnlyToDevice(address: String): Boolean {
+    fun pairOnlyToDevice(address: String) {
         val device = bluetoothAdapter.getRemoteDevice(address)
 
         bluetoothAdapter.getBondedDevices().forEach {
-            if (isScannerAddress(it.address)) {
+            if (isScannerAddress(it.address) && it.address != device.address) {
                 it.removeBond()
             }
         }
 
-        return device.createBond()
+        device.createBond()
     }
 
     fun getPairedScannerAddresses(): List<String> =
@@ -87,7 +87,9 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
                     val bondState = intent.getIntExtra(ComponentBluetoothDevice.EXTRA_BOND_STATE, ComponentBluetoothDevice.BOND_NONE)
                     val reason = intent.getIntExtra(ComponentBluetoothDevice.EXTRA_REASON, ComponentBluetoothDevice.BOND_SUCCESS)
                     val pairSucceeded = bondState == ComponentBluetoothDevice.BOND_BONDED
-                    val pairingFailed = bondState == ComponentBluetoothDevice.BOND_NONE && reason != ComponentBluetoothDevice.BOND_SUCCESS
+                    val pairingFailed = bondState == ComponentBluetoothDevice.BOND_NONE
+                        && reason != ComponentBluetoothDevice.BOND_SUCCESS
+                        && reason != ComponentBluetoothDevice.UNBOND_REASON_REMOVED
                     if (pairSucceeded) {
                         onPairSuccess()
                     } else if (pairingFailed) {

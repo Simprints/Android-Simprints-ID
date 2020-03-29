@@ -19,7 +19,8 @@ class NfcPairViewModel(
     fun handleNfcTagDetected(tag: ComponentNfcTag?) {
         try {
             val mifare = nfcAdapter.getMifareUltralight(tag)
-            val macAddress = mifare?.readScannerMacAddress() ?: throw IllegalArgumentException("Empty tag")
+            val macAddress = mifare?.readScannerMacAddress()
+                ?: throw IllegalArgumentException("Empty tag")
             startPairing(macAddress)
         } catch (e: IOException) {
             toastMessage.postValue("Could not read NFC chip, please try again")
@@ -29,12 +30,8 @@ class NfcPairViewModel(
     }
 
     fun startPairing(macAddress: String) {
-        val couldStartPairing = scannerPairingManager.pairOnlyToDevice(macAddress)
-        if (couldStartPairing) {
-            isAwaitingPairMacAddress.postValue(macAddress)
-        } else {
-            toastMessage.postValue("Could not pair to device. Please pair manually.")
-        }
+        scannerPairingManager.pairOnlyToDevice(macAddress)
+        isAwaitingPairMacAddress.postValue(macAddress)
     }
 
     private fun ComponentMifareUltralight.readScannerMacAddress(): String = use { mifare ->

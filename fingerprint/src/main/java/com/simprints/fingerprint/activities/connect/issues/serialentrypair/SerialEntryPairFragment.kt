@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.connect.issues.serialentrypair
 
 import android.content.IntentFilter
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,16 +32,20 @@ class SerialEntryPairFragment : Fragment() {
         onPairFailed = ::handlePairingAttemptFailed
     )
 
+    // Sometimes the BOND_BONDED state is never sent, so we need to check after a timeout whether the devices are paired
+    private val handler = Handler()
+    private val determineWhetherPairingWasSuccessful = ::checkIfNowBondedToSingleScannerThenProceed
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_serial_entry_pair, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        serialEntryOkButton.setOnClickListener { tryPairToScanner() }
+        serialEntryOkButton.setOnClickListener { parseTextAndCommencePair() }
         serialEntryEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == IME_ACTION_DONE) {
-                tryPairToScanner()
+                parseTextAndCommencePair()
                 true
             } else {
                 false
@@ -55,16 +60,11 @@ class SerialEntryPairFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.toastMessage.observe(this, Observer {
-            it?.let {
-                viewModel.toastMessage.value = null
-                context?.showToast(it)
-            }
-        })
         viewModel.isAwaitingPairSerialNumber.observe(this, Observer {
             it?.let {
                 serialEntryOkButton.visibility = View.INVISIBLE
                 serialEntryPairProgressBar.visibility = View.VISIBLE
+                handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
             }
         })
     }
@@ -72,6 +72,7 @@ class SerialEntryPairFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         viewModel.toastMessage.removeObservers(this)
+        viewModel.isAwaitingPairSerialNumber.removeObservers(this)
     }
 
     override fun onStop() {
@@ -79,12 +80,12 @@ class SerialEntryPairFragment : Fragment() {
         activity?.unregisterReceiver(bluetoothPairStateChangeReceiver)
     }
 
-    private fun tryPairToScanner() {
+    private fun parseTextAndCommencePair() {
         try {
             val serialNumber = scannerPairingManager.interpretEnteredTextAsSerialNumber(serialEntryEditText.text.toString())
             viewModel.startPairing(serialNumber)
         } catch (e: NumberFormatException) {
-            viewModel.toastMessage.postValue("Please enter the 6 digits of the serial number")
+            context?.showToast("Please enter the 6 digits of the serial number")
         }
     }
 
@@ -97,6 +98,7 @@ class SerialEntryPairFragment : Fragment() {
     }
 
     private fun handlePairingAttemptFailed() {
+        handler.removeCallbacks(determineWhetherPairingWasSuccessful)
         viewModel.isAwaitingPairSerialNumber.value?.let { macAddress ->
             serialEntryPairProgressBar.visibility = View.INVISIBLE
             serialEntryOkButton.visibility = View.VISIBLE
@@ -106,7 +108,12 @@ class SerialEntryPairFragment : Fragment() {
     }
 
     private fun retryConnectAndFinishFragment() {
+        handler.removeCallbacks(determineWhetherPairingWasSuccessful)
         connectScannerViewModel.retryConnect()
         findNavController().navigate(R.id.action_serialEntryPairFragment_to_connectScannerMainFragment)
+    }
+
+    companion object {
+        private const val PAIRING_WAIT_TIMEOUT = 4000L
     }
 }
