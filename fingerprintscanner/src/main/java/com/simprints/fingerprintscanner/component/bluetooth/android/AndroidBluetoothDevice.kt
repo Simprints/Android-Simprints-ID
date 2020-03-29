@@ -7,7 +7,7 @@ import java.util.*
 
 class AndroidBluetoothDevice(private val device: BluetoothDevice) : ComponentBluetoothDevice {
 
-    override val name: String = device.name
+    override val name: String? = device.name
 
     override fun isBonded(): Boolean = device.bondState == BluetoothDevice.BOND_BONDED
 

@@ -13,7 +13,7 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
      * The address will appear reversed
      */
     fun interpretNfcDataAsScannerMacAddress(payload: ByteArray): String =
-        payload.sliceArray(0..5).reversedArray().toHexString().replace(" ", ":").also {
+        payload.sliceArray(0..5).reversedArray().toHexString().replace(" ", ":").dropLast(1).also {
             if (!isScannerAddress(it)) throw IllegalArgumentException("NFC chip is does not contain a valid Simprints scanner MAC address")
         }
 
