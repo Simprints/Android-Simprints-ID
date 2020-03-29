@@ -82,7 +82,7 @@ class BluetoothOffFragment : Fragment() {
 
     private fun retryConnectAndFinishFragment() {
         connectScannerViewModel.retryConnect()
-        findNavController().popBackStack()
+        findNavController().navigate(R.id.action_bluetoothOffFragment_to_connectScannerMainFragment)
     }
 
     companion object {
