@@ -48,6 +48,7 @@
     <string name="nfc_pair_instructions">Tap back of scanner to back of phone</string>
     <string name="cannot_connect_devices">Cannot connect devices</string>
     <string name="nfc_pairing_in_progress">Found scanner %1$s</string>
+    <string name="nfc_pairing_try_again_instruction">Please ensure scanner %1$s is turned on and try again.</string>
 
 
 

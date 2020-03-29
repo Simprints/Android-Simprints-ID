@@ -23,6 +23,24 @@
         app:layout_constraintTop_toBottomOf="@+id/nfcPairImageGuideline"
         app:layout_constraintVertical_bias="0.7" />
 
+    <Button
+        android:id="@+id/tryAgainButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:background="@drawable/button_rounded_corners_orange"
+        android:fontFamily="@font/muli"
+        android:padding="8sp"
+        android:text="@string/try_again_label"
+        android:textColor="@color/simprints_white"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/nfcPairEndGuideline"
+        app:layout_constraintStart_toStartOf="@+id/nfcPairStartGuideline"
+        app:layout_constraintTop_toBottomOf="@+id/nfcPairImageGuideline"
+        app:layout_constraintVertical_bias="0.7" />
+
     <TextView
         android:id="@+id/nfcPairInstructionsTextView"
         android:layout_width="match_parent"
@@ -34,7 +52,7 @@
         android:text="@string/nfc_pair_instructions"
         android:textColor="@color/simprints_white"
         android:textSize="22sp"
-        app:layout_constraintBottom_toTopOf="@id/couldNotPairTextView"
+        app:layout_constraintBottom_toTopOf="@id/tryAgainButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/nfcPairImageGuideline"
@@ -77,10 +95,10 @@
         android:layout_height="wrap_content"
         android:progressTint="@color/simprints_white"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@id/couldNotPairTextView"
-        app:layout_constraintEnd_toEndOf="@id/couldNotPairTextView"
-        app:layout_constraintStart_toStartOf="@id/couldNotPairTextView"
-        app:layout_constraintTop_toTopOf="@id/couldNotPairTextView" />
+        app:layout_constraintBottom_toBottomOf="@id/tryAgainButton"
+        app:layout_constraintEnd_toEndOf="@id/tryAgainButton"
+        app:layout_constraintStart_toStartOf="@id/tryAgainButton"
+        app:layout_constraintTop_toTopOf="@id/tryAgainButton" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/nfcPairEndGuideline"
