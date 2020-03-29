@@ -30,8 +30,14 @@ class NfcPairFragment : Fragment() {
     private val bluetoothPairStateChangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             if (intent.action == ComponentBluetoothDevice.ACTION_BOND_STATE_CHANGED) {
-                when (intent.getIntExtra(ComponentBluetoothDevice.EXTRA_BOND_STATE, ComponentBluetoothDevice.BOND_NONE)) {
-                    ComponentBluetoothDevice.BOND_BONDED -> checkIfNowBondedToSingleScannerThenProceed()
+                val bondState = intent.getIntExtra(ComponentBluetoothDevice.EXTRA_BOND_STATE, ComponentBluetoothDevice.BOND_NONE)
+                val reason = intent.getIntExtra(ComponentBluetoothDevice.EXTRA_REASON, ComponentBluetoothDevice.BOND_SUCCESS)
+                val pairSucceeded = bondState == ComponentBluetoothDevice.BOND_BONDED
+                val pairingFailed = bondState == ComponentBluetoothDevice.BOND_NONE && reason != ComponentBluetoothDevice.BOND_SUCCESS
+                if (pairSucceeded) {
+                    checkIfNowBondedToSingleScannerThenProceed()
+                } else if (pairingFailed) {
+                    handlePairingAttemptFailed()
                 }
             }
         }
@@ -63,8 +69,13 @@ class NfcPairFragment : Fragment() {
             ComponentNfcAdapter.FLAG_READER_NFC_A or ComponentNfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,
             null
         )
-        viewModel.toastMessage.observe(this, Observer { it?.let { context?.showToast(it) } })
-        viewModel.isAwaitingPairScannerSerialNumber.observe(this, Observer {
+        viewModel.toastMessage.observe(this, Observer {
+            it?.let {
+                viewModel.toastMessage.value = null
+                context?.showToast(it)
+            }
+        })
+        viewModel.isAwaitingPairMacAddress.observe(this, Observer {
             it?.let { handleAwaitingPair(it) }
         })
     }
@@ -73,7 +84,7 @@ class NfcPairFragment : Fragment() {
         super.onPause()
         nfcAdapter.disableReaderMode(requireActivity())
         viewModel.toastMessage.removeObservers(this)
-        viewModel.isAwaitingPairScannerSerialNumber.removeObservers(this)
+        viewModel.isAwaitingPairMacAddress.removeObservers(this)
     }
 
     override fun onDestroy() {
@@ -86,10 +97,11 @@ class NfcPairFragment : Fragment() {
         viewModel.handleNfcTagDetected(tag)
     }
 
-    private fun handleAwaitingPair(serialNumber: String) {
-        couldNotPairTextView.visibility = View.INVISIBLE
+    private fun handleAwaitingPair(macAddress: String) {
+        tryAgainButton.visibility = View.INVISIBLE
+        couldNotPairTextView.visibility = View.GONE
         nfcPairingProgressBar.visibility = View.VISIBLE
-        nfcPairInstructionsTextView.text = getString(R.string.nfc_pairing_in_progress, serialNumber)
+        nfcPairInstructionsTextView.text = getString(R.string.nfc_pairing_in_progress, scannerPairingManager.convertAddressToSerialNumber(macAddress))
     }
 
     private fun goToSerialEntryPair() {
@@ -99,6 +111,16 @@ class NfcPairFragment : Fragment() {
     private fun checkIfNowBondedToSingleScannerThenProceed() {
         if (scannerPairingManager.isOnlyPairedToOneScanner()) {
             retryConnectAndFinishFragment()
+        }
+    }
+
+    private fun handlePairingAttemptFailed() {
+        viewModel.isAwaitingPairMacAddress.value?.let { macAddress ->
+            couldNotPairTextView.visibility = View.GONE
+            nfcPairingProgressBar.visibility = View.INVISIBLE
+            tryAgainButton.visibility = View.VISIBLE
+            nfcPairInstructionsTextView.text = getString(R.string.nfc_pairing_try_again_instruction, scannerPairingManager.convertAddressToSerialNumber(macAddress))
+            tryAgainButton.setOnClickListener { viewModel.startPairing(macAddress) }
         }
     }
 
