@@ -1,9 +1,6 @@
 package com.simprints.fingerprint.activities.connect.issues.nfcoff
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
@@ -19,17 +16,9 @@ import org.koin.android.ext.android.inject
 
 class NfcOffFragment : Fragment() {
 
-    private val nfcAdapter: ComponentNfcAdapter by inject()
+    private var handlingNfcEnabled = false
 
-    private val nfcOnReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
-            if (intent.action == ComponentNfcAdapter.ACTION_ADAPTER_STATE_CHANGED) {
-                when (intent.getIntExtra(ComponentNfcAdapter.EXTRA_ADAPTER_STATE, ComponentNfcAdapter.STATE_OFF)) {
-                    ComponentNfcAdapter.STATE_ON -> handleNfcEnabled()
-                }
-            }
-        }
-    }
+    private val nfcAdapter: ComponentNfcAdapter by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_nfc_off, container, false)
@@ -50,12 +39,7 @@ class NfcOffFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        activity?.registerReceiver(nfcOnReceiver, IntentFilter(ComponentNfcAdapter.ACTION_ADAPTER_STATE_CHANGED))
-    }
-
-    override fun onPause() {
-        super.onPause()
-        activity?.unregisterReceiver(nfcOnReceiver)
+        if (nfcAdapter.isEnabled()) handleNfcEnabled()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -70,6 +54,8 @@ class NfcOffFragment : Fragment() {
     }
 
     private fun handleNfcEnabled() {
+        if (handlingNfcEnabled) return
+        handlingNfcEnabled = true
         turnOnNfcButton.isEnabled = false
         turnOnNfcButton.setText(R.string.nfc_on)
         turnOnNfcButton.setBackgroundColor(resources.getColor(R.color.simprints_green, null))
