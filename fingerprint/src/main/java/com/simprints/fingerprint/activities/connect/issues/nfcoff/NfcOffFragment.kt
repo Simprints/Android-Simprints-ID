@@ -24,9 +24,9 @@ class NfcOffFragment : Fragment() {
     private val nfcOnReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             if (intent.action == ComponentNfcAdapter.ACTION_ADAPTER_STATE_CHANGED) {
-//                when (intent.getIntExtra(ComponentNfcAdapter.EXTRA_ADAPTER_STATE, ComponentNfcAdapter.STATE_OFF)) {
-//                    ComponentNfcAdapter.STATE_ON -> handleNfcEnabled()
-//                }
+                when (intent.getIntExtra(ComponentNfcAdapter.EXTRA_ADAPTER_STATE, ComponentNfcAdapter.STATE_OFF)) {
+                    ComponentNfcAdapter.STATE_ON -> handleNfcEnabled()
+                }
             }
         }
     }
@@ -42,16 +42,19 @@ class NfcOffFragment : Fragment() {
             return
         }
 
-        activity?.registerReceiver(nfcOnReceiver, IntentFilter(ComponentNfcAdapter.ACTION_ADAPTER_STATE_CHANGED))
-
         turnOnNfcButton.setOnClickListener {
             val enableNfcIntent = Intent(Settings.ACTION_NFC_SETTINGS)
             startActivityForResult(enableNfcIntent, REQUEST_ENABLE_NFC)
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onResume() {
+        super.onResume()
+        activity?.registerReceiver(nfcOnReceiver, IntentFilter(ComponentNfcAdapter.ACTION_ADAPTER_STATE_CHANGED))
+    }
+
+    override fun onPause() {
+        super.onPause()
         activity?.unregisterReceiver(nfcOnReceiver)
     }
 
@@ -82,7 +85,7 @@ class NfcOffFragment : Fragment() {
     }
 
     companion object {
-        const val REQUEST_ENABLE_NFC = 10
-        private const val FINISHED_TIME_DELAY_MS = 1200L
+        private const val REQUEST_ENABLE_NFC = 10
+        private const val FINISHED_TIME_DELAY_MS = 2000L
     }
 }
