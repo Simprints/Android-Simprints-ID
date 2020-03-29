@@ -31,13 +31,19 @@
     <string name="connect_scanner_finished">Connected</string>
     <!-- Scanner issue text -->
     <!-- BluetoothOffFragment -->
-    <string name="bluetooth_off">Bluetooth off</string>
+    <string name="bluetooth_off_title">Bluetooth off</string>
     <string name="turn_on_bluetooth">Turn on Bluetooth</string>
     <string name="bluetooth_on">✓ Bluetooth on</string>
     <!-- NfcOffFragment -->
-    <string name="nfc_off">NFC off</string>
+    <string name="nfc_off_title">NFC off</string>
     <string name="turn_on_nfc">Turn on NFC</string>
     <string name="nfc_on">✓ NFC on</string>
+    <!-- ScannerOffFragment -->
+    <string name="scanner_off_title">Scanner off</string>
+    <string name="scanner_off_instructions">Press scanner power button.</string>
+    <string name="scanner_on">✓ Scanner on</string>
+    <string name="try_again_label">Try Again</string>
+
 
 
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
@@ -123,7 +129,6 @@
     <string name="scanner_error_turn_scanner_on_message">1. Turn scanner on \n 2. Tap Try Again</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">CLOSE</string>
-    <string name="try_again_label">Try Again</string>
     <string name="settings_label">Phone settings</string>
     <string name="pair_scanner_label">Settings</string>
     <!-- Content Descriptions -->

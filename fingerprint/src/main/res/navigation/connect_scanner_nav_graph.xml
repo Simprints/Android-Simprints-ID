@@ -58,9 +58,9 @@
     </fragment>
     <fragment
         android:id="@+id/turnOnScannerFragment"
-        android:name="com.simprints.fingerprint.activities.connect.issues.turnonscanner.TurnOnScannerFragment"
-        android:label="fragment_turn_on_scanner"
-        tools:layout="@layout/fragment_turn_on_scanner" />
+        android:name="com.simprints.fingerprint.activities.connect.issues.scanneroff.ScannerOffFragment"
+        android:label="fragment_scanner_off"
+        tools:layout="@layout/fragment_scanner_off" />
     <fragment
         android:id="@+id/serialEntryFragment"
         android:name="com.simprints.fingerprint.activities.connect.issues.serialentrypair.SerialEntryFragment"

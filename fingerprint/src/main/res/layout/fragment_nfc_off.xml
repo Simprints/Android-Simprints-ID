@@ -44,7 +44,7 @@
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="@string/nfc_off"
+        android:text="@string/nfc_off_title"
         android:textColor="@color/simprints_white"
         android:textSize="26sp"
         android:textStyle="bold"

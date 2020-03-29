@@ -60,7 +60,6 @@ class BluetoothOffFragment : Fragment() {
         if (bluetoothAdapter.enable()) {
             turnOnBluetoothProgressBar.visibility = View.VISIBLE
             turnOnBluetoothButton.visibility = View.INVISIBLE
-            turnOnBluetoothButton.text = ""
             turnOnBluetoothButton.isEnabled = false
         } else {
             handleCouldNotEnable()
