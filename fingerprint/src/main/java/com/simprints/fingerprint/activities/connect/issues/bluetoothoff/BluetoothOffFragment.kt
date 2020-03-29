@@ -40,8 +40,6 @@ class BluetoothOffFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        activity?.registerReceiver(bluetoothOnReceiver, IntentFilter(ComponentBluetoothAdapter.ACTION_STATE_CHANGED))
-
         turnOnBluetoothButton.setOnClickListener {
             if (bluetoothAdapter.isEnabled()) {
                 handleBluetoothEnabled()
@@ -51,8 +49,13 @@ class BluetoothOffFragment : Fragment() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onStart() {
+        super.onStart()
+        activity?.registerReceiver(bluetoothOnReceiver, IntentFilter(ComponentBluetoothAdapter.ACTION_STATE_CHANGED))
+    }
+
+    override fun onStop() {
+        super.onStop()
         activity?.unregisterReceiver(bluetoothOnReceiver)
     }
 
