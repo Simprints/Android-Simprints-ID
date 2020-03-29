@@ -31,7 +31,6 @@ class NfcPairViewModel(
     fun startPairing(macAddress: String) {
         val couldStartPairing = scannerPairingManager.pairOnlyToDevice(macAddress)
         if (couldStartPairing) {
-            val serialNumber = scannerPairingManager.convertAddressToSerialNumber(macAddress)
             isAwaitingPairMacAddress.postValue(macAddress)
         } else {
             toastMessage.postValue("Could not pair to device. Please pair manually.")
