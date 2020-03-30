@@ -67,6 +67,7 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':id')
+    implementation project(':uicomponents')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation deps.androidx.appcompat
@@ -91,6 +92,9 @@ dependencies {
     }
 
     // Koin
+    implementation deps.koin.core
+    implementation deps.koin.android
+    implementation deps.koin.viewmodel
     androidTestImplementation deps.koin.core_ext
     androidTestImplementation deps.testing.koin
 

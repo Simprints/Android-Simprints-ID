@@ -13,11 +13,15 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.request.Ap
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.WhereLabelKey.*
 import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
+import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.tools.utils.retrySimNetworkCalls
 
 
-open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
-                                      private val simApiClientFactory: SimApiClientFactory) : PersonRemoteDataSource {
+open class PersonRemoteDataSourceImpl(
+    private val remoteDbManager: RemoteDbManager,
+    private val simApiClientFactory: SimApiClientFactory,
+    private val baseUrlProvider: BaseUrlProvider
+) : PersonRemoteDataSource {
 
     override suspend fun downloadPerson(patientId: String, projectId: String): Person =
         makeNetworkRequest({
@@ -26,29 +30,40 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
 
     override suspend fun uploadPeople(projectId: String, patientsToUpload: List<Person>) =
         makeNetworkRequest({
-            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::fromDomainToPostApi)))
+            it.uploadPeople(
+                projectId,
+                hashMapOf("patients" to patientsToUpload.map(Person::fromDomainToPostApi))
+            )
         }, "uploadPatientBatch")
 
 
-    override suspend fun getDownSyncPeopleCount(projectId: String, peopleOperationsParams: List<PeopleDownSyncOperation>): List<PeopleCount> =
+    override suspend fun getDownSyncPeopleCount(
+        projectId: String,
+        peopleOperationsParams: List<PeopleDownSyncOperation>
+    ): List<PeopleCount> =
         if (peopleOperationsParams.isNotEmpty()) {
             makeRequestForPeopleOperations(projectId, peopleOperationsParams)
         } else {
             throw EmptyPeopleOperationsParamsException()
         }
 
-    private suspend fun makeRequestForPeopleOperations(projectId: String, peopleOperationsParams: List<PeopleDownSyncOperation>): List<PeopleCount> =
+    private suspend fun makeRequestForPeopleOperations(
+        projectId: String,
+        peopleOperationsParams: List<PeopleDownSyncOperation>
+    ): List<PeopleCount> =
         makeNetworkRequest({
             val response = it.requestPeopleOperations(
                 projectId,
-                buildApiPeopleOperations(peopleOperationsParams))
+                buildApiPeopleOperations(peopleOperationsParams)
+            )
 
             response.groups.map { responseGroup ->
                 val countsForSyncScope = responseGroup.counts
                 PeopleCount(
                     countsForSyncScope.create,
                     countsForSyncScope.update,
-                    countsForSyncScope.delete)
+                    countsForSyncScope.delete
+                )
             }
         }, "countRequest")
 
@@ -69,7 +84,12 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
                 whereLabels.add(ApiPeopleOperationWhereLabel(MODULE.key, moduleId))
             }
 
-            whereLabels.add(ApiPeopleOperationWhereLabel(MODE.key, PipeSeparatorWrapperForURLListParam(*it.modes.toTypedArray()).toString()))
+            whereLabels.add(
+                ApiPeopleOperationWhereLabel(
+                    MODE.key,
+                    PipeSeparatorWrapperForURLListParam(*it.modes.toTypedArray()).toString()
+                )
+            )
 
             val lastKnownInfo = with(it.lastResult) {
                 if (this@with?.lastPatientId?.isNotEmpty() == true && this@with.lastPatientUpdatedAt != null) {
@@ -82,12 +102,16 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
             ApiPeopleOperationGroup(lastKnownInfo, whereLabels)
         }
 
-    private suspend fun <T> makeNetworkRequest(block: suspend (client: PeopleRemoteInterface) -> T, traceName: String): T =
+    private suspend fun <T> makeNetworkRequest(
+        block: suspend (client: PeopleRemoteInterface) -> T,
+        traceName: String
+    ): T =
         retrySimNetworkCalls(getPeopleApiClient(), block, traceName)
 
 
     override suspend fun getPeopleApiClient(): PeopleRemoteInterface {
+        val baseUrl = baseUrlProvider.getApiBaseUrl()
         val token = remoteDbManager.getCurrentToken()
-        return simApiClientFactory.build<PeopleRemoteInterface>(token).api
+        return simApiClientFactory.build<PeopleRemoteInterface>(baseUrl, token).api
     }
 }

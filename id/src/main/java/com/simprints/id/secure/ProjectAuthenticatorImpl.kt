@@ -3,6 +3,7 @@ package com.simprints.id.secure
 import androidx.annotation.VisibleForTesting
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.extentions.resumeSafely
 import com.simprints.core.tools.extentions.resumeWithExceptionSafely
 import com.simprints.core.tools.extentions.singleWithSuspend
@@ -22,8 +23,9 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 
 class ProjectAuthenticatorImpl(
-    secureApiClient: SecureApiInterface,
     loginInfoManager: LoginInfoManager,
+    simApiClientFactory: SimApiClientFactory,
+    baseUrlProvider: BaseUrlProvider,
     private val safetyNetClient: SafetyNetClient,
     private val secureDataManager: SecureLocalDbKeyProvider,
     private val projectRemoteDataSource: ProjectRemoteDataSource,
@@ -31,14 +33,22 @@ class ProjectAuthenticatorImpl(
     private val remoteConfigWrapper: RemoteConfigWrapper,
     private val longConsentManager: LongConsentManager,
     private val preferencesManager: PreferencesManager,
-    private val attestationManager: AttestationManager = AttestationManager(),
-    private val authenticationDataManager: AuthenticationDataManager = AuthenticationDataManager(secureApiClient)
+    private val attestationManager: AttestationManager = AttestationManager()
 ) : ProjectAuthenticator {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
 
-    private val authManager = AuthManager(secureApiClient)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal val authenticationDataManager by lazy {
+        AuthenticationDataManager(
+            simApiClientFactory.build<SecureApiInterface>(baseUrlProvider.getApiBaseUrl()).api
+        )
+    }
+
+    private val authManager = AuthManager(
+        simApiClientFactory.build<SecureApiInterface>(baseUrlProvider.getApiBaseUrl()).api
+    )
 
     override suspend fun authenticate(nonceScope: NonceScope, projectSecret: String) {
         suspendCancellableCoroutine<Unit> { continuation ->
@@ -52,12 +62,10 @@ class ProjectAuthenticatorImpl(
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(
                     onComplete = {
-                        println("TEST_ALAN - onComplete")
                         continuation.resumeSafely(Unit)
                     },
                     onError = {
                         Timber.e(it)
-                        println("TEST_ALAN - onError")
                         continuation.resumeWithExceptionSafely(it)
                     }
                 )
@@ -68,7 +76,6 @@ class ProjectAuthenticatorImpl(
         nonceScope: NonceScope,
         projectSecret: String
     ): Single<AuthRequest> {
-        println("TEST_ALAN - prepareAuthRequestParameters")
         return andThen(buildAuthRequestParameters(nonceScope, projectSecret))
     }
 
@@ -80,7 +87,6 @@ class ProjectAuthenticatorImpl(
             nonceScope.projectId,
             nonceScope.userId
         ).flatMap { authenticationData ->
-            println("TEST_ALAN - buildAuthRequestParameters")
             zipAuthRequestParameters(
                 getEncryptedProjectSecret(projectSecret, authenticationData),
                 getGoogleAttestation(safetyNetClient, authenticationData),
@@ -126,14 +132,12 @@ class ProjectAuthenticatorImpl(
 
     private fun Single<out AuthRequest>.makeAuthRequest(): Single<Token> {
         return flatMap { authRequest ->
-            println("TEST_ALAN - makeAuthRequest")
             authManager.requestAuthToken(authRequest)
         }
     }
 
     private fun Single<out Token>.signIn(projectId: String, userId: String): Completable {
         return flatMapCompletable { tokens ->
-            println("TEST_ALAN - signIn")
             signerManager.signIn(projectId, userId, tokens)
         }
     }
@@ -146,7 +150,6 @@ class ProjectAuthenticatorImpl(
         projectId: String
     ): Single<JsonElement> {
         return andThen(singleWithSuspend {
-            println("TEST_ALAN - fetchProjectRemoteConfigSettings")
             projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(
                 projectId
             )
@@ -156,7 +159,6 @@ class ProjectAuthenticatorImpl(
     private fun Single<out JsonElement>.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(
     ): Single<Array<String>> {
         return flatMap {
-            println("TEST_ALAN - storeProjectRemoteConfigSettingsAndReturnProjectLanguages")
             remoteConfigWrapper.projectSettingsJsonString = it.toString()
             Single.just(preferencesManager.projectLanguages)
         }
@@ -164,7 +166,6 @@ class ProjectAuthenticatorImpl(
 
     private fun Single<out Array<String>>.fetchProjectLongConsentTexts(): Completable {
         return flatMapCompletable { languages ->
-            println("TEST_ALAN - fetchProjectLongConsentTexts")
             longConsentManager.downloadAllLongConsents(languages)
         }
     }

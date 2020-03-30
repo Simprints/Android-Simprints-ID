@@ -19,8 +19,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
-import com.simprints.id.activities.login.response.CredentialsResponse
 import com.simprints.id.activities.login.response.LoginActivityResponse
+import com.simprints.id.activities.login.response.QrCodeResponse
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.qrcapture.QrCaptureActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -29,7 +29,6 @@ import com.simprints.testtools.android.getCurrentActivity
 import io.mockk.every
 import io.mockk.verify
 import org.hamcrest.CoreMatchers.not
-import org.json.JSONException
 
 const val USER_ID = "user_id"
 const val VALID_PROJECT_ID = "project_id"
@@ -93,7 +92,7 @@ class LoginActivityRobot(
     fun receiveValidQrCodeResponse() {
         every {
             mockLoginActivityHelper.tryParseQrCodeResponse(any())
-        } returns CredentialsResponse(
+        } returns QrCodeResponse(
             VALID_PROJECT_ID,
             VALID_PROJECT_SECRET
         )
@@ -101,7 +100,7 @@ class LoginActivityRobot(
     }
 
     fun receiveInvalidQrCodeResponse() {
-        every { mockLoginActivityHelper.tryParseQrCodeResponse(any()) } throws JSONException("")
+        every { mockLoginActivityHelper.tryParseQrCodeResponse(any()) } throws Throwable()
         stubQrScanIntent()
     }
 
