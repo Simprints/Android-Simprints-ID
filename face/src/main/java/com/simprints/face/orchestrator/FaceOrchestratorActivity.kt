@@ -35,9 +35,9 @@ class FaceOrchestratorActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         viewModel.startCapture.observe(this, LiveDataEventWithContentObserver {
-            val i = Intent(this, FaceCaptureActivity::class.java)
-            i.putExtra(IFaceRequest.BUNDLE_KEY, it)
-            startActivityForResult(i, CAPTURE_REQUEST)
+            val intent = Intent(this, FaceCaptureActivity::class.java)
+            intent.putExtra(IFaceRequest.BUNDLE_KEY, it)
+            startActivityForResult(intent, CAPTURE_REQUEST)
         })
         viewModel.flowFinished.observe(this, LiveDataEventWithContentObserver {
             val intent = Intent().putExtra(IFaceResponse.BUNDLE_KEY, it)
