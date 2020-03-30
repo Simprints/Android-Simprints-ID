@@ -1,5 +1,5 @@
 apply plugin: "com.android.application"
-apply plugin: "io.fabric"
+apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.firebase.firebase-perf'
 apply plugin: 'kotlin-android'
 apply plugin: "kotlin-kapt"
@@ -114,7 +114,6 @@ repositories {
     maven { url "https://jitpack.io" }
     maven { url "https://maven.google.com" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url "https://maven.fabric.io/public" }
     maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
     maven {
         url "http://178.62.61.39:8081/artifactory/libs-release-local"
@@ -170,13 +169,7 @@ dependencies {
     api deps.firebase.storage
     api deps.firebase.mlkit
     api deps.firebase.mlkit_barcode
-
-    implementation(deps.crashlytics.core) {
-        transitive = true
-    }
-    implementation(deps.crashlytics.ndk) {
-        transitive = true
-    }
+    api deps.firebase.crashlytics
 
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter
@@ -285,12 +278,6 @@ kapt {
     arguments {
         arg("realm.ignoreKotlinNullability", true)
     }
-}
-
-crashlytics {
-    enableNdk true
-    androidNdkOut "src/main/obj"
-    androidNdkLibsOut "src/main/libs"
 }
 
 apply plugin: "com.google.gms.google-services"
