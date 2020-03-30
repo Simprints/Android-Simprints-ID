@@ -16,7 +16,7 @@
         android:text="@string/cannot_connect_devices"
         android:gravity="center"
         android:textSize="15sp"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/simprints_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/nfcPairEndGuideline"
         app:layout_constraintStart_toStartOf="@+id/nfcPairStartGuideline"
