@@ -3,7 +3,7 @@ package com.simprints.id.secure
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
 import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent.Result.*
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -21,7 +21,7 @@ class AuthenticationHelperImpl(
     private val loginInfoManager: LoginInfoManager,
     private val timeHelper: TimeHelper,
     private val projectAuthenticator: ProjectAuthenticator,
-    private val sessionEventsManager: SessionEventsManager
+    private val sessionRepository: SessionRepository
 ) : AuthenticationHelper {
 
     private var loginStartTime = 0L
@@ -93,7 +93,6 @@ class AuthenticationHelperImpl(
             AuthenticationEvent.UserInfo(projectId, userId),
             result
         )
-        sessionEventsManager.addEventInBackground(event)
+        sessionRepository.addEventToCurrentSessionInBackground(event)
     }
-
 }

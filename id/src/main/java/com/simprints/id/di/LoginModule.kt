@@ -10,7 +10,7 @@ import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
@@ -64,14 +64,14 @@ open class LoginModule {
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         projectAuthenticator: ProjectAuthenticator,
-        sessionEventsManager: SessionEventsManager
+        sessionRepository: SessionRepository
     ): AuthenticationHelper {
         return AuthenticationHelperImpl(
             crashReportManager,
             loginInfoManager,
             timeHelper,
             projectAuthenticator,
-            sessionEventsManager
+            sessionRepository
         )
     }
 

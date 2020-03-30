@@ -3,8 +3,7 @@ package com.simprints.clientapi.activities.robots
 import androidx.test.rule.ActivityTestRule
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.activities.odk.OdkActivityTest
-import com.simprints.testtools.android.BaseAssertions
-import com.simprints.testtools.common.syntax.verifyOnce
+import io.mockk.verify
 
 fun OdkActivityTest.odk(func: OdkActivityRobot.() -> Unit) = OdkActivityRobot(rule).apply(func)
 
@@ -16,12 +15,9 @@ class OdkActivityRobot(private val rule: ActivityTestRule<OdkActivity>) {
 
 }
 
-class OdkActivityAssertions(private val rule: ActivityTestRule<OdkActivity>) : BaseAssertions() {
+class OdkActivityAssertions(private val rule: ActivityTestRule<OdkActivity>) {
 
     fun toastMessageIsDisplayed() {
-        verifyOnce(rule.activity.guidSelectionNotifier) {
-            showMessage()
-        }
+        verify(exactly = 1) { rule.activity.guidSelectionNotifier.showMessage() }
     }
-
 }

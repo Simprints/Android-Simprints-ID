@@ -31,12 +31,16 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.session.domain.SessionEventsManager
-import com.simprints.id.data.db.session.domain.SessionEventsManagerImpl
-import com.simprints.id.data.db.session.local.RealmSessionEventsDbManagerImpl
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
-import com.simprints.id.data.db.session.remote.RemoteSessionsManager
-import com.simprints.id.data.db.session.remote.RemoteSessionsManagerImpl
+import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.session.SessionRepositoryImpl
+import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
+import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilderImpl
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
+import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl
+import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
+import com.simprints.id.data.db.session.local.SessionRealmConfigBuilderImpl
+import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
+import com.simprints.id.data.db.session.remote.SessionRemoteDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -211,30 +215,54 @@ open class AppModule {
     }
 
     @Provides
+    open fun provideSessionRealmConfigBuilder(): SessionRealmConfigBuilder =
+        SessionRealmConfigBuilderImpl()
+
+
+    @Provides
+    @Singleton
+    open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsBuilder =
+        SessionEventValidatorsBuilderImpl()
+
+
+    @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(
         ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider
-    ): SessionEventsLocalDbManager =
-        RealmSessionEventsDbManagerImpl(ctx, secureDataManager)
+        secureDataManager: SecureLocalDbKeyProvider,
+        timeHelper: TimeHelper,
+        sessionRealmConfigBuilder: SessionRealmConfigBuilder,
+        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
+    ): SessionLocalDataSource =
+        SessionLocalDataSourceImpl(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder, sessionEventValidatorsBuilder.build())
+
+    @Provides
+    @Singleton
+    open fun provideSessionEventsRemoteDbManager(
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory
+    ): SessionRemoteDataSource = SessionRemoteDataSourceImpl(remoteDbManager, simApiClientFactory)
 
     @Provides
     @Singleton
     open fun provideSessionEventsManager(
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
-        sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+        sessionLocalDataSource: SessionLocalDataSource,
+        sessionRemoteDataSource: SessionRemoteDataSource,
         preferencesManager: PreferencesManager,
+        loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         crashReportManager: CrashReportManager
-    ): SessionEventsManager =
-        SessionEventsManagerImpl(
+    ): SessionRepository =
+        SessionRepositoryImpl(
             ctx.deviceId,
             ctx.packageVersionName,
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
             sessionEventsSyncManager,
-            sessionEventsLocalDbManager,
+            sessionLocalDataSource,
+            sessionRemoteDataSource,
             preferencesManager,
-            timeHelper,
             crashReportManager
         )
 
@@ -256,25 +284,13 @@ open class AppModule {
     ): ModuleRepository = ModuleRepositoryImpl(preferencesManager, crashReportManager)
 
     @Provides
-    @Singleton
-    open fun provideRemoteSessionsManager(
-        remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider
-    ): RemoteSessionsManager = RemoteSessionsManagerImpl(
-        remoteDbManager,
-        simApiClientFactory,
-        baseUrlProvider
-    )
-
-    @Provides
     open fun provideGuidSelectionManager(
         context: Context,
         loginInfoManager: LoginInfoManager,
         analyticsManager: AnalyticsManager,
         crashReportManager: CrashReportManager,
         timeHelper: TimeHelper,
-        sessionEventsManager: SessionEventsManager
+        sessionRepository: SessionRepository
     ): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId,
@@ -282,7 +298,7 @@ open class AppModule {
             analyticsManager,
             crashReportManager,
             timeHelper,
-            sessionEventsManager
+            sessionRepository
         )
 
     @Provides
@@ -315,30 +331,28 @@ open class AppModule {
     @Provides
     open fun provideConsentViewModelFactory(
         consentTextManager: ConsentRepository,
-        sessionEventsManager: SessionEventsManager,
+        sessionRepository: SessionRepository,
         timeHelper: TimeHelper
     ) =
-        ConsentViewModelFactory(consentTextManager, sessionEventsManager)
+        ConsentViewModelFactory(consentTextManager, sessionRepository)
 
     @Provides
-    open fun provideCoreExitFormViewModelFactory(sessionEventsManager: SessionEventsManager) =
-        CoreExitFormViewModelFactory(sessionEventsManager)
+    open fun provideCoreExitFormViewModelFactory(sessionRepository: SessionRepository) =
+        CoreExitFormViewModelFactory(sessionRepository)
 
     @Provides
-    open fun provideFingerprintExitFormViewModelFactory(sessionEventsManager: SessionEventsManager) =
-        FingerprintExitFormViewModelFactory(sessionEventsManager)
+    open fun provideFingerprintExitFormViewModelFactory(sessionRepository: SessionRepository) =
+        FingerprintExitFormViewModelFactory(sessionRepository)
 
     @Provides
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
 
     @Provides
-    open fun provideFetchGuidViewModelFactory(
-        personRepository: PersonRepository,
-        deviceManager: DeviceManager,
-        sessionEventsManager: SessionEventsManager,
-        timeHelper: TimeHelper
-    ) =
-        FetchGuidViewModelFactory(personRepository, deviceManager, sessionEventsManager, timeHelper)
+    open fun provideFetchGuidViewModelFactory(personRepository: PersonRepository,
+                                              deviceManager: DeviceManager,
+                                              sessionRepository: SessionRepository,
+                                              timeHelper: TimeHelper) =
+        FetchGuidViewModelFactory(personRepository, deviceManager, sessionRepository, timeHelper)
 
     @Provides
     open fun provideSyncInformationViewModelFactory(
