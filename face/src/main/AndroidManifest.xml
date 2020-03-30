@@ -15,7 +15,7 @@
             android:name="com.simprints.face.activities.FaceCaptureActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
         <activity
-            android:name=".activities.orchestrator.FaceOrchestratorActivity"
+            android:name="com.simprints.face.orchestrator.FaceOrchestratorActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
     </application>
 

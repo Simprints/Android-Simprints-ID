@@ -1,4 +1,4 @@
-package com.simprints.face.activities.orchestrator
+package com.simprints.face.orchestrator
 
 import android.app.Activity
 import android.content.Intent
@@ -34,8 +34,10 @@ class FaceOrchestratorActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.startCapture.observe(this, LiveDataEventObserver {
-            startActivityForResult(Intent(this, FaceCaptureActivity::class.java), CAPTURE_REQUEST)
+        viewModel.startCapture.observe(this, LiveDataEventWithContentObserver {
+            val intent = Intent(this, FaceCaptureActivity::class.java)
+            intent.putExtra(IFaceRequest.BUNDLE_KEY, it)
+            startActivityForResult(intent, CAPTURE_REQUEST)
         })
         viewModel.flowFinished.observe(this, LiveDataEventWithContentObserver {
             val intent = Intent().putExtra(IFaceResponse.BUNDLE_KEY, it)
@@ -52,8 +54,11 @@ class FaceOrchestratorActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == CAPTURE_REQUEST) {
-                viewModel.captureFinished()
+                viewModel.captureFinished(data?.getParcelableExtra(IFaceResponse.BUNDLE_KEY))
             }
+        } else {
+            setResult(Activity.RESULT_CANCELED)
+            finish()
         }
     }
 
