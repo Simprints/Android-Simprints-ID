@@ -4,10 +4,10 @@ import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.secure.models.*
+import com.simprints.id.tools.extensions.getProjectLanguagesFromJsonOrEmpty
 
 class ProjectAuthenticatorImpl(
     private val authManager: AuthManager,
@@ -18,7 +18,6 @@ class ProjectAuthenticatorImpl(
     private val signerManager: SignerManager,
     private val remoteConfigWrapper: RemoteConfigWrapper,
     private val longConsentRepository: LongConsentRepository,
-    private val preferencesManager: PreferencesManager,
     private val attestationManager: AttestationManager,
     private val authenticationDataManager: AuthenticationDataManager
 ) : ProjectAuthenticator {
@@ -76,8 +75,9 @@ class ProjectAuthenticatorImpl(
         projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(projectId)
 
     private fun JsonElement.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(): Array<String> {
-        remoteConfigWrapper.projectSettingsJsonString = this.toString()
-        return preferencesManager.projectLanguages
+        val jsonString = this.toString()
+        remoteConfigWrapper.projectSettingsJsonString = jsonString
+        return this.getProjectLanguagesFromJsonOrEmpty()
     }
 
     private suspend fun Array<String>.fetchProjectLongConsentTexts() {

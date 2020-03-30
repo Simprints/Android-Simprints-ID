@@ -113,7 +113,6 @@ class ProjectAuthenticatorImplTest {
             signerManager,
             remoteConfigWrapper,
             longConsentRepositoryMock,
-            preferencesManager,
             attestationManagerMock,
             authenticationDataManagerMock
         )
