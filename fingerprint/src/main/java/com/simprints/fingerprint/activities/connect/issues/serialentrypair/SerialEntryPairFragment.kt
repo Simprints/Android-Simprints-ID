@@ -91,7 +91,7 @@ class SerialEntryPairFragment : Fragment() {
             val serialNumber = scannerPairingManager.interpretEnteredTextAsSerialNumber(serialEntryEditText.text.toString())
             viewModel.startPairing(serialNumber)
         } catch (e: NumberFormatException) {
-            context?.showToast("Please enter the 6 digits of the serial number")
+            context?.showToast(getString(R.string.serial_entry_pair_toast_invalid))
         }
     }
 

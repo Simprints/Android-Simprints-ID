@@ -70,7 +70,7 @@ class BluetoothOffFragment : Fragment() {
     }
 
     private fun handleCouldNotEnable() {
-        context?.showToast("Could not turn on bluetooth. Please turn on bluetooth in device settings.")
+        context?.showToast(getString(R.string.bluetooth_off_toast_error))
     }
 
     private fun handleBluetoothEnabled() {
