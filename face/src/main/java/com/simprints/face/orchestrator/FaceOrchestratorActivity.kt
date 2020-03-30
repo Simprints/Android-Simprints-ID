@@ -11,7 +11,7 @@ import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class FaceOrchestratorActivity : AppCompatActivity() {
     private val viewModel: FaceOrchestratorViewModel by viewModel()
