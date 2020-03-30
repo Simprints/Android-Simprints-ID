@@ -106,6 +106,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         const val API_BASE_URL_KEY = "ApiBaseUrl"
         const val IMAGE_STORAGE_BUCKET_URL_KEY = "ImageStorageBucketUrlKey"
+        const val IMAGE_STORAGE_BUCKET_URL_DEFAULT = ""
     }
 
     // Number of GUIDs to be returned to the calling app as the result of an identification
@@ -179,8 +180,11 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var apiBaseUrl: String
         by PrimitivePreference(prefs, API_BASE_URL_KEY, NetworkConstants.DEFAULT_BASE_URL)
 
-    override var imageStorageBucketUrl: String
-        by PrimitivePreference(prefs, IMAGE_STORAGE_BUCKET_URL_KEY, "") // TODO
+    override var imageStorageBucketUrl: String by PrimitivePreference(
+        prefs,
+        IMAGE_STORAGE_BUCKET_URL_KEY,
+        IMAGE_STORAGE_BUCKET_URL_DEFAULT
+    )
 
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()

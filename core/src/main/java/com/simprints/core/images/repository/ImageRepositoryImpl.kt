@@ -23,16 +23,16 @@ class ImageRepositoryImpl internal constructor(
         return localDataSource.encryptAndStoreImage(imageBytes, relativePath)
     }
 
-    override suspend fun uploadStoredImagesAndDelete(): Boolean {
-        val uploads = uploadImages()
+    override suspend fun uploadStoredImagesAndDelete(bucketUrl: String): Boolean {
+        val uploads = uploadImages(bucketUrl)
         return getOperationResult(uploads)
     }
 
-    private suspend fun uploadImages(): List<UploadResult> {
+    private suspend fun uploadImages(bucketUrl: String): List<UploadResult> {
         val images = localDataSource.listImages()
         return images.map { imageRef ->
             localDataSource.decryptImage(imageRef)?.let { stream ->
-                remoteDataSource.uploadImage(stream, imageRef)
+                remoteDataSource.uploadImage(stream, imageRef, bucketUrl)
             } ?: UploadResult(
                 imageRef,
                 UploadResult.Status.FAILED

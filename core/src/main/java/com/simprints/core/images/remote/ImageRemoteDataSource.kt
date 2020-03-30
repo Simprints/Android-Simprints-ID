@@ -13,9 +13,15 @@ internal interface ImageRemoteDataSource {
      *
      * @param imageStream the image file as a stream
      * @param imageRef a reference to the image to be uploaded
+     * @param bucketUrl the image storage bucket URL
+     *
      * @return the result of the operation.
      * @see [UploadResult]
      */
-    suspend fun uploadImage(imageStream: FileInputStream, imageRef: SecuredImageRef): UploadResult
+    suspend fun uploadImage(
+        imageStream: FileInputStream,
+        imageRef: SecuredImageRef,
+        bucketUrl: String
+    ): UploadResult
 
 }

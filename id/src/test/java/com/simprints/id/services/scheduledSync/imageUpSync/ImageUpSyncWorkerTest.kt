@@ -8,9 +8,9 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.testtools.TestApplication
 import io.mockk.coEvery
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,6 +30,7 @@ class ImageUpSyncWorkerTest {
         imageUpSyncWorker = TestListenableWorkerBuilder<ImageUpSyncWorker>(app).build().apply {
             imageRepository = mockk()
             crashReportManager = mockk(relaxed = true)
+            baseUrlProvider = mockk()
         }
         app.component = mockk(relaxed = true)
     }
@@ -52,9 +53,16 @@ class ImageUpSyncWorkerTest {
         assertThat(result).isEqualTo(ListenableWorker.Result.retry())
     }
 
+    @Test
+    fun shouldFetchImageStorageBucketUrlFromBaseUrlProvider() = runBlocking {
+        imageUpSyncWorker.doWork()
+
+        verify { imageUpSyncWorker.baseUrlProvider.getImageStorageBucketUrl() }
+    }
+
     private fun mockUploadResults(allUploadsSuccessful: Boolean) {
         coEvery {
-            imageUpSyncWorker.imageRepository.uploadStoredImagesAndDelete()
+            imageUpSyncWorker.imageRepository.uploadStoredImagesAndDelete(any())
         } returns allUploadsSuccessful
     }
 
