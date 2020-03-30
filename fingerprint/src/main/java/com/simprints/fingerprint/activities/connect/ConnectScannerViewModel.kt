@@ -120,6 +120,7 @@ class ConnectScannerViewModel(
 
     private fun manageVeroErrors(it: Throwable) {
         Timber.d(it)
+        scannerConnected.postValue(false)
         launchAlertOrScannerIssueOrShowDialog(scannerManager.getAlertType(it))
         if (it !is FingerprintSafeException) {
             crashReportManager.logExceptionOrSafeException(it)
