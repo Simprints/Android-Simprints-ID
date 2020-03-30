@@ -38,7 +38,9 @@ class NfcPairFragment : Fragment() {
 
     // Sometimes the BOND_BONDED state is never sent, so we need to check after a timeout whether the devices are paired
     private val handler = Handler()
-    private val determineWhetherPairingWasSuccessful = ::checkIfNowBondedToSingleScannerThenProceed
+    private val determineWhetherPairingWasSuccessful = Runnable {
+        checkIfNowBondedToSingleScannerThenProceed()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_nfc_pair, container, false)
@@ -129,6 +131,6 @@ class NfcPairFragment : Fragment() {
     }
 
     companion object {
-        private const val PAIRING_WAIT_TIMEOUT = 4000L
+        private const val PAIRING_WAIT_TIMEOUT = 6000L
     }
 }

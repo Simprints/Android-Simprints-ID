@@ -34,7 +34,9 @@ class SerialEntryPairFragment : Fragment() {
 
     // Sometimes the BOND_BONDED state is never sent, so we need to check after a timeout whether the devices are paired
     private val handler = Handler()
-    private val determineWhetherPairingWasSuccessful = ::checkIfNowBondedToSingleScannerThenProceed
+    private val determineWhetherPairingWasSuccessful = Runnable {
+        checkIfNowBondedToSingleScannerThenProceed()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_serial_entry_pair, container, false)
