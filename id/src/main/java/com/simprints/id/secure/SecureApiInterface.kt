@@ -9,18 +9,24 @@ import retrofit2.Response
 import retrofit2.http.*
 
 interface SecureApiInterface {
+
     companion object {
-        const val apiKey: String = BuildConfig.ANDROID_AUTH_API_KEY
+        const val API_KEY: String = BuildConfig.ANDROID_AUTH_API_KEY
     }
 
     @GET("projects/{projectId}/users/{userId}/authentication-data")
-    fun requestAuthenticationData(@Path("projectId") projectId: String,
-                                  @Path("userId") userId: String,
-                                  @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<ApiAuthenticationData>>
+    fun requestAuthenticationData(
+        @Path("projectId") projectId: String,
+        @Path("userId") userId: String,
+        @Query("key") key: String = API_KEY
+    ): Single<Response<ApiAuthenticationData>>
 
     @POST("projects/{projectId}/users/{userId}/authenticate")
-    fun requestCustomTokens(@Path("projectId") projectId: String,
-                            @Path("userId") userId: String,
-                            @Body credentials: AuthRequestBody,
-                            @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<ApiToken>>
+    fun requestCustomTokens(
+        @Path("projectId") projectId: String,
+        @Path("userId") userId: String,
+        @Body credentials: AuthRequestBody,
+        @Query("key") key: String = API_KEY
+    ): Single<Response<ApiToken>>
+
 }

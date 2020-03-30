@@ -45,8 +45,7 @@ class QrCaptureActivityAndroidTest {
                 mockQrCodeProducer.apply {
                     every { qrCodeChannel } returns mockChannel
                 }
-            },
-            cameraFocusManagerRule = DependencyRule.MockkRule
+            }
         )
     }
 
