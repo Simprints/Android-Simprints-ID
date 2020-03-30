@@ -5,7 +5,7 @@ import com.simprints.face.controllers.core.androidResources.FaceAndroidResources
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.id.Application
 import org.koin.android.ext.koin.androidApplication
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module

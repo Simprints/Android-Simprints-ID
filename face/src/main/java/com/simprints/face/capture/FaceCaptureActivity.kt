@@ -13,7 +13,7 @@ import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import kotlinx.android.synthetic.main.activity_face_capture.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.android.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import com.otaliastudios.cameraview.frame.FrameProcessor as CameraViewFrameProcessor
 
