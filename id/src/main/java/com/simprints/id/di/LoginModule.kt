@@ -81,7 +81,6 @@ open class LoginModule {
         signerManager,
         remoteConfigWrapper,
         longConsentRepository,
-        preferencesManager,
         attestationManager,
         authenticationDataManager
     )
