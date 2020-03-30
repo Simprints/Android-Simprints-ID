@@ -7,6 +7,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.GROUP
+import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import javax.inject.Inject
@@ -21,6 +22,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     @Inject lateinit var sessionEventManager: SessionEventsManager
     @Inject lateinit var recentEventsManager: RecentEventsPreferencesManager
     @Inject lateinit var longConsentManager: LongConsentManager
+    @Inject lateinit var baseUrlProvider: BaseUrlProvider
 
     init {
         component.inject(this)
@@ -89,6 +91,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
         syncManager.cancelBackgroundSyncs()
         longConsentManager.deleteLongConsents()
         sessionEventManager.signOut()
+        baseUrlProvider.resetImageStorageBucketUrl()
 
         view.finishSettings()
     }

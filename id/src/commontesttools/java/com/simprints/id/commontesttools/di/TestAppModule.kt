@@ -27,6 +27,7 @@ import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.secure.BaseUrlProvider
+import com.simprints.id.secure.RemoteProjectInfoProvider
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
@@ -59,6 +60,7 @@ class TestAppModule(
     private val syncStatusDatabaseRule: DependencyRule = RealRule,
     private val deviceManagerRule: DependencyRule = RealRule,
     private val recentEventsPreferencesManagerRule: DependencyRule = RealRule,
+    private val remoteProjectInfoProviderRule: DependencyRule = RealRule,
     private val baseUrlProviderRule: DependencyRule = RealRule,
     private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule {
         setupFakeEncryptedSharedPreferences(
@@ -255,10 +257,17 @@ class TestAppModule(
         super.provideQrCodeDetector(crashReportManager)
     }
 
+    override fun provideRemoteProjectInfoProvider(): RemoteProjectInfoProvider {
+        return remoteProjectInfoProviderRule.resolveDependency {
+            super.provideRemoteProjectInfoProvider()
+        }
+    }
+
     override fun provideBaseUrlProvider(
-        settingsPreferencesManager: SettingsPreferencesManager
+        settingsPreferencesManager: SettingsPreferencesManager,
+        remoteProjectInfoProvider: RemoteProjectInfoProvider
     ): BaseUrlProvider = baseUrlProviderRule.resolveDependency {
-        super.provideBaseUrlProvider(settingsPreferencesManager)
+        super.provideBaseUrlProvider(settingsPreferencesManager, remoteProjectInfoProvider)
     }
 
 }

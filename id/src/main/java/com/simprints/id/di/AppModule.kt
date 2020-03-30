@@ -53,10 +53,7 @@ import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
-import com.simprints.id.secure.BaseUrlProvider
-import com.simprints.id.secure.BaseUrlProviderImpl
-import com.simprints.id.secure.SignerManager
-import com.simprints.id.secure.SignerManagerImpl
+import com.simprints.id.secure.*
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
@@ -186,9 +183,15 @@ open class AppModule {
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
+    open fun provideRemoteProjectInfoProvider(): RemoteProjectInfoProvider {
+        return RemoteProjectInfoProviderImpl()
+    }
+
+    @Provides
     open fun provideBaseUrlProvider(
-        settingsPreferencesManager: SettingsPreferencesManager
-    ): BaseUrlProvider = BaseUrlProviderImpl(settingsPreferencesManager)
+        settingsPreferencesManager: SettingsPreferencesManager,
+        remoteProjectInfoProvider: RemoteProjectInfoProvider
+    ): BaseUrlProvider = BaseUrlProviderImpl(settingsPreferencesManager, remoteProjectInfoProvider)
 
     @Provides
     open fun provideSimApiClientFactory(
