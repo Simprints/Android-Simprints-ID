@@ -47,7 +47,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
                 1 -> migrateTo2(realm.schema)
                 2 -> migrateTo3(realm.schema)
                 3 -> migrateTo4(realm.schema)
-                4 -> migrateTo5(realm.schema)
+                4 -> migrateTo5()
                 5 -> migrateTo6(realm.schema)
                 6 -> migrateTo7(realm.schema)
                 7 -> migrateTo8(realm.schema)
@@ -140,12 +140,11 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
 
     private fun migrateTo4(schema: RealmSchema) {
         with(PeopleSchemaV4) {
-            schema.get(SYNC_INFO_TABLE)
-                ?.addField(SYNC_INFO_MODULE_ID, String::class.java)
+            schema.get(SYNC_INFO_TABLE)?.addField(SYNC_INFO_MODULE_ID, String::class.java)
         }
     }
 
-    private fun migrateTo5(schema: RealmSchema) {
+    private fun migrateTo5() {
         //We want to delete DbSyncInfo, but we need to migrate to Room.
         //We do the migration in DownSyncTask
         //In the next version, we will drop this class.
@@ -155,7 +154,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
         schema.rename(PeopleSchemaV5.PERSON_TABLE, PERSON_TABLE)
         schema.rename(PeopleSchemaV5.FINGERPRINT_TABLE, FINGERPRINT_TABLE)
         schema.rename(PeopleSchemaV5.PROJECT_TABLE, PROJECT_TABLE)
-        schema.get(PROJECT_TABLE)?.removeField("legacyId")
+        schema.get(PROJECT_TABLE)?.removeField(PROJECT_LEGACY_ID)
 
         schema.rename(PeopleSchemaV5.SYNC_INFO_TABLE, SYNC_INFO_TABLE)
     }
@@ -180,7 +179,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
 
     private fun migrateTo8(schema: RealmSchema) {
         try {
-            schema.remove("DbSyncInfo")
+            schema.remove(SYNC_INFO_TABLE)
         } catch (t: Throwable) {
             t.printStackTrace()
         }
