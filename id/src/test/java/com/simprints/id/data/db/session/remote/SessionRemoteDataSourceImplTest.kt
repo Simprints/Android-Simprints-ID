@@ -44,7 +44,7 @@ class SessionRemoteDataSourceImplTest {
     @Test
     fun successfulResponseOnUpload() {
         runBlocking {
-            sessionsRemoteInterface = SimApiClientFactory("deviceId", endpoint = mockServer.url("/").toString()).build<SessionsRemoteInterface>().api
+            sessionsRemoteInterface = SimApiClientFactory("deviceId").build<SessionsRemoteInterface>(mockServer.url("/").toString()).api
             coEvery { sessionRemoteDataSourceSpy.getSessionsApiClient() } returns sessionsRemoteInterface
             mockServer.enqueue(mockSuccessfulResponse())
 
@@ -86,13 +86,13 @@ class SessionRemoteDataSourceImplTest {
         SessionRemoteDataSourceImpl(mockk(), mockk())
 
     private fun buildSessionApiToThrowFirstThenCall(): SessionsRemoteInterface {
-        val api = SimApiClientFactory("deviceId", endpoint = mockServer.url("/").toString()).build<SessionsRemoteInterface>().api
+        val api = SimApiClientFactory("deviceId").build<SessionsRemoteInterface>(mockServer.url("/").toString()).api
         return mockk {
             coEvery { uploadSessions(any(), any()) } throws Throwable("Network issue") coAndThen {
                 api.uploadSessions(
                     args[0] as String,
                     args[1] as HashMap<String, Array<ApiSessionEvents>>
-                    )
+                )
             }
         }
     }

@@ -77,7 +77,7 @@ class TestLoginModule(
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         projectAuthenticator: ProjectAuthenticator,
-        sessionEventsManager: SessionEventsManager
+        sessionRepository: SessionRepository
     ): AuthenticationHelper {
         return authenticationHelperRule.resolveDependency {
             super.provideAuthenticationHelper(
@@ -85,7 +85,7 @@ class TestLoginModule(
                 loginInfoManager,
                 timeHelper,
                 projectAuthenticator,
-                sessionEventsManager
+                sessionRepository
             )
         }
     }

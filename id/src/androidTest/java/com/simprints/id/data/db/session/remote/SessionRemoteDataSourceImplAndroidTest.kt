@@ -2,6 +2,7 @@ package com.simprints.id.data.db.session.remote
 
 import android.net.NetworkInfo
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
@@ -17,6 +18,7 @@ import com.simprints.id.data.db.session.domain.models.events.callout.Identificat
 import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
+import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
@@ -25,6 +27,7 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.testtools.android.waitOnSystem
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -58,7 +61,9 @@ class SessionRemoteDataSourceImplAndroidTest {
 
         val firebaseTestToken = remoteTestingManager.generateFirebaseToken(testProject.id, SIGNED_ID_USER)
         coEvery { remoteDbManager.getCurrentToken() } returns firebaseTestToken.token
-        sessionRemoteDataSource = SessionRemoteDataSourceImpl(remoteDbManager, SimApiClientFactory("some_device"))
+        val baseUrlProvider = mockk<BaseUrlProvider>()
+        every { baseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
+        sessionRemoteDataSource = SessionRemoteDataSourceImpl(remoteDbManager, SimApiClientFactory("some_device"), baseUrlProvider)
     }
 
     @Test
