@@ -53,9 +53,14 @@ class TestDataModule(
 
     override fun provideProjectRepository(
         projectLocalDataSource: ProjectLocalDataSource,
-        projectRemoteDataSource: ProjectRemoteDataSource
+        projectRemoteDataSource: ProjectRemoteDataSource,
+        baseUrlProvider: BaseUrlProvider
     ): ProjectRepository = projectRepositoryRule.resolveDependency {
-        super.provideProjectRepository(projectLocalDataSource, projectRemoteDataSource)
+        super.provideProjectRepository(
+            projectLocalDataSource,
+            projectRemoteDataSource,
+            baseUrlProvider
+        )
     }
 
     override fun providePersonRepository(

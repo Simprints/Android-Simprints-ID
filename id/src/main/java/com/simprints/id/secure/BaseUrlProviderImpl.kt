@@ -28,4 +28,12 @@ class BaseUrlProviderImpl(
         settingsPreferencesManager.apiBaseUrl = DEFAULT_BASE_URL
     }
 
+    override fun getImageStorageBucketUrl(): String {
+        return settingsPreferencesManager.imageStorageBucketUrl
+    }
+
+    override fun setImageStorageBucketUrl(imageStorageBucketUrl: String) {
+        settingsPreferencesManager.imageStorageBucketUrl = imageStorageBucketUrl
+    }
+
 }

@@ -7,6 +7,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
+import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -25,14 +26,33 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class ProjectRepositoryTest {
 
-    private val localProject = Project(DEFAULT_PROJECT_ID, "local", "",  "")
-    private val remoteProject = Project(DEFAULT_PROJECT_ID, "remote", "",  "")
+    private val localProject = Project(
+        DEFAULT_PROJECT_ID,
+        "local",
+        "",
+        "",
+        "some_image_bucket"
+    )
+
+    private val remoteProject = Project(
+        DEFAULT_PROJECT_ID,
+        "remote",
+        "",
+        "",
+        "some_image_bucket"
+    )
 
     private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mockk()
     private val projectLocalDataSourceMock: ProjectLocalDataSource = mockk(relaxUnitFun = true)
+    private val baseUrlProviderMock: BaseUrlProvider = mockk()
     private val firebasePerformanceMock: FirebasePerformance = mockk()
 
-    private val projectRepository = ProjectRepositoryImpl(projectLocalDataSourceMock, projectRemoteDataSourceMock, firebasePerformanceMock)
+    private val projectRepository = ProjectRepositoryImpl(
+        projectLocalDataSourceMock,
+        projectRemoteDataSourceMock,
+        baseUrlProviderMock,
+        firebasePerformanceMock
+    )
 
     @Before
     fun setup() {
@@ -87,6 +107,18 @@ class ProjectRepositoryTest {
         assertThat(project).isNull()
         coVerify(exactly = 0) { projectLocalDataSourceMock.save(remoteProject) }
         coVerify { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) }
+    }
+
+    @Test
+    fun whenFetchingProjectFromRemote_shouldUpdateImageStorageBucketUrl() = runBlocking {
+        coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns null
+        coEvery {
+            projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID)
+        } returns remoteProject
+
+        val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
+
+        coVerify { baseUrlProviderMock.setImageStorageBucketUrl(project!!.imageBucket) }
     }
 
 }
