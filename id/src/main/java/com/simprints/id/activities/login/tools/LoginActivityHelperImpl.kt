@@ -2,7 +2,7 @@ package com.simprints.id.activities.login.tools
 
 import android.content.Intent
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.activities.login.response.CredentialsResponse
+import com.simprints.id.activities.login.response.QrCodeResponse
 
 class LoginActivityHelperImpl : LoginActivityHelper {
 
@@ -23,7 +23,7 @@ class LoginActivityHelperImpl : LoginActivityHelper {
         return suppliedProjectId == projectIdFromIntent
     }
 
-    override fun tryParseQrCodeResponse(response: Intent): CredentialsResponse {
+    override fun tryParseQrCodeResponse(response: Intent): QrCodeResponse {
         val qrValue = response.getStringExtra(EXTRA_SCAN_RESULT)
         return JsonHelper.fromJson(qrValue)
     }

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
@@ -17,12 +19,13 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
 import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
-import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
@@ -51,10 +54,12 @@ class TestAppModule(
     private val sessionEventsManagerRule: DependencyRule = RealRule,
     private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
     private val simNetworkUtilsRule: DependencyRule = RealRule,
+    private val longConsentManagerRule: DependencyRule = RealRule,
     private val secureApiInterfaceRule: DependencyRule = RealRule,
     private val syncStatusDatabaseRule: DependencyRule = RealRule,
     private val deviceManagerRule: DependencyRule = RealRule,
     private val recentEventsPreferencesManagerRule: DependencyRule = RealRule,
+    private val baseUrlProviderRule: DependencyRule = RealRule,
     private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule {
         setupFakeEncryptedSharedPreferences(
             app
@@ -63,8 +68,7 @@ class TestAppModule(
     private val cameraHelperRule: DependencyRule = RealRule,
     private val qrPreviewBuilderRule: DependencyRule = RealRule,
     private val qrCodeDetectorRule: DependencyRule = RealRule,
-    private val qrCodeProducerRule: DependencyRule = RealRule,
-    private val cameraFocusManagerRule: DependencyRule = RealRule
+    private val qrCodeProducerRule: DependencyRule = RealRule
 ) : AppModule() {
 
     override fun provideCrashManager(): CrashReportManager =
@@ -130,14 +134,6 @@ class TestAppModule(
     override fun provideKeystoreManager(): KeystoreManager =
         keystoreManagerRule.resolveDependency { super.provideKeystoreManager() }
 
-    override fun provideSecureApiInterface(
-        simApiClientFactory: SimApiClientFactory
-    ): SecureApiInterface = secureApiInterfaceRule.resolveDependency {
-        super.provideSecureApiInterface(
-            simApiClientFactory
-        )
-    }
-
     override fun provideSessionEventsManager(
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
@@ -173,12 +169,14 @@ class TestAppModule(
 
     override fun provideRemoteSessionsManager(
         remoteDbManager: RemoteDbManager,
-        factory: SimApiClientFactory
+        simApiClientFactory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider
     ): RemoteSessionsManager =
         remoteSessionsManagerRule.resolveDependency {
             super.provideRemoteSessionsManager(
                 remoteDbManager,
-                factory
+                simApiClientFactory,
+                baseUrlProvider
             )
         }
 
@@ -243,6 +241,12 @@ class TestAppModule(
         crashReportManager: CrashReportManager
     ): QrCodeDetector = qrCodeDetectorRule.resolveDependency {
         super.provideQrCodeDetector(crashReportManager)
+    }
+
+    override fun provideBaseUrlProvider(
+        settingsPreferencesManager: SettingsPreferencesManager
+    ): BaseUrlProvider = baseUrlProviderRule.resolveDependency {
+        super.provideBaseUrlProvider(settingsPreferencesManager)
     }
 
 }
