@@ -34,6 +34,7 @@
     <string name="bluetooth_off_title">Bluetooth off</string>
     <string name="turn_on_bluetooth">Turn on Bluetooth</string>
     <string name="bluetooth_on">✓ Bluetooth on</string>
+    <string name="bluetooth_off_toast_error">Could not turn on bluetooth. Please turn on bluetooth in device settings.</string>
     <!-- NfcOffFragment -->
     <string name="nfc_off_title">NFC off</string>
     <string name="turn_on_nfc">Turn on NFC</string>
@@ -49,11 +50,14 @@
     <string name="cannot_connect_devices">Cannot connect devices</string>
     <string name="nfc_pairing_in_progress">Found scanner %1$s</string>
     <string name="nfc_pairing_try_again_instruction">Please ensure scanner %1$s is turned on and try again.</string>
+    <string name="nfc_pair_toast_try_again">Could not read NFC chip, please try again</string>
+    <string name="nfc_pair_toast_invalid">Invalid NFC chip detected</string>
     <!-- SerialEntryPairFragment -->
     <string name="serial_entry_pair_title">Scanner not connected</string>
     <string name="enter_scanner_number">Enter scanner number</string>
     <string name="enter_scanner_number_detail">This is found on the bottom of the scanner</string>
     <string name="serial_entry_pair_failed">Please ensure scanner %1$s is turned on and try again.</string>
+    <string name="serial_entry_pair_toast_invalid">Please enter the 6 digits of the serial number</string>
     <string name="sp" translatable="false">SP</string>
 
 

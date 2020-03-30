@@ -68,7 +68,7 @@ class NfcPairFragment : Fragment() {
         viewModel.toastMessage.observe(this, Observer {
             it?.let {
                 viewModel.toastMessage.value = null
-                context?.showToast(it)
+                context?.showToast(getString(it))
             }
         })
         viewModel.isAwaitingPairMacAddress.observe(this, Observer {

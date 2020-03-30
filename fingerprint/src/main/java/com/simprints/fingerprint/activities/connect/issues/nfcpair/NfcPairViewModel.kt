@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.connect.issues.nfcpair
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.simprints.fingerprint.R
 import com.simprints.fingerprint.scanner.ScannerPairingManager
 import com.simprints.fingerprint.tools.nfc.ComponentMifareUltralight
 import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
@@ -14,7 +15,7 @@ class NfcPairViewModel(
 ) : ViewModel() {
 
     val isAwaitingPairMacAddress = MutableLiveData<String?>(null)
-    val toastMessage = MutableLiveData<String?>(null)
+    val toastMessage = MutableLiveData<Int?>(null)
 
     fun handleNfcTagDetected(tag: ComponentNfcTag?) {
         try {
@@ -23,9 +24,9 @@ class NfcPairViewModel(
                 ?: throw IllegalArgumentException("Empty tag")
             startPairing(macAddress)
         } catch (e: IOException) {
-            toastMessage.postValue("Could not read NFC chip, please try again")
+            toastMessage.postValue(R.string.nfc_pair_toast_try_again)
         } catch (e: IllegalArgumentException) {
-            toastMessage.postValue("Invalid NFC chip detected")
+            toastMessage.postValue(R.string.nfc_pair_toast_invalid)
         }
     }
 
