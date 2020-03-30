@@ -8,12 +8,21 @@ import org.junit.Test
 
 class ProjectTest {
 
-    private val domainProject = Project("id", "name", "description", "creator", "now")
+    private val domainProject = Project(
+        "id",
+        "name",
+        "description",
+        "creator",
+        "image-bucket",
+        "now"
+    )
+
     private val dbProject = DbProject().apply {
         id = "id"
         name = "name"
         description = "description"
         creator = "creator"
+        imageBucket = "image-bucket"
         updatedAt = "now"
     }
 
@@ -29,6 +38,8 @@ class ProjectTest {
         assertThat(dbProjectFromDomain.name).isEqualTo(dbProject.name)
         assertThat(dbProjectFromDomain.description).isEqualTo(dbProject.description)
         assertThat(dbProjectFromDomain.creator).isEqualTo(dbProject.creator)
+        assertThat(dbProjectFromDomain.imageBucket).isEqualTo(dbProject.imageBucket)
         assertThat(dbProjectFromDomain.updatedAt).isEqualTo(dbProject.updatedAt)
     }
+
 }
