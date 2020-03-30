@@ -12,7 +12,6 @@ import com.simprints.id.testtools.di.DaggerAppComponentForTests
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.injectClassFromComponent
 import com.simprints.testtools.unit.BaseUnitTestConfig
-import io.fabric.sdk.android.Fabric
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
@@ -46,7 +45,6 @@ class UnitTestConfig<T : Any>(
             .coroutinesMainThread()
             .setupFirebase()
             .setupWorkManager()
-            .setupCrashlytics()
             .initAndInjectComponent()
 
     @ExperimentalCoroutinesApi
@@ -69,10 +67,6 @@ class UnitTestConfig<T : Any>(
         } catch (e: IllegalStateException) {
             Log.d("TestConfig", "WorkManager already initialized")
         }
-    }
-
-    fun setupCrashlytics() = also {
-        Fabric.with(ctx)
     }
 
     fun initAndInjectComponent() =
