@@ -46,7 +46,6 @@ repositories {
     maven { url "https://jitpack.io" }
     maven { url "https://maven.google.com" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url "https://maven.fabric.io/public" }
     maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
     maven {
         url "http://178.62.61.39:8081/artifactory/libs-release-local"
