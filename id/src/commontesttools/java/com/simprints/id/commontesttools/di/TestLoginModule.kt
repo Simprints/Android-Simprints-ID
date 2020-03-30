@@ -2,7 +2,7 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.id.activities.login.repository.LoginRepository
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -15,8 +15,8 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.LoginModule
 import com.simprints.id.secure.AuthenticationHelper
+import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
@@ -25,7 +25,6 @@ import com.simprints.testtools.common.di.DependencyRule.RealRule
 class TestLoginModule(
     private val loginActivityHelperRule: DependencyRule = RealRule,
     private val loginViewModelFactoryRule: DependencyRule = RealRule,
-    private val loginRepositoryRule: DependencyRule = RealRule,
     private val projectAuthenticatorRule: DependencyRule = RealRule,
     private val authenticationHelperRule: DependencyRule = RealRule,
     private val safetyNetClientRule: DependencyRule = RealRule
@@ -37,31 +36,18 @@ class TestLoginModule(
         }
     }
 
-    override fun provideLoginViewModelFactory(loginRepository: LoginRepository): LoginViewModelFactory {
+    override fun provideLoginViewModelFactory(
+        authenticationHelper: AuthenticationHelper
+    ): LoginViewModelFactory {
         return loginViewModelFactoryRule.resolveDependency {
-            super.provideLoginViewModelFactory(loginRepository)
-        }
-    }
-
-    override fun provideLoginRepository(
-        projectAuthenticator: ProjectAuthenticator,
-        authenticationHelper: AuthenticationHelper,
-        sessionRepository: SessionRepository,
-        timeHelper: TimeHelper
-    ): LoginRepository {
-        return loginRepositoryRule.resolveDependency {
-            super.provideLoginRepository(
-                projectAuthenticator,
-                authenticationHelper,
-                sessionRepository,
-                timeHelper
-            )
+            super.provideLoginViewModelFactory(authenticationHelper)
         }
     }
 
     override fun provideProjectAuthenticator(
-        secureApiClient: SecureApiInterface,
         loginInfoManager: LoginInfoManager,
+        simApiClientFactory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider,
         safetyNetClient: SafetyNetClient,
         secureDataManager: SecureLocalDbKeyProvider,
         projectRemoteDataSource: ProjectRemoteDataSource,
@@ -72,8 +58,9 @@ class TestLoginModule(
     ): ProjectAuthenticator {
         return projectAuthenticatorRule.resolveDependency {
             super.provideProjectAuthenticator(
-                secureApiClient,
                 loginInfoManager,
+                simApiClientFactory,
+                baseUrlProvider,
                 safetyNetClient,
                 secureDataManager,
                 projectRemoteDataSource,
@@ -87,10 +74,19 @@ class TestLoginModule(
 
     override fun provideAuthenticationHelper(
         crashReportManager: CrashReportManager,
-        loginInfoManager: LoginInfoManager
+        loginInfoManager: LoginInfoManager,
+        timeHelper: TimeHelper,
+        projectAuthenticator: ProjectAuthenticator,
+        sessionEventsManager: SessionEventsManager
     ): AuthenticationHelper {
         return authenticationHelperRule.resolveDependency {
-            super.provideAuthenticationHelper(crashReportManager, loginInfoManager)
+            super.provideAuthenticationHelper(
+                crashReportManager,
+                loginInfoManager,
+                timeHelper,
+                projectAuthenticator,
+                sessionEventsManager
+            )
         }
     }
 

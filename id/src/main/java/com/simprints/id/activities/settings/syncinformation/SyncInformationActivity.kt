@@ -8,7 +8,6 @@ import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -18,12 +17,12 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.EXTRA
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.ON
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_sync_information.*
-import kotlinx.android.synthetic.main.progress_overlay.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SyncInformationActivity : AppCompatActivity() {
@@ -58,6 +57,7 @@ class SyncInformationActivity : AppCompatActivity() {
         setupClickListeners()
         observeUi()
         setupProgressOverlay()
+        setupRecordsCountCards()
 
         fetchRecordsInfo()
     }
@@ -163,37 +163,37 @@ class SyncInformationActivity : AppCompatActivity() {
     }
 
     private fun observeLocalRecordCount() {
-        viewModel.localRecordCount.observe(this, Observer {
+        viewModel.localRecordCountLiveData.observe(this, Observer {
             totalRecordsCount.text = it.toString()
         })
     }
 
     private fun observeUpSyncRecordCount() {
-        viewModel.recordsToUpSyncCount.observe(this, Observer {
+        viewModel.recordsToUpSyncCountLiveData.observe(this, Observer {
             recordsToUploadCount.text = it.toString()
         })
     }
 
     private fun observeDownSyncRecordCount() {
-        viewModel.recordsToDownSyncCount.observe(this, Observer {
+        viewModel.recordsToDownSyncCountLiveData.observe(this, Observer {
             recordsToDownloadCount.text = it.toString()
         })
     }
 
     private fun observeDeleteRecordCount() {
-        viewModel.recordsToDeleteCount.observe(this, Observer {
+        viewModel.recordsToDeleteCountLiveData.observe(this, Observer {
             recordsToDeleteCount.text = it.toString()
         })
     }
 
     private fun observeSelectedModules() {
-        viewModel.selectedModulesCount.observe(this, Observer {
+        viewModel.selectedModulesCountLiveData.observe(this, Observer {
             addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
         })
     }
 
     private fun observeUnselectedModules() {
-        viewModel.unselectedModulesCount.observe(this, Observer {
+        viewModel.unselectedModulesCountLiveData.observe(this, Observer {
             if (it.isEmpty()) {
                 removeUnselectedModulesTab()
             } else {
@@ -204,18 +204,18 @@ class SyncInformationActivity : AppCompatActivity() {
     }
 
     private fun setupProgressOverlay() {
-        progressOverlayContainer.setOnTouchListener { _, _ -> true }
+        group_progress_overlay.setOnTouchListener { _, _ -> true }
         progress_sync_overlay.text = androidResourcesHelper.getString(R.string.progress_sync_overlay)
     }
 
-    private fun isProgressOverlayVisible() = progressOverlayContainer.visibility == View.VISIBLE
+    private fun isProgressOverlayVisible() = group_progress_overlay.visibility == View.VISIBLE
 
     private fun showProgressOverlay() {
-        progressOverlayContainer.visibility = View.VISIBLE
+        group_progress_overlay.visibility = View.VISIBLE
     }
 
     private fun hideProgressOverlay() {
-        progressOverlayContainer.visibility = View.GONE
+        group_progress_overlay.visibility = View.GONE
     }
 
     private fun addTotalRowAndSubmitList(
@@ -258,9 +258,18 @@ class SyncInformationActivity : AppCompatActivity() {
     }
 
     private fun fetchRecordsInfo() {
-        lifecycleScope.launch {
-            viewModel.fetchRecordsInfo()
+        viewModel.fetchRecordsInfo()
+    }
+
+    private fun setupRecordsCountCards() {
+        if(!isDownSyncAllowed()) {
+            recordsToDownloadCardView.visibility = View.GONE
+            recordsToDeleteCardView.visibility = View.GONE
         }
+    }
+
+    private fun isDownSyncAllowed() = with(preferencesManager) {
+        peopleDownSyncSetting == ON || peopleDownSyncSetting == EXTRA
     }
 
     private fun PeopleSyncState.isRunning(): Boolean {

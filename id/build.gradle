@@ -152,8 +152,10 @@ dependencies {
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
     implementation deps.androidx.security
-    implementation deps.androidx.camerax.core
+    api deps.androidx.camerax.core
     implementation deps.androidx.camerax.camera2
+    implementation deps.androidx.camerax.lifecycle
+    implementation deps.androidx.camerax.view
     implementation deps.support.material
     implementation deps.arch_components.work
     implementation deps.playservices.location

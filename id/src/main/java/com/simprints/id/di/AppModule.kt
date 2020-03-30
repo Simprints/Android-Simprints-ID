@@ -48,6 +48,7 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.*
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
 import com.simprints.id.data.secure.keystore.KeystoreManager
@@ -56,7 +57,8 @@ import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
-import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.secure.BaseUrlProvider
+import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
 import com.simprints.id.services.GuidSelectionManager
@@ -155,9 +157,11 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSecureLocalDbKeyProvider(builder: EncryptedSharedPreferencesBuilder,
-                                             randomGenerator: RandomGenerator,
-                                             unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
+    open fun provideSecureLocalDbKeyProvider(
+        builder: EncryptedSharedPreferencesBuilder,
+        randomGenerator: RandomGenerator,
+        unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider
+    ): SecureLocalDbKeyProvider =
         SecureLocalDbKeyProviderImpl(
             builder.buildEncryptedSharedPreferences(FILENAME_FOR_REALM_KEY_SHARED_PREFS),
             randomGenerator,
@@ -186,12 +190,15 @@ open class AppModule {
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
-    open fun provideSimApiClientFactory(ctx: Context) =
-        SimApiClientFactory(ctx.deviceId)
+    open fun provideBaseUrlProvider(
+        settingsPreferencesManager: SettingsPreferencesManager
+    ): BaseUrlProvider = BaseUrlProviderImpl(settingsPreferencesManager)
 
     @Provides
-    open fun provideSecureApiInterface(simApiClientFactory: SimApiClientFactory): SecureApiInterface =
-        simApiClientFactory.build<SecureApiInterface>(null).api
+    open fun provideSimApiClientFactory(
+        ctx: Context,
+        baseUrlProvider: BaseUrlProvider
+    ) = SimApiClientFactory(ctx.deviceId)
 
     @Provides
     @Singleton
@@ -370,16 +377,25 @@ open class AppModule {
         builder.buildEncryptedSharedPreferences()
 
     @Provides
-    open fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager = DeviceManagerImpl(connectivityHelper)
+    open fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager =
+        DeviceManagerImpl(connectivityHelper)
 
     @Provides
-    open fun provideConnectivityHelper(ctx: Context): ConnectivityHelper = ConnectivityHelperImpl(ctx)
+    open fun provideConnectivityHelper(ctx: Context): ConnectivityHelper =
+        ConnectivityHelperImpl(ctx)
 
     @Provides
     open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)
 
     @Provides
-    open fun provideCameraBinder(): CameraBinder = CameraBinderImpl()
+    open fun provideCameraHelper(
+        context: Context,
+        previewBuilder: QrPreviewBuilder,
+        cameraFocusManager: CameraFocusManager
+    ): CameraHelper = CameraHelperImpl(context, previewBuilder, cameraFocusManager)
+
+    @Provides
+    open fun provideCameraFocusManager(): CameraFocusManager = CameraFocusManagerImpl()
 
     @Provides
     open fun provideQrPreviewBuilder(): QrPreviewBuilder = QrPreviewBuilderImpl()
