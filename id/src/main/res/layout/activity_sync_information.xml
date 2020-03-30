@@ -69,12 +69,12 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/recordsToUploadCardView"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_marginTop="15dp"
         app:layout_constraintBottom_toBottomOf="@+id/recordsCardsBarrier"
         app:layout_constraintEnd_toStartOf="@+id/recordsToDownloadCardView"
-        app:layout_constraintHeight_min="wrap"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recordsInLocalCardView">
 
@@ -109,7 +109,6 @@
         android:id="@+id/recordsToDownloadCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
         app:layout_constraintBottom_toBottomOf="@+id/recordsToUploadCardView"
         app:layout_constraintEnd_toStartOf="@+id/recordsToDeleteCardView"
@@ -232,7 +231,7 @@
         app:layout_constraintBottom_toTopOf="@+id/moduleSelectionButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recordsToDeleteCardView">
+        app:layout_constraintTop_toBottomOf="@+id/recordsToUploadCardView">
 
         <LinearLayout
             android:layout_width="match_parent"
