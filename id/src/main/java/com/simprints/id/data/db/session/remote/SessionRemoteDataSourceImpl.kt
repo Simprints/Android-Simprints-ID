@@ -5,10 +5,12 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.remote.session.ApiSessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
+import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.tools.utils.retrySimNetworkCalls
 
 class SessionRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
-                                  private val simApiClientFactory: SimApiClientFactory) : SessionRemoteDataSource {
+                                  private val simApiClientFactory: SimApiClientFactory,
+                                  private val baseUrlProvider: BaseUrlProvider) : SessionRemoteDataSource {
 
     override suspend fun uploadSessions(projectId: String,
                                         sessions: List<SessionEvents>) {
@@ -25,6 +27,7 @@ class SessionRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
 
     internal suspend fun getSessionsApiClient(): SessionsRemoteInterface {
         val token = remoteDbManager.getCurrentToken()
-        return simApiClientFactory.build<SessionsRemoteInterface>(token).api
+        val baseUrl = baseUrlProvider.getApiBaseUrl()
+        return simApiClientFactory.build<SessionsRemoteInterface>(baseUrl, token).api
     }
 }

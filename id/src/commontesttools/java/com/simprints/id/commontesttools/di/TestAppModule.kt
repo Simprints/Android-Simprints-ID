@@ -49,6 +49,7 @@ class TestAppModule(
     private val remoteDbManagerRule: DependencyRule = RealRule,
     private val dbManagerRule: DependencyRule = RealRule,
     private val secureDataManagerRule: DependencyRule = RealRule,
+    private val legacyLocalDbKeyProviderRule: DependencyRule = RealRule,
     private val loginInfoManagerRule: DependencyRule = RealRule,
     private val randomGeneratorRule: DependencyRule = RealRule,
     private val keystoreManagerRule: DependencyRule = RealRule,
@@ -126,7 +127,7 @@ class TestAppModule(
         preferencesManager: PreferencesManager,
         keystoreManager: KeystoreManager
     ): LegacyLocalDbKeyProvider =
-        secureDataManagerRule.resolveDependency {
+        legacyLocalDbKeyProviderRule.resolveDependency {
             super.provideLegacyLocalDbKeyProvider(
                 preferencesManager,
                 keystoreManager
@@ -168,8 +169,9 @@ class TestAppModule(
         sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder, sessionEventValidatorsBuilder) }
 
     override fun provideSessionEventsRemoteDbManager(remoteDbManager: RemoteDbManager,
-                                                     simApiClientFactory: SimApiClientFactory): SessionRemoteDataSource =
-        sessionEventsRemoteDbManagerRule.resolveDependency { super.provideSessionEventsRemoteDbManager(remoteDbManager, simApiClientFactory) }
+                                                     simApiClientFactory: SimApiClientFactory,
+                                                     baseUrlProvider: BaseUrlProvider): SessionRemoteDataSource =
+        sessionEventsRemoteDbManagerRule.resolveDependency { super.provideSessionEventsRemoteDbManager(remoteDbManager, simApiClientFactory, baseUrlProvider) }
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
