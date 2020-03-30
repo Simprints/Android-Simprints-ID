@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.google.firebase.FirebaseApp
 import com.simprints.core.network.NetworkConstants.Companion.BASE_URL_SUFFIX
 import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
@@ -29,7 +30,14 @@ class BaseUrlProviderImpl(
     }
 
     override fun getImageStorageBucketUrl(): String {
-        return settingsPreferencesManager.imageStorageBucketUrl
+        val storedValue = settingsPreferencesManager.imageStorageBucketUrl
+
+        return if (storedValue.isEmpty()) {
+            val firebaseProjectName = FirebaseApp.getInstance().options.projectId
+            "gs://$firebaseProjectName-images-eu"
+        } else {
+            storedValue
+        }
     }
 
     override fun setImageStorageBucketUrl(imageStorageBucketUrl: String) {

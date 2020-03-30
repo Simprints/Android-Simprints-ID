@@ -5,6 +5,7 @@ import androidx.work.WorkerParameters
 import com.simprints.core.images.repository.ImageRepository
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,16 +18,19 @@ class ImageUpSyncWorker(
 
     override val tag: String = ImageUpSyncWorker::class.java.simpleName
 
-    @Inject lateinit var imageRepository: ImageRepository
     @Inject override lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var imageRepository: ImageRepository
+    @Inject lateinit var baseUrlProvider: BaseUrlProvider
 
     override suspend fun doWork(): Result =
         withContext(Dispatchers.IO) {
             (applicationContext as Application).component.inject(this@ImageUpSyncWorker)
             crashlyticsLog("Start")
 
+            val bucketUrl = baseUrlProvider.getImageStorageBucketUrl()
+
             val success = try {
-                imageRepository.uploadStoredImagesAndDelete()
+                imageRepository.uploadStoredImagesAndDelete(bucketUrl)
             } catch (ex: Exception) {
                 crashReportManager.logExceptionOrSafeException(ex)
                 false

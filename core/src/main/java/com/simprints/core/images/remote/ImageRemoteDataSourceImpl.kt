@@ -9,18 +9,15 @@ import java.io.FileInputStream
 
 internal class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
 
-    private companion object {
-        val firebaseProjectName = FirebaseApp.getInstance()?.options?.projectId
-        val bucketName = "gs://$firebaseProjectName-images-eu"
-    }
+    private val firebaseProjectName = FirebaseApp.getInstance()?.options?.projectId
 
     override suspend fun uploadImage(
         imageStream: FileInputStream,
-        imageRef: SecuredImageRef
+        imageRef: SecuredImageRef,
+        bucketUrl: String
     ): UploadResult {
-
         return if (firebaseProjectName != null) {
-            val rootRef = FirebaseStorage.getInstance(bucketName).reference
+            val rootRef = FirebaseStorage.getInstance(bucketUrl).reference
 
             var fileRef = rootRef
             imageRef.relativePath.parts.forEach { pathPart ->
@@ -43,4 +40,5 @@ internal class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
             UploadResult(imageRef, UploadResult.Status.FAILED)
         }
     }
+
 }
