@@ -19,7 +19,7 @@ interface ModalityFlow {
 
     fun getNextStepToLaunch(): Step?
 
-    fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step?
+    suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step?
 
     fun restoreState(stepsToRestore: List<Step>)
 }

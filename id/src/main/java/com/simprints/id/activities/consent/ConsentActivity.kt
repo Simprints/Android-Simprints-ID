@@ -17,7 +17,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.ConsentEvent
 import com.simprints.id.data.db.session.domain.models.session.Location
 import com.simprints.id.data.prefs.PreferencesManager
@@ -56,7 +56,7 @@ class ConsentActivity : AppCompatActivity() {
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var exitFormHelper: ExitFormHelper
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
@@ -222,7 +222,7 @@ class ConsentActivity : AppCompatActivity() {
                 val locationsFlow = locationManager.requestLocation(locationRequest).take(1)
                 locationsFlow.collect { locations ->
                     val lastLocation = locations.last()
-                    sessionEventsManager.updateSessionInBackground {
+                    sessionRepository.updateCurrentSession {
                         Timber.d("Saving user's location into the current session")
                         it.location = Location(lastLocation.latitude, lastLocation.longitude)
                     }

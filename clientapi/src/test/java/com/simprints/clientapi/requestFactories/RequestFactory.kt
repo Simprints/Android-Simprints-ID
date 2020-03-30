@@ -5,8 +5,7 @@ import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.ClientBase
-import com.simprints.testtools.common.syntax.whenever
-
+import io.mockk.every
 
 abstract class RequestFactory {
 
@@ -29,10 +28,11 @@ abstract class RequestFactory {
     abstract fun getValidSimprintsRequest(integrationInfo: IntegrationInfo): ClientBase
 
     open fun setMockDefaultExtractor(mockExtractor: ClientRequestExtractor) {
-        whenever(mockExtractor) { getProjectId() } thenReturn MOCK_PROJECT_ID
-        whenever(mockExtractor) { getUserId() } thenReturn MOCK_USER_ID
-        whenever(mockExtractor) { getModuleId() } thenReturn MOCK_MODULE_ID
-        whenever(mockExtractor) { getMetadata() } thenReturn MOCK_METADATA
+        every { mockExtractor.getProjectId() } returns MOCK_PROJECT_ID
+        every { mockExtractor.getUserId() } returns MOCK_USER_ID
+        every { mockExtractor.getModuleId() } returns MOCK_MODULE_ID
+        every { mockExtractor.getMetadata() } returns MOCK_METADATA
+        every { mockExtractor.getUnknownExtras() } returns emptyMap()
     }
 
 }
