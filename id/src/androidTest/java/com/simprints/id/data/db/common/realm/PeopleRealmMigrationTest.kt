@@ -57,7 +57,7 @@ class PeopleRealmMigrationTest {
         }
 
         return tmpDb.also {
-            val outputStream = FileOutputStream(tmpDb)
+            val outputStream = FileOutputStream(it)
             originalDb.use { input ->
                 outputStream.use { output ->
                     input.copyTo(output)
