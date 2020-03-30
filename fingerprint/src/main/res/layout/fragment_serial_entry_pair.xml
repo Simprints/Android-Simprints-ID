@@ -41,7 +41,9 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@id/serialEntrySpTextView"
         app:layout_constraintTop_toTopOf="@id/serialEntryOkButton"
-        tools:ignore="Autofill,LabelFor" />
+        tools:ignore="Autofill,LabelFor" >
+        <requestFocus />
+    </EditText>
 
     <ProgressBar
         android:id="@+id/serialEntryPairProgressBar"

@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.activities.connect.issues.serialentrypair
 
+import android.content.Context
 import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
@@ -7,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -69,6 +71,8 @@ class SerialEntryPairFragment : Fragment() {
                 handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
             }
         })
+        val inputMethodManager: InputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.showSoftInput(serialEntryEditText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     override fun onPause() {
