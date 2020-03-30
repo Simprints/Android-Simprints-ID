@@ -17,6 +17,7 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import io.reactivex.Completable
 import io.reactivex.observers.TestObserver
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
@@ -124,6 +125,7 @@ class SignerManagerTest {
     }
 
     @Test
+    @ExperimentalCoroutinesApi
     fun signOut_shouldRemoveAnyState() = runBlockingTest {
         every { loginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
 
@@ -160,7 +162,15 @@ class SignerManagerTest {
     private fun mockFetchingProjectInto(error: Boolean = false) =
         coEvery { projectRepository.loadFromRemoteAndRefreshCache(any()) }.apply {
             if (!error) {
-                this.returns(Project(DEFAULT_PROJECT_ID, "local", "",  ""))
+                this.returns(
+                    Project(
+                        DEFAULT_PROJECT_ID,
+                        "local",
+                        "",
+                        "",
+                        "some_bucket_url"
+                    )
+                )
             } else {
                 this.throws(Throwable("Failed to fetch project info"))
             }

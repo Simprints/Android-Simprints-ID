@@ -70,8 +70,13 @@ open class DataModule {
     @Provides
     open fun provideProjectRepository(
         projectLocalDataSource: ProjectLocalDataSource,
-        projectRemoteDataSource: ProjectRemoteDataSource
-    ): ProjectRepository = ProjectRepositoryImpl(projectLocalDataSource, projectRemoteDataSource)
+        projectRemoteDataSource: ProjectRemoteDataSource,
+        baseUrlProvider: BaseUrlProvider
+    ): ProjectRepository = ProjectRepositoryImpl(
+        projectLocalDataSource,
+        projectRemoteDataSource,
+        baseUrlProvider
+    )
 
     @Provides
     open fun providePersonRepository(
