@@ -13,11 +13,16 @@ import java.util.*
 
 internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
 
-    @RealmModule(classes = [DbFingerprintSample::class, DbFaceSample::class, DbPerson::class, DbProject::class])
+    @RealmModule(classes = [
+        DbFingerprintSample::class,
+        DbFaceSample::class,
+        DbPerson::class,
+        DbProject::class
+    ])
     class PeopleModule
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 8
+        const val REALM_SCHEMA_VERSION: Long = 9
 
         const val PERSON_TABLE: String = "DbPerson"
         const val FINGERPRINT_TABLE: String = "DbFingerprint"
@@ -29,6 +34,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
         const val PROJECT_NAME = "name"
         const val PROJECT_DESCRIPTION = "description"
         const val PROJECT_CREATOR = "creator"
+        const val IMAGE_BUCKET = "imageBucket"
         const val PROJECT_UPDATED_AT = "updatedAt"
 
         const val FINGERPRINT_PERSON = "person"
@@ -45,6 +51,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
                 5 -> migrateTo6(realm.schema)
                 6 -> migrateTo7(realm.schema)
                 7 -> migrateTo8(realm.schema)
+                8 -> migrateTo9(realm.schema)
             }
         }
     }
@@ -177,6 +184,10 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
         } catch (t: Throwable) {
             t.printStackTrace()
         }
+    }
+
+    private fun migrateTo9(schema: RealmSchema) {
+        schema.get(PROJECT_TABLE)?.addNewField<String>(IMAGE_BUCKET, REQUIRED)
     }
 
     private inline fun <reified T> RealmObjectSchema.addNewField(name: String, vararg attributes: FieldAttribute): RealmObjectSchema =
