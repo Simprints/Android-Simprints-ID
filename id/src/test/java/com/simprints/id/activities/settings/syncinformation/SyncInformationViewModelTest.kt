@@ -10,16 +10,14 @@ import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,7 +39,6 @@ class SyncInformationViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         personRepositoryMock = mockk()
-        UnitTestConfig(this).rescheduleRxMainThread()
         viewModel = SyncInformationViewModel(personRepositoryMock, personLocalDataSourceMock, preferencesManagerMock, projectId, peopleDownSyncScopeRepositoryMock)
     }
 
@@ -52,11 +49,11 @@ class SyncInformationViewModelTest {
 
         viewModel.fetchAndUpdateLocalRecordCount()
 
-        assertThat(viewModel.localRecordCount.value).isEqualTo(totalRecordsInLocal)
+        assertThat(viewModel.localRecordCountLiveData.value).isEqualTo(totalRecordsInLocal)
     }
 
     @Test
-    fun fetchCountFromRemote_shouldUpdateValue() {
+    fun fetchCountFromRemote_shouldUpdateValue() = runBlockingTest {
         val countInRemoteForCreate = 123
         val countInRemoteForUpdate = 0
         val countInRemoteForDelete = 22
@@ -66,22 +63,22 @@ class SyncInformationViewModelTest {
 
         viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount()
 
-        assertThat(viewModel.recordsToDownSyncCount.value).isEqualTo(countInRemoteForCreate)
-        assertThat(viewModel.recordsToDeleteCount.value).isEqualTo(countInRemoteForDelete)
+        assertThat(viewModel.recordsToDownSyncCountLiveData.value).isEqualTo(countInRemoteForCreate)
+        assertThat(viewModel.recordsToDeleteCountLiveData.value).isEqualTo(countInRemoteForDelete)
     }
 
     @Test
-    fun fetchRecordsToUpSyncCount_shouldUpdateValue() = runBlocking {
+    fun fetchRecordsToUpSyncCount_shouldUpdateValue() = runBlockingTest {
         val recordsToUpSyncCount = 123
         mockPersonLocalDataSourceCount(recordsToUpSyncCount)
 
         viewModel.fetchAndUpdateRecordsToUpSyncCount()
 
-        assertThat(viewModel.recordsToUpSyncCount.value).isEqualTo(recordsToUpSyncCount)
+        assertThat(viewModel.recordsToUpSyncCountLiveData.value).isEqualTo(recordsToUpSyncCount)
     }
 
     @Test
-    fun fetchSelectedModulesCount_shouldUpdateValue() = runBlocking {
+    fun fetchSelectedModulesCount_shouldUpdateValue() = runBlockingTest {
         val moduleName = "module1"
         val countForModule = 123
         every { preferencesManagerMock.selectedModules } returns setOf(moduleName)
@@ -89,14 +86,14 @@ class SyncInformationViewModelTest {
 
         viewModel.fetchAndUpdateSelectedModulesCount()
 
-        with(viewModel.selectedModulesCount.value?.first()) {
+        with(viewModel.selectedModulesCountLiveData.value?.first()) {
             assertThat(this?.name).isEqualTo(moduleName)
             assertThat(this?.count).isEqualTo(countForModule)
         }
     }
 
     @Test
-    fun withUnselectedModules_shouldUpdateValue() = runBlocking {
+    fun withUnselectedModules_shouldUpdateValue() = runBlockingTest {
         val selectedModuleName = "module1"
         val unselectedModuleName = "module2"
         val recordWithSelectedModule = Person(
@@ -122,14 +119,14 @@ class SyncInformationViewModelTest {
 
         viewModel.fetchAndUpdatedUnselectedModulesCount()
 
-        with(viewModel.unselectedModulesCount.value?.first()) {
+        with(viewModel.unselectedModulesCountLiveData.value?.first()) {
             assertThat(this?.name).isEqualTo(unselectedModuleName)
             assertThat(this?.count).isEqualTo(2)
         }
     }
 
     @Test
-    fun withNoUnselectedModules_shouldUpdateValueAsEmptyList() = runBlocking {
+    fun withNoUnselectedModules_shouldUpdateValueAsEmptyList() = runBlockingTest {
         val selectedModuleName = "module1"
         val recordWithSelectedModule = Person(
             randomUUID(),
@@ -145,7 +142,34 @@ class SyncInformationViewModelTest {
 
         viewModel.fetchAndUpdatedUnselectedModulesCount()
 
-        assertThat(viewModel.unselectedModulesCount.value).isEmpty()
+        assertThat(viewModel.unselectedModulesCountLiveData.value).isEmpty()
+    }
+
+    @Test
+    fun downSyncSettingIsOn_shouldRequestRecordsToDownloadAndDeleteCount() = runBlockingTest {
+        every { preferencesManagerMock.peopleDownSyncSetting } returns PeopleDownSyncSetting.ON
+
+        viewModel.fetchRecordsToUpdateAndDeleteCountIfNecessary()
+
+        coVerify(exactly = 1) { viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount() }
+    }
+
+    @Test
+    fun downSyncSettingIsExtra_shouldRequestRecordsToDownloadAndDeleteCount() = runBlockingTest {
+        every { preferencesManagerMock.peopleDownSyncSetting } returns PeopleDownSyncSetting.EXTRA
+
+        viewModel.fetchRecordsToUpdateAndDeleteCountIfNecessary()
+
+        coVerify(exactly = 1) { viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount() }
+    }
+
+    @Test
+    fun downSyncSettingIsOffShouldRequestRecordsToDownloadAndDeleteCount() = runBlockingTest {
+        every { preferencesManagerMock.peopleDownSyncSetting } returns PeopleDownSyncSetting.OFF
+
+        viewModel.fetchRecordsToUpdateAndDeleteCountIfNecessary()
+
+        coVerify(exactly = 0) { viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount() }
     }
 
     private fun mockPersonLocalDataSourceCount(recordCount: Int) {

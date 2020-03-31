@@ -3,8 +3,8 @@ package com.simprints.id.data.db.session.controllers.remote.apiAdapters
 import android.net.NetworkInfo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.commontesttools.sessionEvents.*
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPool
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPoolType
@@ -387,7 +387,7 @@ class SessionEventsAdapterFactoryTest {
             Device("28", "phone", "device_id"),
             0,
             DatabaseInfo(0, 0))
-        session.addEvent(AlertScreenEvent(0, AlertScreenEvent.AlertScreenEventType.INVALID_SELECTED_ID))
+        session.events.add(AlertScreenEvent(0, AlertScreenEvent.AlertScreenEventType.INVALID_SELECTED_ID))
         val apiSession = ApiSessionEvents(session)
         val json = gsonWithAdapters.toJsonTree(apiSession).asJsonObject
         validateSessionEventsApiModel(json)

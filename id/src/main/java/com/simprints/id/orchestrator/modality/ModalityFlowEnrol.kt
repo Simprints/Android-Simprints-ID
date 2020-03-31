@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -14,14 +14,16 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFace
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
+import com.simprints.id.tools.TimeHelper
 
 
 class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
                             private val faceEnrolProcessor: FaceStepProcessor,
                             private val coreStepProcessor: CoreStepProcessor,
-                            sessionEventsManager: SessionEventsManager,
+                            timeHelper: TimeHelper,
+                            sessionRepository: SessionRepository,
                             consentRequired: Boolean) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceEnrolProcessor, sessionEventsManager, consentRequired) {
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceEnrolProcessor, timeHelper, sessionRepository, consentRequired) {
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppEnrolRequest)
@@ -39,7 +41,7 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
 
     override fun getNextStepToLaunch(): Step? = steps.firstOrNull { it.getStatus() == NOT_STARTED }
 
-    override fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step? {
+    override suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step? {
         val result = when {
             isCoreResult(requestCode) -> coreStepProcessor.processResult(data)
             isFingerprintResult(requestCode) -> {
@@ -56,7 +58,7 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
         return stepForRequest?.apply { setResult(result) }
     }
 
-    private fun addEventIfFingerprintCaptureResponse(it: Step.Result?) {
+    private suspend fun addEventIfFingerprintCaptureResponse(it: Step.Result?) {
         if (it is FingerprintCaptureResponse) {
             extractFingerprintAndAddPersonCreationEvent(it)
         }
