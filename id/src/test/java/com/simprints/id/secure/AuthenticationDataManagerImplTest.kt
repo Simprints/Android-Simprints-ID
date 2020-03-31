@@ -2,6 +2,7 @@ package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
@@ -49,7 +50,10 @@ class AuthenticationDataManagerImplTest: AutoCloseKoinTest() {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         UnitTestConfig(this).setupFirebase()
-        apiClient = SimApiClientFactory("deviceId").build(DEFAULT_BASE_URL)
+
+        val mockBaseUrlProvider = mockk<BaseUrlProvider>()
+        every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
+        apiClient = SimApiClientFactory(mockBaseUrlProvider, "deviceId").build()
     }
 
     @Test

@@ -157,12 +157,12 @@ class SettingsAboutPresenterTest {
     }
 
     @Test
-    fun presenterLogout_imageStorageBucketUrlIsReset() = runBlockingTest {
+    fun presenterLogout_apiBaseUrlIsReset() = runBlockingTest {
         mockDepsForLogout(presenter)
 
         presenter.logout()
 
-        verify { presenter.baseUrlProvider.resetImageStorageBucketUrl() }
+        verify { presenter.baseUrlProvider.resetApiBaseUrl() }
     }
 
     private fun mockDepsForLogout(presenter: SettingsAboutPresenter) {

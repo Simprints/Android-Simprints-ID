@@ -3,19 +3,25 @@ package com.simprints.id.secure
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.network.NetworkConstants.Companion.BASE_URL_SUFFIX
 import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
+import com.simprints.id.data.db.project.domain.Project
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl.Companion.IMAGE_STORAGE_BUCKET_URL_DEFAULT
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 
 class BaseUrlProviderImplTest {
 
     @MockK lateinit var mockSettingsPreferencesManager: SettingsPreferencesManager
-    @MockK lateinit var mockRemoteProjectInfoProvider: RemoteProjectInfoProvider
+    @MockK lateinit var mockProjectLocalDataSource: ProjectLocalDataSource
+    @MockK lateinit var mockLoginInfoManager: LoginInfoManager
 
     private lateinit var baseUrlProvider: BaseUrlProviderImpl
 
@@ -23,11 +29,11 @@ class BaseUrlProviderImplTest {
     fun setUp() {
         MockKAnnotations.init(this)
         every { mockSettingsPreferencesManager.apiBaseUrl } returns MOCK_URL
-        every { mockRemoteProjectInfoProvider.getProjectName() } returns MOCK_PROJECT_NAME
 
         baseUrlProvider = BaseUrlProviderImpl(
             mockSettingsPreferencesManager,
-            mockRemoteProjectInfoProvider
+            mockProjectLocalDataSource,
+            mockLoginInfoManager
         )
     }
 
@@ -72,50 +78,45 @@ class BaseUrlProviderImplTest {
     }
 
     @Test
-    fun shouldReturnImageStorageBucketUrlFromSharedPreferences() {
+    @ExperimentalCoroutinesApi
+    fun shouldReturnImageStorageBucketUrlFromProjectLocalDataSource() = runBlockingTest {
         val expected = "mock-bucket-url"
-        every { mockSettingsPreferencesManager.imageStorageBucketUrl } returns expected
+        every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns "mock-project-id"
+        coEvery {
+            mockProjectLocalDataSource.load(any())
+        } returns Project(
+            "id",
+            "name",
+            "description",
+            "creator",
+            expected
+        )
 
         assertThat(baseUrlProvider.getImageStorageBucketUrl()).isEqualTo(expected)
     }
 
     @Test
-    fun whenNoValueIsFoundInSharedPreferences_shouldUseDefaultImageStorageBucketUrl() {
-        every { mockSettingsPreferencesManager.imageStorageBucketUrl } returns ""
-        val expected = "gs://$MOCK_PROJECT_NAME-images-eu"
+    @ExperimentalCoroutinesApi
+    fun whenNoValueIsFoundInLoginInfoManager_shouldReturnNull() = runBlockingTest {
+        every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns ""
 
-        assertThat(baseUrlProvider.getImageStorageBucketUrl()).isEqualTo(expected)
+        assertThat(baseUrlProvider.getImageStorageBucketUrl()).isNull()
     }
 
     @Test
-    fun whenImageStorageBucketUrlIsStoredInSharedPreferences_shouldNotUseDefault() {
-        val expected = "mock-bucket-url"
-        every { mockSettingsPreferencesManager.imageStorageBucketUrl } returns expected
+    @ExperimentalCoroutinesApi
+    fun whenNoValueIsFoundInProjectLocalDataSource_shouldReturnDefaultImageStorageBucketUrl() {
+        every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns "mock-project-id"
+        coEvery { mockProjectLocalDataSource.load(any()) } returns null
 
-        baseUrlProvider.getImageStorageBucketUrl()
-
-        verify(exactly = 0) { mockRemoteProjectInfoProvider.getProjectName() }
-    }
-
-    @Test
-    fun shouldSaveNewImageStorageBucketUrlToSharedPreferences() {
-        baseUrlProvider.setImageStorageBucketUrl("mock-bucket-url")
-
-        verify { mockSettingsPreferencesManager.imageStorageBucketUrl = any() }
-    }
-
-    @Test
-    fun whenResettingImageStorageBucketUrl_shouldSaveDefaultToSharedPreferences() {
-        baseUrlProvider.resetImageStorageBucketUrl()
-
-        verify {
-            mockSettingsPreferencesManager.imageStorageBucketUrl = IMAGE_STORAGE_BUCKET_URL_DEFAULT
+        val expected = "gs://mock-project-id-images-eu"
+        runBlockingTest {
+            assertThat(baseUrlProvider.getImageStorageBucketUrl()).isEqualTo(expected)
         }
     }
 
     private companion object {
         const val MOCK_URL = "https://mock-url"
-        const val MOCK_PROJECT_NAME = "mock-project"
     }
 
 }
