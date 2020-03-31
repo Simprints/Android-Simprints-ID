@@ -64,12 +64,10 @@ class SerialEntryPairFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.isAwaitingPairSerialNumber.observe(this, Observer {
-            it?.let {
-                serialEntryOkButton.visibility = View.INVISIBLE
-                serialEntryPairProgressBar.visibility = View.VISIBLE
-                handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
-            }
+        viewModel.awaitingToPairToMacAddress.observe(this, Observer {
+            serialEntryOkButton.visibility = View.INVISIBLE
+            serialEntryPairProgressBar.visibility = View.VISIBLE
+            handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
         })
         val inputMethodManager: InputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.showSoftInput(serialEntryEditText, InputMethodManager.SHOW_IMPLICIT)
@@ -77,8 +75,7 @@ class SerialEntryPairFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.toastMessage.removeObservers(this)
-        viewModel.isAwaitingPairSerialNumber.removeObservers(this)
+        viewModel.awaitingToPairToMacAddress.removeObservers(this)
     }
 
     override fun onStop() {
@@ -105,11 +102,11 @@ class SerialEntryPairFragment : Fragment() {
 
     private fun handlePairingAttemptFailed() {
         handler.removeCallbacks(determineWhetherPairingWasSuccessful)
-        viewModel.isAwaitingPairSerialNumber.value?.let { macAddress ->
+        viewModel.awaitingToPairToMacAddress.value?.let { macAddressEvent ->
             serialEntryPairProgressBar.visibility = View.INVISIBLE
             serialEntryOkButton.visibility = View.VISIBLE
             serialEntryPairInstructionsDetailTextView.visibility = View.INVISIBLE
-            serialEntryPairInstructionsTextView.text = getString(R.string.serial_entry_pair_failed, scannerPairingManager.convertAddressToSerialNumber(macAddress))
+            serialEntryPairInstructionsTextView.text = getString(R.string.serial_entry_pair_failed, scannerPairingManager.convertAddressToSerialNumber(macAddressEvent.peekContent()))
         }
     }
 
