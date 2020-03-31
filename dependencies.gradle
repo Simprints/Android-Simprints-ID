@@ -74,12 +74,8 @@ def firebase = [
     perf         : "com.google.firebase:firebase-perf:19.0.5",
     storage      : "com.google.firebase:firebase-storage-ktx:19.1.1",
     mlkit        : "com.google.firebase:firebase-ml-vision:24.0.1",
-    mlkit_barcode: "com.google.firebase:firebase-ml-vision-barcode-model:16.0.2"
-]
-
-def crashlytics = [
-    core: "com.crashlytics.sdk.android:crashlytics:2.9.9@aar",
-    ndk : "com.crashlytics.sdk.android:crashlytics-ndk:2.0.5@aar"
+    mlkit_barcode: "com.google.firebase:firebase-ml-vision-barcode-model:16.0.2",
+    crashlytics  : "com.google.firebase:firebase-crashlytics:17.0.0-beta02"
 ]
 
 def retrofit_version = "2.7.1"
@@ -202,7 +198,6 @@ ext.deps = [
     arch_components: arch_components,
     playservices   : playservices,
     firebase       : firebase,
-    crashlytics    : crashlytics,
     retrofit       : retrofit,
     gson           : gson,
     timber         : timber,
