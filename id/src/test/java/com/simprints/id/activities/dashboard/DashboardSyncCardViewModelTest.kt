@@ -55,7 +55,7 @@
 //
 //    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 //
-//    @get:Rule
+//    @build:Rule
 //    var rule: TestRule = InstantTaskExecutorRule()
 //
 //    private var remoteDbManagerMock: RemoteDbManager = mock()

@@ -3,7 +3,7 @@ package com.simprints.clientapi.clientrequests.validators
 import com.simprints.clientapi.exceptions.InvalidSelectedIdException
 import com.simprints.clientapi.exceptions.InvalidSessionIdException
 import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
-import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
 import org.junit.Assert
 import org.junit.Test
 
@@ -16,7 +16,7 @@ class ConfirmIdentityValidatorTest : AppRequestValidatorTest(ConfirmIdentityFact
     @Test
     fun validateClientRequest_shouldFailOnSessionId() {
         val extractor = ConfirmIdentityFactory.getMockExtractor()
-        whenever(extractor) { getSessionId() } thenReturn ""
+        every { extractor.getSessionId() } returns ""
 
         try {
             ConfirmIdentityFactory.getValidator(extractor).validateClientRequest()
@@ -29,7 +29,7 @@ class ConfirmIdentityValidatorTest : AppRequestValidatorTest(ConfirmIdentityFact
     @Test
     fun validateClientRequest_shouldFailOnSelectedGuid() {
         val extractor = ConfirmIdentityFactory.getMockExtractor()
-        whenever(extractor) { getSelectedGuid() } thenReturn ""
+        every { extractor.getSelectedGuid() } returns ""
 
         try {
             ConfirmIdentityFactory.getValidator(extractor).validateClientRequest()

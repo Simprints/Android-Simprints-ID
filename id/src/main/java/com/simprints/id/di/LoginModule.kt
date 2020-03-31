@@ -8,9 +8,9 @@ import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.consent.LongConsentManager
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
@@ -34,7 +34,27 @@ open class LoginModule {
     }
 
     @Provides
+    open fun provideSecreteManager(loginInfoManager: LoginInfoManager): ProjectSecretManager =
+        ProjectSecretManager(loginInfoManager)
+
+    @Provides
+    open fun provideAuthManager(
+        apiClientFactory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider
+    ): AuthManager = AuthManagerImpl(apiClientFactory, baseUrlProvider)
+
+    @Provides
+    open fun provideAuthenticationDataManager(apiClientFactory: SimApiClientFactory,
+                                              baseUrlProvider: BaseUrlProvider): AuthenticationDataManager =
+        AuthenticationDataManagerImpl(apiClientFactory, baseUrlProvider)
+
+    @Provides
+    open fun provideAttestationManager(): AttestationManager = AttestationManagerImpl()
+
+    @Provides
     open fun provideProjectAuthenticator(
+        authManager: AuthManager,
+        projectSecretManager: ProjectSecretManager,
         loginInfoManager: LoginInfoManager,
         simApiClientFactory: SimApiClientFactory,
         baseUrlProvider: BaseUrlProvider,
@@ -43,19 +63,21 @@ open class LoginModule {
         projectRemoteDataSource: ProjectRemoteDataSource,
         signerManager: SignerManager,
         remoteConfigWrapper: RemoteConfigWrapper,
-        longConsentManager: LongConsentManager,
-        preferencesManager: PreferencesManager
+        longConsentRepository: LongConsentRepository,
+        preferencesManager: PreferencesManager,
+        attestationManager: AttestationManager,
+        authenticationDataManager: AuthenticationDataManager
     ) : ProjectAuthenticator = ProjectAuthenticatorImpl(
-        loginInfoManager,
-        simApiClientFactory,
-        baseUrlProvider,
+        authManager,
+        projectSecretManager,
         safetyNetClient,
         secureDataManager,
         projectRemoteDataSource,
         signerManager,
         remoteConfigWrapper,
-        longConsentManager,
-        preferencesManager
+        longConsentRepository,
+        attestationManager,
+        authenticationDataManager
     )
 
     @Provides
@@ -64,14 +86,14 @@ open class LoginModule {
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         projectAuthenticator: ProjectAuthenticator,
-        sessionEventsManager: SessionEventsManager
+        sessionRepository: SessionRepository
     ): AuthenticationHelper {
         return AuthenticationHelperImpl(
             crashReportManager,
             loginInfoManager,
             timeHelper,
             projectAuthenticator,
-            sessionEventsManager
+            sessionRepository
         )
     }
 
