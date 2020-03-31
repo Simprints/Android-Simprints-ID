@@ -8,31 +8,32 @@ import com.simprints.core.images.model.SecuredImageRef
 import com.simprints.core.images.remote.ImageRemoteDataSource
 import com.simprints.core.images.remote.ImageRemoteDataSourceImpl
 import com.simprints.core.images.remote.UploadResult
+import com.simprints.core.network.BaseUrlProvider
 
 class ImageRepositoryImpl internal constructor(
     private val localDataSource: ImageLocalDataSource,
     private val remoteDataSource: ImageRemoteDataSource
 ) : ImageRepository {
 
-    constructor(context: Context) : this(
+    constructor(context: Context, baseUrlProvider: BaseUrlProvider) : this(
         ImageLocalDataSourceImpl(context),
-        ImageRemoteDataSourceImpl()
+        ImageRemoteDataSourceImpl(baseUrlProvider)
     )
 
     override fun storeImageSecurely(imageBytes: ByteArray, relativePath: Path): SecuredImageRef? {
         return localDataSource.encryptAndStoreImage(imageBytes, relativePath)
     }
 
-    override suspend fun uploadStoredImagesAndDelete(bucketUrl: String): Boolean {
-        val uploads = uploadImages(bucketUrl)
+    override suspend fun uploadStoredImagesAndDelete(): Boolean {
+        val uploads = uploadImages()
         return getOperationResult(uploads)
     }
 
-    private suspend fun uploadImages(bucketUrl: String): List<UploadResult> {
+    private suspend fun uploadImages(): List<UploadResult> {
         val images = localDataSource.listImages()
         return images.map { imageRef ->
             localDataSource.decryptImage(imageRef)?.let { stream ->
-                remoteDataSource.uploadImage(stream, imageRef, bucketUrl)
+                remoteDataSource.uploadImage(stream, imageRef)
             } ?: UploadResult(
                 imageRef,
                 UploadResult.Status.FAILED

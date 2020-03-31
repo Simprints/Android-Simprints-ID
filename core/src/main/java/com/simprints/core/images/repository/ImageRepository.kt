@@ -23,10 +23,8 @@ interface ImageRepository {
     /**
      * Uploads all images stored locally and deletes if the upload has been successful
      *
-     * @param bucketUrl the image storage bucket URL
-     *
      * @return true if all images have been successfully uploaded and deleted from the device
      */
-    suspend fun uploadStoredImagesAndDelete(bucketUrl: String): Boolean
+    suspend fun uploadStoredImagesAndDelete(): Boolean
 
 }

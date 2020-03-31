@@ -3,20 +3,23 @@ package com.simprints.core.images.remote
 import com.google.firebase.FirebaseApp
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.core.images.model.SecuredImageRef
+import com.simprints.core.network.BaseUrlProvider
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import java.io.FileInputStream
 
-internal class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
+internal class ImageRemoteDataSourceImpl(
+    private val baseUrlProvider: BaseUrlProvider
+) : ImageRemoteDataSource {
 
-    private val firebaseProjectName = FirebaseApp.getInstance()?.options?.projectId
+    private val firebaseProjectName = FirebaseApp.getInstance().options.projectId
 
     override suspend fun uploadImage(
         imageStream: FileInputStream,
-        imageRef: SecuredImageRef,
-        bucketUrl: String
+        imageRef: SecuredImageRef
     ): UploadResult {
         return if (firebaseProjectName != null) {
+            val bucketUrl = baseUrlProvider.getImageStorageBucketUrl()
             val rootRef = FirebaseStorage.getInstance(bucketUrl).reference
 
             var fileRef = rootRef
