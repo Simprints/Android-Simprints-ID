@@ -9,13 +9,14 @@ import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.session.domain.SessionEventsManager
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
-import com.simprints.id.data.db.session.remote.RemoteSessionsManager
+import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
+import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
+import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
@@ -45,17 +46,19 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 class TestAppModule(
     app: Application,
     private val remoteDbManagerRule: DependencyRule = RealRule,
-    private val remoteSessionsManagerRule: DependencyRule = RealRule,
     private val dbManagerRule: DependencyRule = RealRule,
     private val secureDataManagerRule: DependencyRule = RealRule,
+    private val legacyLocalDbKeyProviderRule: DependencyRule = RealRule,
     private val loginInfoManagerRule: DependencyRule = RealRule,
     private val randomGeneratorRule: DependencyRule = RealRule,
     private val keystoreManagerRule: DependencyRule = RealRule,
     private val crashReportManagerRule: DependencyRule = RealRule,
     private val sessionEventsManagerRule: DependencyRule = RealRule,
     private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
+    private val sessionEventsRemoteDbManagerRule: DependencyRule = RealRule,
     private val simNetworkUtilsRule: DependencyRule = RealRule,
     private val longConsentManagerRule: DependencyRule = RealRule,
+    private val secureApiInterfaceRule: DependencyRule = RealRule,
     private val syncStatusDatabaseRule: DependencyRule = RealRule,
     private val deviceManagerRule: DependencyRule = RealRule,
     private val recentEventsPreferencesManagerRule: DependencyRule = RealRule,
@@ -124,7 +127,7 @@ class TestAppModule(
         preferencesManager: PreferencesManager,
         keystoreManager: KeystoreManager
     ): LegacyLocalDbKeyProvider =
-        secureDataManagerRule.resolveDependency {
+        legacyLocalDbKeyProviderRule.resolveDependency {
             super.provideLegacyLocalDbKeyProvider(
                 preferencesManager,
                 keystoreManager
@@ -137,16 +140,20 @@ class TestAppModule(
     override fun provideSessionEventsManager(
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
-        sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+        sessionLocalDataSource: SessionLocalDataSource,
+        sessionRemoteDataSource: SessionRemoteDataSource,
         preferencesManager: PreferencesManager,
+        loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         crashReportManager: CrashReportManager
-    ): SessionEventsManager = sessionEventsManagerRule.resolveDependency {
+    ): SessionRepository = sessionEventsManagerRule.resolveDependency {
         super.provideSessionEventsManager(
             ctx,
             sessionEventsSyncManager,
-            sessionEventsLocalDbManager,
+            sessionLocalDataSource,
+            sessionRemoteDataSource,
             preferencesManager,
+            loginInfoManager,
             timeHelper,
             crashReportManager
         )
@@ -154,43 +161,21 @@ class TestAppModule(
 
     override fun provideSessionEventsLocalDbManager(
         ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider
-    ): SessionEventsLocalDbManager =
-        sessionEventsLocalDbManagerRule.resolveDependency {
-            super.provideSessionEventsLocalDbManager(
-                ctx,
-                secureDataManager
-            )
-        }
+        secureDataManager: SecureLocalDbKeyProvider,
+        timeHelper: TimeHelper,
+        sessionRealmConfigBuilder: SessionRealmConfigBuilder,
+        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
+    ): SessionLocalDataSource =
+        sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder, sessionEventValidatorsBuilder) }
+
+    override fun provideSessionEventsRemoteDbManager(remoteDbManager: RemoteDbManager,
+                                                     simApiClientFactory: SimApiClientFactory,
+                                                     baseUrlProvider: BaseUrlProvider): SessionRemoteDataSource =
+        sessionEventsRemoteDbManagerRule.resolveDependency { super.provideSessionEventsRemoteDbManager(remoteDbManager, simApiClientFactory, baseUrlProvider) }
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
 
-    override fun provideLongConsentManager(
-        ctx: Context,
-        loginInfoManager: LoginInfoManager,
-        crashReportManager: CrashReportManager
-    ): LongConsentManager =
-        longConsentManagerRule.resolveDependency {
-            super.provideLongConsentManager(
-                ctx,
-                loginInfoManager,
-                crashReportManager
-            )
-        }
-
-    override fun provideRemoteSessionsManager(
-        remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider
-    ): RemoteSessionsManager =
-        remoteSessionsManagerRule.resolveDependency {
-            super.provideRemoteSessionsManager(
-                remoteDbManager,
-                simApiClientFactory,
-                baseUrlProvider
-            )
-        }
 
     override fun provideSyncStatusDatabase(ctx: Context): PeopleSyncStatusDatabase =
         syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase(ctx) }

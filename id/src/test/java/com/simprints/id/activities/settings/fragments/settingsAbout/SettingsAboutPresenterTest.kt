@@ -143,7 +143,7 @@ class SettingsAboutPresenterTest {
 
         presenter.logout()
 
-        verify(exactly = 1) { presenter.longConsentManager.deleteLongConsents() }
+        verify(exactly = 1) { presenter.longConsentRepository.deleteLongConsents() }
     }
 
     @Test
@@ -152,13 +152,13 @@ class SettingsAboutPresenterTest {
 
         presenter.logout()
 
-        verify(exactly = 1) { presenter.sessionEventManager.signOut() }
+        coVerify(exactly = 1) { presenter.sessionEventManager.signOut() }
     }
 
     private fun mockDepsForLogout(presenter: SettingsAboutPresenter) {
         presenter.signerManager = mockk(relaxed = true)
         presenter.syncManager = mockk(relaxed = true)
-        presenter.longConsentManager = mockk(relaxed = true)
+        presenter.longConsentRepository = mockk(relaxed = true)
         presenter.sessionEventManager = mockk(relaxed = true)
     }
 }
