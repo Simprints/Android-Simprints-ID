@@ -2,20 +2,23 @@ package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.network.NetworkConstants.Companion.BASE_URL
+import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
-import com.simprints.id.secure.SecureApiInterface.Companion.apiKey
+import com.simprints.id.secure.SecureApiInterface.Companion.API_KEY
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.retrofit.FakeResponseInterceptor
 import com.simprints.testtools.common.syntax.assertThrows
+import io.mockk.MockKAnnotations
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import okhttp3.OkHttpClient
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,7 +37,7 @@ class AuthenticationDataManagerImplTest: AutoCloseKoinTest() {
     private val publicKeyFromServer = "public_key_from_server"
     private val validAuthenticationJsonResponse = "{\"nonce\":\"$nonceFromServer\", \"publicKey\":\"$publicKeyFromServer\"}"
     private val expectedAuthenticationData = AuthenticationData(Nonce(nonceFromServer), PublicKeyString(publicKeyFromServer))
-    private val expectedUrl = BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?key=$apiKey"
+    private val expectedUrl = DEFAULT_BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?key=$API_KEY"
 
     private val validateUrl: (url: String) -> Unit  = {
         assertThat(it).isEqualTo(expectedUrl)
@@ -44,16 +47,17 @@ class AuthenticationDataManagerImplTest: AutoCloseKoinTest() {
 
     @Before
     fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
         UnitTestConfig(this).setupFirebase()
-        apiClient = SimApiClientFactory("deviceId", endpoint = BASE_URL).build()
+        apiClient = SimApiClientFactory("deviceId").build(DEFAULT_BASE_URL)
     }
 
     @Test
     fun successfulResponse_shouldObtainValidAuthenticationData() {
         runBlocking {
-            forceOkHttpToReturnSuccessfulResponse(apiClient.okHttpClientConfig)
+            apiClient.okHttpClientConfig.addInterceptor(FakeResponseInterceptor(200, validAuthenticationJsonResponse, validateUrl = validateUrl))
 
-            val actualAuthenticationData = makeTestRequestForAuthenticationData(apiClient.api)
+            val actualAuthenticationData = makeTestRequestForAuthenticationData()
 
             assertThat(actualAuthenticationData).isEqualTo(expectedAuthenticationData)
         }
@@ -65,15 +69,15 @@ class AuthenticationDataManagerImplTest: AutoCloseKoinTest() {
             apiClient.okHttpClientConfig.addInterceptor(FakeResponseInterceptor(500, validateUrl = validateUrl))
 
             assertThrows<SimprintsInternalServerException> {
-                makeTestRequestForAuthenticationData(apiClient.api)
+                makeTestRequestForAuthenticationData()
             }
         }
     }
 
-    private suspend fun makeTestRequestForAuthenticationData(secureApiInterfaceMock: SecureApiInterface) =
-        AuthenticationDataManagerImpl(secureApiInterfaceMock).requestAuthenticationData(PROJECT_ID, USER_ID)
+    private suspend fun makeTestRequestForAuthenticationData(): AuthenticationData {
+        val authenticationDataManagerSpy = spyk(AuthenticationDataManagerImpl(mockk(), mockk()))
+        every { authenticationDataManagerSpy.apiClient } returns apiClient.api
 
-    private fun forceOkHttpToReturnSuccessfulResponse(okHttpClientConfig: OkHttpClient.Builder) {
-        okHttpClientConfig.addInterceptor(FakeResponseInterceptor(200, validAuthenticationJsonResponse, validateUrl = validateUrl))
+        return authenticationDataManagerSpy.requestAuthenticationData(PROJECT_ID, USER_ID)
     }
 }

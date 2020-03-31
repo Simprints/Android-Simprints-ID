@@ -1,10 +1,12 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
+import com.simprints.core.network.NetworkConstants
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
+import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
@@ -102,6 +104,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         val SCANNER_GENERATIONS_DEFAULT = listOf(ScannerGeneration.VERO_1)
         const val SCANNER_GENERATIONS_KEY = "ScannerGenerations"
 
+        const val API_BASE_URL_KEY = "ApiBaseUrl"
     }
 
     // Number of GUIDs to be returned to the calling app as the result of an identification
@@ -171,6 +174,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     override var scannerGenerations: List<ScannerGeneration>
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SCANNER_GENERATIONS_KEY, SCANNER_GENERATIONS_DEFAULT, scannerGenerationsSerializer)
+
+    override var apiBaseUrl: String
+        by PrimitivePreference(prefs, API_BASE_URL_KEY, NetworkConstants.DEFAULT_BASE_URL)
 
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()

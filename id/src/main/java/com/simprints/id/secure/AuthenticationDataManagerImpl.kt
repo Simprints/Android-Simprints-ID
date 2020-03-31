@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.secure.models.AuthenticationData
@@ -9,7 +10,9 @@ import com.simprints.id.tools.utils.retrySimNetworkCalls
 import retrofit2.HttpException
 import retrofit2.Response
 
-class AuthenticationDataManagerImpl(private val client: SecureApiInterface): AuthenticationDataManager {
+class AuthenticationDataManagerImpl(private val apiClientFactory: SimApiClientFactory,
+                                    private val baseUrlProvider: BaseUrlProvider): AuthenticationDataManager {
+
 
     override suspend fun requestAuthenticationData(projectId: String, userId: String): AuthenticationData {
         val response = makeNetworkRequest({
@@ -29,5 +32,9 @@ class AuthenticationDataManagerImpl(private val client: SecureApiInterface): Aut
         }
 
     private suspend fun <T> makeNetworkRequest(block: suspend (client: SecureApiInterface) -> T, traceName: String): T =
-        retrySimNetworkCalls(client, block, traceName)
+        retrySimNetworkCalls(apiClient, block, traceName)
+
+    internal val apiClient by lazy {
+        apiClientFactory.build<SecureApiInterface>(baseUrlProvider.getApiBaseUrl()).api
+    }
 }
