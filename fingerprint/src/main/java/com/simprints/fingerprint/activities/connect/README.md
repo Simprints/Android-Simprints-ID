@@ -37,8 +37,10 @@ The default assumption is that it is off, so the user is prompted to turn it on.
 
 Whilst this activity is created, the `ConnectScannerViewModel` is retrying the connect indefinitely in the background.
 A "Try Again" button exists, but does nothing.
+The user is provided with a "link" in case we are trying to connect to the wrong scanner and got to this screen by accident.
 
 Upon successful connection, always directly finishes the activity.
+If the user presses the "SPXX is not my scanner" link, this leads to the appropriate pairing fragment, which can be either `NfcOffFragment`, `NfcPairFragment`, or the `SerialEntryFragment`.
 
 ### NfcPairFragment
 This fragment is launched if the user confirms the wrong scanner is paired, if there are no scanners paired, or if there are multiple scanners paired.
