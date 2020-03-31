@@ -27,7 +27,7 @@ import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
-import com.simprints.id.secure.BaseUrlProvider
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.id.secure.RemoteProjectInfoProvider
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
@@ -172,7 +172,8 @@ class TestAppModule(
 
     override fun provideSessionEventsRemoteDbManager(remoteDbManager: RemoteDbManager,
                                                      simApiClientFactory: SimApiClientFactory,
-                                                     baseUrlProvider: BaseUrlProvider): SessionRemoteDataSource =
+                                                     baseUrlProvider: BaseUrlProvider
+    ): SessionRemoteDataSource =
         sessionEventsRemoteDbManagerRule.resolveDependency { super.provideSessionEventsRemoteDbManager(remoteDbManager, simApiClientFactory, baseUrlProvider) }
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =

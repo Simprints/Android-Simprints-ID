@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
@@ -12,7 +13,8 @@ import retrofit2.HttpException
 import retrofit2.Response
 
 class AuthManagerImpl(private val apiClientFactory: SimApiClientFactory,
-                      private val baseUrlProvider: BaseUrlProvider): AuthManager {
+                      private val baseUrlProvider: BaseUrlProvider
+): AuthManager {
 
     override suspend fun requestAuthToken(authRequest: AuthRequest): Token {
         val response = makeNetworkRequest({

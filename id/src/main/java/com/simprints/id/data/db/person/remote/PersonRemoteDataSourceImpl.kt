@@ -13,7 +13,7 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.request.Ap
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.WhereLabelKey.*
 import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
-import com.simprints.id.secure.BaseUrlProvider
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.id.tools.utils.retrySimNetworkCalls
 
 

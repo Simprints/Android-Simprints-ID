@@ -4,7 +4,7 @@ import com.google.firebase.perf.FirebasePerformance
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.secure.BaseUrlProvider
+import com.simprints.core.network.BaseUrlProvider
 
 class ProjectRepositoryImpl(
     private val projectLocalDataSource: ProjectLocalDataSource,

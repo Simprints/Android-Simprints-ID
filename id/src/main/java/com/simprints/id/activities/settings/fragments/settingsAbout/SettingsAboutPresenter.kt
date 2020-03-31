@@ -7,7 +7,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.GROUP
-import com.simprints.id.secure.BaseUrlProvider
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import javax.inject.Inject

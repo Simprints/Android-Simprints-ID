@@ -17,7 +17,7 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
-import com.simprints.id.secure.BaseUrlProvider
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.testtools.common.di.DependencyRule
 import kotlinx.coroutines.FlowPreview
