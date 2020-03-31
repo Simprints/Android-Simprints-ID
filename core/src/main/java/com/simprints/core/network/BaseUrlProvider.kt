@@ -5,7 +5,5 @@ interface BaseUrlProvider {
     fun setApiBaseUrl(apiBaseUrl: String?)
     fun resetApiBaseUrl()
 
-    fun getImageStorageBucketUrl(): String
-    fun setImageStorageBucketUrl(imageStorageBucketUrl: String)
-    fun resetImageStorageBucketUrl()
+    suspend fun getImageStorageBucketUrl(): String?
 }

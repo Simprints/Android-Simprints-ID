@@ -20,6 +20,8 @@ internal class ImageRemoteDataSourceImpl(
     ): UploadResult {
         return if (firebaseProjectName != null) {
             val bucketUrl = baseUrlProvider.getImageStorageBucketUrl()
+                ?: return UploadResult(imageRef, UploadResult.Status.FAILED)
+
             val rootRef = FirebaseStorage.getInstance(bucketUrl).reference
 
             var fileRef = rootRef
