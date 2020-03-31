@@ -34,7 +34,27 @@ open class LoginModule {
     }
 
     @Provides
+    open fun provideSecreteManager(loginInfoManager: LoginInfoManager): ProjectSecretManager =
+        ProjectSecretManager(loginInfoManager)
+
+    @Provides
+    open fun provideAuthManager(
+        apiClientFactory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider
+    ): AuthManager = AuthManagerImpl(apiClientFactory, baseUrlProvider)
+
+    @Provides
+    open fun provideAuthenticationDataManager(apiClientFactory: SimApiClientFactory,
+                                              baseUrlProvider: BaseUrlProvider): AuthenticationDataManager =
+        AuthenticationDataManagerImpl(apiClientFactory, baseUrlProvider)
+
+    @Provides
+    open fun provideAttestationManager(): AttestationManager = AttestationManagerImpl()
+
+    @Provides
     open fun provideProjectAuthenticator(
+        authManager: AuthManager,
+        projectSecretManager: ProjectSecretManager,
         loginInfoManager: LoginInfoManager,
         simApiClientFactory: SimApiClientFactory,
         baseUrlProvider: BaseUrlProvider,
@@ -44,18 +64,20 @@ open class LoginModule {
         signerManager: SignerManager,
         remoteConfigWrapper: RemoteConfigWrapper,
         longConsentRepository: LongConsentRepository,
-        preferencesManager: PreferencesManager
+        preferencesManager: PreferencesManager,
+        attestationManager: AttestationManager,
+        authenticationDataManager: AuthenticationDataManager
     ) : ProjectAuthenticator = ProjectAuthenticatorImpl(
-        loginInfoManager,
-        simApiClientFactory,
-        baseUrlProvider,
+        authManager,
+        projectSecretManager,
         safetyNetClient,
         secureDataManager,
         projectRemoteDataSource,
         signerManager,
         remoteConfigWrapper,
         longConsentRepository,
-        preferencesManager
+        attestationManager,
+        authenticationDataManager
     )
 
     @Provides
