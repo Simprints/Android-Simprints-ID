@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import com.simprints.core.images.repository.ImageRepository
 import com.simprints.core.images.repository.ImageRepositoryImpl
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
@@ -26,7 +27,6 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
-import com.simprints.core.network.BaseUrlProvider
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import dagger.Module
 import dagger.Provides
@@ -116,8 +116,9 @@ open class DataModule {
 
     @Provides
     open fun provideImageRepository(
-        context: Context
-    ): ImageRepository = ImageRepositoryImpl(context)
+        context: Context,
+        baseUrlProvider: BaseUrlProvider
+    ): ImageRepository = ImageRepositoryImpl(context, baseUrlProvider)
 
     @Provides
     open fun provideLongConsentLocalDataSource(
