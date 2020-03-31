@@ -14,5 +14,4 @@ interface ProjectAuthenticator {
      * @throws com.simprints.id.exceptions.safe.secure.SafetyNetException
      */
     suspend fun authenticate(nonceScope: NonceScope, projectSecret: String)
-
 }

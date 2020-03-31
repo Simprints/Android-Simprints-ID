@@ -4,7 +4,7 @@ import com.simprints.clientapi.exceptions.InvalidModuleIdException
 import com.simprints.clientapi.exceptions.InvalidProjectIdException
 import com.simprints.clientapi.exceptions.InvalidUserIdException
 import com.simprints.clientapi.requestFactories.RequestFactory
-import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
 import org.junit.Assert
 import org.junit.Test
 
@@ -18,7 +18,7 @@ abstract class AppRequestValidatorTest(private val mockFactory: RequestFactory) 
     @Test
     open fun validateClientRequest_shouldFailOnProjectId() {
         val extractor = mockFactory.getMockExtractor()
-        whenever(extractor) { getProjectId() } thenReturn ""
+        every { extractor.getProjectId() } returns ""
 
         try {
             mockFactory.getValidator(extractor).validateClientRequest()
@@ -31,7 +31,7 @@ abstract class AppRequestValidatorTest(private val mockFactory: RequestFactory) 
     @Test
     open fun validateClientRequest_shouldFailOnUserId() {
         val extractor = mockFactory.getMockExtractor()
-        whenever(extractor) { getUserId() } thenReturn ""
+        every { extractor.getUserId() } returns ""
 
         try {
             mockFactory.getValidator(extractor).validateClientRequest()
@@ -44,7 +44,7 @@ abstract class AppRequestValidatorTest(private val mockFactory: RequestFactory) 
     @Test
     open fun validateClientRequest_shouldFailOnModuleId() {
         val extractor = mockFactory.getMockExtractor()
-        whenever(extractor) { getModuleId() } thenReturn ""
+        every { extractor.getModuleId() } returns ""
 
         try {
             mockFactory.getValidator(extractor).validateClientRequest()
@@ -57,7 +57,7 @@ abstract class AppRequestValidatorTest(private val mockFactory: RequestFactory) 
     @Test
     open fun validateClientRequest_shouldSucceedOnEmptyMetadata() {
         val extractor = mockFactory.getMockExtractor()
-        whenever(extractor) { getMetadata() } thenReturn ""
+        every { extractor.getMetadata() } returns ""
 
         try {
             mockFactory.getValidator(extractor).validateClientRequest()

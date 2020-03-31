@@ -144,7 +144,7 @@ class SettingsAboutPresenterTest {
 
         presenter.logout()
 
-        verify(exactly = 1) { presenter.longConsentManager.deleteLongConsents() }
+        verify(exactly = 1) { presenter.longConsentRepository.deleteLongConsents() }
     }
 
     @Test
@@ -153,7 +153,7 @@ class SettingsAboutPresenterTest {
 
         presenter.logout()
 
-        verify(exactly = 1) { presenter.sessionEventManager.signOut() }
+        coVerify(exactly = 1) { presenter.sessionEventManager.signOut() }
     }
 
     @Test
@@ -169,7 +169,7 @@ class SettingsAboutPresenterTest {
         with(presenter) {
             signerManager = mockk(relaxed = true)
             syncManager = mockk(relaxed = true)
-            longConsentManager = mockk(relaxed = true)
+            longConsentRepository = mockk(relaxed = true)
             sessionEventManager = mockk(relaxed = true)
             baseUrlProvider = mockk()
         }

@@ -1,12 +1,11 @@
 package com.simprints.id.data.analytics
 
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import io.reactivex.Single
 
 
 interface AnalyticsManager {
 
-    val analyticsId: Single<String>
+    suspend fun getAnalyticsId(): String
 
     fun logCallout(appRequest: AppRequest)
 

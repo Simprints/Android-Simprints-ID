@@ -1,16 +1,13 @@
 package com.simprints.id.data.db.session.controllers.local
 
 import com.google.common.truth.Truth
-import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
-import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.data.db.session.domain.models.events.*
-import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.session.local.SessionEventsLocalDbManager
-import com.simprints.id.data.db.session.local.models.*
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.data.db.session.local.models.DbDatabaseInfo
+import com.simprints.id.data.db.session.local.models.DbDevice
+import com.simprints.id.data.db.session.local.models.DbEvent
+import com.simprints.id.data.db.session.local.models.DbLocation
 import io.realm.Realm
 import junit.framework.TestCase.*
-import java.util.*
 
 fun verifyEventsForFailedSignedIdFollowedBySucceedSignIn(events: List<Event>) {
 
@@ -120,55 +117,55 @@ fun checkDbHasOnlyTheExpectedInfo(realmForDataEvent: Realm, nEvents: Int) {
     }
 }
 
-fun verifySessionIsOpen(sessionEvents: SessionEvents) {
-    assertNotNull(sessionEvents)
-    assertNotNull(sessionEvents.id)
-    assertNotSame(sessionEvents.startTime, 0L)
-    assertEquals(sessionEvents.relativeEndTime, 0L)
-}
-
-fun createAndSaveCloseFakeSession(timeHelper: TimeHelper,
-                                  realmSessionEventsManager: SessionEventsLocalDbManager,
-                                  projectId: String,
-                                  id: String = UUID.randomUUID().toString() + "close"): String =
-    createFakeClosedSession(timeHelper, projectId, id).also { saveSessionInDb(it, realmSessionEventsManager) }.id
-
-fun createAndSaveOpenFakeSession(timeHelper: TimeHelper,
-                                 realmSessionEventsManager: SessionEventsLocalDbManager,
-                                 projectId: String,
-                                 id: String = UUID.randomUUID().toString() + "open") =
-    createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(1000)).also { saveSessionInDb(it, realmSessionEventsManager) }.id
-
-fun saveSessionInDb(session: SessionEvents, realmSessionEventsManager: SessionEventsLocalDbManager) {
-    realmSessionEventsManager.insertOrUpdateSessionEvents(session).blockingAwait()
-}
-
-fun verifyNumberOfSessionsInDb(count: Int, realmForDataEvent: Realm) {
-    with(realmForDataEvent) {
-        assertEquals(count, where(DbSession::class.java).findAll().size)
-    }
-}
-
-fun verifyNumberOfDatabaseInfosInDb(count: Int, realmForDataEvent: Realm) {
-    with(realmForDataEvent) {
-        assertEquals(count, where(DbDatabaseInfo::class.java).findAll().size)
-    }
-}
-
-fun verifyNumberOfEventsInDb(count: Int, realmForDataEvent: Realm) {
-    with(realmForDataEvent) {
-        assertEquals(count, where(DbEvent::class.java).findAll().size)
-    }
-}
-
-fun verifyNumberOfDeviceInfosInDb(count: Int, realmForDataEvent: Realm) {
-    with(realmForDataEvent) {
-        assertEquals(count, where(DbDevice::class.java).findAll().size)
-    }
-}
-
-fun verifyNumberOfLocationsInDb(count: Int, realmForDataEvent: Realm) {
-    with(realmForDataEvent) {
-        assertEquals(count, where(DbLocation::class.java).findAll().size)
-    }
-}
+//fun verifySessionIsOpen(sessionEvents: SessionEvents) {
+//    assertNotNull(sessionEvents)
+//    assertNotNull(sessionEvents.id)
+//    assertNotSame(sessionEvents.startTime, 0L)
+//    assertEquals(sessionEvents.relativeEndTime, 0L)
+//}
+//
+//fun createAndSaveCloseFakeSession(timeHelper: TimeHelper,
+//                                  realmSessionManager: SessionLocalDataSource,
+//                                  projectId: String,
+//                                  id: String = UUID.randomUUID().toString() + "close"): String =
+//    createFakeClosedSession(timeHelper, projectId, id).also { saveSessionInDb(it, realmSessionManager) }.id
+//
+//fun createAndSaveOpenFakeSession(timeHelper: TimeHelper,
+//                                 realmSessionManager: SessionLocalDataSource,
+//                                 projectId: String,
+//                                 id: String = UUID.randomUUID().toString() + "open") =
+//    createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(1000)).also { saveSessionInDb(it, realmSessionManager) }.id
+//
+//fun saveSessionInDb(session: SessionEvents, realmSessionManager: SessionLocalDataSource) {
+//    realmSessionManager.insertOrUpdateSessionEvents(session).blockingAwait()
+//}
+//
+//fun verifyNumberOfSessionsInDb(count: Int, realmForDataEvent: Realm) {
+//    with(realmForDataEvent) {
+//        assertEquals(count, where(DbSession::class.java).findAll().size)
+//    }
+//}
+//
+//fun verifyNumberOfDatabaseInfosInDb(count: Int, realmForDataEvent: Realm) {
+//    with(realmForDataEvent) {
+//        assertEquals(count, where(DbDatabaseInfo::class.java).findAll().size)
+//    }
+//}
+//
+//fun verifyNumberOfEventsInDb(count: Int, realmForDataEvent: Realm) {
+//    with(realmForDataEvent) {
+//        assertEquals(count, where(DbEvent::class.java).findAll().size)
+//    }
+//}
+//
+//fun verifyNumberOfDeviceInfosInDb(count: Int, realmForDataEvent: Realm) {
+//    with(realmForDataEvent) {
+//        assertEquals(count, where(DbDevice::class.java).findAll().size)
+//    }
+//}
+//
+//fun verifyNumberOfLocationsInDb(count: Int, realmForDataEvent: Realm) {
+//    with(realmForDataEvent) {
+//        assertEquals(count, where(DbLocation::class.java).findAll().size)
+//    }
+//}

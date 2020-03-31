@@ -19,7 +19,6 @@ import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivi
 import com.simprints.id.activities.guidselection.GuidSelectionActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
-import com.simprints.id.activities.longConsent.PrivacyNoticePresenter
 import com.simprints.id.activities.qrcapture.QrCaptureActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
@@ -35,7 +34,7 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -50,7 +49,7 @@ import com.simprints.id.services.scheduledSync.people.master.workers.PeopleStart
 import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
+import com.simprints.id.services.scheduledSync.sessionSync.UpSessionEventsWorker
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import dagger.BindsInstance
@@ -104,9 +103,8 @@ interface AppComponent {
     fun inject(projectAuthenticator: ProjectAuthenticatorImpl)
     fun inject(alertPresenter: AlertPresenter)
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
-    fun inject(privacyNoticePresenter: PrivacyNoticePresenter)
     fun inject(syncSchedulerHelper: SyncSchedulerImpl)
-    fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
+    fun inject(sessionsSyncWorkerUp: UpSessionEventsWorker)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
     fun inject(moduleSelectionActivity: ModuleSelectionActivity)
     fun inject(moduleSelectionActivity: ModuleSelectionFragment)
@@ -132,7 +130,7 @@ interface AppComponent {
     fun inject(peopleStartSyncWorker: PeopleStartSyncReporterWorker)
     fun inject(qrCaptureActivity: QrCaptureActivity)
 
-    fun getSessionEventsManager(): SessionEventsManager
+    fun getSessionEventsManager(): SessionRepository
     fun getCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
     fun getPersonRepository(): PersonRepository
