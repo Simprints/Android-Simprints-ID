@@ -7,8 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.livedata.LiveDataEvent
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
@@ -29,9 +30,9 @@ class ScannerOffFragment : Fragment() {
             replaceTryAgainButtonWithProgressBar()
         }
 
-        connectScannerViewModel.showScannerErrorDialogWithScannerId.value?.let { scannerId ->
+        connectScannerViewModel.showScannerErrorDialogWithScannerId.value?.let { scannerIdEvent ->
             couldNotConnectTextView.paintFlags = couldNotConnectTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-            couldNotConnectTextView.text = getString(R.string.not_my_scanner, scannerId)
+            couldNotConnectTextView.text = getString(R.string.not_my_scanner, scannerIdEvent.peekContent())
             couldNotConnectTextView.setOnClickListener {
                 connectScannerViewModel.handleIncorrectScanner()
             }
@@ -43,25 +44,22 @@ class ScannerOffFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        connectScannerViewModel.scannerConnected.observe(this, Observer { success: Boolean? ->
+        connectScannerViewModel.scannerConnected.observe(this, LiveDataEventWithContentObserver { success ->
             when (success) {
                 true -> handleScannerConnected()
                 false -> connectScannerViewModel.retryConnect()
             }
         })
-        connectScannerViewModel.connectScannerIssue.observe(this, Observer {
-            it?.let {
-                // Set to null so it is cleared for future fragments
-                connectScannerViewModel.connectScannerIssue.value = null
-                connectScannerViewModel.stopConnectingAndResetState()
-                goToToAppropriatePairingScreen(it)
-            }
+        connectScannerViewModel.connectScannerIssue.observe(this, LiveDataEventWithContentObserver {
+            connectScannerViewModel.stopConnectingAndResetState()
+            goToToAppropriatePairingScreen(it)
         })
     }
 
     override fun onPause() {
         super.onPause()
         connectScannerViewModel.scannerConnected.removeObservers(this)
+        connectScannerViewModel.connectScannerIssue.removeObservers(this)
     }
 
     // The tryAgainButton doesn't actually do anything - we're already retrying in the background
@@ -93,7 +91,7 @@ class ScannerOffFragment : Fragment() {
     }
 
     private fun finishConnectActivity() {
-        connectScannerViewModel.finish.postValue(Unit)
+        connectScannerViewModel.finish.postValue(LiveDataEvent())
     }
 
     companion object {

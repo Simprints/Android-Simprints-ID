@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.connect.issues.nfcpair
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.scanner.ScannerPairingManager
 import com.simprints.fingerprint.tools.nfc.ComponentMifareUltralight
@@ -14,8 +15,8 @@ class NfcPairViewModel(
     private val scannerPairingManager: ScannerPairingManager
 ) : ViewModel() {
 
-    val isAwaitingPairMacAddress = MutableLiveData<String?>(null)
-    val toastMessage = MutableLiveData<Int?>(null)
+    val awaitingToPairToMacAddress = MutableLiveData<LiveDataEventWithContent<String>>()
+    val showToastWithStringRes = MutableLiveData<LiveDataEventWithContent<Int>>()
 
     fun handleNfcTagDetected(tag: ComponentNfcTag?) {
         try {
@@ -24,15 +25,15 @@ class NfcPairViewModel(
                 ?: throw IllegalArgumentException("Empty tag")
             startPairing(macAddress)
         } catch (e: IOException) {
-            toastMessage.postValue(R.string.nfc_pair_toast_try_again)
+            showToastWithStringRes.postValue(LiveDataEventWithContent( R.string.nfc_pair_toast_try_again))
         } catch (e: IllegalArgumentException) {
-            toastMessage.postValue(R.string.nfc_pair_toast_invalid)
+            showToastWithStringRes.postValue(LiveDataEventWithContent(R.string.nfc_pair_toast_invalid))
         }
     }
 
     fun startPairing(macAddress: String) {
         scannerPairingManager.pairOnlyToDevice(macAddress)
-        isAwaitingPairMacAddress.postValue(macAddress)
+        awaitingToPairToMacAddress.postValue(LiveDataEventWithContent(macAddress))
     }
 
     private fun ComponentMifareUltralight.readScannerMacAddress(): String = use { mifare ->

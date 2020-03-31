@@ -8,8 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.scanner.ScannerPairingManager
@@ -65,22 +65,19 @@ class NfcPairFragment : Fragment() {
             ComponentNfcAdapter.FLAG_READER_NFC_A or ComponentNfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,
             null
         )
-        viewModel.toastMessage.observe(this, Observer {
-            it?.let {
-                viewModel.toastMessage.value = null
-                context?.showToast(getString(it))
-            }
+        viewModel.showToastWithStringRes.observe(this, LiveDataEventWithContentObserver {
+            context?.showToast(getString(it))
         })
-        viewModel.isAwaitingPairMacAddress.observe(this, Observer {
-            it?.let { handleAwaitingPair(it) }
+        viewModel.awaitingToPairToMacAddress.observe(this, LiveDataEventWithContentObserver {
+            handleAwaitingPair(it)
         })
     }
 
     override fun onPause() {
         super.onPause()
         nfcAdapter.disableReaderMode(requireActivity())
-        viewModel.toastMessage.removeObservers(this)
-        viewModel.isAwaitingPairMacAddress.removeObservers(this)
+        viewModel.showToastWithStringRes.removeObservers(this)
+        viewModel.awaitingToPairToMacAddress.removeObservers(this)
     }
 
     override fun onStop() {
@@ -111,12 +108,13 @@ class NfcPairFragment : Fragment() {
 
     private fun handlePairingAttemptFailed() {
         handler.removeCallbacks(determineWhetherPairingWasSuccessful)
-        viewModel.isAwaitingPairMacAddress.value?.let { macAddress ->
+        viewModel.awaitingToPairToMacAddress.value?.let { macAddressEvent ->
             couldNotPairTextView.visibility = View.GONE
             nfcPairingProgressBar.visibility = View.INVISIBLE
             tryAgainButton.visibility = View.VISIBLE
-            nfcPairInstructionsTextView.text = getString(R.string.nfc_pairing_try_again_instruction, scannerPairingManager.convertAddressToSerialNumber(macAddress))
-            tryAgainButton.setOnClickListener { viewModel.startPairing(macAddress) }
+            nfcPairInstructionsTextView.text = getString(R.string.nfc_pairing_try_again_instruction,
+                scannerPairingManager.convertAddressToSerialNumber(macAddressEvent.peekContent()))
+            tryAgainButton.setOnClickListener { viewModel.startPairing(macAddressEvent.peekContent()) }
         }
     }
 

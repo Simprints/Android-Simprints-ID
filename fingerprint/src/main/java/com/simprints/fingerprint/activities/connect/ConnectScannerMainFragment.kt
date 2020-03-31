@@ -8,11 +8,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.livedata.LiveDataEvent
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.connect.confirmscannererror.ConfirmScannerErrorBuilder
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import com.simprints.fingerprint.tools.Vibrate.vibrate
 import kotlinx.android.synthetic.main.fragment_connect_scanner_main.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -34,16 +35,12 @@ class ConnectScannerMainFragment : Fragment() {
     }
 
     private fun observeLifecycleEvents() {
-        connectScannerViewModel.connectScannerIssue.observe(this, Observer {
-            it?.let {
-                // Set to null so it is cleared when we return to this fragment
-                connectScannerViewModel.connectScannerIssue.value = null
-                navigateToScannerIssueFragment(it)
-            }
+        connectScannerViewModel.connectScannerIssue.observe(this, LiveDataEventWithContentObserver {
+            navigateToScannerIssueFragment(it)
         })
-        connectScannerViewModel.scannerConnected.observe(this, Observer {
-            if (it == true) {
-                connectScannerViewModel.finish.postValue(Unit)
+        connectScannerViewModel.scannerConnected.observe(this, LiveDataEventWithContentObserver { success ->
+            if (success) {
+                connectScannerViewModel.finish.postValue(LiveDataEvent())
             }
         })
     }
@@ -51,8 +48,7 @@ class ConnectScannerMainFragment : Fragment() {
     private fun observeScannerEvents() {
         connectScannerViewModel.progress.observe(this, Observer { connectScannerProgressBar.progress = it })
         connectScannerViewModel.message.observe(this, Observer { connectScannerInfoTextView.text = androidResourcesHelper.getString(it) })
-        connectScannerViewModel.vibrate.observe(this, Observer { it?.let { vibrate(context!!) } })
-        connectScannerViewModel.showScannerErrorDialogWithScannerId.observe(this, Observer { it?.let { showDialogForScannerErrorConfirmation(it) } })
+        connectScannerViewModel.showScannerErrorDialogWithScannerId.observe(this, LiveDataEventWithContentObserver { showDialogForScannerErrorConfirmation(it) })
     }
 
     override fun onPause() {
@@ -61,7 +57,6 @@ class ConnectScannerMainFragment : Fragment() {
         connectScannerViewModel.scannerConnected.removeObservers(this)
         connectScannerViewModel.progress.removeObservers(this)
         connectScannerViewModel.message.removeObservers(this)
-        connectScannerViewModel.vibrate.removeObservers(this)
         connectScannerViewModel.showScannerErrorDialogWithScannerId.removeObservers(this)
     }
 

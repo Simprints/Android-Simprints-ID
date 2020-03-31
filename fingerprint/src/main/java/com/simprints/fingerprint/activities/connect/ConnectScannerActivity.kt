@@ -4,7 +4,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.lifecycle.Observer
+import com.simprints.core.livedata.LiveDataEventObserver
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
@@ -14,6 +15,7 @@ import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForConnectScannerActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.tools.Vibrate
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class ConnectScannerActivity : FingerprintActivity() {
@@ -41,8 +43,8 @@ class ConnectScannerActivity : FingerprintActivity() {
     }
 
     private fun observeLifecycleEvents() {
-        viewModel.launchAlert.observe(this, Observer { it?.let { launchAlert(this, it) } })
-        viewModel.finish.observe(this, Observer { it?.let { continueToNextActivity() } })
+        viewModel.launchAlert.observe(this, LiveDataEventWithContentObserver { launchAlert(this, it) } )
+        viewModel.finish.observe(this, LiveDataEventObserver { vibrateAndContinueToNextActivity() })
     }
 
     override fun onPause() {
@@ -66,7 +68,8 @@ class ConnectScannerActivity : FingerprintActivity() {
         }
     }
 
-    private fun continueToNextActivity() {
+    private fun vibrateAndContinueToNextActivity() {
+        Vibrate.vibrate(this)
         setResultAndFinish(ResultCode.OK, Intent().apply {
             putExtra(ConnectScannerTaskResult.BUNDLE_KEY, ConnectScannerTaskResult())
         })

@@ -2,18 +2,18 @@ package com.simprints.fingerprint.activities.connect.issues.serialentrypair
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.scanner.ScannerPairingManager
 
 class SerialEntryPairViewModel(
     private val scannerPairingManager: ScannerPairingManager
 ) : ViewModel() {
 
-    val isAwaitingPairSerialNumber = MutableLiveData<String?>(null)
-    val toastMessage = MutableLiveData<String?>(null)
+    val awaitingToPairToMacAddress = MutableLiveData<LiveDataEventWithContent<String>>()
 
     fun startPairing(serialNumber: String) {
         val macAddress = scannerPairingManager.convertSerialNumberToAddress(serialNumber)
         scannerPairingManager.pairOnlyToDevice(macAddress)
-        isAwaitingPairSerialNumber.postValue(macAddress)
+        awaitingToPairToMacAddress.postValue(LiveDataEventWithContent(macAddress))
     }
 }
