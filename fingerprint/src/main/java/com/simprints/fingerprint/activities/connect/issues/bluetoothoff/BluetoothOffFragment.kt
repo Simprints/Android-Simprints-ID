@@ -9,9 +9,9 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.fragment_bluetooth_off.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class BluetoothOffFragment : Fragment() {
+class BluetoothOffFragment : FingerprintFragment() {
 
     private val bluetoothAdapter: ComponentBluetoothAdapter by inject()
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()

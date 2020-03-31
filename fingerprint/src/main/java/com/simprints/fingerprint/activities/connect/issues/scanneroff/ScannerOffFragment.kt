@@ -6,17 +6,16 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.livedata.LiveDataEvent
-import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import kotlinx.android.synthetic.main.fragment_scanner_off.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class ScannerOffFragment : Fragment() {
+class ScannerOffFragment : FingerprintFragment() {
 
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
 
@@ -44,16 +43,16 @@ class ScannerOffFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        connectScannerViewModel.scannerConnected.observe(this, LiveDataEventWithContentObserver { success ->
+        connectScannerViewModel.scannerConnected.fragmentObserveEventWith { success ->
             when (success) {
                 true -> handleScannerConnected()
                 false -> connectScannerViewModel.retryConnect()
             }
-        })
-        connectScannerViewModel.connectScannerIssue.observe(this, LiveDataEventWithContentObserver {
+        }
+        connectScannerViewModel.connectScannerIssue.fragmentObserveEventWith {
             connectScannerViewModel.stopConnectingAndResetState()
             goToToAppropriatePairingScreen(it)
-        })
+        }
     }
 
     override fun onPause() {

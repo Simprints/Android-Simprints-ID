@@ -7,10 +7,9 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.scanner.ScannerPairingManager
 import com.simprints.fingerprint.tools.Vibrate
@@ -23,7 +22,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class NfcPairFragment : Fragment() {
+class NfcPairFragment : FingerprintFragment() {
 
     private val nfcAdapter: ComponentNfcAdapter by inject()
     private val scannerPairingManager: ScannerPairingManager by inject()
@@ -65,12 +64,8 @@ class NfcPairFragment : Fragment() {
             ComponentNfcAdapter.FLAG_READER_NFC_A or ComponentNfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,
             null
         )
-        viewModel.showToastWithStringRes.observe(this, LiveDataEventWithContentObserver {
-            context?.showToast(getString(it))
-        })
-        viewModel.awaitingToPairToMacAddress.observe(this, LiveDataEventWithContentObserver {
-            handleAwaitingPair(it)
-        })
+        viewModel.showToastWithStringRes.fragmentObserveEventWith { context?.showToast(getString(it)) }
+        viewModel.awaitingToPairToMacAddress.fragmentObserveEventWith { handleAwaitingPair(it) }
     }
 
     override fun onPause() {
