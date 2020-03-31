@@ -14,6 +14,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.LoginModule
+import com.simprints.id.secure.*
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.secure.ProjectAuthenticator
@@ -45,6 +46,8 @@ class TestLoginModule(
     }
 
     override fun provideProjectAuthenticator(
+        authManager: AuthManager,
+        projectSecretManager: ProjectSecretManager,
         loginInfoManager: LoginInfoManager,
         simApiClientFactory: SimApiClientFactory,
         baseUrlProvider: BaseUrlProvider,
@@ -54,10 +57,14 @@ class TestLoginModule(
         signerManager: SignerManager,
         remoteConfigWrapper: RemoteConfigWrapper,
         longConsentRepository: LongConsentRepository,
-        preferencesManager: PreferencesManager
-    ): ProjectAuthenticator {
+        preferencesManager: PreferencesManager,
+        attestationManager: AttestationManager,
+        authenticationDataManager: AuthenticationDataManager
+    ) : ProjectAuthenticator {
         return projectAuthenticatorRule.resolveDependency {
             super.provideProjectAuthenticator(
+                authManager,
+                projectSecretManager,
                 loginInfoManager,
                 simApiClientFactory,
                 baseUrlProvider,
@@ -67,7 +74,9 @@ class TestLoginModule(
                 signerManager,
                 remoteConfigWrapper,
                 longConsentRepository,
-                preferencesManager
+                preferencesManager,
+                attestationManager,
+                authenticationDataManager
             )
         }
     }

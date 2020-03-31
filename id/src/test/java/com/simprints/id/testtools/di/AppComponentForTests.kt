@@ -51,7 +51,7 @@ interface AppComponentForTests : AppComponent {
 
     fun inject(checkLoginFromMainLauncherActivityTest: CheckLoginFromMainLauncherActivityTest)
     fun inject(projectSecretManagerTest: ProjectSecretManagerTest)
-    fun inject(projectAuthenticatorTest: ProjectAuthenticatorImplTest)
+    fun inject(projectAuthenticatorImplTest: ProjectAuthenticatorImplTest)
     fun inject(alertActivityTest: AlertActivityTest)
     fun inject(settingsPreferencesManagerTest: SettingsPreferencesManagerTest)
     fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)
