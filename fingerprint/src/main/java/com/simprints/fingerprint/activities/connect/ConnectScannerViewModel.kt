@@ -55,15 +55,7 @@ class ConnectScannerViewModel(
 
     @SuppressLint("CheckResult")
     private fun startSetup() {
-        progress.value = 0
-        message.value = R.string.connect_scanner_bt_connect
-        vibrate.value = null
-        connectScannerIssue.value = null
-        launchAlert.value = null
-        scannerConnected.value = null
-        finish.value = null
-        showScannerErrorDialogWithScannerId.value = null
-        setupFlow?.dispose()
+        stopConnectingAndResetState()
         setupFlow = disconnectVero()
             .andThen(checkIfBluetoothIsEnabled())
             .andThen(initVero())
@@ -74,6 +66,18 @@ class ConnectScannerViewModel(
             .subscribeBy(onError = { manageVeroErrors(it) }, onComplete = {
                 handleSetupFinished()
             })
+    }
+
+    fun stopConnectingAndResetState() {
+        progress.value = 0
+        message.value = R.string.connect_scanner_bt_connect
+        vibrate.value = null
+        connectScannerIssue.value = null
+        launchAlert.value = null
+        scannerConnected.value = null
+        finish.value = null
+        showScannerErrorDialogWithScannerId.value = null
+        setupFlow?.dispose()
     }
 
     private fun disconnectVero() =
