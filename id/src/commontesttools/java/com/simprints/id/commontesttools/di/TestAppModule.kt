@@ -4,6 +4,7 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
@@ -12,6 +13,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
@@ -27,7 +29,6 @@ import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
-import com.simprints.core.network.BaseUrlProvider
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
@@ -167,13 +168,26 @@ class TestAppModule(
         sessionRealmConfigBuilder: SessionRealmConfigBuilder,
         sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
     ): SessionLocalDataSource =
-        sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder, sessionEventValidatorsBuilder) }
+        sessionEventsLocalDbManagerRule.resolveDependency {
+            super.provideSessionEventsLocalDbManager(
+                ctx,
+                secureDataManager,
+                timeHelper,
+                sessionRealmConfigBuilder,
+                sessionEventValidatorsBuilder
+            )
+        }
 
-    override fun provideSessionEventsRemoteDbManager(remoteDbManager: RemoteDbManager,
-                                                     simApiClientFactory: SimApiClientFactory,
-                                                     baseUrlProvider: BaseUrlProvider
+    override fun provideSessionEventsRemoteDbManager(
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory
     ): SessionRemoteDataSource =
-        sessionEventsRemoteDbManagerRule.resolveDependency { super.provideSessionEventsRemoteDbManager(remoteDbManager, simApiClientFactory, baseUrlProvider) }
+        sessionEventsRemoteDbManagerRule.resolveDependency {
+            super.provideSessionEventsRemoteDbManager(
+                remoteDbManager,
+                simApiClientFactory
+            )
+        }
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
@@ -242,17 +256,16 @@ class TestAppModule(
         super.provideQrCodeDetector(crashReportManager)
     }
 
-    override fun provideRemoteProjectInfoProvider(): RemoteProjectInfoProvider {
-        return remoteProjectInfoProviderRule.resolveDependency {
-            super.provideRemoteProjectInfoProvider()
-        }
-    }
-
     override fun provideBaseUrlProvider(
         settingsPreferencesManager: SettingsPreferencesManager,
-        remoteProjectInfoProvider: RemoteProjectInfoProvider
+        projectLocalDataSource: ProjectLocalDataSource,
+        loginInfoManager: LoginInfoManager
     ): BaseUrlProvider = baseUrlProviderRule.resolveDependency {
-        super.provideBaseUrlProvider(settingsPreferencesManager, remoteProjectInfoProvider)
+        super.provideBaseUrlProvider(
+            settingsPreferencesManager,
+            projectLocalDataSource,
+            loginInfoManager
+        )
     }
 
 }

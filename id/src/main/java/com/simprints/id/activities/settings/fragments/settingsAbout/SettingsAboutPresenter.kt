@@ -91,6 +91,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
         syncManager.cancelBackgroundSyncs()
         longConsentRepository.deleteLongConsents()
         sessionEventManager.signOut()
+        baseUrlProvider.resetApiBaseUrl()
 
         view.finishSettings()
     }

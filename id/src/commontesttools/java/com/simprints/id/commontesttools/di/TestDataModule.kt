@@ -50,21 +50,18 @@ class TestDataModule(
 
     override fun provideProjectRemoteDataSource(
         remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider
+        simApiClientFactory: SimApiClientFactory
     ): ProjectRemoteDataSource = projectRemoteDataSourceRule.resolveDependency {
-        super.provideProjectRemoteDataSource(remoteDbManager, simApiClientFactory, baseUrlProvider)
+        super.provideProjectRemoteDataSource(remoteDbManager, simApiClientFactory)
     }
 
     override fun provideProjectRepository(
         projectLocalDataSource: ProjectLocalDataSource,
-        projectRemoteDataSource: ProjectRemoteDataSource,
-        baseUrlProvider: BaseUrlProvider
+        projectRemoteDataSource: ProjectRemoteDataSource
     ): ProjectRepository = projectRepositoryRule.resolveDependency {
         super.provideProjectRepository(
             projectLocalDataSource,
-            projectRemoteDataSource,
-            baseUrlProvider
+            projectRemoteDataSource
         )
     }
 
@@ -91,14 +88,12 @@ class TestDataModule(
 
     override fun providePersonRemoteDataSource(
         remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider
+        simApiClientFactory: SimApiClientFactory
     ): PersonRemoteDataSource =
         personRemoteDataSourceRule.resolveDependency {
             super.providePersonRemoteDataSource(
                 remoteDbManager,
-                simApiClientFactory,
-                baseUrlProvider
+                simApiClientFactory
             )
         }
 

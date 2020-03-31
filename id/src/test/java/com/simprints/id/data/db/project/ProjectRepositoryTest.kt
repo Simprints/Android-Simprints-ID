@@ -7,7 +7,6 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.core.network.BaseUrlProvider
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -44,13 +43,11 @@ class ProjectRepositoryTest {
 
     private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mockk()
     private val projectLocalDataSourceMock: ProjectLocalDataSource = mockk(relaxUnitFun = true)
-    private val baseUrlProviderMock: BaseUrlProvider = mockk()
     private val firebasePerformanceMock: FirebasePerformance = mockk()
 
     private val projectRepository = ProjectRepositoryImpl(
         projectLocalDataSourceMock,
         projectRemoteDataSourceMock,
-        baseUrlProviderMock,
         firebasePerformanceMock
     )
 
@@ -107,18 +104,6 @@ class ProjectRepositoryTest {
         assertThat(project).isNull()
         coVerify(exactly = 0) { projectLocalDataSourceMock.save(remoteProject) }
         coVerify { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) }
-    }
-
-    @Test
-    fun whenFetchingProjectFromRemote_shouldUpdateImageStorageBucketUrl() = runBlocking {
-        coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns null
-        coEvery {
-            projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID)
-        } returns remoteProject
-
-        val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
-
-        coVerify { baseUrlProviderMock.setImageStorageBucketUrl(project!!.imageBucket) }
     }
 
 }
