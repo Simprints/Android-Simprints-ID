@@ -12,7 +12,7 @@ import org.junit.runner.Description
 /**
  * Creates a new [TestProject] on the backend.
  * Usage as a [TestRule]:
- * @get:Rule val testProjectRule = TestProjectRule()
+ * @build:Rule val testProjectRule = TestProjectRule()
  */
 class TestProjectRule(
     val testProjectCreationParameters: TestProjectCreationParameters = TestProjectCreationParameters()
