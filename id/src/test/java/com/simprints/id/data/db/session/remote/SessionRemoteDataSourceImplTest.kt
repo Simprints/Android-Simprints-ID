@@ -83,7 +83,7 @@ class SessionRemoteDataSourceImplTest {
     }
 
     private fun buildRemoteDataSource() =
-        SessionRemoteDataSourceImpl(mockk(), mockk())
+        SessionRemoteDataSourceImpl(mockk(), mockk(), mockk())
 
     private fun buildSessionApiToThrowFirstThenCall(): SessionsRemoteInterface {
         val api = SimApiClientFactory("deviceId").build<SessionsRemoteInterface>(mockServer.url("/").toString()).api
