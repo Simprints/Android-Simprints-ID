@@ -4,12 +4,10 @@ import com.google.firebase.perf.FirebasePerformance
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.core.network.BaseUrlProvider
 
 class ProjectRepositoryImpl(
     private val projectLocalDataSource: ProjectLocalDataSource,
     private val projectRemoteDataSource: ProjectRemoteDataSource,
-    private val baseUrlProvider: BaseUrlProvider,
     private val performanceTracker: FirebasePerformance = FirebasePerformance.getInstance()
 ) : ProjectRepository,
     ProjectLocalDataSource by projectLocalDataSource,
@@ -32,11 +30,11 @@ class ProjectRepositoryImpl(
 
     private suspend fun fetchAndUpdateCache(projectId: String): Project? = try {
         projectRemoteDataSource.loadProjectFromRemote(projectId).also {
-            baseUrlProvider.setImageStorageBucketUrl(it.imageBucket)
             projectLocalDataSource.save(it)
         }
     } catch (t: Throwable) {
         t.printStackTrace()
         null
     }
+
 }

@@ -40,12 +40,10 @@ open class DataModule {
     @Singleton
     open fun providePersonRemoteDataSource(
         remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider
+        simApiClientFactory: SimApiClientFactory
     ): PersonRemoteDataSource = PersonRemoteDataSourceImpl(
         remoteDbManager,
-        simApiClientFactory,
-        baseUrlProvider
+        simApiClientFactory
     )
 
     @Provides
@@ -64,23 +62,19 @@ open class DataModule {
     @Singleton
     open fun provideProjectRemoteDataSource(
         remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider
+        simApiClientFactory: SimApiClientFactory
     ): ProjectRemoteDataSource = ProjectRemoteDataSourceImpl(
         remoteDbManager,
-        simApiClientFactory,
-        baseUrlProvider
+        simApiClientFactory
     )
 
     @Provides
     open fun provideProjectRepository(
         projectLocalDataSource: ProjectLocalDataSource,
-        projectRemoteDataSource: ProjectRemoteDataSource,
-        baseUrlProvider: BaseUrlProvider
+        projectRemoteDataSource: ProjectRemoteDataSource
     ): ProjectRepository = ProjectRepositoryImpl(
         projectLocalDataSource,
-        projectRemoteDataSource,
-        baseUrlProvider
+        projectRemoteDataSource
     )
 
     @Provides

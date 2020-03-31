@@ -3,12 +3,14 @@ package com.simprints.id.secure
 import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.NetworkConstants.Companion.BASE_URL_SUFFIX
 import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl.Companion.IMAGE_STORAGE_BUCKET_URL_DEFAULT
 
 class BaseUrlProviderImpl(
     private val settingsPreferencesManager: SettingsPreferencesManager,
-    private val remoteProjectInfoProvider: RemoteProjectInfoProvider
+    private val projectLocalDataSource: ProjectLocalDataSource,
+    private val loginInfoManager: LoginInfoManager
 ) : BaseUrlProvider {
 
     override fun getApiBaseUrl(): String = settingsPreferencesManager.apiBaseUrl
@@ -31,23 +33,19 @@ class BaseUrlProviderImpl(
         settingsPreferencesManager.apiBaseUrl = DEFAULT_BASE_URL
     }
 
-    override fun getImageStorageBucketUrl(): String {
-        val storedValue = settingsPreferencesManager.imageStorageBucketUrl
+    override suspend fun getImageStorageBucketUrl(): String? {
+        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
 
-        return if (storedValue.isEmpty()) {
-            val remoteProjectName = remoteProjectInfoProvider.getProjectName()
-            "gs://$remoteProjectName-images-eu"
+        if (projectId.isEmpty())
+            return null
+
+        val imageStorageBucketUrl = projectLocalDataSource.load(projectId)?.imageBucket
+
+        return if (imageStorageBucketUrl.isNullOrEmpty()) {
+            "gs://$projectId-images-eu"
         } else {
-            storedValue
+            imageStorageBucketUrl
         }
-    }
-
-    override fun setImageStorageBucketUrl(imageStorageBucketUrl: String) {
-        settingsPreferencesManager.imageStorageBucketUrl = imageStorageBucketUrl
-    }
-
-    override fun resetImageStorageBucketUrl() {
-        settingsPreferencesManager.imageStorageBucketUrl = IMAGE_STORAGE_BUCKET_URL_DEFAULT
     }
 
 }

@@ -38,7 +38,6 @@ interface SettingsPreferencesManager {
     var saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
     var scannerGenerations: List<ScannerGeneration>
     var apiBaseUrl: String
-    var imageStorageBucketUrl: String
 
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
