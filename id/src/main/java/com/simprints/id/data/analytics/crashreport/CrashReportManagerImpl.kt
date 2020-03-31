@@ -1,7 +1,6 @@
 package com.simprints.id.data.analytics.crashreport
 
-import android.util.Log
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MALFUNCTION_MESSAGE
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MODULE_IDS
@@ -17,12 +16,12 @@ import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSy
 open class CrashReportManagerImpl: CrashReportManager {
 
     internal val crashlyticsInstance by lazy {
-        Crashlytics.getInstance().core
+        FirebaseCrashlytics.getInstance()
     }
 
     override fun logMessageForCrashReport(crashReportTag: CrashReportTag, crashReportTrigger: CrashReportTrigger,
                                           crashPriority: Int, message: String) {
-        crashlyticsInstance.log(crashPriority, crashReportTag.name, getLogMessage(crashReportTrigger, message))
+        crashlyticsInstance.log(getLogMessage(crashReportTrigger, message))
     }
 
     internal fun getLogMessage(crashReportTrigger: CrashReportTrigger, message: String) = "[${crashReportTrigger.name}] $message"
@@ -36,40 +35,40 @@ open class CrashReportManagerImpl: CrashReportManager {
     }
 
     override fun logException(throwable: Throwable) {
-        crashlyticsInstance.logException(throwable)
+        crashlyticsInstance.recordException(throwable)
     }
 
     override fun logSafeException(throwable: Throwable) {
-        crashlyticsInstance.log(Log.ERROR, CrashReportTag.SAFE_EXCEPTION.name, "$throwable")
+        crashlyticsInstance.log("$throwable")
     }
 
     override fun logMalfunction(message: String) {
-        crashlyticsInstance.setString(MALFUNCTION_MESSAGE, message)
-        crashlyticsInstance.logException(MalfunctionException())
+        crashlyticsInstance.setCustomKey(MALFUNCTION_MESSAGE, message)
+        crashlyticsInstance.recordException(MalfunctionException())
     }
 
     override fun setProjectIdCrashlyticsKey(projectId: String) {
-        crashlyticsInstance.setString(PROJECT_ID, projectId)
+        crashlyticsInstance.setCustomKey(PROJECT_ID, projectId)
     }
 
     override fun setUserIdCrashlyticsKey(userId: String) {
-        crashlyticsInstance.setString(USER_ID, userId)
-        crashlyticsInstance.setUserIdentifier(userId)
+        crashlyticsInstance.setCustomKey(USER_ID, userId)
+        crashlyticsInstance.setUserId(userId)
     }
 
     override fun setModuleIdsCrashlyticsKey(moduleIds: Set<String>?) {
-        crashlyticsInstance.setString(MODULE_IDS, moduleIds.toString())
+        crashlyticsInstance.setCustomKey(MODULE_IDS, moduleIds.toString())
     }
 
     override fun setDownSyncTriggersCrashlyticsKey(peopleDownSyncSetting: PeopleDownSyncSetting) {
-        crashlyticsInstance.setString(PEOPLE_DOWN_SYNC_TRIGGERS, peopleDownSyncSetting.toString())
+        crashlyticsInstance.setCustomKey(PEOPLE_DOWN_SYNC_TRIGGERS, peopleDownSyncSetting.toString())
     }
 
     override fun setSessionIdCrashlyticsKey(sessionId: String) {
-        crashlyticsInstance.setString(SESSION_ID, sessionId)
+        crashlyticsInstance.setCustomKey(SESSION_ID, sessionId)
     }
 
     override fun setFingersSelectedCrashlyticsKey(fingersSelected: Map<FingerIdentifier, Boolean>) {
-        crashlyticsInstance.setString(FINGERS_SELECTED, fingersSelected.toString())
+        crashlyticsInstance.setCustomKey(FINGERS_SELECTED, fingersSelected.toString())
     }
 }
