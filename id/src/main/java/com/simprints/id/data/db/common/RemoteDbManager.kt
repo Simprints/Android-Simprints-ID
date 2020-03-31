@@ -1,11 +1,10 @@
 package com.simprints.id.data.db.common
 
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
-import io.reactivex.Completable
 
 interface RemoteDbManager {
 
-    fun signIn(token: String): Completable
+    suspend fun signIn(token: String)
     fun signOut()
 
     /** @throws DifferentProjectIdSignedInException */
