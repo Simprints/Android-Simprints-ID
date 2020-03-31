@@ -105,7 +105,7 @@ class CommCarePresenter(
         }
     }
 
-    private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId() ?: ""
+    private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId()
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
@@ -118,7 +118,7 @@ class CommCarePresenter(
         }
     }
 
-    private fun checkAndProcessSessionId() {
+    private suspend fun checkAndProcessSessionId() {
         if ((view.extras?.get(Constants.SIMPRINTS_SESSION_ID) as CharSequence?).isNullOrBlank()) {
             if (sharedPreferencesManager.peekSessionId().isNotBlank()) {
                 view.injectSessionIdIntoIntent(sharedPreferencesManager.popSessionId())

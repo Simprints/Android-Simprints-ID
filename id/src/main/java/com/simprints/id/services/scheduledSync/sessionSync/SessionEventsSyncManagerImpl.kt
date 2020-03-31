@@ -19,7 +19,7 @@ open class SessionEventsSyncManagerImpl(private val workManager: WorkManager) : 
         cancelPreviousVersionedWorkerMaster()
 
         val uniqueName = getMasterWorkerUniqueName(version)
-        return PeriodicWorkRequestBuilder<SessionEventsMasterWorker>(time, unit)
+        return PeriodicWorkRequestBuilder<UpSessionEventsWorker>(time, unit)
             .setConstraints(getConstraints())
             .addTag(tag)
             .build().let {
@@ -50,7 +50,7 @@ open class SessionEventsSyncManagerImpl(private val workManager: WorkManager) : 
         .build()
 
     companion object {
-        private const val SYNC_REPEAT_INTERVAL = 1L
+        private const val SYNC_REPEAT_INTERVAL = 15L
         private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
 
         internal const val MASTER_WORKER_VERSION = 1L

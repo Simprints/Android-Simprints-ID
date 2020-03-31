@@ -1,13 +1,9 @@
 package com.simprints.id.data.db.session.domain.models.session
 
 import androidx.annotation.Keep
-import com.google.gson.GsonBuilder
-import com.simprints.id.BuildConfig
-import com.simprints.id.data.db.session.domain.models.events.ArtificialTerminationEvent
 import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.events.EventType
 import com.simprints.id.tools.TimeHelper
-import timber.log.Timber
 import java.util.*
 
 @Keep
@@ -33,15 +29,18 @@ open class SessionEvents(var projectId: String,
     var location: Location? = null
     var analyticsId: String? = null
 
-    // Function and not kotlin properties to avoid them to get serialised/deserialised
+    // Function and not kotlin properties to avoid them to build serialised/deserialised
     fun isClosed(): Boolean = relativeEndTime > 0
     fun isOpen(): Boolean = !isClosed()
 
-    fun addArtificialTerminationIfRequired(timeHelper: TimeHelper, reason: ArtificialTerminationEvent.Reason) {
-        if (isOpen()) {
-            addEvent(ArtificialTerminationEvent(timeHelper.now(), reason))
-        }
-    }
+    fun isPossiblyInProgress(timeHelper: TimeHelper): Boolean =
+        timeHelper.msBetweenNowAndTime(startTime) < GRACE_PERIOD
+
+    fun hasEvent(eventType: EventType) =
+        events.any { it.type == eventType }
+
+    fun count(eventType: EventType) =
+        events.count { it.type == eventType }
 
     fun closeIfRequired(timeHelper: TimeHelper) {
         if (!isClosed()) {
@@ -50,22 +49,5 @@ open class SessionEvents(var projectId: String,
     }
 
     fun timeRelativeToStartTime(time: Long): Long = time - startTime
-
-    fun isPossiblyInProgress(timeHelper: TimeHelper): Boolean =
-        timeHelper.msBetweenNowAndTime(startTime) < GRACE_PERIOD
-
-
-    fun addEvent(event: Event) {
-        if(BuildConfig.DEBUG) {
-            Timber.d("Add event: ${GsonBuilder().create().toJson(event)}")
-        }
-
-        event.updateRelativeTimes(startTime)
-
-        events.add(event)
-    }
-
-    fun hasEvent(eventType: EventType) =
-        events.any { it.type == eventType }
 
 }

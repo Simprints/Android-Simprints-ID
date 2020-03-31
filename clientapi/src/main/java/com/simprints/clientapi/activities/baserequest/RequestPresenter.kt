@@ -12,7 +12,6 @@ import com.simprints.clientapi.domain.ClientBase
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.exceptions.*
-import com.simprints.clientapi.extensions.doInBackground
 import com.simprints.clientapi.tools.DeviceManager
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
@@ -21,26 +20,26 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 protected val crashReportManager: ClientApiCrashReportManager)
     : RequestContract.Presenter {
 
-    override fun processEnrollRequest() = validateAndSendRequest(
+    override suspend fun processEnrollRequest() = validateAndSendRequest(
         EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))
     )
 
-    override fun processIdentifyRequest() = validateAndSendRequest(
+    override suspend fun processIdentifyRequest() = validateAndSendRequest(
         IdentifyBuilder(view.identifyExtractor, IdentifyValidator(view.identifyExtractor))
     )
 
-    override fun processVerifyRequest() = validateAndSendRequest(
+    override suspend fun processVerifyRequest() = validateAndSendRequest(
         VerifyBuilder(view.verifyExtractor, VerifyValidator(view.verifyExtractor))
     )
 
-    override fun processConfirmIdentityRequest() = validateAndSendRequest(
+    override suspend fun processConfirmIdentityRequest() = validateAndSendRequest(
         ConfirmIdentifyBuilder(
             view.confirmIdentityExtractor,
             ConfirmIdentityValidator(view.confirmIdentityExtractor)
         )
     )
 
-    override fun validateAndSendRequest(builder: ClientRequestBuilder) = try {
+    override suspend fun validateAndSendRequest(builder: ClientRequestBuilder) = try {
         val request = builder.build()
         addSuspiciousEventIfRequired(request)
 
@@ -55,7 +54,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         handleInvalidRequest(exception)
     }
 
-    protected fun runIfDeviceIsNotRooted(block: () -> Unit) {
+    protected suspend fun runIfDeviceIsNotRooted(block: suspend () -> Unit) {
         try {
             deviceManager.checkIfDeviceIsRooted()
             block()
@@ -84,15 +83,14 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         }
     }
 
-    private fun addSuspiciousEventIfRequired(request: ClientBase) {
+    private suspend fun addSuspiciousEventIfRequired(request: ClientBase) {
         if (request.unknownExtras.isNotEmpty()) {
-            eventsManager.addSuspiciousIntentEvent(request.unknownExtras).doInBackground()
+            eventsManager.addSuspiciousIntentEvent(request.unknownExtras)
         }
     }
 
-    private fun logInvalidSessionInBackground() {
+    private suspend fun logInvalidSessionInBackground() {
         eventsManager.addInvalidIntentEvent(view.action ?: "", view.extras ?: emptyMap())
-            .doInBackground()
     }
 
 }

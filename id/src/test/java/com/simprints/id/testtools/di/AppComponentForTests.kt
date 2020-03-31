@@ -11,7 +11,6 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.data.consent.LongConsentManagerImplTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.*
-import com.simprints.id.secure.ProjectAuthenticatorImplTest
 import com.simprints.id.secure.ProjectSecretManagerTest
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncWorkerTest
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorkerTest
@@ -52,7 +51,6 @@ interface AppComponentForTests : AppComponent {
 
     fun inject(checkLoginFromMainLauncherActivityTest: CheckLoginFromMainLauncherActivityTest)
     fun inject(projectSecretManagerTest: ProjectSecretManagerTest)
-    fun inject(projectAuthenticatorTest: ProjectAuthenticatorImplTest)
     fun inject(alertActivityTest: AlertActivityTest)
     fun inject(settingsPreferencesManagerTest: SettingsPreferencesManagerTest)
     fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)
