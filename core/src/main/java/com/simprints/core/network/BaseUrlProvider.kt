@@ -1,4 +1,4 @@
-package com.simprints.id.secure
+package com.simprints.core.network
 
 interface BaseUrlProvider {
     fun getApiBaseUrl(): String

@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.NetworkConstants.Companion.BASE_URL_SUFFIX
 import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager

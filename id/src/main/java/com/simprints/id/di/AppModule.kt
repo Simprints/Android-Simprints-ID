@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application

@@ -18,7 +18,7 @@ import com.simprints.id.data.db.session.domain.models.events.callout.Identificat
 import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
-import com.simprints.id.secure.BaseUrlProvider
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager

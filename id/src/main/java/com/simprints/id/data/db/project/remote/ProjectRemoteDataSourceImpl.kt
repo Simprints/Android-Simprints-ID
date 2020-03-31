@@ -4,7 +4,7 @@ import com.google.gson.JsonElement
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.secure.BaseUrlProvider
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.id.tools.utils.retrySimNetworkCalls
 
 
