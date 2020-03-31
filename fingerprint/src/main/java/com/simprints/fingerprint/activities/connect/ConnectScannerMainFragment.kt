@@ -26,8 +26,8 @@ class ConnectScannerMainFragment : FingerprintFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_connect_scanner_main, container, false)
 
-    override fun onResume() {
-        super.onResume()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         observeLifecycleEvents()
         observeScannerEvents()
     }
@@ -47,15 +47,6 @@ class ConnectScannerMainFragment : FingerprintFragment() {
         connectScannerViewModel.progress.fragmentObserveWith { connectScannerProgressBar.progress = it }
         connectScannerViewModel.message.fragmentObserveWith { connectScannerInfoTextView.text = androidResourcesHelper.getString(it) }
         connectScannerViewModel.showScannerErrorDialogWithScannerId.fragmentObserveEventWith { showDialogForScannerErrorConfirmation(it) }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        connectScannerViewModel.connectScannerIssue.removeObservers(this)
-        connectScannerViewModel.scannerConnected.removeObservers(this)
-        connectScannerViewModel.progress.removeObservers(this)
-        connectScannerViewModel.message.removeObservers(this)
-        connectScannerViewModel.showScannerErrorDialogWithScannerId.removeObservers(this)
     }
 
     private fun navigateToScannerIssueFragment(issue: ConnectScannerIssue) {

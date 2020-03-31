@@ -54,6 +54,8 @@ class NfcPairFragment : FingerprintFragment() {
     override fun onStart() {
         super.onStart()
         activity?.registerReceiver(bluetoothPairStateChangeReceiver, IntentFilter(ComponentBluetoothDevice.ACTION_BOND_STATE_CHANGED))
+        viewModel.showToastWithStringRes.fragmentObserveEventWith { context?.showToast(getString(it)) }
+        viewModel.awaitingToPairToMacAddress.fragmentObserveEventWith { handleAwaitingPair(it) }
     }
 
     override fun onResume() {
@@ -64,15 +66,11 @@ class NfcPairFragment : FingerprintFragment() {
             ComponentNfcAdapter.FLAG_READER_NFC_A or ComponentNfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,
             null
         )
-        viewModel.showToastWithStringRes.fragmentObserveEventWith { context?.showToast(getString(it)) }
-        viewModel.awaitingToPairToMacAddress.fragmentObserveEventWith { handleAwaitingPair(it) }
     }
 
     override fun onPause() {
         super.onPause()
         nfcAdapter.disableReaderMode(requireActivity())
-        viewModel.showToastWithStringRes.removeObservers(this)
-        viewModel.awaitingToPairToMacAddress.removeObservers(this)
     }
 
     override fun onStop() {

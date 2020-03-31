@@ -37,18 +37,8 @@ class ConnectScannerActivity : FingerprintActivity() {
 
     override fun onResume() {
         super.onResume()
-        observeLifecycleEvents()
-    }
-
-    private fun observeLifecycleEvents() {
         viewModel.launchAlert.activityObserveEventWith { launchAlert(this, it) }
         viewModel.finish.activityObserveEventWith { vibrateAndContinueToNextActivity() }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewModel.launchAlert.removeObservers(this)
-        viewModel.finish.removeObservers(this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

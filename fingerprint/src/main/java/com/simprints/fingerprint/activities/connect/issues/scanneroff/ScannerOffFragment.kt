@@ -39,10 +39,6 @@ class ScannerOffFragment : FingerprintFragment() {
         }
 
         connectScannerViewModel.retryConnect()
-    }
-
-    override fun onResume() {
-        super.onResume()
         connectScannerViewModel.scannerConnected.fragmentObserveEventWith { success ->
             when (success) {
                 true -> handleScannerConnected()
@@ -53,12 +49,6 @@ class ScannerOffFragment : FingerprintFragment() {
             connectScannerViewModel.stopConnectingAndResetState()
             goToToAppropriatePairingScreen(it)
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        connectScannerViewModel.scannerConnected.removeObservers(this)
-        connectScannerViewModel.connectScannerIssue.removeObservers(this)
     }
 
     // The tryAgainButton doesn't actually do anything - we're already retrying in the background

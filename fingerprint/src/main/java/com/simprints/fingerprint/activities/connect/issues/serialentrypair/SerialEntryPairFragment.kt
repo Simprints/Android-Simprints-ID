@@ -54,6 +54,12 @@ class SerialEntryPairFragment : FingerprintFragment() {
                 false
             }
         }
+
+        viewModel.awaitingToPairToMacAddress.fragmentObserveEventWith {
+            serialEntryOkButton.visibility = View.INVISIBLE
+            serialEntryPairProgressBar.visibility = View.VISIBLE
+            handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
+        }
     }
 
     override fun onStart() {
@@ -63,18 +69,8 @@ class SerialEntryPairFragment : FingerprintFragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.awaitingToPairToMacAddress.fragmentObserveEventWith {
-            serialEntryOkButton.visibility = View.INVISIBLE
-            serialEntryPairProgressBar.visibility = View.VISIBLE
-            handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
-        }
         val inputMethodManager: InputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.showSoftInput(serialEntryEditText, InputMethodManager.SHOW_IMPLICIT)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewModel.awaitingToPairToMacAddress.removeObservers(this)
     }
 
     override fun onStop() {
