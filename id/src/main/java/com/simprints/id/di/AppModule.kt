@@ -10,6 +10,7 @@ import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
+import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
@@ -18,8 +19,7 @@ import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
-import com.simprints.id.data.consent.LongConsentManager
-import com.simprints.id.data.consent.LongConsentManagerImpl
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSource
 import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSourceImpl
 import com.simprints.id.data.consent.shortconsent.ConsentRepository
@@ -175,15 +175,6 @@ open class AppModule {
         keystoreManager: KeystoreManager
     ): LegacyLocalDbKeyProvider =
         LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager)
-
-    @Provides
-    open fun provideLongConsentManager(
-        ctx: Context,
-        loginInfoManager: LoginInfoManager,
-        crashReportManager: CrashReportManager
-    ):
-        LongConsentManager =
-        LongConsentManagerImpl(ctx.filesDir.absolutePath, loginInfoManager, crashReportManager)
 
     @Provides
     @Singleton
@@ -387,7 +378,7 @@ open class AppModule {
 
     @Provides
     open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)
-
+    
     @Provides
     open fun provideCameraHelper(
         context: Context,
@@ -413,5 +404,10 @@ open class AppModule {
         crashReportManager: CrashReportManager
     ): QrCodeDetector = QrCodeDetectorImpl(crashReportManager)
 
+    @Provides
+    open fun providePrivacyNoticeViewModelFactory(
+        longConsentRepository: LongConsentRepository,
+        preferencesManager: PreferencesManager
+    ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager)
 }
 

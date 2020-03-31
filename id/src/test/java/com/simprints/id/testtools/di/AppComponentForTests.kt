@@ -8,7 +8,6 @@ import com.simprints.id.activities.consent.ConsentActivityTest
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelTest
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragmentTest
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenterTest
-import com.simprints.id.data.consent.LongConsentManagerImplTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.*
 import com.simprints.id.secure.ProjectSecretManagerTest
@@ -54,7 +53,6 @@ interface AppComponentForTests : AppComponent {
     fun inject(alertActivityTest: AlertActivityTest)
     fun inject(settingsPreferencesManagerTest: SettingsPreferencesManagerTest)
     fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)
-    fun inject(longConsentManagerImplTest: LongConsentManagerImplTest)
     fun inject(moduleViewModelTest: ModuleViewModelTest)
     fun inject(consentActivityTest: ConsentActivityTest)
     fun inject(peopleDownSyncCountWorkerTest: PeopleDownSyncCountWorkerTest)
