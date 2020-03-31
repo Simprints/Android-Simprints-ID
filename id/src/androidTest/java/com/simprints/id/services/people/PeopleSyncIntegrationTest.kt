@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.simprints.id.services.people
 
 import android.app.Activity
@@ -6,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
@@ -45,6 +48,8 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
@@ -58,8 +63,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 
-
 @RunWith(AndroidJUnit4::class)
+@ExperimentalCoroutinesApi
 class PeopleSyncIntegrationTest {
 
     companion object {
@@ -107,9 +112,12 @@ class PeopleSyncIntegrationTest {
         mockServer.start()
         mockServer.dispatcher = mockDispatcher
 
-        val remotePeopleApi = SimApiClientFactory("deviceId").build<PeopleRemoteInterface>(
-            mockServer.url("/").toString()
-        ).api
+        val mockBaseUrlProvider = mockk<BaseUrlProvider>()
+        every { mockBaseUrlProvider.getApiBaseUrl() } returns mockServer.url("/").toString()
+        val remotePeopleApi = SimApiClientFactory(
+            mockBaseUrlProvider,
+            "deviceId"
+        ).build<PeopleRemoteInterface>().api
 
         coEvery { personRemoteDataSourceSpy.getPeopleApiClient() } returns remotePeopleApi
         every { downSyncScopeRepositorySpy.getDownSyncScope() } returns projectSyncScope
@@ -253,7 +261,11 @@ private fun mockResponsesForSync(scope: PeopleDownSyncScope): Int {
     val ops = runBlocking { downSyncScopeRepositorySpy.getDownSyncOperations(scope) }
     val apiPeopleToDownload = ops.map {
         val peopleToDownload = getRandomPeople(N_TO_DOWNLOAD_PER_MODULE, it, listOf(false))
-        peopleToDownload.map { it.fromDomainToGetApi() }.sortedBy { it.updatedAt }
+        peopleToDownload.map { person ->
+            person.fromDomainToGetApi()
+        }.sortedBy { apiGetPerson ->
+            apiGetPerson.updatedAt
+        }
     }.flatten()
 
     val countResponse = ApiPeopleOperationsResponse(listOf(PeopleCount(apiPeopleToDownload.size, 0, 0)).map {

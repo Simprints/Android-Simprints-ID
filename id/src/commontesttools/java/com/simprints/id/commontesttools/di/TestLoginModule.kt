@@ -16,7 +16,7 @@ import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.LoginModule
 import com.simprints.id.secure.*
 import com.simprints.id.secure.AuthenticationHelper
-import com.simprints.id.secure.BaseUrlProvider
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.tools.TimeHelper

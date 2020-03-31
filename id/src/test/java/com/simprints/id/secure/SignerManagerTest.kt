@@ -13,6 +13,7 @@ import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
@@ -47,6 +48,7 @@ class SignerManagerTest {
     }
 
     @Test
+    @ExperimentalCoroutinesApi
     fun signIn_shouldSignInToRemoteDb() = runBlockingTest {
         mockRemoteSignedIn()
         mockFetchingProjectInto()
@@ -57,6 +59,7 @@ class SignerManagerTest {
     }
 
     @Test
+    @ExperimentalCoroutinesApi
     fun signInToRemoteFails_signInShouldFail() = runBlockingTest {
         mockRemoteSignedIn(true)
 
@@ -64,6 +67,7 @@ class SignerManagerTest {
     }
 
     @Test
+    @ExperimentalCoroutinesApi
     fun signIn_shouldStoreCredentialsLocally() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
@@ -75,6 +79,7 @@ class SignerManagerTest {
     }
 
     @Test
+    @ExperimentalCoroutinesApi
     fun storeCredentialsFails_signInShouldFail() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally(true)
@@ -83,6 +88,7 @@ class SignerManagerTest {
     }
 
     @Test
+    @ExperimentalCoroutinesApi
     fun signIn_shouldFetchProjectInfo() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
@@ -94,6 +100,7 @@ class SignerManagerTest {
     }
 
     @Test
+    @ExperimentalCoroutinesApi
     fun loadAndRefreshCacheFails_signInShouldFail() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
@@ -103,6 +110,7 @@ class SignerManagerTest {
     }
 
     @Test
+    @ExperimentalCoroutinesApi
     fun signIn_shouldSucceed() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
@@ -113,6 +121,7 @@ class SignerManagerTest {
     }
 
     @Test
+    @ExperimentalCoroutinesApi
     fun signOut_shouldRemoveAnyState() = runBlockingTest {
         every { loginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
 
@@ -147,10 +156,18 @@ class SignerManagerTest {
 
     private fun mockFetchingProjectInto(error: Boolean = false) =
         coEvery { projectRepository.loadFromRemoteAndRefreshCache(any()) }.apply {
-            if (error) {
-                this.throws(Throwable("Failed to fetch project info"))
+            if (!error) {
+                this.returns(
+                    Project(
+                        DEFAULT_PROJECT_ID,
+                        "local",
+                        "",
+                        "",
+                        "some_bucket_url"
+                    )
+                )
             } else {
-                this.returns(Project(DEFAULT_PROJECT_ID, "local", "",  ""))
+                this.throws(Throwable("Failed to fetch project info"))
             }
         }
 

@@ -25,14 +25,31 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class ProjectRepositoryTest {
 
-    private val localProject = Project(DEFAULT_PROJECT_ID, "local", "",  "")
-    private val remoteProject = Project(DEFAULT_PROJECT_ID, "remote", "",  "")
+    private val localProject = Project(
+        DEFAULT_PROJECT_ID,
+        "local",
+        "",
+        "",
+        "some_image_bucket"
+    )
+
+    private val remoteProject = Project(
+        DEFAULT_PROJECT_ID,
+        "remote",
+        "",
+        "",
+        "some_image_bucket"
+    )
 
     private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mockk()
     private val projectLocalDataSourceMock: ProjectLocalDataSource = mockk(relaxUnitFun = true)
     private val firebasePerformanceMock: FirebasePerformance = mockk()
 
-    private val projectRepository = ProjectRepositoryImpl(projectLocalDataSourceMock, projectRemoteDataSourceMock, firebasePerformanceMock)
+    private val projectRepository = ProjectRepositoryImpl(
+        projectLocalDataSourceMock,
+        projectRemoteDataSourceMock,
+        firebasePerformanceMock
+    )
 
     @Before
     fun setup() {

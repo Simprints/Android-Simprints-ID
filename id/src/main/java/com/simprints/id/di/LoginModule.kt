@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
@@ -45,7 +46,8 @@ open class LoginModule {
 
     @Provides
     open fun provideAuthenticationDataManager(apiClientFactory: SimApiClientFactory,
-                                              baseUrlProvider: BaseUrlProvider): AuthenticationDataManager =
+                                              baseUrlProvider: BaseUrlProvider
+    ): AuthenticationDataManager =
         AuthenticationDataManagerImpl(apiClientFactory, baseUrlProvider)
 
     @Provides
