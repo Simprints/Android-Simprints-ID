@@ -3,8 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.id.activities.login.repository.LoginRepository
-import com.simprints.id.activities.login.repository.LoginRepositoryImpl
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
@@ -28,33 +27,26 @@ open class LoginModule {
     open fun provideLoginActivityHelper(): LoginActivityHelper = LoginActivityHelperImpl()
 
     @Provides
-    open fun provideLoginViewModelFactory(loginRepository: LoginRepository): LoginViewModelFactory {
-        return LoginViewModelFactory(loginRepository)
+    open fun provideLoginViewModelFactory(
+        authenticationHelper: AuthenticationHelper
+    ): LoginViewModelFactory {
+        return LoginViewModelFactory(authenticationHelper)
     }
-
-    @Provides
-    open fun provideLoginRepository(
-        projectAuthenticator: ProjectAuthenticator,
-        authenticationHelper: AuthenticationHelper,
-        sessionEventsManager: SessionEventsManager,
-        timeHelper: TimeHelper
-    ): LoginRepository = LoginRepositoryImpl(
-        projectAuthenticator,
-        authenticationHelper,
-        sessionEventsManager,
-        timeHelper
-    )
 
     @Provides
     open fun provideSecreteManager(loginInfoManager: LoginInfoManager): ProjectSecretManager =
         ProjectSecretManager(loginInfoManager)
 
     @Provides
-    open fun provideAuthManager(secureApiInterface: SecureApiInterface): AuthManager = AuthManagerImpl(secureApiInterface)
+    open fun provideAuthManager(
+        apiClientFactory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider
+    ): AuthManager = AuthManagerImpl(apiClientFactory, baseUrlProvider)
 
     @Provides
-    open fun provideAuthenticationDataManager(secureApiInterface: SecureApiInterface): AuthenticationDataManager =
-        AuthenticationDataManagerImpl(secureApiInterface)
+    open fun provideAuthenticationDataManager(apiClientFactory: SimApiClientFactory,
+                                              baseUrlProvider: BaseUrlProvider): AuthenticationDataManager =
+        AuthenticationDataManagerImpl(apiClientFactory, baseUrlProvider)
 
     @Provides
     open fun provideAttestationManager(): AttestationManager = AttestationManagerImpl()
@@ -63,6 +55,9 @@ open class LoginModule {
     open fun provideProjectAuthenticator(
         authManager: AuthManager,
         projectSecretManager: ProjectSecretManager,
+        loginInfoManager: LoginInfoManager,
+        simApiClientFactory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider,
         safetyNetClient: SafetyNetClient,
         secureDataManager: SecureLocalDbKeyProvider,
         projectRemoteDataSource: ProjectRemoteDataSource,
@@ -88,11 +83,17 @@ open class LoginModule {
     @Provides
     open fun provideAuthenticationHelper(
         crashReportManager: CrashReportManager,
-        loginInfoManager: LoginInfoManager
+        loginInfoManager: LoginInfoManager,
+        timeHelper: TimeHelper,
+        projectAuthenticator: ProjectAuthenticator,
+        sessionEventsManager: SessionEventsManager
     ): AuthenticationHelper {
-        return AuthenticationHelper(
+        return AuthenticationHelperImpl(
             crashReportManager,
-            loginInfoManager
+            loginInfoManager,
+            timeHelper,
+            projectAuthenticator,
+            sessionEventsManager
         )
     }
 

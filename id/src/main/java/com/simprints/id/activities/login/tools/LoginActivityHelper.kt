@@ -1,7 +1,7 @@
 package com.simprints.id.activities.login.tools
 
 import android.content.Intent
-import com.simprints.id.activities.login.response.CredentialsResponse
+import com.simprints.id.activities.login.response.QrCodeResponse
 import org.json.JSONException
 
 interface LoginActivityHelper {
@@ -18,10 +18,10 @@ interface LoginActivityHelper {
     ): Boolean
 
     /**
-     * Valid Scanned Text Format:
-     * {"projectId":"someProjectId","projectSecret":"someSecret"}
+     * Valid scanned QR code format:
+     * {"projectId":"someProjectId","projectSecret":"someSecret","backend":"https://some-url"}
      **/
     @Throws(JSONException::class)
-    fun tryParseQrCodeResponse(response: Intent): CredentialsResponse
+    fun tryParseQrCodeResponse(response: Intent): QrCodeResponse
 
 }
