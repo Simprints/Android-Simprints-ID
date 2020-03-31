@@ -7,6 +7,22 @@
     android:background="@color/simprints_blue"
     tools:context=".activities.connect.issues.scanneroff.ScannerOffFragment">
 
+    <TextView
+        android:id="@+id/couldNotConnectTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/muli"
+        android:padding="8sp"
+        android:text="@string/not_my_scanner"
+        android:gravity="center"
+        android:textSize="15sp"
+        android:textColor="@color/simprints_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/scannerOffEndGuideline"
+        app:layout_constraintStart_toStartOf="@+id/scannerOffStartGuideline"
+        app:layout_constraintTop_toBottomOf="@id/tryAgainButton"
+        app:layout_constraintVertical_bias="0.5" />
+
     <Button
         android:id="@+id/tryAgainButton"
         style="?android:attr/borderlessButtonStyle"
@@ -54,7 +70,7 @@
         tools:ignore="ContentDescription" />
 
     <ProgressBar
-        android:id="@+id/turnOnScannerProgressBar"
+        android:id="@+id/scannerOffProgressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

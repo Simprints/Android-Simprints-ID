@@ -130,25 +130,25 @@ class ConnectScannerViewModel(
     private fun launchAlertOrScannerIssueOrShowDialog(alert: FingerprintAlert) {
         when (alert) {
             BLUETOOTH_NOT_ENABLED -> connectScannerIssue.postValue(ConnectScannerIssue.BLUETOOTH_OFF)
-            NOT_PAIRED, MULTIPLE_PAIRED_SCANNERS -> launchAppropriatePairScannerIssue()
+            NOT_PAIRED, MULTIPLE_PAIRED_SCANNERS -> connectScannerIssue.postValue(determineAppropriateScannerIssueForPairing())
             DISCONNECTED -> showScannerErrorDialogWithScannerId.postValue(scannerManager.lastPairedScannerId)
             BLUETOOTH_NOT_SUPPORTED, LOW_BATTERY, UNEXPECTED_ERROR -> launchAlert.postValue(alert)
         }
     }
 
-    private fun launchAppropriatePairScannerIssue() {
+    private fun determineAppropriateScannerIssueForPairing(): ConnectScannerIssue {
         val couldNotBeVero1 = !preferencesManager.scannerGenerations.contains(ScannerGeneration.VERO_1)
         val deviceHasNfcAdapter = !nfcAdapter.isNull()
         val nfcAdapterIsEnabled = !nfcAdapter.isNull() && nfcAdapter.isEnabled()
 
-        if (couldNotBeVero1 && deviceHasNfcAdapter) {
+        return if (couldNotBeVero1 && deviceHasNfcAdapter) {
             if (nfcAdapterIsEnabled) {
-                connectScannerIssue.postValue(ConnectScannerIssue.NFC_PAIR)
+                ConnectScannerIssue.NFC_PAIR
             } else {
-                connectScannerIssue.postValue(ConnectScannerIssue.NFC_OFF)
+                ConnectScannerIssue.NFC_OFF
             }
         } else {
-            connectScannerIssue.postValue(ConnectScannerIssue.SERIAL_ENTRY_PAIR)
+            ConnectScannerIssue.SERIAL_ENTRY_PAIR
         }
     }
 
@@ -173,7 +173,11 @@ class ConnectScannerViewModel(
     }
 
     fun handleScannerDisconnectedNoClick() {
-        launchAppropriatePairScannerIssue()
+        connectScannerIssue.postValue(determineAppropriateScannerIssueForPairing())
+    }
+
+    fun handleIncorrectScanner() {
+        connectScannerIssue.postValue(determineAppropriateScannerIssueForPairing())
     }
 
     private fun addBluetoothConnectivityEvent() {

@@ -44,6 +44,7 @@
     <string name="scanner_off_instructions">Press scanner power button.</string>
     <string name="scanner_on">✓ Scanner on</string>
     <string name="try_again_label">Try Again</string>
+    <string name="not_my_scanner">%1$s is not my scanner</string>
     <!-- NfcPairFragment -->
     <string name="nfc_pair_title">Scanner not connected</string>
     <string name="nfc_pair_instructions">Tap back of scanner to back of phone</string>
