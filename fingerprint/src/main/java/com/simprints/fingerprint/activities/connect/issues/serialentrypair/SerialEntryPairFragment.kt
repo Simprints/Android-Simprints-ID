@@ -9,10 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.view.inputmethod.InputMethodManager
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.scanner.ScannerPairingManager
 import com.simprints.fingerprint.tools.extensions.showToast
@@ -22,7 +21,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class SerialEntryPairFragment : Fragment() {
+class SerialEntryPairFragment : FingerprintFragment() {
 
     private val scannerPairingManager: ScannerPairingManager by inject()
 
@@ -64,11 +63,11 @@ class SerialEntryPairFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.awaitingToPairToMacAddress.observe(this, Observer {
+        viewModel.awaitingToPairToMacAddress.fragmentObserveEventWith {
             serialEntryOkButton.visibility = View.INVISIBLE
             serialEntryPairProgressBar.visibility = View.VISIBLE
             handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
-        })
+        }
         val inputMethodManager: InputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.showSoftInput(serialEntryEditText, InputMethodManager.SHOW_IMPLICIT)
     }

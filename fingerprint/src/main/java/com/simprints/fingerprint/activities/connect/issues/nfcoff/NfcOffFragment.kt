@@ -7,14 +7,14 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import kotlinx.android.synthetic.main.fragment_nfc_off.*
 import org.koin.android.ext.android.inject
 
-class NfcOffFragment : Fragment() {
+class NfcOffFragment : FingerprintFragment() {
 
     private var handlingNfcEnabled = false
 

@@ -4,8 +4,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
-import com.simprints.core.livedata.LiveDataEventObserver
-import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
@@ -43,8 +41,8 @@ class ConnectScannerActivity : FingerprintActivity() {
     }
 
     private fun observeLifecycleEvents() {
-        viewModel.launchAlert.observe(this, LiveDataEventWithContentObserver { launchAlert(this, it) } )
-        viewModel.finish.observe(this, LiveDataEventObserver { vibrateAndContinueToNextActivity() })
+        viewModel.launchAlert.activityObserveEventWith { launchAlert(this, it) }
+        viewModel.finish.activityObserveEventWith { vibrateAndContinueToNextActivity() }
     }
 
     override fun onPause() {
