@@ -86,7 +86,7 @@ class ConnectScannerMainFragment : Fragment() {
     private fun buildConfirmScannerErrorAlertDialog(scannerId: String) =
         ConfirmScannerErrorBuilder()
             .build(
-                context!!, androidResourcesHelper, scannerId,
+                requireContext(), androidResourcesHelper, scannerId,
                 onYes = { connectScannerViewModel.handleScannerDisconnectedYesClick() },
                 onNo = { connectScannerViewModel.handleScannerDisconnectedNoClick() }
             )

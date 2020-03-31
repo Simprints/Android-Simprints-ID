@@ -72,6 +72,6 @@ class NfcOffFragment : Fragment() {
 
     companion object {
         private const val REQUEST_ENABLE_NFC = 10
-        private const val FINISHED_TIME_DELAY_MS = 2000L
+        private const val FINISHED_TIME_DELAY_MS = 1500L
     }
 }

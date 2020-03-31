@@ -29,9 +29,13 @@ class ScannerOffFragment : Fragment() {
             replaceTryAgainButtonWithProgressBar()
         }
 
-        couldNotConnectTextView.paintFlags = couldNotConnectTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-        couldNotConnectTextView.setOnClickListener {
-            connectScannerViewModel.handleIncorrectScanner()
+        connectScannerViewModel.showScannerErrorDialogWithScannerId.value?.let { scannerId ->
+            couldNotConnectTextView.paintFlags = couldNotConnectTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+            couldNotConnectTextView.text = getString(R.string.not_my_scanner, scannerId)
+            couldNotConnectTextView.setOnClickListener {
+                connectScannerViewModel.handleIncorrectScanner()
+            }
+            couldNotConnectTextView.visibility = View.VISIBLE
         }
 
         connectScannerViewModel.retryConnect()
@@ -46,7 +50,12 @@ class ScannerOffFragment : Fragment() {
             }
         })
         connectScannerViewModel.connectScannerIssue.observe(this, Observer {
-            goToToAppropriatePairingScreen(it)
+            it?.let {
+                // Set to null so it is cleared for future fragments
+                connectScannerViewModel.connectScannerIssue.value = null
+                connectScannerViewModel.stopConnectingAndResetState()
+                goToToAppropriatePairingScreen(it)
+            }
         })
     }
 
@@ -65,6 +74,7 @@ class ScannerOffFragment : Fragment() {
 
     private fun handleScannerConnected() {
         scannerOffProgressBar.visibility = View.INVISIBLE
+        couldNotConnectTextView.visibility = View.INVISIBLE
         tryAgainButton.visibility = View.VISIBLE
         tryAgainButton.isEnabled = false
         tryAgainButton.setText(R.string.scanner_on)
@@ -72,14 +82,13 @@ class ScannerOffFragment : Fragment() {
         Handler().postDelayed({ finishConnectActivity() }, FINISHED_TIME_DELAY_MS)
     }
 
-    private fun goToToAppropriatePairingScreen(issue: ConnectScannerIssue?) {
+    private fun goToToAppropriatePairingScreen(issue: ConnectScannerIssue) {
         val navAction = when (issue) {
             ConnectScannerIssue.NFC_OFF -> R.id.action_scannerOffFragment_to_nfcOffFragment
             ConnectScannerIssue.NFC_PAIR -> R.id.action_scannerOffFragment_to_nfcPairFragment
             ConnectScannerIssue.SERIAL_ENTRY_PAIR -> R.id.action_scannerOffFragment_to_serialEntryPairFragment
             else -> null
         }
-
         navAction?.let { findNavController().navigate(it) }
     }
 
