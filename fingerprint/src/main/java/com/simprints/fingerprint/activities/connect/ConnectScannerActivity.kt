@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.activities.connect
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
@@ -20,8 +19,6 @@ class ConnectScannerActivity : FingerprintActivity() {
 
     private val viewModel: ConnectScannerViewModel by viewModel()
 
-    private var scannerErrorConfirmationDialog: AlertDialog? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connect_scanner)
@@ -32,13 +29,9 @@ class ConnectScannerActivity : FingerprintActivity() {
             this.intent.extras?.getParcelable(ConnectScannerTaskRequest.BUNDLE_KEY) as ConnectScannerTaskRequest?
                 ?: throw InvalidRequestForConnectScannerActivityException()
 
-        viewModel.start()
-    }
-
-    override fun onResume() {
-        super.onResume()
         viewModel.launchAlert.activityObserveEventWith { launchAlert(this, it) }
         viewModel.finish.activityObserveEventWith { vibrateAndContinueToNextActivity() }
+        viewModel.start()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -48,10 +41,7 @@ class ConnectScannerActivity : FingerprintActivity() {
                 ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
                 ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
                 ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
-                ResultCode.OK -> {
-                    scannerErrorConfirmationDialog?.dismiss()
-                    viewModel.retryConnect()
-                }
+                ResultCode.OK -> viewModel.retryConnect()
             }
         }
     }
