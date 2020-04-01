@@ -18,10 +18,10 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprintscanner.v1.ScannerUtils.convertAddressToSerial
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
@@ -36,7 +36,7 @@ class ConnectScannerViewModel(
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val preferencesManager: FingerprintPreferencesManager,
     private val analyticsManager: FingerprintAnalyticsManager,
-    private val nfcAdapter: ComponentNfcAdapter) : ViewModel() {
+    private val nfcManager: NfcManager) : ViewModel() {
 
     val progress: MutableLiveData<Int> = MutableLiveData(0)
     val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
@@ -141,11 +141,9 @@ class ConnectScannerViewModel(
 
     private fun determineAppropriateScannerIssueForPairing(): ConnectScannerIssue {
         val couldNotBeVero1 = !preferencesManager.scannerGenerations.contains(ScannerGeneration.VERO_1)
-        val deviceHasNfcAdapter = !nfcAdapter.isNull()
-        val nfcAdapterIsEnabled = !nfcAdapter.isNull() && nfcAdapter.isEnabled()
 
-        return if (couldNotBeVero1 && deviceHasNfcAdapter) {
-            if (nfcAdapterIsEnabled) {
+        return if (couldNotBeVero1 && nfcManager.doesDeviceHaveNfcCapability()) {
+            if (nfcManager.isNfcEnabled()) {
                 ConnectScannerIssue.NFC_PAIR
             } else {
                 ConnectScannerIssue.NFC_OFF

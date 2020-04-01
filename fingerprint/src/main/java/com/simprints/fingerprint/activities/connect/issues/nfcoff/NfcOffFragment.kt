@@ -11,7 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
+import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import kotlinx.android.synthetic.main.fragment_nfc_off.*
 import org.koin.android.ext.android.inject
 
@@ -19,7 +19,7 @@ class NfcOffFragment : FingerprintFragment() {
 
     private var handlingNfcEnabled = false
 
-    private val nfcAdapter: ComponentNfcAdapter by inject()
+    private val nfcManager: NfcManager by inject()
     private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -29,7 +29,7 @@ class NfcOffFragment : FingerprintFragment() {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
 
-        if (nfcAdapter.isNull()) {
+        if (!nfcManager.doesDeviceHaveNfcCapability()) {
             continueToSerialEntryPair()
             return
         }
@@ -49,14 +49,14 @@ class NfcOffFragment : FingerprintFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (nfcAdapter.isEnabled()) handleNfcEnabled()
+        if (nfcManager.isNfcEnabled()) handleNfcEnabled()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             REQUEST_ENABLE_NFC -> {
-                if (nfcAdapter.isEnabled()) {
+                if (nfcManager.isNfcEnabled()) {
                     handleNfcEnabled()
                 }
             }
