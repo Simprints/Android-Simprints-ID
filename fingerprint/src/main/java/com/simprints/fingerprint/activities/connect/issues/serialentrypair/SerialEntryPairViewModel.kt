@@ -3,7 +3,7 @@ package com.simprints.fingerprint.activities.connect.issues.serialentrypair
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.fingerprint.scanner.ScannerPairingManager
+import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 
 class SerialEntryPairViewModel(
     private val scannerPairingManager: ScannerPairingManager

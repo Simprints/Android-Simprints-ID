@@ -7,18 +7,22 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import com.simprints.fingerprint.scanner.ScannerPairingManager
+import com.simprints.fingerprint.controllers.fingerprint.NfcManager
+import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.fingerprint.tools.extensions.showToast
-import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.tools.nfc.ComponentNfcTag
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 import kotlinx.android.synthetic.main.fragment_nfc_pair.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -28,7 +32,7 @@ class NfcPairFragment : FingerprintFragment() {
     private val viewModel: NfcPairViewModel by viewModel()
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
 
-    private val nfcAdapter: ComponentNfcAdapter by inject()
+    private val nfcManager: NfcManager by inject()
     private val scannerPairingManager: ScannerPairingManager by inject()
     private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
 
@@ -71,19 +75,18 @@ class NfcPairFragment : FingerprintFragment() {
         activity?.registerReceiver(bluetoothPairStateChangeReceiver, IntentFilter(ComponentBluetoothDevice.ACTION_BOND_STATE_CHANGED))
     }
 
+    @ExperimentalCoroutinesApi
     override fun onResume() {
         super.onResume()
-        nfcAdapter.enableReaderMode(
-            requireActivity(),
-            ::handleNfcTagDetected,
-            ComponentNfcAdapter.FLAG_READER_NFC_A or ComponentNfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,
-            null
-        )
+        lifecycleScope.launch {
+            nfcManager.enableReaderMode(requireActivity())
+            nfcManager.channelTags.consumeEach { handleNfcTagDetected(it) }
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        nfcAdapter.disableReaderMode(requireActivity())
+        nfcManager.disableReaderMode(requireActivity())
     }
 
     override fun onStop() {
@@ -91,7 +94,7 @@ class NfcPairFragment : FingerprintFragment() {
         activity?.unregisterReceiver(bluetoothPairStateChangeReceiver)
     }
 
-    private fun handleNfcTagDetected(tag: ComponentNfcTag?) {
+    private fun handleNfcTagDetected(tag: ComponentNfcTag) {
         Vibrate.vibrate(requireContext())
         viewModel.handleNfcTagDetected(tag)
     }

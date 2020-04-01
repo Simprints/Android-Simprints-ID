@@ -1,5 +1,6 @@
 ### Component NFC
 These component NFC classes are designed to wrap completely the Android SDK `android.nfc` package functionality.
+They are intended to mimic the Android SDK API identically, so it is recommended to wrap usage of this class with smarter logic as NPEs can occur.
 
 `android` contains the classes for use in production that delegate to the real Android implementation.
 
