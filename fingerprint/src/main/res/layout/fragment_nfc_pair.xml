@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/simprints_blue"
+    tools:context=".activities.connect.issues.nfcpair.NfcPairFragment">
+
+    <TextView
+        android:id="@+id/couldNotPairTextView"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:fontFamily="@font/muli"
+        android:padding="8sp"
+        android:text="@string/cannot_connect_devices"
+        android:gravity="center"
+        android:textSize="15sp"
+        android:textColor="@color/simprints_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/nfcPairEndGuideline"
+        app:layout_constraintStart_toStartOf="@+id/nfcPairStartGuideline"
+        app:layout_constraintTop_toBottomOf="@+id/nfcPairImageGuideline"
+        app:layout_constraintVertical_bias="0.7" />
+
+    <Button
+        android:id="@+id/tryAgainButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:background="@drawable/button_rounded_corners_orange"
+        android:fontFamily="@font/muli"
+        android:padding="8sp"
+        android:text="@string/try_again_label"
+        android:textColor="@color/simprints_white"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/nfcPairEndGuideline"
+        app:layout_constraintStart_toStartOf="@+id/nfcPairStartGuideline"
+        app:layout_constraintTop_toBottomOf="@+id/nfcPairImageGuideline"
+        app:layout_constraintVertical_bias="0.7" />
+
+    <TextView
+        android:id="@+id/nfcPairInstructionsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:gravity="center"
+        android:text="@string/nfc_pair_instructions"
+        android:textColor="@color/simprints_white"
+        android:textSize="22sp"
+        app:layout_constraintBottom_toTopOf="@id/tryAgainButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/nfcPairImageGuideline"
+        app:layout_constraintVertical_weight="0.4" />
+
+    <ImageView
+        android:id="@+id/nfcPairImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="0dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/scanner"
+        app:layout_constraintBottom_toTopOf="@+id/nfcPairImageGuideline"
+        app:layout_constraintEnd_toStartOf="@+id/nfcPairEndGuideline"
+        app:layout_constraintStart_toStartOf="@+id/nfcPairStartGuideline"
+        app:layout_constraintTop_toBottomOf="@+id/nfcPairTitleTextView"
+        app:layout_constraintVertical_weight="0.6"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/nfcPairTitleTextView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/nfc_pair_title"
+        android:textColor="@color/simprints_white"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/nfcPairImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_weight="0.4" />
+
+    <ProgressBar
+        android:id="@+id/nfcPairingProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:progressTint="@color/simprints_white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@id/tryAgainButton"
+        app:layout_constraintEnd_toEndOf="@id/tryAgainButton"
+        app:layout_constraintStart_toStartOf="@id/tryAgainButton"
+        app:layout_constraintTop_toTopOf="@id/tryAgainButton" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/nfcPairEndGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.80" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/nfcPairImageGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/nfcPairStartGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.20" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

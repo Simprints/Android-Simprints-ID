@@ -30,7 +30,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.test.KoinTest
-import org.koin.test.mock.declare
+import org.koin.test.mock.declareModule
 
 @RunWith(AndroidJUnit4::class)
 class OrchestratorActivityAndroidTest : KoinTest {
@@ -46,7 +46,7 @@ class OrchestratorActivityAndroidTest : KoinTest {
         acquireFingerprintKoinModules()
         Intents.init()
 
-        declare {
+        declareModule {
             factory { orchestratorMock }
             viewModel { orchestratorViewModel }
         }

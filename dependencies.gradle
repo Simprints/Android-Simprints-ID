@@ -17,6 +17,7 @@ def dagger = [
 def androidx_lifecycle_version = "2.2.0-rc03"
 def androidx_room_version = "2.1.0-alpha04"
 def androidx_camerax_version = '1.0.0-beta01'
+def androidx_navigation_version = "2.3.0-alpha04"
 def androidx = [
     core     : "androidx.core:core-ktx:1.0.2",
     multidex : "androidx.multidex:multidex:2.0.1",
@@ -48,6 +49,11 @@ def androidx = [
         camera2  : "androidx.camera:camera-camera2:$androidx_camerax_version",
         lifecycle: "androidx.camera:camera-lifecycle:$androidx_camerax_version",
         view     : "androidx.camera:camera-view:1.0.0-alpha08"
+    ],
+    navigation: [
+        fragment       : "androidx.navigation:navigation-fragment-ktx:$androidx_navigation_version",
+        ui             : "androidx.navigation:navigation-ui-ktx:$androidx_navigation_version",
+        dynamicfeatures: "androidx.navigation:navigation-dynamic-features-fragment:$androidx_navigation_version"
     ]
 ]
 
@@ -115,7 +121,7 @@ def fuzzywuzzy = [
 ]
 
 // Koin, Service Location
-def koin_version = "2.0.1"
+def koin_version = "2.1.5"
 def koin = [
     core     : "org.koin:koin-core:$koin_version",
     core_ext : "org.koin:koin-core-ext:$koin_version",
@@ -174,7 +180,8 @@ def testing = [
         orchestrator: "androidx.test:orchestrator:1.1.1",
         runner      : "androidx.test:runner:1.1.2-alpha01",
         rules       : "androidx.test:rules:1.1.2-alpha01",
-        room        : "androidx.room:room-testing:$androidx_room_version"
+        room        : "androidx.room:room-testing:$androidx_room_version",
+        navigation  : "androidx.navigation:navigation-testing:$androidx_navigation_version"
     ],
     rx2_idler      : 'com.squareup.rx.idler:rx2-idler:0.9.1',
     coroutines_test: 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.1',
