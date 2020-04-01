@@ -39,7 +39,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.KoinTest
-import org.koin.test.mock.declare
+import org.koin.test.mock.declareModule
 
 @RunWith(AndroidJUnit4::class)
 class AlertActivityTest : KoinTest {
@@ -49,7 +49,7 @@ class AlertActivityTest : KoinTest {
     @Before
     fun setUp() {
         acquireFingerprintKoinModules()
-        declare { factory { sessionEventManagerMock } }
+        declareModule { factory { sessionEventManagerMock } }
         Intents.init()
     }
 

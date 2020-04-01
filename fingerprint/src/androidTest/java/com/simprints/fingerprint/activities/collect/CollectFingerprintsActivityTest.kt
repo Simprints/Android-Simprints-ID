@@ -31,7 +31,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.KoinTest
-import org.koin.test.mock.declare
+import org.koin.test.mock.declareModule
 
 @RunWith(AndroidJUnit4::class)
 class CollectFingerprintsActivityTest : KoinTest {
@@ -44,9 +44,9 @@ class CollectFingerprintsActivityTest : KoinTest {
     }
 
     private fun mockScannerManagerWithScanner(scanner: ScannerWrapper) {
-        declare {
+        declareModule {
             factory<ScannerManager> {
-                ScannerManagerImpl(DummyBluetoothAdapter(), mock()).also { it.scanner = scanner }
+                ScannerManagerImpl(DummyBluetoothAdapter(), mock(), mock()).also { it.scanner = scanner }
             }
             factory<MasterFlowManager> { setupMock { whenThis { getCurrentAction() } thenReturn Action.IDENTIFY } }
         }
