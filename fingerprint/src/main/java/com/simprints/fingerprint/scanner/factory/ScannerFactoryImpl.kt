@@ -7,7 +7,7 @@ import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV2
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.v2.channel.CypressOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
 import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
@@ -49,7 +49,7 @@ import timber.log.Timber
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
-class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter,
+class ScannerFactoryImpl(private val bluetoothAdapter: ComponentBluetoothAdapter,
                          private val preferencesManager: FingerprintPreferencesManager,
                          private val crashReportManager: FingerprintCrashReportManager,
                          private val scannerUiHelper: ScannerUiHelper) : ScannerFactory {
