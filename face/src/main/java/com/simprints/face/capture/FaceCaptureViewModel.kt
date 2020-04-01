@@ -68,6 +68,7 @@ class FaceCaptureViewModel : ViewModel() {
     fun handlePreviewFrame(frame: Frame) = frameChannel.offer(frame)
 
     fun flowFinished() {
+        saveCaptures()
         // TODO: add analytics for FlowFinished(SUCCESS) and EndSession
 
         val results = captures.value?.mapIndexed { index, detection ->
@@ -80,7 +81,6 @@ class FaceCaptureViewModel : ViewModel() {
     fun captureFinished(captures: List<FaceDetection>) {
         stopFaceDetection()
         this.captures.value = captures
-        saveCaptures()
     }
 
     fun willRetry() {
