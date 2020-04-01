@@ -96,7 +96,7 @@ class FaceCaptureViewModel : ViewModel() {
     }
 
     private fun saveCaptures() {
-        captures.value?.forEachIndexed { index, capture -> saveImage(capture) }
+        captures.value?.forEach { capture -> saveImage(capture) }
     }
 
     private fun saveImage(capture: FaceDetection) {
