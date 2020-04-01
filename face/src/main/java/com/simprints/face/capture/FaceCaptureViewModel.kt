@@ -65,7 +65,9 @@ class FaceCaptureViewModel : ViewModel() {
         processFrames.send(false)
     }
 
-    fun handlePreviewFrame(frame: Frame) = frameChannel.offer(frame)
+    fun handlePreviewFrame(frame: Frame) {
+        frameChannel.offer(frame)
+    }
 
     fun flowFinished() {
         saveCaptures()
