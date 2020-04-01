@@ -206,4 +206,8 @@ dependencies {
     androidTestImplementation deps.testing.truth
 
     androidTestImplementation deps.testing.rx2_idler
+
+    // Trust me I hate this fix more than you
+    // This is to solve multiple imports of guava https://stackoverflow.com/a/60492942/4072335
+    androidTestImplementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 }
