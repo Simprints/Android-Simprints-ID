@@ -28,7 +28,7 @@ class LiveFeedbackFragmentViewModel(
     )
 
     val currentDetection = MutableLiveData<FaceDetection>()
-    val capturing = MutableLiveData<CapturingState>(CapturingState.NOT_STARTED)
+    val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
     val captures = mutableListOf<FaceDetection>()
 
@@ -46,7 +46,7 @@ class LiveFeedbackFragmentViewModel(
 
         val faceDetection = getFaceDetectionFromPotentialFace(potentialFace, previewFrame)
 
-        if (capturing.value == CapturingState.CAPTURING) {
+        if (capturingState.value == CapturingState.CAPTURING) {
             captures += faceDetection
             if (captures.size == mainVM.samplesToCapture) {
                 finishCapture()
@@ -57,7 +57,7 @@ class LiveFeedbackFragmentViewModel(
     }
 
     fun startCapture() {
-        capturing.value = CapturingState.CAPTURING
+        capturingState.value = CapturingState.CAPTURING
     }
 
     private fun finishCapture() {
@@ -67,9 +67,9 @@ class LiveFeedbackFragmentViewModel(
             .filter { it.status == FaceDetection.Status.VALID_CAPTURING }
 
         if (areCapturesBelowThreshold(sortedQualifyingCaptures)) {
-            capturing.value = CapturingState.FINISHED_FAILED
+            capturingState.value = CapturingState.FINISHED_FAILED
         } else {
-            capturing.value = CapturingState.FINISHED
+            capturingState.value = CapturingState.FINISHED
         }
     }
 
@@ -110,7 +110,7 @@ class LiveFeedbackFragmentViewModel(
             else -> FaceDetection(
                 previewFrame,
                 potentialFace,
-                if (capturing.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID
+                if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID
             )
         }
     }
