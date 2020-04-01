@@ -6,6 +6,7 @@ import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.EncodingUtils
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.data.db.common.RemoteDbManager
@@ -185,9 +186,27 @@ class SessionRemoteDataSourceImplAndroidTest {
     private fun SessionEvents.addFingerprintCaptureEvent() {
         FingerprintCaptureEvent.Result.values().forEach { result ->
             FingerIdentifier.values().forEach { fingerIdentifier ->
-                val fakeTemplate = EncodingUtils.byteArrayToBase64(PeopleGeneratorUtils.getRandomFingerprintSample().template)
-                events.add(FingerprintCaptureEvent(0, 0, fingerIdentifier, 0, result,
-                    FingerprintCaptureEvent.Fingerprint(fingerIdentifier, 0, fakeTemplate)))
+                val fakeTemplate = EncodingUtils.byteArrayToBase64(
+                    PeopleGeneratorUtils.getRandomFingerprintSample().template
+                )
+
+                val fingerprint = FingerprintCaptureEvent.Fingerprint(
+                    fingerIdentifier,
+                    0,
+                    fakeTemplate
+                )
+
+                val event = FingerprintCaptureEvent(
+                    0,
+                    0,
+                    fingerIdentifier,
+                    0,
+                    result,
+                    fingerprint,
+                    randomUUID()
+                )
+
+                events.add(event)
             }
         }
     }
