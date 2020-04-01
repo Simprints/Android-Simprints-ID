@@ -22,7 +22,8 @@ import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprintscanner.v1.ScannerUtils.convertAddressToSerial
+import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
+import com.simprints.fingerprint.tools.livedata.postEvent
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -36,7 +37,8 @@ class ConnectScannerViewModel(
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val preferencesManager: FingerprintPreferencesManager,
     private val analyticsManager: FingerprintAnalyticsManager,
-    private val nfcManager: NfcManager) : ViewModel() {
+    private val nfcManager: NfcManager,
+    private val scannerPairingManager: ScannerPairingManager) : ViewModel() {
 
     val progress: MutableLiveData<Int> = MutableLiveData(0)
     val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
@@ -119,7 +121,7 @@ class ConnectScannerViewModel(
 
     private fun manageVeroErrors(it: Throwable) {
         Timber.d(it)
-        scannerConnected.postValue(LiveDataEventWithContent(false))
+        scannerConnected.postEvent(false)
         launchAlertOrScannerIssueOrShowDialog(scannerManager.getAlertType(it))
         if (it !is FingerprintSafeException) {
             crashReportManager.logExceptionOrSafeException(it)
@@ -129,13 +131,13 @@ class ConnectScannerViewModel(
     private fun launchAlertOrScannerIssueOrShowDialog(alert: FingerprintAlert) {
         when (alert) {
             BLUETOOTH_NOT_ENABLED ->
-                connectScannerIssue.postValue(LiveDataEventWithContent(ConnectScannerIssue.BLUETOOTH_OFF))
+                connectScannerIssue.postEvent(ConnectScannerIssue.BLUETOOTH_OFF)
             NOT_PAIRED, MULTIPLE_PAIRED_SCANNERS ->
-                connectScannerIssue.postValue(LiveDataEventWithContent(determineAppropriateScannerIssueForPairing()))
+                connectScannerIssue.postEvent(determineAppropriateScannerIssueForPairing())
             DISCONNECTED ->
-                scannerManager.lastPairedScannerId?.let { showScannerErrorDialogWithScannerId.postValue(LiveDataEventWithContent(it)) }
+                scannerManager.lastPairedScannerId?.let { showScannerErrorDialogWithScannerId.postEvent(it) }
             BLUETOOTH_NOT_SUPPORTED, LOW_BATTERY, UNEXPECTED_ERROR ->
-                launchAlert.postValue(LiveDataEventWithContent(alert))
+                launchAlert.postEvent(alert)
         }
     }
 
@@ -156,12 +158,13 @@ class ConnectScannerViewModel(
     private fun handleSetupFinished() {
         progress.postValue(computeProgress(7))
         message.postValue(R.string.connect_scanner_finished)
-        preferencesManager.lastScannerUsed = convertAddressToSerial(scannerManager.lastPairedMacAddress
-            ?: "")
+        preferencesManager.lastScannerUsed = scannerManager.lastPairedMacAddress?.let {
+            scannerPairingManager.convertAddressToSerialNumber(it)
+        } ?: ""
         preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.firmwareVersion.toString()
         analyticsManager.logScannerProperties(scannerManager.lastPairedMacAddress
             ?: "", scannerManager.lastPairedScannerId ?: "")
-        scannerConnected.postValue(LiveDataEventWithContent(true))
+        scannerConnected.postEvent(true)
     }
 
     fun retryConnect() {
@@ -169,19 +172,19 @@ class ConnectScannerViewModel(
     }
 
     fun handleScannerDisconnectedYesClick() {
-        connectScannerIssue.postValue(LiveDataEventWithContent(ConnectScannerIssue.SCANNER_OFF))
+        connectScannerIssue.postEvent(ConnectScannerIssue.SCANNER_OFF)
     }
 
     fun handleScannerDisconnectedNoClick() {
-        connectScannerIssue.postValue(LiveDataEventWithContent(determineAppropriateScannerIssueForPairing()))
+        connectScannerIssue.postEvent(determineAppropriateScannerIssueForPairing())
     }
 
     fun handleIncorrectScanner() {
-        connectScannerIssue.postValue(LiveDataEventWithContent(determineAppropriateScannerIssueForPairing()))
+        connectScannerIssue.postEvent(determineAppropriateScannerIssueForPairing())
     }
 
     fun finishConnectActivity() {
-        finish.postValue(LiveDataEvent())
+        finish.postEvent()
     }
 
     private fun addBluetoothConnectivityEvent() {
