@@ -22,6 +22,7 @@ import com.simprints.fingerprint.orchestrator.state.FingerprintTaskFlowState
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.testtools.common.syntax.*
 import org.junit.After
 import org.junit.Assert.assertNotNull
@@ -36,7 +37,7 @@ import org.koin.test.mock.declareModule
 class OrchestratorActivityAndroidTest : KoinTest {
 
     private val orchestratorMock = mock<Orchestrator>()
-    private val scannerManagerMock = mock<ScannerManager>()
+    private val scannerManagerMock = spy<ScannerManager>(ScannerManagerImpl(mock(), mock(), mock()))
     private val orchestratorViewModel = spy(OrchestratorViewModel(orchestratorMock, scannerManagerMock))
 
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
