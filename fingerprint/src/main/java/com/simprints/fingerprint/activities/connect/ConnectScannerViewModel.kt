@@ -182,6 +182,10 @@ class ConnectScannerViewModel(
         connectScannerIssue.postValue(LiveDataEventWithContent(determineAppropriateScannerIssueForPairing()))
     }
 
+    fun finishConnectActivity() {
+        finish.postValue(LiveDataEvent())
+    }
+
     private fun addBluetoothConnectivityEvent() {
         scannerManager.apply {
             sessionEventsManager.addEventInBackground(
