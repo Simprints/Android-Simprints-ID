@@ -11,7 +11,7 @@ class FingerprintCaptureEvent(
     val qualityThreshold: Int,
     val result: Result,
     val fingerprint: Fingerprint?,
-    override val id: String
+    id: String
 ) : Event(EventType.FINGERPRINT_CAPTURE, starTime, endTime, id) {
 
     @Keep
