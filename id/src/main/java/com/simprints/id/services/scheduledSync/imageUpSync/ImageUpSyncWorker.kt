@@ -17,8 +17,8 @@ class ImageUpSyncWorker(
 
     override val tag: String = ImageUpSyncWorker::class.java.simpleName
 
-    @Inject lateinit var imageRepository: ImageRepository
     @Inject override lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var imageRepository: ImageRepository
 
     override suspend fun doWork(): Result =
         withContext(Dispatchers.IO) {

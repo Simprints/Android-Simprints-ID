@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
@@ -31,6 +32,7 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.SessionRepositoryImpl
 import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
@@ -57,7 +59,6 @@ import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
-import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
@@ -182,14 +183,20 @@ open class AppModule {
 
     @Provides
     open fun provideBaseUrlProvider(
-        settingsPreferencesManager: SettingsPreferencesManager
-    ): BaseUrlProvider = BaseUrlProviderImpl(settingsPreferencesManager)
+        settingsPreferencesManager: SettingsPreferencesManager,
+        projectLocalDataSource: ProjectLocalDataSource,
+        loginInfoManager: LoginInfoManager
+    ): BaseUrlProvider = BaseUrlProviderImpl(
+        settingsPreferencesManager,
+        projectLocalDataSource,
+        loginInfoManager
+    )
 
     @Provides
     open fun provideSimApiClientFactory(
         ctx: Context,
         baseUrlProvider: BaseUrlProvider
-    ) = SimApiClientFactory(ctx.deviceId)
+    ) = SimApiClientFactory(baseUrlProvider, ctx.deviceId)
 
     @Provides
     @Singleton
@@ -231,9 +238,8 @@ open class AppModule {
     @Singleton
     open fun provideSessionEventsRemoteDbManager(
         remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider
-    ): SessionRemoteDataSource = SessionRemoteDataSourceImpl(remoteDbManager, simApiClientFactory, baseUrlProvider)
+        simApiClientFactory: SimApiClientFactory
+    ): SessionRemoteDataSource = SessionRemoteDataSourceImpl(remoteDbManager, simApiClientFactory)
 
     @Provides
     @Singleton

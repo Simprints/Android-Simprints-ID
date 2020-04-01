@@ -2,6 +2,7 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import com.simprints.core.images.repository.ImageRepository
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
@@ -17,7 +18,6 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
-import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.testtools.common.di.DependencyRule
 import kotlinx.coroutines.FlowPreview
@@ -50,17 +50,19 @@ class TestDataModule(
 
     override fun provideProjectRemoteDataSource(
         remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider
+        simApiClientFactory: SimApiClientFactory
     ): ProjectRemoteDataSource = projectRemoteDataSourceRule.resolveDependency {
-        super.provideProjectRemoteDataSource(remoteDbManager, simApiClientFactory, baseUrlProvider)
+        super.provideProjectRemoteDataSource(remoteDbManager, simApiClientFactory)
     }
 
     override fun provideProjectRepository(
         projectLocalDataSource: ProjectLocalDataSource,
         projectRemoteDataSource: ProjectRemoteDataSource
     ): ProjectRepository = projectRepositoryRule.resolveDependency {
-        super.provideProjectRepository(projectLocalDataSource, projectRemoteDataSource)
+        super.provideProjectRepository(
+            projectLocalDataSource,
+            projectRemoteDataSource
+        )
     }
 
     override fun providePersonRepository(
@@ -78,21 +80,20 @@ class TestDataModule(
     }
 
     override fun provideImageRepository(
-        context: Context
+        context: Context,
+        baseUrlProvider: BaseUrlProvider
     ): ImageRepository = imageRepositoryRule.resolveDependency {
-        super.provideImageRepository(context)
+        super.provideImageRepository(context, baseUrlProvider)
     }
 
     override fun providePersonRemoteDataSource(
         remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider
+        simApiClientFactory: SimApiClientFactory
     ): PersonRemoteDataSource =
         personRemoteDataSourceRule.resolveDependency {
             super.providePersonRemoteDataSource(
                 remoteDbManager,
-                simApiClientFactory,
-                baseUrlProvider
+                simApiClientFactory
             )
         }
 

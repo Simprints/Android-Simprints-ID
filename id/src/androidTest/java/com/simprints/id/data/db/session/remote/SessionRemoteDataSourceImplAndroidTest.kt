@@ -2,6 +2,7 @@ package com.simprints.id.data.db.session.remote
 
 import android.net.NetworkInfo
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.EncodingUtils
@@ -18,7 +19,6 @@ import com.simprints.id.data.db.session.domain.models.events.callout.Identificat
 import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
-import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
@@ -51,7 +51,7 @@ class SessionRemoteDataSourceImplAndroidTest {
     val testProjectRule = TestProjectRule()
     private lateinit var testProject: TestProject
 
-    lateinit var sessionRemoteDataSource: SessionRemoteDataSource
+    private lateinit var sessionRemoteDataSource: SessionRemoteDataSource
     @MockK var remoteDbManager = mockk<RemoteDbManager>()
 
     @Before
@@ -61,9 +61,12 @@ class SessionRemoteDataSourceImplAndroidTest {
 
         val firebaseTestToken = remoteTestingManager.generateFirebaseToken(testProject.id, SIGNED_ID_USER)
         coEvery { remoteDbManager.getCurrentToken() } returns firebaseTestToken.token
-        val baseUrlProvider = mockk<BaseUrlProvider>()
-        every { baseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
-        sessionRemoteDataSource = SessionRemoteDataSourceImpl(remoteDbManager, SimApiClientFactory("some_device"), baseUrlProvider)
+        val mockBaseUrlProvider = mockk<BaseUrlProvider>()
+        every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
+        sessionRemoteDataSource = SessionRemoteDataSourceImpl(
+            remoteDbManager,
+            SimApiClientFactory(mockBaseUrlProvider, "some_device")
+        )
     }
 
     @Test

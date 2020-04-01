@@ -13,14 +13,11 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.request.Ap
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.WhereLabelKey.*
 import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
-import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.tools.utils.retrySimNetworkCalls
-
 
 open class PersonRemoteDataSourceImpl(
     private val remoteDbManager: RemoteDbManager,
-    private val simApiClientFactory: SimApiClientFactory,
-    private val baseUrlProvider: BaseUrlProvider
+    private val simApiClientFactory: SimApiClientFactory
 ) : PersonRemoteDataSource {
 
     override suspend fun downloadPerson(patientId: String, projectId: String): Person =
@@ -110,8 +107,7 @@ open class PersonRemoteDataSourceImpl(
 
 
     override suspend fun getPeopleApiClient(): PeopleRemoteInterface {
-        val baseUrl = baseUrlProvider.getApiBaseUrl()
         val token = remoteDbManager.getCurrentToken()
-        return simApiClientFactory.build<PeopleRemoteInterface>(baseUrl, token).api
+        return simApiClientFactory.build<PeopleRemoteInterface>(token).api
     }
 }

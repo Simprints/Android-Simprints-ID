@@ -1,6 +1,7 @@
 package com.simprints.id.activities.settings.fragments.settingsAbout
 
 import android.preference.Preference
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.prefs.PreferencesManager
@@ -20,6 +21,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var sessionEventManager: SessionRepository
     @Inject lateinit var recentEventsManager: RecentEventsPreferencesManager
+    @Inject lateinit var baseUrlProvider: BaseUrlProvider
     @Inject lateinit var longConsentRepository: LongConsentRepository
 
     init {
@@ -89,6 +91,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
         syncManager.cancelBackgroundSyncs()
         longConsentRepository.deleteLongConsents()
         sessionEventManager.signOut()
+        baseUrlProvider.resetApiBaseUrl()
 
         view.finishSettings()
     }

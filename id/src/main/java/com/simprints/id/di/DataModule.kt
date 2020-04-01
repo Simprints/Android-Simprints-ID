@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import com.simprints.core.images.repository.ImageRepository
 import com.simprints.core.images.repository.ImageRepositoryImpl
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
@@ -26,7 +27,6 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
-import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import dagger.Module
 import dagger.Provides
@@ -40,12 +40,10 @@ open class DataModule {
     @Singleton
     open fun providePersonRemoteDataSource(
         remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider
+        simApiClientFactory: SimApiClientFactory
     ): PersonRemoteDataSource = PersonRemoteDataSourceImpl(
         remoteDbManager,
-        simApiClientFactory,
-        baseUrlProvider
+        simApiClientFactory
     )
 
     @Provides
@@ -64,19 +62,20 @@ open class DataModule {
     @Singleton
     open fun provideProjectRemoteDataSource(
         remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider
+        simApiClientFactory: SimApiClientFactory
     ): ProjectRemoteDataSource = ProjectRemoteDataSourceImpl(
         remoteDbManager,
-        simApiClientFactory,
-        baseUrlProvider
+        simApiClientFactory
     )
 
     @Provides
     open fun provideProjectRepository(
         projectLocalDataSource: ProjectLocalDataSource,
         projectRemoteDataSource: ProjectRemoteDataSource
-    ): ProjectRepository = ProjectRepositoryImpl(projectLocalDataSource, projectRemoteDataSource)
+    ): ProjectRepository = ProjectRepositoryImpl(
+        projectLocalDataSource,
+        projectRemoteDataSource
+    )
 
     @Provides
     open fun providePersonRepository(
@@ -111,8 +110,9 @@ open class DataModule {
 
     @Provides
     open fun provideImageRepository(
-        context: Context
-    ): ImageRepository = ImageRepositoryImpl(context)
+        context: Context,
+        baseUrlProvider: BaseUrlProvider
+    ): ImageRepository = ImageRepositoryImpl(context, baseUrlProvider)
 
     @Provides
     open fun provideLongConsentLocalDataSource(
