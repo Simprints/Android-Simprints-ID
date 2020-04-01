@@ -7,11 +7,13 @@ import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.tools.extentions.area
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
+import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
 import com.simprints.face.models.FaceTarget
 import com.simprints.face.models.SymmetricTarget
 import com.simprints.uicomponents.models.FloatRange
+import com.simprints.uicomponents.models.PreviewFrame
 import com.simprints.uicomponents.models.Size
 
 class LiveFeedbackFragmentViewModel(
@@ -38,47 +40,11 @@ class LiveFeedbackFragmentViewModel(
         faceRectF: RectF,
         size: Size
     ) {
-        val previewFrame = frameProcessor.previewFrameFrom(
-            frame,
-            faceRectF,
-            size,
-            false
-        )
+        val previewFrame = frameProcessor.previewFrameFrom(frame, faceRectF, size, false)
 
         val potentialFace = faceDetector.analyze(previewFrame)
 
-        val faceDetection: FaceDetection = if (potentialFace == null) {
-            FaceDetection(previewFrame, potentialFace, FaceDetection.Status.NOFACE)
-        } else {
-            val areaOccupied = potentialFace.relativeBoundingBox.area()
-            when {
-                areaOccupied < faceTarget.areaRange.start -> FaceDetection(
-                    previewFrame,
-                    potentialFace,
-                    FaceDetection.Status.TOOFAR
-                )
-                areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection(
-                    previewFrame,
-                    potentialFace,
-                    FaceDetection.Status.TOOCLOSE
-                )
-                potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection(
-                    previewFrame,
-                    potentialFace,
-                    FaceDetection.Status.OFFYAW
-                )
-                potentialFace.roll !in faceTarget.rollTarget -> FaceDetection(
-                    previewFrame,
-                    potentialFace,
-                    FaceDetection.Status.OFFROLL
-                )
-                else -> FaceDetection(
-                    previewFrame,
-                    potentialFace,
-                    if (capturing.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID
-                )
-            }
-        }
+        val faceDetection = getFaceDetectionFromPotentialFace(potentialFace, previewFrame)
 
         if (capturing.value == CapturingState.CAPTURING) {
             captures += faceDetection
@@ -104,6 +70,45 @@ class LiveFeedbackFragmentViewModel(
             capturing.value = CapturingState.FINISHED_FAILED
         } else {
             capturing.value = CapturingState.FINISHED
+        }
+    }
+
+    private fun getFaceDetectionFromPotentialFace(potentialFace: Face?, previewFrame: PreviewFrame): FaceDetection {
+        return if (potentialFace == null) {
+            FaceDetection(previewFrame, potentialFace, FaceDetection.Status.NOFACE)
+        } else {
+            getFaceDetection(potentialFace, previewFrame)
+        }
+    }
+
+    private fun getFaceDetection(potentialFace: Face, previewFrame: PreviewFrame): FaceDetection {
+        val areaOccupied = potentialFace.relativeBoundingBox.area()
+        return when {
+            areaOccupied < faceTarget.areaRange.start -> FaceDetection(
+                previewFrame,
+                potentialFace,
+                FaceDetection.Status.TOOFAR
+            )
+            areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection(
+                previewFrame,
+                potentialFace,
+                FaceDetection.Status.TOOCLOSE
+            )
+            potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection(
+                previewFrame,
+                potentialFace,
+                FaceDetection.Status.OFFYAW
+            )
+            potentialFace.roll !in faceTarget.rollTarget -> FaceDetection(
+                previewFrame,
+                potentialFace,
+                FaceDetection.Status.OFFROLL
+            )
+            else -> FaceDetection(
+                previewFrame,
+                potentialFace,
+                if (capturing.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID
+            )
         }
     }
 
