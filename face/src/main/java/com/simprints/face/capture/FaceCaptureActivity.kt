@@ -35,7 +35,7 @@ class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
     private fun bindViewModel() {
         vm.startCamera.observe(this, LiveDataEventObserver { startCamera() })
 
-        vm.processFrames.observe(this, LiveDataEventWithContentObserver {
+        vm.shouldProcessFrames.observe(this, LiveDataEventWithContentObserver {
             if (it) {
                 face_capture_camera.addFrameProcessor(this)
             } else {

@@ -25,7 +25,7 @@ class FaceCaptureViewModel : ViewModel() {
 //    private val analyticsManager: AnalyticsManager
 
     val captures = MutableLiveData<List<FaceDetection>>()
-    val processFrames: MutableLiveData<LiveDataEventWithContent<Boolean>> = MutableLiveData()
+    val shouldProcessFrames: MutableLiveData<LiveDataEventWithContent<Boolean>> = MutableLiveData()
 
     val frameChannel = Channel<Frame>(CONFLATED)
 
@@ -58,11 +58,11 @@ class FaceCaptureViewModel : ViewModel() {
     }
 
     fun startFaceDetection() {
-        processFrames.send(true)
+        shouldProcessFrames.send(true)
     }
 
     fun stopFaceDetection() {
-        processFrames.send(false)
+        shouldProcessFrames.send(false)
     }
 
     fun handlePreviewFrame(frame: Frame) {
