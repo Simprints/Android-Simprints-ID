@@ -47,11 +47,15 @@ class RetryFragment : Fragment() {
             mainVM.willRetry()
         } else {
             // TODO: should have a better understanding on what to do after failed all retries
-            layout_retry_tips.isVisible = false
-            retry_btn.text = androidResourcesHelper.getString(R.string.btn_finish)
-            retry_btn.setOnClickListener { mainVM.flowFinished() }
+            setUiForFlowFinished()
             mainVM.retryFailed()
         }
+    }
+
+    private fun setUiForFlowFinished() {
+        layout_retry_tips.isVisible = false
+        retry_btn.text = androidResourcesHelper.getString(R.string.btn_finish)
+        retry_btn.setOnClickListener { mainVM.flowFinished() }
     }
 
 }
