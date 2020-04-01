@@ -15,7 +15,7 @@
         android:background="@drawable/button_rounded_corners_orange"
         android:fontFamily="@font/muli"
         android:padding="8sp"
-        android:text="@string/ok"
+        android:text="@string/serial_entry_ok"
         android:textColor="@color/simprints_white"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"

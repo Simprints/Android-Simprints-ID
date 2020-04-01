@@ -54,6 +54,7 @@
     <string name="nfc_pair_toast_try_again">Could not read NFC chip, please try again</string>
     <string name="nfc_pair_toast_invalid">Invalid NFC chip detected</string>
     <!-- SerialEntryPairFragment -->
+    <string name="serial_entry_ok">OK</string>
     <string name="serial_entry_pair_title">Scanner not connected</string>
     <string name="enter_scanner_number">Enter scanner number</string>
     <string name="enter_scanner_number_detail">This is found on the bottom of the scanner</string>

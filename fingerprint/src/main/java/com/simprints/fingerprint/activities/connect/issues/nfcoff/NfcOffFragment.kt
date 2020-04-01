@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import kotlinx.android.synthetic.main.fragment_nfc_off.*
 import org.koin.android.ext.android.inject
@@ -19,12 +20,14 @@ class NfcOffFragment : FingerprintFragment() {
     private var handlingNfcEnabled = false
 
     private val nfcAdapter: ComponentNfcAdapter by inject()
+    private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_nfc_off, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setTextInLayout()
 
         if (nfcAdapter.isNull()) {
             continueToSerialEntryPair()
@@ -34,6 +37,13 @@ class NfcOffFragment : FingerprintFragment() {
         turnOnNfcButton.setOnClickListener {
             val enableNfcIntent = Intent(Settings.ACTION_NFC_SETTINGS)
             startActivityForResult(enableNfcIntent, REQUEST_ENABLE_NFC)
+        }
+    }
+
+    private fun setTextInLayout() {
+        with(resourceHelper) {
+            turnOnNfcButton.text = getString(R.string.turn_on_nfc)
+            nfcOffTitleTextView.text = getString(R.string.nfc_off_title)
         }
     }
 
@@ -57,7 +67,7 @@ class NfcOffFragment : FingerprintFragment() {
         if (handlingNfcEnabled) return
         handlingNfcEnabled = true
         turnOnNfcButton.isEnabled = false
-        turnOnNfcButton.setText(R.string.nfc_on)
+        turnOnNfcButton.text = resourceHelper.getString(R.string.nfc_on)
         turnOnNfcButton.setBackgroundColor(resources.getColor(R.color.simprints_green, null))
         Handler().postDelayed({ continueToNfcPair() }, FINISHED_TIME_DELAY_MS)
     }
