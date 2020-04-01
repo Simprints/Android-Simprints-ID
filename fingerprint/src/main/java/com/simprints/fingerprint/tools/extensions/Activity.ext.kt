@@ -1,10 +1,12 @@
 package com.simprints.fingerprint.tools.extensions
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
+import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 
 fun Activity.launchRefusalActivity(requestCode: Int = RequestCode.REFUSAL.value) {
@@ -24,7 +26,7 @@ fun Activity.runOnUiThreadIfStillRunning(then: () -> Unit, otherwise: () -> Unit
     }
 }
 
-fun Activity.showToast(string: String) =
+fun Context.showToast(string: String) =
     runOnUiThread {
         Toast.makeText(this, string, Toast.LENGTH_LONG).show()
     }

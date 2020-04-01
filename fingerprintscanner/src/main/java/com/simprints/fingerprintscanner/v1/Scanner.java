@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter;
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter;
 import com.simprints.fingerprintscanner.v1.enums.HARDWARE_CONFIG;
 import com.simprints.fingerprintscanner.v1.enums.LED_STATE;
 import com.simprints.fingerprintscanner.v1.enums.MESSAGE_STATUS;
@@ -46,7 +46,7 @@ public class Scanner {
     private final AtomicBoolean available;
     private volatile BluetoothConnection connection;
     private final String macAddress;
-    private final BluetoothComponentAdapter bluetoothAdapter;
+    private final ComponentBluetoothAdapter bluetoothAdapter;
 
     private volatile short ucVersion;        // ARM controller firmware version
     private volatile short un20Version;      // UN20 client firmware version
@@ -67,7 +67,7 @@ public class Scanner {
      *
      * @param macAddress The MAC address of the scanner
      */
-    public Scanner(@NonNull String macAddress, @NonNull BluetoothComponentAdapter bluetoothAdapter) {
+    public Scanner(@NonNull String macAddress, @NonNull ComponentBluetoothAdapter bluetoothAdapter) {
         if (!ScannerUtils.isScannerAddress(macAddress))
             throw new IllegalArgumentException("Invalid scanner mac address");
 
