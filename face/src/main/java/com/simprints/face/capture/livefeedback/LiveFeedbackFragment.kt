@@ -58,8 +58,8 @@ class LiveFeedbackFragment : Fragment() {
 //            renderDebugInfo(it.face)
         })
 
-        vm.capturing.observe(viewLifecycleOwner, Observer { capturingState ->
-            when (capturingState) {
+        vm.capturingState.observe(viewLifecycleOwner, Observer {
+            when (it) {
                 LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED ->
                     renderCapturingNotStarted()
                 LiveFeedbackFragmentViewModel.CapturingState.CAPTURING ->
