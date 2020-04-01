@@ -10,12 +10,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.tools.extentions.setCheckedWithLeftDrawable
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
+import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
 import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
-import com.simprints.core.tools.extentions.setCheckedWithLeftDrawable
-import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
 import com.simprints.uicomponents.models.Size
 import kotlinx.android.synthetic.main.fragment_live_feedback.*
 import kotlinx.coroutines.launch
@@ -60,28 +60,14 @@ class LiveFeedbackFragment : Fragment() {
 
         vm.capturing.observe(viewLifecycleOwner, Observer { capturingState ->
             when (capturingState) {
-                LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED -> {
-                    capture_overlay.drawSemiTransparentTarget()
-                    capture_title.text =
-                        androidResourcesHelper.getString(R.string.title_preparation)
-                    capture_feedback_txt_title.text =
-                        androidResourcesHelper.getString(R.string.capture_prep_begin_btn)
-                    toggleCaptureButtons(false)
-                }
-                LiveFeedbackFragmentViewModel.CapturingState.CAPTURING -> {
-                    prepareCapturingStateColors()
-                    capture_progress.isVisible = true
-                    capture_title.text = androidResourcesHelper.getString(R.string.title_capturing)
-                    capture_feedback_txt_title.text =
-                        androidResourcesHelper.getString(R.string.capture_prep_begin_btn_capturing)
-                    toggleCaptureButtons(false)
-                }
-                LiveFeedbackFragmentViewModel.CapturingState.FINISHED -> {
+                LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED ->
+                    renderCapturingNotStarted()
+                LiveFeedbackFragmentViewModel.CapturingState.CAPTURING ->
+                    renderCapturing()
+                LiveFeedbackFragmentViewModel.CapturingState.FINISHED ->
                     findNavController().navigate(R.id.action_liveFeedbackFragment_to_confirmationFragment)
-                }
-                LiveFeedbackFragmentViewModel.CapturingState.FINISHED_FAILED -> {
+                LiveFeedbackFragmentViewModel.CapturingState.FINISHED_FAILED ->
                     findNavController().navigate(R.id.action_liveFeedbackFragment_to_retryFragment)
-                }
             }
         })
 
@@ -122,7 +108,7 @@ class LiveFeedbackFragment : Fragment() {
         }
     }
 
-    private fun prepareCapturingStateColors() {
+    private fun renderCapturingStateColors() {
         capture_overlay.drawWhiteTarget()
 
         capture_title.setTextColor(
@@ -131,6 +117,24 @@ class LiveFeedbackFragment : Fragment() {
         capture_feedback_txt_explanation.setTextColor(
             ContextCompat.getColor(requireContext(), UCR.color.capture_grey_blue)
         )
+    }
+
+    private fun renderCapturingNotStarted() {
+        capture_overlay.drawSemiTransparentTarget()
+        capture_title.text =
+            androidResourcesHelper.getString(R.string.title_preparation)
+        capture_feedback_txt_title.text =
+            androidResourcesHelper.getString(R.string.capture_prep_begin_btn)
+        toggleCaptureButtons(false)
+    }
+
+    private fun renderCapturing() {
+        renderCapturingStateColors()
+        capture_progress.isVisible = true
+        capture_title.text = androidResourcesHelper.getString(R.string.title_capturing)
+        capture_feedback_txt_title.text =
+            androidResourcesHelper.getString(R.string.capture_prep_begin_btn_capturing)
+        toggleCaptureButtons(false)
     }
 
     private fun renderValidFace() {
