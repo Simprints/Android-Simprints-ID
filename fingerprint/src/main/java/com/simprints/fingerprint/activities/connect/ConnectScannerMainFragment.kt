@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.confirmscannererror.ConfirmScannerErrorBuilder
@@ -38,7 +37,7 @@ class ConnectScannerMainFragment : FingerprintFragment() {
         }
         connectScannerViewModel.scannerConnected.fragmentObserveEventWith { success ->
             if (success) {
-                connectScannerViewModel.finish.postValue(LiveDataEvent())
+                connectScannerViewModel.finishConnectActivity()
             }
         }
     }

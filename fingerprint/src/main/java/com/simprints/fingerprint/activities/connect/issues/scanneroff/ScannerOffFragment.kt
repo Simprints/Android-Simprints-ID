@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -82,7 +81,7 @@ class ScannerOffFragment : FingerprintFragment() {
         tryAgainButton.isEnabled = false
         tryAgainButton.text = resourceHelper.getString(R.string.scanner_on)
         tryAgainButton.setBackgroundColor(resources.getColor(R.color.simprints_green, null))
-        Handler().postDelayed({ finishConnectActivity() }, FINISHED_TIME_DELAY_MS)
+        Handler().postDelayed({ connectScannerViewModel.finishConnectActivity() }, FINISHED_TIME_DELAY_MS)
     }
 
     private fun goToAppropriatePairingScreen(issue: ConnectScannerIssue) {
@@ -93,10 +92,6 @@ class ScannerOffFragment : FingerprintFragment() {
             else -> null
         }
         navAction?.let { findNavController().navigate(it) }
-    }
-
-    private fun finishConnectActivity() {
-        connectScannerViewModel.finish.postValue(LiveDataEvent())
     }
 
     companion object {
