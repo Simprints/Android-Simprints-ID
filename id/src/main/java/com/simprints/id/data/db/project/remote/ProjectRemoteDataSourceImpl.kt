@@ -4,14 +4,11 @@ import com.google.gson.JsonElement
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.secure.BaseUrlProvider
 import com.simprints.id.tools.utils.retrySimNetworkCalls
-
 
 open class ProjectRemoteDataSourceImpl(
     private val remoteDbManager: RemoteDbManager,
-    private val simApiClientFactory: SimApiClientFactory,
-    private val baseUrlProvider: BaseUrlProvider
+    private val simApiClientFactory: SimApiClientFactory
 ) : ProjectRemoteDataSource {
 
     override suspend fun loadProjectFromRemote(projectId: String): Project =
@@ -25,9 +22,8 @@ open class ProjectRemoteDataSourceImpl(
         }, "requestProjectConfig")
 
     override suspend fun getProjectApiClient(): ProjectRemoteInterface {
-        val baseUrl = baseUrlProvider.getApiBaseUrl()
         val token = remoteDbManager.getCurrentToken()
-        return simApiClientFactory.build<ProjectRemoteInterface>(baseUrl, token).api
+        return simApiClientFactory.build<ProjectRemoteInterface>(token).api
     }
 
     private suspend fun <T> makeNetworkRequest(
