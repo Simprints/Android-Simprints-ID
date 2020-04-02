@@ -2,7 +2,6 @@ package com.simprints.fingerprint.activities.matching
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
@@ -33,8 +32,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.KoinTest
 import org.koin.test.get
-import org.koin.test.mock.declare
 import org.koin.test.mock.declareMock
+import org.koin.test.mock.declareModule
 import java.io.Serializable
 import kotlin.random.Random
 import com.simprints.fingerprintmatcher.Person as LibPerson
@@ -83,7 +82,7 @@ class MatchingViewModelTest : KoinTest {
     @Before
     fun setUp() {
         acquireFingerprintKoinModules()
-        declare {
+        declareModule {
             factory { dbManagerMock }
             factory { crashReportManagerMock }
             factory { masterFlowManager }

@@ -1,12 +1,12 @@
 package com.simprints.fingerprintscannermock.simulated.component
 
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import java.io.InputStream
 import java.io.OutputStream
 
 
-class SimulatedBluetoothSocket(private val simulatedScannerManager: SimulatedScannerManager) : BluetoothComponentSocket {
+class SimulatedBluetoothSocket(private val simulatedScannerManager: SimulatedScannerManager) : ComponentBluetoothSocket {
 
     override fun connect() = simulatedScannerManager.connect()
 

@@ -9,12 +9,10 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityViewModel
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
-import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.fingerprint.commontesttools.scanner.DEFAULT_MAC_ADDRESS
 import com.simprints.fingerprint.commontesttools.scanner.DEFAULT_SCANNER_ID
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
@@ -28,6 +26,7 @@ import com.simprints.fingerprint.scanner.exceptions.safe.ScannerLowBatteryExcept
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
+import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothAdapter
 import com.simprints.id.Application
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -43,7 +42,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.KoinTest
-import org.koin.test.mock.declare
+import org.koin.test.mock.declareModule
 
 @RunWith(AndroidJUnit4::class)
 class ConnectScannerActivityAndroidTest : KoinTest {
@@ -54,7 +53,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
     private val scannerWrapperMock: ScannerWrapper = mock()
     private val scannerManagerSpy: ScannerManager = spy(
-        ScannerManagerImpl(DummyBluetoothAdapter(), mock())
+        ScannerManagerImpl(DummyBluetoothAdapter(), mock(), mock())
     )
     private val dbManagerMock: FingerprintDbManager = mock()
 
@@ -63,7 +62,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
         AndroidTestConfig().initRxIdler()
 
         acquireFingerprintKoinModules()
-        declare {
+        declareModule {
             single { scannerManagerSpy }
             factory { dbManagerMock }
         }
