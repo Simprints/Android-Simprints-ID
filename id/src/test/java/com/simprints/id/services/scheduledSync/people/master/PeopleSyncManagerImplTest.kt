@@ -51,7 +51,6 @@ class PeopleSyncManagerImplTest {
         UnitTestConfig(this)
             .setupWorkManager()
             .setupFirebase()
-            .setupCrashlytics()
 
         MockKAnnotations.init(this, relaxed = true)
         peopleSyncManager = PeopleSyncManagerImpl(ctx, peopleSyncStateProcessor, peopleUpSyncScopeRepository, peopleDownSyncScopeRepository, peopleSyncCache)

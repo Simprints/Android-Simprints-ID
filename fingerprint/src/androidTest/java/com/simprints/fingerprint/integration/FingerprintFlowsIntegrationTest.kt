@@ -36,7 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.KoinTest
-import org.koin.test.mock.declare
+import org.koin.test.mock.declareModule
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
@@ -57,7 +57,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
 
     private fun setupMocksAndKoinModules(simulationMode: SimulationMode, action: Action) {
         val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager(simulationMode))
-        declare {
+        declareModule {
             single<ScannerFactory> {
                 spy(ScannerFactoryImpl(simulatedBluetoothAdapter, mock(), mock(), mock())).apply {
                     whenThis { create(anyNotNull()) } then {
@@ -69,7 +69,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
                     }
                 }
             }
-            single<ScannerManager> { ScannerManagerImpl(simulatedBluetoothAdapter, get()) }
+            single<ScannerManager> { ScannerManagerImpl(simulatedBluetoothAdapter, get(), get()) }
             factory { masterFlowManager }
             factory { dbManagerMock }
         }

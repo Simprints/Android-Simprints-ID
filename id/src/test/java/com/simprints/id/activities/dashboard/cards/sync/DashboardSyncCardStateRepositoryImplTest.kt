@@ -10,6 +10,7 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState.SyncWorkerInfo
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.*
@@ -86,14 +87,39 @@ class DashboardSyncCardStateRepositoryImplTest {
     }
 
     @Test
-    fun noModulesSelectedWithSyncByModule_syncStateShouldBeSelectModules() = runBlockingTest {
+    fun downSyncSettingIsOnAndModulesEmpty_syncStateShouldBeSelectModules() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
         every { syncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.moduleSyncScope
+        every { preferencesManager.peopleDownSyncSetting } returns PeopleDownSyncSetting.ON
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.testObserver()
 
         assertThat(tester.observedValues.last()).isEqualTo(SyncNoModules(lastSyncTime))
+    }
+
+    @Test
+    fun downSyncSettingIsExtraAndModulesEmpty_syncStateShouldBeSelectModules() = runBlockingTest {
+        every { preferencesManager.selectedModules } returns emptySet()
+        every { syncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.moduleSyncScope
+        every { preferencesManager.peopleDownSyncSetting } returns PeopleDownSyncSetting.EXTRA
+
+        dashboardSyncCardStateRepository.syncIfRequired()
+        val tester = syncCardTestLiveData.testObserver()
+
+        assertThat(tester.observedValues.last()).isEqualTo(SyncNoModules(lastSyncTime))
+    }
+
+    @Test
+    fun downSyncSettingIsOffAndModulesEmpty_syncStateShouldBeConnecting() = runBlockingTest {
+        every { preferencesManager.selectedModules } returns emptySet()
+        every { syncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.moduleSyncScope
+        every { preferencesManager.peopleDownSyncSetting } returns PeopleDownSyncSetting.OFF
+
+        dashboardSyncCardStateRepository.syncIfRequired()
+        val tester = syncCardTestLiveData.testObserver()
+
+        assertThat(tester.observedValues.last()).isEqualTo(SyncConnecting(lastSyncTime, 0, null))
     }
 
     @Test

@@ -16,10 +16,13 @@ suspend fun <T, V : SimRemoteInterface> retrySimNetworkCalls(client: V,
         trace(traceName)
     } else null
 
+    trace?.start()
+
     return retryIO(
         times = NetworkConstants.RETRY_ATTEMPTS_FOR_NETWORK_CALLS,
         runBlock = {
             return@retryIO try {
+
                 withContext(Dispatchers.IO) {
                     networkBlock(client)
                 }.also { trace?.stop() }

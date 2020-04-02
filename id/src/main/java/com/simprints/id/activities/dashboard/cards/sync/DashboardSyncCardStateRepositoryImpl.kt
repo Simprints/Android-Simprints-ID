@@ -8,6 +8,8 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.EXTRA
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.ON
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState
 import com.simprints.id.tools.TimeHelper
@@ -148,7 +150,15 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
 
 
     private fun isModuleSelectionRequired() =
-        preferencesManager.selectedModules.isEmpty() && syncScopeRepository.getDownSyncScope() is ModuleSyncScope
+        isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
+
+    private fun isDownSyncAllowed() = with(preferencesManager) {
+        peopleDownSyncSetting == ON || peopleDownSyncSetting == EXTRA
+    }
+
+    private fun isSelectedModulesEmpty() = preferencesManager.selectedModules.isEmpty()
+
+    private fun isModuleSync() = syncScopeRepository.getDownSyncScope() is ModuleSyncScope
 
     private fun isConnected() = isConnectedLiveData.value ?: true
 

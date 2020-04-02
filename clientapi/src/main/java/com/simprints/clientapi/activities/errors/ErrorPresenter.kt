@@ -2,15 +2,14 @@ package com.simprints.clientapi.activities.errors
 
 import com.simprints.clientapi.R
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.extensions.doInBackground
 
 class ErrorPresenter(val view: ErrorContract.View,
                      private val sessionEventsManager: ClientApiSessionEventsManager)
     : ErrorContract.Presenter {
 
-    override fun start(clientApiAlert: ClientApiAlert) {
-        sessionEventsManager.addAlertScreenEvent(clientApiAlert).doInBackground()
+    override suspend fun start(clientApiAlert: ClientApiAlert) {
         setUpView(clientApiAlert)
+        sessionEventsManager.addAlertScreenEvent(clientApiAlert)
     }
 
     private fun setUpView(clientApiAlert: ClientApiAlert) {

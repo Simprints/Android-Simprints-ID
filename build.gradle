@@ -13,9 +13,6 @@ buildscript {
             url 'https://kotlin.bintray.com/kotlinx/'
         }
         maven {
-            url "https://maven.fabric.io/public"
-        }
-        maven {
             url "https://plugins.gradle.org/m2/"
         }
     }
@@ -29,13 +26,17 @@ buildscript {
         classpath "com.google.gms:google-services:4.2.0"
         classpath "com.google.firebase:firebase-plugins:1.1.5"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "io.fabric.tools:gradle:1.28.0"
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.0.0-beta03'
         classpath "com.github.ben-manes:gradle-versions-plugin:0.20.0"
 
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.0"
         classpath "io.realm:realm-gradle-plugin:6.0.2"
+
+        // Android X Navigation components
+        def androidx_navigation_version = "2.3.0-alpha04"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$androidx_navigation_version"
     }
 }
 

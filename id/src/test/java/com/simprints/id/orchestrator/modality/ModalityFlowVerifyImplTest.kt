@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.session.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.orchestrator.steps.Step
@@ -11,6 +11,8 @@ import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.verifyAppRequest
+import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.TimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -29,10 +31,11 @@ class ModalityFlowVerifyImplTest {
     }
 
     private lateinit var modalityFlowVerify: ModalityFlowVerifyImpl
+    private val timeHelper: TimeHelper = TimeHelperImpl()
     @MockK private lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @MockK lateinit var faceStepProcessor: FaceStepProcessor
     @MockK lateinit var coreStepProcessor: CoreStepProcessor
-    @MockK lateinit var sessionEventsManager: SessionEventsManager
+    @MockK lateinit var sessionRepository: SessionRepository
     @MockK lateinit var fingerprintStepMock: Step
     @MockK lateinit var faceStepMock: Step
     @MockK lateinit var verifyCoreStepMock: Step
@@ -162,6 +165,6 @@ class ModalityFlowVerifyImplTest {
 
     private fun buildModalityFlowVerify(consentRequired: Boolean) {
         modalityFlowVerify = ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, sessionEventsManager, consentRequired)
+            coreStepProcessor, timeHelper, sessionRepository, consentRequired)
     }
 }
