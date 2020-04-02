@@ -4,12 +4,15 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 
 @Keep
-class FingerprintCaptureEvent(starTime: Long,
-                              endTime: Long,
-                              val finger: FingerIdentifier,
-                              val qualityThreshold: Int,
-                              val result: Result,
-                              val fingerprint: Fingerprint?) : Event(EventType.FINGERPRINT_CAPTURE, starTime, endTime) {
+class FingerprintCaptureEvent(
+    starTime: Long,
+    endTime: Long,
+    val finger: FingerIdentifier,
+    val qualityThreshold: Int,
+    val result: Result,
+    val fingerprint: Fingerprint?,
+    id: String
+) : Event(EventType.FINGERPRINT_CAPTURE, starTime, endTime, id) {
 
     @Keep
     class Fingerprint(val finger: FingerIdentifier, val quality: Int, val template: String)
@@ -22,4 +25,5 @@ class FingerprintCaptureEvent(starTime: Long,
         SKIPPED,
         FAILURE_TO_ACQUIRE;
     }
+
 }
