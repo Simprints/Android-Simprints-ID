@@ -62,7 +62,6 @@
     <string name="scanner_confirmation_no">አይ</string>
     <string name="scanner_confirmation_yes">አዎ</string>
     <string name="scanner_id_confirmation_message">እስካነሩ %1$s ነው?</string>
-    <string name="scanner_not_working">እስካነሩ አይሰራም</string>
     <string name="try_again_label">እንደገና ይሞክሩ</string>
     <string name="try_another_finger">"እባክዎት ሌላ ጣት ይሞክሩ "</string>
     <string name="bluetooth_not_enabled_message">ብሉቱዝ አልተከፈተም ፡ለመጠቀም አያስችልም፤እባክዎ ማስተካከያው ውስጥ ገብተው ብሉቱዙን ከፍተው እንደገና ይሞክሩ</string>

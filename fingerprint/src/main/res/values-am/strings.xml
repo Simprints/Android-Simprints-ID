@@ -76,5 +76,4 @@
     <string name="scan">"እስካን "</string>
     <string name="transfering_data">መረጃ በማስተላለፍ ላይ ነው</string>
     <string name="returning_results">ውጤቱን መመለስ</string>
-    <string name="scanner_not_working">እስካነሩ አይሰራም</string>
 </resources>
