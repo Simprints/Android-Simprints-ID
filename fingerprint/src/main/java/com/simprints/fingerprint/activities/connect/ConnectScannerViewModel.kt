@@ -195,7 +195,7 @@ class ConnectScannerViewModel(
                     ScannerConnectionEvent.ScannerInfo(
                         lastPairedScannerId ?: "",
                         lastPairedMacAddress ?: "",
-                        onScanner { versionInformation() }.toString())))
+                        onScanner { versionInformation() }.firmwareVersion.toString())))
         }
     }
 
