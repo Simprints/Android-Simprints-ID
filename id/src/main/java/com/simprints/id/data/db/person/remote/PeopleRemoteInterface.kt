@@ -4,10 +4,11 @@ import com.simprints.core.network.SimRemoteInterface
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.ApiModes
 import com.simprints.id.data.db.person.remote.models.ApiPostPerson
-import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
-import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationsResponse
+import com.simprints.id.data.db.person.remote.models.personcounts.ApiEventCounts
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEvents
 import okhttp3.ResponseBody
 import retrofit2.http.*
+
 
 @JvmSuppressWildcards
 interface PeopleRemoteInterface : SimRemoteInterface {
@@ -31,8 +32,23 @@ interface PeopleRemoteInterface : SimRemoteInterface {
         @Path("patientId") patientId: String,
         @Path("projectId") projectId: String): ApiGetPerson
 
-    @POST("projects/{projectId}/patient-operations/count")
-    suspend fun requestPeopleOperations(
+    @GET("projects/{projectId}/events/count")
+    suspend fun requestRecordCount(
         @Path("projectId") projectId: String,
-        @Body operationsJson: ApiPeopleOperations): ApiPeopleOperationsResponse
+        @Query("type") eventType: Array<String>,
+        @Query("l_moduleId") vararg moduleIds: String,
+        @Query("lastEventId") lastEventId: String): ApiEventCounts
+
+    @POST("projects/{projectId}/events")
+    suspend fun postEnrolmentRecordEvents(
+        @Path("projectId") projectId: String,
+        @Body events: ApiEvents
+    )
+
+    @GET("projects/{projectId}/events")
+    suspend fun downloadEnrolmentEvents(
+        @Path("projectId") projectId: String,
+        @Query("type") eventType: Array<String>,
+        @Query("l_moduleId") vararg moduleIds: String,
+        @Query("lastEventId") lastEventId: String): ResponseBody
 }
