@@ -43,7 +43,6 @@
     <string name="verify_guid_not_found_title">ግለሰቡ አልተገኘም</string>
     <string name="error_occurred_title">ስህተት አጋጥሟል</string>
     <string name="low_battery_title">ዝቅተኛ ባትሪ</string>
-    <string name="about_libsimprints_version">ሊብ ስምፕሪንት ስሪት</string>
     <string name="button_scan_prints">የጣት አሻራውን እስካን ያድርጉ</string>
     <string name="button_submit">ይላኩ</string>
     <string name="close">ይዝጉ</string>
