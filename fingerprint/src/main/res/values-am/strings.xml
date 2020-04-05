@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="title_fingerprint">የጣት አሻራ</string>
     <string name="register_title">ወደ ሲስተሙ ማስገባት</string>
     <string name="identify_title">መለየት</string>
     <string name="verify_title">ማመሳከር</string>
@@ -77,6 +76,4 @@
     <string name="scan">"እስካን "</string>
     <string name="transfering_data">መረጃ በማስተላለፍ ላይ ነው</string>
     <string name="returning_results">ውጤቱን መመለስ</string>
-    <string name="privacy_notice_text"><u>የደህንነት ማሳታወቂያ</u></string>
-    <string name="scanner_not_working">እስካነሩ አይሰራም</string>
 </resources>

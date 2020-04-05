@@ -69,7 +69,6 @@
     <string name="scanner_id_confirmation_message">Je, Skana yako ni %1$s ?</string>
     <string name="scanning">Inaskani</string>
     <string name="settings_label">Mpangilio wa Simu</string>
-    <string name="title_fingerprint">Alama ya kidole</string>
     <string name="transfering_data">Kuhamisha taarifa...</string>
     <string name="try_again_label">Jaribu tena</string>
     <string name="try_another_finger">Ngoja tujaribu kidole kingine</string>
