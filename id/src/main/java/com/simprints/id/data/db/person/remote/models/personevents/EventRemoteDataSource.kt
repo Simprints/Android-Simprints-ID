@@ -4,10 +4,10 @@ import com.simprints.id.data.db.person.remote.models.personcounts.ApiEventCounts
 
 interface EventRemoteDataSource {
 
-    suspend fun count(query: String): ApiEventCounts
+    suspend fun count(query: ApiEventQuery): ApiEventCounts
 
-    suspend fun get(query: String): List<ApiEvent>
+    suspend fun get(query: ApiEventQuery): List<ApiEvent>
 
-    suspend fun write(events: List<ApiEvent>)
+    suspend fun write(projectId: String, events: ApiEvents)
 
 }
