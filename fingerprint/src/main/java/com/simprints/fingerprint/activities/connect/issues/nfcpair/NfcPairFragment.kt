@@ -7,6 +7,8 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.R
@@ -53,6 +55,7 @@ class NfcPairFragment : FingerprintFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
+        setupScannerPhoneTappingAnimation()
 
         couldNotPairTextView.paintFlags = couldNotPairTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         couldNotPairTextView.setOnClickListener { goToSerialEntryPair() }
@@ -67,6 +70,19 @@ class NfcPairFragment : FingerprintFragment() {
             tryAgainButton.text = getString(R.string.try_again_label)
             nfcPairInstructionsTextView.text = getString(R.string.nfc_pair_instructions)
             nfcPairTitleTextView.text = getString(R.string.nfc_pair_title)
+        }
+    }
+
+    private fun setupScannerPhoneTappingAnimation() {
+        AnimationUtils.loadAnimation(requireContext(), R.anim.animation_nfc_pair_scanner).also { scannerAnimation ->
+            scannerAnimation.repeatMode = Animation.REVERSE
+            scannerAnimation.repeatCount = Animation.INFINITE
+            nfcPairScannerImageView.startAnimation(scannerAnimation)
+        }
+        AnimationUtils.loadAnimation(requireContext(), R.anim.animation_nfc_pair_phone).also { phoneAnimation ->
+            phoneAnimation.repeatMode = Animation.REVERSE
+            phoneAnimation.repeatCount = Animation.INFINITE
+            nfcPairPhoneImageView.startAnimation(phoneAnimation)
         }
     }
 

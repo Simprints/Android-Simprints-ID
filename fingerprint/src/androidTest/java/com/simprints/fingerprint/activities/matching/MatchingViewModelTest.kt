@@ -32,7 +32,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.KoinTest
 import org.koin.test.get
-import org.koin.test.mock.declareMock
 import org.koin.test.mock.declareModule
 import java.io.Serializable
 import kotlin.random.Random
@@ -86,9 +85,10 @@ class MatchingViewModelTest : KoinTest {
             factory { dbManagerMock }
             factory { crashReportManagerMock }
             factory { masterFlowManager }
+            factory<FingerprintPreferencesManager> { mock() }
+            factory<FingerprintSessionEventsManager> { mock() }
         }
-        declareMock<FingerprintPreferencesManager>()
-        declareMock<FingerprintSessionEventsManager>()
+
     }
 
     @Test
