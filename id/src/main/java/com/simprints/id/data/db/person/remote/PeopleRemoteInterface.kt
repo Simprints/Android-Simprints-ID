@@ -35,9 +35,9 @@ interface PeopleRemoteInterface : SimRemoteInterface {
     @GET("projects/{projectId}/events/count")
     suspend fun requestRecordCount(
         @Path("projectId") projectId: String,
-        @Query("type") eventType: Array<String>,
-        @Query("l_moduleId") vararg moduleIds: String,
-        @Query("lastEventId") lastEventId: String): ApiEventCounts
+        @Query("l_LabelKey") vararg labels: String?,
+        @Query("lastEventId") lastEventId: String?,
+        @Query("type") eventType: Array<String>): ApiEventCounts
 
     @POST("projects/{projectId}/events")
     suspend fun postEnrolmentRecordEvents(
@@ -49,6 +49,6 @@ interface PeopleRemoteInterface : SimRemoteInterface {
     suspend fun downloadEnrolmentEvents(
         @Path("projectId") projectId: String,
         @Query("type") eventType: Array<String>,
-        @Query("l_moduleId") vararg moduleIds: String,
+        @Query("l_LabelKey") vararg labels: String,
         @Query("lastEventId") lastEventId: String): ResponseBody
 }

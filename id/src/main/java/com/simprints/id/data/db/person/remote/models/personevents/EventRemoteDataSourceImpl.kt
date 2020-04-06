@@ -3,24 +3,25 @@ package com.simprints.id.data.db.person.remote.models.personevents
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
-import com.simprints.id.data.db.person.remote.models.personcounts.ApiEventCount
 import com.simprints.id.data.db.person.remote.models.personcounts.ApiEventCounts
 import com.simprints.id.tools.utils.retrySimNetworkCalls
 
 class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                                 private val simApiClientFactory: SimApiClientFactory) : EventRemoteDataSource {
 
-    override suspend fun count(query: String): ApiEventCounts =
+    override suspend fun count(query: ApiEventQuery): ApiEventCounts =
         makeNetworkRequest({
-            TODO("make api call")
+            it.requestRecordCount()
         }, "RecordCount")
 
-    override suspend fun get(query: String): List<ApiEvent> {
-
+    override suspend fun get(query: ApiEventQuery): List<ApiEvent> {
+        TODO()
     }
 
-    override suspend fun write(events: List<ApiEvent>) {
-
+    override suspend fun write(projectId: String, events: ApiEvents) {
+        makeNetworkRequest({
+            it.postEnrolmentRecordEvents(projectId, events)
+        }, "RecordWrite")
     }
 
     private suspend fun <T> makeNetworkRequest(
