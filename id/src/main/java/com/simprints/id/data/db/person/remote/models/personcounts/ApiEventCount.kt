@@ -5,9 +5,6 @@ import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.EventType
 
 @Keep
-class ApiEventCounts(val eventCounts: ApiEventCount)
-
-@Keep
 class ApiEventCount(val type: ApiEventCountType, val count: Int)
 
 @Keep
