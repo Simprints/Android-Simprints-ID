@@ -6,4 +6,6 @@ import androidx.annotation.Keep
 class ApiEvents(val events: Array<ApiEvent>)
 
 @Keep
-class ApiEvent(val id: String, vararg labels: String, val payload: ApiEnrolmentRecordOperation)
+class ApiEvent(val id: String,
+               vararg labels: String,
+               val payload: ApiEnrolmentRecordOperation)

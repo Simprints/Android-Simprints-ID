@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.person.remote.models.personevents
 
+import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordOperationType
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordOperationType.*
 
 sealed class ApiEnrolmentRecordOperation(val type: ApiEnrolmentRecordOperationType)
@@ -22,4 +23,10 @@ enum class ApiEnrolmentRecordOperationType {
     EnrolmentRecordCreation,
     EnrolmentRecordDeletion,
     EnrolmentRecordMove
+}
+
+fun EnrolmentRecordOperationType.fromDomainToApi() = when (this) {
+    EnrolmentRecordOperationType.EnrolmentRecordCreation -> EnrolmentRecordCreation
+    EnrolmentRecordOperationType.EnrolmentRecordDeletion -> EnrolmentRecordDeletion
+    EnrolmentRecordOperationType.EnrolmentRecordMove -> EnrolmentRecordMove
 }
