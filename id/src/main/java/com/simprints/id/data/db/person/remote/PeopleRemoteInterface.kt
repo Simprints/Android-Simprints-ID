@@ -4,6 +4,8 @@ import com.simprints.core.network.SimRemoteInterface
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.ApiModes
 import com.simprints.id.data.db.person.remote.models.ApiPostPerson
+import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
+import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationsResponse
 import com.simprints.id.data.db.person.remote.models.personcounts.ApiEventCounts
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEvents
 import okhttp3.ResponseBody
@@ -35,7 +37,10 @@ interface PeopleRemoteInterface : SimRemoteInterface {
     @GET("projects/{projectId}/events/count")
     suspend fun requestRecordCount(
         @Path("projectId") projectId: String,
-        @Query("l_LabelKey") vararg labels: String?,
+        @Query("l_moduleId") moduleIds: Array<String>?,
+        @Query("l_attendantId") attendantId: String?,
+        @Query("l_subjectId") subjectId: String?,
+        @Query("l_mode") modes: Array<ApiModes>,
         @Query("lastEventId") lastEventId: String?,
         @Query("type") eventType: Array<String>): ApiEventCounts
 
@@ -48,7 +53,17 @@ interface PeopleRemoteInterface : SimRemoteInterface {
     @GET("projects/{projectId}/events")
     suspend fun downloadEnrolmentEvents(
         @Path("projectId") projectId: String,
-        @Query("type") eventType: Array<String>,
-        @Query("l_LabelKey") vararg labels: String,
-        @Query("lastEventId") lastEventId: String): ResponseBody
+        @Query("l_moduleId") moduleIds: Array<String>?,
+        @Query("l_attendantId") attendantId: String?,
+        @Query("l_subjectId") subjectId: String?,
+        @Query("l_mode") modes: Array<ApiModes>,
+        @Query("lastEventId") lastEventId: String?,
+        @Query("type") eventType: Array<String>): ResponseBody
+
+    @POST("projects/{projectId}/patient-operations/count")
+    suspend fun requestPeopleOperations(
+        @Path("projectId") projectId: String,
+        @Body operationsJson: ApiPeopleOperations): ApiPeopleOperationsResponse
+
+
 }

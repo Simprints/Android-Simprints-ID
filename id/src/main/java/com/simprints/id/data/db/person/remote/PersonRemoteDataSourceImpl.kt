@@ -49,7 +49,7 @@ open class PersonRemoteDataSourceImpl(
         peopleOperationsParams: List<PeopleDownSyncOperation>
     ): List<PeopleCount> =
         makeNetworkRequest({
-            val response = it.requestRecordCount(
+            val response = it.requestPeopleOperations(
                 projectId,
                 buildApiPeopleOperations(peopleOperationsParams)
             )
