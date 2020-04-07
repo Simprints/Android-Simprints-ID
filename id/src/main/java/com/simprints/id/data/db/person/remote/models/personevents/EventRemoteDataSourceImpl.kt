@@ -2,15 +2,16 @@ package com.simprints.id.data.db.person.remote.models.personevents
 
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
-import com.simprints.id.data.db.person.remote.models.personcounts.ApiEventCounts
+import com.simprints.id.data.db.common.models.EventCount
+import com.simprints.id.data.db.person.remote.EnrolmentEventRecordRemoteInterface
+import com.simprints.id.data.db.person.remote.models.personcounts.fromApiToDomain
 import com.simprints.id.tools.utils.retrySimNetworkCalls
 import okhttp3.ResponseBody
 
 class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                                 private val simApiClientFactory: SimApiClientFactory) : EventRemoteDataSource {
 
-    override suspend fun count(query: ApiEventQuery): ApiEventCounts =
+    override suspend fun count(query: ApiEventQuery): List<EventCount> =
         makeNetworkRequest({ peopleRemoteInterface ->
             peopleRemoteInterface.requestRecordCount(
                 projectId = query.projectId,
@@ -20,7 +21,7 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                 modes = query.modes.toTypedArray(),
                 lastEventId = query.lastEventId,
                 eventType = query.types.map { it.name }.toTypedArray()
-            )
+            ).map { it.fromApiToDomain() }
         }, "RecordCount")
 
     override suspend fun get(query: ApiEventQuery): ResponseBody =
@@ -43,14 +44,14 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
     }
 
     private suspend fun <T> makeNetworkRequest(
-        block: suspend (client: PeopleRemoteInterface) -> T,
+        block: suspend (client: EnrolmentEventRecordRemoteInterface) -> T,
         traceName: String
     ): T =
         retrySimNetworkCalls(getPeopleApiClient(), block, traceName)
 
 
-    private suspend fun getPeopleApiClient(): PeopleRemoteInterface {
+    private suspend fun getPeopleApiClient(): EnrolmentEventRecordRemoteInterface {
         val token = remoteDbManager.getCurrentToken()
-        return simApiClientFactory.build<PeopleRemoteInterface>(token).api
+        return simApiClientFactory.build<EnrolmentEventRecordRemoteInterface>(token).api
     }
 }
