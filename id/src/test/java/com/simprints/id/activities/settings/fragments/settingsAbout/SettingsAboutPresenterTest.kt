@@ -165,6 +165,15 @@ class SettingsAboutPresenterTest {
         verify { presenter.baseUrlProvider.resetApiBaseUrl() }
     }
 
+    @Test
+    fun presenterLogout_clearRemoteConfig() = runBlockingTest {
+        mockDepsForLogout(presenter)
+
+        presenter.logout()
+
+        coVerify { presenter.remoteConfigWrapper.clearRemoteConfig() }
+    }
+
     private fun mockDepsForLogout(presenter: SettingsAboutPresenter) {
         with(presenter) {
             signerManager = mockk(relaxed = true)
@@ -172,6 +181,7 @@ class SettingsAboutPresenterTest {
             longConsentRepository = mockk(relaxed = true)
             sessionEventManager = mockk(relaxed = true)
             baseUrlProvider = mockk()
+            remoteConfigWrapper = mockk(relaxed = true)
         }
     }
 }
