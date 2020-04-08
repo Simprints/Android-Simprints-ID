@@ -23,7 +23,7 @@ class PersonCreationEvent(starTime: Long,
         // It extracts CaptureEvents Ids with the templates used to create the "Person" object for
         // identification, verification, enrolment.
         private fun extractCaptureEventIdsBasedOnPersonTemplate(sessionEvents: SessionEvents, personTemplates: List<String>): List<String> =
-            sessionEvents.events
+            sessionEvents.getEvents()
                 .filterIsInstance(FingerprintCaptureEvent::class.java)
                 .filter {
                     it.fingerprint?.template in personTemplates && it.result != FingerprintCaptureEvent.Result.SKIPPED

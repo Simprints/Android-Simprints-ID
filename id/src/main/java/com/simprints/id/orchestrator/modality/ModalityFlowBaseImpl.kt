@@ -109,7 +109,8 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     private suspend fun addPersonCreationEventForFingerprintSamples(fingerprintSamples: List<FingerprintSample>) {
         ignoreException {
             sessionRepository.updateCurrentSession {
-                it.events.add(PersonCreationEvent.build(timeHelper, it, fingerprintSamples))
+                val event = PersonCreationEvent.build(timeHelper, it, fingerprintSamples)
+                it.addEvent(event)
             }
         }
     }
