@@ -92,14 +92,16 @@
                 android:gravity="center"
                 android:padding="5dp"
                 android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Records to upload"/>
 
             <TextView
                 android:id="@+id/recordsToUploadCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="0"/>
 
         </LinearLayout>
 
@@ -129,17 +131,18 @@
                 android:gravity="center"
                 android:padding="5dp"
                 android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Records to download"/>
 
             <TextView
                 android:id="@+id/recordsToDownloadCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="0"/>
 
         </LinearLayout>
-
 
     </androidx.cardview.widget.CardView>
 
@@ -170,14 +173,16 @@
                 android:gravity="center"
                 android:padding="5dp"
                 android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Records to delete"/>
 
             <TextView
                 android:id="@+id/recordsToDeleteCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="0"/>
 
         </LinearLayout>
 
@@ -208,7 +213,8 @@
                 android:layout_weight="0.8"
                 android:padding="5dp"
                 android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Total records on device"/>
 
             <TextView
                 android:id="@+id/totalRecordsCount"
@@ -217,7 +223,8 @@
                 android:layout_gravity="center"
                 android:layout_weight="0.2"
                 android:gravity="center"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="137"/>
 
         </LinearLayout>
 
