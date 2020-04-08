@@ -47,12 +47,12 @@ interface EnrolmentEventRecordRemoteInterface : SimRemoteInterface {
     @GET("projects/{projectId}/events/count")
     suspend fun requestRecordCount(
         @Path("projectId") projectId: String,
-        @Query("l_moduleId") moduleIds: Array<String>?,
+        @Query("l_moduleId") moduleIds: List<String>?,
         @Query("l_attendantId") attendantId: String?,
         @Query("l_subjectId") subjectId: String?,
-        @Query("l_mode") modes: Array<ApiModes>,
+        @Query("l_mode") modes: List<ApiModes>,
         @Query("lastEventId") lastEventId: String?,
-        @Query("type") eventType: Array<String>): List<ApiEventCount>
+        @Query("type") eventType: List<String>): List<ApiEventCount>
 
     @POST("projects/{projectId}/events")
     suspend fun postEnrolmentRecordEvents(
@@ -63,10 +63,10 @@ interface EnrolmentEventRecordRemoteInterface : SimRemoteInterface {
     @GET("projects/{projectId}/events")
     suspend fun downloadEnrolmentEvents(
         @Path("projectId") projectId: String,
-        @Query("l_moduleId") moduleIds: Array<String>?,
+        @Query("l_moduleId") moduleIds: List<String>?,
         @Query("l_attendantId") attendantId: String?,
         @Query("l_subjectId") subjectId: String?,
-        @Query("l_mode") modes: Array<ApiModes>,
+        @Query("l_mode") modes: List<ApiModes>,
         @Query("lastEventId") lastEventId: String?,
-        @Query("type") eventType: Array<String>): ResponseBody
+        @Query("type") eventType: List<String>): ResponseBody
 }
