@@ -85,8 +85,8 @@
     <string name="bluetooth_on">✓ Bluetooth imewashwa</string>
     <string name="turn_on_nfc">Washa NFC</string>
     <string name="nfc_on">✓ NFC imewashwa</string>
-    <string name="scanner_off_instructions">Skana imezima</string>
-    <string name="nfc_pair_instructions">Skana na simu havijaungana</string>
+    <string name="scanner_off_instructions">Bonyeza kitufe cha kuwashia skana</string>
+    <string name="nfc_pair_instructions">Gusisha nyumba ya skana na nyuma ya simu</string>
     <string name="enter_scanner_number">Ingiza namba ya skana kwenye box kwa chini</string>
     <string name="enter_scanner_number_detail">Hii inapatikana kwa upande wa chini wa skana</string>
     <string name="cannot_connect_devices">Haiwezi kuunganika na kifaa</string>
