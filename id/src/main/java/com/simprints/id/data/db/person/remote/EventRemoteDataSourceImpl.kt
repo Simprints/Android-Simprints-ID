@@ -1,10 +1,11 @@
-package com.simprints.id.data.db.person.remote.models.personevents
+package com.simprints.id.data.db.person.remote
 
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.person.remote.EnrolmentEventRecordRemoteInterface
 import com.simprints.id.data.db.person.remote.models.personcounts.fromApiToDomain
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEventQuery
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEvents
 import com.simprints.id.tools.utils.retrySimNetworkCalls
 import okhttp3.ResponseBody
 
