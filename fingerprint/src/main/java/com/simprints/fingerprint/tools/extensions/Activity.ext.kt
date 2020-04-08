@@ -3,8 +3,6 @@ package com.simprints.fingerprint.tools.extensions
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
@@ -39,13 +37,4 @@ fun Activity.logActivityCreated() {
 
 fun Activity.logActivityDestroyed() {
     Timber.d("Fingerprint Activity Log : destroyed ${this::class.simpleName}")
-}
-
-fun Activity.hideKeyboard() {
-    val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    var focusedView = currentFocus
-    if (focusedView == null)
-        focusedView = View(this)
-    val flags = 0
-    inputMethodManager.hideSoftInputFromWindow(focusedView.windowToken, flags)
 }
