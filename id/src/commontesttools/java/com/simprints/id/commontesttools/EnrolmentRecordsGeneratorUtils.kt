@@ -13,7 +13,11 @@ object EnrolmentRecordsGeneratorUtils {
                 fakeRecords.add(
                     Event(
                         UUID.randomUUID().toString(),
-                        listOf("labels"),
+                        hashMapOf(
+                            "projectId" to listOf(projectId),
+                            "attendantId" to listOf(userId),
+                            "moduleId" to listOf(moduleId)
+                        ),
                         buildFakeEnrolmentRecordCreation(projectId, userId, moduleId)
                     )
                 )
@@ -34,8 +38,8 @@ object EnrolmentRecordsGeneratorUtils {
         val fingerprint = FingerprintGeneratorUtils.generateRandomFingerprint()
 
         return listOf(
-            FaceReference("metadata", arrayOf(FaceTemplate("face_template"))),
-            FingerprintReference("metadata", arrayOf(
+            FaceReference(hashMapOf("SDK" to "ML_Kit"), arrayOf(FaceTemplate("face_template"))),
+            FingerprintReference(hashMapOf("vero" to "VERO_2"), arrayOf(
                 FingerprintTemplate(fingerprint.templateQualityScore,
                     fingerprint.template.toString(), FingerIdentifier.LEFT_3RD_FINGER)
             ))

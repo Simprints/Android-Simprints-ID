@@ -7,5 +7,5 @@ class Events(val events: List<Event>)
 
 @Keep
 class Event(val id: String,
-            val labels: List<String>,
+            val labels: Map<String, List<String>>,
             val payload: EnrolmentRecordOperation)
