@@ -21,6 +21,7 @@ class LongConsentRepositoryImpl(private val longConsentLocalDataSource: LongCons
         private const val TIMEOUT_FAILURE_WINDOW_MILLIS = 1L
     }
 
+    //TODO Explore how to centralised these constants based on BuildConfig in a gradle file
     private val bucketUrl = if(BuildConfig.DEBUG) "gs://simprints-dev-firebase-storage" else "gs://simprints-152315-firebase-storage"
 
     private val firebaseStorage by lazy { FirebaseStorage.getInstance(bucketUrl) }
