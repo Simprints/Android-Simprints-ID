@@ -7,7 +7,7 @@ class EnrolmentRecordCreation(val subjectId: String,
                                  val projectId: String,
                                  val moduleId: String,
                                  val attendantId: String,
-                                 val biometricReferences: Array<BiometricReference>): EnrolmentRecordOperation(EnrolmentRecordOperationType.EnrolmentRecordCreation)
+                                 val biometricReferences: List<BiometricReference>): EnrolmentRecordOperation(EnrolmentRecordOperationType.EnrolmentRecordCreation)
 
 class EnrolmentRecordDeletion(val subjectId: String,
                                  val projectId: String,

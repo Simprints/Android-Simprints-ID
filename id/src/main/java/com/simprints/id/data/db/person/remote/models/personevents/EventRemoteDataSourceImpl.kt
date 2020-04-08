@@ -15,12 +15,12 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
         makeNetworkRequest({ peopleRemoteInterface ->
             peopleRemoteInterface.requestRecordCount(
                 projectId = query.projectId,
-                moduleIds = query.moduleIds?.toTypedArray(),
+                moduleIds = query.moduleIds,
                 attendantId = query.userId,
                 subjectId = query.subjectId,
-                modes = query.modes.toTypedArray(),
+                modes = query.modes,
                 lastEventId = query.lastEventId,
-                eventType = query.types.map { it.name }.toTypedArray()
+                eventType = query.types.map { it.name }
             ).map { it.fromApiToDomain() }
         }, "RecordCount")
 
@@ -28,12 +28,12 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
         makeNetworkRequest({ peopleRemoteInterface ->
             peopleRemoteInterface.downloadEnrolmentEvents(
                 projectId = query.projectId,
-                moduleIds = query.moduleIds?.toTypedArray(),
+                moduleIds = query.moduleIds,
                 attendantId = query.userId,
                 subjectId = query.subjectId,
-                modes = query.modes.toTypedArray(),
+                modes = query.modes,
                 lastEventId = query.lastEventId,
-                eventType = query.types.map { it.name }.toTypedArray()
+                eventType = query.types.map { it.name }
             )
         }, "RecordDownload")
 
@@ -50,7 +50,7 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
         retrySimNetworkCalls(getPeopleApiClient(), block, traceName)
 
 
-    private suspend fun getPeopleApiClient(): EnrolmentEventRecordRemoteInterface {
+    internal suspend fun getPeopleApiClient(): EnrolmentEventRecordRemoteInterface {
         val token = remoteDbManager.getCurrentToken()
         return simApiClientFactory.build<EnrolmentEventRecordRemoteInterface>(token).api
     }

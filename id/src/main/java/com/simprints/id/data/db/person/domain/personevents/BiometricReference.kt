@@ -11,15 +11,15 @@ class FingerprintReference(val metadata: String,
 class FaceTemplate(val template: String)
 
 class FingerprintTemplate(val quality: Int,
-                             val template: String,
-                             val finger: ApiFingerIdentifier)
+                          val template: String,
+                          val finger: FingerIdentifier)
 
 enum class BiometricReferenceType {
     FaceReference,
     FingerprintReference
 }
 
-enum class ApiFingerIdentifier {
+enum class FingerIdentifier {
     RIGHT_5TH_FINGER,
     RIGHT_4TH_FINGER,
     RIGHT_3RD_FINGER,
