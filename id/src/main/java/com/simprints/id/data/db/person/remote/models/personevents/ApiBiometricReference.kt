@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.person.remote.models.personevents
 
+import androidx.annotation.Keep
 import com.simprints.id.data.db.person.domain.personevents.BiometricReference
 import com.simprints.id.data.db.person.domain.personevents.FaceTemplate
 import com.simprints.id.data.db.person.domain.personevents.FingerIdentifier
@@ -9,36 +10,21 @@ import com.simprints.id.data.db.person.remote.models.personevents.ApiBiometricRe
 import com.simprints.id.data.db.person.domain.personevents.FaceReference as DomainFaceReference
 import com.simprints.id.data.db.person.domain.personevents.FingerprintReference as DomainFingerprintReference
 
+@Keep
 sealed class ApiBiometricReference(val type: ApiBiometricReferenceType)
 
+@Keep
 class ApiFaceReference(val metadata: String,
                        val templates: List<ApiFaceTemplate>): ApiBiometricReference(FaceReference)
 
+@Keep
 class ApiFingerprintReference(val metadata: String,
                               val templates: List<ApiFingerprintTemplate>): ApiBiometricReference(FingerprintReference)
 
-class ApiFaceTemplate(val template: String)
-
-class ApiFingerprintTemplate(val quality: Int,
-                             val template: String,
-                             val finger: ApiFingerIdentifier)
-
+@Keep
 enum class ApiBiometricReferenceType {
     FaceReference,
     FingerprintReference
-}
-
-enum class ApiFingerIdentifier {
-    RIGHT_5TH_FINGER,
-    RIGHT_4TH_FINGER,
-    RIGHT_3RD_FINGER,
-    RIGHT_INDEX_FINGER,
-    RIGHT_THUMB,
-    LEFT_THUMB,
-    LEFT_INDEX_FINGER,
-    LEFT_3RD_FINGER,
-    LEFT_4TH_FINGER,
-    LEFT_5TH_FINGER
 }
 
 fun BiometricReference.fromDomainToApi() = when (this) {

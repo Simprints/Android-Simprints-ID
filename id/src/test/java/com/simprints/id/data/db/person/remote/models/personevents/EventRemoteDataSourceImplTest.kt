@@ -8,6 +8,7 @@ import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandom
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.person.remote.EnrolmentEventRecordRemoteInterface
+import com.simprints.id.data.db.person.remote.EventRemoteDataSourceImpl
 import com.simprints.id.data.db.person.remote.models.ApiModes
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.mockserver.mockSuccessfulResponse
@@ -66,7 +67,7 @@ class EventRemoteDataSourceImplTest {
     @Test
     fun successfulResponse_onGetCount_shouldFormCorrectUrlAndEventCounts() {
         runBlocking {
-            val countsToVerify = listOf(
+            val expectedCounts = listOf(
                 EventCount(EventType.EnrolmentRecordCreation, 42),
                 EventCount(EventType.EnrolmentRecordDeletion, 42),
                 EventCount(EventType.EnrolmentRecordMove, 42)
@@ -76,7 +77,6 @@ class EventRemoteDataSourceImplTest {
             enrolmentEventRecordRemoteInterface = SimApiClientFactory(
                 mockBaseUrlProvider, "deviceId"
             ).build<EnrolmentEventRecordRemoteInterface>().api
-
             coEvery { eventRemoteDataSourceSpy.getPeopleApiClient() } returns enrolmentEventRecordRemoteInterface
             mockServer.enqueue(buildSuccessfulResponseForCount())
 
@@ -84,10 +84,9 @@ class EventRemoteDataSourceImplTest {
 
             assertThat(mockServer.requestCount).isEqualTo(1)
             assertThat(mockServer.takeRequest().requestUrl.toString()).contains(expectedRequestUrlFormat)
-
             counts.forEachIndexed { index, it ->
-                assertThat(it.type).isEqualTo(countsToVerify[index].type)
-                assertThat(it.count).isEqualTo(countsToVerify[index].count)
+                assertThat(it.type).isEqualTo(expectedCounts[index].type)
+                assertThat(it.count).isEqualTo(expectedCounts[index].count)
             }
         }
     }
