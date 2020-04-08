@@ -8,7 +8,7 @@ class ApiEvents(val events: List<ApiEvent>)
 
 @Keep
 class ApiEvent(val id: String,
-               val labels: List<String>,
+               val labels: Map<String, List<String>>,
                val payload: ApiEnrolmentRecordOperation)
 
 fun Event.fromDomainToApi() =

@@ -14,11 +14,11 @@ import com.simprints.id.data.db.person.domain.personevents.FingerprintReference 
 sealed class ApiBiometricReference(val type: ApiBiometricReferenceType)
 
 @Keep
-class ApiFaceReference(val metadata: String,
+class ApiFaceReference(val metadata: HashMap<String, String>,
                        val templates: List<ApiFaceTemplate>): ApiBiometricReference(FaceReference)
 
 @Keep
-class ApiFingerprintReference(val metadata: String,
+class ApiFingerprintReference(val metadata: HashMap<String, String>,
                               val templates: List<ApiFingerprintTemplate>): ApiBiometricReference(FingerprintReference)
 
 @Keep

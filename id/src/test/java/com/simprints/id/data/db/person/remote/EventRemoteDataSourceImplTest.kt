@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.person.remote.models.personevents
+package com.simprints.id.data.db.person.remote
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -7,15 +7,18 @@ import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.EventType
-import com.simprints.id.data.db.person.remote.EnrolmentEventRecordRemoteInterface
-import com.simprints.id.data.db.person.remote.EventRemoteDataSourceImpl
 import com.simprints.id.data.db.person.remote.models.ApiModes
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordOperationType
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEventQuery
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEvents
+import com.simprints.id.data.db.person.remote.models.personevents.fromDomainToApi
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.mockserver.mockSuccessfulResponse
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -40,6 +43,7 @@ class EventRemoteDataSourceImplTest {
     private val eventRemoteDataSourceSpy = spyk(EventRemoteDataSourceImpl(mockk(), mockk()))
     private lateinit var enrolmentEventRecordRemoteInterface: EnrolmentEventRecordRemoteInterface
 
+    @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
         UnitTestConfig(this).setupFirebase()
@@ -53,13 +57,11 @@ class EventRemoteDataSourceImplTest {
             enrolmentEventRecordRemoteInterface = SimApiClientFactory(
                 mockBaseUrlProvider, "deviceId"
             ).build<EnrolmentEventRecordRemoteInterface>().api
-
             coEvery { eventRemoteDataSourceSpy.getPeopleApiClient() } returns enrolmentEventRecordRemoteInterface
             mockServer.enqueue(mockSuccessfulResponse())
 
-            val events = buildEnrolmentRecordEvents()
-
             eventRemoteDataSourceSpy.write("projectId", buildEnrolmentRecordEvents())
+
             assertThat(mockServer.requestCount).isEqualTo(1)
         }
     }
@@ -73,10 +75,10 @@ class EventRemoteDataSourceImplTest {
                 EventCount(EventType.EnrolmentRecordMove, 42)
             )
             val expectedRequestUrlFormat = "projects/project_id/events/count?l_moduleId=module1&l_moduleId=module2&l_attendantId=user_id&l_subjectId=subject_id&l_mode=FINGERPRINT&l_mode=FACE&lastEventId=last_event_id&type=EnrolmentRecordMove&type=EnrolmentRecordDeletion&type=EnrolmentRecordCreation"
-
             enrolmentEventRecordRemoteInterface = SimApiClientFactory(
                 mockBaseUrlProvider, "deviceId"
             ).build<EnrolmentEventRecordRemoteInterface>().api
+
             coEvery { eventRemoteDataSourceSpy.getPeopleApiClient() } returns enrolmentEventRecordRemoteInterface
             mockServer.enqueue(buildSuccessfulResponseForCount())
 
@@ -90,6 +92,9 @@ class EventRemoteDataSourceImplTest {
             }
         }
     }
+
+    /*TODO: We will be creating a separate helper for the downsync of the enrolment records.
+       Will be adding tests for that in the EnrolmentRecordRepository work*/
 
     private fun buildEnrolmentRecordEvents() = ApiEvents(buildApiEventsList())
 

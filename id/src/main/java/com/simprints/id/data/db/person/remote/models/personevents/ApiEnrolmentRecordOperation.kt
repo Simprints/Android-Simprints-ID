@@ -16,15 +16,17 @@ class ApiEnrolmentRecordCreation(val subjectId: String,
                                  val projectId: String,
                                  val moduleId: String,
                                  val attendantId: String,
-                                 val biometricReferences: List<ApiBiometricReference>): ApiEnrolmentRecordOperation(EnrolmentRecordCreation)
+                                 val biometricReferences: List<ApiBiometricReference>) : ApiEnrolmentRecordOperation(EnrolmentRecordCreation)
+
 @Keep
 class ApiEnrolmentRecordDeletion(val subjectId: String,
                                  val projectId: String,
                                  val moduleId: String,
-                                 val attendantId: String): ApiEnrolmentRecordOperation(EnrolmentRecordDeletion)
+                                 val attendantId: String) : ApiEnrolmentRecordOperation(EnrolmentRecordDeletion)
+
 @Keep
 class ApiEnrolmentRecordMove(val enrolmentRecordCreation: ApiEnrolmentRecordCreation,
-                             val enrolmentRecordDeletion: ApiEnrolmentRecordDeletion): ApiEnrolmentRecordOperation(EnrolmentRecordMove)
+                             val enrolmentRecordDeletion: ApiEnrolmentRecordDeletion) : ApiEnrolmentRecordOperation(EnrolmentRecordMove)
 
 @Keep
 enum class ApiEnrolmentRecordOperationType {
@@ -33,7 +35,7 @@ enum class ApiEnrolmentRecordOperationType {
     EnrolmentRecordMove
 }
 
-fun EnrolmentRecordOperation.fromDomainToApi() = when(this) {
+fun EnrolmentRecordOperation.fromDomainToApi() = when (this) {
     is DomainEnrolmentRecordCreation -> this.fromDomainToApi()
     is DomainEnrolmentRecordDeletion -> this.fromDomainToApi()
     is DomainEnrolmentRecordMove -> this.fromDomainToApi()
