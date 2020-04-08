@@ -204,8 +204,10 @@ class SyncInformationActivity : AppCompatActivity() {
     }
 
     private fun setupProgressOverlay() {
-        group_progress_overlay.setOnTouchListener { _, _ -> true }
+        progressOverlayBackground.setOnTouchListener { _, _ -> true }
+        progress_sync_overlay.setOnTouchListener { _, _ -> true }
         progress_sync_overlay.text = androidResourcesHelper.getString(R.string.progress_sync_overlay)
+        progressBar.setOnTouchListener { _, _ -> true }
     }
 
     private fun isProgressOverlayVisible() = group_progress_overlay.visibility == View.VISIBLE
