@@ -18,8 +18,8 @@
         android:textSize="15sp"
         android:textColor="@color/simprints_white"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/nfcPairEndGuideline"
-        app:layout_constraintStart_toStartOf="@+id/nfcPairStartGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nfcPairImageGuideline"
         app:layout_constraintVertical_bias="0.7" />
 
