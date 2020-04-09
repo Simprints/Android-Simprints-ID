@@ -18,8 +18,8 @@
         android:textSize="15sp"
         android:textColor="@color/simprints_white"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/nfcPairEndGuideline"
-        app:layout_constraintStart_toStartOf="@+id/nfcPairStartGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nfcPairImageGuideline"
         app:layout_constraintVertical_bias="0.7" />
 
@@ -39,7 +39,7 @@
         app:layout_constraintEnd_toStartOf="@+id/nfcPairEndGuideline"
         app:layout_constraintStart_toStartOf="@+id/nfcPairStartGuideline"
         app:layout_constraintTop_toBottomOf="@+id/nfcPairImageGuideline"
-        app:layout_constraintVertical_bias="0.7" />
+        app:layout_constraintVertical_bias="0.6" />
 
     <TextView
         android:id="@+id/nfcPairInstructionsTextView"
@@ -56,20 +56,36 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/nfcPairImageGuideline"
-        app:layout_constraintVertical_weight="0.4" />
+        app:layout_constraintVertical_weight="0.3" />
 
     <ImageView
-        android:id="@+id/nfcPairImageView"
+        android:id="@+id/nfcPairScannerImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="0dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/scanner"
+        android:src="@drawable/nfc_pair_scanner"
         app:layout_constraintBottom_toTopOf="@+id/nfcPairImageGuideline"
-        app:layout_constraintEnd_toStartOf="@+id/nfcPairEndGuideline"
-        app:layout_constraintStart_toStartOf="@+id/nfcPairStartGuideline"
+        app:layout_constraintEnd_toStartOf="@+id/nfcPairScannerRightEdgeGuideline"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nfcPairTitleTextView"
         app:layout_constraintVertical_weight="0.6"
+        android:translationZ="10dp"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/nfcPairPhoneImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="0dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/nfc_pair_phone"
+        app:layout_constraintBottom_toTopOf="@+id/nfcPairImageGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/nfcPairDeviceLeftEdgeGuideline"
+        app:layout_constraintTop_toBottomOf="@+id/nfcPairTitleTextView"
+        app:layout_constraintVertical_weight="0.6"
+        android:translationZ="5dp"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -77,16 +93,17 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
+        android:paddingTop="20dp"
         android:gravity="center"
         android:text="@string/nfc_pair_title"
         android:textColor="@color/simprints_white"
         android:textSize="26sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/nfcPairImageView"
+        app:layout_constraintBottom_toTopOf="@id/nfcPairPhoneImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_weight="0.4" />
+        app:layout_constraintVertical_weight="0.28" />
 
     <ProgressBar
         android:id="@+id/nfcPairingProgressBar"
@@ -101,6 +118,20 @@
         app:layout_constraintTop_toTopOf="@id/tryAgainButton" />
 
     <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/nfcPairScannerRightEdgeGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.40" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/nfcPairDeviceLeftEdgeGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.60" />
+
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/nfcPairEndGuideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -112,7 +143,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5" />
+        app:layout_constraintGuide_percent="0.6" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/nfcPairStartGuideline"

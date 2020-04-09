@@ -96,6 +96,11 @@ class SerialEntryPairFragment : FingerprintFragment() {
         activity?.unregisterReceiver(bluetoothPairStateChangeReceiver)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(determineWhetherPairingWasSuccessful)
+    }
+
     private fun parseTextAndCommencePair() {
         try {
             val serialNumber = scannerPairingManager.interpretEnteredTextAsSerialNumber(serialEntryEditText.text.toString())

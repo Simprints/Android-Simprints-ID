@@ -6,8 +6,7 @@
 
     <dist:module
         dist:instant="false"
-        dist:onDemand="false"
-        dist:title="@string/title_fingerprint">
+        dist:onDemand="false">
         <dist:fusing dist:include="true" />
     </dist:module>
 

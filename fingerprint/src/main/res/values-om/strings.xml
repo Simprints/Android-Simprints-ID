@@ -40,7 +40,6 @@
     <string name="scanner_confirmation_no">Lakkii</string>
     <string name="scanner_confirmation_yes">Eyyee</string>
     <string name="scanner_id_confirmation_message">Iskanara keetii %1$s?</string>
-    <string name="title_fingerprint">Ashaaraa Qubaa</string>
     <string name="try_again_label">Irra deebi\'ii yaali</string>
     <string name="try_another_finger">Quba biraa haa yaallu</string>
     <string name="verify_title">Mirkaneeffannaa</string>
@@ -77,4 +76,28 @@
     <string name="please_wait_button">Maaloo eegi</string>
     <string name="scan">Scan\' godhi</string>
     <string name="transfering_data">Odeffannoo dabarsi...</string>
+    <string name="bluetooth_off_title">Bluetooth cufaa</string>
+    <string name="nfc_off_title">NFC cufaa</string>
+    <string name="scanner_off_title">Skaanarii cufaa</string>
+    <string name="nfc_pair_title">Skaanarrii fi bilbilli walhin qunnamne</string>
+    <string name="turn_on_bluetooth">Bluetooth bani</string>
+    <string name="bluetooth_on">✓ Bluetooth banamadha</string>
+    <string name="turn_on_nfc">NFC bani</string>
+    <string name="nfc_on">✓ NFC banamaadha</string>
+    <string name="scanner_off_instructions">Mallatoo humna ibsaa skaanarii gad-qabi</string>
+    <string name="nfc_pair_instructions">Gara bilbilatti deebi\'uuf mallatoo of booda deebisa skaanarii tuqi</string>
+    <string name="enter_scanner_number">Lakkoofsa skaanarii sanduqaa armaan gadi keessa jiru tuqi</string>
+    <string name="enter_scanner_number_detail">Kunis jala skaanariitti argama</string>
+    <string name="cannot_connect_devices">Bilbilaan walqunnamu hin dandeenye</string>
+    <string name="scanner_on">✓ Iskaanarri banamaaadha</string>
+    <string name="nfc_pairing_in_progress">Iskaanarii %1$s argatteetta?</string>
+    <string name="nfc_pairing_try_again_instruction">Maaloo iskaanarii %1$s banamaa ta\'uu isaa mirkaneeffadhuutii  irra deebiin yaalii</string>
+    <string name="serial_entry_pair_failed">Maaloo iskaanarii %1$s banamaa ta\'uu isaa mirkaneeffadhuutii  irra deebiin yaalii</string>
+    <string name="nfc_pair_toast_try_again">NFC xiqqoonillee  dubbiffamuu hin danda\'amne, maaloo irraa deebi\'ii</string>
+    <string name="nfc_pair_toast_invalid">NFC xiqqoon hin milkoofne, barbaadi</string>
+    <string name="bluetooth_off_toast_error">Bluetooth, hin bannee?, maaloo mijeessa keessa seeni bani</string>
+    <string name="serial_entry_pair_toast_invalid">Maaloo lakkoofsaa siraalii dijiiti 6 galchii.</string>
+    <string name="not_my_scanner">%1$s iskaanarii koo miti</string>
+    <string name="serial_entry_pair_title">Skaanarrii fi bilbilli walhin qunnamne</string>
+    <string name="serial_entry_ok">Tole</string>
 </resources>

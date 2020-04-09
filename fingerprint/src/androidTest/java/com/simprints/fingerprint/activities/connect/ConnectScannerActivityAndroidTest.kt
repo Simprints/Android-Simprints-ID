@@ -36,15 +36,13 @@ import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.hamcrest.CoreMatchers.containsString
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 import org.koin.test.KoinTest
 import org.koin.test.mock.declareModule
 
 @RunWith(AndroidJUnit4::class)
+@Ignore("Overhaul in progess")
 class ConnectScannerActivityAndroidTest : KoinTest {
 
     @get:Rule var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
