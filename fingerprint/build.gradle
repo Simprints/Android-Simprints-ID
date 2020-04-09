@@ -146,16 +146,29 @@ dependencies {
     testImplementation deps.testing.androidx.core
     testImplementation deps.testing.androidx.core_testing
     testImplementation deps.testing.androidx.runner
+    testImplementation deps.testing.androidx.room
+    testImplementation deps.testing.androidx.rules
+
+    // Espresso
+    testImplementation deps.testing.espresso.core
+    testImplementation deps.testing.espresso.intents
+    testImplementation deps.testing.espresso.contrib
 
     // Kotlin
+    testImplementation deps.testing.kotlin
     testImplementation deps.testing.coroutines_test
 
-    // Mockito
+    // Mocking and assertion frameworks
     testImplementation deps.testing.mockito.kotlin
     testImplementation deps.testing.truth
+    testImplementation deps.testing.mockk.core
+
+    // Koin
+    testImplementation deps.testing.koin
 
     // Robolectric
     testImplementation deps.testing.robolectric.core
+    testImplementation deps.testing.robolectric.multidex
 
     // ######################################################
     //                      Android test
