@@ -1,14 +1,15 @@
 package com.simprints.id.data.db.session.domain.models.events
 
 import androidx.annotation.Keep
-import java.util.*
+import com.simprints.core.tools.utils.randomUUID
 
 @Keep
 abstract class Event(
     val type: EventType,
     open val startTime: Long,
     open val endTime: Long? = null,
-    val id: String = UUID.randomUUID().toString()) {
+    open val id: String = randomUUID()
+) {
 
     var relativeStartTime: Long? = null
     var relativeEndTime: Long? = null

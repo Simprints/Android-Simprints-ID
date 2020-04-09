@@ -23,6 +23,7 @@ import org.junit.After
 import org.junit.Before
 import org.koin.test.KoinTest
 import org.koin.test.mock.declare
+import org.koin.test.mock.declareModule
 
 open class BaseClientApiTest : KoinTest {
 
@@ -64,7 +65,7 @@ open class BaseClientApiTest : KoinTest {
         Intents.init()
 
         KoinInjector.loadClientApiKoinModules()
-        declare {
+        declareModule {
             factory { buildDummySessionEventsManagerMock() }
         }
     }

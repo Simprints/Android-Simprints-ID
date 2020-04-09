@@ -16,8 +16,8 @@ class GuidSelectionEventValidatorTest {
     @Test
     fun validate_shouldRejectASessionWithMultipleGuidSelectionEvents() {
         val session = createFakeOpenSession(timeHelper)
-        session.events.add(GuidSelectionEvent(0, UUID.randomUUID().toString()))
-        session.events.add(GuidSelectionEvent(0, UUID.randomUUID().toString()))
+        session.addEvent(GuidSelectionEvent(0, UUID.randomUUID().toString()))
+        session.addEvent(GuidSelectionEvent(0, UUID.randomUUID().toString()))
 
         shouldThrow<GuidSelectEventValidatorException> {
             GuidSelectionEventValidator().validate(session)
@@ -27,7 +27,7 @@ class GuidSelectionEventValidatorTest {
     @Test
     fun validate_shouldRejectASessionWithNoIdentificationCallback() {
         val session = createFakeOpenSession(timeHelper)
-        session.events.add(GuidSelectionEvent(0, UUID.randomUUID().toString()))
+        session.addEvent(GuidSelectionEvent(0, UUID.randomUUID().toString()))
 
         shouldThrow<GuidSelectEventValidatorException> {
             GuidSelectionEventValidator().validate(session)
@@ -37,8 +37,8 @@ class GuidSelectionEventValidatorTest {
     @Test
     fun validate_shouldAcceptAValidSession() {
         val session = createFakeOpenSession(timeHelper)
-        session.events.add(IdentificationCallbackEvent(0, UUID.randomUUID().toString(), emptyList()))
-        session.events.add(GuidSelectionEvent(0, UUID.randomUUID().toString()))
+        session.addEvent(IdentificationCallbackEvent(0, UUID.randomUUID().toString(), emptyList()))
+        session.addEvent(GuidSelectionEvent(0, UUID.randomUUID().toString()))
 
         GuidSelectionEventValidator().validate(session)
     }
