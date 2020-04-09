@@ -190,6 +190,7 @@ dependencies {
     api deps.androidx.lifecycle.viewmodel
     api deps.androidx.lifecycle.scope
     api deps.androidx.ui.constraintlayout
+    api deps.androidx.navigation.dynamicfeatures
     api deps.androidx.navigation.fragment
     api deps.androidx.navigation.ui
     api deps.kotlin.coroutines_android

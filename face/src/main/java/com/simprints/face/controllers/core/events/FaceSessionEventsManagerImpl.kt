@@ -18,7 +18,7 @@ class FaceSessionEventsManagerImpl(private val sessionRepository: SessionReposit
             ignoreException {
                 fromDomainToCore(event)?.let {
                     sessionRepository.updateCurrentSession { currentSession ->
-                        currentSession.events.add(it)
+                        currentSession.addEvent(it)
                     }
                 }
             }
