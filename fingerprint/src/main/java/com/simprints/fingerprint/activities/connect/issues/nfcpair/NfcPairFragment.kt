@@ -110,6 +110,11 @@ class NfcPairFragment : FingerprintFragment() {
         activity?.unregisterReceiver(bluetoothPairStateChangeReceiver)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(determineWhetherPairingWasSuccessful)
+    }
+
     private fun handleNfcTagDetected(tag: ComponentNfcTag) {
         Vibrate.vibrate(requireContext())
         viewModel.handleNfcTagDetected(tag)
