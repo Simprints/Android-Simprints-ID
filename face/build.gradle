@@ -69,10 +69,6 @@ dependencies {
     implementation project(':uicomponents')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    // NavComponents
-    implementation deps.androidx.navigation.fragment
-    implementation deps.androidx.navigation.ui
-
     implementation deps.cameraView
     implementation deps.circleImageView
 
