@@ -7,11 +7,11 @@ import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.EventType
-import com.simprints.id.data.db.person.remote.models.ApiModes
-import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordOperationType
-import com.simprints.id.data.db.person.remote.models.personevents.ApiEventQuery
+import com.simprints.id.data.db.people_sync.down.domain.EventQuery
+import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordOperationType
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEvents
 import com.simprints.id.data.db.person.remote.models.personevents.fromDomainToApi
+import com.simprints.id.domain.modality.Modes
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.mockserver.mockSuccessfulResponse
 import io.mockk.coEvery
@@ -103,16 +103,16 @@ class EventRemoteDataSourceImplTest {
             it.fromDomainToApi()
         }
 
-    private fun buildEventQuery() = ApiEventQuery(
+    private fun buildEventQuery() = EventQuery(
         PROJECT_ID,
         USER_ID,
         MODULES,
         SUBJECT_ID,
         LAST_EVENT_ID,
-        listOf(ApiModes.FINGERPRINT, ApiModes.FACE),
-        listOf(ApiEnrolmentRecordOperationType.EnrolmentRecordMove,
-            ApiEnrolmentRecordOperationType.EnrolmentRecordDeletion,
-            ApiEnrolmentRecordOperationType.EnrolmentRecordCreation)
+        listOf(Modes.FINGERPRINT, Modes.FACE),
+        listOf(EnrolmentRecordOperationType.EnrolmentRecordMove,
+            EnrolmentRecordOperationType.EnrolmentRecordDeletion,
+            EnrolmentRecordOperationType.EnrolmentRecordCreation)
     )
 
     private fun buildSuccessfulResponseForCount() = MockResponse().apply {
