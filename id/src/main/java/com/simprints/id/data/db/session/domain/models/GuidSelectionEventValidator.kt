@@ -10,10 +10,10 @@ class GuidSelectionEventValidator: SessionEventValidator {
         if (session.hasEvent(EventType.GUID_SELECTION)) {
 
             if (session.count(EventType.GUID_SELECTION) > 1)
-                throw GuidSelectEventValidatorException("GuidSelectionEvent already exist")
+                throw GuidSelectEventValidatorException("GuidSelectionEvent already exist in session ${session.id}")
 
             if (session.count(EventType.CALLBACK_IDENTIFICATION) == 0)
-                throw GuidSelectEventValidatorException("Identification Callback missing")
+                throw GuidSelectEventValidatorException("Identification Callback missing in session ${session.id}")
         }
     }
 }
