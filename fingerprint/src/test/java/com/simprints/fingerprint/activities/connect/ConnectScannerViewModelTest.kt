@@ -16,6 +16,7 @@ import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSuppo
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
+import com.simprints.fingerprint.testtools.assertEventReceived
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothDevice
@@ -74,7 +75,7 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun bluetoothOff_start_sendsBluetoothOffIssueEvent() {
+    fun start_bluetoothOff_sendsBluetoothOffIssueEvent() {
         every { bluetoothAdapter.isEnabled() } returns false
         every { scannerFactory.create(any()) } returns mockScannerWrapper()
 
@@ -86,7 +87,7 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun bluetoothNotSupported_start_sendsBluetoothNotSupportedAlert() {
+    fun start_bluetoothNotSupported_sendsBluetoothNotSupportedAlert() {
         every { bluetoothAdapter.isEnabled() } returns true
         every { bluetoothAdapter.getBondedDevices() } returns setOf(DummyBluetoothDevice.random())
         every { scannerFactory.create(any()) } returns mockScannerWrapper(connectFailException = BluetoothNotSupportedException())
@@ -99,7 +100,7 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun scannerConnect_succeeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() {
+    fun start_scannerConnectSucceeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() {
         every { bluetoothAdapter.isEnabled() } returns true
         every { bluetoothAdapter.getBondedDevices() } returns setOf(DummyBluetoothDevice.random())
         every { scannerFactory.create(any()) } returns mockScannerWrapper()
@@ -117,7 +118,7 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun noScannersPaired_vero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() {
+    fun start_noScannersPairedWithVero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() {
         every { bluetoothAdapter.isEnabled() } returns true
         every { bluetoothAdapter.getBondedDevices() } returns emptySet()
         every { nfcManager.doesDeviceHaveNfcCapability() } returns true
@@ -132,7 +133,7 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun noScannersPaired_vero2WithNfcAvailableAndOff_sendsNfcOffIssueEvent() {
+    fun start_noScannersPairedWithVero2WithNfcAvailableAndOff_sendsNfcOffIssueEvent() {
         every { bluetoothAdapter.isEnabled() } returns true
         every { bluetoothAdapter.getBondedDevices() } returns emptySet()
         every { nfcManager.doesDeviceHaveNfcCapability() } returns true
@@ -147,7 +148,7 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun noScannersPaired_vero2WithNfcNotAvailable_sendsSerialEntryIssueEvent() {
+    fun start_noScannersPairedWithVero2WithNfcNotAvailable_sendsSerialEntryIssueEvent() {
         every { bluetoothAdapter.isEnabled() } returns true
         every { bluetoothAdapter.getBondedDevices() } returns emptySet()
         every { nfcManager.doesDeviceHaveNfcCapability() } returns false
@@ -161,7 +162,7 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun noScannersPaired_vero1WithNfcAvailableAndOn_sendsSerialEntryIssueEvent() {
+    fun start_noScannersPairedWithVero1WithNfcAvailableAndOn_sendsSerialEntryIssueEvent() {
         every { bluetoothAdapter.isEnabled() } returns true
         every { bluetoothAdapter.getBondedDevices() } returns emptySet()
         every { nfcManager.doesDeviceHaveNfcCapability() } returns true
@@ -176,7 +177,7 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun noScannersPaired_mixedVeroGenerationsWithNfcAvailableAndOn_sendsSerialEntryIssueEvent() {
+    fun start_noScannersPairedWithMixedVeroGenerationsWithNfcAvailableAndOn_sendsSerialEntryIssueEvent() {
         every { bluetoothAdapter.isEnabled() } returns true
         every { bluetoothAdapter.getBondedDevices() } returns emptySet()
         every { nfcManager.doesDeviceHaveNfcCapability() } returns true
@@ -191,7 +192,7 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun multipleScannersPaired_vero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() {
+    fun start_multipleScannersPairedWithVero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() {
         every { bluetoothAdapter.isEnabled() } returns true
         every { bluetoothAdapter.getBondedDevices() } returns setOf(DummyBluetoothDevice.random(), DummyBluetoothDevice.random())
         every { nfcManager.doesDeviceHaveNfcCapability() } returns true
@@ -206,7 +207,7 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun scannerConnect_fails_sendsScannerConnectedFailedEvent() {
+    fun start_scannerConnectFailsWithDisconnectedException_sendsScannerConnectedFailedEvent() {
         every { bluetoothAdapter.isEnabled() } returns true
         every { bluetoothAdapter.getBondedDevices() } returns setOf(DummyBluetoothDevice.random())
         every { scannerFactory.create(any()) } returns mockScannerWrapper(ScannerDisconnectedException())
@@ -219,7 +220,7 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun scannerConnect_failsWithUnexpectedException_sendsAlertEventAndLogsCrashlytics() {
+    fun start_scannerConnectFailsWithUnexpectedException_sendsAlertEventAndLogsCrashlytics() {
         val error = Error("Oops")
         every { bluetoothAdapter.isEnabled() } returns true
         every { bluetoothAdapter.getBondedDevices() } returns setOf(DummyBluetoothDevice.random())
@@ -233,5 +234,49 @@ class ConnectScannerViewModelTest : KoinTest {
         scannerConnectedObserver.assertEventReceivedWithContent(false)
         launchAlertObserver.assertEventReceivedWithContent(FingerprintAlert.UNEXPECTED_ERROR)
         verify { crashReportManager.logExceptionOrSafeException(eq(error)) }
+    }
+
+    @Test
+    fun handleScannerDisconnectedYesClick_sendsScannerOffEvent() {
+        val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
+
+        viewModel.handleScannerDisconnectedYesClick()
+
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.SCANNER_OFF)
+    }
+
+    @Test
+    fun handleScannerDisconnectedNoClick_vero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() {
+        every { nfcManager.doesDeviceHaveNfcCapability() } returns true
+        every { nfcManager.isNfcEnabled() } returns true
+        every { preferencesManager.scannerGenerations } returns listOf(ScannerGeneration.VERO_2)
+
+        val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
+
+        viewModel.handleScannerDisconnectedNoClick()
+
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NFC_PAIR)
+    }
+
+    @Test
+    fun handleIncorrectScanner_vero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() {
+        every { nfcManager.doesDeviceHaveNfcCapability() } returns true
+        every { nfcManager.isNfcEnabled() } returns true
+        every { preferencesManager.scannerGenerations } returns listOf(ScannerGeneration.VERO_2)
+
+        val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
+
+        viewModel.handleIncorrectScanner()
+
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NFC_PAIR)
+    }
+
+    @Test
+    fun finishConnectActivity_sendsFinishEvent() {
+        val finishObserver = viewModel.finish.testObserver()
+
+        viewModel.finishConnectActivity()
+
+        finishObserver.assertEventReceived()
     }
 }
