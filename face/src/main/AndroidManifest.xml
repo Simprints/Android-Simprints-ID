@@ -12,7 +12,7 @@
 
     <application tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name="com.simprints.face.activities.FaceCaptureActivity"
+            android:name="com.simprints.face.capture.FaceCaptureActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
         <activity
             android:name="com.simprints.face.orchestrator.FaceOrchestratorActivity"
