@@ -10,7 +10,7 @@ import androidx.work.workDataOf
 import com.google.gson.reflect.TypeToken
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.common.models.PeopleCount
+import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.PersonRepository
@@ -97,9 +97,9 @@ class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) 
 
 }
 
-fun WorkInfo.getDownCountsFromOutput(): List<PeopleCount>? {
+fun WorkInfo.getDownCountsFromOutput(): List<EventCount>? {
     val outputJson = this.outputData.getString(PeopleDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN)
-    val listType = object : TypeToken<ArrayList<PeopleCount?>?>() {}.type
-    return JsonHelper.gson.fromJson<List<PeopleCount>>(outputJson, listType)
+    val listType = object : TypeToken<ArrayList<EventCount?>?>() {}.type
+    return JsonHelper.gson.fromJson<List<EventCount>>(outputJson, listType)
 }
 

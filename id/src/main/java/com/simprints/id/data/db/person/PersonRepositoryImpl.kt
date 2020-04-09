@@ -3,26 +3,29 @@ package com.simprints.id.data.db.person
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
-import com.simprints.id.data.db.common.models.PeopleCount
+import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
+import com.simprints.id.data.db.people_sync.down.domain.toEventQuery
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import kotlinx.coroutines.flow.first
 
 class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
+                           val eventRemoteDataSource: EventRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
                            val downSyncScopeRepository: PeopleDownSyncScopeRepository,
                            private val peopleUpSyncExecutor: PeopleUpSyncExecutor) :
     PersonRepository,
     PersonLocalDataSource by personLocalDataSource,
-    PersonRemoteDataSource by personRemoteDataSource {
+    PersonRemoteDataSource by personRemoteDataSource,
+    EventRemoteDataSource by eventRemoteDataSource {
 
-    override suspend fun countToDownSync(peopleDownSyncScope: PeopleDownSyncScope): List<PeopleCount> =
-        personRemoteDataSource.getDownSyncPeopleCount(peopleDownSyncScope.projectId, downSyncScopeRepository.getDownSyncOperations(peopleDownSyncScope))
-
+    override suspend fun countToDownSync(peopleDownSyncScope: PeopleDownSyncScope): List<EventCount> =
+        eventRemoteDataSource.count(peopleDownSyncScope.toEventQuery())
 
     override suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult =
         try {
