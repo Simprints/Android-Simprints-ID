@@ -73,9 +73,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     internal suspend fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
         ignoreException {
             sessionRepository.updateCurrentSession { currentSession ->
-                currentSession.events.apply {
-                    add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
-                    add(buildRequestEvent(timeHelper.now(), appRequest))
+                with(currentSession) {
+                    addEvent(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
+                    addEvent(buildRequestEvent(timeHelper.now(), appRequest))
                 }
             }
         }
@@ -179,11 +179,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         ignoreException {
             val peopleInDb = personLocalDataSource.count()
             sessionRepository.updateCurrentSession { currentSession ->
-                currentSession.events.apply {
-                    buildAuthorizationEvent(AuthorizationEvent.Result.AUTHORIZED)
+                val authorisationEvent = buildAuthorizationEvent(AuthorizationEvent.Result.AUTHORIZED)
+
+                with(currentSession) {
+                    addEvent(authorisationEvent)
+                    projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+                    databaseInfo.recordCount = peopleInDb
                 }
-                currentSession.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-                currentSession.databaseInfo.recordCount = peopleInDb
             }
         }
 

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="title_fingerprint">የጣት አሻራ</string>
     <string name="register_title">ወደ ሲስተሙ ማስገባት</string>
     <string name="identify_title">መለየት</string>
     <string name="verify_title">ማመሳከር</string>
@@ -18,7 +17,6 @@
     <string name="finger_skipped_message">ጣት አሻረው ተዘሏል</string>
     <string name="no_fingers_scanned">"እባክዎ ቢያንስ አንድ ጣትዎን ለአሻራ ይስጡ "</string>
     <string name="reconnecting_message">እንደገና ያገናኙ</string>
-    <string name="add_finger_dialog_title">እጣትዎን ይጨምሩ(ያስቀምጡ)</string>
     <string name="confirm_fingers_dialog_title">ጣትዎ አሻራ ተነስቷል</string>
     <string name="rescan_label">እንደገና እስካን ያድርጉ</string>
     <string name="rescan_label_question">እንደገና እስካን ይደረግ?</string>
@@ -40,10 +38,8 @@
     <string name="loading_candidates">ዕጩዎችን በመጫን ላይ ነው</string>
     <string name="matching_fingerprints">የጣት አሻራውን ማመሳከር</string>
     <string name="returning_results">ውጤቱን መመለስ</string>
-    <string name="verify_guid_not_found_title">ግለሰቡ አልተገኘም</string>
     <string name="error_occurred_title">ስህተት አጋጥሟል</string>
     <string name="low_battery_title">ዝቅተኛ ባትሪ</string>
-    <string name="about_libsimprints_version">ሊብ ስምፕሪንት ስሪት</string>
     <string name="button_scan_prints">የጣት አሻራውን እስካን ያድርጉ</string>
     <string name="button_submit">ይላኩ</string>
     <string name="close">ይዝጉ</string>
@@ -66,23 +62,42 @@
     <string name="scanner_confirmation_no">አይ</string>
     <string name="scanner_confirmation_yes">አዎ</string>
     <string name="scanner_id_confirmation_message">እስካነሩ %1$s ነው?</string>
-    <string name="scanner_not_working">እስካነሩ አይሰራም</string>
     <string name="try_again_label">እንደገና ይሞክሩ</string>
     <string name="try_another_finger">"እባክዎት ሌላ ጣት ይሞክሩ "</string>
-    <string name="bluetooth_error_title">የብሉቱዝ ስህተት</string>
     <string name="bluetooth_not_enabled_message">ብሉቱዝ አልተከፈተም ፡ለመጠቀም አያስችልም፤እባክዎ ማስተካከያው ውስጥ ገብተው ብሉቱዙን ከፍተው እንደገና ይሞክሩ</string>
     <string name="bluetooth_not_supported_message">የሚጠቀሙበት መሳሪያ ብሉቱዝ ለመጠቀም አያስችልም፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
     <string name="bluetooth_error_pair_scanner_and_device_message">1. እስካነሩ መብራቱን ያረጋግጡ \n 2. መቸቱን /ሴቲንግ ይምረጡ \n 3. የተጣመረውን እስካነር ያለያዩ \n 4.እስካነርና ስልኩን ያጣምሩ \n 5. ወደ ሲምፕሪንት ይመለሱ</string>
     <string name="unforeseen_error_message">እባክዎ እንደገና ይሞክሩ እና ሲምፕሪንቱ መስራት ካለቻለ የሲስተም አስተዳዳሪውን ያነጋግረ</string>
-    <string name="verify_guid_not_found_offline_message">ግለሰቡ የለም፡ እባክዎ ከኢንተርኔት ጋር መገናኘትዎን አረጋግጠው እንደገና ይሞክሩ</string>
-    <string name="verify_guid_not_found_online_message">አንዲጠራ የተመረጠው ግለሰብ ዳታቤዙ ውስጥ የለም</string>
     <string name="why_did_you_skip_fingerprinting">የጣት አሻራውን ለምንድን ነው የሚዘሉት?</string>
     <string name="bluetooth_error_pair_scanner_and_device_title">እስካነርና ስልኩን ያጣምሩ</string>
     <string name="scanner_error_turn_scanner_on_title">እስካነሩን ያብሩ</string>
     <string name="settings_label">የስልክ ማስተካከያ</string>
-    <string name="privacy_notice_text"><u>የደህንነት ማሳታወቂያ</u></string>
     <string name="connect_scanner_finished">ተገናኝቷል</string>
     <string name="scan">"እስካን "</string>
     <string name="transfering_data">መረጃ በማስተላለፍ ላይ ነው</string>
     <string name="please_wait_button">እባክዎትን ይጠብቁ</string>
+    <string name="bluetooth_off_title">ብሉቱዙ ጠፍቷል</string>
+    <string name="nfc_off_title">NFC ጠፍቷል</string>
+    <string name="scanner_off_title">ስካነሩ ጠፍቷል</string>
+    <string name="nfc_pair_title">ስካነሩ እና የሚጠቀሙት መሳሪያ አልተገናኘም</string>
+    <string name="serial_entry_pair_title">ስካነሩ እና የሚጠቀሙት መሳሪያ አልተገናኘም</string>
+    <string name="turn_on_bluetooth">ብሉቱዙውን ያብሩት</string>
+    <string name="bluetooth_on">✓ ብሉቱዙው በርቷል</string>
+    <string name="turn_on_nfc">NFC ያብሩት</string>
+    <string name="nfc_on">✓ NFC በርቷል</string>
+    <string name="scanner_off_instructions">የስካነሩን ማስነሻ ቁልፍ ይጫኑ</string>
+    <string name="nfc_pair_instructions">የስካነሩን ጀርባ ከስልኩ ጀርባ ጋር ያገናኙ</string>
+    <string name="enter_scanner_number">የስካነሩን ቁጥር ቀጥሎ ካለው ሳጥን ላይ ይፃፉ</string>
+    <string name="enter_scanner_number_detail">ይህ የሚገኘው በስካነሩ የታችኛው ክፍል ነው</string>
+    <string name="cannot_connect_devices">የሚጠቀሙበት መሳሪያ ሊገናኝ አልቻለም</string>
+    <string name="scanner_on">✓ ስካነሩ በርቷል</string>
+    <string name="nfc_pairing_in_progress">የተገኘው ስካነር  %1$s</string>
+    <string name="nfc_pairing_try_again_instruction">እባክዎ ስካነር ቁጥር %1$s መብራቱን አረጋግጠው እንደገና ይሞክሩ</string>
+    <string name="nfc_pair_toast_try_again">የNFC ቺፑን ማንበብ አልተቻለም፤ እባክዎ እንደገና ይሞክሩ</string>
+    <string name="nfc_pair_toast_invalid">የተሳሳተ NFC ቺፕ ተገኝቷል</string>
+    <string name="bluetooth_off_toast_error">ብሉቱዙን ማብራት አልተቻለም። እባክዎ ብሉቱዙን የስልኩ መቸት (settings) ውስጥ ገብተው ያብሩ</string>
+    <string name="serial_entry_pair_toast_invalid">እባክዎ የሲሪያል ቁጥሩን 6 አሃዞች ያስገቡ</string>
+    <string name="not_my_scanner">%1$s የእኔ እስካነር አይደለም።</string>
+    <string name="serial_entry_ok">እሽ</string>
+    <string name="serial_entry_pair_failed">እባክዎ ስካነር ቁጥር %1$s መብራቱን አረጋግጠው እንደገና ይሞክሩ</string>
 </resources>
