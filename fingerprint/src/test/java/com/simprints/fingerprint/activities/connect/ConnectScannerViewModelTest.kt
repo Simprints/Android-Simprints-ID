@@ -76,7 +76,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Test
     fun start_bluetoothOff_sendsBluetoothOffIssueEvent() {
-        every { bluetoothAdapter.isEnabled() } returns false
+        setupBluetooth(isEnabled = false)
         every { scannerFactory.create(any()) } returns mockScannerWrapper()
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
@@ -88,8 +88,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Test
     fun start_bluetoothNotSupported_sendsBluetoothNotSupportedAlert() {
-        every { bluetoothAdapter.isEnabled() } returns true
-        every { bluetoothAdapter.getBondedDevices() } returns setOf(DummyBluetoothDevice.random())
+        setupBluetooth(numberOfPairedScanners = 1)
         every { scannerFactory.create(any()) } returns mockScannerWrapper(connectFailException = BluetoothNotSupportedException())
 
         val launchAlertObserver = viewModel.launchAlert.testObserver()
@@ -101,8 +100,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Test
     fun start_scannerConnectSucceeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() {
-        every { bluetoothAdapter.isEnabled() } returns true
-        every { bluetoothAdapter.getBondedDevices() } returns setOf(DummyBluetoothDevice.random())
+        setupBluetooth(numberOfPairedScanners = 1)
         every { scannerFactory.create(any()) } returns mockScannerWrapper()
 
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
@@ -119,10 +117,8 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Test
     fun start_noScannersPairedWithVero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() {
-        every { bluetoothAdapter.isEnabled() } returns true
-        every { bluetoothAdapter.getBondedDevices() } returns emptySet()
-        every { nfcManager.doesDeviceHaveNfcCapability() } returns true
-        every { nfcManager.isNfcEnabled() } returns true
+        setupBluetooth(numberOfPairedScanners = 0)
+        setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = true)
         every { preferencesManager.scannerGenerations } returns listOf(ScannerGeneration.VERO_2)
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
@@ -134,10 +130,8 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Test
     fun start_noScannersPairedWithVero2WithNfcAvailableAndOff_sendsNfcOffIssueEvent() {
-        every { bluetoothAdapter.isEnabled() } returns true
-        every { bluetoothAdapter.getBondedDevices() } returns emptySet()
-        every { nfcManager.doesDeviceHaveNfcCapability() } returns true
-        every { nfcManager.isNfcEnabled() } returns false
+        setupBluetooth(numberOfPairedScanners = 0)
+        setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = false)
         every { preferencesManager.scannerGenerations } returns listOf(ScannerGeneration.VERO_2)
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
@@ -149,9 +143,8 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Test
     fun start_noScannersPairedWithVero2WithNfcNotAvailable_sendsSerialEntryIssueEvent() {
-        every { bluetoothAdapter.isEnabled() } returns true
-        every { bluetoothAdapter.getBondedDevices() } returns emptySet()
-        every { nfcManager.doesDeviceHaveNfcCapability() } returns false
+        setupBluetooth(numberOfPairedScanners = 0)
+        setupNfc(doesDeviceHaveNfcCapability = false)
         every { preferencesManager.scannerGenerations } returns listOf(ScannerGeneration.VERO_2)
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
@@ -163,10 +156,8 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Test
     fun start_noScannersPairedWithVero1WithNfcAvailableAndOn_sendsSerialEntryIssueEvent() {
-        every { bluetoothAdapter.isEnabled() } returns true
-        every { bluetoothAdapter.getBondedDevices() } returns emptySet()
-        every { nfcManager.doesDeviceHaveNfcCapability() } returns true
-        every { nfcManager.isNfcEnabled() } returns true
+        setupBluetooth(numberOfPairedScanners = 0)
+        setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = true)
         every { preferencesManager.scannerGenerations } returns listOf(ScannerGeneration.VERO_1)
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
@@ -178,10 +169,8 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Test
     fun start_noScannersPairedWithMixedVeroGenerationsWithNfcAvailableAndOn_sendsSerialEntryIssueEvent() {
-        every { bluetoothAdapter.isEnabled() } returns true
-        every { bluetoothAdapter.getBondedDevices() } returns emptySet()
-        every { nfcManager.doesDeviceHaveNfcCapability() } returns true
-        every { nfcManager.isNfcEnabled() } returns true
+        setupBluetooth(numberOfPairedScanners = 0)
+        setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = true)
         every { preferencesManager.scannerGenerations } returns listOf(ScannerGeneration.VERO_1, ScannerGeneration.VERO_2)
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
@@ -193,10 +182,8 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Test
     fun start_multipleScannersPairedWithVero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() {
-        every { bluetoothAdapter.isEnabled() } returns true
-        every { bluetoothAdapter.getBondedDevices() } returns setOf(DummyBluetoothDevice.random(), DummyBluetoothDevice.random())
-        every { nfcManager.doesDeviceHaveNfcCapability() } returns true
-        every { nfcManager.isNfcEnabled() } returns true
+        setupBluetooth(numberOfPairedScanners = 2)
+        setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = true)
         every { preferencesManager.scannerGenerations } returns listOf(ScannerGeneration.VERO_2)
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
@@ -208,8 +195,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Test
     fun start_scannerConnectFailsWithDisconnectedException_sendsScannerConnectedFailedEvent() {
-        every { bluetoothAdapter.isEnabled() } returns true
-        every { bluetoothAdapter.getBondedDevices() } returns setOf(DummyBluetoothDevice.random())
+        setupBluetooth(numberOfPairedScanners = 1)
         every { scannerFactory.create(any()) } returns mockScannerWrapper(ScannerDisconnectedException())
 
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
@@ -222,8 +208,7 @@ class ConnectScannerViewModelTest : KoinTest {
     @Test
     fun start_scannerConnectFailsWithUnexpectedException_sendsAlertEventAndLogsCrashlytics() {
         val error = Error("Oops")
-        every { bluetoothAdapter.isEnabled() } returns true
-        every { bluetoothAdapter.getBondedDevices() } returns setOf(DummyBluetoothDevice.random())
+        setupBluetooth(numberOfPairedScanners = 1)
         every { scannerFactory.create(any()) } returns mockScannerWrapper(error)
 
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
@@ -247,8 +232,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Test
     fun handleScannerDisconnectedNoClick_vero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() {
-        every { nfcManager.doesDeviceHaveNfcCapability() } returns true
-        every { nfcManager.isNfcEnabled() } returns true
+        setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = true)
         every { preferencesManager.scannerGenerations } returns listOf(ScannerGeneration.VERO_2)
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
@@ -260,8 +244,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Test
     fun handleIncorrectScanner_vero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() {
-        every { nfcManager.doesDeviceHaveNfcCapability() } returns true
-        every { nfcManager.isNfcEnabled() } returns true
+        setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = true)
         every { preferencesManager.scannerGenerations } returns listOf(ScannerGeneration.VERO_2)
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
@@ -278,5 +261,19 @@ class ConnectScannerViewModelTest : KoinTest {
         viewModel.finishConnectActivity()
 
         finishObserver.assertEventReceived()
+    }
+
+    private fun setupBluetooth(isEnabled: Boolean = true, numberOfPairedScanners: Int = 1) {
+        every { bluetoothAdapter.isEnabled() } returns isEnabled
+        every { bluetoothAdapter.getBondedDevices() } returns List(numberOfPairedScanners) { DummyBluetoothDevice.random() }.toSet()
+    }
+
+    private fun setupNfc(doesDeviceHaveNfcCapability: Boolean? = null, isEnabled: Boolean? = null) {
+        if (doesDeviceHaveNfcCapability != null) {
+            every { nfcManager.doesDeviceHaveNfcCapability() } returns doesDeviceHaveNfcCapability
+        }
+        if (isEnabled != null) {
+            every { nfcManager.isNfcEnabled() } returns isEnabled
+        }
     }
 }
