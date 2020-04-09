@@ -218,7 +218,7 @@ class ConnectScannerViewModel(
     }
 
     companion object {
-        private const val NUMBER_OF_STEPS = 7
+        const val NUMBER_OF_STEPS = 7
         private fun computeProgress(step: Int) = step * 100 / NUMBER_OF_STEPS
     }
 }
