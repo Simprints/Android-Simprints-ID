@@ -104,7 +104,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
 
     override suspend fun addEventToCurrentSession(event: Event) {
         updateCurrentSession {
-            it.events.add(event)
+            it.addEvent(event)
         }
     }
 
@@ -124,7 +124,9 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
                     val session = addQueryParams(query).findFirst() ?: throw NoSessionsFoundException()
                     val domainSession = session.toDomain()
                     updateBlock(domainSession)
-                    sessionEventsValidators.forEach { it.validate((domainSession)) }
+                    sessionEventsValidators.forEach { validator ->
+                        validator.validate((domainSession))
+                    }
 
                     it.insertOrUpdate(DbSession(domainSession))
                 }
@@ -175,8 +177,11 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
             currentSession.forEach {
                 val updatedSession = it.toDomain()
                 val artificialTerminationEvent = ArtificialTerminationEvent(timeHelper.now(), ArtificialTerminationEvent.Reason.NEW_SESSION)
-                updatedSession.events.add(artificialTerminationEvent)
-                updatedSession.closeIfRequired(timeHelper)
+
+                with(updatedSession) {
+                    addEvent(artificialTerminationEvent)
+                    closeIfRequired(timeHelper)
+                }
 
                 reamInTrans.insertOrUpdate(DbSession(updatedSession))
             }
