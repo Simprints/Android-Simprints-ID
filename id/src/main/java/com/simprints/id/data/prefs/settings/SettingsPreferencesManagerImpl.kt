@@ -34,11 +34,15 @@ open class SettingsPreferencesManagerImpl(
     scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
 ) : SettingsPreferencesManager {
 
-    // Number of GUIDs to be returned to the calling app as the result of an identification
+    /**
+     *  Number of GUIDs to be returned to the calling app as the result of an identification
+     */
     override var returnIdCount: Int
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, NB_IDS_KEY, NB_IDS_DEFAULT)
 
-    // What languages should be selectable for this project. Serialize as commas separated list. The empty list defaults to all languages
+    /**
+     *  What languages should be selectable for this project. Serialize as commas separated list. The empty list defaults to all languages
+     */
     override var projectLanguages: Array<String>
         by RemoteConfigComplexPreference(
             prefs,
@@ -48,7 +52,9 @@ open class SettingsPreferencesManagerImpl(
             languagesStringArraySerializer
         )
 
-    // Selected language
+    /**
+     * Selected language
+     */
     override var language: String
         by OverridableRemoteConfigPrimitivePreference(
             prefs,
@@ -57,7 +63,9 @@ open class SettingsPreferencesManagerImpl(
             LANGUAGE_DEFAULT
         )
 
-    // What modules will be available to sync by for this project. Serialize as pipe (|) separated list. Empty list indicates that module sync should not be possible.
+    /**
+     * What modules will be available to sync by for this project. Serialize as pipe (|) separated list. Empty list indicates that module sync should not be possible.
+     */
     override var moduleIdOptions: Set<String>
         by RemoteConfigComplexPreference(
             prefs,
@@ -67,7 +75,9 @@ open class SettingsPreferencesManagerImpl(
             moduleIdOptionsStringSetSerializer
         )
 
-    // What modules were selected by the user
+    /**
+     * What modules were selected by the user
+     */
     override var selectedModules: Set<String>
         by ComplexPreference(
             prefs,
@@ -84,7 +94,9 @@ open class SettingsPreferencesManagerImpl(
             MAX_NUMBER_OF_MODULES_DEFAULT
         )
 
-    // Sync group. Default is user
+    /**
+     * Sync group. Default is user
+     */
     override var syncGroup: GROUP
         by RemoteConfigComplexPreference(
             prefs,
@@ -94,7 +106,9 @@ open class SettingsPreferencesManagerImpl(
             groupSerializer
         )
 
-    // Match group. Default is user
+    /**
+     * Match group. Default is user
+     */
     override var matchGroup: GROUP
         by RemoteConfigComplexPreference(
             prefs,
@@ -104,8 +118,10 @@ open class SettingsPreferencesManagerImpl(
             groupSerializer
         )
 
-    // The map of default fingers
-    /** @throws JsonSyntaxException */
+    /**
+     * The map of default fingers
+     * @throws JsonSyntaxException
+     */
     override var fingerStatus: Map<FingerIdentifier, Boolean>
         by OverridableRemoteConfigComplexPreference(
             prefs,
@@ -115,7 +131,9 @@ open class SettingsPreferencesManagerImpl(
             fingerIdToBooleanSerializer
         )
 
-    // Name of the partner's program
+    /**
+     * Name of the partner's program
+     */
     override var programName: String
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -124,7 +142,9 @@ open class SettingsPreferencesManagerImpl(
             PROGRAM_NAME_DEFAULT
         )
 
-    // Name of the partner's organization
+    /**
+     * Name of the partner's organization
+     */
     override var organizationName: String
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -133,7 +153,9 @@ open class SettingsPreferencesManagerImpl(
             ORGANIZATION_NAME_DEFAULT
         )
 
-    // Whether to show the Simprints logo at the top of the launch activity
+    /**
+     * Whether to show the Simprints logo at the top of the launch activity
+     */
     override var logoExists: Boolean
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -142,6 +164,9 @@ open class SettingsPreferencesManagerImpl(
             LOGO_EXISTS_DEFAULT
         )
 
+    /**
+     * Wheter consent screen should show or not
+     */
     override var consentRequired: Boolean
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -150,6 +175,9 @@ open class SettingsPreferencesManagerImpl(
             CONSENT_REQUIRED_DEFAULT
         )
 
+    /**
+     * List of modalities to use
+     */
     override var modalities: List<Modality>
         by RemoteConfigComplexPreference(
             prefs,
