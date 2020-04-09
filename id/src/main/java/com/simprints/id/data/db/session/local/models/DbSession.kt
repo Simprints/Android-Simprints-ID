@@ -37,7 +37,7 @@ open class DbSession : RealmObject {
         this.projectId = sessionEvents.projectId
         this.startTime = sessionEvents.startTime
         this.realmEvents = RealmList()
-        setEvents(sessionEvents.events)
+        setEvents(sessionEvents.getEvents())
         this.relativeEndTime = sessionEvents.relativeEndTime
         this.relativeUploadTime = sessionEvents.relativeUploadTime
         this.device = DbDevice(sessionEvents.device)
@@ -50,7 +50,7 @@ open class DbSession : RealmObject {
         this.analyticsId = sessionEvents.analyticsId
     }
 
-    private fun setEvents(events: ArrayList<Event>) = realmEvents.apply {
+    private fun setEvents(events: List<Event>) = realmEvents.apply {
         clear()
         addAll(events.map { DbEvent(it) })
     }
