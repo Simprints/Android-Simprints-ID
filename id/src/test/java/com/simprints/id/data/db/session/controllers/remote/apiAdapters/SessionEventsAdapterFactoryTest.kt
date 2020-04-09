@@ -413,7 +413,7 @@ class SessionEventsAdapterFactoryTest {
             0,
             DatabaseInfo(0, 0)
         )
-        session.events.add(
+        session.addEvent(
             AlertScreenEvent(
                 0,
                 AlertScreenEvent.AlertScreenEventType.INVALID_SELECTED_ID

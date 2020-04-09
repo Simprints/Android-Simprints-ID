@@ -25,7 +25,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.tools.AndroidResourcesHelper
-import com.simprints.id.tools.extensions.hideKeyboard
+import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.fragment_module_selection.*
