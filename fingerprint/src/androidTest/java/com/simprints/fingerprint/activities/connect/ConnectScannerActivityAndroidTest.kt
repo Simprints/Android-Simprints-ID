@@ -55,6 +55,18 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     )
     private val dbManagerMock: FingerprintDbManager = mock()
 
+    // 1. Test successful flow returns good result
+    // 2. Test bluetooth not supported shows alert
+    // 3. Test back button shows refusal
+    // 4. Test not paired with NFC on on Vero 2.0 goes to NFC pairing fragment
+    // 5. Test not paired with NFC off on Vero 1.0 goes to Serial Entry pairing fragment
+    // 6. Test not paired with NFC off on Vero 2.0 goes to NFC off fragment
+    // 7. Test not paired with NFC not available on Vero 2.0 goes to Serial Entry pairing fragment
+    // 5. Test multiple paired goes to pairing fragment
+    // 6. Test connect fails shows dialog
+    // 7. Test bluetooth off goes to bluetooth off fragment
+    // 8. Test not paired with NFC off goes to
+
     @Before
     fun setUp() {
         AndroidTestConfig().initRxIdler()
