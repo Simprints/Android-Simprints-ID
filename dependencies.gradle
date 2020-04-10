@@ -154,8 +154,8 @@ def testing = [
         mockito_inline_androidtests: "com.linkedin.dexmaker:dexmaker-mockito-inline:2.25.0" //Mockito-inline works only in unit tests. Required to mock final attributes in android tests
     ],
     mockk          : [
-        core   : "io.mockk:mockk:1.9",
-        android: "io.mockk:mockk-android:1.9"
+        core   : "io.mockk:mockk:1.9.2",
+        android: "io.mockk:mockk-android:1.9.2"
     ],
     mockwebserver  : "com.squareup.okhttp3:mockwebserver:$okttp_version",
     espresso       : [

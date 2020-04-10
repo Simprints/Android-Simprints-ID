@@ -180,6 +180,7 @@ dependencies {
         exclude group: 'org.mockito'
         exclude group: 'org.robolectric'
         exclude group: 'org.jetbrains.kotlinx'
+        exclude group: 'io.mockk'
     }
 
     // Koin
@@ -199,11 +200,13 @@ dependencies {
     // Android X navigation components
     androidTestImplementation deps.testing.androidx.navigation
 
-    // Mockito
+    // Mocking and assertion frameworks
     androidTestImplementation deps.testing.mockito.core
     androidTestImplementation deps.testing.mockito.android
     androidTestImplementation deps.testing.mockito.kotlin
-    androidTestApi deps.testing.mockito.mockito_inline_androidtests
+    androidTestImplementation deps.testing.truth
+    androidTestImplementation deps.testing.mockk.core
+    androidTestImplementation deps.testing.mockk.android
 
     // Espresso
     androidTestImplementation deps.testing.espresso.core
