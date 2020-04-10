@@ -7,4 +7,7 @@
     <string name="guid_selection_data_sent">መረጃው ተልኳል</string>
     <string name="guid_selection_result_sent">ውጤቱ ተልኳል</string>
     <string name="rooted_device_title">ዋናው መሳሪያ ተገኝቷል</string>
+    <string name="invalid_moduleId_message">የተሳሳተ የምዕራፍ መለያ ቁጥር ስላላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_userId_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ስላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_verifyId_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ማጣሪያ ስላደረጉ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
 </resources>

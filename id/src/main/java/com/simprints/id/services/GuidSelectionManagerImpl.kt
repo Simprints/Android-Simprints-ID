@@ -48,7 +48,8 @@ class GuidSelectionManagerImpl(val deviceId: String,
     private suspend fun saveGuidSelectionEvent(request: AppIdentityConfirmationRequest) =
         ignoreException {
             sessionRepository.updateSession(request.sessionId) {
-                it.events.add(GuidSelectionEvent(timerHelper.now(), request.selectedGuid))
+                val event = GuidSelectionEvent(timerHelper.now(), request.selectedGuid)
+                it.addEvent(event)
             }
         }
 

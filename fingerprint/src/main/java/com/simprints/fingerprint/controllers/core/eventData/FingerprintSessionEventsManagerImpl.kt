@@ -21,7 +21,7 @@ class FingerprintSessionEventsManagerImpl(private val sessionRepository: Session
                 fromDomainToCore(event)?.let {
                     runBlocking {
                         sessionRepository.updateCurrentSession { currentSession ->
-                            currentSession.events.add(it)
+                            currentSession.addEvent(it)
                         }
                     }
                 }
@@ -32,7 +32,7 @@ class FingerprintSessionEventsManagerImpl(private val sessionRepository: Session
         runBlocking {
             ignoreException {
                 sessionRepository.updateCurrentSession {
-                    val scannerConnectivityEvents = it.events.filterIsInstance(ScannerConnectionEvent::class.java)
+                    val scannerConnectivityEvents = it.getEvents().filterIsInstance(ScannerConnectionEvent::class.java)
                     scannerConnectivityEvents.forEach { it.scannerInfo.hardwareVersion = hardwareVersion }
                 }
             }

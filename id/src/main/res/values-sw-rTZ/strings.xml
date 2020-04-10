@@ -137,4 +137,6 @@
     <string name="dashboard_sync_card_no_modules_message">Tafadhali chagua vipengele vya kuoanisha kwenye mfumo</string>
     <string name="hint_search_modules">Tafuta vipengele</string>
     <string name="no_modules_selected">Hakuna vipengele vilivyochaguliwa</string>
+    <string name="progress_sync_overlay">Inaoanisha...</string>
+    <string name="privacy_notice_title">Taarifa zinazohusiana na kutoa idhin</string>
 </resources>

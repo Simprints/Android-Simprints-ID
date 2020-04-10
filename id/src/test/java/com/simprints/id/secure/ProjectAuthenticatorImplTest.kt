@@ -34,7 +34,7 @@ class ProjectAuthenticatorImplTest {
     @MockK private lateinit var projectSecretManager: ProjectSecretManager
     @MockK private lateinit var signerManager: SignerManager
     @MockK private lateinit var remoteConfigWrapper: RemoteConfigWrapper
-    @MockK private lateinit var preferencesManager: PreferencesManager
+    @MockK private lateinit var preferencesManagerMock: PreferencesManager
     @MockK private lateinit var safetyNetClient: SafetyNetClient
     @MockK private lateinit var authenticationDataManagerMock: AuthenticationDataManager
     @MockK private lateinit var attestationManagerMock: AttestationManager
@@ -113,6 +113,7 @@ class ProjectAuthenticatorImplTest {
             signerManager,
             remoteConfigWrapper,
             longConsentRepositoryMock,
+            preferencesManagerMock,
             attestationManagerMock,
             authenticationDataManagerMock
         )
@@ -120,10 +121,10 @@ class ProjectAuthenticatorImplTest {
 
     private fun mockManagers() {
         coEvery { authenticationDataManagerMock.requestAuthenticationData(any(), any()) } returns AuthenticationData(Nonce(""), PublicKeyString(""))
-        every { preferencesManager.projectLanguages } returns emptyArray()
+        every { preferencesManagerMock.projectLanguages } returns emptyArray()
         coEvery { authManagerMock.requestAuthToken(any()) } returns Token("")
         coEvery { projectRemoteDataSourceMock.loadProjectRemoteConfigSettingsJsonString(any()) } returns JsonObject()
-        every { preferencesManager.projectLanguages } returns emptyArray()
+        every { preferencesManagerMock.projectLanguages } returns emptyArray()
         every { attestationManagerMock.requestAttestation(any(), any()) } returns AttestToken("google_attestation")
     }
 
