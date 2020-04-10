@@ -234,6 +234,22 @@ open class SettingsPreferencesManagerImpl(
     override var apiBaseUrl: String
         by PrimitivePreference(prefs, API_BASE_URL_KEY, NetworkConstants.DEFAULT_BASE_URL)
 
+    override var faceMaxRetries: Int
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            FACE_MAX_RETRIES,
+            FACE_MAX_RETRIES_DEFAULT
+        )
+
+    override var faceQualityThreshold: Float
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            FACE_QUALITY_THRESHOLD,
+            FACE_QUALITY_THRESHOLD_DEFAULT
+        )
+
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()
     }
@@ -319,6 +335,11 @@ open class SettingsPreferencesManagerImpl(
         const val SCANNER_GENERATIONS_KEY = "ScannerGenerations"
 
         const val API_BASE_URL_KEY = "ApiBaseUrl"
+
+        const val FACE_MAX_RETRIES = "FaceMaxRetries"
+        const val FACE_MAX_RETRIES_DEFAULT = 2
+        const val FACE_QUALITY_THRESHOLD = "FaceQualityThreshold"
+        const val FACE_QUALITY_THRESHOLD_DEFAULT = -1f
     }
 
 }
