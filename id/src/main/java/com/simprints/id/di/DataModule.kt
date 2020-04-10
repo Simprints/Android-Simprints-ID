@@ -17,6 +17,8 @@ import com.simprints.id.data.db.person.PersonRepositoryImpl
 import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.local.PersonLocalDataSourceImpl
+import com.simprints.id.data.db.person.remote.EventRemoteDataSource
+import com.simprints.id.data.db.person.remote.EventRemoteDataSourceImpl
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSourceImpl
 import com.simprints.id.data.db.project.ProjectRepository
@@ -45,6 +47,13 @@ open class DataModule {
         remoteDbManager,
         simApiClientFactory
     )
+
+    @Provides
+    @Singleton
+    open fun provideEventRemoteDataSource(
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory
+    ): EventRemoteDataSource = EventRemoteDataSourceImpl(remoteDbManager, simApiClientFactory)
 
     @Provides
     @FlowPreview
@@ -81,10 +90,12 @@ open class DataModule {
     open fun providePersonRepository(
         personRemoteDataSource: PersonRemoteDataSource,
         personLocalDataSource: PersonLocalDataSource,
+        eventRemoteDataSource: EventRemoteDataSource,
         peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
         peopleUpSyncExecutor: PeopleUpSyncExecutor
     ): PersonRepository = PersonRepositoryImpl(
         personRemoteDataSource,
+        eventRemoteDataSource,
         personLocalDataSource,
         peopleDownSyncScopeRepository,
         peopleUpSyncExecutor
