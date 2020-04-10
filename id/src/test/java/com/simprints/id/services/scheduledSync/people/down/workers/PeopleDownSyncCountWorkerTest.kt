@@ -9,7 +9,8 @@ import androidx.work.workDataOf
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.data.db.common.models.PeopleCount
+import com.simprints.id.data.db.common.models.EventCount
+import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.people_sync.down.domain.ProjectSyncScope
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.people.common.TAG_MASTER_SYNC_ID
@@ -63,7 +64,11 @@ class PeopleDownSyncCountWorkerTest {
 
     @Test
     fun countWorker_shouldExecuteTheTaskSuccessfully() = runBlocking {
-        val counts = listOf(PeopleCount(1, 1, 1))
+        val counts = listOf(
+            EventCount(EventType.EnrolmentRecordCreation, 1),
+            EventCount(EventType.EnrolmentRecordMove, 1),
+            EventCount(EventType.EnrolmentRecordDeletion, 1)
+        )
         mockDependenciesToSucceed(counts)
 
         countWorker.doWork()
@@ -104,7 +109,7 @@ class PeopleDownSyncCountWorkerTest {
         verify { countWorker.resultSetter.success() }
     }
 
-    private fun mockDependenciesToSucceed(counts: List<PeopleCount>) {
+    private fun mockDependenciesToSucceed(counts: List<EventCount>) {
         coEvery { countWorker.personRepository.countToDownSync(any()) } returns counts
         coEvery { countWorker.downSyncScopeRepository.getDownSyncScope() } returns ProjectSyncScope(DEFAULT_PROJECT_ID, listOf(Modes.FINGERPRINT))
     }

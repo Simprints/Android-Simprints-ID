@@ -7,11 +7,12 @@ import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
 import com.simprints.id.commontesttools.DefaultTestConstants.userSyncScope
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.data.db.common.models.PeopleCount
-import com.simprints.id.data.db.common.models.totalCount
+import com.simprints.id.data.db.common.models.EventCount
+import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.id.testtools.UnitTestConfig
@@ -40,6 +41,7 @@ class PersonRepositoryTest {
     @RelaxedMockK lateinit var localDataSource: PersonLocalDataSource
     @RelaxedMockK lateinit var peopleUpSyncExecutor: PeopleUpSyncExecutor
     @RelaxedMockK lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
+    @RelaxedMockK lateinit var eventRemoteDataSource: EventRemoteDataSource
 
     private lateinit var personRepository: PersonRepository
 
@@ -47,7 +49,7 @@ class PersonRepositoryTest {
     fun setup() {
         UnitTestConfig(this).coroutinesMainThread()
         MockKAnnotations.init(this, relaxUnitFun = true)
-        personRepository = PersonRepositoryImpl(remoteDataSource, localDataSource, downSyncScopeRepository, peopleUpSyncExecutor)
+        personRepository = PersonRepositoryImpl(remoteDataSource, eventRemoteDataSource, localDataSource, downSyncScopeRepository, peopleUpSyncExecutor)
     }
 
     @Test
@@ -106,15 +108,15 @@ class PersonRepositoryTest {
 
 
     private suspend fun assesDownSyncCount(downSyncScope: PeopleDownSyncScope) {
-        val ops = listOf(PeopleCount(REMOTE_PEOPLE_FOR_SUBSYNC, 0, 0))
+        val eventCounts = listOf(EventCount(EventType.EnrolmentRecordCreation, REMOTE_PEOPLE_FOR_SUBSYNC))
 
         coEvery { downSyncScopeRepository.getDownSyncOperations(any()) } returns emptyList()
-        coEvery { remoteDataSource.getDownSyncPeopleCount(any(), any()) } returns ops
+        coEvery { eventRemoteDataSource.count(any()) } returns eventCounts
 
         val counts = personRepository.countToDownSync(downSyncScope)
 
-        assertThat(counts.size).isEqualTo(ops.size)
-        assertThat(counts.sumBy { it.totalCount() }).isEqualTo(REMOTE_PEOPLE_FOR_SUBSYNC * ops.size)
+        assertThat(counts.size).isEqualTo(eventCounts.size)
+        assertThat(counts.sumBy { it.count }).isEqualTo(REMOTE_PEOPLE_FOR_SUBSYNC)
     }
 
     @After
