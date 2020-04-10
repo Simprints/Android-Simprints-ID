@@ -54,7 +54,7 @@ class SettingsAboutActivity : AppCompatPreferenceActivity() {
             || SettingsAboutFragment::class.java.name == fragmentName
     }
 
-    fun finishActivityBecauseLogout(){
+    fun finishActivityBecauseLogout() {
         setResult(SettingsAboutActivity.LOGOUT_RESULT_CODE)
         finish()
     }

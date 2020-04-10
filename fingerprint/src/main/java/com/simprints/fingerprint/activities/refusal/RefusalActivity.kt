@@ -11,6 +11,7 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.fingerprint.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_refusal.*
 import org.jetbrains.anko.inputMethodManager
@@ -152,5 +153,10 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
 
     override fun showToastForSelectOptionAndSubmit() {
         showToast(androidResourcesHelper.getString(R.string.refusal_toast_select_option_submit))
+    }
+
+    override fun onStop() {
+        super.onStop()
+        hideKeyboard()
     }
 }

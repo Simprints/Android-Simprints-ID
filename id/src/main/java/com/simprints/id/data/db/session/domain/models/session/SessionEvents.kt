@@ -15,7 +15,7 @@ open class SessionEvents(var projectId: String,
                          var startTime: Long = 0,
                          var databaseInfo: DatabaseInfo,
                          val id: String = UUID.randomUUID().toString(),
-                         val events: ArrayList<Event> = arrayListOf()) {
+                         private val events: ArrayList<Event> = arrayListOf()) {
 
     companion object {
         // When the sync starts, any open activeSession started GRACE_PERIOD ms
@@ -28,6 +28,13 @@ open class SessionEvents(var projectId: String,
     var relativeUploadTime: Long = 0
     var location: Location? = null
     var analyticsId: String? = null
+    
+    fun addEvent(event: Event) {
+        events.add(event)
+        event.updateRelativeTimes(startTime)
+    }
+
+    fun getEvents(): List<Event> = events
 
     // Function and not kotlin properties to avoid them to build serialised/deserialised
     fun isClosed(): Boolean = relativeEndTime > 0
