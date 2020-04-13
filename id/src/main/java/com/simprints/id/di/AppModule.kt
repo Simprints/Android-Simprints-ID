@@ -238,8 +238,13 @@ open class AppModule {
     @Singleton
     open fun provideSessionEventsRemoteDbManager(
         remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory
-    ): SessionRemoteDataSource = SessionRemoteDataSourceImpl(remoteDbManager, simApiClientFactory)
+        simApiClientFactory: SimApiClientFactory,
+        timeHelper: TimeHelper
+    ): SessionRemoteDataSource = SessionRemoteDataSourceImpl(
+        remoteDbManager,
+        simApiClientFactory,
+        timeHelper
+    )
 
     @Provides
     @Singleton
