@@ -180,14 +180,12 @@ class TestAppModule(
 
     override fun provideSessionEventsRemoteDbManager(
         remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory,
-        timeHelper: TimeHelper
+        simApiClientFactory: SimApiClientFactory
     ): SessionRemoteDataSource =
         sessionEventsRemoteDbManagerRule.resolveDependency {
             super.provideSessionEventsRemoteDbManager(
                 remoteDbManager,
-                simApiClientFactory,
-                timeHelper
+                simApiClientFactory
             )
         }
 

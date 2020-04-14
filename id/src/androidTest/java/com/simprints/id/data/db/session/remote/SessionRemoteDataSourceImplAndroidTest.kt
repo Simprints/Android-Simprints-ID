@@ -69,8 +69,7 @@ class SessionRemoteDataSourceImplAndroidTest {
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         sessionRemoteDataSource = SessionRemoteDataSourceImpl(
             remoteDbManager,
-            SimApiClientFactory(mockBaseUrlProvider, "some_device"),
-            timeHelper
+            SimApiClientFactory(mockBaseUrlProvider, "some_device")
         )
     }
 
