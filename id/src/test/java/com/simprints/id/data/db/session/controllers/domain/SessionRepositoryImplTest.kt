@@ -52,7 +52,7 @@ class SessionRepositoryImplTest {
             APP_VERSION_NAME,
             PROJECT_ID,
             sessionEventsSyncManagerMock, sessionLocalDataSourceMock, sessionRemoteDataSourceMock,
-            preferencesManagerMock, crashReportManagerMock)
+            preferencesManagerMock, crashReportManagerMock, timeHelper)
         mockPreferenceManagerInfo()
     }
 
