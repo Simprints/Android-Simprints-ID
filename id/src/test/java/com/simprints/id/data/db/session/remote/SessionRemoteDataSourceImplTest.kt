@@ -88,7 +88,7 @@ class SessionRemoteDataSourceImplTest {
     }
 
     private fun buildRemoteDataSource() =
-        SessionRemoteDataSourceImpl(mockk(), mockk(), timeHelper)
+        SessionRemoteDataSourceImpl(mockk(), mockk())
 
     @Suppress("UNCHECKED_CAST")
     private fun buildSessionApiToThrowFirstThenCall(): SessionsRemoteInterface {
