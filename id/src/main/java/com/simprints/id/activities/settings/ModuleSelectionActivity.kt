@@ -12,9 +12,8 @@ import javax.inject.Inject
 
 class ModuleSelectionActivity : AppCompatActivity() {
 
+    private lateinit var moduleSelectionFragment: ModuleSelectionFragment
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
-
-    lateinit var moduleSelectionFragment: ModuleSelectionFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,4 +47,5 @@ class ModuleSelectionActivity : AppCompatActivity() {
     override fun onBackPressed() {
         moduleSelectionFragment.showModuleSelectionDialogIfNecessary()
     }
+
 }

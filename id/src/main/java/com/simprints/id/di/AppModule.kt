@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
@@ -10,6 +11,8 @@ import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
+import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
+import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -17,14 +20,7 @@ import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManagerImpl
-import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
-import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
-import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManagerImpl
-import com.simprints.id.data.consent.LongConsentManager
-import com.simprints.id.data.consent.LongConsentManagerImpl
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSource
 import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSourceImpl
 import com.simprints.id.data.consent.shortconsent.ConsentRepository
@@ -36,6 +32,17 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
+import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.session.SessionRepositoryImpl
+import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
+import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilderImpl
+import com.simprints.id.data.db.session.local.SessionLocalDataSource
+import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl
+import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
+import com.simprints.id.data.db.session.local.SessionRealmConfigBuilderImpl
+import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
+import com.simprints.id.data.db.session.remote.SessionRemoteDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -43,6 +50,7 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.*
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
 import com.simprints.id.data.secure.keystore.KeystoreManager
@@ -51,7 +59,7 @@ import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
-import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
 import com.simprints.id.services.GuidSelectionManager
@@ -72,6 +80,7 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -149,9 +158,11 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSecureLocalDbKeyProvider(builder: EncryptedSharedPreferencesBuilder,
-                                             randomGenerator: RandomGenerator,
-                                             unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
+    open fun provideSecureLocalDbKeyProvider(
+        builder: EncryptedSharedPreferencesBuilder,
+        randomGenerator: RandomGenerator,
+        unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider
+    ): SecureLocalDbKeyProvider =
         SecureLocalDbKeyProviderImpl(
             builder.buildEncryptedSharedPreferences(FILENAME_FOR_REALM_KEY_SHARED_PREFS),
             randomGenerator,
@@ -167,25 +178,25 @@ open class AppModule {
         LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager)
 
     @Provides
-    open fun provideLongConsentManager(
-        ctx: Context,
-        loginInfoManager: LoginInfoManager,
-        crashReportManager: CrashReportManager
-    ):
-        LongConsentManager =
-        LongConsentManagerImpl(ctx.filesDir.absolutePath, loginInfoManager, crashReportManager)
-
-    @Provides
     @Singleton
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
-    open fun provideSimApiClientFactory(ctx: Context) =
-        SimApiClientFactory(ctx.deviceId)
+    open fun provideBaseUrlProvider(
+        settingsPreferencesManager: SettingsPreferencesManager,
+        projectLocalDataSource: ProjectLocalDataSource,
+        loginInfoManager: LoginInfoManager
+    ): BaseUrlProvider = BaseUrlProviderImpl(
+        settingsPreferencesManager,
+        projectLocalDataSource,
+        loginInfoManager
+    )
 
     @Provides
-    open fun provideSecureApiInterface(simApiClientFactory: SimApiClientFactory): SecureApiInterface =
-        simApiClientFactory.build<SecureApiInterface>(null).api
+    open fun provideSimApiClientFactory(
+        ctx: Context,
+        baseUrlProvider: BaseUrlProvider
+    ) = SimApiClientFactory(baseUrlProvider, ctx.deviceId)
 
     @Provides
     @Singleton
@@ -202,33 +213,60 @@ open class AppModule {
     }
 
     @Provides
+    open fun provideSessionRealmConfigBuilder(): SessionRealmConfigBuilder =
+        SessionRealmConfigBuilderImpl()
+
+
+    @Provides
+    @Singleton
+    open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsBuilder =
+        SessionEventValidatorsBuilderImpl()
+
+
+    @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(
         ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider
-    ): SessionEventsLocalDbManager =
-        RealmSessionEventsDbManagerImpl(ctx, secureDataManager)
+        secureDataManager: SecureLocalDbKeyProvider,
+        timeHelper: TimeHelper,
+        sessionRealmConfigBuilder: SessionRealmConfigBuilder,
+        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
+    ): SessionLocalDataSource =
+        SessionLocalDataSourceImpl(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder, sessionEventValidatorsBuilder.build())
+
+    @Provides
+    @Singleton
+    open fun provideSessionEventsRemoteDbManager(
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory
+    ): SessionRemoteDataSource = SessionRemoteDataSourceImpl(
+        remoteDbManager,
+        simApiClientFactory
+    )
 
     @Provides
     @Singleton
     open fun provideSessionEventsManager(
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
-        sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+        sessionLocalDataSource: SessionLocalDataSource,
+        sessionRemoteDataSource: SessionRemoteDataSource,
         preferencesManager: PreferencesManager,
+        loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         crashReportManager: CrashReportManager
-    ): SessionEventsManager =
-        SessionEventsManagerImpl(
+    ): SessionRepository =
+        SessionRepositoryImpl(
             ctx.deviceId,
             ctx.packageVersionName,
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
             sessionEventsSyncManager,
-            sessionEventsLocalDbManager,
+            sessionLocalDataSource,
+            sessionRemoteDataSource,
             preferencesManager,
-            timeHelper,
-            crashReportManager
+            crashReportManager,
+            timeHelper
         )
-
 
     @Provides
     @Singleton
@@ -247,19 +285,13 @@ open class AppModule {
     ): ModuleRepository = ModuleRepositoryImpl(preferencesManager, crashReportManager)
 
     @Provides
-    @Singleton
-    open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager,
-                                          simApiClientFactory: SimApiClientFactory): RemoteSessionsManager =
-        RemoteSessionsManagerImpl(remoteDbManager, simApiClientFactory)
-
-    @Provides
     open fun provideGuidSelectionManager(
         context: Context,
         loginInfoManager: LoginInfoManager,
         analyticsManager: AnalyticsManager,
         crashReportManager: CrashReportManager,
         timeHelper: TimeHelper,
-        sessionEventsManager: SessionEventsManager
+        sessionRepository: SessionRepository
     ): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId,
@@ -267,7 +299,7 @@ open class AppModule {
             analyticsManager,
             crashReportManager,
             timeHelper,
-            sessionEventsManager
+            sessionRepository
         )
 
     @Provides
@@ -300,18 +332,18 @@ open class AppModule {
     @Provides
     open fun provideConsentViewModelFactory(
         consentTextManager: ConsentRepository,
-        sessionEventsManager: SessionEventsManager,
+        sessionRepository: SessionRepository,
         timeHelper: TimeHelper
     ) =
-        ConsentViewModelFactory(consentTextManager, sessionEventsManager)
+        ConsentViewModelFactory(consentTextManager, sessionRepository)
 
     @Provides
-    open fun provideCoreExitFormViewModelFactory(sessionEventsManager: SessionEventsManager) =
-        CoreExitFormViewModelFactory(sessionEventsManager)
+    open fun provideCoreExitFormViewModelFactory(sessionRepository: SessionRepository) =
+        CoreExitFormViewModelFactory(sessionRepository)
 
     @Provides
-    open fun provideFingerprintExitFormViewModelFactory(sessionEventsManager: SessionEventsManager) =
-        FingerprintExitFormViewModelFactory(sessionEventsManager)
+    open fun provideFingerprintExitFormViewModelFactory(sessionRepository: SessionRepository) =
+        FingerprintExitFormViewModelFactory(sessionRepository)
 
     @Provides
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
@@ -319,9 +351,9 @@ open class AppModule {
     @Provides
     open fun provideFetchGuidViewModelFactory(personRepository: PersonRepository,
                                               deviceManager: DeviceManager,
-                                              sessionEventsManager: SessionEventsManager,
+                                              sessionRepository: SessionRepository,
                                               timeHelper: TimeHelper) =
-        FetchGuidViewModelFactory(personRepository, deviceManager, sessionEventsManager, timeHelper)
+        FetchGuidViewModelFactory(personRepository, deviceManager, sessionRepository, timeHelper)
 
     @Provides
     open fun provideSyncInformationViewModelFactory(
@@ -346,10 +378,45 @@ open class AppModule {
         builder.buildEncryptedSharedPreferences()
 
     @Provides
-    open fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager = DeviceManagerImpl(connectivityHelper)
+    open fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager =
+        DeviceManagerImpl(connectivityHelper)
 
     @Provides
-    open fun provideConnectivityHelper(ctx: Context): ConnectivityHelper = ConnectivityHelperImpl(ctx)
+    open fun provideConnectivityHelper(ctx: Context): ConnectivityHelper =
+        ConnectivityHelperImpl(ctx)
 
+    @Provides
+    open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)
+    
+    @Provides
+    open fun provideCameraHelper(
+        context: Context,
+        previewBuilder: QrPreviewBuilder,
+        cameraFocusManager: CameraFocusManager
+    ): CameraHelper = CameraHelperImpl(context, previewBuilder, cameraFocusManager)
+
+    @Provides
+    open fun provideCameraFocusManager(): CameraFocusManager = CameraFocusManagerImpl()
+
+    @Provides
+    open fun provideQrPreviewBuilder(): QrPreviewBuilder = QrPreviewBuilderImpl()
+
+    @Provides
+    @ExperimentalCoroutinesApi
+    open fun provideQrCodeProducer(
+        qrCodeDetector: QrCodeDetector,
+        crashReportManager: CrashReportManager
+    ): QrCodeProducer = QrCodeProducerImpl(qrCodeDetector, crashReportManager)
+
+    @Provides
+    open fun provideQrCodeDetector(
+        crashReportManager: CrashReportManager
+    ): QrCodeDetector = QrCodeDetectorImpl(crashReportManager)
+
+    @Provides
+    open fun providePrivacyNoticeViewModelFactory(
+        longConsentRepository: LongConsentRepository,
+        preferencesManager: PreferencesManager
+    ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager)
 }
 

@@ -1,12 +1,11 @@
 package com.simprints.id
 
+import androidx.camera.camera2.Camera2Config
+import androidx.camera.core.CameraXConfig
 import androidx.multidex.MultiDexApplication
-import com.crashlytics.android.Crashlytics
-import com.crashlytics.android.core.CrashlyticsCore
 import com.simprints.core.tools.LineNumberDebugTree
 import com.simprints.id.di.*
 import com.simprints.id.tools.FileLoggingTree
-import io.fabric.sdk.android.Fabric
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import org.koin.android.ext.koin.androidContext
@@ -18,7 +17,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import timber.log.Timber
 
-open class Application : MultiDexApplication() {
+open class Application : MultiDexApplication(), CameraXConfig.Provider {
 
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
@@ -61,17 +60,10 @@ open class Application : MultiDexApplication() {
             }
         }
 
-        initFabric()
         handleUndeliverableExceptionInRxJava()
     }
 
-    private fun initFabric() {
-        val crashlyticsKit = Crashlytics.Builder()
-            .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
-            .build()
-
-        Fabric.with(this, crashlyticsKit)
-    }
+    override fun getCameraXConfig(): CameraXConfig = Camera2Config.defaultConfig()
 
     // RxJava doesn't allow not handled exceptions, when that happens the app crashes.
     // https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#reason-handling

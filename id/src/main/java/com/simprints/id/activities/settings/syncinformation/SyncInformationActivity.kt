@@ -8,7 +8,6 @@ import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -17,9 +16,13 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.EXTRA
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.ON
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_sync_information.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SyncInformationActivity : AppCompatActivity() {
@@ -27,6 +30,7 @@ class SyncInformationActivity : AppCompatActivity() {
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var viewModelFactory: SyncInformationViewModelFactory
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var peopleSyncManager: PeopleSyncManager
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
     private val moduleCountAdapterForUnselected by lazy { ModuleCountAdapter() }
@@ -52,24 +56,29 @@ class SyncInformationActivity : AppCompatActivity() {
         setupModulesTabs()
         setupClickListeners()
         observeUi()
+        setupProgressOverlay()
+        setupRecordsCountCards()
+
+        fetchRecordsInfo()
     }
 
     override fun onResume() {
         super.onResume()
         clearValues()
         setFocusOnDefaultModulesTab()
-
-        lifecycleScope.launch {
-            viewModel.start()
-        }
     }
 
     private fun setTextInLayout() {
-        moduleSelectionButton.text = androidResourcesHelper.getString(R.string.select_modules_button_title)
-        recordsToUploadText.text = androidResourcesHelper.getString(R.string.sync_info_records_to_upload)
-        recordsToDownloadText.text = androidResourcesHelper.getString(R.string.sync_info_records_to_download)
-        recordsToDeleteText.text = androidResourcesHelper.getString(R.string.sync_info_records_to_delete)
-        totalRecordsOnDeviceText.text = androidResourcesHelper.getString(R.string.sync_info_total_records_on_device)
+        moduleSelectionButton.text =
+            androidResourcesHelper.getString(R.string.select_modules_button_title)
+        recordsToUploadText.text =
+            androidResourcesHelper.getString(R.string.sync_info_records_to_upload)
+        recordsToDownloadText.text =
+            androidResourcesHelper.getString(R.string.sync_info_records_to_download)
+        recordsToDeleteText.text =
+            androidResourcesHelper.getString(R.string.sync_info_records_to_delete)
+        totalRecordsOnDeviceText.text =
+            androidResourcesHelper.getString(R.string.sync_info_total_records_on_device)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -150,40 +159,41 @@ class SyncInformationActivity : AppCompatActivity() {
         observeDeleteRecordCount()
         observeSelectedModules()
         observeUnselectedModules()
+        observeForSyncState()
     }
 
     private fun observeLocalRecordCount() {
-        viewModel.localRecordCount.observe(this, Observer {
+        viewModel.localRecordCountLiveData.observe(this, Observer {
             totalRecordsCount.text = it.toString()
         })
     }
 
     private fun observeUpSyncRecordCount() {
-        viewModel.recordsToUpSyncCount.observe(this, Observer {
+        viewModel.recordsToUpSyncCountLiveData.observe(this, Observer {
             recordsToUploadCount.text = it.toString()
         })
     }
 
     private fun observeDownSyncRecordCount() {
-        viewModel.recordsToDownSyncCount.observe(this, Observer {
+        viewModel.recordsToDownSyncCountLiveData.observe(this, Observer {
             recordsToDownloadCount.text = it.toString()
         })
     }
 
     private fun observeDeleteRecordCount() {
-        viewModel.recordsToDeleteCount.observe(this, Observer {
+        viewModel.recordsToDeleteCountLiveData.observe(this, Observer {
             recordsToDeleteCount.text = it.toString()
         })
     }
 
     private fun observeSelectedModules() {
-        viewModel.selectedModulesCount.observe(this, Observer {
+        viewModel.selectedModulesCountLiveData.observe(this, Observer {
             addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
         })
     }
 
     private fun observeUnselectedModules() {
-        viewModel.unselectedModulesCount.observe(this, Observer {
+        viewModel.unselectedModulesCountLiveData.observe(this, Observer {
             if (it.isEmpty()) {
                 removeUnselectedModulesTab()
             } else {
@@ -193,13 +203,34 @@ class SyncInformationActivity : AppCompatActivity() {
         })
     }
 
-    private fun addTotalRowAndSubmitList(moduleCounts: List<ModuleCount>, moduleCountAdapter: ModuleCountAdapter) {
+    private fun setupProgressOverlay() {
+        progressOverlayBackground.setOnTouchListener { _, _ -> true }
+        progress_sync_overlay.setOnTouchListener { _, _ -> true }
+        progress_sync_overlay.text = androidResourcesHelper.getString(R.string.progress_sync_overlay)
+        progressBar.setOnTouchListener { _, _ -> true }
+    }
+
+    private fun isProgressOverlayVisible() = group_progress_overlay.visibility == View.VISIBLE
+
+    private fun showProgressOverlay() {
+        group_progress_overlay.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressOverlay() {
+        group_progress_overlay.visibility = View.GONE
+    }
+
+    private fun addTotalRowAndSubmitList(
+        moduleCounts: List<ModuleCount>,
+        moduleCountAdapter: ModuleCountAdapter
+    ) {
         val moduleCountsArray = ArrayList<ModuleCount>().apply {
             addAll(moduleCounts)
         }
 
-        val totalRecordsEntry = ModuleCount(androidResourcesHelper.getString(R.string.sync_info_total_records),
-            moduleCounts.sumBy { it.count })
+        val totalRecordsEntry =
+            ModuleCount(androidResourcesHelper.getString(R.string.sync_info_total_records),
+                moduleCounts.sumBy { it.count })
         moduleCountsArray.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)
 
         moduleCountAdapter.submitList(moduleCountsArray)
@@ -214,6 +245,41 @@ class SyncInformationActivity : AppCompatActivity() {
     private fun addUnselectedModulesTabIfNecessary() {
         if (modulesTabHost.tabWidget.tabCount != MAX_MODULES_TAB_COUNT) {
             modulesTabHost.addTab(unselectedModulesTabSpec)
+        }
+    }
+
+    private fun observeForSyncState() {
+        peopleSyncManager.getLastSyncState().observe(this, Observer { syncState ->
+            if (syncState.isRunning() && !isProgressOverlayVisible()) {
+                showProgressOverlay()
+            } else if (!syncState.isRunning() && isProgressOverlayVisible()) {
+                hideProgressOverlay()
+                fetchRecordsInfo()
+            }
+        })
+    }
+
+    private fun fetchRecordsInfo() {
+        viewModel.fetchRecordsInfo()
+    }
+
+    private fun setupRecordsCountCards() {
+        if(!isDownSyncAllowed()) {
+            recordsToDownloadCardView.visibility = View.GONE
+            recordsToDeleteCardView.visibility = View.GONE
+        }
+    }
+
+    private fun isDownSyncAllowed() = with(preferencesManager) {
+        peopleDownSyncSetting == ON || peopleDownSyncSetting == EXTRA
+    }
+
+    private fun PeopleSyncState.isRunning(): Boolean {
+        val downSyncStates = downSyncWorkersInfo
+        val upSyncStates = upSyncWorkersInfo
+        val allSyncStates = downSyncStates + upSyncStates
+        return allSyncStates.any {
+            it.state is PeopleSyncWorkerState.Running || it.state is PeopleSyncWorkerState.Enqueued
         }
     }
 

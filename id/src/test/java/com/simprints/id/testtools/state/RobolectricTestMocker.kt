@@ -6,7 +6,6 @@ import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REAL
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -16,7 +15,6 @@ import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
 import io.mockk.coEvery
 import io.mockk.every
 import io.reactivex.Completable
-import io.reactivex.Single
 import java.math.BigInteger
 
 object RobolectricTestMocker {
@@ -26,7 +24,14 @@ object RobolectricTestMocker {
     suspend fun mockLoadProject(projectRemoteDataSource: ProjectRemoteDataSource,
                                 projectLocalDataSource: ProjectLocalDataSource): RobolectricTestMocker {
 
-        val project = Project(DEFAULT_PROJECT_ID, "local", "",  "")
+        val project = Project(
+            DEFAULT_PROJECT_ID,
+            "local",
+            "",
+            "",
+            "some_bucket_url"
+        )
+
         val projectSettings: JsonObject = JsonObject().apply { addProperty("key", "value") }
         coEvery { projectLocalDataSource.load(any()) } returns project
         coEvery { projectRemoteDataSource.loadProjectFromRemote(any()) } returns project
@@ -43,7 +48,6 @@ object RobolectricTestMocker {
         }
 
         coEvery { remoteDbManagerMock.getCurrentToken() } returns ""
-        every { remoteDbManagerMock.signIn(any()) } returns Completable.complete()
         return this
     }
 
@@ -62,12 +66,6 @@ object RobolectricTestMocker {
         editor.putBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, logged)
         editor.putString(LegacyLocalDbKeyProviderImpl.SHARED_PREFS_KEY_FOR_REALM_KEY + projectId, if (logged) realmKey else "")
         editor.commit()
-        return this
-    }
-
-    fun setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager): RobolectricTestMocker {
-        every { sessionEventsLocalDbManagerMock.loadSessions(any(), any()) } returns Single.error(IllegalStateException())
-        every { sessionEventsLocalDbManagerMock.insertOrUpdateSessionEvents(any()) } returns Completable.complete()
         return this
     }
 }

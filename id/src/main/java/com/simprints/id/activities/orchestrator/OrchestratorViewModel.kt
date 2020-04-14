@@ -5,12 +5,11 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.OrchestratorManager
-import io.reactivex.Single
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -18,7 +17,7 @@ class OrchestratorViewModel(
     private val orchestratorManager: OrchestratorManager,
     private val orchestratorEventsHelper: OrchestratorEventsHelper,
     private val modalities: List<Modality>,
-    private val sessionEventsManager: SessionEventsManager,
+    private val sessionRepository: SessionRepository,
     private val domainToModuleApiConverter: DomainToModuleApiAppResponse,
     private val crashReportManager: CrashReportManager
 ) : ViewModel() {
@@ -32,23 +31,17 @@ class OrchestratorViewModel(
         }
     }
 
-    fun startModalityFlow(appRequest: AppRequest) {
-        runBlocking {
-            orchestratorManager.initialise(
-                modalities,
-                appRequest,
-                getCurrentSessionId()) //TODO: consider to pass sessionId as parameter from previous Activities. Currently blocking UI
-        }
+    suspend fun startModalityFlow(appRequest: AppRequest) {
+        orchestratorManager.initialise(
+            modalities,
+            appRequest,
+            getCurrentSessionId())
+
     }
 
-    private fun getCurrentSessionId(): String =
-        sessionEventsManager
-            .getCurrentSession()
-            .map { it.id }
-            .onErrorResumeNext {
-                crashReportManager.logException(it)
-                Single.just("")
-            }.blockingGet()
+    private suspend fun getCurrentSessionId(): String =
+        sessionRepository.getCurrentSession().id
+
 
     fun onModalStepRequestDone(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?) {
         viewModelScope.launch {

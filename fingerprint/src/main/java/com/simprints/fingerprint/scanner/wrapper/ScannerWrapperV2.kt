@@ -15,8 +15,8 @@ import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSuppo
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
@@ -34,10 +34,10 @@ import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 class ScannerWrapperV2(private val scannerV2: ScannerV2,
                        private val scannerUiHelper: ScannerUiHelper,
                        private val macAddress: String,
-                       private val bluetoothAdapter: BluetoothComponentAdapter,
+                       private val bluetoothAdapter: ComponentBluetoothAdapter,
                        private val crashReportManager: FingerprintCrashReportManager) : ScannerWrapper {
 
-    private lateinit var socket: BluetoothComponentSocket
+    private lateinit var socket: ComponentBluetoothSocket
 
     private var unifiedVersionInformation: UnifiedVersionInformation? = null
 

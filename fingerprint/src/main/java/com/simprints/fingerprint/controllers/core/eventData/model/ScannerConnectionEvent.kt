@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ScannerConnectionEvent as ScannerConnectionEventCore
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ScannerConnectionEvent.ScannerInfo as ScannerInfoCore
+import com.simprints.id.data.db.session.domain.models.events.ScannerConnectionEvent as ScannerConnectionEventCore
+import com.simprints.id.data.db.session.domain.models.events.ScannerConnectionEvent.ScannerInfo as ScannerInfoCore
 
 @Keep
 class ScannerConnectionEvent(startTime: Long,

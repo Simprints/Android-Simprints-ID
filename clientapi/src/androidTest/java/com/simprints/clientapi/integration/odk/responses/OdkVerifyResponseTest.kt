@@ -10,8 +10,8 @@ import com.simprints.clientapi.integration.AppVerifyResponse
 import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
 import com.simprints.moduleapi.app.responses.IAppResponseTier
-import com.simprints.testtools.common.syntax.key
-import com.simprints.testtools.common.syntax.value
+import com.simprints.clientapi.integration.key
+import com.simprints.clientapi.integration.value
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*

@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.fail
 import org.junit.Before
@@ -15,6 +16,7 @@ import org.robolectric.annotation.Config
 @Suppress("UsePropertyAccessSyntax")
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@ExperimentalCoroutinesApi
 class SettingsAboutPresenterTest {
 
     companion object {
@@ -108,7 +110,6 @@ class SettingsAboutPresenterTest {
         var actionForLogoutPreference: Preference.OnPreferenceClickListener? = null
         every { mockPreference.setOnPreferenceClickListener(any()) } answers {
             actionForLogoutPreference = this.args.first() as Preference.OnPreferenceClickListener
-            null
         }
 
         presenter.loadValueAndBindChangeListener(mockPreference)
@@ -143,7 +144,7 @@ class SettingsAboutPresenterTest {
 
         presenter.logout()
 
-        verify(exactly = 1) { presenter.longConsentManager.deleteLongConsents() }
+        verify(exactly = 1) { presenter.longConsentRepository.deleteLongConsents() }
     }
 
     @Test
@@ -152,13 +153,35 @@ class SettingsAboutPresenterTest {
 
         presenter.logout()
 
-        verify(exactly = 1) { presenter.sessionEventManager.signOut() }
+        coVerify(exactly = 1) { presenter.sessionEventManager.signOut() }
+    }
+
+    @Test
+    fun presenterLogout_apiBaseUrlIsReset() = runBlockingTest {
+        mockDepsForLogout(presenter)
+
+        presenter.logout()
+
+        verify { presenter.baseUrlProvider.resetApiBaseUrl() }
+    }
+
+    @Test
+    fun presenterLogout_clearRemoteConfig() = runBlockingTest {
+        mockDepsForLogout(presenter)
+
+        presenter.logout()
+
+        coVerify { presenter.remoteConfigWrapper.clearRemoteConfig() }
     }
 
     private fun mockDepsForLogout(presenter: SettingsAboutPresenter) {
-        presenter.signerManager = mockk(relaxed = true)
-        presenter.syncManager = mockk(relaxed = true)
-        presenter.longConsentManager = mockk(relaxed = true)
-        presenter.sessionEventManager = mockk(relaxed = true)
+        with(presenter) {
+            signerManager = mockk(relaxed = true)
+            syncManager = mockk(relaxed = true)
+            longConsentRepository = mockk(relaxed = true)
+            sessionEventManager = mockk(relaxed = true)
+            baseUrlProvider = mockk()
+            remoteConfigWrapper = mockk(relaxed = true)
+        }
     }
 }

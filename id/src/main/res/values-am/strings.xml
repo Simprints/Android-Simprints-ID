@@ -147,7 +147,7 @@
     <string name="verify_guid_not_found_offline_message">ግለሰቡ የለም፡ እባክዎ ከኢንተርኔት ጋር መገናኘትዎን አረጋግጠው እንደገና ይሞክሩ</string>
     <string name="verify_guid_not_found_online_message">አንዲጠራ የተመረጠው ግለሰብ ዳታቤዙ ውስጥ የለም</string>
     <string name="verify_guid_not_found_title">ግለሰቡ አልተገኘም</string>
-    <string name="login_enter_project_secret_id">የፕሮጀክት መለያ ቁጥሩን እና ቁልፉን ያስገቡ</string>
     <string name="preference_summary_sync_information">ሲንክ ላይ ተጨማሪ ዝርዝር መረጃ</string>
     <string name="preference_sync_information_title">ሲንክ የተደረገ መረጃ</string>
+    <string name="progress_sync_overlay">በግንኙነት ላይ</string>
 </resources>

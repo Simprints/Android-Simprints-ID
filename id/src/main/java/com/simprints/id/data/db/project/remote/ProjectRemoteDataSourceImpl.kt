@@ -6,9 +6,10 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.tools.utils.retrySimNetworkCalls
 
-
-open class ProjectRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
-                                       private val simApiClientFactory: SimApiClientFactory) : ProjectRemoteDataSource {
+open class ProjectRemoteDataSourceImpl(
+    private val remoteDbManager: RemoteDbManager,
+    private val simApiClientFactory: SimApiClientFactory
+) : ProjectRemoteDataSource {
 
     override suspend fun loadProjectFromRemote(projectId: String): Project =
         makeNetworkRequest({
@@ -25,6 +26,9 @@ open class ProjectRemoteDataSourceImpl(private val remoteDbManager: RemoteDbMana
         return simApiClientFactory.build<ProjectRemoteInterface>(token).api
     }
 
-    private suspend fun <T> makeNetworkRequest(block: suspend (client: ProjectRemoteInterface) -> T, traceName: String): T =
+    private suspend fun <T> makeNetworkRequest(
+        block: suspend (client: ProjectRemoteInterface) -> T,
+        traceName: String
+    ): T =
         retrySimNetworkCalls(getProjectApiClient(), block, traceName)
 }

@@ -3,6 +3,7 @@ package com.simprints.id.services.scheduledSync.people.down.workers
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
@@ -38,6 +39,7 @@ import com.simprints.testtools.unit.mockserver.assertQueryUrlParam
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.kotlintest.shouldThrow
 import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -94,6 +96,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
     @RelaxedMockK lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
     @RelaxedMockK lateinit var personLocalDataSourceMock: PersonLocalDataSource
     @RelaxedMockK lateinit var peopleSyncCache: PeopleSyncCache
+    @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
 
     private val module by lazy {
         TestAppModule(app,
@@ -118,7 +121,12 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
         mockServer.start()
 
-        val remotePeopleApi = SimApiClientFactory("deviceId", endpoint = mockServer.url("/").toString()).build<PeopleRemoteInterface>().api
+        every { mockBaseUrlProvider.getApiBaseUrl() } returns mockServer.url("/").toString()
+
+        val remotePeopleApi = SimApiClientFactory(
+            mockBaseUrlProvider,
+            "deviceId"
+        ).build<PeopleRemoteInterface>().api
 
         coEvery { personRemoteDataSourceMock.getPeopleApiClient() } returns remotePeopleApi
     }
@@ -312,7 +320,10 @@ class PeopleDownSyncDownloaderTaskImplTest {
     }
 
     private fun mockClientToThrowFirstAndThenExecuteNetworkCall(): PeopleRemoteInterface {
-        val remotePeopleApi = SimApiClientFactory("deviceId", endpoint = mockServer.url("/").toString()).build<PeopleRemoteInterface>().api
+        val remotePeopleApi = SimApiClientFactory(
+            mockBaseUrlProvider,
+            "deviceId"
+        ).build<PeopleRemoteInterface>().api
         return mockk {
             coEvery { downSync(any(), any(), any(), any(), any(), any()) } throws Throwable("Network issue") coAndThen {
                 remotePeopleApi.downSync(
