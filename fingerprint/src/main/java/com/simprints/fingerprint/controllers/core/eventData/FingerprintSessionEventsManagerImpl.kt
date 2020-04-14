@@ -1,24 +1,43 @@
 package com.simprints.fingerprint.controllers.core.eventData
 
+import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.tools.ignoreException
 import io.reactivex.Completable
-import com.simprints.id.data.analytics.eventdata.models.domain.events.Event as CoreEvent
+import kotlinx.coroutines.runBlocking
+import com.simprints.id.data.db.session.domain.models.events.Event as CoreEvent
 
-class FingerprintSessionEventsManagerImpl(private val sessionEventsManager: SessionEventsManager) : FingerprintSessionEventsManager {
+class FingerprintSessionEventsManagerImpl(private val sessionRepository: SessionRepository) : FingerprintSessionEventsManager {
 
     override fun addEventInBackground(event: Event) {
-        fromDomainToCore(event)?.let { sessionEventsManager.addEventInBackground(it) }
+        fromDomainToCore(event)?.let { sessionRepository.addEventToCurrentSessionInBackground(it) }
     }
 
     override fun addEvent(event: Event): Completable =
-        fromDomainToCore(event)
-            ?.let { sessionEventsManager.addEvent(it) }
-            ?: Completable.complete()
+        completableWithSuspend {
+            ignoreException {
+                fromDomainToCore(event)?.let {
+                    runBlocking {
+                        sessionRepository.updateCurrentSession { currentSession ->
+                            currentSession.addEvent(it)
+                        }
+                    }
+                }
+            }
+        }
 
-    override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) =
-        sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(hardwareVersion)
+    override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
+        runBlocking {
+            ignoreException {
+                sessionRepository.updateCurrentSession {
+                    val scannerConnectivityEvents = it.getEvents().filterIsInstance(ScannerConnectionEvent::class.java)
+                    scannerConnectivityEvents.forEach { it.scannerInfo.hardwareVersion = hardwareVersion }
+                }
+            }
+        }
+    }
 
     private fun fromDomainToCore(event: Event): CoreEvent? =
         when (event.type) {

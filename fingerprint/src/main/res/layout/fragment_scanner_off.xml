@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/simprints_blue"
+    tools:context=".activities.connect.issues.scanneroff.ScannerOffFragment">
+
+    <TextView
+        android:id="@+id/couldNotConnectTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/muli"
+        android:padding="8sp"
+        android:text="@string/not_my_scanner"
+        android:gravity="center"
+        android:textSize="15sp"
+        android:textColor="@color/simprints_white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/scannerOffEndGuideline"
+        app:layout_constraintStart_toStartOf="@+id/scannerOffStartGuideline"
+        app:layout_constraintTop_toBottomOf="@id/tryAgainButton"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <Button
+        android:id="@+id/tryAgainButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:background="@drawable/button_rounded_corners_orange"
+        android:fontFamily="@font/muli"
+        android:padding="8sp"
+        android:text="@string/try_again_label"
+        android:textColor="@color/simprints_white"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/scannerOffEndGuideline"
+        app:layout_constraintStart_toStartOf="@+id/scannerOffStartGuideline"
+        app:layout_constraintTop_toBottomOf="@+id/scannerOffImageGuideline"
+        app:layout_constraintVertical_bias="0.55" />
+
+    <TextView
+        android:id="@+id/scannerOffInstructionsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/scanner_off_instructions"
+        android:textColor="@color/simprints_white"
+        android:textSize="22sp"
+        app:layout_constraintBottom_toTopOf="@id/tryAgainButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/scannerOffImageGuideline"
+        app:layout_constraintVertical_weight="0.25" />
+
+    <ImageView
+        android:id="@+id/scannerOffImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="0dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/turn_on_scanner"
+        app:layout_constraintBottom_toTopOf="@+id/scannerOffImageGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scannerOffTitleTextView"
+        app:layout_constraintVertical_weight="0.65"
+        tools:ignore="ContentDescription" />
+
+    <ProgressBar
+        android:id="@+id/scannerOffProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:progressTint="@color/simprints_white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@id/tryAgainButton"
+        app:layout_constraintEnd_toEndOf="@id/tryAgainButton"
+        app:layout_constraintStart_toStartOf="@id/tryAgainButton"
+        app:layout_constraintTop_toTopOf="@id/tryAgainButton" />
+
+    <TextView
+        android:id="@+id/scannerOffTitleTextView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/scanner_off_title"
+        android:textColor="@color/simprints_white"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/scannerOffImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_weight="0.4" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/scannerOffEndGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.80" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/scannerOffImageGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.65" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/scannerOffStartGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.20" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

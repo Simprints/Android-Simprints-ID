@@ -3,6 +3,7 @@ package com.simprints.id.data.prefs
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
+import com.simprints.id.tools.extensions.awaitTask
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -20,6 +21,11 @@ class RemoteConfigWrapper(private val remoteConfig: FirebaseRemoteConfig, prefs:
 
     fun registerAllPreparedDefaultValues() {
         remoteConfig.setDefaults(remoteConfigDefaults)
+    }
+
+    suspend fun clearRemoteConfig() {
+        projectSettingsJsonString = ""
+        remoteConfig.reset().awaitTask()
     }
 
     fun getString(key: String): String? = getProjectValOtherwiseLocalVal(key, { getString(it) }, { getString(it) })

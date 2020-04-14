@@ -8,15 +8,16 @@ import com.simprints.core.images.model.SecuredImageRef
 import com.simprints.core.images.remote.ImageRemoteDataSource
 import com.simprints.core.images.remote.ImageRemoteDataSourceImpl
 import com.simprints.core.images.remote.UploadResult
+import com.simprints.core.network.BaseUrlProvider
 
 class ImageRepositoryImpl internal constructor(
     private val localDataSource: ImageLocalDataSource,
     private val remoteDataSource: ImageRemoteDataSource
 ) : ImageRepository {
 
-    constructor(context: Context) : this(
+    constructor(context: Context, baseUrlProvider: BaseUrlProvider) : this(
         ImageLocalDataSourceImpl(context),
-        ImageRemoteDataSourceImpl()
+        ImageRemoteDataSourceImpl(baseUrlProvider)
     )
 
     override fun storeImageSecurely(imageBytes: ByteArray, relativePath: Path): SecuredImageRef? {

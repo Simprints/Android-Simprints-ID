@@ -5,23 +5,30 @@ import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.Required
 
-
 open class DbProject : RealmObject() {
     @PrimaryKey
     @Required var id: String = ""
     @Required var name: String = ""
     @Required var description: String = ""
     @Required var creator: String = ""
+    @Required var imageBucket: String = ""
     @Required var updatedAt: String = ""
 }
 
-
-fun DbProject.fromDbToDomain(): Project = Project(id, name, description, creator, if (updatedAt.isBlank()) null else updatedAt)
+fun DbProject.fromDbToDomain(): Project = Project(
+    id,
+    name,
+    description,
+    creator,
+    imageBucket,
+    if (updatedAt.isBlank()) null else updatedAt
+)
 
 fun Project.fromDomainToDb(): DbProject = DbProject().also {
     it.id = id
     it.creator = creator
     it.description = description
     it.name = name
+    it.imageBucket = imageBucket
     it.updatedAt = updatedAt ?: ""
 }

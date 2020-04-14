@@ -5,7 +5,7 @@
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- Activity Titles -->
     <string name="settings_title">সেটিংস</string>
-    <string name="alert_title">সতর্ক</string>
+    <string name="alert_title">সতর্ক বার্তা</string>
 
 
     <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
@@ -48,7 +48,7 @@
     <!-- Error Message Titles -->
     <string name="configuration_error_title">কনফিগারেশন সমস্যা</string>
     <string name="verify_guid_not_found_title">ব্যক্তি খুঁজে পাওয়া যায়নি</string>
-    <string name="error_occurred_title">ত্রুটি ঘটেছে</string>
+    <string name="error_occurred_title">সমস্যা ঘটেছে</string>
     <!-- Error Message Text -->
     <string name="verify_guid_not_found_online_message">যাচাইয়ের জন্য নির্বাচিত ব্যক্তি ডাটাবেসে নেই</string>
     <string name="verify_guid_not_found_offline_message">ব্যক্তি খুঁজে পাওয়া যায়নি, দয়া করে নিশ্চিত করুন যে আপনি ইন্টারনেটে সংযুক্ত আছেন এবং আবার চেষ্টা করুন</string>
@@ -82,7 +82,7 @@
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
-    <string name="alert_try_again">আবার চেষ্টা করা</string>
+    <string name="alert_try_again">আবার চেষ্টা করুন</string>
     <string name="confirmation_logout_cancel">বাতিল করুন</string>
     <string name="confirmation_logout_message">আপনি কি লগআউট করতে চান?</string>
     <string name="confirmation_logout_title">লগআউট করুন</string>
@@ -97,8 +97,7 @@
     <string name="dashboard_card_scanner_used">স্ক্যানার ব্যবহার করা হয়েছে: %1$s</string>
     <string name="dashboard_card_sync_last_sync">সর্বশেষ সিঙ্ক: %1$s</string>
     <string name="dashboard_label">ড্যাশবোর্ড</string>
-    <string name="different_projectId_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (ভিন্ন প্রজেক্ট আই ডি), সাইন আউট করুন এবং আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
-    <string name="different_userId_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (ভিন্ন ব্যবহারকারী আই ডি), সাইন আউট করুন এবং আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
+    <string name="different_userId_message">একটি কনফিগারেশন সমস্যা ঘটেছে (ভিন্ন ব্যবহারকারী আই ডি), সাইন আউট করুন এবং আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
     <string name="login">লগইন করুন</string>
     <string name="login_id_hint">প্রজেক্ট আইডি</string>
     <string name="login_invalid_credentials">তথ্য সঠিক নয়। প্রজেক্ট আইডি এবং কী চেক করুন।</string>
@@ -106,7 +105,7 @@
     <string name="login_missing_credentials">তথ্য অসম্পূর্ণ। ব্যবহারকারী আইডি, প্রজেক্ট আইডি এবং কী চেক করুন এবং আবার চেষ্টা করুন</string>
     <string name="login_no_network">আপনি এখন অফলাইন। আপনার ইন্টারনেট সংযোগ চেক করুন</string>
     <string name="login_project_id_intent_mismatch">ভিন্ন প্রজেক্ট আইডি। সিস্টেম অ্যাডমিন এর সাথে যোগাযোগ করুন</string>
-    <string name="login_qr_code_scanning_problem">কিউআর কোড স্ক্যান করার সময় সমস্যা হয়েছে</string>
+    <string name="login_qr_code_scanning_problem">কিউআর কোড স্ক্যান- এ সমস্যা হয়েছে</string>
     <string name="login_secret_hint">প্রজেক্ট কী</string>
     <string name="login_server_error">সার্ভার এর সাথে সংযোগ স্থাপনে সমস্যা হয়েছে। পরবর্তীতে আবার চেষ্টা করুন।</string>
     <string name="login_title">প্রজেক্টের তথ্য অনুরোধ করুন</string>
@@ -128,7 +127,7 @@
     <string name="requestLogin_message">আপনাকে লগইন করতে হবে। সিমপ্রিন্টস আইডি খুলতে আপনার ক্লায়েন্ট অ্যাপ ব্যবহার করুন এবং লগইন করুন</string>
     <string name="requestLogin_title">লগইন প্রয়োজন</string>
     <string name="safetynet_down_alert_message">৫-১০ মিনিট পর চেষ্টা করুন</string>
-    <string name="scan_qr">কিউআর স্ক্যান করুন</string>
+    <string name="scan_qr">কিউআর কোড স্ক্যান করুন</string>
     <string name="settings_app_details">অ্যাপ বিবরন</string>
     <string name="settings_general">সাধারণ</string>
     <string name="settings_invalid_selection">অবৈধ নির্বাচন</string>
@@ -149,8 +148,8 @@
     <string name="refusal_does_not_have_permission">অনুমতি নেই</string>
     <string name="refusal_person_not_present">ব্যক্তি উপস্থিত নয়</string>
     <string name="refusal_religious_concerns">"ধর্মীয় সমস্যা   "</string>
-    <string name="refusal_toast_select_option_submit">একটি অপশন সিলেক্ট করুন এবং সাবমিট করুন</string>
-    <string name="refusal_toast_submit">ফরম সাবমিট করুন</string>
+    <string name="refusal_toast_select_option_submit">একটি অপশন সিলেক্ট করুন এবং জমা দিন</string>
+    <string name="refusal_toast_submit">"ফর্ম জমা দিন "</string>
     <string name="refusal_too_young">বয়স কম</string>
     <string name="refusal_other">অন্যান্য</string>
 
@@ -188,11 +187,15 @@
     <string name="dashboard_sync_card_no_modules_button">মডিউল</string>
     <string name="dashboard_sync_card_offline_message">সেটিংস্‌ থেকে ইন্টারনেট সংযোগ চালু করুন</string>
     <string name="dashboard_sync_card_incomplete">সিঙ্ক অসম্পূর্ণ</string>
-    <string name="dashboard_sync_card_complete">সিঙ্ক সম্পন্ন হয়েছে</string>
+    <string name="dashboard_sync_card_complete">সিঙ্ক হয়েছে</string>
     <string name="dashboard_sync_card_failed_message">সিঙ্ক অসফল হয়েছে</string>
     <string name="dashboard_sync_card_offline_button">স্ক্যানার যোগ করুন</string>
-    <string name="dashboard_sync_card_sync_button">সিঙ্ক করুন</string>
+    <string name="dashboard_sync_card_sync_button">"সিঙ্ক করুন  "</string>
     <string name="dashboard_sync_card_try_again_button">আবার চেষ্টা করুন</string>
     <string name="dashboard_sync_card_progress">সিঙ্ক করা হচ্ছে… %1$s</string>
     <string name="dashboard_card_activity">কার্যক্রম তথ্য: %1$s</string>
+    <string name="progress_sync_overlay">সিঙ্ক করা হচ্ছে</string>
+    <string name="different_projectId_message">একটি কনফিগারেশন সমস্যা ঘটেছে (ভিন্ন প্রজেক্ট আই ডি), সাইন আউট করুন এবং আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
+    <string name="fetch_guid_checking_person_in_database">ব্যক্তির তথ্য ডাটাবেসে আছে কি না খুঁজে দেখা হচ্ছে</string>
+
 </resources>

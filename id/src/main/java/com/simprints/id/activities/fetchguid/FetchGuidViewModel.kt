@@ -3,18 +3,18 @@ package com.simprints.id.activities.fetchguid
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.CandidateReadEvent
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.session.domain.models.events.CandidateReadEvent
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import kotlinx.coroutines.launch
 
 class FetchGuidViewModel(private val personRepository: PersonRepository,
                          private val deviceManager: DeviceManager,
-                         private val sessionEventsManager: SessionEventsManager,
+                         private val sessionRepository: SessionRepository,
                          private val timeHelper: TimeHelper) : ViewModel() {
 
     var personFetch = MutableLiveData<PersonSource>()
@@ -44,7 +44,7 @@ class FetchGuidViewModel(private val personRepository: PersonRepository,
     private fun addPersonFetchEventToSession(personFetchResult: PersonFetchResult,
                                              personFetchStartTime: Long,
                                              verifyGuid: String) {
-        sessionEventsManager.addEventInBackground(getCandidateReadEvent(personFetchResult,
+        sessionRepository.addEventToCurrentSessionInBackground(getCandidateReadEvent(personFetchResult,
             personFetchStartTime, verifyGuid))
     }
 

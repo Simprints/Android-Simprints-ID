@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
@@ -15,6 +15,8 @@ import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CONSENT_ACTIVITY_NAME
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
+import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.TimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -26,10 +28,11 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorI
 class ModalityFlowIdentifyImplTest {
 
     private lateinit var modalityFlowIdentify: ModalityFlowIdentifyImpl
+    private val timeHelper: TimeHelper = TimeHelperImpl()
     @MockK lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @MockK lateinit var faceStepProcessor: FaceStepProcessor
     @MockK lateinit var coreStepProcessor: CoreStepProcessor
-    @MockK lateinit var sessionEventsManager: SessionEventsManager
+    @MockK lateinit var sessionRepository: SessionRepository
     @MockK lateinit var fingerprintStepMock: Step
     @MockK lateinit var faceStepMock: Step
     @MockK lateinit var coreStepMock: Step
@@ -157,6 +160,6 @@ class ModalityFlowIdentifyImplTest {
 
     private fun buildModalityFlowIdentify(consentRequired: Boolean) {
         modalityFlowIdentify = ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, GROUP.GLOBAL, sessionEventsManager, consentRequired)
+            coreStepProcessor, GROUP.GLOBAL, timeHelper, sessionRepository, consentRequired)
     }
 }

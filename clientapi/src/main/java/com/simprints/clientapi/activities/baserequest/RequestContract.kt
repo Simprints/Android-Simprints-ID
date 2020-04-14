@@ -29,16 +29,16 @@ interface RequestContract {
 
     interface Presenter {
         suspend fun start()
-        fun processEnrollRequest()
-        fun processIdentifyRequest()
-        fun processVerifyRequest()
-        fun processConfirmIdentityRequest()
+        suspend fun processEnrollRequest()
+        suspend fun processIdentifyRequest()
+        suspend fun processVerifyRequest()
+        suspend fun processConfirmIdentityRequest()
         fun handleEnrollResponse(enroll: EnrollResponse)
         fun handleIdentifyResponse(identify: IdentifyResponse)
         fun handleVerifyResponse(verify: VerifyResponse)
         fun handleRefusalResponse(refusalForm: RefusalFormResponse)
         fun handleResponseError(errorResponse: ErrorResponse)
-        fun validateAndSendRequest(builder: ClientRequestBuilder)
+        suspend fun validateAndSendRequest(builder: ClientRequestBuilder)
         fun handleConfirmationResponse(response: ConfirmationResponse)
     }
 

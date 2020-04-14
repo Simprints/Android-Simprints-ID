@@ -2,7 +2,7 @@ package com.simprints.clientapi.clientrequests.validators
 
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.exceptions.InvalidVerifyIdException
-
+import com.simprints.core.tools.utils.isValidGuid
 
 class VerifyValidator(val extractor: VerifyExtractor) : ClientRequestValidator(extractor) {
 
@@ -12,8 +12,8 @@ class VerifyValidator(val extractor: VerifyExtractor) : ClientRequestValidator(e
     }
 
     private fun validateVerifyGuid(verifyGuid: String?) {
-        if (verifyGuid.isNullOrBlank())
-            throw InvalidVerifyIdException("Missing Verify ID")
+        if (verifyGuid.isNullOrBlank() || !verifyGuid.isValidGuid())
+            throw InvalidVerifyIdException("Invalid verify ID")
     }
 
 }

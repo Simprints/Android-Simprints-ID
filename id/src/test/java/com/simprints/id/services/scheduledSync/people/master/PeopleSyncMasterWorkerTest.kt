@@ -11,8 +11,9 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.common.*
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger.MANUAL
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncTrigger.PERIODIC_BACKGROUND
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.OFF
+import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.ON
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.*
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.Companion.tagForType
@@ -71,7 +72,7 @@ class PeopleSyncMasterWorkerTest {
             peopleSyncCache = mockk(relaxed = true)
             peopleSyncSubMasterWorkersBuilder = mockk(relaxed = true)
         }
-        mockBackgroundTrigger(true)
+        mockPeopleDownSyncSetting(ON)
     }
 
     @Test
@@ -91,7 +92,7 @@ class PeopleSyncMasterWorkerTest {
         with(masterWorker) {
             val uniqueSyncId = masterWorker.uniqueSyncId
             prepareSyncWorkers(uniqueSyncId)
-            mockBackgroundTrigger(false)
+            mockPeopleDownSyncSetting(OFF)
 
             masterWorker.doWork()
 
@@ -111,7 +112,7 @@ class PeopleSyncMasterWorkerTest {
     fun doWork_syncNotGoingAndBackgroundOn_shouldEnqueueAllWorkers() = runBlocking {
         val uniqueSyncId = masterWorker.uniqueSyncId
         prepareSyncWorkers(uniqueSyncId)
-        mockBackgroundTrigger(true)
+        mockPeopleDownSyncSetting(ON)
 
         masterWorker.doWork()
 
@@ -121,12 +122,11 @@ class PeopleSyncMasterWorkerTest {
     }
 
     @Test
-    fun doWorkAsOneTimeSync_syncBackgroundOff_shouldEnqueueAllWorkers() = runBlocking {
+    fun doWorkAsOneTimeSync_shouldEnqueueAllWorkers() = runBlocking {
         buildOneTimeMasterWorker()
-        every { masterWorker.preferenceManager.peopleDownSyncTriggers[MANUAL] } returns true
+        mockPeopleDownSyncSetting(ON)
         val uniqueSyncId = masterWorker.uniqueSyncId
         prepareSyncWorkers(uniqueSyncId)
-        mockBackgroundTrigger(backgroundTrigger = false, manualTrigger = true)
 
         masterWorker.doWork()
 
@@ -269,9 +269,9 @@ class PeopleSyncMasterWorkerTest {
         verify { masterWorker.resultSetter.success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId)) }
     }
 
-    private fun mockBackgroundTrigger(backgroundTrigger: Boolean, manualTrigger: Boolean = false) {
+    private fun mockPeopleDownSyncSetting(peopleDownSyncSetting: PeopleDownSyncSetting) {
         masterWorker.preferenceManager = mockk<PreferencesManager>(relaxed = true).apply {
-            every { this@apply.peopleDownSyncTriggers } returns mapOf(PERIODIC_BACKGROUND to backgroundTrigger, MANUAL to manualTrigger)
+            every { this@apply.peopleDownSyncSetting } returns peopleDownSyncSetting
         }
     }
 

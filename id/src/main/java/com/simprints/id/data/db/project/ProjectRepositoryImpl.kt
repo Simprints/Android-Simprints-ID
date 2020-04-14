@@ -16,8 +16,8 @@ class ProjectRepositoryImpl(
     override suspend fun loadFromRemoteAndRefreshCache(projectId: String): Project? {
         val trace = performanceTracker.newTrace("refreshProjectInfoWithServer").apply { start() }
         val projectInLocal = projectLocalDataSource.load(projectId)
-        return projectInLocal?.apply {
-            fetchAndUpdateCache(this.id)
+        return projectInLocal?.also {
+            fetchAndUpdateCache(it.id)
             trace.stop()
         } ?: fetchAndUpdateCache(projectId).apply {
             trace.stop()
@@ -36,4 +36,5 @@ class ProjectRepositoryImpl(
         t.printStackTrace()
         null
     }
+
 }

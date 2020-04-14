@@ -2,7 +2,11 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import com.simprints.core.images.repository.ImageRepository
+import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
@@ -24,15 +28,25 @@ class TestDataModule(
     private val projectRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val personRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val personLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val longConsentRepositoryRule: DependencyRule = DependencyRule.RealRule,
+    private val longConsentLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val personRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val imageRepositoryRule: DependencyRule = DependencyRule.RealRule
 ) : DataModule() {
 
     @FlowPreview
-    override fun provideProjectLocalDataSource(ctx: Context,
-                                               secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-                                               loginInfoManager: LoginInfoManager): ProjectLocalDataSource =
-        projectLocalDataSourceRule.resolveDependency { super.provideProjectLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager) }
+    override fun provideProjectLocalDataSource(
+        ctx: Context,
+        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
+        loginInfoManager: LoginInfoManager
+    ): ProjectLocalDataSource =
+        projectLocalDataSourceRule.resolveDependency {
+            super.provideProjectLocalDataSource(
+                ctx,
+                secureLocalDbKeyProvider,
+                loginInfoManager
+            )
+        }
 
     override fun provideProjectRemoteDataSource(
         remoteDbManager: RemoteDbManager,
@@ -45,7 +59,10 @@ class TestDataModule(
         projectLocalDataSource: ProjectLocalDataSource,
         projectRemoteDataSource: ProjectRemoteDataSource
     ): ProjectRepository = projectRepositoryRule.resolveDependency {
-        super.provideProjectRepository(projectLocalDataSource, projectRemoteDataSource)
+        super.provideProjectRepository(
+            projectLocalDataSource,
+            projectRemoteDataSource
+        )
     }
 
     override fun providePersonRepository(
@@ -63,19 +80,42 @@ class TestDataModule(
     }
 
     override fun provideImageRepository(
-        context: Context
+        context: Context,
+        baseUrlProvider: BaseUrlProvider
     ): ImageRepository = imageRepositoryRule.resolveDependency {
-        super.provideImageRepository(context)
+        super.provideImageRepository(context, baseUrlProvider)
     }
 
-    override fun providePersonRemoteDataSource(remoteDbManager: RemoteDbManager,
-                                               simApiClientFactory: SimApiClientFactory): PersonRemoteDataSource =
-        personRemoteDataSourceRule.resolveDependency { super.providePersonRemoteDataSource(remoteDbManager, simApiClientFactory) }
+    override fun providePersonRemoteDataSource(
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory
+    ): PersonRemoteDataSource =
+        personRemoteDataSourceRule.resolveDependency {
+            super.providePersonRemoteDataSource(
+                remoteDbManager,
+                simApiClientFactory
+            )
+        }
+
+    override fun provideLongConsentLocalDataSource(context: Context, loginInfoManager: LoginInfoManager): LongConsentLocalDataSource =
+        longConsentLocalDataSourceRule.resolveDependency { super.provideLongConsentLocalDataSource(context, loginInfoManager) }
+
+    override fun provideLongConsentRepository(longConsentLocalDataSource: LongConsentLocalDataSource, loginInfoManager: LoginInfoManager,
+                                              crashReportManager: CrashReportManager): LongConsentRepository =
+        longConsentRepositoryRule.resolveDependency { super.provideLongConsentRepository(longConsentLocalDataSource, loginInfoManager, crashReportManager) }
 
     @FlowPreview
-    override fun providePersonLocalDataSource(ctx: Context,
-                                              secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-                                              loginInfoManager: LoginInfoManager): PersonLocalDataSource =
-        personLocalDataSourceRule.resolveDependency { super.providePersonLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager) }
+    override fun providePersonLocalDataSource(
+        ctx: Context,
+        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
+        loginInfoManager: LoginInfoManager
+    ): PersonLocalDataSource =
+        personLocalDataSourceRule.resolveDependency {
+            super.providePersonLocalDataSource(
+                ctx,
+                secureLocalDbKeyProvider,
+                loginInfoManager
+            )
+        }
 
 }
