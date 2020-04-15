@@ -100,14 +100,14 @@ open class PersonRemoteDataSourceImpl(
         }
 
     private suspend fun <T> makeNetworkRequest(
-        block: suspend (client: EnrolmentEventRecordRemoteInterface) -> T,
-        traceName: String
+            block: suspend (client: EventRemoteInterface) -> T,
+            traceName: String
     ): T =
         retrySimNetworkCalls(getPeopleApiClient(), block, traceName)
 
 
-    override suspend fun getPeopleApiClient(): EnrolmentEventRecordRemoteInterface {
+    override suspend fun getPeopleApiClient(): EventRemoteInterface {
         val token = remoteDbManager.getCurrentToken()
-        return simApiClientFactory.build<EnrolmentEventRecordRemoteInterface>(token).api
+        return simApiClientFactory.build<EventRemoteInterface>(token).api
     }
 }

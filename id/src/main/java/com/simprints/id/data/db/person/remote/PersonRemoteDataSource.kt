@@ -10,5 +10,5 @@ interface PersonRemoteDataSource {
     suspend fun uploadPeople(projectId: String, patientsToUpload: List<Person>)
 
     suspend fun getDownSyncPeopleCount(projectId: String, peopleOperationsParams: List<PeopleDownSyncOperation>): List<PeopleCount>
-    suspend fun getPeopleApiClient(): EnrolmentEventRecordRemoteInterface
+    suspend fun getPeopleApiClient(): EventRemoteInterface
 }

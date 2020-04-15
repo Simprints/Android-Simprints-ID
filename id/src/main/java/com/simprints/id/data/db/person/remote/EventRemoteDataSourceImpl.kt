@@ -15,7 +15,7 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
 
     override suspend fun count(query: EventQuery): List<EventCount> = with(query.fromDomainToApi()) {
         makeNetworkRequest({ peopleRemoteInterface ->
-            peopleRemoteInterface.requestRecordCount(
+            peopleRemoteInterface.countEvents(
                 projectId = projectId,
                 moduleIds = moduleIds,
                 attendantId = userId,
@@ -24,12 +24,12 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                 lastEventId = lastEventId,
                 eventType = types.map { it.name }
             ).map { it.fromApiToDomain() }
-        }, "RecordCount")
+        }, "EventCount")
     }
 
     override suspend fun get(query: EventQuery): ResponseBody = with(query.fromDomainToApi()) {
         makeNetworkRequest({ peopleRemoteInterface ->
-            peopleRemoteInterface.downloadEnrolmentEvents(
+            peopleRemoteInterface.downloadEvents(
                 projectId = projectId,
                 moduleIds = moduleIds,
                 attendantId = userId,
@@ -38,24 +38,24 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                 lastEventId = lastEventId,
                 eventType = types.map { it.name }
             )
-        }, "RecordDownload")
+        }, "EventDownload")
     }
 
     override suspend fun write(projectId: String, events: ApiEvents) {
         makeNetworkRequest({
-            it.postEnrolmentRecordEvents(projectId, events)
-        }, "RecordWrite")
+            it.uploadEvents(projectId, events)
+        }, "EventUplaod")
     }
 
     private suspend fun <T> makeNetworkRequest(
-        block: suspend (client: EnrolmentEventRecordRemoteInterface) -> T,
-        traceName: String
+            block: suspend (client: EventRemoteInterface) -> T,
+            traceName: String
     ): T =
         retrySimNetworkCalls(getPeopleApiClient(), block, traceName)
 
 
-    internal suspend fun getPeopleApiClient(): EnrolmentEventRecordRemoteInterface {
+    internal suspend fun getPeopleApiClient(): EventRemoteInterface {
         val token = remoteDbManager.getCurrentToken()
-        return simApiClientFactory.build<EnrolmentEventRecordRemoteInterface>(token).api
+        return simApiClientFactory.build<EventRemoteInterface>(token).api
     }
 }
