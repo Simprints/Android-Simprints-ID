@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.gson.GsonBuilder
 import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.LanguageHelper
@@ -76,6 +77,7 @@ import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
+import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
@@ -193,10 +195,14 @@ open class AppModule {
     )
 
     @Provides
+    open fun provideSimGsonBuilder(): GsonBuilder = SimJsonHelper.gsonBuilder
+
+    @Provides
     open fun provideSimApiClientFactory(
         ctx: Context,
-        baseUrlProvider: BaseUrlProvider
-    ) = SimApiClientFactory(baseUrlProvider, ctx.deviceId)
+        baseUrlProvider: BaseUrlProvider,
+        gsonBuilder: GsonBuilder
+    ) = SimApiClientFactory(baseUrlProvider, ctx.deviceId, gsonBuilder.create())
 
     @Provides
     @Singleton
