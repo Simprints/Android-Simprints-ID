@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
@@ -195,14 +196,14 @@ open class AppModule {
     )
 
     @Provides
-    open fun provideSimGsonBuilder(): GsonBuilder = SimJsonHelper.gsonBuilder
+    open fun provideSimGson(): Gson = SimJsonHelper.gson
 
     @Provides
     open fun provideSimApiClientFactory(
         ctx: Context,
         baseUrlProvider: BaseUrlProvider,
-        gsonBuilder: GsonBuilder
-    ) = SimApiClientFactory(baseUrlProvider, ctx.deviceId, gsonBuilder.create())
+        gson: Gson
+    ) = SimApiClientFactory(baseUrlProvider, ctx.deviceId, gson)
 
     @Provides
     @Singleton

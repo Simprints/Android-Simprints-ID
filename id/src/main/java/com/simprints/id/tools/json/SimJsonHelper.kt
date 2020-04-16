@@ -30,8 +30,4 @@ object SimJsonHelper {
         RuntimeTypeAdapterFactory.of(ApiBiometricReference::class.java, "type")
             .registerSubtype(ApiFingerprintReference::class.java, FingerprintReference.name)
             .registerSubtype(ApiFaceReference::class.java, FaceReference.name)
-
-    inline fun <reified T> fromJson(json: String): T {
-        return gson.fromJson(json, T::class.java)
-    }
 }
