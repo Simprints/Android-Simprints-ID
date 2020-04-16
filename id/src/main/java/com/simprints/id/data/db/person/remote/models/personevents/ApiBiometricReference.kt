@@ -11,7 +11,7 @@ import com.simprints.id.data.db.person.domain.personevents.FaceReference as Doma
 import com.simprints.id.data.db.person.domain.personevents.FingerprintReference as DomainFingerprintReference
 
 @Keep
-sealed class ApiBiometricReference(val type: ApiBiometricReferenceType)
+sealed class ApiBiometricReference(@Transient val type: ApiBiometricReferenceType)
 
 @Keep
 class ApiFaceReference(val metadata: HashMap<String, String>,

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.LanguageHelper
@@ -78,7 +77,6 @@ import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
-import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
@@ -194,9 +192,6 @@ open class AppModule {
         projectLocalDataSource,
         loginInfoManager
     )
-
-    @Provides
-    open fun provideSimGson(): Gson = SimJsonHelper.gson
 
     @Provides
     open fun provideSimApiClientFactory(

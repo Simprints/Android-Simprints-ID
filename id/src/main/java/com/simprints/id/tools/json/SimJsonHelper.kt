@@ -10,7 +10,7 @@ import com.simprints.id.data.db.person.remote.models.personevents.ApiBiometricRe
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordOperationType.*
 
 object SimJsonHelper {
-    val gsonBuilder: GsonBuilder by lazy {
+    private val gsonBuilder: GsonBuilder by lazy {
         JsonHelper.defaultBuilder
             .registerTypeAdapterFactory(getTypeAdapterFactoryForEvents())
             .registerTypeAdapterFactory(getTypeAdapterFactoryForBiometricReferences())
