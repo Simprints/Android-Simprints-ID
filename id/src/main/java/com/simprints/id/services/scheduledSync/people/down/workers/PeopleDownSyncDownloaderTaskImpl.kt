@@ -8,7 +8,7 @@ import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationR
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult.DownSyncState.COMPLETE
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult.DownSyncState.FAILED
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.person.remote.EnrolmentEventRecordRemoteInterface
+import com.simprints.id.data.db.person.remote.EventRemoteInterface
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.PipeSeparatorWrapperForURLListParam
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
@@ -95,7 +95,7 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
         downSyncWorkerProgressReporter.reportCount(count)
     }
 
-    private suspend fun makeDownSyncApiCallAndGetResponse(client: EnrolmentEventRecordRemoteInterface): ResponseBody =
+    private suspend fun makeDownSyncApiCallAndGetResponse(client: EventRemoteInterface): ResponseBody =
         retrySimNetworkCalls(client, {
             with(downSyncOperation) {
                 client.downSync(

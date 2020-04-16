@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.EventType
@@ -41,7 +42,7 @@ class EventRemoteDataSourceImplTest {
     private val mockBaseUrlProvider: BaseUrlProvider = mockk()
 
     private val eventRemoteDataSourceSpy = spyk(EventRemoteDataSourceImpl(mockk(), mockk()))
-    private lateinit var enrolmentEventRecordRemoteInterface: EnrolmentEventRecordRemoteInterface
+    private lateinit var eventRemoteInterface: EventRemoteInterface
 
     @ExperimentalCoroutinesApi
     @Before
@@ -54,15 +55,22 @@ class EventRemoteDataSourceImplTest {
     @Test
     fun successfulResponse_onWrite() {
         runBlocking {
-            enrolmentEventRecordRemoteInterface = SimApiClientFactory(
+            val apiEvents = buildEnrolmentRecordEvents()
+            val expectedJsonBody = JsonHelper.toJson(apiEvents)
+            val expectedRequestUrlFormat = "/projects/project_id/events"
+            eventRemoteInterface = SimApiClientFactory(
                 mockBaseUrlProvider, "deviceId"
-            ).build<EnrolmentEventRecordRemoteInterface>().api
-            coEvery { eventRemoteDataSourceSpy.getPeopleApiClient() } returns enrolmentEventRecordRemoteInterface
+            ).build<EventRemoteInterface>().api
+            coEvery { eventRemoteDataSourceSpy.getPeopleApiClient() } returns eventRemoteInterface
             mockServer.enqueue(mockSuccessfulResponse())
 
-            eventRemoteDataSourceSpy.write("projectId", buildEnrolmentRecordEvents())
+            eventRemoteDataSourceSpy.write(PROJECT_ID, apiEvents)
 
             assertThat(mockServer.requestCount).isEqualTo(1)
+            with(mockServer.takeRequest()) {
+                assertThat(body.readUtf8()).isEqualTo(expectedJsonBody)
+                assertThat(requestUrl.toString()).contains(expectedRequestUrlFormat)
+            }
         }
     }
 
@@ -75,11 +83,11 @@ class EventRemoteDataSourceImplTest {
                 EventCount(EventType.EnrolmentRecordMove, 42)
             )
             val expectedRequestUrlFormat = "projects/project_id/events/count?l_moduleId=module1&l_moduleId=module2&l_attendantId=user_id&l_subjectId=subject_id&l_mode=FINGERPRINT&l_mode=FACE&lastEventId=last_event_id&type=EnrolmentRecordMove&type=EnrolmentRecordDeletion&type=EnrolmentRecordCreation"
-            enrolmentEventRecordRemoteInterface = SimApiClientFactory(
+            eventRemoteInterface = SimApiClientFactory(
                 mockBaseUrlProvider, "deviceId"
-            ).build<EnrolmentEventRecordRemoteInterface>().api
+            ).build<EventRemoteInterface>().api
 
-            coEvery { eventRemoteDataSourceSpy.getPeopleApiClient() } returns enrolmentEventRecordRemoteInterface
+            coEvery { eventRemoteDataSourceSpy.getPeopleApiClient() } returns eventRemoteInterface
             mockServer.enqueue(buildSuccessfulResponseForCount())
 
             val counts = eventRemoteDataSourceSpy.count(buildEventQuery())
