@@ -9,7 +9,7 @@ import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordDeleti
 import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordMove as DomainEnrolmentRecordMove
 
 @Keep
-sealed class ApiEnrolmentRecordOperation(val type: ApiEnrolmentRecordOperationType)
+sealed class ApiEnrolmentRecordOperation(@Transient val type: ApiEnrolmentRecordOperationType)
 
 @Keep
 class ApiEnrolmentRecordCreation(val subjectId: String,

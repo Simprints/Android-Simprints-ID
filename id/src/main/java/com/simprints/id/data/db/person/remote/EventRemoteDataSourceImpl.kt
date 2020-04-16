@@ -41,7 +41,7 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
         }, "EventDownload")
     }
 
-    override suspend fun write(projectId: String, events: ApiEvents) {
+    override suspend fun post(projectId: String, events: ApiEvents) {
         makeNetworkRequest({
             it.uploadEvents(projectId, events)
         }, "EventUplaod")
