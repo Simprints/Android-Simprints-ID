@@ -9,6 +9,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.serializers.ScannerGener
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
+import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.id.tools.serializers.*
 import dagger.Module
 import dagger.Provides
@@ -25,7 +26,7 @@ class SerializerModule {
     @Provides @Singleton @Named("GroupSerializer") fun provideGroupSerializer(): Serializer<GROUP> = EnumSerializer(GROUP::class.java)
     @Provides @Singleton @Named("PeopleDownSyncSettingSerializer") fun providePeopleDownSyncSettingSerializer(): Serializer<PeopleDownSyncSetting> = EnumSerializer(PeopleDownSyncSetting::class.java)
     @Provides @Singleton @Named("ModalitiesSerializer") fun provideModalSerializer(): Serializer<List<Modality>> = ModalitiesListSerializer()
-    @Provides @Singleton fun provideGson(): Gson = Gson()
+    @Provides @Singleton fun provideGson(): Gson = SimJsonHelper.gson
 
     @Provides @Singleton @Named("FingerIdToBooleanSerializer") fun provideFingerIdToBooleanSerializer(@Named("FingerIdentifierSerializer") fingerIdentifierSerializer: Serializer<FingerIdentifier>,
                                                                                                       @Named("BooleanSerializer") booleanSerializer: Serializer<Boolean>,

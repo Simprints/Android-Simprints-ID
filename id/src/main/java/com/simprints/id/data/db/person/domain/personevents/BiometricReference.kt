@@ -3,10 +3,10 @@ package com.simprints.id.data.db.person.domain.personevents
 sealed class BiometricReference(val type: BiometricReferenceType)
 
 class FaceReference(val metadata: HashMap<String, String>,
-                    val templates: Array<FaceTemplate>): BiometricReference(BiometricReferenceType.FaceReference)
+                    val templates: List<FaceTemplate>): BiometricReference(BiometricReferenceType.FaceReference)
 
 class FingerprintReference(val metadata: HashMap<String, String>,
-                           val templates: Array<FingerprintTemplate>): BiometricReference(BiometricReferenceType.FingerprintReference)
+                           val templates: List<FingerprintTemplate>): BiometricReference(BiometricReferenceType.FingerprintReference)
 
 class FaceTemplate(val template: String)
 
