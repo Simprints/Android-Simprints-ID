@@ -13,7 +13,7 @@ import retrofit2.http.*
 
 
 @JvmSuppressWildcards
-interface EnrolmentEventRecordRemoteInterface : SimRemoteInterface {
+interface EventRemoteInterface : SimRemoteInterface {
 
 
     //TODO: To be removed once EventRemoteDataSource is used in PersonRepository
@@ -45,7 +45,7 @@ interface EnrolmentEventRecordRemoteInterface : SimRemoteInterface {
         @Body operationsJson: ApiPeopleOperations): ApiPeopleOperationsResponse
 
     @GET("projects/{projectId}/events/count")
-    suspend fun requestRecordCount(
+    suspend fun countEvents(
         @Path("projectId") projectId: String,
         @Query("l_moduleId") moduleIds: List<String>?,
         @Query("l_attendantId") attendantId: String?,
@@ -55,13 +55,13 @@ interface EnrolmentEventRecordRemoteInterface : SimRemoteInterface {
         @Query("type") eventType: List<String>): List<ApiEventCount>
 
     @POST("projects/{projectId}/events")
-    suspend fun postEnrolmentRecordEvents(
+    suspend fun uploadEvents(
         @Path("projectId") projectId: String,
         @Body events: ApiEvents
     )
 
     @GET("projects/{projectId}/events")
-    suspend fun downloadEnrolmentEvents(
+    suspend fun downloadEvents(
         @Path("projectId") projectId: String,
         @Query("l_moduleId") moduleIds: List<String>?,
         @Query("l_attendantId") attendantId: String?,

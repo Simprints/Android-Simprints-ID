@@ -28,7 +28,7 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.person.remote.EnrolmentEventRecordRemoteInterface
+import com.simprints.id.data.db.person.remote.EventRemoteInterface
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.fromDomainToApi
@@ -117,7 +117,7 @@ class PeopleSyncIntegrationTest {
         val remotePeopleApi = SimApiClientFactory(
             mockBaseUrlProvider,
             "deviceId"
-        ).build<EnrolmentEventRecordRemoteInterface>().api
+        ).build<EventRemoteInterface>().api
 
         coEvery { personRemoteDataSourceSpy.getPeopleApiClient() } returns remotePeopleApi
         every { downSyncScopeRepositorySpy.getDownSyncScope() } returns projectSyncScope
