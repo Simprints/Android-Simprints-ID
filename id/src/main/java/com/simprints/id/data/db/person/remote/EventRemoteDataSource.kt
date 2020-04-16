@@ -11,6 +11,6 @@ interface EventRemoteDataSource {
 
     suspend fun get(query: EventQuery): ResponseBody
 
-    suspend fun write(projectId: String, events: ApiEvents)
+    suspend fun post(projectId: String, events: ApiEvents)
 
 }
