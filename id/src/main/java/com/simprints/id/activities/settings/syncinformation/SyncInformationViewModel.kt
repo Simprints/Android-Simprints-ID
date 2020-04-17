@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
-import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
@@ -60,12 +59,12 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
         try {
             val downSyncScope = peopleDownSyncScopeRepository.getDownSyncScope()
             val counts = personRepository.countToDownSync(downSyncScope)
-            recordsToDownSyncCountLiveData.postValue(counts.filter {
-                it.type == EventType.EnrolmentRecordCreation
-            }.sumBy { it.count })
-            recordsToDeleteCountLiveData.postValue(counts.filter {
-                it.type == EventType.EnrolmentRecordDeletion
-            }.sumBy { it.count })
+            recordsToDownSyncCountLiveData.postValue(counts.sumBy {
+                it.created
+            })
+            recordsToDeleteCountLiveData.postValue(counts.sumBy {
+                it.deleted
+            })
         } catch (t: Throwable) {
             t.printStackTrace()
         }

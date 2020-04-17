@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
 import androidx.work.WorkInfo
-import com.simprints.id.data.db.common.models.EventType
+import com.simprints.id.data.db.common.models.fromDownSync
 import com.simprints.id.data.db.common.models.totalCount
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
@@ -90,7 +90,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
     private fun List<WorkInfo>.calculateTotalForDownSync(): Int? {
         val countersCompleted = this.filterByTags(tagForType(DOWN_COUNTER)).completedWorkers()
         val counter = countersCompleted.firstOrNull()
-        return counter?.getDownCountsFromOutput()?.filter { it.type == EventType.EnrolmentRecordCreation }?.sumBy { it.count }
+        return counter?.getDownCountsFromOutput()?.sumBy { it.fromDownSync() }
     }
 
     private fun List<WorkInfo>.calculateTotalForUpSync(): Int? {
