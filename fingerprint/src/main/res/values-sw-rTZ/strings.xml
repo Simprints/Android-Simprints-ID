@@ -92,8 +92,8 @@
     <string name="cannot_connect_devices">Haiwezi kuunganika na kifaa</string>
     <string name="scanner_on">✓ Skana imewashwa</string>
     <string name="nfc_pairing_in_progress">Skana imepatikana %1$s</string>
-    <string name="nfc_pairing_try_again_instruction">Tafadhali hakikisha skana %1$ imewashwa na jaribu tena</string>
-    <string name="serial_entry_pair_failed">Tafadhali hakikisha skana %1$ imewashwa na jaribu tena</string>
+    <string name="nfc_pairing_try_again_instruction">Tafadhali hakikisha skana %1$s imewashwa na jaribu tena</string>
+    <string name="serial_entry_pair_failed">Tafadhali hakikisha skana %1$s imewashwa na jaribu tena</string>
     <string name="nfc_pair_toast_try_again">Huwezi kusoma chip ya NFC, tafadhali jaribu tena</string>
     <string name="nfc_pair_toast_invalid">Chip ya NFC iliyoonekana sio sahihi</string>
     <string name="bluetooth_off_toast_error">Hukuweza kuwassha bluetooth. Tafadhali washa bluetooth kwenye simu.</string>
