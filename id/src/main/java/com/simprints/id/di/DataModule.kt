@@ -12,8 +12,11 @@ import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.PersonRepositoryImpl
+import com.simprints.id.data.db.person.PersonRepositoryUpSyncHelper
+import com.simprints.id.data.db.person.PersonRepositoryUpSyncHelperImpl
 import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.local.PersonLocalDataSourceImpl
@@ -29,6 +32,7 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import dagger.Module
 import dagger.Provides
@@ -87,18 +91,30 @@ open class DataModule {
     )
 
     @Provides
+    open fun providePersonRepositoryUpSyncHelper(
+        loginInfoManager: LoginInfoManager,
+        personLocalDataSource: PersonLocalDataSource,
+        eventRemoteDataSource: EventRemoteDataSource,
+        peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
+        peopleSyncCache: PeopleSyncCache) : PersonRepositoryUpSyncHelper =
+        PersonRepositoryUpSyncHelperImpl(loginInfoManager, personLocalDataSource, eventRemoteDataSource,
+            peopleUpSyncScopeRepository, peopleSyncCache)
+
+    @Provides
     open fun providePersonRepository(
         personRemoteDataSource: PersonRemoteDataSource,
         personLocalDataSource: PersonLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
         peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
-        peopleUpSyncExecutor: PeopleUpSyncExecutor
+        peopleUpSyncExecutor: PeopleUpSyncExecutor,
+        personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper
     ): PersonRepository = PersonRepositoryImpl(
         personRemoteDataSource,
         eventRemoteDataSource,
         personLocalDataSource,
         peopleDownSyncScopeRepository,
-        peopleUpSyncExecutor
+        peopleUpSyncExecutor,
+        personRepositoryUpSyncHelper
     )
 
     @Provides
