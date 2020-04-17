@@ -20,7 +20,7 @@ import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationF
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult.DownSyncState.COMPLETE
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
+import com.simprints.id.data.db.person.remote.EventRemoteInterface
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.PipeSeparatorWrapperForURLListParam
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
@@ -126,7 +126,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
         val remotePeopleApi = SimApiClientFactory(
             mockBaseUrlProvider,
             "deviceId"
-        ).build<PeopleRemoteInterface>().api
+        ).build<EventRemoteInterface>().api
 
         coEvery { personRemoteDataSourceMock.getPeopleApiClient() } returns remotePeopleApi
     }
@@ -319,11 +319,11 @@ class PeopleDownSyncDownloaderTaskImplTest {
         return response
     }
 
-    private fun mockClientToThrowFirstAndThenExecuteNetworkCall(): PeopleRemoteInterface {
+    private fun mockClientToThrowFirstAndThenExecuteNetworkCall(): EventRemoteInterface {
         val remotePeopleApi = SimApiClientFactory(
             mockBaseUrlProvider,
             "deviceId"
-        ).build<PeopleRemoteInterface>().api
+        ).build<EventRemoteInterface>().api
         return mockk {
             coEvery { downSync(any(), any(), any(), any(), any(), any()) } throws Throwable("Network issue") coAndThen {
                 remotePeopleApi.downSync(

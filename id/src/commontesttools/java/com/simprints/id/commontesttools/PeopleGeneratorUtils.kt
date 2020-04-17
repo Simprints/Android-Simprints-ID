@@ -1,9 +1,9 @@
 package com.simprints.id.commontesttools
 
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import java.util.*
 import kotlin.random.Random
 
