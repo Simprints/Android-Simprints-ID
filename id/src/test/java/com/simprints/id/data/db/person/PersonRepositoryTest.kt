@@ -115,8 +115,7 @@ class PersonRepositoryTest {
 
         val counts = personRepository.countToDownSync(downSyncScope)
 
-        assertThat(counts.size).isEqualTo(eventCounts.size)
-        assertThat(counts.sumBy { it.count }).isEqualTo(REMOTE_PEOPLE_FOR_SUBSYNC)
+        assertThat(counts.created).isEqualTo(REMOTE_PEOPLE_FOR_SUBSYNC)
     }
 
     @After
