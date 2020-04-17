@@ -14,4 +14,6 @@ interface PersonRepository : PersonLocalDataSource, PersonRemoteDataSource, Fing
 
     suspend fun saveAndUpload(person: Person)
     suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult
+
+    suspend fun performUpload()
 }
