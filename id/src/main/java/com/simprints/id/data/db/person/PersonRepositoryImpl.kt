@@ -17,7 +17,8 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                            val eventRemoteDataSource: EventRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
                            val downSyncScopeRepository: PeopleDownSyncScopeRepository,
-                           private val peopleUpSyncExecutor: PeopleUpSyncExecutor) :
+                           private val peopleUpSyncExecutor: PeopleUpSyncExecutor,
+                           val personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper) :
     PersonRepository,
     PersonLocalDataSource by personLocalDataSource,
     PersonRemoteDataSource by personRemoteDataSource,
@@ -48,5 +49,9 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     override suspend fun saveAndUpload(person: Person) {
         personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))
         peopleUpSyncExecutor.sync()
+    }
+
+    override suspend fun performUpload() {
+        personRepositoryUpSyncHelper.executeUpload()
     }
 }

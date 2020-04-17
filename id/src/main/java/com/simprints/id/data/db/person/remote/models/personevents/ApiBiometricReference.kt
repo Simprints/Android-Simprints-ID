@@ -14,12 +14,12 @@ import com.simprints.id.data.db.person.domain.personevents.FingerprintReference 
 sealed class ApiBiometricReference(@Transient val type: ApiBiometricReferenceType)
 
 @Keep
-class ApiFaceReference(val metadata: HashMap<String, String>,
-                       val templates: List<ApiFaceTemplate>): ApiBiometricReference(FaceReference)
+class ApiFaceReference(val templates: List<ApiFaceTemplate>,
+                       val metadata: HashMap<String, String>? = null): ApiBiometricReference(FaceReference)
 
 @Keep
-class ApiFingerprintReference(val metadata: HashMap<String, String>,
-                              val templates: List<ApiFingerprintTemplate>): ApiBiometricReference(FingerprintReference)
+class ApiFingerprintReference(val templates: List<ApiFingerprintTemplate>,
+                              val metadata: HashMap<String, String>? = null): ApiBiometricReference(FingerprintReference)
 
 @Keep
 enum class ApiBiometricReferenceType {
@@ -29,10 +29,10 @@ enum class ApiBiometricReferenceType {
 
 fun BiometricReference.fromDomainToApi() = when (this) {
     is DomainFaceReference -> {
-        ApiFaceReference(metadata, templates.map { it.fromDomainToApi() })
+        ApiFaceReference(templates.map { it.fromDomainToApi() }, metadata)
     }
     is DomainFingerprintReference -> {
-        ApiFingerprintReference(metadata, templates.map { it.fromDomainToApi() })
+        ApiFingerprintReference(templates.map { it.fromDomainToApi() }, metadata)
     }
 }
 
