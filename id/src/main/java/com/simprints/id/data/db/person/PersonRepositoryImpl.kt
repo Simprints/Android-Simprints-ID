@@ -3,10 +3,9 @@ package com.simprints.id.data.db.person
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
-import com.simprints.id.data.db.common.models.EventCount
+import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
-import com.simprints.id.data.db.people_sync.down.domain.toEventQuery
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
@@ -24,8 +23,10 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     PersonRemoteDataSource by personRemoteDataSource,
     EventRemoteDataSource by eventRemoteDataSource {
 
-    override suspend fun countToDownSync(peopleDownSyncScope: PeopleDownSyncScope): List<EventCount> =
-        eventRemoteDataSource.count(peopleDownSyncScope.toEventQuery())
+    override suspend fun countToDownSync(peopleDownSyncScope: PeopleDownSyncScope): List<PeopleCount> {
+        //eventRemoteDataSource.count(peopleDownSyncScope.toEventQuery())
+        TODO()
+    }
 
     override suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult =
         try {
