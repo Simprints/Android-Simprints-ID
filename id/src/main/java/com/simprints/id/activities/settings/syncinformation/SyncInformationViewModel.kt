@@ -59,12 +59,8 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
         try {
             val downSyncScope = peopleDownSyncScopeRepository.getDownSyncScope()
             val counts = personRepository.countToDownSync(downSyncScope)
-            recordsToDownSyncCountLiveData.postValue(counts.sumBy {
-                it.created
-            })
-            recordsToDeleteCountLiveData.postValue(counts.sumBy {
-                it.deleted
-            })
+            recordsToDownSyncCountLiveData.postValue(counts.created)
+            recordsToDeleteCountLiveData.postValue(counts.deleted)
         } catch (t: Throwable) {
             t.printStackTrace()
         }

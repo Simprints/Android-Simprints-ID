@@ -3,9 +3,12 @@ package com.simprints.id.data.db.person
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
+import com.simprints.id.data.db.common.models.EventCount
+import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
+import com.simprints.id.data.db.people_sync.down.domain.toEventQuery
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
@@ -23,9 +26,9 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     PersonRemoteDataSource by personRemoteDataSource,
     EventRemoteDataSource by eventRemoteDataSource {
 
-    override suspend fun countToDownSync(peopleDownSyncScope: PeopleDownSyncScope): List<PeopleCount> {
-        //eventRemoteDataSource.count(peopleDownSyncScope.toEventQuery())
-        TODO()
+    override suspend fun countToDownSync(peopleDownSyncScope: PeopleDownSyncScope): PeopleCount {
+        val eventCounts = eventRemoteDataSource.count(peopleDownSyncScope.toEventQuery())
+        return buildPeopleCountFromEventCounts(eventCounts)
     }
 
     override suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult =
@@ -48,5 +51,20 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     override suspend fun saveAndUpload(person: Person) {
         personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))
         peopleUpSyncExecutor.sync()
+    }
+
+    private fun buildPeopleCountFromEventCounts(eventCounts: List<EventCount>): PeopleCount {
+        var created = 0
+        var deleted = 0
+        var updated = 0
+        eventCounts.forEach {
+            when (it.type) {
+                EventType.EnrolmentRecordCreation -> created += it.count
+                EventType.EnrolmentRecordDeletion -> deleted += it.count
+                EventType.EnrolmentRecordMove -> updated += it.count
+            }
+        }
+
+        return PeopleCount(created, deleted, updated)
     }
 }
