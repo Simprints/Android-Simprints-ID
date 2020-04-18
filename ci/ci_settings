@@ -1,0 +1,12 @@
+
+buildCache {
+    remote(HttpBuildCache) {
+        url = 'http://209.97.181.8/cache/'
+        push = true
+
+        credentials {
+            username = 'simprintsid'
+            password = 'simprintsidcachesystem'
+        }
+    }
+}
