@@ -4,11 +4,11 @@ apply plugin: "kotlin-kapt"
 apply plugin: "kotlin-android-extensions"
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion config.min_sdk
-        targetSdkVersion 28
+        targetSdkVersion 29
         multiDexEnabled true
         versionCode 1
         versionName "1.0"

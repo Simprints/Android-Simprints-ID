@@ -13,9 +13,8 @@ class ImprovedSharedPreferencesImpl(private val prefs: SharedPreferences)
     override fun edit(): ImprovedSharedPreferences.Editor =
             ImprovedSharedPreferencesEditorImpl(prefs.edit())
 
-    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     override fun getString(key: String, defaultValue: String): String =
-        prefs.getString(key, defaultValue)
+        prefs.getString(key, defaultValue) ?: defaultValue
 
     override fun <T: Any> getPrimitive(key: String, defaultValue: T): T =
             try {
