@@ -1,9 +1,6 @@
 name: Android Release
 
-on:
-  push:
-    branches:
-      - 'tfabio-test-gactions'
+on: pull_request
 
 jobs:
   clientapi_unit_tests:
