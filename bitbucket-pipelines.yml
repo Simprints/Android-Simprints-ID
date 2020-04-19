@@ -13,8 +13,8 @@ pipelines:
           - gradle
         script: 
           - 
-          - echo "SIMPRINTS_ARTIFACTORY_USERNAME=${{ ARTIFACTORY_USERNAME }} " >> gradle.properties
-          - echo "SIMPRINTS_ARTIFACTORY_PASSWORD=${{ ARTIFACTORY_PASSWORD }}" >> gradle.properties
+          - echo "SIMPRINTS_ARTIFACTORY_USERNAME=$ARTIFACTORY_USERNAME" >> gradle.properties
+          - echo "SIMPRINTS_ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD" >> gradle.properties
           - echo "org.gradle.caching=true" >> gradle.properties
           - cat ci/ci_settings >> settings.gradle
           - echo "ndk.dir=$ANDROID_HOME/ndk-bundle" >> local.properties
