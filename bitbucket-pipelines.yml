@@ -35,24 +35,32 @@ pipelines:
               - gradle
             script: 
               - ./gradlew id:bundleDebugClasses && ./gradlew clientapi:testDebugUnitTest
+            artifacts:
+              - clientapi/build/reports/tests/testDebugUnitTest/*
 
         - step:
             name: "Run id unit tests"
             caches:
               - gradle
             script: 
-              - ./gradlew id:bundleDebugClasses && ./gradlew clientapi:testDebugUnitTest
-
+              - ./gradlew id:bundleDebugClasses && ./gradlew id:testDebugUnitTest
+            artifacts:
+              - id/build/reports/tests/testDebugUnitTest/*
+              
         - step:
             name: "Run face unit tests"
             caches:
               - gradle
             script: 
-              - ./gradlew id:bundleDebugClasses && ./gradlew clientapi:testDebugUnitTest
-
+              - ./gradlew id:bundleDebugClasses && ./gradlew face:testDebugUnitTest
+            artifacts:
+              - face/build/reports/tests/testDebugUnitTest/*
+                          
         - step:
             name: "Run fingerprint unit tests"
             caches:
               - gradle
             script: 
-              - ./gradlew id:bundleDebugClasses && ./gradlew clientapi:testDebugUnitTest
+              - ./gradlew id:bundleDebugClasses && ./gradlew fingerprint:testDebugUnitTest
+            artifacts:
+              - fingerprint/build/reports/tests/testDebugUnitTest/*
