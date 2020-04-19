@@ -13,10 +13,8 @@ pipelines:
             caches:
               - gradle
             script: 
-              - ls -la
-              - ls -la ci/
-              - ls -la ci/pipeline/
               - bash ./ci/pipeline/setup
+              - ls -la libsimprints/
               - ./gradlew id:bundleDebugClasses && ./gradlew clientapi:testDebugUnitTest
             artifacts:
               - clientapi/build/reports/tests/testDebugUnitTest/*
@@ -25,10 +23,8 @@ pipelines:
             caches:
               - gradle
             script: 
-              - ls -la
-              - ls -la ci/
-              - ls -la ci/pipeline/
               - bash ./ci/pipeline/setup
+              - ls -la libsimprints/
               - ./gradlew id:bundleDebugClasses && ./gradlew id:testDebugUnitTest
             artifacts:
               - id/build/reports/tests/testDebugUnitTest/*
@@ -37,10 +33,8 @@ pipelines:
             caches:
               - gradle
             script: 
-              - ls -la
-              - ls -la ci/
-              - ls -la ci/pipeline/
               - bash ./ci/pipeline/setup
+              - ls -la libsimprints/
               - ./gradlew id:bundleDebugClasses && ./gradlew face:testDebugUnitTest
             artifacts:
               - face/build/reports/tests/testDebugUnitTest/*           
@@ -49,10 +43,8 @@ pipelines:
             caches:
               - gradle
             script: 
-              - ls -la
-              - ls -la ci/
-              - ls -la ci/pipeline/
               - bash ./ci/pipeline/setup
+              - ls -la libsimprints/
               - ./gradlew id:bundleDebugClasses && ./gradlew fingerprint:testDebugUnitTest
             artifacts:
               - fingerprint/build/reports/tests/testDebugUnitTest/*
