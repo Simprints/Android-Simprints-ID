@@ -1,18 +1,123 @@
+# This is a sample build configuration for Java (Gradle).
+# Check our guides at https://confluence.atlassian.com/x/zd-5Mw for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
 image: circleci/android:api-29-ndk
 
 pipelines:
-  default:    
-  
+  default:       
+    - parallel:
+        - step:
+            name: "Run Clientapi unit tests"
+            caches:
+              - gradle
+            script: 
+              - bash ./ci/pipeline/setup
+              - ./gradlew id:bundleDebugClasses && ./gradlew clientapi:testDebugUnitTest
+            artifacts:
+              - clientapi/build/reports/tests/testDebugUnitTest/*
+        - step:
+            name: "Run Id unit tests"
+            caches:
+              - gradle
+            script: 
+              - bash ./ci/pipeline/setup
+              - ./gradlew id:bundleDebugClasses && ./gradlew id:testDebugUnitTest
+            artifacts:
+              - id/build/reports/tests/testDebugUnitTest/*
+        - step:
+            name: "Run Face unit tests"
+            caches:
+              - gradle
+            script: 
+              - bash ./ci/pipeline/setup
+              - ./gradlew id:bundleDebugClasses && ./gradlew face:testDebugUnitTest
+            artifacts:
+              - face/build/reports/tests/testDebugUnitTest/*           
+        - step:
+            name: "Run Fingerprint unit tests"
+            caches:
+              - gradle
+            script: 
+              - bash ./ci/pipeline/setup
+              - ./gradlew id:bundleDebugClasses && ./gradlew fingerprint:testDebugUnitTest
+            artifacts:
+              - fingerprint/build/reports/tests/testDebugUnitTest/*
+
     - step:
+        name: "Build and sign universal apk"
         caches:
           - gradle
         script: 
           - bash ./ci/pipeline/setup
-          - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew id:assembleDebugAndroidTest
-          - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk 
-          - cp id-debug-androidTest.apk universal.apk
-          - bash ./ci/pipeline/install_gcloud
-          - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
-          - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
-          - gcloud config set project simprints-android-ci
-          - gcloud firebase test android run --type instrumentation --app universal.apk --test id-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
+          - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew bundleDebug --stacktrace
+          - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
+          - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/debug/id-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=ci/debug_keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
+          - mv universal.apks universal.zip
+          - unzip universal.zip
+
+        artifacts:
+          - universal.apk
+    - parallel:
+        - step:
+            name: "Run id android tests"
+            caches:
+              - gradle
+            script: 
+              - bash ./ci/pipeline/setup
+              - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew id:assembleDebugAndroidTest
+              - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk 
+              - bash ./ci/pipeline/install_gcloud
+              - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
+              - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
+              - gcloud config set project simprints-android-ci
+              - gcloud firebase test android run --type instrumentation --app universal.apk --test id-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
+
+        - step:
+            name: "Run ClientApi android tests"
+            caches:
+              - gradle
+            script: 
+              - bash ./ci/pipeline/setup
+              - cat ci/debug_gradle_signing >> id/build.gradle &&
+              - cat ci/debug_gradle_signing >> clientapi/build.gradle && ./gradlew clientapi:assembleDebugAndroidTest
+              - mv clientapi/build/outputs/apk/androidTest/debug/clientapi-debug-androidTest.apk clientapi-debug-androidTest.apk 
+              -
+              - bash ./ci/pipeline/install_gcloud
+              - gcloud firebase test android run --type instrumentation --app universal.apk --test clientapi-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
+        - step:
+            name: "Run Fingerprint android tests"
+            caches:
+              - gradle
+            script: 
+              - bash ./ci/pipeline/setup
+              - cat ci/debug_gradle_signing >> id/build.gradle &&
+              - cat ci/debug_gradle_signing >> fingerprint/build.gradle && ./gradlew fingerprint:assembleDebugAndroidTest
+              - mv fingerprint/build/outputs/apk/androidTest/debug/fingerprint-debug-androidTest.apk fingerprint-debug-androidTest.apk 
+              -
+              - bash ./ci/pipeline/install_gcloud
+              - gcloud firebase test android run --type instrumentation --app universal.apk --test fingerprint-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
+        - step:
+            name: "Run Face android tests"
+            caches:
+              - gradle
+            script: 
+              - bash ./ci/pipeline/setup
+              - cat ci/debug_gradle_signing >> face/build.gradle &&
+              - cat ci/debug_gradle_signing >> face/build.gradle && ./gradlew face:assembleDebugAndroidTest
+              - mv face/build/outputs/apk/androidTest/debug/face-debug-androidTest.apk face-debug-androidTest.apk 
+              -
+              - bash ./ci/pipeline/install_gcloud
+              - gcloud firebase test android run --type instrumentation --app universal.apk --test face-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
+        - step:
+            name: "Run Id android tests"
+            caches:
+              - gradle
+            script: 
+              - bash ./ci/pipeline/setup
+              - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew id:assembleDebugAndroidTest
+              - mv clientapi/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk 
+              -
+              - bash ./ci/pipeline/install_gcloud
+              - gcloud firebase test android run --type instrumentation --app universal.apk --test id-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
