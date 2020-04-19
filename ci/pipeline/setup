@@ -4,4 +4,3 @@ echo "SIMPRINTS_ARTIFACTORY_USERNAME=${ARTIFACTORY_USERNAME}" >> gradle.properti
 echo "SIMPRINTS_ARTIFACTORY_PASSWORD=${ARTIFACTORY_PASSWORD}" >> gradle.properties
 echo "org.gradle.caching=true" >> gradle.properties
 cat ci/ci_settings >> settings.gradle
-echo "ndk.dir=$ANDROID_NDK_HOME" >> local.properties
