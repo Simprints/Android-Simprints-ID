@@ -11,4 +11,3 @@ fun PeopleCount.totalCount() = created + deleted + updated
 
 // Cloud returns always the last state only, so if a patient is created, updated and then deleted,
 // only the deletion is in the down stream. So # of patients from the down sync stream is equivalent to the creations.
-fun PeopleCount.fromDownSync() = created
