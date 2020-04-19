@@ -8,9 +8,11 @@ image: openjdk:8
 pipelines:
   default:
     - step:
+        image: bitbucketpipelines/android-ci-image
         caches:
           - gradle
         script: 
-          - bash echo "SIMPRINTS_ARTIFACTORY_USERNAME=$ARTIFACTORY_USERNAME" >> gradle.properties
-          - bash echo "SIMPRINTS_ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD" >> gradle.properties
-          - bash echo $ANDROID_HOME
+          - echo "SIMPRINTS_ARTIFACTORY_USERNAME=$ARTIFACTORY_USERNAME" >> gradle.properties
+          - echo "SIMPRINTS_ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD" >> gradle.properties
+          - echo $ANDROID_HOME
+          - cat gradle.properties 
