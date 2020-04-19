@@ -1,4 +1,5 @@
 #!/bin/bash
+git submodule update --init --recursive
 
 echo "SIMPRINTS_ARTIFACTORY_USERNAME=${ARTIFACTORY_USERNAME}" >> gradle.properties
 echo "SIMPRINTS_ARTIFACTORY_PASSWORD=${ARTIFACTORY_PASSWORD}" >> gradle.properties
