@@ -1,3 +1,5 @@
+image: circleci/android:api-29-ndk
+
 pipelines:
   default:    
   
