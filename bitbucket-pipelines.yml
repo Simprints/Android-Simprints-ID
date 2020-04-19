@@ -12,6 +12,7 @@ pipelines:
           caches:
             - gradle
           script: 
+            - bash ./ci/pipeline/setup
             - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew bundleDebug --stacktrace
             - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
             - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/debug/id-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=ci/debug_keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
