@@ -6,7 +6,8 @@
 image: circleci/android:api-29-ndk
       
 pipelines:
-  default:       
+  default:    
+    - parallel:
       - step:
           name: "Build and sign universal apk"
           caches:
@@ -22,9 +23,19 @@ pipelines:
           artifacts:
             - universal.apk    
       - step:
-          name: "Build and sign universal apk"
           caches:
             - gradle
           script: 
-           - ls -la ./
+            - bash ./ci/pipeline/setup
+            - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew id:assembleDebugAndroidTest
+          artifacts:
+            - id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk         
 
+    - step:
+        name: "Build apk for id android tests"
+        image: google/cloud-sdk:latest
+        script:
+            - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
+            - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
+            - gcloud config set project simprints-android-ci
+            - gcloud firebase test android run --type instrumentation --app universal.apk --test id-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
