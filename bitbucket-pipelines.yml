@@ -8,18 +8,13 @@ image: circleci/android:api-29-ndk
 pipelines:
   default:
     - step:
-          services:
-            - docker
-          caches:
-            - docker
-          script:
-            - docker pull circleci/android:api-29-ndk
-    - step:
         name: "Set up project"
         caches:
           - gradle
         script: 
           - echo $ARTIFACTORY_PASSWORD
+          - TEST=1
+          - echo $TEST
           - echo "SIMPRINTS_ARTIFACTORY_USERNAME=${ARTIFACTORY_USERNAME}" >> gradle.properties
           - echo "SIMPRINTS_ARTIFACTORY_PASSWORD=${ARTIFACTORY_PASSWORD}" >> gradle.properties
           - echo "org.gradle.caching=true" >> gradle.properties
@@ -34,6 +29,7 @@ pipelines:
             caches:
               - gradle
             script: 
+              - echo $TEST
               - ./gradlew id:bundleDebugClasses && ./gradlew clientapi:testDebugUnitTest
             artifacts:
               - clientapi/build/reports/tests/testDebugUnitTest/*
