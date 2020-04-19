@@ -6,13 +6,11 @@
 image: openjdk:8
 
 pipelines:
-  branches:
-    master:
-      - parallel:
-        - step:
-              name: Set up
-              image: bitbucketpipelines/android-ci-image
-              script:
-                - echo "SIMPRINTS_ARTIFACTORY_USERNAME=$ARTIFACTORY_USERNAME" >> gradle.properties
-                - echo "SIMPRINTS_ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD" >> gradle.properties
-                - echo $ANDROID_HOME
+  default:
+    - step:
+        caches:
+          - gradle
+        script: 
+          - echo "SIMPRINTS_ARTIFACTORY_USERNAME=$ARTIFACTORY_USERNAME" >> gradle.properties
+          - echo "SIMPRINTS_ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD" >> gradle.properties
+          - echo $ANDROID_HOME
