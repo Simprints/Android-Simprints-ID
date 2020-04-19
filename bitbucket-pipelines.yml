@@ -28,8 +28,9 @@ pipelines:
           script: 
             - bash ./ci/pipeline/setup
             - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew id:assembleDebugAndroidTest
+            - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk 
           artifacts:
-            - id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk         
+            - id-debug-androidTest.apk       
 
     - step:
         name: "Build apk for id android tests"
