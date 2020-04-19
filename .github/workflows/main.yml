@@ -32,7 +32,7 @@ jobs:
           echo "ndk.dir=$ANDROID_HOME/ndk-bundle" >> local.properties
           
       - name: Run Unit tests
-        run: bash ./gradlew clientapi:testDebugUnitTest --stacktrace
+        run: ./gradlew id:bundleDebugClasses && ./gradlew clientapi:testDebugUnitTest
 
       - name: Prepare results
         if: always()
@@ -121,7 +121,7 @@ jobs:
           echo "ndk.dir=$ANDROID_HOME/ndk-bundle" >> local.properties
           
       - name: Run Unit tests
-        run: bash ./gradlew face:testDebugUnitTest --stacktrace
+        run: ./gradlew id:bundleDebugClasses && ./gradlew face:testDebugUnitTest
 
       - name: Prepare results
         if: always()
@@ -165,7 +165,7 @@ jobs:
           echo "ndk.dir=$ANDROID_HOME/ndk-bundle" >> local.properties
           
       - name: Run Unit tests
-        run: bash ./gradlew fingerprint:testDebugUnitTest --stacktrace
+        run: ./gradlew id:bundleDebugClasses && ./gradlew fingerprint:testDebugUnitTest
 
       - name: Prepare results
         if: always()
