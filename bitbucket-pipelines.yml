@@ -61,7 +61,7 @@ pipelines:
           - universal.apk
     - parallel:
         - step:
-            name: "Run id android tests"
+            name: "Run Id android tests"
             caches:
               - gradle
             script: 
@@ -104,20 +104,9 @@ pipelines:
               - gradle
             script: 
               - bash ./ci/pipeline/setup
-              - cat ci/debug_gradle_signing >> face/build.gradle &&
+              - cat ci/debug_gradle_signing >> id/build.gradle &&
               - cat ci/debug_gradle_signing >> face/build.gradle && ./gradlew face:assembleDebugAndroidTest
               - mv face/build/outputs/apk/androidTest/debug/face-debug-androidTest.apk face-debug-androidTest.apk 
               -
               - bash ./ci/pipeline/install_gcloud
               - gcloud firebase test android run --type instrumentation --app universal.apk --test face-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
-        - step:
-            name: "Run Id android tests"
-            caches:
-              - gradle
-            script: 
-              - bash ./ci/pipeline/setup
-              - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew id:assembleDebugAndroidTest
-              - mv clientapi/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk 
-              -
-              - bash ./ci/pipeline/install_gcloud
-              - gcloud firebase test android run --type instrumentation --app universal.apk --test id-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
