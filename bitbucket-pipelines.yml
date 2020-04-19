@@ -3,16 +3,16 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: openjdk:8
+image: circleci/android:api-29-ndk
 
 pipelines:
   default:
     - step:
-        image: bitbucketpipelines/android-ci-image
         caches:
           - gradle
         script: 
-          - echo "SIMPRINTS_ARTIFACTORY_USERNAME=$ARTIFACTORY_USERNAME" >> gradle.properties
-          - echo "SIMPRINTS_ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD" >> gradle.properties
+          - 
+          - echo "SIMPRINTS_ARTIFACTORY_USERNAME=${{ ARTIFACTORY_USERNAME }} " >> gradle.properties
+          - echo "SIMPRINTS_ARTIFACTORY_PASSWORD=${{ ARTIFACTORY_PASSWORD }}" >> gradle.properties
           - echo $ANDROID_HOME
           - cat gradle.properties 
