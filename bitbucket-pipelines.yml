@@ -1,42 +1,15 @@
-# This is a sample build configuration for Java (Gradle).
-# Check our guides at https://confluence.atlassian.com/x/zd-5Mw for more examples.
-# Only use spaces to indent your .yml configuration.
-# -----
-# You can specify a custom docker image from Docker Hub as your build environment.
-image: circleci/android:api-29-ndk
-      
 pipelines:
   default:    
-    - parallel:
-      - step:
-          name: "Build and sign universal apk"
-          caches:
-            - gradle
-          script: 
-            - bash ./ci/pipeline/setup
-            - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew bundleDebug --stacktrace
-            - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
-            - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/debug/id-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=ci/debug_keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
-            - mv universal.apks universal.zip
-            - unzip universal.zip
-                      
-          artifacts:
-            - universal.apk    
-      - step:
-          caches:
-            - gradle
-          script: 
-            - bash ./ci/pipeline/setup
-            - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew id:assembleDebugAndroidTest
-            - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk 
-          artifacts:
-            - id-debug-androidTest.apk       
-
+  
     - step:
-        name: "Build apk for id android tests"
-        image: google/cloud-sdk:latest
-        script:
-            - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
-            - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
-            - gcloud config set project simprints-android-ci
-            - gcloud firebase test android run --type instrumentation --app universal.apk --test id-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
+        caches:
+          - gradle
+        script: 
+          - bash ./ci/pipeline/setup
+          - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew id:assembleDebugAndroidTest
+          - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk 
+          - bash ./ci/install_gcloud
+          - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
+          - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
+          - gcloud config set project simprints-android-ci
+          - gcloud firebase test android run --type instrumentation --app universal.apk --test id-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
