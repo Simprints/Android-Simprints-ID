@@ -20,5 +20,11 @@ pipelines:
             - unzip universal.zip
                       
           artifacts:
-            - universal.apk
+            - universal.apk    
+      - step:
+          name: "Build and sign universal apk"
+          caches:
+            - gradle
+          script: 
+           - ls -la ./
 
