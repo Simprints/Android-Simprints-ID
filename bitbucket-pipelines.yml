@@ -3,14 +3,56 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: openjdk:8
-
+image: circleci/android:api-29-ndk
+      
 pipelines:
-  default:
-    - step:
-        caches:
-          - gradle
-        script: 
-          - echo "SIMPRINTS_ARTIFACTORY_USERNAME=$ARTIFACTORY_USERNAME" >> gradle.properties
-          - echo "SIMPRINTS_ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD" >> gradle.properties
-          - echo $ANDROID_HOME
+  default:       
+    - parallel:
+        - step:
+            name: "Run clientapi unit tests"
+            caches:
+              - gradle
+            script: 
+              - ls -la
+              - ls -la ci/
+              - ls -la ci/pipeline/
+              - bash ./ci/pipeline/setup
+              - ./gradlew id:bundleDebugClasses && ./gradlew clientapi:testDebugUnitTest
+            artifacts:
+              - clientapi/build/reports/tests/testDebugUnitTest/*
+        - step:
+            name: "Run id unit tests"
+            caches:
+              - gradle
+            script: 
+              - ls -la
+              - ls -la ci/
+              - ls -la ci/pipeline/
+              - bash ./ci/pipeline/setup
+              - ./gradlew id:bundleDebugClasses && ./gradlew id:testDebugUnitTest
+            artifacts:
+              - id/build/reports/tests/testDebugUnitTest/*
+        - step:
+            name: "Run face unit tests"
+            caches:
+              - gradle
+            script: 
+              - ls -la
+              - ls -la ci/
+              - ls -la ci/pipeline/
+              - bash ./ci/pipeline/setup
+              - ./gradlew id:bundleDebugClasses && ./gradlew face:testDebugUnitTest
+            artifacts:
+              - face/build/reports/tests/testDebugUnitTest/*           
+        - step:
+            name: "Run fingerprint unit tests"
+            caches:
+              - gradle
+            script: 
+              - ls -la
+              - ls -la ci/
+              - ls -la ci/pipeline/
+              - bash ./ci/pipeline/setup
+              - ./gradlew id:bundleDebugClasses && ./gradlew fingerprint:testDebugUnitTest
+            artifacts:
+              - fingerprint/build/reports/tests/testDebugUnitTest/*
