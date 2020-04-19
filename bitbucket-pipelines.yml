@@ -25,6 +25,9 @@ pipelines:
             caches:
               - gradle
             script: 
+              - ls -la
+              - ls -la ci/
+              - ls -la ci/pipeline/
               - bash ./ci/pipeline/setup
               - ./gradlew id:bundleDebugClasses && ./gradlew id:testDebugUnitTest
             artifacts:
@@ -34,6 +37,9 @@ pipelines:
             caches:
               - gradle
             script: 
+              - ls -la
+              - ls -la ci/
+              - ls -la ci/pipeline/
               - bash ./ci/pipeline/setup
               - ./gradlew id:bundleDebugClasses && ./gradlew face:testDebugUnitTest
             artifacts:
@@ -43,6 +49,9 @@ pipelines:
             caches:
               - gradle
             script: 
+              - ls -la
+              - ls -la ci/
+              - ls -la ci/pipeline/
               - bash ./ci/pipeline/setup
               - ./gradlew id:bundleDebugClasses && ./gradlew fingerprint:testDebugUnitTest
             artifacts:
