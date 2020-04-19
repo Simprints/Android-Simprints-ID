@@ -11,6 +11,6 @@ pipelines:
         caches:
           - gradle
         script: 
-          - echo "SIMPRINTS_ARTIFACTORY_USERNAME=$ARTIFACTORY_USERNAME" >> gradle.properties
-          - echo "SIMPRINTS_ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD" >> gradle.properties
-          - echo $ANDROID_HOME
+          - bash echo "SIMPRINTS_ARTIFACTORY_USERNAME=$ARTIFACTORY_USERNAME" >> gradle.properties
+          - bash echo "SIMPRINTS_ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD" >> gradle.properties
+          - bash echo $ANDROID_HOME
