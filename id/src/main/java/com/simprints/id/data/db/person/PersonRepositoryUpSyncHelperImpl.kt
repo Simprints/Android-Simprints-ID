@@ -11,11 +11,15 @@ import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.domain.personevents.*
 import com.simprints.id.data.db.person.domain.personevents.Event.Companion.ATTENDANT_ID_LABEL
+import com.simprints.id.data.db.person.domain.personevents.Event.Companion.MODE_LABEL
 import com.simprints.id.data.db.person.domain.personevents.Event.Companion.MODULE_ID_LABEL
 import com.simprints.id.data.db.person.domain.personevents.Event.Companion.PROJECT_ID_LABEL
+import com.simprints.id.data.db.person.domain.personevents.Event.Companion.SUBJECT_ID_LABEL
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.domain.modality.Modality
+import com.simprints.id.domain.modality.toMode
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.tools.extensions.bufferedChunks
 import kotlinx.coroutines.flow.collect
@@ -28,6 +32,7 @@ class PersonRepositoryUpSyncHelperImpl(
     private val personLocalDataSource: PersonLocalDataSource,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
+    private val modalities: List<Modality>,
     private val cache: PeopleSyncCache
 ) : PersonRepositoryUpSyncHelper {
 
@@ -84,17 +89,19 @@ class PersonRepositoryUpSyncHelperImpl(
         with(person) {
             Event(
                 UUID.randomUUID().toString(),
-                createLabels(projectId, moduleId, userId),
+                createLabels(projectId, moduleId, userId, patientId),
                 createPayload(person)
             )
         }
 
 
-    private fun createLabels(projectId: String, moduleId: String, userId: String) =
+    private fun createLabels(projectId: String, moduleId: String, userId: String, patientId: String) =
         mapOf(
             PROJECT_ID_LABEL to listOf(projectId),
             MODULE_ID_LABEL to listOf(moduleId),
-            ATTENDANT_ID_LABEL to listOf(userId)
+            ATTENDANT_ID_LABEL to listOf(userId),
+            SUBJECT_ID_LABEL to listOf(patientId),
+            MODE_LABEL to modalities.map { it.toMode().name }
         )
 
     private fun createPayload(person: Person) =

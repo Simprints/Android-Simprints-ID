@@ -31,6 +31,7 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSourceImpl
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
@@ -96,9 +97,10 @@ open class DataModule {
         personLocalDataSource: PersonLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
         peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
+        preferencesManager: PreferencesManager,
         peopleSyncCache: PeopleSyncCache) : PersonRepositoryUpSyncHelper =
         PersonRepositoryUpSyncHelperImpl(loginInfoManager, personLocalDataSource, eventRemoteDataSource,
-            peopleUpSyncScopeRepository, peopleSyncCache)
+            peopleUpSyncScopeRepository, preferencesManager.modalities, peopleSyncCache)
 
     @Provides
     open fun providePersonRepository(
