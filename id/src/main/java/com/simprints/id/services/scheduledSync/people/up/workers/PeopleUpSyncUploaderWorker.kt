@@ -5,10 +5,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
@@ -27,26 +24,15 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
 
     override val tag: String = PeopleUpSyncUploaderWorker::class.java.simpleName
 
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var personLocalDataSource: PersonLocalDataSource
-    @Inject lateinit var personRemoteDataSource: PersonRemoteDataSource
     @Inject override lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository
-    @Inject lateinit var peopleSyncCache: PeopleSyncCache
+    @Inject lateinit var personRepository: PersonRepository
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
             getComponent<PeopleUpSyncUploaderWorker> { it.inject(this@PeopleUpSyncUploaderWorker) }
             crashlyticsLog("Start")
 
-            val task = PeopleUpSyncUploaderTask(
-                loginInfoManager, personLocalDataSource, personRemoteDataSource,
-                PATIENT_UPLOAD_BATCH_SIZE,
-                peopleUpSyncScopeRepository,
-                peopleSyncCache
-            )
-
-            val totalUploaded = task.execute(this@PeopleUpSyncUploaderWorker.id.toString(), this@PeopleUpSyncUploaderWorker)
+            val totalUploaded = personRepository.performUpload()
             success(workDataOf(OUTPUT_UP_SYNC to totalUploaded), "Total uploaded: $totalUploaded")
         } catch (t: Throwable) {
             retryOrFailIfCloudIntegrationError(t)
