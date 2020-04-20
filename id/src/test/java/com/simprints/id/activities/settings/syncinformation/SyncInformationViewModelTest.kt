@@ -4,8 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
-import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.common.models.EventType
+import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.domain.Person
@@ -58,13 +57,10 @@ class SyncInformationViewModelTest {
         val countInRemoteForCreate = 123
         val countInRemoteForMove = 0
         val countInRemoteForDelete = 22
-        val eventCounts = listOf(
-            EventCount(EventType.EnrolmentRecordCreation, countInRemoteForCreate),
-            EventCount(EventType.EnrolmentRecordMove, countInRemoteForMove),
-            EventCount(EventType.EnrolmentRecordDeletion, countInRemoteForDelete)
-        )
+        val peopleCount = PeopleCount(countInRemoteForCreate, countInRemoteForDelete, countInRemoteForMove)
+
         every { peopleDownSyncScopeRepositoryMock.getDownSyncScope() } returns projectSyncScope
-        coEvery { personRepositoryMock.countToDownSync(any()) } returns eventCounts
+        coEvery { personRepositoryMock.countToDownSync(any()) } returns peopleCount
 
         viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount()
 

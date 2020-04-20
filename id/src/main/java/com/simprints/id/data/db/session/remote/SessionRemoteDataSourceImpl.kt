@@ -7,8 +7,9 @@ import com.simprints.id.data.db.session.remote.session.ApiSessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.tools.utils.retrySimNetworkCalls
 
-class SessionRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
-                                  private val simApiClientFactory: SimApiClientFactory
+class SessionRemoteDataSourceImpl(
+    private val remoteDbManager: RemoteDbManager,
+    private val simApiClientFactory: SimApiClientFactory
 ) : SessionRemoteDataSource {
 
     override suspend fun uploadSessions(projectId: String,
@@ -16,8 +17,12 @@ class SessionRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
         if (sessions.isEmpty()) {
             throw NoSessionsFoundException()
         }
+
         makeNetworkRequest({ sessionsRemoteInterface ->
-            sessionsRemoteInterface.uploadSessions(projectId, hashMapOf("sessions" to sessions.map { ApiSessionEvents(it) }.toTypedArray()))
+            sessionsRemoteInterface.uploadSessions(
+                projectId,
+                hashMapOf("sessions" to sessions.map { ApiSessionEvents(it) }.toTypedArray())
+            )
         }, "uploadSessionsBatch")
     }
 
@@ -28,4 +33,5 @@ class SessionRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
         val token = remoteDbManager.getCurrentToken()
         return simApiClientFactory.build<SessionsRemoteInterface>(token).api
     }
+
 }
