@@ -7,17 +7,18 @@ import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
-import com.simprints.id.data.db.people_sync.down.domain.toEventQuery
+import com.simprints.id.data.db.people_sync.down.domain.*
 import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordOperationType.*
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.exceptions.safe.sync.NoModulesSelectedForModuleSyncException
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import kotlinx.coroutines.flow.first
 
 class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
-                           val eventRemoteDataSource: EventRemoteDataSource,
+                           private val eventRemoteDataSource: EventRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
                            val downSyncScopeRepository: PeopleDownSyncScopeRepository,
                            private val peopleUpSyncExecutor: PeopleUpSyncExecutor) :
@@ -27,7 +28,7 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     EventRemoteDataSource by eventRemoteDataSource {
 
     override suspend fun countToDownSync(peopleDownSyncScope: PeopleDownSyncScope): PeopleCount {
-        val eventCounts = eventRemoteDataSource.count(peopleDownSyncScope.toEventQuery())
+        val eventCounts = eventRemoteDataSource.count(buildEventQuery(peopleDownSyncScope))
         return buildPeopleCountFromEventCounts(eventCounts)
     }
 
@@ -67,4 +68,25 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
 
         return PeopleCount(created, deleted, updated)
     }
+
+    private fun buildEventQuery(peopleDownSyncScope: PeopleDownSyncScope) =
+        with(peopleDownSyncScope) {
+            when (this) {
+                is ProjectSyncScope -> {
+                    EventQuery(projectId, modes = modes,
+                        types = listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove))
+                }
+                is UserSyncScope -> {
+                    EventQuery(projectId, userId = userId, modes = modes,
+                        types = listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove))
+                }
+                is ModuleSyncScope -> {
+                    if (modules.isEmpty()) {
+                        throw NoModulesSelectedForModuleSyncException()
+                    }
+                    EventQuery(projectId, moduleIds = modules, modes = modes,
+                        types = listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove))
+                }
+            }
+        }
 }
