@@ -14,6 +14,8 @@ class Event(val id: String,
         const val PROJECT_ID_LABEL = "projectId"
         const val ATTENDANT_ID_LABEL = "attendantId"
         const val MODULE_ID_LABEL = "moduleId"
+        const val SUBJECT_ID_LABEL = "subjectId"
+        const val MODE_LABEL = "mode"
     }
 }
 
