@@ -8,6 +8,7 @@ import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.bufferedChunks
 import com.simprints.id.tools.ignoreException
 import kotlinx.coroutines.CoroutineScope
@@ -19,14 +20,17 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 // Class to manage the current activeSession
-open class SessionRepositoryImpl(private val deviceId: String,
-                                 private val appVersionName: String,
-                                 private val projectId: String,
-                                 private val sessionEventsSyncManager: SessionEventsSyncManager,
-                                 private val sessionLocalDataSource: SessionLocalDataSource,
-                                 private val sessionRemoteDataSource: SessionRemoteDataSource,
-                                 private val preferencesManager: PreferencesManager,
-                                 private val crashReportManager: CrashReportManager) : SessionRepository {
+open class SessionRepositoryImpl(
+    private val deviceId: String,
+    private val appVersionName: String,
+    private val projectId: String,
+    private val sessionEventsSyncManager: SessionEventsSyncManager,
+    private val sessionLocalDataSource: SessionLocalDataSource,
+    private val sessionRemoteDataSource: SessionRemoteDataSource,
+    private val preferencesManager: PreferencesManager,
+    private val crashReportManager: CrashReportManager,
+    private val timeHelper: TimeHelper
+) : SessionRepository {
 
     companion object {
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
@@ -53,6 +57,7 @@ open class SessionRepositoryImpl(private val deviceId: String,
             }
         }
     }
+
     override suspend fun uploadSessions() {
         createBatchesFromLocalAndUploadSessions()
     }
@@ -61,7 +66,7 @@ open class SessionRepositoryImpl(private val deviceId: String,
         loadSessionsToUpload()
             .filterClosedSessions()
             .createBatches()
-            .startUploadingSessions()
+            .updateRelativeUploadTimeAndUploadSessions()
             .deleteSessionsFromDb()
     }
 
@@ -74,9 +79,10 @@ open class SessionRepositoryImpl(private val deviceId: String,
     private suspend fun Flow<SessionEvents>.createBatches() =
         this.bufferedChunks(SESSION_BATCH_SIZE)
 
-    private suspend fun Flow<List<SessionEvents>>.startUploadingSessions(): Flow<List<SessionEvents>> {
+    private suspend fun Flow<List<SessionEvents>>.updateRelativeUploadTimeAndUploadSessions(): Flow<List<SessionEvents>> {
         this.collect {
-            sessionRemoteDataSource.uploadSessions(projectId, it)
+            val sessionsWithUpdatedRelativeUploadTime = it.updateRelativeUploadTime()
+            sessionRemoteDataSource.uploadSessions(projectId, sessionsWithUpdatedRelativeUploadTime)
         }
         return this
     }
@@ -115,4 +121,11 @@ open class SessionRepositoryImpl(private val deviceId: String,
             crashReportManager.logExceptionOrSafeException(t)
             throw t
         }
+
+    private fun List<SessionEvents>.updateRelativeUploadTime() = map { session ->
+        session.also {
+            it.relativeUploadTime = timeHelper.now() - it.startTime
+        }
+    }
+
 }

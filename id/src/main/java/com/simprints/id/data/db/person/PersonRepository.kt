@@ -10,7 +10,7 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 
 interface PersonRepository : PersonLocalDataSource, PersonRemoteDataSource, FingerprintIdentityLocalDataSource {
 
-    suspend fun countToDownSync(peopleDownSyncScope: PeopleDownSyncScope): List<PeopleCount>
+    suspend fun countToDownSync(peopleDownSyncScope: PeopleDownSyncScope): PeopleCount
 
     suspend fun saveAndUpload(person: Person)
     suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult
