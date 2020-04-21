@@ -7,6 +7,7 @@ import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
@@ -15,13 +16,8 @@ import com.simprints.face.models.FaceDetection
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.launch
-import java.util.*
 
-class FaceCaptureViewModel(private val maxRetries: Int, private val qualityThreshold: Float) : ViewModel() {
-    // TODO: get correct information from SimprintsID managers
-    private val projectId: String = UUID.randomUUID().toString()
-    private val sessionId: String = UUID.randomUUID().toString()
-//    private val imageStoreManager: ImageStoreManager
+class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageManager: FaceImageManager) : ViewModel() {
 //    private val analyticsManager: AnalyticsManager
 
     val captures = MutableLiveData<List<FaceDetection>>()
