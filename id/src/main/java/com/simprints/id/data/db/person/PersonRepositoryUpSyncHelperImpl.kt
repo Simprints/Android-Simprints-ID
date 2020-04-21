@@ -22,10 +22,14 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.toMode
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.tools.extensions.bufferedChunks
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.util.*
+
+data class Progress(val count: Int)
 
 class PersonRepositoryUpSyncHelperImpl(
     private val loginInfoManager: LoginInfoManager,
@@ -48,7 +52,7 @@ class PersonRepositoryUpSyncHelperImpl(
             }
         }
 
-    override suspend fun executeUpload() {
+    override suspend fun executeUpload(scope: CoroutineScope) = scope.produce {
         try {
             //count = cache.readProgress(workerId)
 
@@ -57,6 +61,7 @@ class PersonRepositoryUpSyncHelperImpl(
                 .collect {
                     upSyncBatch(it)
                     count += it.size
+                    this.send(Progress(count))
                 }
 
         } catch (t: Throwable) {
@@ -122,9 +127,11 @@ class PersonRepositoryUpSyncHelperImpl(
                         it.fingerIdentifier.fromPersonToEvent())
                 }),
             FaceReference(
-                faceSamples.map { FaceTemplate(
-                    EncodingUtils.byteArrayToBase64(it.template)
-                ) })
+                faceSamples.map {
+                    FaceTemplate(
+                        EncodingUtils.byteArrayToBase64(it.template)
+                    )
+                })
         )
 
     private fun markPeopleAsSynced(people: List<Person>) {
