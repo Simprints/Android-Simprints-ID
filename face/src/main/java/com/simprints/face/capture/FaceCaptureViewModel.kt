@@ -7,7 +7,6 @@ import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
@@ -18,7 +17,7 @@ import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.launch
 import java.util.*
 
-class FaceCaptureViewModel(private val facePreferencesManager: FacePreferencesManager) : ViewModel() {
+class FaceCaptureViewModel(private val maxRetries: Int, private val qualityThreshold: Float) : ViewModel() {
     // TODO: get correct information from SimprintsID managers
     private val projectId: String = UUID.randomUUID().toString()
     private val sessionId: String = UUID.randomUUID().toString()
@@ -38,9 +37,8 @@ class FaceCaptureViewModel(private val facePreferencesManager: FacePreferencesMa
     private var retriesUsed: Int = 0
 
     val canRetry: Boolean
-        get() = retriesUsed++ < facePreferencesManager.maxRetries
+        get() = retriesUsed++ < maxRetries
 
-    private val qualityThreshold = facePreferencesManager.qualityThreshold
     var samplesToCapture = 1
 
     init {
