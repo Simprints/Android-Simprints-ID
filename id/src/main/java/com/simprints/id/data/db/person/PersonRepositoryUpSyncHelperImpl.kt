@@ -82,7 +82,7 @@ class PersonRepositoryUpSyncHelperImpl(
         }
     }
 
-    private fun createEvents(people: List<Person>) =
+    internal fun createEvents(people: List<Person>) =
         Events(people.map { createEventFromPerson(it) })
 
     private fun createEventFromPerson(person: Person): Event =

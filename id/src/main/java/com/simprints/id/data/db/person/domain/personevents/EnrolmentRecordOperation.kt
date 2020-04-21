@@ -8,18 +8,18 @@ import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRe
 
 sealed class EnrolmentRecordOperation(val type: EnrolmentRecordOperationType)
 
-class EnrolmentRecordCreation(val subjectId: String,
+data class EnrolmentRecordCreation(val subjectId: String,
                               val projectId: String,
                               val moduleId: String,
                               val attendantId: String,
                               val biometricReferences: List<BiometricReference>) : EnrolmentRecordOperation(EnrolmentRecordOperationType.EnrolmentRecordCreation)
 
-class EnrolmentRecordDeletion(val subjectId: String,
+data class EnrolmentRecordDeletion(val subjectId: String,
                               val projectId: String,
                               val moduleId: String,
                               val attendantId: String) : EnrolmentRecordOperation(EnrolmentRecordOperationType.EnrolmentRecordDeletion)
 
-class EnrolmentRecordMove(val enrolmentRecordCreation: EnrolmentRecordCreation,
+data class EnrolmentRecordMove(val enrolmentRecordCreation: EnrolmentRecordCreation,
                           val enrolmentRecordDeletion: EnrolmentRecordDeletion) : EnrolmentRecordOperation(EnrolmentRecordOperationType.EnrolmentRecordMove)
 
 enum class EnrolmentRecordOperationType {

@@ -4,7 +4,7 @@ import com.simprints.id.data.db.person.remote.models.personevents.ApiFingerIdent
 import com.simprints.id.data.db.person.remote.models.personevents.ApiFingerprintTemplate
 import com.simprints.id.data.db.person.domain.FingerIdentifier as PersonFingerIdentifier
 
-class FingerprintTemplate(val quality: Int,
+data class FingerprintTemplate(val quality: Int,
                           val template: String,
                           val finger: FingerIdentifier)
 

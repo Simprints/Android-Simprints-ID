@@ -38,11 +38,14 @@ object EnrolmentRecordsGeneratorUtils {
         val fingerprint = FingerprintGeneratorUtils.generateRandomFingerprint()
 
         return listOf(
-            FaceReference(hashMapOf("SDK" to "ML_Kit"), listOf(FaceTemplate("face_template"))),
-            FingerprintReference(hashMapOf("vero" to "VERO_2"), listOf(
-                FingerprintTemplate(fingerprint.templateQualityScore,
+            FaceReference(listOf(FaceTemplate("face_template")), hashMapOf("SDK" to "ML_Kit")),
+            FingerprintReference(
+                listOf(
+                    FingerprintTemplate(fingerprint.templateQualityScore,
                     fingerprint.template.toString(), FingerIdentifier.LEFT_3RD_FINGER)
-            ))
+                ),
+                hashMapOf("vero" to "VERO_2")
+            )
         )
     }
 }
