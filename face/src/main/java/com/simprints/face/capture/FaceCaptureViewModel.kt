@@ -16,11 +16,12 @@ import com.simprints.face.models.FaceDetection
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageManager: FaceImageManager) : ViewModel() {
 //    private val analyticsManager: AnalyticsManager
 
-    val captures = MutableLiveData<List<FaceDetection>>()
+    val faceDetections = MutableLiveData<List<FaceDetection>>()
     val shouldProcessFrames: MutableLiveData<LiveDataEventWithContent<Boolean>> = MutableLiveData()
 
     val frameChannel = Channel<Frame>(CONFLATED)
@@ -63,19 +64,19 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
     }
 
     fun flowFinished() {
-        saveCaptures()
+        saveFaceDetections()
         // TODO: add analytics for FlowFinished(SUCCESS) and EndSession
 
-        val results = captures.value?.mapIndexed { index, detection ->
+        val results = faceDetections.value?.mapIndexed { index, detection ->
             FaceCaptureResult(index, detection.toFaceSample())
         } ?: listOf()
 
         flowFinished.send(FaceCaptureResponse(results))
     }
 
-    fun captureFinished(captures: List<FaceDetection>) {
+    fun captureFinished(faceDetections: List<FaceDetection>) {
         stopFaceDetection()
-        this.captures.value = captures
+        this.faceDetections.value = faceDetections
     }
 
     fun willRetry() {
@@ -90,12 +91,15 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
         // TODO: add analytics for StartSession
     }
 
-    private fun saveCaptures() {
-        captures.value?.forEach { capture -> saveImage(capture) }
+    private fun saveFaceDetections() {
+        // TODO: send the correct captureEventId once we can get it
+        faceDetections.value?.forEachIndexed { index, faceDetection -> saveImage(faceDetection, index.toString()) }
     }
 
-    private fun saveImage(capture: FaceDetection) {
-        // TODO: use image manager to store the images
+    private fun saveImage(faceDetection: FaceDetection, captureEventId: String) {
+        runBlocking {
+            faceImageManager.save(faceDetection.frame.toByteArray(), captureEventId)
+        }
     }
 
 }
