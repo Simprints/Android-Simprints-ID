@@ -98,7 +98,7 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
 
     private fun saveImage(faceDetection: FaceDetection, captureEventId: String) {
         runBlocking {
-            faceImageManager.save(faceDetection.frame.toByteArray(), captureEventId)
+            faceDetection.securedImageRef = faceImageManager.save(faceDetection.frame.toByteArray(), captureEventId)
         }
     }
 
