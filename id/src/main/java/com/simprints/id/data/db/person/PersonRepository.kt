@@ -7,6 +7,7 @@ import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import kotlinx.coroutines.channels.ReceiveChannel
 
 interface PersonRepository : PersonLocalDataSource, PersonRemoteDataSource, FingerprintIdentityLocalDataSource {
 
@@ -15,5 +16,5 @@ interface PersonRepository : PersonLocalDataSource, PersonRemoteDataSource, Fing
     suspend fun saveAndUpload(person: Person)
     suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult
 
-    suspend fun performUpload()
+    suspend fun performUpload(): ReceiveChannel<Progress>
 }

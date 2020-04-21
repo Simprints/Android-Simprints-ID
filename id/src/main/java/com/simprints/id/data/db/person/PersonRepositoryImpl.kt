@@ -15,7 +15,9 @@ import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.exceptions.safe.sync.NoModulesSelectedForModuleSyncException
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 
 class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                            private val eventRemoteDataSource: EventRemoteDataSource,
@@ -91,7 +93,7 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             }
         }
 
-    override suspend fun performUpload() {
-        personRepositoryUpSyncHelper.executeUpload()
+    override suspend fun performUpload() = withContext(IO) {
+        personRepositoryUpSyncHelper.executeUpload(this)
     }
 }
