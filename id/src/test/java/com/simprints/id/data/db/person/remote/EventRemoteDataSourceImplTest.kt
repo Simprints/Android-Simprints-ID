@@ -10,7 +10,11 @@ import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.people_sync.down.domain.EventQuery
 import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordOperationType
-import com.simprints.id.data.db.person.remote.models.personevents.*
+import com.simprints.id.data.db.person.domain.personevents.Events
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordCreation
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordDeletion
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordMove
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEvent
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.json.SimJsonHelper
@@ -126,12 +130,10 @@ class EventRemoteDataSourceImplTest {
 
     }
 
-    private fun buildEnrolmentRecordEvents() = ApiEvents(buildApiEventsList())
+    private fun buildEnrolmentRecordEvents() = Events(buildApiEventsList())
 
     private fun buildApiEventsList() =
-        getRandomEnrolmentEvents(5, PROJECT_ID, USER_ID, "module_id").map {
-            it.fromDomainToApi()
-        }
+        getRandomEnrolmentEvents(5, PROJECT_ID, USER_ID, "module_id")
 
     private fun buildEventQuery() = EventQuery(
         PROJECT_ID,

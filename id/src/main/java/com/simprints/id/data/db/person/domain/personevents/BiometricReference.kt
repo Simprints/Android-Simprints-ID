@@ -6,10 +6,10 @@ import com.simprints.id.data.db.person.remote.models.personevents.ApiFingerprint
 
 sealed class BiometricReference(val type: BiometricReferenceType)
 
-class FaceReference(val templates: List<FaceTemplate>,
+data class FaceReference(val templates: List<FaceTemplate>,
                     val metadata: HashMap<String, String>? = null): BiometricReference(BiometricReferenceType.FaceReference)
 
-class FingerprintReference(val templates: List<FingerprintTemplate>,
+data class FingerprintReference(val templates: List<FingerprintTemplate>,
                            val metadata: HashMap<String, String>? = null): BiometricReference(BiometricReferenceType.FingerprintReference)
 
 enum class BiometricReferenceType {

@@ -42,6 +42,7 @@ class PersonRepositoryTest {
     @RelaxedMockK lateinit var peopleUpSyncExecutor: PeopleUpSyncExecutor
     @RelaxedMockK lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
     @RelaxedMockK lateinit var eventRemoteDataSource: EventRemoteDataSource
+    @RelaxedMockK lateinit var personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper
 
     private lateinit var personRepository: PersonRepository
 
@@ -49,7 +50,8 @@ class PersonRepositoryTest {
     fun setup() {
         UnitTestConfig(this).coroutinesMainThread()
         MockKAnnotations.init(this, relaxUnitFun = true)
-        personRepository = PersonRepositoryImpl(remoteDataSource, eventRemoteDataSource, localDataSource, downSyncScopeRepository, peopleUpSyncExecutor)
+        personRepository = PersonRepositoryImpl(remoteDataSource, eventRemoteDataSource,
+            localDataSource, downSyncScopeRepository, peopleUpSyncExecutor, personRepositoryUpSyncHelper)
     }
 
     @Test
