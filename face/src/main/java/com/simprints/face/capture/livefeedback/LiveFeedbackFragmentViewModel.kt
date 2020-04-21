@@ -21,7 +21,7 @@ class LiveFeedbackFragmentViewModel(
     private val mainVM: FaceCaptureViewModel,
     private val faceDetector: FaceDetector,
     private val frameProcessor: FrameProcessor,
-    private val facePreferencesManager: FacePreferencesManager
+    private val qualityThreshold: Float
 ) : ViewModel() {
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
@@ -33,8 +33,6 @@ class LiveFeedbackFragmentViewModel(
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
     val captures = mutableListOf<FaceDetection>()
-
-    private val qualityThreshold = facePreferencesManager.qualityThreshold
 
     suspend fun process(
         frame: Frame,
