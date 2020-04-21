@@ -61,19 +61,17 @@ class LiveFeedbackFragmentViewModel(
 
     private fun finishCapture() {
         val sortedQualifyingCaptures = captures
+            .filter { it.hasValidStatus() && it.isAboveQualityThreshold(qualityThreshold) }
             .sortedByDescending { it.face?.quality }
-            .also { mainVM.captureFinished(it) }
-            .filter { it.status == FaceDetection.Status.VALID_CAPTURING }
 
-        if (areCapturesBelowThreshold(sortedQualifyingCaptures)) {
+        mainVM.captureFinished(sortedQualifyingCaptures)
+
+        if (sortedQualifyingCaptures.isEmpty()) {
             capturingState.value = CapturingState.FINISHED_FAILED
         } else {
             capturingState.value = CapturingState.FINISHED
         }
     }
-
-    private fun areCapturesBelowThreshold(captures: List<FaceDetection>) =
-        captures.isEmpty() || captures.first().face?.quality ?: Float.NEGATIVE_INFINITY < qualityThreshold
 
     private fun getFaceDetectionFromPotentialFace(potentialFace: Face?, previewFrame: PreviewFrame): FaceDetection {
         return if (potentialFace == null) {
