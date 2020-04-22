@@ -2,9 +2,9 @@ package com.simprints.id.tools.json
 
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.reflect.TypeToken
-import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordCreation
-import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordDeletion
-import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordMove
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordCreationPayload
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordMovePayload
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEvent
 import org.junit.Test
 
@@ -19,8 +19,8 @@ class SimJsonHelperTest {
         val listType = object : TypeToken<ArrayList<ApiEvent?>?>() {}.type
         val apiEvents = SimJsonHelper.gson.fromJson<List<ApiEvent>>(EVENTS_JSON, listType)
         assertThat(apiEvents.size).isEqualTo(3)
-        assertThat(apiEvents[0].payload).isInstanceOf(ApiEnrolmentRecordCreation::class.java)
-        assertThat(apiEvents[1].payload).isInstanceOf(ApiEnrolmentRecordDeletion::class.java)
-        assertThat(apiEvents[2].payload).isInstanceOf(ApiEnrolmentRecordMove::class.java)
+        assertThat(apiEvents[0].payload).isInstanceOf(ApiEnrolmentRecordCreationPayload::class.java)
+        assertThat(apiEvents[1].payload).isInstanceOf(ApiEnrolmentRecordDeletionPayload::class.java)
+        assertThat(apiEvents[2].payload).isInstanceOf(ApiEnrolmentRecordMovePayload::class.java)
     }
 }

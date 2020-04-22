@@ -9,7 +9,7 @@ import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.*
 import com.simprints.id.data.db.person.domain.Person
-import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordOperationType.*
+import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.*
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource

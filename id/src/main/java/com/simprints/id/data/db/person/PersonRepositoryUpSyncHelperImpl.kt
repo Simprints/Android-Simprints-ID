@@ -11,11 +11,6 @@ import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.domain.personevents.*
-import com.simprints.id.data.db.person.domain.personevents.Event.Companion.ATTENDANT_ID_LABEL
-import com.simprints.id.data.db.person.domain.personevents.Event.Companion.MODE_LABEL
-import com.simprints.id.data.db.person.domain.personevents.Event.Companion.MODULE_ID_LABEL
-import com.simprints.id.data.db.person.domain.personevents.Event.Companion.PROJECT_ID_LABEL
-import com.simprints.id.data.db.person.domain.personevents.Event.Companion.SUBJECT_ID_LABEL
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -90,23 +85,17 @@ class PersonRepositoryUpSyncHelperImpl(
         with(person) {
             Event(
                 UUID.randomUUID().toString(),
-                createLabels(projectId, moduleId, userId, patientId),
+                listOf(projectId),
+                listOf(patientId),
+                listOf(userId),
+                listOf(moduleId),
+                modalities.map { it.toMode() },
                 createPayload(person)
             )
         }
 
-
-    private fun createLabels(projectId: String, moduleId: String, userId: String, patientId: String) =
-        mapOf(
-            PROJECT_ID_LABEL to listOf(projectId),
-            MODULE_ID_LABEL to listOf(moduleId),
-            ATTENDANT_ID_LABEL to listOf(userId),
-            SUBJECT_ID_LABEL to listOf(patientId),
-            MODE_LABEL to modalities.map { it.toMode().name }
-        )
-
     private fun createPayload(person: Person) =
-        EnrolmentRecordCreation(
+        EnrolmentRecordCreationPayload(
             subjectId = person.patientId,
             projectId = person.projectId,
             moduleId = person.moduleId,
