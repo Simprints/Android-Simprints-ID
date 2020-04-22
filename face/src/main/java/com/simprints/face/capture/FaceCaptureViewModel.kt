@@ -7,6 +7,8 @@ import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext
+import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.*
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
@@ -17,6 +19,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 
 class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageManager: FaceImageManager) : ViewModel() {
 //    private val analyticsManager: AnalyticsManager
@@ -27,6 +30,7 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
     val frameChannel = Channel<Frame>(CONFLATED)
 
     val startCamera: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val retryFlow: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
     val flowFinished: MutableLiveData<LiveDataEventWithContent<FaceCaptureResponse>> =
         MutableLiveData()
@@ -79,12 +83,33 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
         this.faceDetections.value = faceDetections
     }
 
-    fun willRetry() {
-        // TODO: add analytics for FlowFinished(RETRY)
+    fun handleBackButton(backButtonContext: BackButtonContext) {
+        when (backButtonContext) {
+            CAPTURE -> {
+                Timber.d("GO TO EXIT FORM")
+            }
+            CONFIRMATION -> flowFinished()
+            RETRY -> handleRetry()
+        }
     }
 
-    fun retryFailed() {
+    fun handleRetry() {
+        if (canRetry) {
+            retryFlow()
+        } else {
+            finishFlowWithFailedRetries()
+        }
+    }
+
+    private fun retryFlow() {
+        // TODO: add analytics for FlowFinished(RETRY)
+        retryFlow.send()
+    }
+
+    // TODO: should have a better understanding on what to do after failed all retries
+    private fun finishFlowWithFailedRetries() {
         // TODO: add analytics for FlowFinished(RETRY_FAIL)
+        flowFinished()
     }
 
     private fun startNewAnalyticsSession() {
