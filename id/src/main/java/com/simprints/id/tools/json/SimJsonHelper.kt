@@ -7,7 +7,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.person.remote.models.personevents.*
 import com.simprints.id.data.db.person.remote.models.personevents.ApiBiometricReferenceType.FaceReference
 import com.simprints.id.data.db.person.remote.models.personevents.ApiBiometricReferenceType.FingerprintReference
-import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordOperationType.*
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEventPayloadType.*
 
 object SimJsonHelper {
     private val gsonBuilder: GsonBuilder by lazy {
@@ -21,10 +21,10 @@ object SimJsonHelper {
     }
 
     private fun getTypeAdapterFactoryForEvents() =
-        RuntimeTypeAdapterFactory.of(ApiEnrolmentRecordOperation::class.java, "type")
-            .registerSubtype(ApiEnrolmentRecordCreation::class.java, EnrolmentRecordCreation.name)
-            .registerSubtype(ApiEnrolmentRecordDeletion::class.java, EnrolmentRecordDeletion.name)
-            .registerSubtype(ApiEnrolmentRecordMove::class.java, EnrolmentRecordMove.name)
+        RuntimeTypeAdapterFactory.of(ApiEventPayload::class.java, "type")
+            .registerSubtype(ApiEnrolmentRecordCreationPayload::class.java, EnrolmentRecordCreation.name)
+            .registerSubtype(ApiEnrolmentRecordDeletionPayload::class.java, EnrolmentRecordDeletion.name)
+            .registerSubtype(ApiEnrolmentRecordMovePayload::class.java, EnrolmentRecordMove.name)
 
     private fun getTypeAdapterFactoryForBiometricReferences() =
         RuntimeTypeAdapterFactory.of(ApiBiometricReference::class.java, "type")

@@ -1,6 +1,7 @@
 package com.simprints.id.commontesttools
 
 import com.simprints.id.data.db.person.domain.personevents.*
+import com.simprints.id.domain.modality.Modes
 import java.util.*
 
 object EnrolmentRecordsGeneratorUtils {
@@ -10,24 +11,27 @@ object EnrolmentRecordsGeneratorUtils {
                                  moduleId: String) =
         mutableListOf<Event>().also { fakeRecords ->
             repeat(nPeople) {
+                val subjectId = UUID.randomUUID().toString()
+                val eventId = UUID.randomUUID().toString()
                 fakeRecords.add(
                     Event(
-                        UUID.randomUUID().toString(),
-                        hashMapOf(
-                            "projectId" to listOf(projectId),
-                            "attendantId" to listOf(userId),
-                            "moduleId" to listOf(moduleId)
-                        ),
-                        buildFakeEnrolmentRecordCreation(projectId, userId, moduleId)
+                        eventId,
+                        listOf(projectId),
+                        listOf(subjectId),
+                        listOf(userId),
+                        listOf(moduleId),
+                        listOf(Modes.FACE, Modes.FINGERPRINT),
+                        buildFakeEnrolmentRecordCreation(subjectId, projectId, userId, moduleId)
                     )
                 )
             }
         }
 
-    private fun buildFakeEnrolmentRecordCreation(projectId: String,
+    private fun buildFakeEnrolmentRecordCreation(subjectId: String,
+                                                 projectId: String,
                                                  userId: String,
-                                                 moduleId: String) = EnrolmentRecordCreation(
-        subjectId = UUID.randomUUID().toString(),
+                                                 moduleId: String) = EnrolmentRecordCreationPayload(
+        subjectId = subjectId,
         projectId = projectId,
         moduleId = moduleId,
         attendantId = userId,

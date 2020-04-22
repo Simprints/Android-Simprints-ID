@@ -9,11 +9,11 @@ import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandom
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.people_sync.down.domain.EventQuery
-import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordOperationType
+import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.*
 import com.simprints.id.data.db.person.domain.personevents.Events
-import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordCreation
-import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordDeletion
-import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordMove
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordCreationPayload
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordMovePayload
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEvent
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.testtools.UnitTestConfig
@@ -122,9 +122,9 @@ class EventRemoteDataSourceImplTest {
             val apiEvents = parseApiEventsFromResponse(responseString)
             with (apiEvents) {
                 assertThat(size).isEqualTo(3)
-                assertThat(get(0).payload).isInstanceOf(ApiEnrolmentRecordCreation::class.java)
-                assertThat(get(1).payload).isInstanceOf(ApiEnrolmentRecordDeletion::class.java)
-                assertThat(get(2).payload).isInstanceOf(ApiEnrolmentRecordMove::class.java)
+                assertThat(get(0).payload).isInstanceOf(ApiEnrolmentRecordCreationPayload::class.java)
+                assertThat(get(1).payload).isInstanceOf(ApiEnrolmentRecordDeletionPayload::class.java)
+                assertThat(get(2).payload).isInstanceOf(ApiEnrolmentRecordMovePayload::class.java)
             }
         }
 
@@ -142,9 +142,9 @@ class EventRemoteDataSourceImplTest {
         SUBJECT_ID,
         LAST_EVENT_ID,
         listOf(Modes.FINGERPRINT, Modes.FACE),
-        listOf(EnrolmentRecordOperationType.EnrolmentRecordMove,
-            EnrolmentRecordOperationType.EnrolmentRecordDeletion,
-            EnrolmentRecordOperationType.EnrolmentRecordCreation)
+        listOf(EnrolmentRecordMove,
+            EnrolmentRecordDeletion,
+            EnrolmentRecordCreation)
     )
 
     private fun buildSuccessfulResponseForCount() = MockResponse().apply {

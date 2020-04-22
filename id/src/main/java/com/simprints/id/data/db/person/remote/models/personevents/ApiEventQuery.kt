@@ -10,7 +10,7 @@ data class ApiEventQuery(val projectId: String,
                          val subjectId: String?,
                          val lastEventId: String?,
                          val modes: List<ApiModes>,
-                         val types: List<ApiEnrolmentRecordOperationType>)
+                         val types: List<ApiEventPayloadType>)
 
 fun EventQuery.fromDomainToApi() =
     ApiEventQuery(projectId, userId, moduleIds, subjectId,
