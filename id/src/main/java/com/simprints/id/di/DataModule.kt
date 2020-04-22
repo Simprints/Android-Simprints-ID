@@ -100,7 +100,7 @@ open class DataModule {
         preferencesManager: PreferencesManager,
         peopleSyncCache: PeopleSyncCache) : PersonRepositoryUpSyncHelper =
         PersonRepositoryUpSyncHelperImpl(loginInfoManager, personLocalDataSource, eventRemoteDataSource,
-            peopleUpSyncScopeRepository, preferencesManager.modalities, peopleSyncCache)
+                peopleUpSyncScopeRepository, preferencesManager.modalities)
 
     @Provides
     open fun providePersonRepository(

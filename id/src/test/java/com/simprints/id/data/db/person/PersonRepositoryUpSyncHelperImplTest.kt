@@ -27,7 +27,7 @@ class PersonRepositoryUpSyncHelperImplTest {
     private val modalities = listOf(Modality.FACE, Modality.FINGER)
 
     val personRepositoryUpSyncHelper = spyk(PersonRepositoryUpSyncHelperImpl(loginInfoManager,
-        personLocalDataSource, eventRemoteDataSource, peopleUpSyncScopeRepository, modalities, peopleSyncCache))
+            personLocalDataSource, eventRemoteDataSource, peopleUpSyncScopeRepository, modalities))
 
     private val uniqueWorkerId = "uniqueWorkerId"
     private val projectIdToSync = "projectIdToSync"
