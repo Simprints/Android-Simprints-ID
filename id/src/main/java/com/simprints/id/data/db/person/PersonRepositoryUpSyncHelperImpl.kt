@@ -6,6 +6,7 @@ import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperation
 import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperationResult
 import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperationResult.UpSyncState
 import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperationResult.UpSyncState.RUNNING
+import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncProgress
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
@@ -28,8 +29,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.util.*
-
-data class Progress(val count: Int)
 
 class PersonRepositoryUpSyncHelperImpl(
     private val loginInfoManager: LoginInfoManager,
@@ -61,7 +60,7 @@ class PersonRepositoryUpSyncHelperImpl(
                 .collect {
                     upSyncBatch(it)
                     count += it.size
-                    this.send(Progress(count))
+                    this.send(PeopleUpSyncProgress(count))
                 }
 
         } catch (t: Throwable) {

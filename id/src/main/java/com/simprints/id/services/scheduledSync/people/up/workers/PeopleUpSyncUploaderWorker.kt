@@ -1,7 +1,6 @@
 package com.simprints.id.services.scheduledSync.people.up.workers
 
 import android.content.Context
-import android.util.Log
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -33,15 +32,16 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
             getComponent<PeopleUpSyncUploaderWorker> { it.inject(this@PeopleUpSyncUploaderWorker) }
             crashlyticsLog("Start")
 
-            val totalUploaded = personRepository.performUpload()
+            val totalUploaded = personRepository.performUpload(this)
             while (!totalUploaded.isClosedForReceive) {
                 totalUploaded.poll()?.let {
-                   Log.d("Uploaded")
+                   reportCount(it.count)
                 }
             }
 
             success(workDataOf(OUTPUT_UP_SYNC to totalUploaded), "Total uploaded: $totalUploaded")
         } catch (t: Throwable) {
+            t.printStackTrace()
             retryOrFailIfCloudIntegrationError(t)
         }
     }
@@ -61,7 +61,6 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
     }
 
     companion object {
-        private const val PATIENT_UPLOAD_BATCH_SIZE = 80
         const val PROGRESS_UP_SYNC = "PROGRESS_UP_SYNC"
         const val OUTPUT_UP_SYNC = "OUTPUT_UP_SYNC"
     }
