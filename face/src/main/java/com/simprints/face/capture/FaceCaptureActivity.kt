@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.findNavController
 import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
@@ -48,6 +49,10 @@ class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
             setResult(Activity.RESULT_OK, intent)
             finish()
         })
+
+        vm.retryFlow.observe(this, LiveDataEventObserver {
+            findNavController(R.id.capture_host_fragment).navigate(R.id.action_retryFragment_to_liveFeedbackFragment)
+        })
     }
 
     private fun startCamera() {
@@ -55,6 +60,14 @@ class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
             it.useDeviceOrientation = true
             it.setLifecycleOwner(this)
         }
+    }
+
+    override fun onBackPressed() {
+        vm.handleBackButton(
+            BackButtonContext.fromFragmentId(
+                findNavController(R.id.capture_host_fragment).currentDestination?.id
+            )
+        )
     }
 
     /**
@@ -67,6 +80,19 @@ class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
             vm.handlePreviewFrame(frame.freeze())
         } catch (ex: IllegalStateException) {
             Timber.e(ex)
+        }
+    }
+
+    enum class BackButtonContext {
+        CAPTURE, CONFIRMATION, RETRY;
+
+        companion object {
+            fun fromFragmentId(fragmentId: Int?) = when (fragmentId) {
+                R.id.preparationFragment, R.id.liveFeedbackFragment -> CAPTURE
+                R.id.confirmationFragment -> CONFIRMATION
+                R.id.retryFragment -> RETRY
+                else -> CAPTURE
+            }
         }
     }
 }
