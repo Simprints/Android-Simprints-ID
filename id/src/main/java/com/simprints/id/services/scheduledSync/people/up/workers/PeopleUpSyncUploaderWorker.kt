@@ -14,8 +14,10 @@ import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSync
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 // TODO: uncomment userId when multitenancy is properly implemented
@@ -26,22 +28,32 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var personRepository: PersonRepository
+    @Inject lateinit var peopleSyncCache: PeopleSyncCache
 
+    @ExperimentalCoroutinesApi
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
+            val workerId = this@PeopleUpSyncUploaderWorker.id.toString()
+
             getComponent<PeopleUpSyncUploaderWorker> { it.inject(this@PeopleUpSyncUploaderWorker) }
+            var count = peopleSyncCache.readProgress(workerId)
             crashlyticsLog("Start")
 
             val totalUploaded = personRepository.performUpload(this)
             while (!totalUploaded.isClosedForReceive) {
                 totalUploaded.poll()?.let {
-                   reportCount(it.count)
+                    count += it.upSyncCountForBatch
+                    peopleSyncCache.saveProgress(workerId, count)
+                    Timber.d("Upsync uploader count : $count for batch : $it")
+                    reportCount(count)
                 }
             }
 
-            success(workDataOf(OUTPUT_UP_SYNC to totalUploaded), "Total uploaded: $totalUploaded")
+            Timber.d("Upsync success : $count")
+            success(workDataOf(OUTPUT_UP_SYNC to count), "Total uploaded: $count")
         } catch (t: Throwable) {
             t.printStackTrace()
+            Timber.d("Upsync failed : $t")
             retryOrFailIfCloudIntegrationError(t)
         }
     }

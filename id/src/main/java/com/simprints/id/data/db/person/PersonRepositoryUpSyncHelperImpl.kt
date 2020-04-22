@@ -21,9 +21,9 @@ import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.toMode
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.tools.extensions.bufferedChunks
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
@@ -35,11 +35,8 @@ class PersonRepositoryUpSyncHelperImpl(
     private val personLocalDataSource: PersonLocalDataSource,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
-    private val modalities: List<Modality>,
-    private val cache: PeopleSyncCache
+    private val modalities: List<Modality>
 ) : PersonRepositoryUpSyncHelper {
-
-    var count = 0
 
     val projectId: String
         get() {
@@ -51,20 +48,20 @@ class PersonRepositoryUpSyncHelperImpl(
             }
         }
 
+    @ExperimentalCoroutinesApi
     override suspend fun executeUpload(scope: CoroutineScope) = scope.produce {
         try {
-            //count = cache.readProgress(workerId)
-
             personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true))
-                .bufferedChunks(80)
+                .bufferedChunks(UPSYNC_BATCH_SIZE)
                 .collect {
+                    Timber.d("PersonRepository : uploading ${it.size} people")
                     upSyncBatch(it)
-                    count += it.size
-                    this.send(PeopleUpSyncProgress(count))
+                    this.send(PeopleUpSyncProgress(it.size))
                 }
 
         } catch (t: Throwable) {
             t.printStackTrace()
+            Timber.d("PersonRepository : failed uploading people")
             updateState(UpSyncState.FAILED)
             throw t
         }
@@ -143,6 +140,7 @@ class PersonRepositoryUpSyncHelperImpl(
     }
 
     private suspend fun updateState(state: UpSyncState) {
+        Timber.d("Updating sync state: $state")
         updateLastUpSyncTime(PeopleUpSyncOperation(
             projectId,
             PeopleUpSyncOperationResult(
@@ -150,5 +148,9 @@ class PersonRepositoryUpSyncHelperImpl(
                 Date().time
             )
         ))
+    }
+
+    companion object {
+        private const val UPSYNC_BATCH_SIZE = 80
     }
 }
