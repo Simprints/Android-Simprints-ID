@@ -115,7 +115,7 @@ private fun createDownSyncCounterWorker(state: WorkInfo.State,
                                         id: UUID = UUID.randomUUID()) =
     createWorkInfo(
         state,
-        workDataOf(PeopleDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN to JsonHelper.gson.toJson(listOf(PeopleCount(TO_DOWNLOAD, 0, 0)))),
+        workDataOf(PeopleDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN to JsonHelper.gson.toJson(PeopleCount(TO_DOWNLOAD, 0, 0))),
         createCommonDownSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(DOWN_COUNTER)),
         workDataOf(),
         id
