@@ -92,6 +92,6 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             }
         }
 
-    override suspend fun performUpload(scope: CoroutineScope) =
-        personRepositoryUpSyncHelper.executeUpload(scope)
+    override suspend fun performUploadWithProgress(scope: CoroutineScope) =
+        personRepositoryUpSyncHelper.executeUploadWithProgress(scope)
 }

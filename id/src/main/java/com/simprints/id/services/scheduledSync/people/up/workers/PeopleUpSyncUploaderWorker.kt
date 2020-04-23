@@ -39,7 +39,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
             var count = peopleSyncCache.readProgress(workerId)
             crashlyticsLog("Start")
 
-            val totalUploaded = personRepository.performUpload(this)
+            val totalUploaded = personRepository.performUploadWithProgress(this)
             while (!totalUploaded.isClosedForReceive) {
                 totalUploaded.poll()?.let {
                     count += it.upSyncCountForBatch

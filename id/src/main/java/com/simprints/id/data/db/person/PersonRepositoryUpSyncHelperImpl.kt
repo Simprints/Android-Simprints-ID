@@ -44,7 +44,7 @@ class PersonRepositoryUpSyncHelperImpl(
         }
 
     @ExperimentalCoroutinesApi
-    override suspend fun executeUpload(scope: CoroutineScope) = scope.produce {
+    override suspend fun executeUploadWithProgress(scope: CoroutineScope) = scope.produce {
         try {
             personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true))
                 .bufferedChunks(UPSYNC_BATCH_SIZE)

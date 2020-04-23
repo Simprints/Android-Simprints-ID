@@ -18,5 +18,5 @@ interface PersonRepository : PersonLocalDataSource, PersonRemoteDataSource, Fing
     suspend fun saveAndUpload(person: Person)
     suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult
 
-    suspend fun performUpload(scope: CoroutineScope): ReceiveChannel<PeopleUpSyncProgress>
+    suspend fun performUploadWithProgress(scope: CoroutineScope): ReceiveChannel<PeopleUpSyncProgress>
 }
