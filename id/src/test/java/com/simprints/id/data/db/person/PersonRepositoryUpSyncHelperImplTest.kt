@@ -55,7 +55,7 @@ class PersonRepositoryUpSyncHelperImplTest {
     fun userNotSignedIn1_shouldThrowIllegalStateException() {
         runBlocking {
             assertThrows<IllegalStateException> {
-                personRepositoryUpSyncHelper.executeUpload(this)
+                personRepositoryUpSyncHelper.executeUploadWithProgress(this)
             }
         }
     }
@@ -87,7 +87,7 @@ class PersonRepositoryUpSyncHelperImplTest {
         mockSyncStatusModel()
 
         runBlocking {
-            personRepositoryUpSyncHelper.executeUpload(this)
+            personRepositoryUpSyncHelper.executeUploadWithProgress(this)
         }
 
         verifyLocalPeopleQueries(*localQueryResults)
