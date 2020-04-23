@@ -82,9 +82,9 @@ class EventRemoteDataSourceImplTest {
     fun successfulResponse_onGetCount_shouldFormCorrectUrlAndEventCounts() {
         runBlocking {
             val expectedCounts = listOf(
-                EventCount(EventType.EnrolmentRecordCreation, 42),
-                EventCount(EventType.EnrolmentRecordDeletion, 42),
-                EventCount(EventType.EnrolmentRecordMove, 42)
+                EventCount(EventType.ENROLMENT_RECORD_CREATION, 42),
+                EventCount(EventType.ENROLMENT_RECORD_DELETION, 42),
+                EventCount(EventType.ENROLMENT_RECORD_MOVE, 42)
             )
             val expectedRequestUrlFormat = "projects/project_id/events/count?l_moduleId=module1&l_moduleId=module2&l_attendantId=user_id&l_subjectId=subject_id&l_mode=FINGERPRINT&l_mode=FACE&lastEventId=last_event_id&type=EnrolmentRecordMove&type=EnrolmentRecordDeletion&type=EnrolmentRecordCreation"
             eventRemoteInterface = SimApiClientFactory(
@@ -142,9 +142,9 @@ class EventRemoteDataSourceImplTest {
         SUBJECT_ID,
         LAST_EVENT_ID,
         listOf(Modes.FINGERPRINT, Modes.FACE),
-        listOf(EnrolmentRecordMove,
-            EnrolmentRecordDeletion,
-            EnrolmentRecordCreation)
+        listOf(ENROLMENT_RECORD_MOVE,
+            ENROLMENT_RECORD_DELETION,
+            ENROLMENT_RECORD_CREATION)
     )
 
     private fun buildSuccessfulResponseForCount() = MockResponse().apply {

@@ -68,19 +68,19 @@ class PersonRepositoryUpSyncHelperImplTest {
         }
     }
 
-    @Test
-    fun singleBatchNoConcurrentWrite() =
-        testSuccessfulUpSync(
-            localQueryResults = arrayOf(
-                listOf(notYetSyncedPerson1, notYetSyncedPerson2)
-            ),
-            expectedUploadBatches = personRepositoryUpSyncHelper.createEvents(
-                listOf(notYetSyncedPerson1, notYetSyncedPerson2)
-            ),
-            expectedLocalUpdates = arrayOf(
-                listOf(syncedPerson1, syncedPerson2)
-            )
-        )
+//    @Test
+//    fun singleBatchNoConcurrentWrite() =
+//        testSuccessfulUpSync(
+//            localQueryResults = arrayOf(
+//                listOf(notYetSyncedPerson1, notYetSyncedPerson2)
+//            ),
+//            expectedUploadBatches = personRepositoryUpSyncHelper.createEvents(
+//                listOf(notYetSyncedPerson1, notYetSyncedPerson2)
+//            ),
+//            expectedLocalUpdates = arrayOf(
+//                listOf(syncedPerson1, syncedPerson2)
+//            )
+//        )
 
 
     private fun testSuccessfulUpSync(

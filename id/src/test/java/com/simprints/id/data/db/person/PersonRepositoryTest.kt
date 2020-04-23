@@ -110,7 +110,7 @@ class PersonRepositoryTest {
 
 
     private suspend fun assesDownSyncCount(downSyncScope: PeopleDownSyncScope) {
-        val eventCounts = listOf(EventCount(EventType.EnrolmentRecordCreation, REMOTE_PEOPLE_FOR_SUBSYNC))
+        val eventCounts = listOf(EventCount(EventType.ENROLMENT_RECORD_CREATION, REMOTE_PEOPLE_FOR_SUBSYNC))
 
         coEvery { downSyncScopeRepository.getDownSyncOperations(any()) } returns emptyList()
         coEvery { eventRemoteDataSource.count(any()) } returns eventCounts

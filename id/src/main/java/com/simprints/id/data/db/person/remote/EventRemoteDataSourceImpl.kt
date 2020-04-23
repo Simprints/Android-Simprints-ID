@@ -22,7 +22,7 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                 subjectId = subjectId,
                 modes = modes,
                 lastEventId = lastEventId,
-                eventType = types.map { it.name }
+                eventType = types.map { it.apiName }
             ).map { it.fromApiToDomain() }
         }, "EventCount")
     }
@@ -36,7 +36,7 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                 subjectId = subjectId,
                 modes = modes,
                 lastEventId = lastEventId,
-                eventType = types.map { it.name }
+                eventType = types.map { it.apiName }
             )
         }, "EventDownload")
     }

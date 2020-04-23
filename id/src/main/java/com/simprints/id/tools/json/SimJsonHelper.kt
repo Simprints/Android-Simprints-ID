@@ -5,8 +5,8 @@ import com.google.gson.GsonBuilder
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.person.remote.models.personevents.*
-import com.simprints.id.data.db.person.remote.models.personevents.ApiBiometricReferenceType.FaceReference
-import com.simprints.id.data.db.person.remote.models.personevents.ApiBiometricReferenceType.FingerprintReference
+import com.simprints.id.data.db.person.remote.models.personevents.ApiBiometricReferenceType.FACE_REFERENCE
+import com.simprints.id.data.db.person.remote.models.personevents.ApiBiometricReferenceType.FINGERPRINT_REFERENCE
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEventPayloadType.*
 
 object SimJsonHelper {
@@ -22,12 +22,12 @@ object SimJsonHelper {
 
     private fun getTypeAdapterFactoryForEvents() =
         RuntimeTypeAdapterFactory.of(ApiEventPayload::class.java, "type")
-            .registerSubtype(ApiEnrolmentRecordCreationPayload::class.java, EnrolmentRecordCreation.name)
-            .registerSubtype(ApiEnrolmentRecordDeletionPayload::class.java, EnrolmentRecordDeletion.name)
-            .registerSubtype(ApiEnrolmentRecordMovePayload::class.java, EnrolmentRecordMove.name)
+            .registerSubtype(ApiEnrolmentRecordCreationPayload::class.java, ENROLMENT_RECORD_CREATION.apiName)
+            .registerSubtype(ApiEnrolmentRecordDeletionPayload::class.java, ENROLMENT_RECORD_DELETION.apiName)
+            .registerSubtype(ApiEnrolmentRecordMovePayload::class.java, ENROLMENT_RECORD_MOVE.apiName)
 
     private fun getTypeAdapterFactoryForBiometricReferences() =
         RuntimeTypeAdapterFactory.of(ApiBiometricReference::class.java, "type")
-            .registerSubtype(ApiFingerprintReference::class.java, FingerprintReference.name)
-            .registerSubtype(ApiFaceReference::class.java, FaceReference.name)
+            .registerSubtype(ApiFingerprintReference::class.java, FINGERPRINT_REFERENCE.apiName)
+            .registerSubtype(ApiFaceReference::class.java, FACE_REFERENCE.apiName)
 }

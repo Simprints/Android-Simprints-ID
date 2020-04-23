@@ -62,9 +62,9 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
         var updated = 0
         eventCounts.forEach {
             when (it.type) {
-                EventType.EnrolmentRecordCreation -> created += it.count
-                EventType.EnrolmentRecordDeletion -> deleted += it.count
-                EventType.EnrolmentRecordMove -> updated += it.count
+                EventType.ENROLMENT_RECORD_CREATION -> created += it.count
+                EventType.ENROLMENT_RECORD_DELETION -> deleted += it.count
+                EventType.ENROLMENT_RECORD_MOVE -> updated += it.count
             }
         }
 
@@ -76,18 +76,18 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             when (this) {
                 is ProjectSyncScope -> {
                     EventQuery(projectId, modes = modes,
-                        types = listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove))
+                        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE))
                 }
                 is UserSyncScope -> {
                     EventQuery(projectId, userId = userId, modes = modes,
-                        types = listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove))
+                        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE))
                 }
                 is ModuleSyncScope -> {
                     if (modules.isEmpty()) {
                         throw NoModulesSelectedForModuleSyncException()
                     }
                     EventQuery(projectId, moduleIds = modules, modes = modes,
-                        types = listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove))
+                        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE))
                 }
             }
         }

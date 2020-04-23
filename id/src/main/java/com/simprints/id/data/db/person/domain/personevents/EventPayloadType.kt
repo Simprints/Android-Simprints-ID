@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.person.domain.personevents
 
 enum class EventPayloadType {
-    EnrolmentRecordCreation,
-    EnrolmentRecordDeletion,
-    EnrolmentRecordMove
+    ENROLMENT_RECORD_CREATION,
+    ENROLMENT_RECORD_DELETION,
+    ENROLMENT_RECORD_MOVE
 }
