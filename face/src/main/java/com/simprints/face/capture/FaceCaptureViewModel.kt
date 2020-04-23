@@ -17,7 +17,7 @@ import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.launch
 import java.util.*
 
-class FaceCaptureViewModel : ViewModel() {
+class FaceCaptureViewModel(private val maxRetries: Int, private val qualityThreshold: Float) : ViewModel() {
     // TODO: get correct information from SimprintsID managers
     private val projectId: String = UUID.randomUUID().toString()
     private val sessionId: String = UUID.randomUUID().toString()
@@ -36,12 +36,9 @@ class FaceCaptureViewModel : ViewModel() {
 
     private var retriesUsed: Int = 0
 
-    // TODO: get correct information from SimprintsID managers - cameraPreferences.retries
     val canRetry: Boolean
-        get() = retriesUsed++ < 2
+        get() = retriesUsed++ < maxRetries
 
-    // TODO: get correct information from SimprintsID managers - cameraPreferences.qualityThreshold
-    private val qualityThreshold = -1
     var samplesToCapture = 1
 
     init {
