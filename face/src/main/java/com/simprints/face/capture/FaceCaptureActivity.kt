@@ -34,7 +34,7 @@ class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
     }
 
     private fun bindViewModel() {
-        vm.startCamera.observe(this, LiveDataEventObserver { startCamera() })
+        vm.startCameraEvent.observe(this, LiveDataEventObserver { startCamera() })
 
         vm.shouldProcessFrames.observe(this, LiveDataEventWithContentObserver {
             if (it) {
@@ -50,8 +50,12 @@ class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
             finish()
         })
 
-        vm.retryFlow.observe(this, LiveDataEventObserver {
+        vm.retryFlowEvent.observe(this, LiveDataEventObserver {
             findNavController(R.id.capture_host_fragment).navigate(R.id.action_retryFragment_to_liveFeedbackFragment)
+        })
+
+        vm.exitFormEvent.observe(this, LiveDataEventObserver {
+            findNavController(R.id.capture_host_fragment).navigate(R.id.action_global_refusalFragment)
         })
     }
 
@@ -84,14 +88,15 @@ class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
     }
 
     enum class BackButtonContext {
-        CAPTURE, CONFIRMATION, RETRY;
+        CAPTURE, CONFIRMATION, RETRY, REFUSAL;
 
         companion object {
-            fun fromFragmentId(fragmentId: Int?) = when (fragmentId) {
+            fun fromFragmentId(fragmentId: Int?): BackButtonContext? = when (fragmentId) {
                 R.id.preparationFragment, R.id.liveFeedbackFragment -> CAPTURE
                 R.id.confirmationFragment -> CONFIRMATION
                 R.id.retryFragment -> RETRY
-                else -> CAPTURE
+                R.id.refusalFragment -> REFUSAL
+                else -> null
             }
         }
     }

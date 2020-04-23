@@ -29,8 +29,9 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
 
     val frameChannel = Channel<Frame>(CONFLATED)
 
-    val startCamera: MutableLiveData<LiveDataEvent> = MutableLiveData()
-    val retryFlow: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val startCameraEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val retryFlowEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val exitFormEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
     val flowFinished: MutableLiveData<LiveDataEventWithContent<FaceCaptureResponse>> =
         MutableLiveData()
@@ -43,7 +44,7 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
     var samplesToCapture = 1
 
     init {
-        startCamera.send()
+        startCameraEvent.send()
         viewModelScope.launch { startNewAnalyticsSession() }
     }
 
@@ -83,19 +84,23 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
         this.faceDetections.value = faceDetections
     }
 
-    fun handleBackButton(backButtonContext: BackButtonContext) {
+    fun handleBackButton(backButtonContext: BackButtonContext?) {
         when (backButtonContext) {
-            CAPTURE -> {
-                Timber.d("GO TO EXIT FORM")
-            }
+            CAPTURE -> exitFormEvent.send()
             CONFIRMATION -> flowFinished()
             RETRY -> handleRetry()
+            REFUSAL -> handleRefusalBackButton()
+            null -> Timber.e("Invalid back button context")
         }
+    }
+
+    private fun handleRefusalBackButton() {
+        Timber.d("Do something with the back button")
     }
 
     fun handleRetry() {
         if (canRetry) {
-            retryFlow()
+            exitFormEvent.send()
         } else {
             finishFlowWithFailedRetries()
         }
@@ -103,7 +108,7 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
 
     private fun retryFlow() {
         // TODO: add analytics for FlowFinished(RETRY)
-        retryFlow.send()
+        retryFlowEvent.send()
     }
 
     // TODO: should have a better understanding on what to do after failed all retries
