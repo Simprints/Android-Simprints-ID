@@ -48,4 +48,12 @@
             app:popUpTo="@+id/capture_graph"
             app:popUpToInclusive="true" />
     </fragment>
+    <fragment
+        android:id="@+id/refusalFragment"
+        android:name="com.simprints.face.refusal.RefusalFragment"
+        android:label="refusal_fragment"
+        tools:layout="@layout/refusal_fragment" />
+    <action
+        android:id="@+id/action_global_refusalFragment"
+        app:destination="@+id/refusalFragment" />
 </navigation>
