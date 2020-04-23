@@ -33,46 +33,37 @@ class PersonRepositoryUpSyncHelperImpl(
     private val modalities: List<Modality>
 ) : PersonRepositoryUpSyncHelper {
 
-    val projectId: String
-        get() {
-            val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-            return if (projectId.isEmpty() /*|| userId != loginInfoManager.signedInUserId*/) {
-                throw IllegalStateException("Only people enrolled by the currently signed in user can be up-synced")
-            } else {
-                projectId
-            }
-        }
-
     @ExperimentalCoroutinesApi
     override suspend fun executeUploadWithProgress(scope: CoroutineScope) = scope.produce {
+        val projectId = getProjectIdForSignedInUser()
         try {
             personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true))
                 .bufferedChunks(UPSYNC_BATCH_SIZE)
                 .collect {
                     Timber.d("PersonRepository : uploading ${it.size} people")
-                    upSyncBatch(it)
+                    upSyncBatch(it, projectId)
                     this.send(PeopleUpSyncProgress(it.size))
                 }
 
         } catch (t: Throwable) {
             t.printStackTrace()
             Timber.d("PersonRepository : failed uploading people")
-            updateState(UpSyncState.FAILED)
+            updateState(UpSyncState.FAILED, projectId)
             throw t
         }
 
-        updateState(UpSyncState.COMPLETE)
+        updateState(UpSyncState.COMPLETE, projectId)
     }
 
-    private suspend fun upSyncBatch(people: List<Person>) {
-        uploadPeople(people)
+    private suspend fun upSyncBatch(people: List<Person>, projectId: String) {
+        uploadPeople(people, projectId)
         Timber.d("Uploaded a batch of ${people.size} people")
         markPeopleAsSynced(people)
         Timber.d("Marked a batch of ${people.size} people as synced")
-        updateState(RUNNING)
+        updateState(RUNNING, projectId)
     }
 
-    private suspend fun uploadPeople(people: List<Person>) {
+    private suspend fun uploadPeople(people: List<Person>, projectId: String) {
         if (people.isNotEmpty()) {
             eventRemoteDataSource.post(projectId, createEvents(people))
         }
@@ -128,7 +119,7 @@ class PersonRepositoryUpSyncHelperImpl(
         peopleUpSyncScopeRepository.insertOrUpdate(peopleUpSyncOperation)
     }
 
-    private suspend fun updateState(state: UpSyncState) {
+    private suspend fun updateState(state: UpSyncState, projectId: String) {
         Timber.d("Updating sync state: $state")
         updateLastUpSyncTime(PeopleUpSyncOperation(
             projectId,
@@ -137,6 +128,14 @@ class PersonRepositoryUpSyncHelperImpl(
                 Date().time
             )
         ))
+    }
+
+    private fun getProjectIdForSignedInUser(): String {
+        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        if (projectId.isEmpty()) {
+            throw IllegalStateException("People can only be uploaded when signed in")
+        }
+        return projectId
     }
 
     companion object {
