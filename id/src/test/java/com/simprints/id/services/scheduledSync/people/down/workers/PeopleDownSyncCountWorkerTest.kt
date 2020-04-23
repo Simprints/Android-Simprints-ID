@@ -63,7 +63,7 @@ class PeopleDownSyncCountWorkerTest {
 
     @Test
     fun countWorker_shouldExecuteTheTaskSuccessfully() = runBlocking {
-        val counts = listOf(PeopleCount(1, 1, 1))
+        val counts = PeopleCount(1,1,1)
         mockDependenciesToSucceed(counts)
 
         countWorker.doWork()
@@ -104,7 +104,7 @@ class PeopleDownSyncCountWorkerTest {
         verify { countWorker.resultSetter.success() }
     }
 
-    private fun mockDependenciesToSucceed(counts: List<PeopleCount>) {
+    private fun mockDependenciesToSucceed(counts: PeopleCount) {
         coEvery { countWorker.personRepository.countToDownSync(any()) } returns counts
         coEvery { countWorker.downSyncScopeRepository.getDownSyncScope() } returns ProjectSyncScope(DEFAULT_PROJECT_ID, listOf(Modes.FINGERPRINT))
     }
