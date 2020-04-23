@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.person
 
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.domain.personevents.Events
@@ -12,8 +13,10 @@ import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSync
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Test
 import java.util.*
@@ -54,9 +57,14 @@ class PersonRepositoryUpSyncHelperImplTest {
     @Test
     fun userNotSignedIn1_shouldThrowIllegalStateException() {
         runBlocking {
-            assertThrows<IllegalStateException> {
-                personRepositoryUpSyncHelper.executeUploadWithProgress(this)
-            }
+            val expectedExceptionMessage = "People can only be uploaded when signed in"
+            
+            val exceptionMessage = assertThrows<IllegalStateException> {
+                withContext(Dispatchers.IO) {
+                    personRepositoryUpSyncHelper.executeUploadWithProgress(this)
+                }
+            }.message
+            assertThat(exceptionMessage).isEqualTo(expectedExceptionMessage)
         }
     }
 
