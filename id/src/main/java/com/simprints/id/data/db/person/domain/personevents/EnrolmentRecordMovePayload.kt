@@ -5,7 +5,7 @@ import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRe
 data class EnrolmentRecordMovePayload(
     val enrolmentRecordCreationPayload: EnrolmentRecordCreationPayload,
     val enrolmentRecordDeletionPayload: EnrolmentRecordDeletionPayload
-) : EventPayload(EventPayloadType.EnrolmentRecordMove) {
+) : EventPayload(EventPayloadType.ENROLMENT_RECORD_MOVE) {
 
     constructor(payload: ApiEnrolmentRecordMovePayload) :
         this(EnrolmentRecordCreationPayload(payload.enrolmentRecordCreationPayload),

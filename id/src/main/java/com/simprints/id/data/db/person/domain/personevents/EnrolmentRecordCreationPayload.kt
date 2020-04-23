@@ -8,7 +8,7 @@ data class EnrolmentRecordCreationPayload(
     val moduleId: String,
     val attendantId: String,
     val biometricReferences: List<BiometricReference>
-) : EventPayload(EventPayloadType.EnrolmentRecordCreation) {
+) : EventPayload(EventPayloadType.ENROLMENT_RECORD_CREATION) {
 
     constructor(payload: ApiEnrolmentRecordCreationPayload) :
         this(payload.subjectId, payload.projectId, payload.moduleId,

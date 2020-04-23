@@ -7,7 +7,7 @@ import com.simprints.id.data.db.person.domain.personevents.*
 abstract class ApiEventPayload(@Transient val type: ApiEventPayloadType)
 
 fun EventPayload.fromDomainToApi() = when(this.type) {
-    EventPayloadType.EnrolmentRecordCreation -> ApiEnrolmentRecordCreationPayload(this as EnrolmentRecordCreationPayload)
-    EventPayloadType.EnrolmentRecordDeletion -> ApiEnrolmentRecordDeletionPayload(this as EnrolmentRecordDeletionPayload)
-    EventPayloadType.EnrolmentRecordMove -> ApiEnrolmentRecordMovePayload(this as EnrolmentRecordMovePayload)
+    EventPayloadType.ENROLMENT_RECORD_CREATION -> ApiEnrolmentRecordCreationPayload(this as EnrolmentRecordCreationPayload)
+    EventPayloadType.ENROLMENT_RECORD_DELETION -> ApiEnrolmentRecordDeletionPayload(this as EnrolmentRecordDeletionPayload)
+    EventPayloadType.ENROLMENT_RECORD_MOVE -> ApiEnrolmentRecordMovePayload(this as EnrolmentRecordMovePayload)
 }
