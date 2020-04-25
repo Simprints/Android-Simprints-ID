@@ -33,12 +33,14 @@ class PersonRepositoryUpSyncHelperImpl(
     private val modalities: List<Modality>
 ) : PersonRepositoryUpSyncHelper {
 
+    internal val batchSize by lazy { UPSYNC_BATCH_SIZE }
+
     @ExperimentalCoroutinesApi
     override suspend fun executeUploadWithProgress(scope: CoroutineScope) = scope.produce {
         val projectId = getProjectIdForSignedInUser()
         try {
             personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true))
-                .bufferedChunks(UPSYNC_BATCH_SIZE)
+                .bufferedChunks(batchSize)
                 .collect {
                     Timber.d("PersonRepository : uploading ${it.size} people")
                     upSyncBatch(it, projectId)
@@ -75,7 +77,7 @@ class PersonRepositoryUpSyncHelperImpl(
     private fun createEventFromPerson(person: Person): Event =
         with(person) {
             Event(
-                UUID.randomUUID().toString(),
+                getRandomUuid(),
                 listOf(projectId),
                 listOf(patientId),
                 listOf(userId),
@@ -84,6 +86,8 @@ class PersonRepositoryUpSyncHelperImpl(
                 createPayload(person)
             )
         }
+
+    internal fun getRandomUuid() = UUID.randomUUID().toString()
 
     private fun createPayload(person: Person) =
         EnrolmentRecordCreationPayload(
