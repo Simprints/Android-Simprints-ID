@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.activities.connect
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
@@ -28,18 +28,17 @@ import io.reactivex.Completable
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declareModule
-import org.robolectric.annotation.Config
 
-@RunWith(AndroidJUnit4::class)
-@Config(sdk = [28])
 class ConnectScannerViewModelTest : KoinTest {
 
     @get:Rule
     var unitTestConfigRule = FullUnitTestConfigRule()
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
 
     private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
     private val fingerprintAnalyticsManager: FingerprintAnalyticsManager = mockk(relaxed = true)
