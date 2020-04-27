@@ -10,13 +10,13 @@
         <dist:fusing dist:include="true" />
     </dist:module>
 
-    <application tools:ignore="GoogleAppIndexingWarning">
+    <application
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name="com.simprints.face.capture.FaceCaptureActivity"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name="com.simprints.face.orchestrator.FaceOrchestratorActivity"
-            android:theme="@style/AppTheme" />
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity android:name="com.simprints.face.orchestrator.FaceOrchestratorActivity" />
     </application>
 
 </manifest>
