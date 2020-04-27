@@ -12,8 +12,6 @@ import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepositoryImpl
 import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncOperationLocalDataSource
 import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
@@ -22,8 +20,6 @@ import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilderImpl
-import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
-import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTaskImpl
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManagerImpl
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessor
@@ -40,7 +36,6 @@ import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyn
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilderImpl
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImpl
-import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -59,13 +54,13 @@ open class SyncModule {
     @Provides
     open fun providePeopleDownSyncOperationBuilder(): PeopleDownSyncOperationFactory = PeopleDownSyncOperationFactoryImpl()
 
-    @Provides
-    open fun providePeopleDownSyncDownloaderTask(personLocalDataSource: PersonLocalDataSource,
-                                                 personRemoteDataSource: PersonRemoteDataSource,
-                                                 downSyncScopeRepository: PeopleDownSyncScopeRepository,
-                                                 peopleSyncCache: PeopleSyncCache,
-                                                 timeHelper: TimeHelper): PeopleDownSyncDownloaderTask =
-        PeopleDownSyncDownloaderTaskImpl(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, peopleSyncCache, timeHelper)
+//    @Provides
+//    open fun providePeopleDownSyncDownloaderTask(personLocalDataSource: PersonLocalDataSource,
+//                                                 personRemoteDataSource: PersonRemoteDataSource,
+//                                                 downSyncScopeRepository: PeopleDownSyncScopeRepository,
+//                                                 peopleSyncCache: PeopleSyncCache,
+//                                                 timeHelper: TimeHelper): PeopleDownSyncDownloaderTask =
+//        PeopleDownSyncDownloaderTaskImpl(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, peopleSyncCache, timeHelper)
 
     @Provides
     open fun provideWorkManager(ctx: Context): WorkManager =

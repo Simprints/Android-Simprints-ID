@@ -61,7 +61,7 @@ class PeopleDownSyncOperationFactoryImplTest {
             assertThat(moduleId).isNull()
             assertThat(modes).isEqualTo(DEFAULT_MODES)
             assertThat(lastState).isEqualTo(COMPLETE)
-            assertThat(lastPatientId).isEqualTo(LAST_PATIENT_ID)
+            assertThat(lastEventId).isEqualTo(LAST_PATIENT_ID)
             assertThat(lastPatientUpdatedAt).isEqualTo(LAST_PATIENT_UPDATED_AT)
             assertThat(lastSyncTime).isEqualTo(LAST_SYNC_TIME)
         }

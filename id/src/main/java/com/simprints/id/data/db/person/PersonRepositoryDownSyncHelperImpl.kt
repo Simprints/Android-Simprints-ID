@@ -1,23 +1,25 @@
 package com.simprints.id.data.db.person
 
 import com.google.gson.stream.JsonReader
+import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.EventQuery
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult
-import com.simprints.id.data.db.person.domain.personevents.Event
-import com.simprints.id.data.db.person.domain.personevents.fromApiToDomain
+import com.simprints.id.data.db.person.domain.FaceSample
+import com.simprints.id.data.db.person.domain.FingerprintSample
+import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.domain.personevents.*
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
-import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordCreationPayload
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEvent
 import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
-import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTaskImpl
 import com.simprints.id.tools.TimeHelper
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import okhttp3.ResponseBody
@@ -27,12 +29,13 @@ import java.io.Reader
 import java.util.*
 
 class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalDataSource,
-                                         val eventRemoteDataSource: EventRemoteDataSource,
+                                         private val eventRemoteDataSource: EventRemoteDataSource,
                                          private val downSyncScopeRepository: PeopleDownSyncScopeRepository,
                                          val timeHelper: TimeHelper) : PersonRepositoryDownSyncHelper {
 
     private lateinit var downSyncOperation: PeopleDownSyncOperation
 
+    @ExperimentalCoroutinesApi
     override suspend fun performDownSyncWithProgress(scope: CoroutineScope,
                                                      downSyncOperation: PeopleDownSyncOperation,
                                                      eventQuery: EventQuery): ReceiveChannel<Int> =
@@ -52,6 +55,7 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
                     channelFromNetwork.poll()?.let {
                         bufferToSave.add(it)
                         if (bufferToSave.size > BATCH_SIZE_FOR_DOWNLOADING) {
+                            this.send(bufferToSave.size)
                             saveBatch(bufferToSave)
                         }
                     }
@@ -80,11 +84,13 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
                 it.beginArray()
             }
 
-    private fun CoroutineScope.createPeopleChannelFromJsonReader(reader: JsonReader) = produce<ApiEvent>(capacity = 5 * PeopleDownSyncDownloaderTaskImpl.BATCH_SIZE_FOR_DOWNLOADING) {
-        while (reader.hasNext()) {
-            this.send(JsonHelper.gson.fromJson(reader, ApiEvent::class.java))
+    @ExperimentalCoroutinesApi
+    private fun CoroutineScope.createPeopleChannelFromJsonReader(reader: JsonReader) =
+        produce<ApiEvent>(capacity = 5 * BATCH_SIZE_FOR_DOWNLOADING) {
+            while (reader.hasNext()) {
+                this.send(JsonHelper.gson.fromJson(reader, ApiEvent::class.java))
+            }
         }
-    }
 
     private suspend fun saveBatch(batch: MutableList<ApiEvent>) {
         saveBatchAndUpdateDownSyncStatus(batch)
@@ -102,45 +108,62 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
         val batchOfPeopleToSaveInLocal =
             batchOfEvents.filter { it.payload is ApiEnrolmentRecordCreationPayload }.map {
                 it.fromApiToDomain()
-            }
+            }.map { it.payload as EnrolmentRecordCreationPayload }
 
-        val batchOfPeopleToBeDeleted =
+        val eventRecordsToBeDeleted =
             batchOfEvents.filter { it.payload is ApiEnrolmentRecordDeletionPayload }.map {
                 it.fromApiToDomain()
-            }
+            }.map { it.payload as EnrolmentRecordDeletionPayload }
 
         savePeopleBatchInLocal(batchOfPeopleToSaveInLocal)
-        deletePeopleBatchFromLocal(batchOfPeopleToBeDeleted)
+        deletePeopleBatchFromLocal(eventRecordsToBeDeleted)
     }
 
-    private suspend fun savePeopleBatchInLocal(batchOfPeopleToSaveInLocal: List<Event>) {
+    private suspend fun savePeopleBatchInLocal(batchOfPeopleToSaveInLocal: List<EnrolmentRecordCreationPayload>) {
         if (batchOfPeopleToSaveInLocal.isNotEmpty()) {
-            personLocalDataSource.insertOrUpdate(batchOfPeopleToSaveInLocal.map { it.fromGetApiToDomain() })
+            personLocalDataSource.insertOrUpdate(batchOfPeopleToSaveInLocal.map { buildPersonFromCreationPayload(it) })
         }
     }
 
-    private suspend fun deletePeopleBatchFromLocal(batchOfPeopleToBeDeleted: List<Event>) {
-        if (batchOfPeopleToBeDeleted.isNotEmpty()) {
-            personLocalDataSource.delete(buildQueryForPeopleById(batchOfPeopleToBeDeleted))
+    private suspend fun deletePeopleBatchFromLocal(eventRecordsToBeDeleted: List<EnrolmentRecordDeletionPayload>) {
+        if (eventRecordsToBeDeleted.isNotEmpty()) {
+            personLocalDataSource.delete(buildQueryForPeopleById(eventRecordsToBeDeleted))
         }
     }
 
-    private fun buildQueryForPeopleById(batchOfPeopleToBeDeleted: List<ApiGetPerson>) =
+    private fun buildQueryForPeopleById(batchOfPeopleToBeDeleted: List<EnrolmentRecordDeletionPayload>) =
         batchOfPeopleToBeDeleted.map {
-            PersonLocalDataSource.Query(personId = it.id)
+            PersonLocalDataSource.Query(personId = it.subjectId)
         }
+
+    private fun buildPersonFromCreationPayload(payload: EnrolmentRecordCreationPayload) = Person(
+        patientId = payload.subjectId,
+        projectId = payload.projectId,
+        userId = payload.attendantId,
+        moduleId = payload.moduleId,
+        toSync = false,
+        fingerprintSamples = payload.biometricReferences.filterIsInstance(FingerprintReference::class.java).first().templates.map { buildFingerprintSample(it) },
+        faceSamples = payload.biometricReferences.filterIsInstance(FaceReference::class.java).first().templates.map { buildFaceSample(it) }
+    )
+
+    private fun buildFingerprintSample(template: FingerprintTemplate) = FingerprintSample(
+        template.finger.fromEventToPerson(),
+        EncodingUtils.base64ToBytes(template.template),
+        template.quality
+    )
+
+    private fun buildFaceSample(template: FaceTemplate) = FaceSample(EncodingUtils.base64ToBytes(template.template))
 
     private suspend fun updateDownSyncInfo(state: PeopleDownSyncOperationResult.DownSyncState,
                                            event: ApiEvent? = null,
                                            lastSyncTime: Date? = null) {
         var newResultInfo = downSyncOperation.lastResult?.copy(state = state)
-            ?: PeopleDownSyncOperationResult(state, null, null, null)
+            ?: PeopleDownSyncOperationResult(state, null, null)
 
         if (event != null) {
             newResultInfo = event.let {
                 newResultInfo.copy(
-                    lastPatientId = event.id,
-                    lastPatientUpdatedAt = event.updatedAt?.time)
+                    lastEventId = event.id)
             }
         }
 

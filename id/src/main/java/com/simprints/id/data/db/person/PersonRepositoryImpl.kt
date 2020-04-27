@@ -2,7 +2,6 @@ package com.simprints.id.data.db.person
 
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
-import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.common.models.PeopleCount
@@ -12,22 +11,20 @@ import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.*
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
-import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.exceptions.safe.sync.NoModulesSelectedForModuleSyncException
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.first
 
-class PersonRepositoryImpl(private val personRemoteDataSource: PersonRemoteDataSource,
-                           private val eventRemoteDataSource: EventRemoteDataSource,
+class PersonRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
                            val downSyncScopeRepository: PeopleDownSyncScopeRepository,
                            private val peopleUpSyncExecutor: PeopleUpSyncExecutor,
-                           private val personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper) :
+                           private val personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper,
+                           private val personRepositoryDownSyncHelper: PersonRepositoryDownSyncHelper) :
     PersonRepository,
     PersonLocalDataSource by personLocalDataSource,
-    PersonRemoteDataSource by personRemoteDataSource,
     EventRemoteDataSource by eventRemoteDataSource {
 
     override suspend fun countToDownSync(peopleDownSyncScope: PeopleDownSyncScope): PeopleCount {
@@ -46,8 +43,7 @@ class PersonRepositoryImpl(private val personRemoteDataSource: PersonRemoteDataS
         }
 
     private suspend fun tryToFetchPersonFromRemote(projectId: String, patientId: String): PersonFetchResult {
-        val person = personRemoteDataSource.downloadPerson(patientId = patientId, projectId = projectId)
-        return PersonFetchResult(person, REMOTE)
+        TODO("Download using helper")
     }
 
     private suspend fun savePersonInLocal(person: Person) = personLocalDataSource.insertOrUpdate(listOf(person))
@@ -76,9 +72,9 @@ class PersonRepositoryImpl(private val personRemoteDataSource: PersonRemoteDataS
         personRepositoryUpSyncHelper.executeUploadWithProgress(scope)
 
     override suspend fun performDownloadWithProgress(scope: CoroutineScope,
-                                                     peopleDownSyncScope: PeopleDownSyncScope): ReceiveChannel<Int> {
-
-    }
+                                                     peopleDownSyncOperation: PeopleDownSyncOperation): ReceiveChannel<Int> =
+        personRepositoryDownSyncHelper.performDownSyncWithProgress(scope, peopleDownSyncOperation,
+            buildEventQuery(downSyncScopeRepository.getDownSyncScope()))
 
     private fun buildEventQuery(peopleDownSyncScope: PeopleDownSyncScope) =
         with(peopleDownSyncScope) {

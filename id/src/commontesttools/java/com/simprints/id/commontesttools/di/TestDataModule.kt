@@ -14,7 +14,6 @@ import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.PersonRepositoryUpSyncHelper
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
-import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource

@@ -21,7 +21,6 @@ import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationR
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteInterface
-import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.PipeSeparatorWrapperForURLListParam
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.ApiModes
