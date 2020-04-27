@@ -5,11 +5,11 @@ import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureViewModel
-import com.simprints.face.data.domain.exitform.RefusalFormReason
-import com.simprints.face.data.domain.exitform.RefusalFormReason.*
+import com.simprints.face.controllers.core.events.model.RefusalAnswer
+import com.simprints.face.controllers.core.events.model.RefusalAnswer.*
 
 class ExitFormViewModel(private val mainVM: FaceCaptureViewModel) : ViewModel() {
-    private var reason: RefusalFormReason? = null
+    private var reason: RefusalAnswer? = null
 
     val requestReasonEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val requestSelectOptionEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
@@ -41,7 +41,7 @@ class ExitFormViewModel(private val mainVM: FaceCaptureViewModel) : ViewModel() 
     }
 
     fun handleAppNotWorkingRadioClick() {
-        reason = SCANNER_NOT_WORKING
+        reason = APP_NOT_WORKING
         requestReasonEvent.send()
         logRadioOptionForCrashReport("App not working")
     }
@@ -53,7 +53,10 @@ class ExitFormViewModel(private val mainVM: FaceCaptureViewModel) : ViewModel() 
     }
 
     fun submitExitForm(exitFormText: String) {
-        // TODO: create the correct answer and send back
+        reason?.let {
+            logExitFormEvent()
+            mainVM.submitExitForm(it, exitFormText)
+        }
     }
 
     private fun logRadioOptionForCrashReport(option: String) {
@@ -63,6 +66,10 @@ class ExitFormViewModel(private val mainVM: FaceCaptureViewModel) : ViewModel() 
     private fun logMessageForCrashReport(message: String) {
         // TODO: log on the crash report manager
 //        crashReportManager.logMessageForCrashReport(CrashReportTag.REFUSAL, CrashReportTrigger.UI, message = message)
+    }
+
+    private fun logExitFormEvent() {
+        // TODO: log correct refusal event
     }
 
     fun handleBackButton() {
