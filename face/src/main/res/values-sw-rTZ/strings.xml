@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_confirmation">Kuhakiki</string>
+    <string name="capture_title_howto">Unaskani vipi sura</string>
+    <string name="capture_title_previewing">Maandalizi ya kuskani</string>
+    <string name="capture_title_looks_good">Skani iko tayari</string>
+    <string name="capture_error_no_face">Hakikisha sura imejaa kwenye duara</string>
+    <string name="capture_error_face_too_far">Sogea karibu</string>
+    <string name="capture_error_face_too_close">Rudi nyuma</string>
+    <string name="capture_error_look_straight">Hakikisha mtu anaangalia kwa kunyooka kwenye kamera</string>
+    <string name="capture_ready" translatable="false">Tayari kwa kupiga picha</string>
+    <string name="capture_prep_begin_btn" translatable="false">Bonyeza ili kupiga picha</string>
+    <string name="capture_prep_begin_btn_capturing">Inapiga picha</string>
+    <string name="capture_title_scan_progress">Skani inaendelea</string>
+    <string name="capture_hold">kaa hivohivo</string>
+    <string name="captured_successfully">Picha ya sura imefanikiwa kuchukuliwa</string>
+    <string name="title_preparation">Maandalizi</string>
+    <string name="btn_finish">Bonyeza ili kuendelea</string>
+    <string name="btn_capture_again">Piga tena</string>
+    <string name="captured_unsuccessful">Imeshindwa kuchukukua picha ya sura kwa sababu ya tatizo la kiufundi</string>
+    <string name="retry_tips">Hivi ndivyo unaweza kutatua tatizo\n\n1.Hakikisha uko kwenye mwanga.\n2.Hakikisha anayepigwa picha ameangalia kwa kunyooka.\n3. endelea kubaki na  kukaa hivyohivyo</string>
+    <string name="onboarding_light">Tafuta mahali penye mwanga mzuri</string>
+    <string name="onboarding_fill">Jaza uso kwenye mduara wa fremu</string>
+    <string name="onboarding_straight">Hakikisha mtu anayepigwa picha anaangalia kwa kunyooka</string>
+    <string name="onboarding_continue">Bonyeza popote ili kuendelea</string>
+    <string name="capture_title_look_straight">Hajaangalia kwa kunyooka</string>
+    <string name="capture_title_no_face">Uso haujaonekana</string>
+    <string name="capture_title_too_close">Karibu sana</string>
+    <string name="capture_title_face_too_far">Mbali sana</string>
+    <string name="matching_x_records">Inalinganisha na %s taarifa zilizohifadhiwa</string>
+</resources>

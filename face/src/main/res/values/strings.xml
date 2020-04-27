@@ -1,4 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="title_face"><Face></Face></string>
+    <string name="title_face" translatable="false">Face</string>
+    <string name="face_capture_preview">Face Capture Preview</string>
+
+    <string name="capture_title_howto">How to scan a face</string>
+    <string name="capture_title_previewing">Preparing to scan</string>
+    <string name="capture_title_looks_good">Scan is ready!</string>
+    <string name="capture_error_no_face">Make sure the face fills the circle</string>
+    <string name="capture_error_face_too_far">Move closer</string>
+    <string name="capture_error_face_too_close">Move back</string>
+    <string name="capture_error_look_straight">Make sure the person is looking straight at the camera</string>
+    <string name="capture_ready">Ready to capture</string>
+    <string name="capture_prep_begin_btn">Tap to capture</string>
+    <string name="capture_prep_begin_btn_capturing">Capturing…</string>
+    <string name="capture_title_scan_progress">Scan in progress</string>
+    <string name="capture_hold">Hold the position…</string>
+    <string name="capture_debug_features" translatable="false">Yaw: %s\nRoll: %s\n</string>
+
+    <string name="captured_successfully">Face has been successfully captured.</string>
+    <string name="title_confirmation">Confirmation</string>
+    <string name="title_capturing">Live Capture</string>
+    <string name="title_preparation">Preparation</string>
+
+    <string name="btn_finish">Tap to continue</string>
+    <string name="btn_capture_again">Capture again</string>
+    <string name="captured_unsuccessful">Couldn\'t capture the face due to technical issue.</string>
+    <string name="retry_tips">Here’s how you can fix the issue: \n\n1. Make sure you are in a well lighted space.\n2. Make sure the person is looking straight.\n3. Stay still and hold the position.</string>
+    <string name="onboarding_light">Find a well-lighted place.</string>
+    <string name="onboarding_fill">Fill the face in the circle frame.</string>
+    <string name="onboarding_straight">Make sure the person is looking straight.</string>
+    <string name="onboarding_continue">Tap anywhere to continue</string>
+    <string name="capture_title_look_straight">Not looking straight</string>
+    <string name="capture_title_no_face">No face detected</string>
+    <string name="capture_title_too_close">Too close</string>
+    <string name="capture_title_face_too_far">Too far</string>
+    <string name="matching_x_records">Matching against %s records</string>
 </resources>

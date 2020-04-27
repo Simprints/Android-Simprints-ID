@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.face.activities.FaceCaptureActivity
+import com.simprints.face.capture.FaceCaptureActivity
 import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceRequest
