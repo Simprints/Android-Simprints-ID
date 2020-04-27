@@ -15,16 +15,18 @@ enum class FaceExitReason {
     REFUSED_RELIGION,
     REFUSED_DATA_CONCERNS,
     REFUSED_PERMISSION,
+    APP_NOT_WORKING,
     REFUSED_NOT_PRESENT,
     REFUSED_YOUNG,
     OTHER
 }
 
-fun IFaceExitFormResponse.formModuleApiToDomain(): FaceExitFormResponse {
+fun IFaceExitFormResponse.fromModuleApiToDomain(): FaceExitFormResponse {
     val reason = when (this.reason) {
         IFaceExitReason.REFUSED_RELIGION -> FaceExitReason.REFUSED_RELIGION
         IFaceExitReason.REFUSED_DATA_CONCERNS -> FaceExitReason.REFUSED_DATA_CONCERNS
         IFaceExitReason.REFUSED_PERMISSION -> FaceExitReason.REFUSED_PERMISSION
+        IFaceExitReason.APP_NOT_WORKING -> FaceExitReason.APP_NOT_WORKING
         IFaceExitReason.REFUSED_NOT_PRESENT -> FaceExitReason.REFUSED_NOT_PRESENT
         IFaceExitReason.REFUSED_YOUNG -> FaceExitReason.REFUSED_YOUNG
         IFaceExitReason.OTHER -> FaceExitReason.OTHER
