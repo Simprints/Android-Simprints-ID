@@ -70,6 +70,5 @@ fastlane/
 # lint
 lint/
 
-uicomponents/.cxx/
-
-fingerprintmatcher/.cxx/
+# ndk
+.cxx/

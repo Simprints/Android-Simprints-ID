@@ -19,17 +19,17 @@ def androidx_room_version = "2.1.0-alpha04"
 def androidx_camerax_version = '1.0.0-beta01'
 def androidx_navigation_version = "2.3.0-alpha04"
 def androidx = [
-    core     : "androidx.core:core-ktx:1.0.2",
-    multidex : "androidx.multidex:multidex:2.0.1",
-    appcompat: "androidx.appcompat:appcompat:1.0.2",
-    legacy   : "androidx.legacy:legacy-support-v4: 1.0.0",
-    room     : [
+    core      : "androidx.core:core-ktx:1.0.2",
+    multidex  : "androidx.multidex:multidex:2.0.1",
+    appcompat : "androidx.appcompat:appcompat:1.0.2",
+    legacy    : "androidx.legacy:legacy-support-v4: 1.0.0",
+    room      : [
         core      : "androidx.room:room-runtime:$androidx_room_version",
         compiler  : "androidx.room:room-compiler:$androidx_room_version",
         coroutines: "androidx.room:room-coroutines:$androidx_room_version"
 
     ],
-    lifecycle: [
+    lifecycle : [
         livedata : "androidx.lifecycle:lifecycle-livedata:$androidx_lifecycle_version",
         compiler : "androidx.lifecycle:lifecycle-compiler:$androidx_lifecycle_version",
         viewmodel: "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidx_lifecycle_version",
@@ -37,14 +37,14 @@ def androidx = [
         ktx      : "androidx.lifecycle:lifecycle-livedata-ktx:$androidx_lifecycle_version",
         ext      : "androidx.lifecycle:lifecycle-extensions:$androidx_lifecycle_version"
     ],
-    ui       : [
+    ui        : [
         constraintlayout: "androidx.constraintlayout:constraintlayout:2.0.0-beta4",
         cardview        : "androidx.cardview:cardview:1.0.0",
         fragment        : "androidx.fragment:fragment:1.1.0-alpha04",
         preference      : "androidx.preference:preference:1.1.0-alpha03"
     ],
-    security : ['androidx.security:security-crypto:1.0.0-alpha02'],
-    camerax  : [
+    security  : ['androidx.security:security-crypto:1.0.0-alpha02'],
+    camerax   : [
         core     : "androidx.camera:camera-core:$androidx_camerax_version",
         camera2  : "androidx.camera:camera-camera2:$androidx_camerax_version",
         lifecycle: "androidx.camera:camera-lifecycle:$androidx_camerax_version",
@@ -135,6 +135,10 @@ def rootbeer = [
     core: "com.scottyab:rootbeer-lib:$rootbeer_version"
 ]
 
+def cameraView = "com.otaliastudios:cameraview:2.2.0"
+def circleImageView = "de.hdodenhof:circleimageview:3.0.1"
+
+// Testing
 def mockito_version = "3.2.4"
 def espresso_version = "3.2.0-alpha04"
 def robolectric_version = "4.1"
@@ -213,5 +217,7 @@ ext.deps = [
     commons_io     : commons_io,
     koin           : koin,
     fuzzywuzzy     : fuzzywuzzy,
-    rootbeer       : rootbeer
+    rootbeer       : rootbeer,
+    cameraView     : cameraView,
+    circleImageView: circleImageView
 ]

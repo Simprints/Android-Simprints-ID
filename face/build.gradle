@@ -62,14 +62,15 @@ dependencies {
     // So the tests that have references to the base module fail with java.lang.NoClassDefFoundError exceptions.
     // The following line includes the base module classes.jar into the final one.
     // To run unit tests from CL: ./gradlew fingerprint:test
-    testRuntimeOnly (files("${projectDir}/../id/build/intermediates/app_classes/debug/bundleDebugClasses/classes.jar"))
+    testRuntimeOnly(files("${projectDir}/../id/build/intermediates/app_classes/debug/bundleDebugClasses/classes.jar"))
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':id')
     implementation project(':uicomponents')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    implementation deps.androidx.appcompat
+    implementation deps.cameraView
+    implementation deps.circleImageView
 
     // Android X
     androidTestImplementation deps.testing.androidx.core_testing
@@ -91,9 +92,6 @@ dependencies {
     }
 
     // Koin
-    implementation deps.koin.core
-    implementation deps.koin.android
-    implementation deps.koin.viewmodel
     androidTestImplementation deps.koin.core_ext
     androidTestImplementation deps.testing.koin
 
