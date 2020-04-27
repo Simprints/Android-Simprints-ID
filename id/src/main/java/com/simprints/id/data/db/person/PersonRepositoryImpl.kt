@@ -16,6 +16,7 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.exceptions.safe.sync.NoModulesSelectedForModuleSyncException
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.first
 
 class PersonRepositoryImpl(private val personRemoteDataSource: PersonRemoteDataSource,
@@ -71,6 +72,14 @@ class PersonRepositoryImpl(private val personRemoteDataSource: PersonRemoteDataS
         return PeopleCount(created, deleted, updated)
     }
 
+    override suspend fun performUploadWithProgress(scope: CoroutineScope) =
+        personRepositoryUpSyncHelper.executeUploadWithProgress(scope)
+
+    override suspend fun performDownloadWithProgress(scope: CoroutineScope,
+                                                     peopleDownSyncScope: PeopleDownSyncScope): ReceiveChannel<Int> {
+
+    }
+
     private fun buildEventQuery(peopleDownSyncScope: PeopleDownSyncScope) =
         with(peopleDownSyncScope) {
             when (this) {
@@ -91,7 +100,4 @@ class PersonRepositoryImpl(private val personRemoteDataSource: PersonRemoteDataS
                 }
             }
         }
-
-    override suspend fun performUploadWithProgress(scope: CoroutineScope) =
-        personRepositoryUpSyncHelper.executeUploadWithProgress(scope)
 }
