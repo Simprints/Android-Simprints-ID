@@ -14,6 +14,7 @@ import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.face.models.FaceDetection
 import kotlinx.coroutines.channels.Channel
@@ -33,7 +34,9 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
     val retryFlowEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val exitFormEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
-    val flowFinished: MutableLiveData<LiveDataEventWithContent<FaceCaptureResponse>> =
+    val finishFlowEvent: MutableLiveData<LiveDataEventWithContent<FaceCaptureResponse>> =
+        MutableLiveData()
+    val finishFlowWithExitFormEvent: MutableLiveData<LiveDataEventWithContent<FaceExitFormResponse>> =
         MutableLiveData()
 
     private var retriesUsed: Int = 0
@@ -76,7 +79,7 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
             FaceCaptureResult(index, detection.toFaceSample())
         } ?: listOf()
 
-        flowFinished.send(FaceCaptureResponse(results))
+        finishFlowEvent.send(FaceCaptureResponse(results))
     }
 
     fun captureFinished(faceDetections: List<FaceDetection>) {
@@ -127,7 +130,7 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
     }
 
     fun submitExitForm(reason: RefusalAnswer, exitFormText: String) {
-
+        finishFlowWithExitFormEvent.send(FaceExitFormResponse(reason, exitFormText))
     }
 
 }
