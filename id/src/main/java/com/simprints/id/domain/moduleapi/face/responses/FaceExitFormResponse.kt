@@ -1,5 +1,6 @@
 package com.simprints.id.domain.moduleapi.face.responses
 
+import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormReason
 import com.simprints.moduleapi.face.responses.IFaceExitFormResponse
 import com.simprints.moduleapi.face.responses.IFaceExitReason
 import kotlinx.android.parcel.IgnoredOnParcel
@@ -18,7 +19,19 @@ enum class FaceExitReason {
     APP_NOT_WORKING,
     REFUSED_NOT_PRESENT,
     REFUSED_YOUNG,
-    OTHER
+    OTHER;
+
+    fun toAppRefusalFormReason() =
+        when (this) {
+            REFUSED_RELIGION -> RefusalFormReason.REFUSED_RELIGION
+            REFUSED_DATA_CONCERNS -> RefusalFormReason.REFUSED_DATA_CONCERNS
+            REFUSED_PERMISSION -> RefusalFormReason.REFUSED_PERMISSION
+            REFUSED_YOUNG -> RefusalFormReason.REFUSED_YOUNG
+            REFUSED_NOT_PRESENT -> RefusalFormReason.REFUSED_NOT_PRESENT
+            APP_NOT_WORKING -> RefusalFormReason.APP_NOT_WORKING
+            OTHER -> RefusalFormReason.OTHER
+        }
+
 }
 
 fun IFaceExitFormResponse.fromModuleApiToDomain(): FaceExitFormResponse {
