@@ -9,9 +9,11 @@ import com.simprints.face.data.domain.exitform.RefusalFormReason
 import com.simprints.face.data.domain.exitform.RefusalFormReason.*
 
 class ExitFormViewModel(private val mainVM: FaceCaptureViewModel) : ViewModel() {
-    private var reason: RefusalFormReason = OTHER
+    private var reason: RefusalFormReason? = null
 
     val requestReasonEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val requestSelectOptionEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val requestFormSubmitEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
     fun handleReligiousConcernsRadioClick() {
         reason = REFUSED_RELIGION
@@ -61,5 +63,13 @@ class ExitFormViewModel(private val mainVM: FaceCaptureViewModel) : ViewModel() 
     private fun logMessageForCrashReport(message: String) {
         // TODO: log on the crash report manager
 //        crashReportManager.logMessageForCrashReport(CrashReportTag.REFUSAL, CrashReportTrigger.UI, message = message)
+    }
+
+    fun handleBackButton() {
+        if (reason == null) {
+            requestSelectOptionEvent.send()
+        } else {
+            requestFormSubmitEvent.send()
+        }
     }
 }
