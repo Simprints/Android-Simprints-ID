@@ -4,8 +4,10 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import com.simprints.core.livedata.LiveDataEventObserver
+import com.simprints.core.tools.extentions.showToast
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
@@ -34,12 +36,17 @@ class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         setRadioGroupListener()
         setLayoutChangeListener()
         observeViewModel()
-        // TODO: handle back button click
     }
 
     private fun observeViewModel() {
         vm.requestReasonEvent.observe(viewLifecycleOwner, LiveDataEventObserver {
             setFocusOnExitReasonAndDisableSubmit()
+        })
+        vm.requestSelectOptionEvent.observe(viewLifecycleOwner, LiveDataEventObserver {
+            requireContext().showToast(androidResourcesHelper.getString(IDR.string.refusal_toast_select_option_submit))
+        })
+        vm.requestFormSubmitEvent.observe(viewLifecycleOwner, LiveDataEventObserver {
+            requireContext().showToast(androidResourcesHelper.getString(IDR.string.refusal_toast_submit))
         })
     }
 
@@ -65,6 +72,9 @@ class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         }
         btSubmitExitForm.setOnClickListener {
             vm.submitExitForm(getExitFormText())
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            vm.handleBackButton()
         }
     }
 
