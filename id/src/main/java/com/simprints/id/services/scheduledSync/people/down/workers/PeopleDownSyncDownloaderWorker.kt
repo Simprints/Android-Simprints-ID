@@ -8,6 +8,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
+import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
@@ -15,6 +16,7 @@ import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyn
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.id.services.scheduledSync.people.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -30,8 +32,8 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
     override val tag: String = PeopleDownSyncDownloaderWorker::class.java.simpleName
 
     @Inject override lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var peopleDownSyncDownloaderTask: PeopleDownSyncDownloaderTask
     @Inject lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
+    @Inject lateinit var personRepository: PersonRepository
 
     private val jsonForOp by lazy {
         inputData.getString(INPUT_DOWN_SYNC_OPS)
@@ -44,20 +46,17 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
             val downSyncOperation = extractSubSyncScopeFromInput()
             crashlyticsLog("Start - Params: $downSyncOperation")
 
-            execute(downSyncOperation)
+            execute(this, downSyncOperation)
         } catch (t: Throwable) {
             fail(t)
         }
     }
 
-    private suspend fun execute(downSyncOperation: PeopleDownSyncOperation): Result {
+    private suspend fun execute(scope: CoroutineScope, downSyncOperation: PeopleDownSyncOperation): Result {
         return try {
-            val totalDownloaded = peopleDownSyncDownloaderTask.execute(
-                downSyncOperation,
-                id.toString(),
-                this)
+            personRepository.performDownloadWithProgress(scope, downSyncOperation)
 
-            success(workDataOf(OUTPUT_DOWN_SYNC to totalDownloaded), "Total downloaded: $totalDownloaded for $downSyncOperation")
+            success(workDataOf(OUTPUT_DOWN_SYNC to 0), "Total downloaded: $0 for $downSyncOperation")
         } catch (t: Throwable) {
             retryOrFailIfCloudIntegrationError(t)
         }

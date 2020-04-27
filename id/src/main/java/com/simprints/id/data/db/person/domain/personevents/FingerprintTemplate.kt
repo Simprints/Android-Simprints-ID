@@ -49,3 +49,16 @@ fun PersonFingerIdentifier.fromPersonToEvent() = when(this) {
     PersonFingerIdentifier.LEFT_4TH_FINGER -> FingerIdentifier.LEFT_4TH_FINGER
     PersonFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
 }
+
+fun FingerIdentifier.fromEventToPerson() = when(this) {
+    FingerIdentifier.RIGHT_5TH_FINGER -> PersonFingerIdentifier.RIGHT_5TH_FINGER
+    FingerIdentifier.RIGHT_4TH_FINGER -> PersonFingerIdentifier.RIGHT_4TH_FINGER
+    FingerIdentifier.RIGHT_3RD_FINGER -> PersonFingerIdentifier.RIGHT_3RD_FINGER
+    FingerIdentifier.RIGHT_INDEX_FINGER -> PersonFingerIdentifier.RIGHT_INDEX_FINGER
+    FingerIdentifier.RIGHT_THUMB -> PersonFingerIdentifier.RIGHT_THUMB
+    FingerIdentifier.LEFT_THUMB -> PersonFingerIdentifier.LEFT_THUMB
+    FingerIdentifier.LEFT_INDEX_FINGER -> PersonFingerIdentifier.LEFT_INDEX_FINGER
+    FingerIdentifier.LEFT_3RD_FINGER -> PersonFingerIdentifier.LEFT_3RD_FINGER
+    FingerIdentifier.LEFT_4TH_FINGER -> PersonFingerIdentifier.LEFT_4TH_FINGER
+    FingerIdentifier.LEFT_5TH_FINGER -> PersonFingerIdentifier.LEFT_5TH_FINGER
+}

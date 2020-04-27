@@ -18,8 +18,7 @@ data class DbPeopleDownSyncOperation(
     var moduleId: String? = null,
     var modes: List<Modes> = emptyList(),
     var lastState: DownSyncState?,
-    var lastPatientId: String?,
-    var lastPatientUpdatedAt: Long?,
+    var lastEventId: String?,
     var lastSyncTime: Long? = null
 ) {
     class Converters {
@@ -78,8 +77,7 @@ fun DbPeopleDownSyncOperation.fromDbToDomain() =
         lastState?.let {
             PeopleDownSyncOperationResult(
                 it,
-                lastPatientId,
-                lastPatientUpdatedAt,
+                lastEventId,
                 lastSyncTime
             )
         }
