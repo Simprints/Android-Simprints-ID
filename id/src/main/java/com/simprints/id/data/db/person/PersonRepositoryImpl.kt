@@ -18,12 +18,12 @@ import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 
-class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
+class PersonRepositoryImpl(private val personRemoteDataSource: PersonRemoteDataSource,
                            private val eventRemoteDataSource: EventRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
                            val downSyncScopeRepository: PeopleDownSyncScopeRepository,
                            private val peopleUpSyncExecutor: PeopleUpSyncExecutor,
-                           val personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper) :
+                           private val personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper) :
     PersonRepository,
     PersonLocalDataSource by personLocalDataSource,
     PersonRemoteDataSource by personRemoteDataSource,
