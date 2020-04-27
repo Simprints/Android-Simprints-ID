@@ -2,7 +2,6 @@ package com.simprints.id.data.db.person
 
 import com.google.gson.stream.JsonReader
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.EventQuery
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
@@ -18,6 +17,7 @@ import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRe
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEvent
 import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.json.SimJsonHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -88,7 +88,7 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
     private fun CoroutineScope.createPeopleChannelFromJsonReader(reader: JsonReader) =
         produce<ApiEvent>(capacity = 5 * BATCH_SIZE_FOR_DOWNLOADING) {
             while (reader.hasNext()) {
-                this.send(JsonHelper.gson.fromJson(reader, ApiEvent::class.java))
+                this.send(SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java))
             }
         }
 
@@ -142,8 +142,8 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
         userId = payload.attendantId,
         moduleId = payload.moduleId,
         toSync = false,
-        fingerprintSamples = payload.biometricReferences.filterIsInstance(FingerprintReference::class.java).first().templates.map { buildFingerprintSample(it) },
-        faceSamples = payload.biometricReferences.filterIsInstance(FaceReference::class.java).first().templates.map { buildFaceSample(it) }
+        fingerprintSamples = payload.biometricReferences.filterIsInstance(FingerprintReference::class.java).firstOrNull()?.templates?.map { buildFingerprintSample(it) } ?: emptyList(),
+        faceSamples = payload.biometricReferences.filterIsInstance(FaceReference::class.java).firstOrNull()?.templates?.map { buildFaceSample(it) } ?: emptyList()
     )
 
     private fun buildFingerprintSample(template: FingerprintTemplate) = FingerprintSample(
