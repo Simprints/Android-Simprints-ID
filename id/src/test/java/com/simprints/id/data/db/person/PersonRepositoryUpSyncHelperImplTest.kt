@@ -147,6 +147,10 @@ class PersonRepositoryUpSyncHelperImplTest {
         every { personRepositoryUpSyncHelper.batchSize } returns batchSize
     }
 
+    private fun mockHelperToGenerateSameUuidForEvents() {
+        every { personRepositoryUpSyncHelper.getRandomUuid() } returns "random_uuid"
+    }
+
     private fun testSuccessfulUpSync(
         localQueryResults: Array<List<Person>>,
         expectedUploadBatches: Array<Events>,
@@ -188,10 +192,6 @@ class PersonRepositoryUpSyncHelperImplTest {
 
     private fun mockSuccessfulLocalPeopleUpdates() {
         coEvery { personLocalDataSource.insertOrUpdate(any()) } returns Unit
-    }
-
-    private fun mockHelperToGenerateSameUuidForEvents() {
-        every { personRepositoryUpSyncHelper.getRandomUuid() } returns "random_uuid"
     }
 
     private fun mockEventRemoteDataSource() {
