@@ -8,6 +8,8 @@ import androidx.navigation.findNavController
 import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.core.tools.whenNonNull
+import com.simprints.core.tools.whenNull
 import com.simprints.face.R
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.exceptions.InvalidFaceRequestException
@@ -67,11 +69,11 @@ class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
     }
 
     override fun onBackPressed() {
-        vm.handleBackButton(
-            BackButtonContext.fromFragmentId(
-                findNavController(R.id.capture_host_fragment).currentDestination?.id
-            )
+        BackButtonContext.fromFragmentId(
+            findNavController(R.id.capture_host_fragment).currentDestination?.id
         )
+            .whenNonNull { vm.handleBackButton(this) }
+            .whenNull { super.onBackPressed() }
     }
 
     /**
@@ -88,14 +90,13 @@ class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
     }
 
     enum class BackButtonContext {
-        CAPTURE, CONFIRMATION, RETRY, REFUSAL;
+        CAPTURE, CONFIRMATION, RETRY;
 
         companion object {
             fun fromFragmentId(fragmentId: Int?): BackButtonContext? = when (fragmentId) {
                 R.id.preparationFragment, R.id.liveFeedbackFragment -> CAPTURE
                 R.id.confirmationFragment -> CONFIRMATION
                 R.id.retryFragment -> RETRY
-                R.id.refusalFragment -> REFUSAL
                 else -> null
             }
         }

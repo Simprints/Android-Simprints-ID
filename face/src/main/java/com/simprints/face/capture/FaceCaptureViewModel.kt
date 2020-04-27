@@ -19,7 +19,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 
 class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageManager: FaceImageManager) : ViewModel() {
 //    private val analyticsManager: AnalyticsManager
@@ -84,18 +83,12 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
         this.faceDetections.value = faceDetections
     }
 
-    fun handleBackButton(backButtonContext: BackButtonContext?) {
+    fun handleBackButton(backButtonContext: BackButtonContext) {
         when (backButtonContext) {
             CAPTURE -> exitFormEvent.send()
             CONFIRMATION -> flowFinished()
             RETRY -> handleRetry()
-            REFUSAL -> handleRefusalBackButton()
-            null -> Timber.e("Invalid back button context")
         }
-    }
-
-    private fun handleRefusalBackButton() {
-        Timber.d("Do something with the back button")
     }
 
     fun handleRetry() {
