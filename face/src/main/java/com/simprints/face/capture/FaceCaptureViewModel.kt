@@ -9,6 +9,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.*
+import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
@@ -123,6 +124,10 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
         runBlocking {
             faceDetection.securedImageRef = faceImageManager.save(faceDetection.frame.toByteArray(), captureEventId)
         }
+    }
+
+    fun submitExitForm(reason: RefusalAnswer, exitFormText: String) {
+
     }
 
 }
