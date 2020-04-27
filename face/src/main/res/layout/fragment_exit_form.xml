@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/faceExitFormScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/simprints_blue"
+    android:clipToPadding="false"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -41,7 +42,6 @@
                 android:id="@+id/rbReligiousConcerns"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:checked="true"
                 android:text="@string/refusal_religious_concerns"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
@@ -151,4 +151,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

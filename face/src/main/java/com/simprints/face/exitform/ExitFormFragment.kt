@@ -1,11 +1,15 @@
 package com.simprints.face.exitform
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
+import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
+import com.simprints.id.tools.textWatcherOnChange
 import kotlinx.android.synthetic.main.fragment_exit_form.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -19,9 +23,24 @@ class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
     private val vm: ExitFormViewModel by viewModel { parametersOf(mainVm) }
     private val androidResourcesHelper: FaceAndroidResourcesHelper by inject()
 
+    private val textWatcher = textWatcherOnChange {
+        handleTextChangedInExitForm(it)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
+        setButtonListeners()
+        setRadioGroupListener()
+        setLayoutChangeListener()
+        observeViewModel()
+        // TODO: handle back button click
+    }
+
+    private fun observeViewModel() {
+        vm.requestReasonEvent.observe(viewLifecycleOwner, LiveDataEventObserver {
+            setFocusOnExitReasonAndDisableSubmit()
+        })
     }
 
     private fun setTextInLayout() {
@@ -38,6 +57,76 @@ class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
             btGoBack.text = getString(R.string.exit_form_return_to_face_capture)
             btSubmitExitForm.text = getString(IDR.string.button_submit)
         }
+    }
+
+    private fun setButtonListeners() {
+        btGoBack.setOnClickListener {
+            // TODO: go back to where the user was
+        }
+        btSubmitExitForm.setOnClickListener {
+            vm.submitExitForm(getExitFormText())
+        }
+    }
+
+    private fun setRadioGroupListener() {
+        exitFormRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
+            exitFormText.removeTextChangedListener(textWatcher)
+            enableSubmitButton()
+            enableRefusalText()
+            handleRadioOptionIdentifierClick(optionIdentifier)
+        }
+    }
+
+    private fun handleRadioOptionIdentifierClick(optionIdentifier: Int) {
+        when (optionIdentifier) {
+            R.id.rbReligiousConcerns -> vm.handleReligiousConcernsRadioClick()
+            R.id.rbDataConcerns -> vm.handleDataConcernsRadioClick()
+            R.id.rbPersonNotPresent -> vm.handlePersonNotPresentRadioClick()
+            R.id.rbTooYoung -> vm.handleTooYoungRadioClick()
+            R.id.rbDoesNotHavePermission -> vm.handleDoesNotHavePermissionRadioClick()
+            R.id.rbAppNotWorking -> vm.handleAppNotWorkingRadioClick()
+            R.id.rbOther -> vm.handleOtherRadioOptionClick()
+        }
+    }
+
+    //Changes in the layout occur when the keyboard shows up
+    private fun setLayoutChangeListener() {
+        faceExitFormScrollView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            faceExitFormScrollView.fullScroll(View.FOCUS_DOWN)
+        }
+    }
+
+    private fun handleTextChangedInExitForm(exitFormText: String) {
+        if (exitFormText.isNotBlank()) {
+            enableSubmitButton()
+        } else {
+            disableSubmitButton()
+        }
+    }
+
+    private fun enableSubmitButton() {
+        btSubmitExitForm.isEnabled = true
+    }
+
+    private fun disableSubmitButton() {
+        btSubmitExitForm.isEnabled = false
+    }
+
+    private fun enableRefusalText() {
+        exitFormText.isEnabled = true
+    }
+
+    private fun getExitFormText() = exitFormText.text.toString()
+
+    private fun setFocusOnExitReasonAndDisableSubmit() {
+        btSubmitExitForm.isEnabled = false
+        exitFormText.requestFocus()
+        setTextChangeListenerOnExitText()
+        (requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(exitFormText, InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun setTextChangeListenerOnExitText() {
+        exitFormText.addTextChangedListener(textWatcher)
     }
 
 }
