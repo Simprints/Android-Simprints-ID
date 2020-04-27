@@ -46,7 +46,7 @@ class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
             }
         })
 
-        vm.flowFinished.observe(this, LiveDataEventWithContentObserver {
+        vm.finishFlowEvent.observe(this, LiveDataEventWithContentObserver {
             val intent = Intent().apply { putExtra(IFaceResponse.BUNDLE_KEY, it) }
             setResult(Activity.RESULT_OK, intent)
             finish()
@@ -58,6 +58,12 @@ class FaceCaptureActivity : AppCompatActivity(), CameraViewFrameProcessor {
 
         vm.exitFormEvent.observe(this, LiveDataEventObserver {
             findNavController(R.id.capture_host_fragment).navigate(R.id.action_global_refusalFragment)
+        })
+
+        vm.finishFlowWithExitFormEvent.observe(this, LiveDataEventWithContentObserver {
+            val intent = Intent().apply { putExtra(IFaceResponse.BUNDLE_KEY, it) }
+            setResult(Activity.RESULT_OK, intent)
+            finish()
         })
     }
 
