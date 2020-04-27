@@ -136,23 +136,29 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
             PersonLocalDataSource.Query(personId = it.subjectId)
         }
 
-    private fun buildPersonFromCreationPayload(payload: EnrolmentRecordCreationPayload) = Person(
-        patientId = payload.subjectId,
-        projectId = payload.projectId,
-        userId = payload.attendantId,
-        moduleId = payload.moduleId,
-        toSync = false,
-        fingerprintSamples = payload.biometricReferences.filterIsInstance(FingerprintReference::class.java).firstOrNull()?.templates?.map { buildFingerprintSample(it) } ?: emptyList(),
-        faceSamples = payload.biometricReferences.filterIsInstance(FaceReference::class.java).firstOrNull()?.templates?.map { buildFaceSample(it) } ?: emptyList()
-    )
+    private fun buildPersonFromCreationPayload(payload: EnrolmentRecordCreationPayload) = with(payload) {
+        Person(
+            patientId = subjectId,
+            projectId = projectId,
+            userId = attendantId,
+            moduleId = moduleId,
+            toSync = false,
+            fingerprintSamples = biometricReferences.filterIsInstance(FingerprintReference::class.java)
+                .firstOrNull()?.templates?.map { buildFingerprintSample(it) } ?: emptyList(),
+            faceSamples = biometricReferences.filterIsInstance(FaceReference::class.java)
+                .firstOrNull()?.templates?.map { buildFaceSample(it) } ?: emptyList()
+        )
+    }
 
-    private fun buildFingerprintSample(template: FingerprintTemplate) = FingerprintSample(
-        template.finger.fromEventToPerson(),
-        EncodingUtils.base64ToBytes(template.template),
-        template.quality
-    )
+    private fun buildFingerprintSample(template: FingerprintTemplate) =
+        FingerprintSample(
+            template.finger.fromEventToPerson(),
+            EncodingUtils.base64ToBytes(template.template),
+            template.quality
+        )
 
-    private fun buildFaceSample(template: FaceTemplate) = FaceSample(EncodingUtils.base64ToBytes(template.template))
+    private fun buildFaceSample(template: FaceTemplate) =
+        FaceSample(EncodingUtils.base64ToBytes(template.template))
 
     private suspend fun updateDownSyncInfo(state: PeopleDownSyncOperationResult.DownSyncState,
                                            event: ApiEvent? = null,
