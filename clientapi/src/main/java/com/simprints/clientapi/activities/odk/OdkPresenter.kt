@@ -10,13 +10,14 @@ import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
+import com.simprints.core.tools.extentions.safeSealedWhens
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class OdkPresenter(
     private val view: OdkContract.View,
-    private val action: OdkAction?,
+    private val action: OdkAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     deviceManager: DeviceManager,
     crashReportManager: ClientApiCrashReportManager
@@ -39,8 +40,8 @@ class OdkPresenter(
                 Identify -> processIdentifyRequest()
                 Verify -> processVerifyRequest()
                 ConfirmIdentity -> processConfirmIdentityRequest()
-                null -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
-            }
+                Invalid -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+            }.safeSealedWhens
         }
     }
 
