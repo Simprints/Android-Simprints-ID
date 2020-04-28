@@ -11,6 +11,7 @@ import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
+import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
@@ -45,7 +46,7 @@ class CommCarePresenter(
                 Verify -> processVerifyRequest()
                 ConfirmIdentity -> checkAndProcessSessionId()
                 Invalid -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
-            }
+            }.safeSealedWhens
         }
     }
 
