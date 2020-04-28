@@ -6,7 +6,7 @@ import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.GuidSelectionEvent
 import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppIdentityConfirmationRequest
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.ignoreException

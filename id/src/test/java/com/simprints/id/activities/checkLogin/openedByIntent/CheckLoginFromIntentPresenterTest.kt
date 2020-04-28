@@ -4,9 +4,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.extensions.just

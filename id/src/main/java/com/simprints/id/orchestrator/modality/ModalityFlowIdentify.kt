@@ -5,8 +5,9 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource.Query
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
+import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -34,7 +35,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppIdentifyRequest)
-        super.startFlow(appRequest, modalities)
+        addCoreConsentStepIfRequired(ConsentType.VERIFY)
         steps.addAll(buildStepsList(modalities))
     }
 

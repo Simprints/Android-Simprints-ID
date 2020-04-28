@@ -7,9 +7,9 @@ import kotlinx.android.parcel.Parcelize
 
 data class EnrollRequest(
     override val projectId: String,
-    override val moduleId: String,
+    val moduleId: String,
     override val userId: String,
-    override val metadata: String,
+    val metadata: String,
     override val unknownExtras: Map<String, Any?>
 ) : BaseRequest {
 

@@ -7,7 +7,7 @@ interface AnalyticsManager {
 
     suspend fun getAnalyticsId(): String
 
-    fun logCallout(appRequest: AppRequest)
+    fun logCallout(appRequest: AppRequest.AppRequestFlow)
 
     fun logUserProperties(userId: String, projectId: String, moduleId: String, deviceId: String)
     fun logGuidSelectionWorker(projectId: String, sessionId: String, deviceId: String, selectedGuid: String, callbackSent: Boolean)

@@ -158,7 +158,7 @@ class OdkPresenterTest {
             runBlocking { start() }
         }
 
-        verify(exactly = 1) { view.sendSimprintsConfirmation(ConfirmIdentityFactory.getValidSimprintsRequest(ODK)) }
+        verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(ODK)) }
     }
 
     private fun mockSessionManagerToCreateSession() = mockk<ClientApiSessionEventsManager>().apply {

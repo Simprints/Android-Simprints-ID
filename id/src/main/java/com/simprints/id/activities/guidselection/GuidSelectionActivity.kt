@@ -9,25 +9,25 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.simprints.id.Application
 import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.callback.ConfirmationCallbackEvent
-import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
-import com.simprints.id.domain.moduleapi.app.responses.AppConfirmationResponse
-import com.simprints.id.domain.moduleapi.app.responses.AppResponse
+import com.simprints.id.domain.moduleapi.core.requests.GuidSelectionRequest
+import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
+import com.simprints.id.domain.moduleapi.core.response.GuidSelectionResponse
+import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.extensions.parseAppConfirmation
-import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
 
 class GuidSelectionActivity : AppCompatActivity() {
 
     @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var timeHelper: TimeHelper
+    private lateinit var guildSelectionRequest: GuidSelectionRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         injectDependencies()
+        guildSelectionRequest = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
 
         scheduleGuidSelection()
         sendOkResult()
@@ -40,33 +40,21 @@ class GuidSelectionActivity : AppCompatActivity() {
 
     private fun scheduleGuidSelection() {
         val guidSelectionWork = buildGuidSelectionWork()
-        WorkManager.getInstance().enqueue(guidSelectionWork)
+        WorkManager.getInstance(this).enqueue(guidSelectionWork)
     }
 
     private fun sendOkResult() {
-        val response = AppConfirmationResponse(identificationOutcome = true)
-        addConfirmationCallbackEvent(response)
+        val response = GuidSelectionResponse(identificationOutcome = true)
         setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(IAppResponse.BUNDLE_KEY, fromDomainToAppResponse(response))
+            putExtra(CORE_STEP_BUNDLE, response)
         })
 
         finish()
     }
 
-    private fun fromDomainToAppResponse(response: AppResponse): IAppResponse =
-        DomainToModuleApiAppResponse.fromDomainModuleApiAppResponse(response)
-
     private fun buildGuidSelectionWork() = OneTimeWorkRequestBuilder<GuidSelectionWorker>()
         .setInputData(prepareInputData())
         .build()
 
-    private fun prepareInputData() = intent.parseAppConfirmation().toMap().let {
-        Data.Builder().putAll(it).build()
-    }
-
-    private fun addConfirmationCallbackEvent(response: AppConfirmationResponse) {
-        sessionRepository.addEventToCurrentSessionInBackground(
-            ConfirmationCallbackEvent(timeHelper.now(), response.identificationOutcome)
-        )
-    }
+    private fun prepareInputData() = Data.Builder().putAll(guildSelectionRequest.toMap()).build()
 }

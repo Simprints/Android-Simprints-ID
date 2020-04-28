@@ -8,7 +8,9 @@ interface CoreStepProcessor {
 
     fun buildStepConsent(consentType: ConsentType): Step
 
-    fun buildStepVerify(projectId: String, verifyGuid: String): Step
+    fun buildFetchGuidStep(projectId: String, verifyGuid: String): Step
+
+    fun buildIdentityConfirmationStep(projectId: String, sessionId: String, selectedGuid: String): Step
 
     fun processResult(data: Intent?): Step.Result?
 }

@@ -109,7 +109,7 @@ class CommCarePresenterTest {
             mockk()
         ).apply { runBlocking { start() } }
 
-        verify(exactly = 1) { view.sendSimprintsConfirmation(ConfirmIdentityFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
+        verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
     }
 
     @Test

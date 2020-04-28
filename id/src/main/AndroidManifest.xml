@@ -58,6 +58,7 @@
                 <action android:name="com.simprints.clientapp.REGISTER" />
                 <action android:name="com.simprints.clientapp.IDENTIFY" />
                 <action android:name="com.simprints.clientapp.VERIFY" />
+                <action android:name="com.simprints.clientapp.CONFIRM_IDENTITY" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -66,6 +67,7 @@
                 <action android:name="com.simprints.legacy.REGISTER" />
                 <action android:name="com.simprints.legacy.IDENTIFY" />
                 <action android:name="com.simprints.legacy.VERIFY" />
+                <action android:name="com.simprints.legacy.CONFIRM_IDENTITY" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -120,13 +122,6 @@
             android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="com.simprints.clientapp.CONFIRM_IDENTITY" />
-                <action android:name="com.simprints.legacy.CONFIRM_IDENTITY" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activities.settings.syncinformation.SyncInformationActivity"

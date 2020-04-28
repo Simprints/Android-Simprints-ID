@@ -16,5 +16,6 @@ enum class CoreResponseType {
     CORE_EXIT_FORM,
     FINGERPRINT_EXIT_FORM,
     FACE_EXIT_FORM,
-    FETCH_GUID
+    FETCH_GUID,
+    GUID_SELECTION
 }

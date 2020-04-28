@@ -105,7 +105,7 @@ class LibSimprintsPresenterTest {
             mockk()
         ).apply { runBlocking { start() } }
 
-        verify(exactly = 1) { view.sendSimprintsConfirmation(ConfirmIdentityFactory.getValidSimprintsRequest(STANDARD)) }
+        verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test

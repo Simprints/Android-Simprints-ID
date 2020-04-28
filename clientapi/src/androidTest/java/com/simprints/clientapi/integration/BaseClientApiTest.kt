@@ -99,7 +99,7 @@ open class BaseClientApiTest : KoinTest {
         internal const val APP_ENROL_ACTION = "com.simprints.clientapp.REGISTER"
         internal const val APP_IDENTIFY_ACTION = "com.simprints.clientapp.IDENTIFY"
         internal const val APP_VERIFICATION_ACTION = "com.simprints.clientapp.VERIFY"
-        internal const val APP_CONFIRM_ACTION = "com.simprints.clientapp.CONFIRM_IDENTITY"
+        internal const val APP_CONFIRM_ACTION = "com.simprints.clientapp.GUID_SELECTION"
     }
 
     fun <T : Parcelable> bundleDataMatcherForParcelable(parcelable: T) =

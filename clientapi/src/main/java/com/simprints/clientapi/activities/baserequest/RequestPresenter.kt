@@ -8,9 +8,7 @@ import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.domain.ClientBase
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.tools.DeviceManager
 
@@ -42,12 +40,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
     override suspend fun validateAndSendRequest(builder: ClientRequestBuilder) = try {
         val request = builder.build()
         addSuspiciousEventIfRequired(request)
-
-        when (request) {
-            is BaseRequest -> view.sendSimprintsRequest(request)
-            is BaseConfirmation -> view.sendSimprintsConfirmation(request)
-            else -> throw InvalidClientRequestException()
-        }
+        view.sendSimprintsRequest(request)
     } catch (exception: InvalidRequestException) {
         exception.printStackTrace()
         logInvalidSessionInBackground()
@@ -83,7 +76,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         }
     }
 
-    private suspend fun addSuspiciousEventIfRequired(request: ClientBase) {
+    private suspend fun addSuspiciousEventIfRequired(request: BaseRequest) {
         if (request.unknownExtras.isNotEmpty()) {
             eventsManager.addSuspiciousIntentEvent(request.unknownExtras)
         }
