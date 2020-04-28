@@ -36,12 +36,12 @@ class PersonRepositoryTest {
         const val REMOTE_PEOPLE_FOR_SUBSYNC = 100
     }
 
-    @RelaxedMockK lateinit var remoteDataSource: PersonRemoteDataSource
     @RelaxedMockK lateinit var localDataSource: PersonLocalDataSource
     @RelaxedMockK lateinit var peopleUpSyncExecutor: PeopleUpSyncExecutor
     @RelaxedMockK lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
     @RelaxedMockK lateinit var eventRemoteDataSource: EventRemoteDataSource
     @RelaxedMockK lateinit var personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper
+    @RelaxedMockK lateinit var personRepositoryDownSyncHelper: PersonRepositoryDownSyncHelper
 
     private lateinit var personRepository: PersonRepository
 
@@ -49,8 +49,9 @@ class PersonRepositoryTest {
     fun setup() {
         UnitTestConfig(this).coroutinesMainThread()
         MockKAnnotations.init(this, relaxUnitFun = true)
-        personRepository = PersonRepositoryImpl(remoteDataSource, eventRemoteDataSource,
-            localDataSource, downSyncScopeRepository, peopleUpSyncExecutor, personRepositoryUpSyncHelper)
+        personRepository = PersonRepositoryImpl(eventRemoteDataSource,
+            localDataSource, downSyncScopeRepository, peopleUpSyncExecutor,
+            personRepositoryUpSyncHelper, personRepositoryDownSyncHelper)
     }
 
     @Test
@@ -94,7 +95,6 @@ class PersonRepositoryTest {
         runBlocking {
             val person = PeopleGeneratorUtils.getRandomPerson()
             coEvery { localDataSource.load(any()) } returns flowOf()
-            coEvery { remoteDataSource.downloadPerson(any(), any()) } returns person
 
             val fetch = personRepository.loadFromRemoteIfNeeded(person.projectId, person.patientId)
 

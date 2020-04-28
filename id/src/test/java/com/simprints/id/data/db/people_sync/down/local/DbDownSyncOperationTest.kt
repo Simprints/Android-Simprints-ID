@@ -28,16 +28,14 @@ class DbPeopleDownSyncOperationTest {
             dbKey, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_MODES,
             COMPLETE,
             LAST_PATIENT_ID,
-            LAST_PATIENT_UPDATED_AT,
-            LAST_SYNC_TIME)
+            LAST_PATIENT_UPDATED_AT)
 
         with(dbOp.fromDbToDomain()) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
             assertThat(userId).isEqualTo(DEFAULT_USER_ID)
             assertThat(moduleId).isEqualTo(DEFAULT_MODULE_ID)
             assertThat(modes).isEqualTo(DEFAULT_MODES)
-            assertThat(lastResult?.lastPatientUpdatedAt).isEqualTo(LAST_PATIENT_UPDATED_AT)
-            assertThat(lastResult?.lastPatientId).isEqualTo(LAST_PATIENT_ID)
+            assertThat(lastResult?.lastEventId).isEqualTo(LAST_PATIENT_ID)
             assertThat(lastResult?.lastSyncTime).isEqualTo(LAST_SYNC_TIME)
             assertThat(lastResult?.state).isEqualTo(COMPLETE)
         }

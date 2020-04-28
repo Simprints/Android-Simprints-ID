@@ -1,3 +1,4 @@
+/*
 package com.simprints.id.services.scheduledSync.people.down.workers
 
 import androidx.test.core.app.ApplicationProvider
@@ -421,3 +422,4 @@ class PeopleDownSyncDownloaderTaskImplTest {
 }
 
 fun RecordedRequest.requestedUrl() = this.requestUrl ?: throw Throwable("No request done")
+*/

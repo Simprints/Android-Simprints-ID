@@ -21,6 +21,7 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
+import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -57,18 +58,18 @@ class PeopleDownSyncDownloaderWorkerTest {
     fun worker_shouldParseInputDataCorrectly() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
             doWork()
-            coEvery { peopleDownSyncDownloaderTask.execute(projectSyncOp, any(), any()) }
+            coEvery { personRepository.performDownloadWithProgress(this@runBlocking, any()) }
         }
     }
 
     @Test
     fun worker_shouldExecuteTheTask() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
-            coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any()) } returns 0
+            coEvery { personRepository.performDownloadWithProgress(this@runBlocking, any()) } returns produce { 0 }
 
             doWork()
 
-            coVerify { peopleDownSyncDownloaderTask.execute(any(), any(), any()) }
+            coVerify { personRepository.performDownloadWithProgress(this@runBlocking, any()) }
             verify { resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to 0)) }
         }
     }
@@ -77,7 +78,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     @Test
     fun worker_failForCloudIntegration_shouldFail() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
-            coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any()) } throws SyncCloudIntegrationException("Cloud integration", Throwable())
+            coEvery { personRepository.performDownloadWithProgress(this@runBlocking, any()) } throws SyncCloudIntegrationException("Cloud integration", Throwable())
 
             doWork()
 
@@ -88,7 +89,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     @Test
     fun worker_failForNetworkIssue_shouldRetry() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
-            coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any()) } throws Throwable("Network Exception")
+            coEvery { personRepository.performDownloadWithProgress(this@runBlocking, any()) } throws Throwable("Network Exception")
 
             doWork()
 
@@ -143,8 +144,8 @@ class PeopleDownSyncDownloaderWorkerTest {
         } ?: TestListenableWorkerBuilder<PeopleDownSyncDownloaderWorker>(app).build()).apply {
             crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
-            peopleDownSyncDownloaderTask = mockk(relaxed = true)
             downSyncScopeRepository = mockk(relaxed = true)
+            personRepository = mockk(relaxed = true)
         }
 }
 
