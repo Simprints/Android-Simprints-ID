@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.scanner.pairing
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -47,22 +46,6 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
 
     fun isOnlyPairedToOneScanner(): Boolean =
         getPairedScannerAddresses().count() == 1
-
-    fun convertAddressToSerialNumber(address: String): String =
-        SERIAL_PREFIX + address.replace(":", "").substring(7..11)
-            .toInt(16).toString(10).padStart(6, '0')
-
-    fun convertSerialNumberToAddress(serialNumber: String): String =
-        serialNumber.removePrefix(SERIAL_PREFIX).toInt().let {
-            serialHexToMacAddress(getMacHexFromInt(it))
-        }
-
-    @SuppressLint("DefaultLocale")
-    private fun getMacHexFromInt(int: Int): String = Integer.toHexString(int)
-        .toUpperCase().padStart(5, '0')
-
-    private fun serialHexToMacAddress(hex: String): String = MAC_ADDRESS_PREFIX +
-        StringBuilder(hex).insert(1, ":").insert(4, ":").toString()
 
     fun isScannerAddress(macAddress: String): Boolean =
         SCANNER_ADDRESS_REGEX.matcher(macAddress).matches()
