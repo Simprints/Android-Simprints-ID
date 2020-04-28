@@ -9,6 +9,7 @@ import com.simprints.moduleapi.face.responses.IFaceMatchResult
 import com.simprints.moduleapi.face.responses.IFaceResponseType
 import com.simprints.moduleapi.face.responses.entities.IFaceCaptureResult
 import kotlinx.android.parcel.Parcelize
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 
 internal const val SOME_GUID = "some_guid"
 internal const val SOME_METADATA = "some_metadata"
