@@ -1,7 +1,6 @@
 package com.simprints.id.orchestrator.responsebuilders
 
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.testtools.common.syntax.assertThrows

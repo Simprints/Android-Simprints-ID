@@ -15,15 +15,13 @@ import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
-import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.ignoreException
 import com.simprints.id.tools.utils.SimNetworkUtils
 import timber.log.Timber
@@ -75,18 +73,21 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             sessionRepository.updateCurrentSession { currentSession ->
                 with(currentSession) {
                     addEvent(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
-                    addEvent(buildRequestEvent(timeHelper.now(), appRequest))
+
+                    // For ConfirmIdentity, the calloutEvent is not required since ConfirmIdentity is part of the previous session
+                    if (appRequest is AppRequestFlow) {
+                        addEvent(buildRequestEvent(timeHelper.now(), appRequest))
+                    }
                 }
             }
         }
     }
 
-    internal fun buildRequestEvent(relativeStarTime: Long, request: AppRequest): Event =
+    internal fun buildRequestEvent(relativeStarTime: Long, request: AppRequestFlow): Event =
         when (request) {
             is AppEnrolRequest -> buildEnrolmentCalloutEvent(request, relativeStarTime)
             is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStarTime)
             is AppIdentifyRequest -> buildIdentificationCalloutEvent(request, relativeStarTime)
-            else -> throw InvalidAppRequest()
         }
 
     internal fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStarTime: Long) =
@@ -136,8 +137,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun extractSessionParametersOrThrow() =
         with(appRequest) {
-            analyticsManager.logCallout(this)
-            analyticsManager.logUserProperties(userId, projectId, moduleId, deviceId)
+            if (this is AppRequestFlow) {
+                analyticsManager.logCallout(this)
+                analyticsManager.logUserProperties(userId, projectId, moduleId, deviceId)
+            }
         }
 
     override fun handleNotSignedInUser() {

@@ -13,7 +13,7 @@ sealed class CommCareAction {
         private const val ACTION_REGISTER = "$PACKAGE_NAME.REGISTER"
         private const val ACTION_IDENTIFY = "$PACKAGE_NAME.IDENTIFY"
         private const val ACTION_VERIFY = "$PACKAGE_NAME.VERIFY"
-        private const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
+        private const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.GUID_SELECTION"
 
         fun buildCommCareAction(action: String?): CommCareAction =
             when (action) {

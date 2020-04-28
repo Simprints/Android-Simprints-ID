@@ -34,7 +34,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         private const val EXIT_EXTRA = "exitExtra"
         private const val SIMPRINTS_SESSION_ID = "sessionId"
 
-        private const val CONFIRM_IDENTITY_ACTION = "com.simprints.commcare.CONFIRM_IDENTITY"
+        private const val CONFIRM_IDENTITY_ACTION = "com.simprints.commcare.GUID_SELECTION"
     }
 
     override val presenter: CommCareContract.Presenter by inject { parametersOf(this, buildCommCareAction(action)) }

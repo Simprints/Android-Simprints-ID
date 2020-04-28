@@ -13,11 +13,10 @@ import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
+import com.simprints.clientapi.domain.requests.IdentityConfirmationRequest
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
-import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmation
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.moduleapi.app.responses.*
@@ -49,12 +48,11 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     override val confirmIdentityExtractor: ConfirmIdentityExtractor
         get() = ConfirmIdentityExtractor(intent)
 
-    override fun sendSimprintsRequest(request: BaseRequest) =
+    override fun sendSimprintsRequest(request: BaseRequest) {
         routeSimprintsRequest(this, request)
-
-    override fun sendSimprintsConfirmation(request: BaseConfirmation) {
-        routeSimprintsConfirmation(this, request)
-        guidSelectionNotifier.showMessage()
+        if(request is IdentityConfirmationRequest) {
+            guidSelectionNotifier.showMessage()
+        }
     }
 
     override fun handleClientRequestError(clientApiAlert: ClientApiAlert) {
