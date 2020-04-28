@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 class CommCarePresenter(
     private val view: CommCareContract.View,
-    private val action: CommCareAction?,
+    private val action: CommCareAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     private val sharedPreferencesManager: SharedPreferencesManager,
     deviceManager: DeviceManager,
@@ -44,7 +44,7 @@ class CommCarePresenter(
                 Identify -> processIdentifyRequest()
                 Verify -> processVerifyRequest()
                 ConfirmIdentity -> checkAndProcessSessionId()
-                null -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+                Invalid -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.simprints.clientapi.activities.libsimprints
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.*
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.STANDARD
 import com.simprints.clientapi.domain.responses.EnrollResponse
@@ -14,7 +15,6 @@ import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
-import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
 import com.simprints.testtools.unit.BaseUnitTestConfig
@@ -47,7 +47,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_REGISTER_INTENT,
+            Register,
             mockSessionManagerToCreateSession(),
             mockk(),
             mockk()
@@ -65,7 +65,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_IDENTIFY_INTENT,
+            Identify,
             mockSessionManagerToCreateSession(),
             mockk(),
             mockk()
@@ -83,7 +83,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_VERIFY_INTENT,
+            Verify,
             mockSessionManagerToCreateSession(),
             mockk(),
             mockk()
@@ -99,7 +99,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_SELECT_GUID_INTENT,
+            ConfirmIdentity,
             mockSessionManagerToCreateSession(),
             mockk(),
             mockk()
@@ -112,7 +112,7 @@ class LibSimprintsPresenterTest {
     fun startPresenterWithGarbage_ShouldReturnActionError() {
         LibSimprintsPresenter(
             view,
-            "Garbage",
+            Invalid,
             mockSessionManagerToCreateSession(),
             mockk(),
             mockk()
@@ -128,7 +128,7 @@ class LibSimprintsPresenterTest {
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns sessionId
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_REGISTER_INTENT,
+            Register,
             clientApiSessionEventsManager,
             mockk(),
             mockk()
@@ -154,7 +154,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_IDENTIFY_INTENT,
+            Identify,
             clientApiSessionEventsManager,
             mockk(),
             mockk()
@@ -188,7 +188,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_VERIFY_INTENT,
+            Verify,
             clientApiSessionEventsManager,
             mockk(),
             mockk()
@@ -221,7 +221,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            "",
+            Invalid,
             clientApiSessionEventsManager,
             mockk(),
             mockk()

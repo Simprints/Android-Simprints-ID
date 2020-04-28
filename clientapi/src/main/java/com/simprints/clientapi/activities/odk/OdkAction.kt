@@ -5,7 +5,6 @@ sealed class OdkAction {
     object Verify : OdkAction()
     object Identify : OdkAction()
     object ConfirmIdentity : OdkAction()
-    object RegisterLastBiometrics : OdkAction()
 
     object Invalid : OdkAction()
 
@@ -24,7 +23,6 @@ sealed class OdkAction {
                 ACTION_IDENTIFY -> Identify
                 ACTION_VERIFY -> Verify
                 ACTION_CONFIRM_IDENTITY -> ConfirmIdentity
-                ACTION_REGISTER_LAST_BIOMETRICS -> RegisterLastBiometrics
                 else -> Invalid
             }
     }

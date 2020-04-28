@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 class LibSimprintsPresenter(
     private val view: LibSimprintsContract.View,
-    private val action: LibSimprintsAction?,
+    private val action: LibSimprintsAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     deviceManager: DeviceManager,
     crashReportManager: ClientApiCrashReportManager
@@ -43,7 +43,7 @@ class LibSimprintsPresenter(
                 Identify -> processIdentifyRequest()
                 Verify -> processVerifyRequest()
                 ConfirmIdentity -> processConfirmIdentityRequest()
-                null -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+                Invalid -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
             }
         }
     }
