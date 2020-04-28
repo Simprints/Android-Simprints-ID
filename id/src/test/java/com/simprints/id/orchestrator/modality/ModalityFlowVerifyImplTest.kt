@@ -52,7 +52,7 @@ class ModalityFlowVerifyImplTest {
 
         every { fingerprintStepProcessor.buildStepToCapture() } returns fingerprintStepMock
         every { faceStepProcessor.buildCaptureStep() } returns faceStepMock
-        every { coreStepProcessor.buildStepVerify(any(), any()) } returns verifyCoreStepMock
+        every { coreStepProcessor.buildFetchGuidStep(any(), any()) } returns verifyCoreStepMock
         every { coreStepProcessor.buildStepConsent(any()) } returns consentCoreStepMock
     }
 

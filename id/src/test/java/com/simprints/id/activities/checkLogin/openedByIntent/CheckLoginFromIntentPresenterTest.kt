@@ -4,6 +4,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.extensions.just
@@ -70,7 +71,7 @@ class CheckLoginFromIntentPresenterTest {
             every { this@apply.metadata } returns "metadata"
         }
 
-        checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest)
+        checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest as AppEnrolRequest)
 
         verify(exactly = 1) { checkLoginFromIntentPresenter.buildEnrolmentCalloutEvent(any(), any()) }
     }
@@ -86,7 +87,7 @@ class CheckLoginFromIntentPresenterTest {
             every { this@apply.metadata } returns "metadata"
         }
 
-        checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest)
+        checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest as AppIdentifyRequest)
 
         verify(exactly = 1) { checkLoginFromIntentPresenter.buildIdentificationCalloutEvent(any(), any()) }
     }
@@ -103,7 +104,7 @@ class CheckLoginFromIntentPresenterTest {
             every { this@apply.verifyGuid } returns "verifyGuid"
         }
 
-        checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest)
+        checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest as AppVerifyRequest)
 
         verify(exactly = 1) { checkLoginFromIntentPresenter.buildVerificationCalloutEvent(any(), any()) }
 
