@@ -6,6 +6,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.tools.extentions.showToast
 import com.simprints.face.R
@@ -68,7 +69,7 @@ class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
 
     private fun setButtonListeners() {
         btGoBack.setOnClickListener {
-            // TODO: go back to where the user was
+            findNavController().popBackStack()
         }
         btSubmitExitForm.setOnClickListener {
             vm.submitExitForm(getExitFormText())
