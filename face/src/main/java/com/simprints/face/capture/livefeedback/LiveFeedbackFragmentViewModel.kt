@@ -7,6 +7,7 @@ import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.tools.extentions.area
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
+import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
@@ -19,7 +20,8 @@ import com.simprints.uicomponents.models.Size
 class LiveFeedbackFragmentViewModel(
     private val mainVM: FaceCaptureViewModel,
     private val faceDetector: FaceDetector,
-    private val frameProcessor: FrameProcessor
+    private val frameProcessor: FrameProcessor,
+    private val qualityThreshold: Float
 ) : ViewModel() {
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
@@ -31,9 +33,6 @@ class LiveFeedbackFragmentViewModel(
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
     val captures = mutableListOf<FaceDetection>()
-
-    // TODO: get correct information from SimprintsID managers - cameraPreferences.qualityThreshold
-    private val qualityThreshold = -1
 
     suspend fun process(
         frame: Frame,
@@ -62,19 +61,17 @@ class LiveFeedbackFragmentViewModel(
 
     private fun finishCapture() {
         val sortedQualifyingCaptures = captures
+            .filter { it.hasValidStatus() && it.isAboveQualityThreshold(qualityThreshold) }
             .sortedByDescending { it.face?.quality }
-            .also { mainVM.captureFinished(it) }
-            .filter { it.status == FaceDetection.Status.VALID_CAPTURING }
 
-        if (areCapturesBelowThreshold(sortedQualifyingCaptures)) {
+        mainVM.captureFinished(sortedQualifyingCaptures)
+
+        if (sortedQualifyingCaptures.isEmpty()) {
             capturingState.value = CapturingState.FINISHED_FAILED
         } else {
             capturingState.value = CapturingState.FINISHED
         }
     }
-
-    private fun areCapturesBelowThreshold(captures: List<FaceDetection>) =
-        captures.isEmpty() || captures.first().face?.quality ?: Float.NEGATIVE_INFINITY < qualityThreshold
 
     private fun getFaceDetectionFromPotentialFace(potentialFace: Face?, previewFrame: PreviewFrame): FaceDetection {
         return if (potentialFace == null) {
