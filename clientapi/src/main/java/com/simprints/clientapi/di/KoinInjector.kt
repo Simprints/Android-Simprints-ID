@@ -68,13 +68,13 @@ object KoinInjector {
         factory<ErrorContract.Presenter> { (view: ErrorContract.View) ->
             ErrorPresenter(view, get())
         }
-        factory<LibSimprintsContract.Presenter> { (view: LibSimprintsContract.View, action: LibSimprintsAction?) ->
+        factory<LibSimprintsContract.Presenter> { (view: LibSimprintsContract.View, action: LibSimprintsAction) ->
             LibSimprintsPresenter(view, action, get(), get(), get())
         }
-        factory<OdkContract.Presenter> { (view: OdkContract.View, action: OdkAction?) ->
+        factory<OdkContract.Presenter> { (view: OdkContract.View, action: OdkAction) ->
             OdkPresenter(view, action, get(), get(), get())
         }
-        factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: CommCareAction?) ->
+        factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: CommCareAction) ->
             CommCarePresenter(view, action, get(), get(), get(), get())
         }
     }

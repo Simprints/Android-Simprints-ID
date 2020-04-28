@@ -5,6 +5,9 @@ sealed class OdkAction {
     object Verify : OdkAction()
     object Identify : OdkAction()
     object ConfirmIdentity : OdkAction()
+    object RegisterLastBiometrics : OdkAction()
+
+    object Invalid : OdkAction()
 
     companion object {
 
@@ -13,14 +16,16 @@ sealed class OdkAction {
         private const val ACTION_IDENTIFY = "$PACKAGE_NAME.IDENTIFY"
         private const val ACTION_VERIFY = "$PACKAGE_NAME.VERIFY"
         private const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
+        private const val ACTION_REGISTER_LAST_BIOMETRICS = "$PACKAGE_NAME.REGISTER_LAST_BIOMETRICS"
 
-        fun buildOdkAction(action: String?): OdkAction? =
+        fun buildOdkAction(action: String?): OdkAction =
             when (action) {
                 ACTION_REGISTER -> Register
                 ACTION_IDENTIFY -> Identify
                 ACTION_VERIFY -> Verify
                 ACTION_CONFIRM_IDENTITY -> ConfirmIdentity
-                else -> null
+                ACTION_REGISTER_LAST_BIOMETRICS -> RegisterLastBiometrics
+                else -> Invalid
             }
     }
 }
