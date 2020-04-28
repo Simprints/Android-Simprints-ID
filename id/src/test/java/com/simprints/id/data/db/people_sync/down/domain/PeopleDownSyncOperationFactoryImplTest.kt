@@ -17,7 +17,7 @@ class PeopleDownSyncOperationFactoryImplTest {
         const val LAST_SYNC_TIME = 2L
     }
 
-    val result = PeopleDownSyncOperationResult(COMPLETE, LAST_PATIENT_ID, LAST_PATIENT_UPDATED_AT, LAST_SYNC_TIME)
+    val result = PeopleDownSyncOperationResult(COMPLETE, LAST_PATIENT_ID, LAST_PATIENT_UPDATED_AT)
     val builder = PeopleDownSyncOperationFactoryImpl()
 
     @Test
@@ -62,7 +62,6 @@ class PeopleDownSyncOperationFactoryImplTest {
             assertThat(modes).isEqualTo(DEFAULT_MODES)
             assertThat(lastState).isEqualTo(COMPLETE)
             assertThat(lastEventId).isEqualTo(LAST_PATIENT_ID)
-            assertThat(lastPatientUpdatedAt).isEqualTo(LAST_PATIENT_UPDATED_AT)
             assertThat(lastSyncTime).isEqualTo(LAST_SYNC_TIME)
         }
     }

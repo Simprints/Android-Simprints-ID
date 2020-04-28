@@ -9,27 +9,23 @@ import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncOperationLo
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncOperationLocalDataSource
 import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.SyncModule
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
-import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessor
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
 import javax.inject.Singleton
 
 class TestSyncModule(
     private val peopleDownSyncScopeRepositoryRule: DependencyRule = DependencyRule.RealRule,
-    private val peopleDownSyncDownloaderTaskRule: DependencyRule = DependencyRule.RealRule,
     private val peopleSessionEventsSyncManager: DependencyRule = DependencyRule.RealRule,
     private val peopleSyncStateProcessor: DependencyRule = DependencyRule.RealRule,
     private val peopleSyncManagerRule: DependencyRule = DependencyRule.RealRule,
@@ -54,23 +50,6 @@ class TestSyncModule(
             preferencesManager,
             syncStatusDatabase,
             peopleDownSyncOperationFactory)
-    }
-
-    @Singleton
-    override fun providePeopleDownSyncDownloaderTask(
-        personLocalDataSource: PersonLocalDataSource,
-        personRemoteDataSource: PersonRemoteDataSource,
-        downSyncScopeRepository: PeopleDownSyncScopeRepository,
-        peopleSyncCache: PeopleSyncCache,
-        timeHelper: TimeHelper
-    ): PeopleDownSyncDownloaderTask = peopleDownSyncDownloaderTaskRule.resolveDependency {
-        super.providePeopleDownSyncDownloaderTask(
-            personLocalDataSource,
-            personRemoteDataSource,
-            downSyncScopeRepository,
-            peopleSyncCache,
-            timeHelper
-        )
     }
 
     @Singleton

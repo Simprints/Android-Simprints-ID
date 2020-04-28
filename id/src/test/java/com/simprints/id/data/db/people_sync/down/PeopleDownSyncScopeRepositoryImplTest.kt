@@ -37,7 +37,7 @@ class PeopleDownSyncScopeRepositoryImplTest {
     private val projectSyncOp = PeopleDownSyncOperation(DEFAULT_PROJECT_ID, null, null, DEFAULT_MODES, null)
     private val userSyncOp = PeopleDownSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, null, DEFAULT_MODES, null)
     private val moduleSyncOp = PeopleDownSyncOperation(DEFAULT_PROJECT_ID, null, DEFAULT_MODULE_ID, DEFAULT_MODES, null)
-    private val lastDownSyncResult = PeopleDownSyncOperationResult(COMPLETE, LAST_PATIENT_ID, LAST_PATIENT_UPDATED_AT, LAST_SYNC_TIME)
+    private val lastDownSyncResult = PeopleDownSyncOperationResult(COMPLETE, LAST_PATIENT_ID, LAST_PATIENT_UPDATED_AT)
 
     @MockK lateinit var loginInfoManager: LoginInfoManager
     @MockK lateinit var preferencesManager: PreferencesManager
