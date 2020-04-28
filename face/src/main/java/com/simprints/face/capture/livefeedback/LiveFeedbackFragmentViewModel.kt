@@ -7,7 +7,6 @@ import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.tools.extentions.area
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
-import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
@@ -16,6 +15,7 @@ import com.simprints.face.models.SymmetricTarget
 import com.simprints.uicomponents.models.FloatRange
 import com.simprints.uicomponents.models.PreviewFrame
 import com.simprints.uicomponents.models.Size
+import kotlinx.coroutines.channels.Channel
 
 class LiveFeedbackFragmentViewModel(
     private val mainVM: FaceCaptureViewModel,
@@ -29,10 +29,11 @@ class LiveFeedbackFragmentViewModel(
         FloatRange(0.25f, 0.5f)
     )
 
+    val captures = mutableListOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
-    val captures = mutableListOf<FaceDetection>()
+    val frameChannel = Channel<Frame>(Channel.CONFLATED)
 
     suspend fun process(
         frame: Frame,
@@ -57,6 +58,10 @@ class LiveFeedbackFragmentViewModel(
 
     fun startCapture() {
         capturingState.value = CapturingState.CAPTURING
+    }
+
+    fun handlePreviewFrame(frame: Frame) {
+        frameChannel.offer(frame)
     }
 
     private fun finishCapture() {
@@ -110,11 +115,6 @@ class LiveFeedbackFragmentViewModel(
                 if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID
             )
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        mainVM.stopFaceDetection()
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED, FINISHED_FAILED }
