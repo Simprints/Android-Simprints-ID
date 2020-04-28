@@ -10,7 +10,7 @@ sealed class LibSimprintsAction {
 
     companion object {
 
-        fun buildCommCareAction(action: String?): LibSimprintsAction? =
+        fun buildLibSimprintsAction(action: String?): LibSimprintsAction? =
             when (action) {
                 Constants.SIMPRINTS_REGISTER_INTENT -> Register
                 Constants.SIMPRINTS_IDENTIFY_INTENT -> Identify

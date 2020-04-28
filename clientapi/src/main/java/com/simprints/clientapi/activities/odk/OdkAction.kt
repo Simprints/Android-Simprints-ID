@@ -1,7 +1,5 @@
 package com.simprints.clientapi.activities.odk
 
-import com.simprints.clientapi.activities.commcare.CommCareAction
-
 sealed class OdkAction {
     object Register : OdkAction()
     object Verify : OdkAction()
@@ -16,12 +14,12 @@ sealed class OdkAction {
         private const val ACTION_VERIFY = "$PACKAGE_NAME.VERIFY"
         private const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
 
-        fun buildCommCareAction(action: String?): CommCareAction? =
+        fun buildOdkAction(action: String?): OdkAction? =
             when (action) {
-                ACTION_REGISTER -> CommCareAction.Register
-                ACTION_IDENTIFY -> CommCareAction.Identify
-                ACTION_VERIFY -> CommCareAction.Verify
-                ACTION_CONFIRM_IDENTITY -> CommCareAction.ConfirmIdentity
+                ACTION_REGISTER -> Register
+                ACTION_IDENTIFY -> Identify
+                ACTION_VERIFY -> Verify
+                ACTION_CONFIRM_IDENTITY -> ConfirmIdentity
                 else -> null
             }
     }

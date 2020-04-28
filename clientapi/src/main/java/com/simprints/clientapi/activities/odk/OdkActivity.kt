@@ -24,7 +24,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val CONFIRM_IDENTITY_ACTION = "com.simprints.simodkadapter.CONFIRM_IDENTITY"
     }
 
-    override val presenter: OdkContract.Presenter by inject { parametersOf(this, action) }
+    override val presenter: OdkContract.Presenter by inject { parametersOf(this, OdkAction.buildOdkAction(action)) }
 
     override val guidSelectionNotifier: OdkGuidSelectionNotifier by inject {
         parametersOf(this)
