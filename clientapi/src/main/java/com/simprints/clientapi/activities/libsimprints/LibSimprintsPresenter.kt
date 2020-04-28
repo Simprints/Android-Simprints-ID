@@ -10,6 +10,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
+import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
@@ -44,7 +45,7 @@ class LibSimprintsPresenter(
                 Verify -> processVerifyRequest()
                 ConfirmIdentity -> processConfirmIdentityRequest()
                 Invalid -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
-            }
+            }.safeSealedWhens
         }
     }
 
