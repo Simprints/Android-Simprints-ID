@@ -25,4 +25,8 @@ data class FaceDetection(
 
     fun toFaceSample(): FaceSample =
         FaceSample(UUID.randomUUID().toString(), face?.template ?: ByteArray(0), securedImageRef)
+
+    fun hasValidStatus(): Boolean = status == Status.VALID || status == Status.VALID_CAPTURING
+    fun isAboveQualityThreshold(qualityThreshold: Float): Boolean =
+        face?.let { it.quality > qualityThreshold } ?: false
 }
