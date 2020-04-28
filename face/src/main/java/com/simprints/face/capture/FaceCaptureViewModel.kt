@@ -3,7 +3,6 @@ package com.simprints.face.capture
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -17,8 +16,6 @@ import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.face.models.FaceDetection
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -26,11 +23,7 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
 //    private val analyticsManager: AnalyticsManager
 
     val faceDetections = MutableLiveData<List<FaceDetection>>()
-    val shouldProcessFrames: MutableLiveData<LiveDataEventWithContent<Boolean>> = MutableLiveData()
 
-    val frameChannel = Channel<Frame>(CONFLATED)
-
-    val startCameraEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val retryFlowEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val exitFormEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
@@ -47,7 +40,6 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
     var samplesToCapture = 1
 
     init {
-        startCameraEvent.send()
         viewModelScope.launch { startNewAnalyticsSession() }
     }
 
@@ -57,18 +49,6 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
                 samplesToCapture = faceRequest.nFaceSamplesToCapture
             }
         }
-    }
-
-    fun startFaceDetection() {
-        shouldProcessFrames.send(true)
-    }
-
-    fun stopFaceDetection() {
-        shouldProcessFrames.send(false)
-    }
-
-    fun handlePreviewFrame(frame: Frame) {
-        frameChannel.offer(frame)
     }
 
     fun flowFinished() {
@@ -83,13 +63,12 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
     }
 
     fun captureFinished(faceDetections: List<FaceDetection>) {
-        stopFaceDetection()
         this.faceDetections.value = faceDetections
     }
 
     fun handleBackButton(backButtonContext: BackButtonContext) {
         when (backButtonContext) {
-            CAPTURE -> exitFormEvent.send()
+            CAPTURE -> startExitForm()
             CONFIRMATION -> flowFinished()
             RETRY -> handleRetry()
         }
@@ -97,10 +76,14 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
 
     fun handleRetry() {
         if (canRetry) {
-            exitFormEvent.send()
+            startExitForm()
         } else {
             finishFlowWithFailedRetries()
         }
+    }
+
+    private fun startExitForm() {
+        exitFormEvent.send()
     }
 
     private fun retryFlow() {
