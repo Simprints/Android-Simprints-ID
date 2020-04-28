@@ -3,6 +3,7 @@ package com.simprints.clientapi.activities.libsimprints
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Companion.buildLibSimprintsAction
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
@@ -13,7 +14,7 @@ import org.koin.core.parameter.parametersOf
 
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
-    override val presenter: LibSimprintsContract.Presenter by inject { parametersOf(this, action) }
+    override val presenter: LibSimprintsContract.Presenter by inject { parametersOf(this, buildLibSimprintsAction(action)) }
 
     override val guidSelectionNotifier = DefaultGuidSelectionNotifier(this)
 

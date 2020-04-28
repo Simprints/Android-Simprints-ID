@@ -39,7 +39,7 @@ class OdkPresenter(
                 Identify -> processIdentifyRequest()
                 Verify -> processVerifyRequest()
                 ConfirmIdentity -> processConfirmIdentityRequest()
-                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+                null -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
             }
         }
     }
