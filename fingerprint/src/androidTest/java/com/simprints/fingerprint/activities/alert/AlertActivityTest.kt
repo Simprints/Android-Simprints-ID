@@ -20,7 +20,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.nhaarman.mockitokotlin2.any
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
@@ -32,8 +31,8 @@ import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.id.Application
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.verifyOnce
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -44,7 +43,7 @@ import org.koin.test.mock.declareModule
 @RunWith(AndroidJUnit4::class)
 class AlertActivityTest : KoinTest {
 
-    private val sessionEventManagerMock: FingerprintSessionEventsManager = mock()
+    private val sessionEventManagerMock: FingerprintSessionEventsManager = mockk(relaxed = true)
 
     @Before
     fun setUp() {
@@ -58,7 +57,7 @@ class AlertActivityTest : KoinTest {
         launchAlertActivity()
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
-        verifyOnce(sessionEventManagerMock) { addEventInBackground(any<AlertScreenEvent>()) }
+        verify { sessionEventManagerMock.addEventInBackground(any<AlertScreenEvent>()) }
     }
 
     @Test

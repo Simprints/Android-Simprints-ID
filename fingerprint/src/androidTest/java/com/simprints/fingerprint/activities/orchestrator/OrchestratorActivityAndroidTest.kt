@@ -8,8 +8,6 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtraWithKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
@@ -23,7 +21,10 @@ import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.testtools.common.syntax.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import org.junit.After
 import org.junit.Assert.assertNotNull
 import org.junit.Before
@@ -36,9 +37,9 @@ import org.koin.test.mock.declareModule
 @RunWith(AndroidJUnit4::class)
 class OrchestratorActivityAndroidTest : KoinTest {
 
-    private val orchestratorMock = mock<Orchestrator>()
-    private val scannerManagerMock = spy<ScannerManager>(ScannerManagerImpl(mock(), mock(), mock()))
-    private val orchestratorViewModel = spy(OrchestratorViewModel(orchestratorMock, scannerManagerMock))
+    private val orchestratorMock = mockk<Orchestrator>(relaxed = true)
+    private val scannerManagerMock = spyk<ScannerManager>(ScannerManagerImpl(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)))
+    private val orchestratorViewModel = spyk(OrchestratorViewModel(orchestratorMock, scannerManagerMock))
 
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
 
@@ -55,8 +56,8 @@ class OrchestratorActivityAndroidTest : KoinTest {
 
     @Test
     fun orchestratorActivityCallsNextActivity_returnsWithResult_handlesActivityResult() {
-        whenever(orchestratorMock) { isFinished() } thenReturn false
-        whenever(orchestratorMock) { getNextTask() } thenReturn FingerprintTask.ConnectScanner("connect") {
+        every { orchestratorMock.isFinished() } returns false
+        every { orchestratorMock.getNextTask() } returns FingerprintTask.ConnectScanner("connect") {
             launchTaskRequest()
         }
 
@@ -66,49 +67,47 @@ class OrchestratorActivityAndroidTest : KoinTest {
 
         scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
 
-        whenever(orchestratorMock) { isFinished() } thenReturn true
-        whenever(orchestratorMock) { getFinalResult() } thenReturn
+        every { orchestratorMock.isFinished() } returns true
+        every { orchestratorMock.getFinalResult() } returns
             FinalResult(Activity.RESULT_OK, Intent().putExtra("test_key", 42))
         assertNotNull(scenario.result.resultData.extras?.get("test_key") as Int?)
 
-        verifyOnce(orchestratorMock) { handleActivityTaskResult(anyNotNull(), anyNotNull()) }
+        verify { orchestratorMock.handleActivityTaskResult(any(), any()) }
     }
 
     @Test
     fun orchestratorActivityWithFinishedOrchestrator_getsFinalResultAndFinishes() {
-        whenever(orchestratorMock) { isFinished() } thenReturn true
-        whenever(orchestratorMock) { getFinalResult() } thenReturn
+        every { orchestratorMock.isFinished() } returns true
+        every { orchestratorMock.getFinalResult() } returns
             FinalResult(Activity.RESULT_OK, Intent().putExtra("test_key", 42))
 
         scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
 
         assertNotNull(scenario.result.resultData.extras?.get("test_key") as Int?)
 
-        verifyNever(orchestratorMock) { handleActivityTaskResult(anyNotNull(), anyNotNull()) }
-        verifyOnce(orchestratorMock) { getFinalResult() }
+        verify(exactly = 0) { orchestratorMock.handleActivityTaskResult(any(), any()) }
+        verify { orchestratorMock.getFinalResult() }
     }
 
     @Test
     fun orchestratorActivity_destroyedBeneathActivity_resumesProperly() {
         val orchestratorState = OrchestratorState(FingerprintTaskFlowState(
-            mock(),
+            mockk(relaxed = true),
             2,
-            mutableMapOf("connect" to mock(), "collect" to mock())
+            mutableMapOf("connect" to mockk(relaxed = true), "collect" to mockk(relaxed = true))
         ))
 
-        whenever(orchestratorMock) { getState() } thenReturn orchestratorState
+        every { orchestratorMock.getState() } returns orchestratorState
 
         // Make sure other activities don't start appearing
-        whenever(orchestratorViewModel) { start(anyNotNull()) } thenDoNothing {}
+        every { orchestratorViewModel.start(any()) } returns Unit
 
         scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
 
         scenario.recreate()
 
-        verifyOnce(orchestratorMock) { getState() }
-        verifyOnce(orchestratorMock) { restoreState(eq(orchestratorState)) }
-        verifyNoMoreInteractions(orchestratorMock)
-    }
+        verify { orchestratorMock.getState() }
+        verify { orchestratorMock.restoreState(eq(orchestratorState)) } }
 
     @After
     fun tearDown() {

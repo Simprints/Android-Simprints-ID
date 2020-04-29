@@ -38,7 +38,7 @@ class ConfirmationFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        confirmation_img.setImageBitmap(mainVM.captures.value?.first()?.frame?.toBitmap())
+        confirmation_img.setImageBitmap(mainVM.faceDetections.value?.first()?.frame?.toBitmap())
         confirmation_btn.setOnClickListener { mainVM.flowFinished() }
 
         requireActivity().onBackPressedDispatcher.addCallback(this) {
