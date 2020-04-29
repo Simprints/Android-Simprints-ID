@@ -17,6 +17,7 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
@@ -85,10 +86,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             is AppEnrolRequest -> buildEnrolmentCalloutEvent(request, relativeStarTime)
             is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStarTime)
             is AppIdentifyRequest -> buildIdentificationCalloutEvent(request, relativeStarTime)
-            is AppRequest.AppConfirmIdentityRequest -> addConfirmationCalloutEvent(request, relativeStarTime)
+            is AppConfirmIdentityRequest -> addConfirmationCalloutEvent(request, relativeStarTime)
         }
 
-    internal fun addConfirmationCalloutEvent(request: AppRequest.AppConfirmIdentityRequest, relativeStarTime: Long) =
+    internal fun addConfirmationCalloutEvent(request: AppConfirmIdentityRequest, relativeStarTime: Long) =
         ConfirmationCalloutEvent(
             relativeStarTime,
             request.projectId,
@@ -149,9 +150,12 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
 
     override fun handleNotSignedInUser() {
-        sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(AuthorizationEvent.Result.NOT_AUTHORIZED))
 
-        if (!loginAlreadyTried.get()) {
+        // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
+        // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
+        if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest) {
+            sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(AuthorizationEvent.Result.NOT_AUTHORIZED))
+
             loginAlreadyTried.set(true)
             view.openLoginActivity(appRequest)
         } else {
