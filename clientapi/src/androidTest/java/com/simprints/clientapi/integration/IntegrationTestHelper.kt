@@ -2,8 +2,8 @@ package com.simprints.clientapi.integration
 
 import com.simprints.moduleapi.app.requests.IAppEnrollRequest
 import com.simprints.moduleapi.app.requests.IAppIdentifyRequest
-import com.simprints.moduleapi.app.requests.IAppVerifyRequest
 import com.simprints.moduleapi.app.requests.IAppIdentityConfirmationRequest
+import com.simprints.moduleapi.app.requests.IAppVerifyRequest
 import com.simprints.moduleapi.app.responses.*
 import kotlinx.android.parcel.Parcelize
 
@@ -81,6 +81,7 @@ internal data class AppVerifyRequest(
 @Parcelize
 internal data class AppIdentityConfirmationRequest(
     override val projectId: String,
+    override val userId: String,
     override val sessionId: String,
     override val selectedGuid: String
 ) : IAppIdentityConfirmationRequest
