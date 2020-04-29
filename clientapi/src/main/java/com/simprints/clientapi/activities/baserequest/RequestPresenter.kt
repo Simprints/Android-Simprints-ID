@@ -83,7 +83,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
     }
 
     private suspend fun logInvalidSessionInBackground() {
-        eventsManager.addInvalidIntentEvent(view.action ?: "", view.extras ?: emptyMap())
+        eventsManager.addInvalidIntentEvent(view.intentAction ?: "", view.extras ?: emptyMap())
     }
 
 }
