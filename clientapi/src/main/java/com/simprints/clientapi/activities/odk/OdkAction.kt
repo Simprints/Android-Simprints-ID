@@ -15,7 +15,6 @@ sealed class OdkAction {
         private const val ACTION_IDENTIFY = "$PACKAGE_NAME.IDENTIFY"
         private const val ACTION_VERIFY = "$PACKAGE_NAME.VERIFY"
         private const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
-        private const val ACTION_REGISTER_LAST_BIOMETRICS = "$PACKAGE_NAME.REGISTER_LAST_BIOMETRICS"
 
         fun buildOdkAction(action: String?): OdkAction =
             when (action) {
