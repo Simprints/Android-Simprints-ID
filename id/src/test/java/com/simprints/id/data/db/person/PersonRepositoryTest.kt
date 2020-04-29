@@ -8,9 +8,9 @@ import com.simprints.id.commontesttools.DefaultTestConstants.userSyncScope
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
+import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
@@ -109,7 +109,7 @@ class PersonRepositoryTest {
 
 
     private suspend fun assesDownSyncCount(downSyncScope: PeopleDownSyncScope) {
-        val eventCounts = listOf(EventCount(EventType.ENROLMENT_RECORD_CREATION, REMOTE_PEOPLE_FOR_SUBSYNC))
+        val eventCounts = listOf(EventCount(ENROLMENT_RECORD_CREATION, REMOTE_PEOPLE_FOR_SUBSYNC))
 
         coEvery { downSyncScopeRepository.getDownSyncOperations(any()) } returns emptyList()
         coEvery { eventRemoteDataSource.count(any()) } returns eventCounts

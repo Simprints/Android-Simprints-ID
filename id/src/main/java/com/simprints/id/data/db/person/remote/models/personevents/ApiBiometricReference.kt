@@ -5,6 +5,8 @@ import com.simprints.id.data.db.person.domain.personevents.BiometricReference
 import com.simprints.id.data.db.person.domain.personevents.FaceTemplate
 import com.simprints.id.data.db.person.domain.personevents.FingerIdentifier
 import com.simprints.id.data.db.person.domain.personevents.FingerprintTemplate
+import com.simprints.id.data.db.person.remote.models.personevents.ApiBiometricReferenceName.FACE_REFERENCE_SERIALISED
+import com.simprints.id.data.db.person.remote.models.personevents.ApiBiometricReferenceName.FINGERPRINT_REFERENCE_SERIALISED
 import com.simprints.id.data.db.person.remote.models.personevents.ApiBiometricReferenceType.FACE_REFERENCE
 import com.simprints.id.data.db.person.remote.models.personevents.ApiBiometricReferenceType.FINGERPRINT_REFERENCE
 import com.simprints.id.data.db.person.domain.personevents.FaceReference as DomainFaceReference
@@ -23,8 +25,13 @@ class ApiFingerprintReference(val templates: List<ApiFingerprintTemplate>,
 
 @Keep
 enum class ApiBiometricReferenceType(val apiName: String) {
-    FACE_REFERENCE("FaceReference"),
-    FINGERPRINT_REFERENCE("FingerprintReference")
+    FACE_REFERENCE(FACE_REFERENCE_SERIALISED),
+    FINGERPRINT_REFERENCE(FINGERPRINT_REFERENCE_SERIALISED);
+}
+
+private object ApiBiometricReferenceName{
+    const val FACE_REFERENCE_SERIALISED = "FaceReference"
+    const val FINGERPRINT_REFERENCE_SERIALISED = "FingerprintReference"
 }
 
 fun BiometricReference.fromDomainToApi() = when (this) {

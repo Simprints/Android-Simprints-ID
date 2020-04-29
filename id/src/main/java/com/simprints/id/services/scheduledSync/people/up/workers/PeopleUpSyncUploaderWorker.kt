@@ -33,12 +33,13 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
     @ExperimentalCoroutinesApi
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
-            val workerId = this@PeopleUpSyncUploaderWorker.id.toString()
-
             getComponent<PeopleUpSyncUploaderWorker> { it.inject(this@PeopleUpSyncUploaderWorker) }
-            var count = peopleSyncCache.readProgress(workerId)
-            crashlyticsLog("Start")
 
+
+            val workerId = this@PeopleUpSyncUploaderWorker.id.toString()
+            var count = peopleSyncCache.readProgress(workerId)
+
+            crashlyticsLog("Start")
             val totalUploaded = personRepository.performUploadWithProgress(this)
             while (!totalUploaded.isClosedForReceive) {
                 totalUploaded.poll()?.let {
@@ -53,7 +54,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
             success(workDataOf(OUTPUT_UP_SYNC to count), "Total uploaded: $count")
         } catch (t: Throwable) {
             t.printStackTrace()
-            Timber.d("Upsync failed : $t")
+            Timber.d("Upsync failed : ${t.printStackTrace()}")
             retryOrFailIfCloudIntegrationError(t)
         }
     }
