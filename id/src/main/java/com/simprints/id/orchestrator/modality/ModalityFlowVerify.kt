@@ -8,8 +8,8 @@ import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
-import com.simprints.id.domain.moduleapi.core.requests.ConsentType.VERIFY
-import com.simprints.id.domain.moduleapi.core.response.FetchGUIDResponse
+import com.simprints.id.orchestrator.steps.core.requests.ConsentType.VERIFY
+import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse

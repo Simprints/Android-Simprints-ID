@@ -1,4 +1,4 @@
-package com.simprints.id.domain.moduleapi.core.requests
+package com.simprints.id.orchestrator.steps.core.requests
 
 import android.os.Parcelable
 import com.simprints.id.orchestrator.steps.Step

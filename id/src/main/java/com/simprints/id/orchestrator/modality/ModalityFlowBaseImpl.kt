@@ -4,10 +4,10 @@ import android.content.Intent
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent
-import com.simprints.id.domain.moduleapi.core.requests.ConsentType
-import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreFaceExitFormResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreFingerprintExitFormResponse
+import com.simprints.id.orchestrator.steps.core.requests.ConsentType
+import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.id.orchestrator.steps.Step

@@ -4,10 +4,9 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.GuidSelectionEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppIdentityConfirmationRequest
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
+import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.ignoreException
 import io.reactivex.Completable
@@ -20,9 +19,8 @@ class GuidSelectionManagerImpl(val deviceId: String,
                                private val timerHelper: TimeHelper,
                                val sessionRepository: SessionRepository) : GuidSelectionManager {
 
-    override suspend fun handleIdentityConfirmationRequest(request: AppIdentityConfirmationRequest) {
+    override suspend fun handleIdentityConfirmationRequest(request: GuidSelectionRequest) {
         try {
-            addConfirmationCalloutEvent(request)
             checkRequest(request)
             saveGuidSelectionEvent(request)
             reportToAnalytics(request, true)
@@ -33,19 +31,11 @@ class GuidSelectionManagerImpl(val deviceId: String,
         }
     }
 
-    private fun checkRequest(request: AppIdentityConfirmationRequest): Completable = Completable.fromCallable {
+    private fun checkRequest(request: GuidSelectionRequest): Completable = Completable.fromCallable {
         checkProjectId(request.projectId)
     }
 
-    private fun addConfirmationCalloutEvent(request: AppIdentityConfirmationRequest) =
-        sessionRepository.addEventToCurrentSessionInBackground(ConfirmationCalloutEvent(
-            timerHelper.now(),
-            request.projectId,
-            request.selectedGuid,
-            request.sessionId))
-
-
-    private suspend fun saveGuidSelectionEvent(request: AppIdentityConfirmationRequest) =
+    private suspend fun saveGuidSelectionEvent(request: GuidSelectionRequest) =
         ignoreException {
             sessionRepository.updateSession(request.sessionId) {
                 val event = GuidSelectionEvent(timerHelper.now(), request.selectedGuid)
@@ -54,7 +44,7 @@ class GuidSelectionManagerImpl(val deviceId: String,
         }
 
 
-    private fun reportToAnalytics(request: AppIdentityConfirmationRequest, callbackSent: Boolean) =
+    private fun reportToAnalytics(request: GuidSelectionRequest, callbackSent: Boolean) =
         analyticsManager.logGuidSelectionWorker(
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             request.sessionId,

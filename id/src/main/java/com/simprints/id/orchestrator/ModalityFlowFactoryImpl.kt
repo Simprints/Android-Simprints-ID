@@ -22,6 +22,6 @@ class ModalityFlowFactoryImpl(private val enrolFlow: ModalityFlow,
             is AppEnrolRequest -> enrolFlow
             is AppIdentifyRequest -> identifyFlow
             is AppVerifyRequest -> verifyFlow
-            is AppRequest.AppIdentityConfirmationRequest -> confirmationIdentityFlow
+            is AppRequest.AppConfirmIdentityRequest -> confirmationIdentityFlow
         }
 }

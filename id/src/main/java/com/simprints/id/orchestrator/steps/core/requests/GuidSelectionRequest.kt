@@ -1,6 +1,5 @@
-package com.simprints.id.domain.moduleapi.core.requests
+package com.simprints.id.orchestrator.steps.core.requests
 
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -16,13 +15,11 @@ data class GuidSelectionRequest(val projectId: String,
 
     companion object {
         private const val KEY_PROJECT_ID = "project_id"
-        private const val KEY_USER_ID = "user_id"
         private const val KEY_SESSION_ID = "session_id"
         private const val KEY_SELECTED_GUID = "selected_guid"
 
-        fun fromMap(map: Map<String, Any>) = AppRequest.AppIdentityConfirmationRequest(
+        fun fromMap(map: Map<String, Any>) = GuidSelectionRequest(
             map[KEY_PROJECT_ID].toString(),
-            map[KEY_USER_ID].toString(),
             map[KEY_SESSION_ID].toString(),
             map[KEY_SELECTED_GUID].toString()
         )
