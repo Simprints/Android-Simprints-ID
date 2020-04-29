@@ -8,6 +8,7 @@ import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.AuthorizationEvent
 import com.simprints.id.data.db.session.domain.models.events.ConnectivitySnapshotEvent
 import com.simprints.id.data.db.session.domain.models.events.Event
+import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
 import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
 import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
 import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
@@ -73,22 +74,26 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             sessionRepository.updateCurrentSession { currentSession ->
                 with(currentSession) {
                     addEvent(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
-
-                    // For ConfirmIdentity, the calloutEvent is not required since ConfirmIdentity is part of the previous session
-                    if (appRequest is AppRequestFlow) {
-                        addEvent(buildRequestEvent(timeHelper.now(), appRequest))
-                    }
+                    addEvent(buildRequestEvent(timeHelper.now(), appRequest))
                 }
             }
         }
     }
 
-    internal fun buildRequestEvent(relativeStarTime: Long, request: AppRequestFlow): Event =
+    internal fun buildRequestEvent(relativeStarTime: Long, request: AppRequest): Event =
         when (request) {
             is AppEnrolRequest -> buildEnrolmentCalloutEvent(request, relativeStarTime)
             is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStarTime)
             is AppIdentifyRequest -> buildIdentificationCalloutEvent(request, relativeStarTime)
+            is AppRequest.AppConfirmIdentityRequest -> addConfirmationCalloutEvent(request, relativeStarTime)
         }
+
+    internal fun addConfirmationCalloutEvent(request: AppRequest.AppConfirmIdentityRequest, relativeStarTime: Long) =
+        ConfirmationCalloutEvent(
+            relativeStarTime,
+            request.projectId,
+            request.selectedGuid,
+            request.sessionId)
 
     internal fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStarTime: Long) =
         with(request) {

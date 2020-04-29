@@ -9,12 +9,13 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.simprints.id.Application
 import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.domain.moduleapi.core.requests.GuidSelectionRequest
-import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import com.simprints.id.domain.moduleapi.core.response.GuidSelectionResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.guidselection.GuidSelectionWorker
+import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
+import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
+import com.simprints.id.orchestrator.steps.core.response.GuidSelectionResponse
 import com.simprints.id.tools.TimeHelper
+import timber.log.Timber
 import javax.inject.Inject
 
 class GuidSelectionActivity : AppCompatActivity() {
@@ -25,8 +26,9 @@ class GuidSelectionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         injectDependencies()
+        Timber.d("GuidSelectionActivity started")
+
         guildSelectionRequest = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
 
         scheduleGuidSelection()
@@ -49,6 +51,7 @@ class GuidSelectionActivity : AppCompatActivity() {
             putExtra(CORE_STEP_BUNDLE, response)
         })
 
+        Timber.d("GuidSelectionActivity done")
         finish()
     }
 
