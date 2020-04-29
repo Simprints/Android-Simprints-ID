@@ -115,7 +115,7 @@ class EventRemoteDataSourceImplTest {
             coEvery { eventRemoteDataSourceSpy.getPeopleApiClient() } returns eventRemoteInterface
             mockServer.enqueue(buildSuccessfulResponseForGetEvents())
 
-            val responseString = eventRemoteDataSourceSpy.get(buildEventQuery()).string()
+            val responseString = eventRemoteDataSourceSpy.getStreaming(buildEventQuery()).string()
 
             assertThat(mockServer.requestCount).isEqualTo(1)
             assertThat(mockServer.takeRequest().requestUrl.toString()).contains(expectedUrlFormat)

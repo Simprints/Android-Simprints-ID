@@ -1,15 +1,15 @@
 package com.simprints.id.data.db.person
 
 import com.google.gson.stream.JsonReader
-import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.EventQuery
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult
-import com.simprints.id.data.db.person.domain.FaceSample
-import com.simprints.id.data.db.person.domain.FingerprintSample
-import com.simprints.id.data.db.person.domain.Person
-import com.simprints.id.data.db.person.domain.personevents.*
+import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelper.Companion.BATCH_SIZE_FOR_DOWNLOADING
+import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelper.Companion.buildPersonFromCreationPayload
+import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordCreationPayload
+import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.person.domain.personevents.fromApiToDomain
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordCreationPayload
@@ -22,8 +22,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
-import okhttp3.ResponseBody
 import timber.log.Timber
+import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.Reader
 import java.util.*
@@ -47,8 +47,8 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
             val bufferToSave = mutableListOf<ApiEvent>()
 
             try {
-                val response = makeDownSyncApiCallAndGetResponse(eventQuery)
-                reader = setupJsonReaderFromResponse(response)
+                val responseStream = makeDownSyncApiCallAndGetResponse(eventQuery)
+                reader = setupJsonReaderFromResponse(responseStream)
 
                 val channelFromNetwork = createPeopleChannelFromJsonReader(reader)
                 while (!channelFromNetwork.isClosedForReceive) {
@@ -76,10 +76,10 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
         }
 
     private suspend fun makeDownSyncApiCallAndGetResponse(eventQuery: EventQuery) =
-        eventRemoteDataSource.get(eventQuery)
+        eventRemoteDataSource.getStreaming(eventQuery)
 
-    private fun setupJsonReaderFromResponse(response: ResponseBody): JsonReader =
-        JsonReader(InputStreamReader(response.byteStream()) as Reader?)
+    private fun setupJsonReaderFromResponse(responseStream: InputStream): JsonReader =
+        JsonReader(InputStreamReader(responseStream) as Reader?)
             .also {
                 it.beginArray()
             }
@@ -119,9 +119,9 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
         deletePeopleBatchFromLocal(eventRecordsToBeDeleted)
     }
 
-    private suspend fun savePeopleBatchInLocal(batchOfPeopleToSaveInLocal: List<EnrolmentRecordCreationPayload>) {
-        if (batchOfPeopleToSaveInLocal.isNotEmpty()) {
-            personLocalDataSource.insertOrUpdate(batchOfPeopleToSaveInLocal.map { buildPersonFromCreationPayload(it) })
+    private suspend fun savePeopleBatchInLocal(batchOfEventsToSaveInLocal: List<EnrolmentRecordCreationPayload>) {
+        if (batchOfEventsToSaveInLocal.isNotEmpty()) {
+            personLocalDataSource.insertOrUpdate(batchOfEventsToSaveInLocal.map { buildPersonFromCreationPayload(it) })
         }
     }
 
@@ -135,30 +135,6 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
         batchOfPeopleToBeDeleted.map {
             PersonLocalDataSource.Query(personId = it.subjectId)
         }
-
-    private fun buildPersonFromCreationPayload(payload: EnrolmentRecordCreationPayload) = with(payload) {
-        Person(
-            patientId = subjectId,
-            projectId = projectId,
-            userId = attendantId,
-            moduleId = moduleId,
-            toSync = false,
-            fingerprintSamples = biometricReferences.filterIsInstance(FingerprintReference::class.java)
-                .firstOrNull()?.templates?.map { buildFingerprintSample(it) } ?: emptyList(),
-            faceSamples = biometricReferences.filterIsInstance(FaceReference::class.java)
-                .firstOrNull()?.templates?.map { buildFaceSample(it) } ?: emptyList()
-        )
-    }
-
-    private fun buildFingerprintSample(template: FingerprintTemplate) =
-        FingerprintSample(
-            template.finger.fromEventToPerson(),
-            EncodingUtils.base64ToBytes(template.template),
-            template.quality
-        )
-
-    private fun buildFaceSample(template: FaceTemplate) =
-        FaceSample(EncodingUtils.base64ToBytes(template.template))
 
     private suspend fun updateDownSyncInfo(state: PeopleDownSyncOperationResult.DownSyncState,
                                            event: ApiEvent? = null,
@@ -187,9 +163,5 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
         Timber.tag(SYNC_LOG_TAG).d("Download finished")
         reader?.endArray()
         reader?.close()
-    }
-
-    companion object {
-        const val BATCH_SIZE_FOR_DOWNLOADING = 200
     }
 }

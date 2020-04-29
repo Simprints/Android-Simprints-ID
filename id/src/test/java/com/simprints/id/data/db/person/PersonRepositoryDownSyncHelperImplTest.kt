@@ -106,7 +106,7 @@ class PersonRepositoryDownSyncHelperImplTest {
     private fun mockEventRemoteDataSource(nEvents: Int) {
         val events = getRandomEnrolmentEvents(nEvents, DefaultTestConstants.DEFAULT_PROJECT_ID,
             DefaultTestConstants.DEFAULT_USER_ID, DefaultTestConstants.DEFAULT_MODULE_ID).map { it.fromDomainToApi() }
-        coEvery { eventRemoteDataSource.get(any()) } returns buildResponse(events)
+        coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildResponse(events)
     }
 
     private fun buildResponse(events: List<ApiEvent>): ResponseBody =
