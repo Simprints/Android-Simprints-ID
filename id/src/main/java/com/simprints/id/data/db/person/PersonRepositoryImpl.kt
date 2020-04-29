@@ -4,24 +4,25 @@ import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
 import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.*
 import com.simprints.id.data.db.person.domain.Person
-import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordOperationType.*
+import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.*
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.exceptions.safe.sync.NoModulesSelectedForModuleSyncException
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 
-class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
+class PersonRepositoryImpl(private val personRemoteDataSource: PersonRemoteDataSource,
                            private val eventRemoteDataSource: EventRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
                            val downSyncScopeRepository: PeopleDownSyncScopeRepository,
-                           private val peopleUpSyncExecutor: PeopleUpSyncExecutor) :
+                           private val peopleUpSyncExecutor: PeopleUpSyncExecutor,
+                           private val personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper) :
     PersonRepository,
     PersonLocalDataSource by personLocalDataSource,
     PersonRemoteDataSource by personRemoteDataSource,
@@ -60,9 +61,9 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
         var updated = 0
         eventCounts.forEach {
             when (it.type) {
-                EventType.EnrolmentRecordCreation -> created += it.count
-                EventType.EnrolmentRecordDeletion -> deleted += it.count
-                EventType.EnrolmentRecordMove -> updated += it.count
+                ENROLMENT_RECORD_CREATION -> created += it.count
+                ENROLMENT_RECORD_DELETION -> deleted += it.count
+                ENROLMENT_RECORD_MOVE -> updated += it.count
             }
         }
 
@@ -74,19 +75,22 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             when (this) {
                 is ProjectSyncScope -> {
                     EventQuery(projectId, modes = modes,
-                        types = listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove))
+                        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE))
                 }
                 is UserSyncScope -> {
                     EventQuery(projectId, userId = userId, modes = modes,
-                        types = listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove))
+                        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE))
                 }
                 is ModuleSyncScope -> {
                     if (modules.isEmpty()) {
                         throw NoModulesSelectedForModuleSyncException()
                     }
                     EventQuery(projectId, moduleIds = modules, modes = modes,
-                        types = listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove))
+                        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE))
                 }
             }
         }
+
+    override suspend fun performUploadWithProgress(scope: CoroutineScope) =
+        personRepositoryUpSyncHelper.executeUploadWithProgress(scope)
 }

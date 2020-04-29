@@ -2,7 +2,7 @@ package com.simprints.id.data.db.person.remote
 
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.people_sync.down.domain.EventQuery
-import com.simprints.id.data.db.person.remote.models.personevents.ApiEvents
+import com.simprints.id.data.db.person.domain.personevents.Events
 import okhttp3.ResponseBody
 
 interface EventRemoteDataSource {
@@ -11,6 +11,6 @@ interface EventRemoteDataSource {
 
     suspend fun get(query: EventQuery): ResponseBody
 
-    suspend fun post(projectId: String, events: ApiEvents)
+    suspend fun post(projectId: String, events: Events)
 
 }

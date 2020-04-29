@@ -5,10 +5,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
@@ -17,8 +14,10 @@ import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSync
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 // TODO: uncomment userId when multitenancy is properly implemented
@@ -27,28 +26,35 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
 
     override val tag: String = PeopleUpSyncUploaderWorker::class.java.simpleName
 
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var personLocalDataSource: PersonLocalDataSource
-    @Inject lateinit var personRemoteDataSource: PersonRemoteDataSource
     @Inject override lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository
+    @Inject lateinit var personRepository: PersonRepository
     @Inject lateinit var peopleSyncCache: PeopleSyncCache
 
+    @ExperimentalCoroutinesApi
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
             getComponent<PeopleUpSyncUploaderWorker> { it.inject(this@PeopleUpSyncUploaderWorker) }
+
+
+            val workerId = this@PeopleUpSyncUploaderWorker.id.toString()
+            var count = peopleSyncCache.readProgress(workerId)
+
             crashlyticsLog("Start")
+            val totalUploaded = personRepository.performUploadWithProgress(this)
+            while (!totalUploaded.isClosedForReceive) {
+                totalUploaded.poll()?.let {
+                    count += it.upSyncCountForBatch
+                    peopleSyncCache.saveProgress(workerId, count)
+                    Timber.d("Upsync uploader count : $count for batch : $it")
+                    reportCount(count)
+                }
+            }
 
-            val task = PeopleUpSyncUploaderTask(
-                loginInfoManager, personLocalDataSource, personRemoteDataSource,
-                PATIENT_UPLOAD_BATCH_SIZE,
-                peopleUpSyncScopeRepository,
-                peopleSyncCache
-            )
-
-            val totalUploaded = task.execute(this@PeopleUpSyncUploaderWorker.id.toString(), this@PeopleUpSyncUploaderWorker)
-            success(workDataOf(OUTPUT_UP_SYNC to totalUploaded), "Total uploaded: $totalUploaded")
+            Timber.d("Upsync success : $count")
+            success(workDataOf(OUTPUT_UP_SYNC to count), "Total uploaded: $count")
         } catch (t: Throwable) {
+            t.printStackTrace()
+            Timber.d("Upsync failed : ${t.printStackTrace()}")
             retryOrFailIfCloudIntegrationError(t)
         }
     }
@@ -68,7 +74,6 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
     }
 
     companion object {
-        private const val PATIENT_UPLOAD_BATCH_SIZE = 80
         const val PROGRESS_UP_SYNC = "PROGRESS_UP_SYNC"
         const val OUTPUT_UP_SYNC = "OUTPUT_UP_SYNC"
     }

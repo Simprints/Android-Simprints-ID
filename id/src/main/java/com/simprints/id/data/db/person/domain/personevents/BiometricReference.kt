@@ -6,15 +6,15 @@ import com.simprints.id.data.db.person.remote.models.personevents.ApiFingerprint
 
 sealed class BiometricReference(val type: BiometricReferenceType)
 
-class FaceReference(val metadata: HashMap<String, String>,
-                    val templates: List<FaceTemplate>): BiometricReference(BiometricReferenceType.FaceReference)
+data class FaceReference(val templates: List<FaceTemplate>,
+                    val metadata: HashMap<String, String>? = null): BiometricReference(BiometricReferenceType.FACE_REFERENCE)
 
-class FingerprintReference(val metadata: HashMap<String, String>,
-                           val templates: List<FingerprintTemplate>): BiometricReference(BiometricReferenceType.FingerprintReference)
+data class FingerprintReference(val templates: List<FingerprintTemplate>,
+                           val metadata: HashMap<String, String>? = null): BiometricReference(BiometricReferenceType.FINGERPRINT_REFERENCE)
 
 enum class BiometricReferenceType {
-    FaceReference,
-    FingerprintReference
+    FACE_REFERENCE,
+    FINGERPRINT_REFERENCE
 }
 
 fun ApiBiometricReference.fromApiToDomain() = when(this) {
@@ -22,6 +22,6 @@ fun ApiBiometricReference.fromApiToDomain() = when(this) {
     is ApiFingerprintReference -> this.fromApiToDomain()
 }
 
-fun ApiFaceReference.fromApiToDomain() = FaceReference(metadata, templates.map { it.fromApiToDomain() })
+fun ApiFaceReference.fromApiToDomain() = FaceReference(templates.map { it.fromApiToDomain() }, metadata)
 
-fun ApiFingerprintReference.fromApiToDomain() = FingerprintReference(metadata, templates.map { it.fromApiToDomain() })
+fun ApiFingerprintReference.fromApiToDomain() = FingerprintReference(templates.map { it.fromApiToDomain() }, metadata)

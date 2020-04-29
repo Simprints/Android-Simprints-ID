@@ -4,8 +4,8 @@ import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.people_sync.down.domain.EventQuery
+import com.simprints.id.data.db.person.domain.personevents.Events
 import com.simprints.id.data.db.person.remote.models.personcounts.fromApiToDomain
-import com.simprints.id.data.db.person.remote.models.personevents.ApiEvents
 import com.simprints.id.data.db.person.remote.models.personevents.fromDomainToApi
 import com.simprints.id.tools.utils.retrySimNetworkCalls
 import okhttp3.ResponseBody
@@ -22,7 +22,7 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                 subjectId = subjectId,
                 modes = modes,
                 lastEventId = lastEventId,
-                eventType = types.map { it.name }
+                eventType = types.map { it.apiName }
             ).map { it.fromApiToDomain() }
         }, "EventCount")
     }
@@ -36,14 +36,14 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                 subjectId = subjectId,
                 modes = modes,
                 lastEventId = lastEventId,
-                eventType = types.map { it.name }
+                eventType = types.map { it.apiName }
             )
         }, "EventDownload")
     }
 
-    override suspend fun post(projectId: String, events: ApiEvents) {
+    override suspend fun post(projectId: String, events: Events) {
         makeNetworkRequest({
-            it.uploadEvents(projectId, events)
+            it.uploadEvents(projectId, events.fromDomainToApi())
         }, "EventUpload")
     }
 

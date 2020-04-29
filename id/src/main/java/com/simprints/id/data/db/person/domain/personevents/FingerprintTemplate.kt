@@ -2,8 +2,9 @@ package com.simprints.id.data.db.person.domain.personevents
 
 import com.simprints.id.data.db.person.remote.models.personevents.ApiFingerIdentifier
 import com.simprints.id.data.db.person.remote.models.personevents.ApiFingerprintTemplate
+import com.simprints.id.data.db.person.domain.FingerIdentifier as PersonFingerIdentifier
 
-class FingerprintTemplate(val quality: Int,
+data class FingerprintTemplate(val quality: Int,
                           val template: String,
                           val finger: FingerIdentifier)
 
@@ -34,4 +35,17 @@ fun ApiFingerIdentifier.fromApiToDomain() = when(this) {
     ApiFingerIdentifier.LEFT_3RD_FINGER -> FingerIdentifier.LEFT_3RD_FINGER
     ApiFingerIdentifier.LEFT_4TH_FINGER -> FingerIdentifier.LEFT_4TH_FINGER
     ApiFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
+}
+
+fun PersonFingerIdentifier.fromPersonToEvent() = when(this) {
+    PersonFingerIdentifier.RIGHT_5TH_FINGER -> FingerIdentifier.RIGHT_5TH_FINGER
+    PersonFingerIdentifier.RIGHT_4TH_FINGER -> FingerIdentifier.RIGHT_4TH_FINGER
+    PersonFingerIdentifier.RIGHT_3RD_FINGER -> FingerIdentifier.RIGHT_3RD_FINGER
+    PersonFingerIdentifier.RIGHT_INDEX_FINGER -> FingerIdentifier.RIGHT_INDEX_FINGER
+    PersonFingerIdentifier.RIGHT_THUMB -> FingerIdentifier.RIGHT_THUMB
+    PersonFingerIdentifier.LEFT_THUMB -> FingerIdentifier.LEFT_THUMB
+    PersonFingerIdentifier.LEFT_INDEX_FINGER -> FingerIdentifier.LEFT_INDEX_FINGER
+    PersonFingerIdentifier.LEFT_3RD_FINGER -> FingerIdentifier.LEFT_3RD_FINGER
+    PersonFingerIdentifier.LEFT_4TH_FINGER -> FingerIdentifier.LEFT_4TH_FINGER
+    PersonFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
 }

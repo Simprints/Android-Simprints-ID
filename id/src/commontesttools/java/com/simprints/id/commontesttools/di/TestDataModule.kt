@@ -9,7 +9,9 @@ import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.PersonRepositoryUpSyncHelper
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
@@ -17,8 +19,10 @@ import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
+import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.testtools.common.di.DependencyRule
 import kotlinx.coroutines.FlowPreview
@@ -31,6 +35,7 @@ class TestDataModule(
     private val personLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val personRepositoryUpSyncHelperRule: DependencyRule = DependencyRule.RealRule,
     private val personRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val imageRepositoryRule: DependencyRule = DependencyRule.RealRule
 ) : DataModule() {
@@ -66,19 +71,36 @@ class TestDataModule(
         )
     }
 
+    override fun providePersonRepositoryUpSyncHelper(
+        loginInfoManager: LoginInfoManager,
+        personLocalDataSource: PersonLocalDataSource,
+        eventRemoteDataSource: EventRemoteDataSource,
+        peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
+        preferencesManager: PreferencesManager,
+        peopleSyncCache: PeopleSyncCache
+    ): PersonRepositoryUpSyncHelper =
+        personRepositoryUpSyncHelperRule.resolveDependency {
+            super.providePersonRepositoryUpSyncHelper(
+                loginInfoManager, personLocalDataSource, eventRemoteDataSource,
+                peopleUpSyncScopeRepository, preferencesManager, peopleSyncCache
+            )
+    }
+
     override fun providePersonRepository(
         personRemoteDataSource: PersonRemoteDataSource,
         personLocalDataSource: PersonLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
         peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
-        peopleUpSyncExecutor: PeopleUpSyncExecutor
+        peopleUpSyncExecutor: PeopleUpSyncExecutor,
+        personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper
     ): PersonRepository = personRepositoryRule.resolveDependency {
         super.providePersonRepository(
             personRemoteDataSource,
             personLocalDataSource,
             eventRemoteDataSource,
             peopleDownSyncScopeRepository,
-            peopleUpSyncExecutor
+            peopleUpSyncExecutor,
+            personRepositoryUpSyncHelper
         )
     }
 
