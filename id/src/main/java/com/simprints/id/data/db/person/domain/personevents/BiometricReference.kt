@@ -7,14 +7,14 @@ import com.simprints.id.data.db.person.remote.models.personevents.ApiFingerprint
 sealed class BiometricReference(val type: BiometricReferenceType)
 
 data class FaceReference(val templates: List<FaceTemplate>,
-                    val metadata: HashMap<String, String>? = null): BiometricReference(BiometricReferenceType.FaceReference)
+                    val metadata: HashMap<String, String>? = null): BiometricReference(BiometricReferenceType.FACE_REFERENCE)
 
 data class FingerprintReference(val templates: List<FingerprintTemplate>,
-                           val metadata: HashMap<String, String>? = null): BiometricReference(BiometricReferenceType.FingerprintReference)
+                           val metadata: HashMap<String, String>? = null): BiometricReference(BiometricReferenceType.FINGERPRINT_REFERENCE)
 
 enum class BiometricReferenceType {
-    FaceReference,
-    FingerprintReference
+    FACE_REFERENCE,
+    FINGERPRINT_REFERENCE
 }
 
 fun ApiBiometricReference.fromApiToDomain() = when(this) {

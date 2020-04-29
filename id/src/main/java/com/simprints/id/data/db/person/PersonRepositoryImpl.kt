@@ -4,7 +4,6 @@ import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
 import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.*
@@ -62,9 +61,9 @@ class PersonRepositoryImpl(private val personRemoteDataSource: PersonRemoteDataS
         var updated = 0
         eventCounts.forEach {
             when (it.type) {
-                EventType.ENROLMENT_RECORD_CREATION -> created += it.count
-                EventType.ENROLMENT_RECORD_DELETION -> deleted += it.count
-                EventType.ENROLMENT_RECORD_MOVE -> updated += it.count
+                ENROLMENT_RECORD_CREATION -> created += it.count
+                ENROLMENT_RECORD_DELETION -> deleted += it.count
+                ENROLMENT_RECORD_MOVE -> updated += it.count
             }
         }
 

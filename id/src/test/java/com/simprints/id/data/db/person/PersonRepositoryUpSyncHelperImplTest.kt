@@ -1,18 +1,23 @@
 package com.simprints.id.data.db.person
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
+import com.simprints.id.data.db.person.domain.FaceSample
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
-import com.simprints.id.data.db.person.domain.personevents.Events
+import com.simprints.id.data.db.person.domain.personevents.*
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.modality.Modality
+import com.simprints.id.domain.modality.toMode
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.channel.testChannel
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
+import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
@@ -24,14 +29,13 @@ import java.util.*
 
 @ExperimentalCoroutinesApi
 class PersonRepositoryUpSyncHelperImplTest {
-    private val loginInfoManager: LoginInfoManager = mockk(relaxed = true)
-    private val personLocalDataSource: PersonLocalDataSource = mockk(relaxed = true)
-    private val eventRemoteDataSource: EventRemoteDataSource = mockk()
-    private val peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository = mockk(relaxed = true)
+    @RelaxedMockK lateinit var loginInfoManager: LoginInfoManager
+    @RelaxedMockK lateinit var personLocalDataSource: PersonLocalDataSource
+    @RelaxedMockK lateinit var eventRemoteDataSource: EventRemoteDataSource
+    @RelaxedMockK lateinit var peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository
     private val modalities = listOf(Modality.FACE, Modality.FINGER)
 
-    private val personRepositoryUpSyncHelper = spyk(PersonRepositoryUpSyncHelperImpl(loginInfoManager,
-            personLocalDataSource, eventRemoteDataSource, peopleUpSyncScopeRepository, modalities))
+    private lateinit var personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelperImpl
 
     private val projectIdToSync = "projectIdToSync"
     private val userIdToSync = "userIdToSync"
@@ -51,6 +55,10 @@ class PersonRepositoryUpSyncHelperImplTest {
     fun setUp() {
         UnitTestConfig(this)
             .coroutinesMainThread()
+        MockKAnnotations.init(this)
+
+        personRepositoryUpSyncHelper = spyk(PersonRepositoryUpSyncHelperImpl(loginInfoManager,
+            personLocalDataSource, eventRemoteDataSource, peopleUpSyncScopeRepository, modalities))
         setupBatchSize()
         mockHelperToGenerateSameUuidForEvents()
     }
@@ -70,7 +78,7 @@ class PersonRepositoryUpSyncHelperImplTest {
     }
 
     @Test
-    fun simprintsInternalServerException_shouldWrapInTransientSyncFailureException() {
+    fun simprintsInternalServerException_shouldWrapInSyncCloudIntegrationException() {
         runBlocking {
             mockSignedInUser(projectIdToSync, userIdToSync)
             mockSuccessfulLocalPeopleQueries(listOf(notYetSyncedPerson1))
@@ -85,7 +93,7 @@ class PersonRepositoryUpSyncHelperImplTest {
     }
 
     @Test
-    fun singleBatchNoConcurrentWrite() {
+    fun singleBatchOfPeople_uploadIt_shouldSucceed() {
         val peopleBatches = arrayOf(listOf(notYetSyncedPerson1, notYetSyncedPerson2))
         val events = createEventsFromPeople(
             arrayOf(
@@ -101,7 +109,7 @@ class PersonRepositoryUpSyncHelperImplTest {
     }
 
     @Test
-    fun multipleBatchesNoConcurrentWrite() {
+    fun moreThanBatchSizeFromLocal_uploadIt_shouldSucceedByCreatingBatches() {
         val peopleBatches = arrayOf(listOf(notYetSyncedPerson1, notYetSyncedPerson2, notYetSyncedPerson3))
         val events = createEventsFromPeople(
             arrayOf(
@@ -121,7 +129,7 @@ class PersonRepositoryUpSyncHelperImplTest {
     }
 
     @Test
-    fun singleBatchConcurrentWrite() {
+    fun multipleBatchesFromLocal_uploadIt_shouldSucceed() {
         val peopleBatches = arrayOf(
             listOf(notYetSyncedPerson1, notYetSyncedPerson2),
             listOf(notYetSyncedPerson3)
@@ -160,9 +168,6 @@ class PersonRepositoryUpSyncHelperImplTest {
 
             mockSignedInUser(projectIdToSync, userIdToSync)
             mockSuccessfulLocalPeopleQueries(*localQueryResults)
-            mockSuccessfulLocalPeopleUpdates()
-            mockEventRemoteDataSource()
-            mockSyncStatusModel()
 
             withContext(Dispatchers.IO) {
                 personRepositoryUpSyncHelper.executeUploadWithProgress(this).testChannel()
@@ -176,8 +181,46 @@ class PersonRepositoryUpSyncHelperImplTest {
 
     private fun createEventsFromPeople(people: Array<List<Person>>) =
         people.map {
-            personRepositoryUpSyncHelper.createEvents(it)
+            Events(it.map { createEventFromPerson(it) })
         }.toTypedArray()
+
+    private fun createEventFromPerson(person: Person): Event =
+        with(person) {
+            Event(
+                "random_uuid",
+                listOf(projectId),
+                listOf(patientId),
+                listOf(userId),
+                listOf(moduleId),
+                modalities.map { it.toMode() },
+                createPayload(person)
+            )
+        }
+
+    private fun createPayload(person: Person) =
+        EnrolmentRecordCreationPayload(
+            subjectId = person.patientId,
+            projectId = person.projectId,
+            moduleId = person.moduleId,
+            attendantId = person.userId,
+            biometricReferences = buildBiometricReferences(person.fingerprintSamples, person.faceSamples)
+        )
+
+    private fun buildBiometricReferences(fingerprintSamples: List<FingerprintSample>, faceSamples: List<FaceSample>) =
+        listOf(
+            FingerprintReference(
+                fingerprintSamples.map {
+                    FingerprintTemplate(it.templateQualityScore,
+                        EncodingUtils.byteArrayToBase64(it.template),
+                        it.fingerIdentifier.fromPersonToEvent())
+                }),
+            FaceReference(
+                faceSamples.map {
+                    FaceTemplate(
+                        EncodingUtils.byteArrayToBase64(it.template)
+                    )
+                })
+        )
 
     private fun mockSignedInUser(projectId: String, userId: String) {
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns projectId
@@ -188,18 +231,6 @@ class PersonRepositoryUpSyncHelperImplTest {
         coEvery { personLocalDataSource.load(any()) } coAnswers {
             queryResults.fold(emptyList<Person>()) { aggr, new -> aggr + new }.toList().asFlow()
         }
-    }
-
-    private fun mockSuccessfulLocalPeopleUpdates() {
-        coEvery { personLocalDataSource.insertOrUpdate(any()) } returns Unit
-    }
-
-    private fun mockEventRemoteDataSource() {
-        coEvery{ eventRemoteDataSource.post(projectIdToSync, any()) } returns Unit
-    }
-
-    private fun mockSyncStatusModel() {
-        coEvery { peopleUpSyncScopeRepository.insertOrUpdate(any()) } returns Unit
     }
 
     private fun verifyLocalPeopleQueries() {
