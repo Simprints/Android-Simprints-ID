@@ -38,7 +38,10 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_check_login)
+        if (parseRequest() !is AppRequest.AppConfirmIdentityRequest) {
+            setContentView(R.layout.activity_check_login)
+        }
+
         val component = (application as Application).component
         component.inject(this)
         title = androidResourcesHelper.getString(R.string.title_activity_front)
@@ -77,7 +80,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     }
 
     override fun parseRequest() =
-        intent.parseAppRequest() as AppRequest
+        intent.parseAppRequest()
 
     override fun getCheckCallingApp() = getCallingPackageName()
 
