@@ -7,10 +7,13 @@ import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
 import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.people_sync.down.domain.EventQuery
-import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordOperationType
-import com.simprints.id.data.db.person.remote.models.personevents.*
+import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.*
+import com.simprints.id.data.db.person.domain.personevents.Events
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordCreationPayload
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordMovePayload
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEvent
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.json.SimJsonHelper
@@ -78,9 +81,9 @@ class EventRemoteDataSourceImplTest {
     fun successfulResponse_onGetCount_shouldFormCorrectUrlAndEventCounts() {
         runBlocking {
             val expectedCounts = listOf(
-                EventCount(EventType.EnrolmentRecordCreation, 42),
-                EventCount(EventType.EnrolmentRecordDeletion, 42),
-                EventCount(EventType.EnrolmentRecordMove, 42)
+                EventCount(ENROLMENT_RECORD_CREATION, 42),
+                EventCount(ENROLMENT_RECORD_DELETION, 42),
+                EventCount(ENROLMENT_RECORD_MOVE, 42)
             )
             val expectedRequestUrlFormat = "projects/project_id/events/count?l_moduleId=module1&l_moduleId=module2&l_attendantId=user_id&l_subjectId=subject_id&l_mode=FINGERPRINT&l_mode=FACE&lastEventId=last_event_id&type=EnrolmentRecordMove&type=EnrolmentRecordDeletion&type=EnrolmentRecordCreation"
             eventRemoteInterface = SimApiClientFactory(
@@ -118,20 +121,18 @@ class EventRemoteDataSourceImplTest {
             val apiEvents = parseApiEventsFromResponse(responseString)
             with (apiEvents) {
                 assertThat(size).isEqualTo(3)
-                assertThat(get(0).payload).isInstanceOf(ApiEnrolmentRecordCreation::class.java)
-                assertThat(get(1).payload).isInstanceOf(ApiEnrolmentRecordDeletion::class.java)
-                assertThat(get(2).payload).isInstanceOf(ApiEnrolmentRecordMove::class.java)
+                assertThat(get(0).payload).isInstanceOf(ApiEnrolmentRecordCreationPayload::class.java)
+                assertThat(get(1).payload).isInstanceOf(ApiEnrolmentRecordDeletionPayload::class.java)
+                assertThat(get(2).payload).isInstanceOf(ApiEnrolmentRecordMovePayload::class.java)
             }
         }
 
     }
 
-    private fun buildEnrolmentRecordEvents() = ApiEvents(buildApiEventsList())
+    private fun buildEnrolmentRecordEvents() = Events(buildApiEventsList())
 
     private fun buildApiEventsList() =
-        getRandomEnrolmentEvents(5, PROJECT_ID, USER_ID, "module_id").map {
-            it.fromDomainToApi()
-        }
+        getRandomEnrolmentEvents(5, PROJECT_ID, USER_ID, "module_id")
 
     private fun buildEventQuery() = EventQuery(
         PROJECT_ID,
@@ -140,9 +141,9 @@ class EventRemoteDataSourceImplTest {
         SUBJECT_ID,
         LAST_EVENT_ID,
         listOf(Modes.FINGERPRINT, Modes.FACE),
-        listOf(EnrolmentRecordOperationType.EnrolmentRecordMove,
-            EnrolmentRecordOperationType.EnrolmentRecordDeletion,
-            EnrolmentRecordOperationType.EnrolmentRecordCreation)
+        listOf(ENROLMENT_RECORD_MOVE,
+            ENROLMENT_RECORD_DELETION,
+            ENROLMENT_RECORD_CREATION)
     )
 
     private fun buildSuccessfulResponseForCount() = MockResponse().apply {
