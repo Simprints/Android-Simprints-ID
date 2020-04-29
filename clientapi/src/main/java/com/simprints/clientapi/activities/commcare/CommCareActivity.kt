@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.commcare.CommCareAction.Companion.buildCommCareAction
+import com.simprints.clientapi.activities.commcare.CommCareAction.ConfirmIdentity
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
@@ -33,11 +34,12 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         private const val EXIT_REASON = "exitReason"
         private const val EXIT_EXTRA = "exitExtra"
         private const val SIMPRINTS_SESSION_ID = "sessionId"
-
-        private const val CONFIRM_IDENTITY_ACTION = "com.simprints.commcare.CONFIRM_IDENTITY"
     }
 
-    override val presenter: CommCareContract.Presenter by inject { parametersOf(this, buildCommCareAction(action)) }
+    private val action: CommCareAction
+        get() = buildCommCareAction(intent.action)
+
+    override val presenter: CommCareContract.Presenter by inject { parametersOf(this, action) }
 
     override val guidSelectionNotifier: CommCareGuidSelectionNotifier by inject {
         parametersOf(this)
@@ -45,7 +47,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (intent.action != CONFIRM_IDENTITY_ACTION)
+        if (action !is ConfirmIdentity)
             showLauncherScreen()
 
         loadClientApiKoinModules()
