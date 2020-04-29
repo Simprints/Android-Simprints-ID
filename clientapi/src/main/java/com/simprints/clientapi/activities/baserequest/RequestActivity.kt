@@ -30,7 +30,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
 
     abstract val guidSelectionNotifier: GuidSelectionNotifier
 
-    override val action: String?
+    override val intentAction: String?
         get() = intent.action
 
     override val extras: Map<String, Any?>?

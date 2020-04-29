@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Companion.buildLibSimprintsAction
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.ConfirmIdentity
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
@@ -14,13 +15,16 @@ import org.koin.core.parameter.parametersOf
 
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
-    override val presenter: LibSimprintsContract.Presenter by inject { parametersOf(this, buildLibSimprintsAction(action)) }
+    private val action: LibSimprintsAction
+        get() = buildLibSimprintsAction(intent.action)
+
+    override val presenter: LibSimprintsContract.Presenter by inject { parametersOf(this, action) }
 
     override val guidSelectionNotifier = DefaultGuidSelectionNotifier(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (intent.action != Constants.SIMPRINTS_SELECT_GUID_INTENT)
+        if (action != ConfirmIdentity)
             showLauncherScreen()
 
         loadClientApiKoinModules()
@@ -64,7 +68,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         it.putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, flowCompletedCheck)
         sendOkResult(it)
     }
-    
+
     override fun returnConfirmation(identificationOutcome: Boolean, sessionId: String) = Intent().let {
         it.putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, identificationOutcome)
         it.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
