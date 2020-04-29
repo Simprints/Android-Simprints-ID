@@ -4,6 +4,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -74,6 +75,22 @@ class CheckLoginFromIntentPresenterTest {
         checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest as AppEnrolRequest)
 
         verify(exactly = 1) { checkLoginFromIntentPresenter.buildEnrolmentCalloutEvent(any(), any()) }
+    }
+
+    @Test
+    fun givenCheckLoginFromIntentPresenter_buildRequestIsCalledForConfirmIdentity_buildsConfirmIdentityCallout() {
+        val checkLoginFromIntentPresenter = spyk(CheckLoginFromIntentPresenter(viewMock, "device_id", mockk(relaxed = true)))
+
+        checkLoginFromIntentPresenter.appRequest = mockk<AppRequest.AppConfirmIdentityRequest>().apply {
+            every { this@apply.projectId } returns "projectId"
+            every { this@apply.userId } returns "userId"
+            every { this@apply.sessionId } returns "sessionId"
+            every { this@apply.selectedGuid } returns "selectedGuid"
+        }
+
+        checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest as AppRequest.AppConfirmIdentityRequest)
+
+        verify(exactly = 1) { checkLoginFromIntentPresenter.addConfirmationCalloutEvent(any(), any()) }
     }
 
     @Test
