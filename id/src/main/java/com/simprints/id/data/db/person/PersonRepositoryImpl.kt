@@ -1,21 +1,32 @@
 package com.simprints.id.data.db.person
 
+import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
+import com.simprints.id.data.db.PersonFetchResult.PersonSource.*
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.EventType
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.*
+import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelper.Companion.buildPersonFromCreationPayload
 import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordCreationPayload
+import com.simprints.id.data.db.person.domain.personevents.Event
 import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.*
+import com.simprints.id.data.db.person.domain.personevents.fromApiToDomain
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEvent
+import com.simprints.id.domain.modality.Modes
 import com.simprints.id.exceptions.safe.sync.NoModulesSelectedForModuleSyncException
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
+import com.simprints.id.tools.json.SimJsonHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.first
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.Reader
 
 class PersonRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
@@ -43,7 +54,26 @@ class PersonRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSou
         }
 
     private suspend fun tryToFetchPersonFromRemote(projectId: String, patientId: String): PersonFetchResult {
-        TODO("Download using helper")
+        val eventQuery = buildEventQueryForPersonFetch(projectId, patientId)
+        val inputStream = eventRemoteDataSource.getStreaming(eventQuery)
+        val reader = setupJsonReaderFromResponseStream(inputStream)
+        return if (reader.hasNext()) {
+            val apiEvent: ApiEvent = SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java)
+            createPersonFetchResultFromEvent(apiEvent.fromApiToDomain())
+        } else {
+            PersonFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
+        }
+    }
+
+    private fun setupJsonReaderFromResponseStream(responseStream: InputStream): JsonReader =
+        JsonReader(InputStreamReader(responseStream) as Reader?)
+            .also {
+                it.beginArray()
+            }
+
+    private fun createPersonFetchResultFromEvent(event: Event): PersonFetchResult {
+        val person = buildPersonFromCreationPayload(event.payload as EnrolmentRecordCreationPayload)
+        return PersonFetchResult(person, REMOTE)
     }
 
     private suspend fun savePersonInLocal(person: Person) = personLocalDataSource.insertOrUpdate(listOf(person))
@@ -96,4 +126,11 @@ class PersonRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSou
                 }
             }
         }
+
+    private fun buildEventQueryForPersonFetch(projectId: String, patientId: String) = EventQuery(
+        projectId = projectId,
+        subjectId = patientId,
+        modes = listOf(Modes.FINGERPRINT),
+        types = listOf(ENROLMENT_RECORD_CREATION)
+    )
 }
