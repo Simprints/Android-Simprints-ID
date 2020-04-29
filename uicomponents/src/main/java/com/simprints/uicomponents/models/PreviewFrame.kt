@@ -17,4 +17,11 @@ class PreviewFrame(
             .toByteArray()
             .let { BitmapFactory.decodeByteArray(it, 0, it.size) }
     }
+
+    fun toByteArray(croppingRegion: Rect = Rect(0, 0, width, height)): ByteArray {
+        val yuvImage = YuvImage(bytes, ImageFormat.NV21, width, height, null)
+        return ByteArrayOutputStream()
+            .also { yuvImage.compressToJpeg(croppingRegion, 100, it) }
+            .toByteArray()
+    }
 }
