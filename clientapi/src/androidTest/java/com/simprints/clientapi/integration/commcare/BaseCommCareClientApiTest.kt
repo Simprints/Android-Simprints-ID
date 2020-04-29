@@ -41,6 +41,6 @@ open class BaseCommCareClientApiTest : BaseClientApiTest() {
         internal const val COMMCARE_ENROL_ACTION = "com.simprints.commcare.REGISTER"
         internal const val COMMCARE_IDENTIFY_ACTION = "com.simprints.commcare.IDENTIFY"
         internal const val COMMCARE_VERIFY_ACTION = "com.simprints.commcare.VERIFY"
-        internal const val COMMCARE_CONFIRM_IDENTITY_ACTION = "com.simprints.commcare.GUID_SELECTION"
+        internal const val COMMCARE_CONFIRM_IDENTITY_ACTION = "com.simprints.commcare.CONFIRM_IDENTITY"
     }
 }
