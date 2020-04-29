@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.responsebuilders
 
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppIdentityConfirmationRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.EnrolmentHelper
@@ -26,7 +26,7 @@ class AppResponseFactoryImpl(
             is AppEnrolRequest -> AppResponseBuilderForEnrol(enrolmentHelper, timeHelper)
             is AppIdentifyRequest -> AppResponseBuilderForIdentify()
             is AppVerifyRequest -> AppResponseBuilderForVerify()
-            is AppIdentityConfirmationRequest -> AppResponseBuilderForConfirmationBuilder()
+            is AppConfirmIdentityRequest -> AppResponseBuilderForConfirmationBuilder()
         }.buildAppResponse(modalities, appRequest, steps, sessionId)
 }
 

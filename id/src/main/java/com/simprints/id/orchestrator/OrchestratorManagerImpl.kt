@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppIdentityConfirmationRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.FlowProvider.FlowType.*
@@ -70,7 +70,7 @@ open class OrchestratorManagerImpl(
             is AppEnrolRequest -> ENROL
             is AppIdentifyRequest -> IDENTIFY
             is AppVerifyRequest -> VERIFY
-            is AppIdentityConfirmationRequest -> throw IllegalStateException("Not running one of the main flows")
+            is AppConfirmIdentityRequest -> throw IllegalStateException("Not running one of the main flows")
         }
 
     private suspend fun proceedToNextStepOrAppResponse() {

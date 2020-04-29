@@ -1,4 +1,4 @@
-package com.simprints.id.domain.moduleapi.core.response
+package com.simprints.id.orchestrator.steps.core.response
 
 import android.os.Parcelable
 import com.simprints.id.data.exitform.FingerprintExitFormReason

@@ -1,15 +1,14 @@
 package com.simprints.id.orchestrator.steps.core
 
 import android.content.Intent
-import com.simprints.id.domain.moduleapi.app.responses.AppConfirmationResponse
-import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
-import com.simprints.id.domain.moduleapi.core.requests.ConsentType
-import com.simprints.id.domain.moduleapi.core.requests.FetchGUIDRequest
-import com.simprints.id.domain.moduleapi.core.requests.GuidSelectionRequest
-import com.simprints.id.domain.moduleapi.core.response.*
-import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.*
+import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
+import com.simprints.id.orchestrator.steps.core.requests.ConsentType
+import com.simprints.id.orchestrator.steps.core.requests.FetchGUIDRequest
+import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
+import com.simprints.id.orchestrator.steps.core.response.*
+import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 
 class CoreStepProcessorImpl : CoreStepProcessor {
 
@@ -58,7 +57,7 @@ class CoreStepProcessorImpl : CoreStepProcessor {
                 CoreResponseType.FACE_EXIT_FORM -> data.getParcelableExtra<CoreFaceExitFormResponse>(CORE_STEP_BUNDLE)
                 CoreResponseType.FETCH_GUID -> data.getParcelableExtra<FetchGUIDResponse>(CORE_STEP_BUNDLE)
                 CoreResponseType.CORE_EXIT_FORM -> data.getParcelableExtra<CoreExitFormResponse>(CORE_STEP_BUNDLE)
-                CoreResponseType.GUID_SELECTION -> data.getParcelableExtra<AppConfirmationResponse>(CORE_STEP_BUNDLE)
+                CoreResponseType.GUID_SELECTION -> data.getParcelableExtra<GuidSelectionResponse>(CORE_STEP_BUNDLE)
             }
         }
 }

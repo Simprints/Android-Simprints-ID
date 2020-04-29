@@ -7,7 +7,7 @@ import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.domain.moduleapi.core.requests.GuidSelectionRequest
+import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import timber.log.Timber

@@ -1,4 +1,4 @@
-package com.simprints.id.domain.moduleapi.core.response
+package com.simprints.id.orchestrator.steps.core.response
 
 import kotlinx.android.parcel.Parcelize
 

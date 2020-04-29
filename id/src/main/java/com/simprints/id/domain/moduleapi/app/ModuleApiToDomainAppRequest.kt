@@ -1,11 +1,21 @@
 package com.simprints.id.domain.moduleapi.app
 
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.fromModuleApiToDomain
-import com.simprints.moduleapi.app.requests.IAppRequest
+import com.simprints.moduleapi.app.requests.*
 
-object AppRequestToDomainRequest {
+fun IAppRequest.fromModuleApiToDomain(): AppRequest =
+    when (this) {
+        is IAppEnrollRequest ->
+            AppRequest.AppRequestFlow.AppEnrolRequest(projectId, userId, moduleId, metadata)
 
-    fun fromAppToDomainRequest(appRequest: IAppRequest): AppRequest =
-        appRequest.fromModuleApiToDomain()
-}
+        is IAppIdentifyRequest ->
+            AppRequest.AppRequestFlow.AppIdentifyRequest(projectId, userId, moduleId, metadata)
+
+        is IAppVerifyRequest ->
+            AppRequest.AppRequestFlow.AppVerifyRequest(projectId, userId, moduleId, metadata, verifyGuid)
+
+        is IAppIdentityConfirmationRequest ->
+            AppRequest.AppConfirmIdentityRequest(projectId, userId, sessionId, selectedGuid)
+
+        else -> throw IllegalArgumentException("Request not recognised")
+    }
