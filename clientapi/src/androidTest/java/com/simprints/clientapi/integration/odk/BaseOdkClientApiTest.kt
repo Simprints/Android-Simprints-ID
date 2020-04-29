@@ -40,6 +40,6 @@ open class BaseOdkClientApiTest : BaseClientApiTest() {
         internal const val ODK_ENROL_ACTION = "com.simprints.simodkadapter.REGISTER"
         internal const val ODK_IDENTIFY_ACTION = "com.simprints.simodkadapter.IDENTIFY"
         internal const val ODK_VERIFY_ACTION = "com.simprints.simodkadapter.VERIFY"
-        internal const val ODK_CONFIRM_IDENTITY_ACTION = "com.simprints.simodkadapter.GUID_SELECTION"
+        internal const val ODK_CONFIRM_IDENTITY_ACTION = "com.simprints.simodkadapter.CONFIRM_IDENTITY"
     }
 }

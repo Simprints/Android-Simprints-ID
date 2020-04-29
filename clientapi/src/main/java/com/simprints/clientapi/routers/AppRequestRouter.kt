@@ -15,7 +15,7 @@ object AppRequestRouter {
     private const val REGISTER = "com.simprints.clientapp.REGISTER"
     private const val IDENTIFY = "com.simprints.clientapp.IDENTIFY"
     private const val VERIFY = "com.simprints.clientapp.VERIFY"
-    private const val CONFIRM_IDENTITY = "com.simprints.clientapp.GUID_SELECTION"
+    private const val CONFIRM_IDENTITY = "com.simprints.clientapp.CONFIRM_IDENTITY"
 
     fun routeSimprintsRequest(act: Activity,
                               request: BaseRequest) =

@@ -12,8 +12,6 @@ import com.simprints.clientapi.di.KoinInjector
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.moduleapi.app.responses.IAppResponse
-import com.simprints.clientapi.integration.key
-import com.simprints.clientapi.integration.value
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -22,7 +20,6 @@ import org.hamcrest.Description
 import org.junit.After
 import org.junit.Before
 import org.koin.test.KoinTest
-import org.koin.test.mock.declare
 import org.koin.test.mock.declareModule
 
 open class BaseClientApiTest : KoinTest {
@@ -99,7 +96,7 @@ open class BaseClientApiTest : KoinTest {
         internal const val APP_ENROL_ACTION = "com.simprints.clientapp.REGISTER"
         internal const val APP_IDENTIFY_ACTION = "com.simprints.clientapp.IDENTIFY"
         internal const val APP_VERIFICATION_ACTION = "com.simprints.clientapp.VERIFY"
-        internal const val APP_CONFIRM_ACTION = "com.simprints.clientapp.GUID_SELECTION"
+        internal const val APP_CONFIRM_ACTION = "com.simprints.clientapp.CONFIRM_IDENTITY"
     }
 
     fun <T : Parcelable> bundleDataMatcherForParcelable(parcelable: T) =

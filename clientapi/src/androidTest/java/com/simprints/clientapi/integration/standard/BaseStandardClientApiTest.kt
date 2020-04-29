@@ -30,6 +30,6 @@ open class BaseStandardClientApiTest: BaseClientApiTest() {
         internal const val STANDARD_ENROL_ACTION = "com.simprints.id.REGISTER"
         internal const val STANDARD_IDENTIFY_ACTION = "com.simprints.id.IDENTIFY"
         internal const val STANDARD_VERIFY_ACTION = "com.simprints.id.VERIFY"
-        internal const val STANDARD_CONFIRM_IDENTITY_ACTION = "com.simprints.id.GUID_SELECTION"
+        internal const val STANDARD_CONFIRM_IDENTITY_ACTION = "com.simprints.id.CONFIRM_IDENTITY"
     }
 }
