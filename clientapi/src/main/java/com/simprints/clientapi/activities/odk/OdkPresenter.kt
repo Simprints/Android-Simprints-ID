@@ -29,7 +29,7 @@ class OdkPresenter(
 ), OdkContract.Presenter {
 
     override suspend fun start() {
-        if (action != ConfirmIdentity) {
+        if (action != ConfirmIdentity && action != EnrolLastBiometrics) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.ODK)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
@@ -40,6 +40,7 @@ class OdkPresenter(
                 Identify -> processIdentifyRequest()
                 Verify -> processVerifyRequest()
                 ConfirmIdentity -> processConfirmIdentityRequest()
+                EnrolLastBiometrics -> processRegisterLastBiometrics()
                 Invalid -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
             }.safeSealedWhens
         }

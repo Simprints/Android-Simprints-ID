@@ -2,10 +2,7 @@ package com.simprints.clientapi.activities.baserequest
 
 import com.simprints.clientapi.activities.errors.ClientApiAlert.*
 import com.simprints.clientapi.clientrequests.builders.*
-import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidator
-import com.simprints.clientapi.clientrequests.validators.EnrollValidator
-import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
-import com.simprints.clientapi.clientrequests.validators.VerifyValidator
+import com.simprints.clientapi.clientrequests.validators.*
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.requests.BaseRequest
@@ -34,6 +31,13 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         ConfirmIdentifyBuilder(
             view.confirmIdentityExtractor,
             ConfirmIdentityValidator(view.confirmIdentityExtractor)
+        )
+    )
+
+    override suspend fun processRegisterLastBiometrics() = validateAndSendRequest(
+        EnrolLastBiometricsBuilder(
+            view.enrolLastBiometricsExtractor,
+            EnrolLastBiometricsValidator(view.enrolLastBiometricsExtractor)
         )
     )
 
