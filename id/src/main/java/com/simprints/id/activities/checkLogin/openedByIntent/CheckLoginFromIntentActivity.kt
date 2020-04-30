@@ -101,6 +101,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
             putExtra(AppRequest.BUNDLE_KEY, appRequest)
             addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
         }
+        this.overridePendingTransition(0, 0)
         startActivity(intent)
         finish()
     }
