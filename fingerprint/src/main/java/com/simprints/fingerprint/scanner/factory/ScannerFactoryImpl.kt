@@ -3,6 +3,8 @@ package com.simprints.fingerprint.scanner.factory
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
+import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
@@ -52,28 +54,20 @@ import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 class ScannerFactoryImpl(private val bluetoothAdapter: ComponentBluetoothAdapter,
                          private val preferencesManager: FingerprintPreferencesManager,
                          private val crashReportManager: FingerprintCrashReportManager,
-                         private val scannerUiHelper: ScannerUiHelper) : ScannerFactory {
+                         private val scannerUiHelper: ScannerUiHelper,
+                         private val serialNumberConverter: SerialNumberConverter,
+                         private val scannerGenerationDeterminer: ScannerGenerationDeterminer) : ScannerFactory {
 
     override fun create(macAddress: String): ScannerWrapper {
         val availableScannerGenerations = preferencesManager.scannerGenerations
 
-        val scannerGenerationToUse = when {
-            availableScannerGenerations.isEmpty() -> {
-                ScannerGeneration.VERO_1.also {
-                    Timber.w("No scanner generations found: Defaulting to $it")
-                }
-            }
-            availableScannerGenerations.size == 1 -> {
-                availableScannerGenerations.single().also {
-                    Timber.i("Using scanner generation $it")
-                }
-            }
-            else -> {
-                ScannerGeneration.VERO_1.also {
-                    // TODO : Better scanner generation determination in case a project has multiple generations of Vero
-                    Timber.w("Multiple scanner generations found: $availableScannerGenerations. Defaulting to $it")
-                }
-            }
+        val scannerGenerationToUse = when (availableScannerGenerations.size) {
+            1 -> availableScannerGenerations.single()
+            else -> scannerGenerationDeterminer.determineScannerGenerationFromSerialNumber(
+                serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
+            )
+        }.also {
+            Timber.i("Using scanner generation $it")
         }
 
         return when (scannerGenerationToUse) {

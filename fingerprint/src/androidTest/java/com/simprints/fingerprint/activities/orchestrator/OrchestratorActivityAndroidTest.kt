@@ -38,7 +38,7 @@ import org.koin.test.mock.declareModule
 class OrchestratorActivityAndroidTest : KoinTest {
 
     private val orchestratorMock = mockk<Orchestrator>(relaxed = true)
-    private val scannerManagerMock = spyk<ScannerManager>(ScannerManagerImpl(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)))
+    private val scannerManagerMock = spyk<ScannerManager>(ScannerManagerImpl(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)))
     private val orchestratorViewModel = spyk(OrchestratorViewModel(orchestratorMock, scannerManagerMock))
 
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
