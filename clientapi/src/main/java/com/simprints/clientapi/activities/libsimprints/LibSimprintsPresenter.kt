@@ -3,13 +3,14 @@ package com.simprints.clientapi.activities.libsimprints
 import com.simprints.clientapi.Constants
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.errors.ClientApiAlert
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.*
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
-import com.simprints.libsimprints.Constants.*
+import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
@@ -20,7 +21,7 @@ import kotlinx.coroutines.launch
 
 class LibSimprintsPresenter(
     private val view: LibSimprintsContract.View,
-    private val action: String?,
+    private val action: LibSimprintsAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     deviceManager: DeviceManager,
     crashReportManager: ClientApiCrashReportManager
@@ -32,19 +33,19 @@ class LibSimprintsPresenter(
 ), LibSimprintsContract.Presenter {
 
     override suspend fun start() {
-        if (action != SIMPRINTS_SELECT_GUID_INTENT) {
+        if (action != ConfirmIdentity) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
 
         runIfDeviceIsNotRooted {
             when (action) {
-                SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
-                SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
-                SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
-                SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentityRequest()
-                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
-            }
+                Register -> processEnrollRequest()
+                Identify -> processIdentifyRequest()
+                Verify -> processVerifyRequest()
+                ConfirmIdentity -> processConfirmIdentityRequest()
+                Invalid -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+            }.safeSealedWhens
         }
     }
 
