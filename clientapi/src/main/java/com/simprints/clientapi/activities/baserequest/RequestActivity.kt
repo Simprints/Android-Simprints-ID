@@ -93,11 +93,6 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         finish()
     }
 
-    protected fun showLauncherScreen() {
-        setContentView(R.layout.launcher)
-        supportActionBar?.hide()
-    }
-
     private fun sendCancelResult() {
         setResult(Activity.RESULT_CANCELED)
         finish()
