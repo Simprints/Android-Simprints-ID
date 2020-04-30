@@ -1,7 +1,6 @@
 package com.simprints.id.orchestrator.modality
 
 import android.app.Activity
-import android.content.Intent
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
@@ -12,10 +11,10 @@ import com.simprints.id.domain.moduleapi.app.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
-import com.simprints.id.orchestrator.steps.core.response.CoreResponse
-import com.simprints.id.orchestrator.steps.core.response.GuidSelectionResponse
 import io.mockk.MockKAnnotations
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -44,29 +43,33 @@ class ModalityFlowConfirmIdentityTest {
     @Test
     fun notStartedStep_getNextStepToLaunch_returnTheRightStep() {
         val appRequest = AppConfirmaIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
+        val step = mockk<Step>()
+        every { step.getStatus() } returns Step.Status.NOT_STARTED
+        every { coreProcessorMock.buildIdentityConfirmationStep(any(), any(), any()) } returns step
+
         modalityFlowConfirmIdentity.startFlow(appRequest.fromModuleApiToDomain(), emptyList())
 
         val next = modalityFlowConfirmIdentity.getNextStepToLaunch()
 
         assertThat(next).isNotNull()
-        assertThat(next?.requestCode).isEqualTo(CoreRequestCode.GUID_SELECTION_CODE.value)
     }
 
     @Test
     fun givenAGuidSelectActivityResult_handleIt_shouldReturnTheRightResult() {
         runBlocking {
             val appRequest = AppConfirmaIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
-            val guidSelectionReturn: Intent =
-                Intent().putExtra(CoreResponse.CORE_STEP_BUNDLE, GuidSelectionResponse(true))
+            val step = mockk<Step>()
+            every { step.requestCode } returns CoreRequestCode.GUID_SELECTION_CODE.value
+            modalityFlowConfirmIdentity.steps.addAll(listOf(step))
 
-            val step = modalityFlowConfirmIdentity.handleIntentResult(
+            modalityFlowConfirmIdentity.handleIntentResult(
                 appRequest.fromModuleApiToDomain(),
                 CoreRequestCode.GUID_SELECTION_CODE.value,
                 Activity.RESULT_OK,
-                guidSelectionReturn)
+                null)
 
             assertThat(step).isNotNull()
-            assertThat(step?.getStatus()).isEqualTo(Step.Status.COMPLETED)
+            verify { coreProcessorMock.processResult(any()) }
         }
     }
 }
