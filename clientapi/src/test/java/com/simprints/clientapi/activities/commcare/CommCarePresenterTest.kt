@@ -1,9 +1,6 @@
 package com.simprints.clientapi.activities.commcare
 
-import com.simprints.clientapi.activities.commcare.CommCarePresenter.Companion.ACTION_CONFIRM_IDENTITY
-import com.simprints.clientapi.activities.commcare.CommCarePresenter.Companion.ACTION_IDENTIFY
-import com.simprints.clientapi.activities.commcare.CommCarePresenter.Companion.ACTION_REGISTER
-import com.simprints.clientapi.activities.commcare.CommCarePresenter.Companion.ACTION_VERIFY
+import com.simprints.clientapi.activities.commcare.CommCareAction.*
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
@@ -47,7 +44,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            ACTION_REGISTER,
+            Register,
             mockSessionManagerToCreateSession(),
             mockSharedPrefs(),
             mockk(),
@@ -67,7 +64,7 @@ class CommCarePresenterTest {
 
             CommCarePresenter(
                 view,
-                ACTION_IDENTIFY,
+                Identify,
                 mockSessionManagerToCreateSession(),
                 mockSharedPrefs(),
                 mockk(relaxed = true),
@@ -87,7 +84,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            ACTION_VERIFY,
+            Verify,
             mockSessionManagerToCreateSession(),
             mockSharedPrefs(),
             mockk(),
@@ -105,7 +102,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            ACTION_CONFIRM_IDENTITY,
+            ConfirmIdentity,
             mockSessionManagerToCreateSession(),
             mockSharedPrefs(),
             mockk(),
@@ -119,12 +116,13 @@ class CommCarePresenterTest {
     fun startPresenterWithGarbage_ShouldReturnActionError() {
         CommCarePresenter(
             view,
-            "Garbage",
+            Invalid,
             mockSessionManagerToCreateSession(),
             mockSharedPrefs(),
             mockk(),
             mockk()
         ).apply { runBlocking { start() } }
+
         verify(exactly = 1) { view.handleClientRequestError(any()) }
     }
 
@@ -138,7 +136,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            Constants.SIMPRINTS_REGISTER_INTENT,
+            Register,
             sessionEventsManagerMock,
             mockSharedPrefs(),
             mockk(),
@@ -158,7 +156,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            Constants.SIMPRINTS_IDENTIFY_INTENT,
+            Identify,
             mockk(),
             mockSharedPrefs(),
             mockk(),
@@ -184,7 +182,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            Constants.SIMPRINTS_VERIFY_INTENT,
+            Verify,
             sessionEventsManagerMock,
             mockSharedPrefs(),
             mockk(),
@@ -210,7 +208,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            "",
+            Invalid,
             sessionEventsManagerMock,
             mockSharedPrefs(),
             mockk(),

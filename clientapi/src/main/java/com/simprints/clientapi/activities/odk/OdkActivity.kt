@@ -3,6 +3,8 @@ package com.simprints.clientapi.activities.odk
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
+import com.simprints.clientapi.activities.odk.OdkAction.Companion.buildOdkAction
+import com.simprints.clientapi.activities.odk.OdkAction.ConfirmIdentity
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
@@ -21,8 +23,10 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_SESSION_ID = "odk-session-id"
         private const val ODK_EXIT_REASON = "odk-exit-reason"
         private const val ODK_EXIT_EXTRA = "odk-exit-extra"
-        private const val CONFIRM_IDENTITY_ACTION = "com.simprints.simodkadapter.CONFIRM_IDENTITY"
     }
+
+    private val action: OdkAction
+        get() = buildOdkAction(intent.action)
 
     override val presenter: OdkContract.Presenter by inject { parametersOf(this, action) }
 
@@ -32,7 +36,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (intent.action != CONFIRM_IDENTITY_ACTION)
+        if (action != ConfirmIdentity)
             showLauncherScreen()
 
         loadClientApiKoinModules()

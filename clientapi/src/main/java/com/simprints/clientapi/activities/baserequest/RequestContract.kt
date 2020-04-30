@@ -13,7 +13,7 @@ import com.simprints.clientapi.domain.responses.*
 interface RequestContract {
 
     interface RequestView {
-        val action: String?
+        val intentAction: String?
         val extras: Map<String, Any?>?
         val presenter: Presenter
         val enrollExtractor: EnrollExtractor
