@@ -7,11 +7,11 @@ import kotlinx.android.parcel.Parcelize
 
 data class VerifyRequest(
     override val projectId: String,
-    val moduleId: String,
     override val userId: String,
+    val moduleId: String,
     val metadata: String,
-    override val unknownExtras: Map<String, Any?>,
-    val verifyGuid: String
+    val verifyGuid: String,
+    override val unknownExtras: Map<String, Any?>
 ) : BaseRequest {
 
     override fun convertToAppRequest(): IAppRequest = AppVerifyRequest(

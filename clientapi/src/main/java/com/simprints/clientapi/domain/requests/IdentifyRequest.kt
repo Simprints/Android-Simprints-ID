@@ -7,8 +7,8 @@ import kotlinx.android.parcel.Parcelize
 
 data class IdentifyRequest(
     override val projectId: String,
-    val moduleId: String,
     override val userId: String,
+    val moduleId: String,
     val metadata: String,
     override val unknownExtras: Map<String, Any?>
 ) : BaseRequest {
