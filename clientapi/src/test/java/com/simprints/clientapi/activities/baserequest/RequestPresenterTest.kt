@@ -42,7 +42,7 @@ class RequestPresenterTest {
     fun givenAnIntentWithExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldBeAdded() {
         runBlockingTest {
             val requestBuilder = mockk<ClientRequestBuilder>(relaxed = true).apply {
-                every { this@apply.build() } returns EnrollRequest(projectIdField, moduleIdField, userIdField, metadataField, extraField)
+                every { this@apply.build() } returns EnrollRequest(projectIdField, userIdField, moduleIdField, metadataField, extraField)
             }
 
             val presenter = ImplRequestPresenter(mockk(relaxed = true), clientApiSessionEventsManagerMock, mockk(relaxed = true), mockk(relaxed = true))
@@ -58,7 +58,7 @@ class RequestPresenterTest {
     fun givenAnIntentWithNoExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldNotBeAdded() {
         runBlockingTest {
             val requestBuilder = mockk<ClientRequestBuilder>().apply {
-                every { this@apply.build() } returns EnrollRequest(projectIdField, moduleIdField, userIdField, metadataField, emptyMap())
+                every { this@apply.build() } returns EnrollRequest(projectIdField, userIdField, moduleIdField, metadataField, emptyMap())
             }
 
             val presenter = ImplRequestPresenter(mockk(relaxed = true), clientApiSessionEventsManagerMock, mockk(relaxed = true), mockk(relaxed = true))

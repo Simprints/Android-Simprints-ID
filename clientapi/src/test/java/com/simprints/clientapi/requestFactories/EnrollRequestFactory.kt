@@ -14,9 +14,9 @@ object EnrollRequestFactory : RequestFactory() {
     override fun getValidSimprintsRequest(integrationInfo: IntegrationInfo): BaseRequest =
         EnrollRequest(
             projectId = MOCK_PROJECT_ID,
-            moduleId = MOCK_MODULE_ID,
             userId = MOCK_USER_ID,
             metadata = MOCK_METADATA,
+            moduleId = MOCK_MODULE_ID,
             unknownExtras = emptyMap()
         )
 
