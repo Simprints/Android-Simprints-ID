@@ -11,11 +11,13 @@ object AppRequestRouter {
     private const val IDENTIFY_REQUEST_CODE = 98
     private const val VERIFY_REQUEST_CODE = 99
     private const val CONFIRM_IDENTITY_REQUEST_CODE = 100
+    private const val ENROL_LAST_BIOMETRICS_REQUEST_CODE = 101
 
     private const val REGISTER = "com.simprints.clientapp.REGISTER"
     private const val IDENTIFY = "com.simprints.clientapp.IDENTIFY"
     private const val VERIFY = "com.simprints.clientapp.VERIFY"
     private const val CONFIRM_IDENTITY = "com.simprints.clientapp.CONFIRM_IDENTITY"
+    private const val ENROL_LAST_BIOMETRICS = "com.simprints.clientapp.ENROL_LAST_BIOMETRICS"
 
     fun routeSimprintsRequest(act: Activity,
                               request: BaseRequest) =
@@ -25,6 +27,7 @@ object AppRequestRouter {
             is VerifyRequest -> act.route(request, VERIFY, VERIFY_REQUEST_CODE)
             is IdentifyRequest -> act.route(request, IDENTIFY, IDENTIFY_REQUEST_CODE)
             is IdentityConfirmationRequest -> act.route(request, CONFIRM_IDENTITY, CONFIRM_IDENTITY_REQUEST_CODE)
+            is EnrolLastBiometricsRequest -> act.route(request, ENROL_LAST_BIOMETRICS, ENROL_LAST_BIOMETRICS_REQUEST_CODE)
             else -> throw InvalidClientRequestException("Invalid Action AppRequest")
         }
 
