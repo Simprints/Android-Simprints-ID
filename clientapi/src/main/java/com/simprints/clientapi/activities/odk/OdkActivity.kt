@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.odk.OdkAction.Companion.buildOdkAction
-import com.simprints.clientapi.activities.odk.OdkAction.ConfirmIdentity
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
@@ -36,9 +35,6 @@ class OdkActivity : RequestActivity(), OdkContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (action != ConfirmIdentity)
-            showLauncherScreen()
-
         loadClientApiKoinModules()
     }
 
