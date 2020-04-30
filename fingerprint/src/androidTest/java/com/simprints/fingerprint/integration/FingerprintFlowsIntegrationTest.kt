@@ -59,7 +59,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
         val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager(simulationMode))
         declareModule {
             single<ScannerFactory> {
-                spyk(ScannerFactoryImpl(simulatedBluetoothAdapter, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))).apply {
+                spyk(ScannerFactoryImpl(simulatedBluetoothAdapter, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))).apply {
                     every { create(any()) } answers {
                         val macAddress = args[0] as String
                         when (simulationMode) {
@@ -69,7 +69,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
                     }
                 }
             }
-            single<ScannerManager> { ScannerManagerImpl(simulatedBluetoothAdapter, get(), get()) }
+            single<ScannerManager> { ScannerManagerImpl(simulatedBluetoothAdapter, get(), get(), get()) }
             factory { masterFlowManager }
             factory { dbManagerMock }
         }
