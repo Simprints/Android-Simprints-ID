@@ -39,6 +39,7 @@ class OrchestratorActivity : AppCompatActivity() {
         it?.let {
             with(Intent().setClassName(packageName, it.activityName)) {
                 putExtra(it.bundleKey, it.request.fromDomainToModuleApi())
+                this@OrchestratorActivity.overridePendingTransition(0, 0)
                 startActivityForResult(this, it.requestCode)
             }
         }

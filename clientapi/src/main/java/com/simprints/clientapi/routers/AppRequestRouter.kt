@@ -28,6 +28,8 @@ object AppRequestRouter {
             else -> throw InvalidClientRequestException("Invalid Action AppRequest")
         }
 
-    private fun Activity.route(request: BaseRequest, route: String, code: Int) =
+    private fun Activity.route(request: BaseRequest, route: String, code: Int) {
+        this.overridePendingTransition(0, 0)
         this.startActivityForResult(request.convertToAppRequest().toIntent(route), code)
+    }
 }
