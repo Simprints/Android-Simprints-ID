@@ -24,7 +24,7 @@ object AppRequestRouter {
             is EnrollRequest -> act.route(request, REGISTER, REGISTER_REQUEST_CODE)
             is VerifyRequest -> act.route(request, VERIFY, VERIFY_REQUEST_CODE)
             is IdentifyRequest -> act.route(request, IDENTIFY, IDENTIFY_REQUEST_CODE)
-            is IdentityConfirmationRequest -> act.route(request, CONFIRM_IDENTITY, CONFIRM_IDENTITY_REQUEST_CODE)
+            is ConfirmIdentityRequest -> act.route(request, CONFIRM_IDENTITY, CONFIRM_IDENTITY_REQUEST_CODE)
             else -> throw InvalidClientRequestException("Invalid Action AppRequest")
         }
 

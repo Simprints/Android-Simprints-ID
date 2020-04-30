@@ -8,7 +8,7 @@ import androidx.test.espresso.intent.matcher.BundleMatchers
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
-import com.simprints.clientapi.integration.AppIdentityConfirmationRequest
+import com.simprints.clientapi.integration.AppConfirmIdentityRequest
 import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
 import com.simprints.clientapi.integration.value
 import com.simprints.moduleapi.app.requests.confirmations.IAppConfirmation
@@ -31,7 +31,7 @@ class OdkConfirmationIdentityRequestTest : BaseOdkClientApiTest() {
     fun callingAppSendsAnConfirmRequest_shouldLaunchAnAppConfirmRequest() {
         ActivityScenario.launch<OdkActivity>(odkConfirmIntentRequest.apply { action = ODK_CONFIRM_IDENTITY_ACTION })
 
-        val expectedAppRequest = AppIdentityConfirmationRequest(
+        val expectedAppRequest = AppConfirmIdentityRequest(
             projectIdField.value(),
             sessionIdField.value(),
             selectedGuidField.value())

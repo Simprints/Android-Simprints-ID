@@ -1,10 +1,10 @@
 package com.simprints.clientapi.domain.requests
 
-import com.simprints.moduleapi.app.requests.IAppIdentityConfirmationRequest
+import com.simprints.moduleapi.app.requests.IAppConfirmIdentityRequest
 import kotlinx.android.parcel.Parcelize
 
 
-data class IdentityConfirmationRequest(
+data class ConfirmIdentityRequest(
     override val projectId: String,
     override val userId: String,
     val sessionId: String,
@@ -12,17 +12,17 @@ data class IdentityConfirmationRequest(
     override val unknownExtras: Map<String, Any?>
 ) : BaseRequest {
 
-    override fun convertToAppRequest(): IAppIdentityConfirmationRequest = AppIdentityConfirmationRequest(
+    override fun convertToAppRequest(): IAppConfirmIdentityRequest = AppConfirmIdentityRequest(
         this.projectId, this.userId, this.sessionId, this.selectedGuid
     )
 
     @Parcelize
-    data class AppIdentityConfirmationRequest(
+    data class AppConfirmIdentityRequest(
         override val projectId: String,
         override val userId: String,
         override val sessionId: String,
         override val selectedGuid: String
-    ) : IAppIdentityConfirmationRequest
+    ) : IAppConfirmIdentityRequest
 }
 
 

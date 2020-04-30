@@ -14,7 +14,7 @@ fun IAppRequest.fromModuleApiToDomain(): AppRequest =
         is IAppVerifyRequest ->
             AppRequest.AppRequestFlow.AppVerifyRequest(projectId, userId, moduleId, metadata, verifyGuid)
 
-        is IAppIdentityConfirmationRequest ->
+        is IAppConfirmIdentityRequest ->
             AppRequest.AppConfirmIdentityRequest(projectId, userId, sessionId, selectedGuid)
 
         else -> throw IllegalArgumentException("Request not recognised")

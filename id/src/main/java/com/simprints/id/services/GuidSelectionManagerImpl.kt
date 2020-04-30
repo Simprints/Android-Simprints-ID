@@ -19,7 +19,7 @@ class GuidSelectionManagerImpl(val deviceId: String,
                                private val timerHelper: TimeHelper,
                                val sessionRepository: SessionRepository) : GuidSelectionManager {
 
-    override suspend fun handleIdentityConfirmationRequest(request: GuidSelectionRequest) {
+    override suspend fun handleConfirmIdentityRequest(request: GuidSelectionRequest) {
         try {
             checkRequest(request)
             saveGuidSelectionEvent(request)
