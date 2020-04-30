@@ -48,6 +48,11 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     override val confirmIdentityExtractor: ConfirmIdentityExtractor
         get() = ConfirmIdentityExtractor(intent)
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.request_activity)
+    }
+
     override fun sendSimprintsRequest(request: BaseRequest) {
         routeSimprintsRequest(this, request)
         if(request is IdentityConfirmationRequest) {

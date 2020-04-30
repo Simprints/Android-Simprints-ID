@@ -38,9 +38,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (parseRequest() !is AppRequest.AppConfirmIdentityRequest) {
-            setContentView(R.layout.activity_check_login)
-        }
+        setContentView(R.layout.splash_screen)
 
         val component = (application as Application).component
         component.inject(this)
