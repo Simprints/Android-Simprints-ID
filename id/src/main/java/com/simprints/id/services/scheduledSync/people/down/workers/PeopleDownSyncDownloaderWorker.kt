@@ -62,7 +62,7 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
             }
 
             Timber.d("Downsync success : $count")
-            success(workDataOf(OUTPUT_DOWN_SYNC to 0), "Total downloaded: $0 for $downSyncOperation")
+            success(workDataOf(OUTPUT_DOWN_SYNC to count), "Total downloaded: $0 for $downSyncOperation")
         } catch (t: Throwable) {
             retryOrFailIfCloudIntegrationError(t)
         }
