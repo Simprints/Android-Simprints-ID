@@ -65,6 +65,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     @Test
     fun worker_shouldExecuteTheTask() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
+            coEvery { peopleSyncCache.readProgress(any()) } returns 0
             coEvery { personRepository.performDownloadWithProgress(this@runBlocking, any()) } returns produce { 0 }
 
             doWork()
@@ -146,6 +147,7 @@ class PeopleDownSyncDownloaderWorkerTest {
             resultSetter = mockk(relaxed = true)
             downSyncScopeRepository = mockk(relaxed = true)
             personRepository = mockk(relaxed = true)
+            peopleSyncCache = mockk(relaxed = true)
         }
 }
 

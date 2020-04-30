@@ -92,11 +92,16 @@ class PeopleDownSyncDownloaderTaskImplTest {
     private val syncOpsInFakeDb = mutableListOf<PeopleDownSyncOperation>()
 
     private lateinit var remoteDbManagerSpy: RemoteDbManager
-    @RelaxedMockK lateinit var personRemoteDataSourceMock: PersonRemoteDataSource
-    @RelaxedMockK lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
-    @RelaxedMockK lateinit var personLocalDataSourceMock: PersonLocalDataSource
-    @RelaxedMockK lateinit var peopleSyncCache: PeopleSyncCache
-    @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
+    @RelaxedMockK
+    lateinit var personRemoteDataSourceMock: PersonRemoteDataSource
+    @RelaxedMockK
+    lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
+    @RelaxedMockK
+    lateinit var personLocalDataSourceMock: PersonLocalDataSource
+    @RelaxedMockK
+    lateinit var peopleSyncCache: PeopleSyncCache
+    @MockK
+    lateinit var mockBaseUrlProvider: BaseUrlProvider
 
     private val module by lazy {
         TestAppModule(app,

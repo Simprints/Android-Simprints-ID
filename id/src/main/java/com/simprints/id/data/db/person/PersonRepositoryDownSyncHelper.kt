@@ -32,14 +32,17 @@ interface PersonRepositoryDownSyncHelper {
             )
         }
 
-        private fun buildFingerprintSample(template: FingerprintTemplate) =
-            FingerprintSample(
+        private fun buildFingerprintSample(template: FingerprintTemplate): FingerprintSample {
+            return FingerprintSample(
                 template.finger.fromEventToPerson(),
-                EncodingUtils.base64ToBytes(template.template),
+                convertBase64ToBytes(template.template),
                 template.quality
             )
+        }
 
         private fun buildFaceSample(template: FaceTemplate) =
-            FaceSample(EncodingUtils.base64ToBytes(template.template))
+            FaceSample(convertBase64ToBytes(template.template))
+
+        private fun convertBase64ToBytes(template: String) = EncodingUtils.base64ToBytes(template)
     }
 }
