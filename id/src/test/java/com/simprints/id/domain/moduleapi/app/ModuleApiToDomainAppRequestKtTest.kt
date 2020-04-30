@@ -5,7 +5,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_METADATA
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.moduleApi.AppConfirmaIdentityRequestModuleApi
+import com.simprints.id.commontesttools.moduleApi.AppConfirmaConfirmIdentityRequestModuleApi
 import com.simprints.id.commontesttools.moduleApi.AppEnrollRequestModuleApi
 import com.simprints.id.commontesttools.moduleApi.AppIdentifyRequestModuleApi
 import com.simprints.id.commontesttools.moduleApi.AppVerifyRequestModuleApi
@@ -58,7 +58,7 @@ class ModuleApiToDomainAppRequestKtTest {
     fun fromIAppConfirmIdentityRequestToAppConfirmIdentityRequest() {
         val selectedGuid = UUID.randomUUID().toString()
         val sessionId = UUID.randomUUID().toString()
-        val iAppRequest = AppConfirmaIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, sessionId, selectedGuid)
+        val iAppRequest = AppConfirmaConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, sessionId, selectedGuid)
         val domainRequest = iAppRequest.fromModuleApiToDomain() as AppRequest.AppConfirmIdentityRequest
         with(domainRequest) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)

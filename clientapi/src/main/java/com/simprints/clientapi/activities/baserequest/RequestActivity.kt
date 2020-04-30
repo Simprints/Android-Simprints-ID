@@ -13,7 +13,7 @@ import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.domain.requests.IdentityConfirmationRequest
+import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
@@ -55,7 +55,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
 
     override fun sendSimprintsRequest(request: BaseRequest) {
         routeSimprintsRequest(this, request)
-        if(request is IdentityConfirmationRequest) {
+        if(request is ConfirmIdentityRequest) {
             guidSelectionNotifier.showMessage()
         }
     }

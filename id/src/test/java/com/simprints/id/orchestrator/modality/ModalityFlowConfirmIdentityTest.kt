@@ -6,7 +6,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
-import com.simprints.id.commontesttools.moduleApi.AppConfirmaIdentityRequestModuleApi
+import com.simprints.id.commontesttools.moduleApi.AppConfirmaConfirmIdentityRequestModuleApi
 import com.simprints.id.domain.moduleapi.app.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
@@ -33,19 +33,19 @@ class ModalityFlowConfirmIdentityTest {
 
     @Test
     fun startFlow_shouldBuildTheRightListOfSteps() {
-        val appRequest = AppConfirmaIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
+        val appRequest = AppConfirmaConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
         modalityFlowConfirmIdentity.startFlow(appRequest.fromModuleApiToDomain(), emptyList())
 
         assertThat(modalityFlowConfirmIdentity.steps).hasSize(1)
-        verify { coreProcessorMock.buildIdentityConfirmationStep(DEFAULT_PROJECT_ID, GUID1, GUID2) }
+        verify { coreProcessorMock.buildConfirmIdentityStep(DEFAULT_PROJECT_ID, GUID1, GUID2) }
     }
 
     @Test
     fun notStartedStep_getNextStepToLaunch_returnTheRightStep() {
-        val appRequest = AppConfirmaIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
+        val appRequest = AppConfirmaConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
         val step = mockk<Step>()
         every { step.getStatus() } returns Step.Status.NOT_STARTED
-        every { coreProcessorMock.buildIdentityConfirmationStep(any(), any(), any()) } returns step
+        every { coreProcessorMock.buildConfirmIdentityStep(any(), any(), any()) } returns step
 
         modalityFlowConfirmIdentity.startFlow(appRequest.fromModuleApiToDomain(), emptyList())
 
@@ -57,7 +57,7 @@ class ModalityFlowConfirmIdentityTest {
     @Test
     fun givenAGuidSelectActivityResult_handleIt_shouldReturnTheRightResult() {
         runBlocking {
-            val appRequest = AppConfirmaIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
+            val appRequest = AppConfirmaConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
             val step = mockk<Step>()
             every { step.requestCode } returns CoreRequestCode.GUID_SELECTION_CODE.value
             modalityFlowConfirmIdentity.steps.addAll(listOf(step))
