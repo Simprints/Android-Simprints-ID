@@ -17,6 +17,7 @@ import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
+import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprint.tools.nfc.ComponentNfcTag
@@ -36,6 +37,7 @@ class NfcPairFragment : FingerprintFragment() {
 
     private val nfcManager: NfcManager by inject()
     private val scannerPairingManager: ScannerPairingManager by inject()
+    private val serialNumberConverter: SerialNumberConverter by inject()
     private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
 
     private val bluetoothPairStateChangeReceiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
@@ -125,7 +127,7 @@ class NfcPairFragment : FingerprintFragment() {
         couldNotPairTextView.visibility = View.GONE
         nfcPairingProgressBar.visibility = View.VISIBLE
         nfcPairInstructionsTextView.text = resourceHelper.getString(R.string.nfc_pairing_in_progress,
-            arrayOf(scannerPairingManager.convertAddressToSerialNumber(macAddress)))
+            arrayOf(serialNumberConverter.convertMacAddressToSerialNumber(macAddress)))
         handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
     }
 
@@ -144,7 +146,7 @@ class NfcPairFragment : FingerprintFragment() {
             nfcPairingProgressBar.visibility = View.INVISIBLE
             tryAgainButton.visibility = View.VISIBLE
             nfcPairInstructionsTextView.text = resourceHelper.getString(R.string.nfc_pairing_try_again_instruction,
-                arrayOf(scannerPairingManager.convertAddressToSerialNumber(macAddressEvent.peekContent())))
+                arrayOf(serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())))
             tryAgainButton.setOnClickListener { viewModel.startPairing(macAddressEvent.peekContent()) }
         }
     }
