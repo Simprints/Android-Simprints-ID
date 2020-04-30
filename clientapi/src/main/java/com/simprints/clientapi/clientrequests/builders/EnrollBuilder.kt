@@ -13,8 +13,8 @@ class EnrollBuilder(private val extractor: EnrollExtractor,
     override fun buildAppRequest(): BaseRequest = EnrollRequest(
         projectId = extractor.getProjectId(),
         userId = extractor.getUserId(),
-        moduleId = extractor.getModuleId(),
         metadata = extractor.getMetadata(),
+        moduleId = extractor.getModuleId(),
         unknownExtras = extractor.getUnknownExtras()
     )
 }
