@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.commcare.CommCareAction.Companion.buildCommCareAction
-import com.simprints.clientapi.activities.commcare.CommCareAction.ConfirmIdentity
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
@@ -47,9 +46,6 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (action !is ConfirmIdentity)
-            showLauncherScreen()
-
         loadClientApiKoinModules()
     }
 
