@@ -28,7 +28,7 @@ The activity is not responsible for:
 
 ## When the flow finishes correctly
 
-The FaceCaptureViewModel receives all captures and save them on disk, being valid or not. There is a discussion going on about [save all or not](https://simprints.atlassian.net/browse/CAM-241).
+The FaceCaptureViewModel receives all captures and save the valid ones on disk.
 
 ## PreparationFragment
 
