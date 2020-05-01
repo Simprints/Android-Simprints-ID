@@ -1,5 +1,8 @@
 package com.simprints.id.activities.settings.fragments.settingsAbout
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.preference.Preference
@@ -17,6 +20,7 @@ import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.toast
 import javax.inject.Inject
 
 
@@ -26,7 +30,8 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
     override lateinit var deviceId: String
     override lateinit var viewPresenter: SettingsAboutContract.Presenter
 
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject
+    lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,12 +42,26 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
         component.inject(this)
 
         setTextInLayout()
+        setPreferenceListeners()
 
         packageVersionName = activity.packageVersionName
         deviceId = activity.deviceId
 
         viewPresenter = SettingsAboutPresenter(this, component)
         viewPresenter.start()
+    }
+
+    private fun setPreferenceListeners() {
+        getDeviceIdPreference().setOnPreferenceClickListener {
+            with(activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager) {
+                val clip = ClipData.newPlainText("deviceID", deviceId)
+                primaryClip = clip
+            }
+
+            toast("Your Device Id $deviceId was copied to the clipboard")
+
+            return@setOnPreferenceClickListener true
+        }
     }
 
     private fun setTextInLayout() {
@@ -109,7 +128,7 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
                 androidResourcesHelper.getString(R.string.logout)
             ) { _, _ ->
                 CoroutineScope(Dispatchers.Main).launch {
-                     viewPresenter.logout()
+                    viewPresenter.logout()
                 }
             }
             .setNegativeButton(
