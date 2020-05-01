@@ -18,7 +18,7 @@ fun IFaceResponse.fromModuleApiToDomain(): FaceResponse =
     when (type) {
         IFaceResponseType.CAPTURE -> (this as IFaceCaptureResponse).fromModuleApiToDomain()
         IFaceResponseType.MATCH -> (this as IFaceMatchResponse).fromModuleApiToDomain()
-        IFaceResponseType.EXIT_FORM -> (this as IFaceExitFormResponse).formModuleApiToDomain()
+        IFaceResponseType.EXIT_FORM -> (this as IFaceExitFormResponse).fromModuleApiToDomain()
         IFaceResponseType.ERROR -> (this as IFaceErrorResponse).fromModuleApiToDomain()
     }
 
