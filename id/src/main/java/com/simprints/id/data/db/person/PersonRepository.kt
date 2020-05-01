@@ -3,6 +3,7 @@ package com.simprints.id.data.db.person
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncProgress
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncProgress
 import com.simprints.id.data.db.person.domain.Person
@@ -21,5 +22,5 @@ interface PersonRepository : PersonLocalDataSource, FingerprintIdentityLocalData
 
     suspend fun performUploadWithProgress(scope: CoroutineScope): ReceiveChannel<PeopleUpSyncProgress>
     suspend fun performDownloadWithProgress(scope: CoroutineScope,
-                                            peopleDownSyncOperation: PeopleDownSyncOperation): ReceiveChannel<Int>
+                                            peopleDownSyncOperation: PeopleDownSyncOperation): ReceiveChannel<PeopleDownSyncProgress>
 }

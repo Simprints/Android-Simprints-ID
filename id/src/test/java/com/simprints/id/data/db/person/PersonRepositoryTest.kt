@@ -2,6 +2,8 @@ package com.simprints.id.data.db.person
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.EncodingUtils
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.moduleSyncScope
 import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
 import com.simprints.id.commontesttools.DefaultTestConstants.userSyncScope
@@ -10,11 +12,17 @@ import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
+import com.simprints.id.data.db.person.domain.FaceSample
+import com.simprints.id.data.db.person.domain.FingerprintSample
+import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.domain.personevents.*
 import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
+import com.simprints.id.data.db.person.remote.models.personevents.fromDomainToApi
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.tools.json.SimJsonHelper
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -23,11 +31,13 @@ import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
+import java.io.InputStream
 
 @RunWith(AndroidJUnit4::class)
 class PersonRepositoryTest {
@@ -95,10 +105,16 @@ class PersonRepositoryTest {
         runBlocking {
             val person = PeopleGeneratorUtils.getRandomPerson()
             coEvery { localDataSource.load(any()) } returns flowOf()
+            coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildCreationEventFromPerson(person)
 
             val fetch = personRepository.loadFromRemoteIfNeeded(person.projectId, person.patientId)
 
-            assertThat(fetch.person).isEqualTo(person)
+            with(fetch.person) {
+                assertThat(this?.patientId).isEqualTo(person.patientId)
+                assertThat(this?.userId).isEqualTo(person.userId)
+                assertThat(this?.moduleId).isEqualTo(person.moduleId)
+                assertThat(this?.projectId).isEqualTo(person.projectId)
+            }
             assertThat(fetch.personSource).isEqualTo(PersonFetchResult.PersonSource.REMOTE)
 
             fetch.person?.let {
@@ -118,6 +134,42 @@ class PersonRepositoryTest {
 
         assertThat(counts.created).isEqualTo(REMOTE_PEOPLE_FOR_SUBSYNC)
     }
+
+    private fun buildCreationEventFromPerson(person: Person): InputStream {
+        val event = with(person) {
+            Event(
+                randomUUID(),
+                listOf(projectId),
+                listOf(patientId),
+                listOf(userId),
+                listOf(moduleId),
+                listOf(),
+                buildCreationPayload(this)
+            ).fromDomainToApi()
+        }
+        val responseString = SimJsonHelper.gson.toJson(listOf(event))
+        return responseString.toResponseBody().byteStream()
+    }
+
+    private fun buildCreationPayload(person: Person) = with(person) {
+        EnrolmentRecordCreationPayload(
+            patientId,
+            projectId,
+            moduleId,
+            userId,
+            buildBiometricReferences(person.fingerprintSamples, person.faceSamples)
+        )
+    }
+
+    private fun buildBiometricReferences(fingerprintSamples: List<FingerprintSample>, faceSamples: List<FaceSample>): List<BiometricReference> {
+        val fingerprintReference = FingerprintReference(fingerprintSamples.map {
+            FingerprintTemplate(it.templateQualityScore, EncodingUtils.byteArrayToBase64(it.template),
+                FingerIdentifier.valueOf(it.fingerIdentifier.name)) })
+        val faceReference = FaceReference(faceSamples.map { FaceTemplate(EncodingUtils.byteArrayToBase64(it.template)) })
+
+        return listOf(fingerprintReference, faceReference)
+    }
+
 
     @After
     fun tearDown() {

@@ -54,7 +54,7 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
             val totalDownloaded = personRepository.performDownloadWithProgress(this, downSyncOperation)
             while (!totalDownloaded.isClosedForReceive) {
                 totalDownloaded.poll()?.let {
-                    count += it
+                    count += it.progress
                     peopleSyncCache.saveProgress(workerId, count)
                     Timber.d("Downsync downloader count : $count for batch : $it")
                     reportCount(count)
