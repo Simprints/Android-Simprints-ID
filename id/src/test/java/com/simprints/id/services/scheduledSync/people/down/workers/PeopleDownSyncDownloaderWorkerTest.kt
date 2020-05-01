@@ -71,17 +71,15 @@ class PeopleDownSyncDownloaderWorkerTest {
             with(peopleDownSyncDownloaderWorker) {
                 coEvery { peopleSyncCache.readProgress(any()) } returns 0
 
-                coEvery { personRepository.performDownloadWithProgress(this@runBlocking, any()) } returns produce { PeopleDownSyncProgress(0) }
+                coEvery { personRepository.performDownloadWithProgress(any(), any()) } returns produce { PeopleDownSyncProgress(0) }
 
                 doWork()
 
-                coVerify { personRepository.performDownloadWithProgress(this@runBlocking, any()) }
+                coVerify { personRepository.performDownloadWithProgress(any(), any()) }
                 verify { resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to 0)) }
-
             }
         }
     }
-
 
     @Test
     fun worker_failForCloudIntegration_shouldFail() = runBlocking<Unit> {
