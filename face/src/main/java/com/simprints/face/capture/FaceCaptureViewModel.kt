@@ -3,18 +3,19 @@ package com.simprints.face.capture
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext
+import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.*
+import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.face.models.FaceDetection
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -22,13 +23,13 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
 //    private val analyticsManager: AnalyticsManager
 
     val faceDetections = MutableLiveData<List<FaceDetection>>()
-    val shouldProcessFrames: MutableLiveData<LiveDataEventWithContent<Boolean>> = MutableLiveData()
 
-    val frameChannel = Channel<Frame>(CONFLATED)
+    val retryFlowEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val exitFormEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
-    val startCamera: MutableLiveData<LiveDataEvent> = MutableLiveData()
-
-    val flowFinished: MutableLiveData<LiveDataEventWithContent<FaceCaptureResponse>> =
+    val finishFlowEvent: MutableLiveData<LiveDataEventWithContent<FaceCaptureResponse>> =
+        MutableLiveData()
+    val finishFlowWithExitFormEvent: MutableLiveData<LiveDataEventWithContent<FaceExitFormResponse>> =
         MutableLiveData()
 
     private var retriesUsed: Int = 0
@@ -39,7 +40,6 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
     var samplesToCapture = 1
 
     init {
-        startCamera.send()
         viewModelScope.launch { startNewAnalyticsSession() }
     }
 
@@ -51,18 +51,6 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
         }
     }
 
-    fun startFaceDetection() {
-        shouldProcessFrames.send(true)
-    }
-
-    fun stopFaceDetection() {
-        shouldProcessFrames.send(false)
-    }
-
-    fun handlePreviewFrame(frame: Frame) {
-        frameChannel.offer(frame)
-    }
-
     fun flowFinished() {
         saveFaceDetections()
         // TODO: add analytics for FlowFinished(SUCCESS) and EndSession
@@ -71,20 +59,42 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
             FaceCaptureResult(index, detection.toFaceSample())
         } ?: listOf()
 
-        flowFinished.send(FaceCaptureResponse(results))
+        finishFlowEvent.send(FaceCaptureResponse(results))
     }
 
     fun captureFinished(faceDetections: List<FaceDetection>) {
-        stopFaceDetection()
         this.faceDetections.value = faceDetections
     }
 
-    fun willRetry() {
-        // TODO: add analytics for FlowFinished(RETRY)
+    fun handleBackButton(backButtonContext: BackButtonContext) {
+        when (backButtonContext) {
+            CAPTURE -> startExitForm()
+            CONFIRMATION -> flowFinished()
+            RETRY -> handleRetry()
+        }
     }
 
-    fun retryFailed() {
+    fun handleRetry() {
+        if (canRetry) {
+            startExitForm()
+        } else {
+            finishFlowWithFailedRetries()
+        }
+    }
+
+    private fun startExitForm() {
+        exitFormEvent.send()
+    }
+
+    private fun retryFlow() {
+        // TODO: add analytics for FlowFinished(RETRY)
+        retryFlowEvent.send()
+    }
+
+    // TODO: should have a better understanding on what to do after failed all retries
+    private fun finishFlowWithFailedRetries() {
         // TODO: add analytics for FlowFinished(RETRY_FAIL)
+        flowFinished()
     }
 
     private fun startNewAnalyticsSession() {
@@ -100,6 +110,10 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
         runBlocking {
             faceDetection.securedImageRef = faceImageManager.save(faceDetection.frame.toByteArray(), captureEventId)
         }
+    }
+
+    fun submitExitForm(reason: RefusalAnswer, exitFormText: String) {
+        finishFlowWithExitFormEvent.send(FaceExitFormResponse(reason, exitFormText))
     }
 
 }
