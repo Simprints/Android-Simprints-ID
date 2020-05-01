@@ -46,7 +46,6 @@ class PeopleSyncStatusDatabaseTest {
         PeopleDownSyncOperationResult(
             PeopleDownSyncOperationResult.DownSyncState.RUNNING,
             UUID.randomUUID().toString(),
-            Date().time,
             Date().time
         )
 
@@ -58,7 +57,6 @@ class PeopleSyncStatusDatabaseTest {
         PeopleDownSyncOperationResult(
             PeopleDownSyncOperationResult.DownSyncState.RUNNING,
             UUID.randomUUID().toString(),
-            Date().time,
             Date().time
         )
     )
@@ -70,7 +68,6 @@ class PeopleSyncStatusDatabaseTest {
         listOf(Modes.FINGERPRINT, Modes.FACE),
         PeopleDownSyncOperationResult(
             PeopleDownSyncOperationResult.DownSyncState.FAILED,
-            null,
             null,
             Date().time
         )
