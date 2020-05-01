@@ -1,7 +1,7 @@
 package com.simprints.moduleapi.app.requests
 
 
-interface IAppIdentityConfirmationRequest : IAppRequest {
+interface IAppConfirmIdentityRequest : IAppRequest {
 
     val sessionId: String
     val selectedGuid: String

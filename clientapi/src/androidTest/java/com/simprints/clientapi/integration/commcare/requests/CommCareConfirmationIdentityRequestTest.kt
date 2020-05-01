@@ -9,10 +9,9 @@ import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.simprints.clientapi.activities.commcare.CommCareActivity
-import com.simprints.clientapi.integration.AppIdentityConfirmationRequest
+import com.simprints.clientapi.integration.AppConfirmIdentityRequest
 import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import com.simprints.moduleapi.app.requests.confirmations.IAppConfirmation
-import com.simprints.clientapi.integration.key
 import com.simprints.clientapi.integration.value
 import org.hamcrest.CoreMatchers
 import org.junit.Before
@@ -34,7 +33,7 @@ class CommCareConfirmationIdentityRequestTest : BaseCommCareClientApiTest() {
     fun callingAppSendsAnConfirmRequest_shouldLaunchAnAppConfirmRequest() {
         ActivityScenario.launch<CommCareActivity>(commCareConfirmIntentRequest.apply { action = COMMCARE_CONFIRM_IDENTITY_ACTION })
 
-        val expectedAppRequest = AppIdentityConfirmationRequest(
+        val expectedAppRequest = AppConfirmIdentityRequest(
             projectIdField.value(),
             sessionIdField.value(),
             selectedGuidField.value())

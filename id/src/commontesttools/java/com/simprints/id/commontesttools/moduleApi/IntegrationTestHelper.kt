@@ -2,7 +2,7 @@ package com.simprints.id.commontesttools.moduleApi
 
 import com.simprints.moduleapi.app.requests.IAppEnrollRequest
 import com.simprints.moduleapi.app.requests.IAppIdentifyRequest
-import com.simprints.moduleapi.app.requests.IAppIdentityConfirmationRequest
+import com.simprints.moduleapi.app.requests.IAppConfirmIdentityRequest
 import com.simprints.moduleapi.app.requests.IAppVerifyRequest
 import com.simprints.moduleapi.app.responses.*
 import kotlinx.android.parcel.Parcelize
@@ -79,12 +79,12 @@ internal data class AppVerifyRequestModuleApi(
 ) : IAppVerifyRequest
 
 @Parcelize
-internal data class AppConfirmaIdentityRequestModuleApi(
+internal data class AppConfirmaConfirmIdentityRequestModuleApi(
     override val projectId: String,
     override val userId: String,
     override val sessionId: String,
     override val selectedGuid: String
-) : IAppIdentityConfirmationRequest
+) : IAppConfirmIdentityRequest
 
 fun Pair<String, String>.key() = first
 fun Pair<String, String>.value() = second

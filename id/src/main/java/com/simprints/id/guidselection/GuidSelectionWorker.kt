@@ -31,7 +31,7 @@ class GuidSelectionWorker(context: Context, params: WorkerParameters) : SimCorou
     private suspend fun handleGuidSelectionRequest() {
         try {
             val request = GuidSelectionRequest.fromMap(inputData.keyValueMap)
-            guidSelectionManager.handleIdentityConfirmationRequest(request)
+            guidSelectionManager.handleConfirmIdentityRequest(request)
             Timber.d("Added Guid Selection Event")
             crashReportManager.logMessageForCrashReport(CrashReportTag.SESSION,
                 CrashReportTrigger.UI, message = "Added Guid Selection Event")

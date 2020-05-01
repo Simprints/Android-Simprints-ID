@@ -18,7 +18,7 @@ object DomainToModuleApiAppResponse {
             IDENTIFY -> fromDomainToModuleApiAppIdentifyResponse(response as AppIdentifyResponse)
             REFUSAL -> fromDomainToModuleApiAppRefusalFormResponse(response as AppRefusalFormResponse)
             VERIFY -> fromDomainToModuleApiAppVerifyResponse(response as AppVerifyResponse)
-            CONFIRMATION -> fromDomainToModuleApiAppIdentityConfirmationResponse(response as AppConfirmationResponse)
+            CONFIRMATION -> fromDomainToModuleApiAppConfirmIdentityResponse(response as AppConfirmationResponse)
             ERROR -> fromDomainToModuleApiAppErrorResponse(response as AppErrorResponse)
         }
 
@@ -51,7 +51,7 @@ object DomainToModuleApiAppResponse {
     private fun fromDomainToModuleApiAppMatchResult(result: MatchResult): IAppMatchResult =
         IAppMatchResultImpl(result.guidFound, result.confidence, fromDomainToAppIAppResponseTier(result.tier))
 
-    private fun fromDomainToModuleApiAppIdentityConfirmationResponse(response: AppConfirmationResponse) =
+    private fun fromDomainToModuleApiAppConfirmIdentityResponse(response: AppConfirmationResponse) =
         IAppConfirmationResponseImpl(response.identificationOutcome)
 
     private fun fromDomainToAppIAppResponseTier(tier: Tier): IAppResponseTier =

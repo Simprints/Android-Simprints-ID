@@ -6,14 +6,14 @@ import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtracto
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidator
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.domain.requests.IdentityConfirmationRequest
+import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
 import io.mockk.every
 import io.mockk.mockk
 
 object ConfirmIdentityFactory : RequestFactory() {
 
     override fun getValidSimprintsRequest(integrationInfo: IntegrationInfo): BaseRequest =
-        IdentityConfirmationRequest(
+        ConfirmIdentityRequest(
             projectId = MOCK_PROJECT_ID,
             userId = MOCK_USER_ID,
             sessionId = MOCK_SESSION_ID,
