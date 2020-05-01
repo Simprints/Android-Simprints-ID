@@ -10,7 +10,7 @@ interface CoreStepProcessor {
 
     fun buildFetchGuidStep(projectId: String, verifyGuid: String): Step
 
-    fun buildIdentityConfirmationStep(projectId: String, sessionId: String, selectedGuid: String): Step
+    fun buildConfirmIdentityStep(projectId: String, sessionId: String, selectedGuid: String): Step
 
     fun processResult(data: Intent?): Step.Result?
 }

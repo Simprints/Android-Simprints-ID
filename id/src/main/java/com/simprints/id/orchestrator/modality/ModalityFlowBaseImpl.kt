@@ -4,14 +4,15 @@ import android.content.Intent
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent
-import com.simprints.id.orchestrator.steps.core.requests.ConsentType
-import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
+import com.simprints.id.orchestrator.steps.core.requests.ConsentType
+import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.tools.TimeHelper
@@ -43,6 +44,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     fun completeAllStepsIfExitFormHappened(requestCode: Int, resultCode: Int, data: Intent?) =
         tryProcessingResultFromCoreStepProcessor(data)
             ?: tryProcessingResultFromFingerprintStepProcessor(requestCode, resultCode, data)
+            ?: tryProcessingResultFromFaceStepProcessor(requestCode, resultCode, data)
 
     private fun tryProcessingResultFromCoreStepProcessor(data: Intent?) =
         coreStepProcessor.processResult(data).also { coreResult ->
@@ -64,6 +66,16 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
                 completeAllSteps()
             }
         }
+
+    private fun tryProcessingResultFromFaceStepProcessor(requestCode: Int,
+                                                                resultCode: Int,
+                                                                data: Intent?) =
+        faceStepProcessor.processResult(requestCode, resultCode, data).also { faceResult ->
+            if (faceResult is FaceExitFormResponse) {
+                completeAllSteps()
+            }
+        }
+
 
     private fun completeAllSteps() {
         steps.forEach { it.setStatus(Step.Status.COMPLETED) }

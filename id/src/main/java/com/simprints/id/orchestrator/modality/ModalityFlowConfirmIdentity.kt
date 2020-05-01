@@ -18,7 +18,7 @@ class ModalityFlowConfirmIdentity(private val coreStepProcessor: CoreStepProcess
     }
 
     private fun buildStepsList(appRequest: AppConfirmIdentityRequest) =
-        listOf(coreStepProcessor.buildIdentityConfirmationStep(
+        listOf(coreStepProcessor.buildConfirmIdentityStep(
             appRequest.projectId,
             appRequest.sessionId,
             appRequest.selectedGuid))

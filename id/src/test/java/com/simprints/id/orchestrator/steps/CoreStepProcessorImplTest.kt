@@ -52,8 +52,8 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     }
 
     @Test
-    fun buildIdentityConfirmationStepShouldBuildTheRightStep() {
-        val step = coreStepProcessor.buildIdentityConfirmationStep(DEFAULT_PROJECT_ID, GUID1, GUID2)
+    fun buildConfirmIdentityStepShouldBuildTheRightStep() {
+        val step = coreStepProcessor.buildConfirmIdentityStep(DEFAULT_PROJECT_ID, GUID1, GUID2)
         with(step) {
             assertThat(activityName).isEqualTo(GUID_SELECTION_ACTIVITY_NAME)
             assertThat(requestCode).isEqualTo(GUID_SELECTION_REQUEST_CODE)

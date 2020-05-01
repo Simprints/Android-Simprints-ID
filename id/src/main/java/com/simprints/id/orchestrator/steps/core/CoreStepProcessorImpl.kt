@@ -39,9 +39,9 @@ class CoreStepProcessorImpl : CoreStepProcessor {
         status = Step.Status.NOT_STARTED
     )
 
-    override fun buildIdentityConfirmationStep(projectId: String,
-                                               sessionId: String,
-                                               selectedGuid: String) = Step(
+    override fun buildConfirmIdentityStep(projectId: String,
+                                          sessionId: String,
+                                          selectedGuid: String) = Step(
         requestCode = GUID_SELECTION_CODE.value,
         activityName = GUID_SELECTION_ACTIVITY_NAME,
         bundleKey = CORE_STEP_BUNDLE,
