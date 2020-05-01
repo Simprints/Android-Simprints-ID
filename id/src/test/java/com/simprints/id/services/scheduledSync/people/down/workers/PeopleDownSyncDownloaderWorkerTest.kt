@@ -7,7 +7,6 @@ import androidx.work.WorkInfo
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncProgress
@@ -20,13 +19,12 @@ import com.simprints.id.services.scheduledSync.people.master.internal.OUTPUT_FAI
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,7 +52,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     fun setUp() {
         UnitTestConfig(this).setupWorkManager()
         app.component = mockk(relaxed = true)
-        val correctInputData = JsonHelper.gson.toJson(projectSyncOp)
+        val correctInputData = SimJsonHelper.gson.toJson(projectSyncOp)
         peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
         coEvery { peopleDownSyncDownloaderWorker.downSyncScopeRepository.refreshDownSyncOperationFromDb(any()) } returns null
     }
@@ -73,14 +71,13 @@ class PeopleDownSyncDownloaderWorkerTest {
             with(peopleDownSyncDownloaderWorker) {
                 coEvery { peopleSyncCache.readProgress(any()) } returns 0
 
-                withContext(Dispatchers.IO) {
-                    coEvery { personRepository.performDownloadWithProgress(this@withContext, any()) } returns produce { PeopleDownSyncProgress(0) }
+                coEvery { personRepository.performDownloadWithProgress(this@runBlocking, any()) } returns produce { PeopleDownSyncProgress(0) }
 
-                    doWork()
+                doWork()
 
-                    coVerify { personRepository.performDownloadWithProgress(this@withContext, any()) }
-                    verify { resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to 0)) }
-                }
+                coVerify { personRepository.performDownloadWithProgress(this@runBlocking, any()) }
+                verify { resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to 0)) }
+
             }
         }
     }

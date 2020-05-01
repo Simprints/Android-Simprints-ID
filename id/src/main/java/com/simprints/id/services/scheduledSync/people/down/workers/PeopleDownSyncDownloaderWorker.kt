@@ -51,7 +51,9 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
             val downSyncOperation = extractSubSyncScopeFromInput()
             var count = peopleSyncCache.readProgress(workerId)
             crashlyticsLog("Start - Params: $downSyncOperation")
-            val totalDownloaded = personRepository.performDownloadWithProgress(this, downSyncOperation)
+            val totalDownloaded =
+                personRepository.performDownloadWithProgress(this, downSyncOperation)
+            
             while (!totalDownloaded.isClosedForReceive) {
                 totalDownloaded.poll()?.let {
                     count += it.progress
