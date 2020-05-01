@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.odk
 
+import android.content.Context
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
@@ -25,7 +26,7 @@ class OdkActivityTest : BaseClientApiTest() {
     override fun setUp() {
         super.setUp()
         declareModule {
-            factory { mockk<OdkGuidSelectionNotifier>(relaxed = true) }
+            factory { (_: Context) -> mockk<OdkGuidSelectionNotifier>(relaxed = true) }
         }
         rule.launchActivity(buildIntent())
     }
