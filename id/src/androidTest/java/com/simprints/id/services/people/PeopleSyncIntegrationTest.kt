@@ -29,7 +29,6 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteInterface
 import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationCounts
 import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationGroupResponse
@@ -78,7 +77,6 @@ class PeopleSyncIntegrationTest {
 
     private val app: Application = ApplicationProvider.getApplicationContext()
 
-    @Inject lateinit var eventRemoteDataSourceSpy: EventRemoteDataSource
     @Inject lateinit var personLocalDataSourceSpy: PersonLocalDataSource
     @Inject lateinit var downSyncScopeRepositorySpy: PeopleDownSyncScopeRepository
     @Inject lateinit var peopleSyncManager: PeopleSyncManager
@@ -97,7 +95,6 @@ class PeopleSyncIntegrationTest {
 
     private val dataModule by lazy {
         TestDataModule(
-            eventRemoteDataSourceRule = DependencyRule.SpykRule,
             personLocalDataSourceRule = DependencyRule.SpykRule)
     }
 
