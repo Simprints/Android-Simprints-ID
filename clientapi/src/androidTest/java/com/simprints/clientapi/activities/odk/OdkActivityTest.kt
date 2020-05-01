@@ -1,6 +1,5 @@
 package com.simprints.clientapi.activities.odk
 
-import android.content.Context
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
@@ -13,7 +12,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.test.mock.declare
 import org.koin.test.mock.declareModule
 
 @RunWith(AndroidJUnit4::class)
@@ -27,7 +25,7 @@ class OdkActivityTest : BaseClientApiTest() {
     override fun setUp() {
         super.setUp()
         declareModule {
-            factory { (context: Context) -> mockk<OdkGuidSelectionNotifier>(relaxed = true) }
+            factory { mockk<OdkGuidSelectionNotifier>(relaxed = true) }
         }
         rule.launchActivity(buildIntent())
     }
@@ -37,6 +35,30 @@ class OdkActivityTest : BaseClientApiTest() {
         odk {
         } assert {
             toastMessageIsDisplayed()
+        }
+    }
+
+    @Test
+    fun enrolExtractorShouldBeOdkEnrolExtractor() {
+        odk {
+        } assert {
+            enrolExtractorIsOdkEnrolExtractor()
+        }
+    }
+
+    @Test
+    fun identifyExtractorShouldBeOdkIdentifyExtractor() {
+        odk {
+        } assert {
+            identifyExtractorIsOdkIdentifyExtractor()
+        }
+    }
+
+    @Test
+    fun verifyExtractorShouldBeOdkVerifyExtractor() {
+        odk {
+        } assert {
+            verifyExtractorIsOdkVerifyExtractor()
         }
     }
 
