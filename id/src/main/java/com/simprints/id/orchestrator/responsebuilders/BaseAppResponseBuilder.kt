@@ -5,15 +5,16 @@ import com.simprints.id.domain.moduleapi.app.responses.AppRefusalFormResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormAnswer
 import com.simprints.id.domain.moduleapi.app.responses.entities.fromDomainToModuleApi
-import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintErrorResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppRefusalFormReason
 import com.simprints.id.domain.moduleapi.fingerprint.responses.toAppErrorReason
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
 
 abstract class BaseAppResponseBuilder : AppResponseBuilder {
 
@@ -36,6 +37,9 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
             }
             results.any { it is FingerprintRefusalFormResponse } -> {
                 buildAppRefusalResponse(results.find { it is FingerprintRefusalFormResponse } as FingerprintRefusalFormResponse)
+            }
+            results.any { it is FaceExitFormResponse } -> {
+                buildAppExitFormResponse(results.find { it is FaceExitFormResponse } as FaceExitFormResponse)
             }
             results.any { it is FetchGUIDResponse } -> {
                 buildAppErrorResponse(results.find { it is FetchGUIDResponse } as FetchGUIDResponse)
@@ -72,4 +76,9 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
         AppRefusalFormResponse(RefusalFormAnswer(
             fingerprintRefusalFormResponse.reason.toAppRefusalFormReason(),
             fingerprintRefusalFormResponse.optionalText))
+
+    private fun buildAppExitFormResponse(faceExitFormResponse: FaceExitFormResponse) =
+        AppRefusalFormResponse(RefusalFormAnswer(
+            faceExitFormResponse.reason.toAppRefusalFormReason(),
+            faceExitFormResponse.extra))
 }
