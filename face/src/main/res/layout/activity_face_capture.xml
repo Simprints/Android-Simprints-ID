@@ -5,13 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.otaliastudios.cameraview.CameraView
-        android:id="@+id/face_capture_camera"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:keepScreenOn="true"
-        app:cameraAudio="off" />
-
     <fragment
         android:id="@+id/capture_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
