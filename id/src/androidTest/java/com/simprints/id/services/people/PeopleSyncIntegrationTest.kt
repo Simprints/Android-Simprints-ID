@@ -24,16 +24,14 @@ import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.commontesttools.di.TestSyncModule
-import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteInterface
-import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationCounts
-import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationGroupResponse
-import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationsResponse
+import com.simprints.id.data.db.person.remote.models.personcounts.ApiEventCount
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEvent
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEventPayloadType
 import com.simprints.id.data.db.person.remote.models.personevents.fromDomainToApi
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
@@ -256,7 +254,7 @@ class PeopleSyncIntegrationTest {
 
 private fun mockResponsesForSync(scope: PeopleDownSyncScope): Int {
     val ops = runBlocking { downSyncScopeRepositorySpy.getDownSyncOperations(scope) }
-    val apiPeopleToDownload = ops.map {
+    val eventsToDownload = ops.map {
         val eventsToDownload = getRandomEnrolmentEvents(
             N_TO_DOWNLOAD_PER_MODULE,
             it.projectId,
@@ -270,14 +268,12 @@ private fun mockResponsesForSync(scope: PeopleDownSyncScope): Int {
         }
     }.flatten()
 
-    val countResponse = ApiPeopleOperationsResponse(listOf(PeopleCount(apiPeopleToDownload.size, 0, 0)).map {
-        ApiPeopleOperationGroupResponse(ApiPeopleOperationCounts(it.created, it.deleted, it.updated))
-    })
+    val countResponse = ApiEventCount(ApiEventPayloadType.ENROLMENT_RECORD_CREATION, eventsToDownload.size)
 
-    mockDispatcher.downResponse = 200 to apiPeopleToDownload
+    mockDispatcher.downResponse = 200 to eventsToDownload
     mockDispatcher.countResponse = 200 to countResponse
 
-    return apiPeopleToDownload.size
+    return eventsToDownload.size
 }
 
 
@@ -289,21 +285,21 @@ private fun mockUploadPeople() {
 
 class MockDispatcher : Dispatcher() {
 
-    var countResponse: Pair<Int, ApiPeopleOperationsResponse?>? = null
+    var countResponse: Pair<Int, ApiEventCount?>? = null
     var downResponse: Pair<Int, List<ApiEvent>?>? = null
     var uploadResponse: Pair<Int, String>? = null
 
     override fun dispatch(request: RecordedRequest): MockResponse {
         val lastPart = request.requestUrl?.pathSegments?.last()
 
-        return if (lastPart == "patients" && request.method == "POST") {
+        return if (lastPart == "events" && request.method == "POST") {
             val code = uploadResponse?.first ?: 200
             MockResponse().setResponseCode(code)
         } else if (lastPart == "count") {
             val code = countResponse?.first ?: 200
             val response = JsonHelper.gson.toJson(countResponse?.second ?: "")
             MockResponse().setResponseCode(code).setBody(response)
-        } else if (lastPart == "patients" && request.method == "GET") {
+        } else if (lastPart == "events" && request.method == "GET") {
             val code = downResponse?.first ?: 200
             val response = JsonHelper.gson.toJson(downResponse?.second ?: "")
             MockResponse().setResponseCode(code).setBody(response)
