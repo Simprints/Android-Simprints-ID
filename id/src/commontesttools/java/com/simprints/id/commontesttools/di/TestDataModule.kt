@@ -33,6 +33,7 @@ class TestDataModule(
     private val projectRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val projectRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val personLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val eventRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val personRepositoryUpSyncHelperRule: DependencyRule = DependencyRule.RealRule,
@@ -71,6 +72,12 @@ class TestDataModule(
             projectRemoteDataSource
         )
     }
+
+    override fun provideEventRemoteDataSource(remoteDbManager: RemoteDbManager,
+                                              simApiClientFactory: SimApiClientFactory) =
+        eventRemoteDataSourceRule.resolveDependency {
+            super.provideEventRemoteDataSource(remoteDbManager, simApiClientFactory)
+        }
 
     override fun providePersonRepositoryUpSyncHelper(
         loginInfoManager: LoginInfoManager,

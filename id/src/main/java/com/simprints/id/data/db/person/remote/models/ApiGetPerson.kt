@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.person.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.person.domain.Person
 import java.util.*
 
 @Keep
@@ -14,15 +13,3 @@ data class ApiGetPerson(val id: String,
                         val fingerprints: List<ApiFingerprintSample>? = null,
                         var faces: List<ApiFaceSample>? = null,
                         val deleted: Boolean)
-
-fun ApiGetPerson.fromGetApiToDomain(): Person =
-    Person(
-        patientId = id,
-        projectId = projectId,
-        userId = userId,
-        moduleId = moduleId,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-        fingerprintSamples = fingerprints?.map { it.fromApiToDomain() } ?: emptyList(),
-        toSync = false
-    )
