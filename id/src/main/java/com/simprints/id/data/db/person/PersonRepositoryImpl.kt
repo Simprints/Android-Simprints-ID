@@ -101,7 +101,7 @@ class PersonRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSou
         personRepositoryUpSyncHelper.executeUploadWithProgress(scope)
 
     override suspend fun performDownloadWithProgress(scope: CoroutineScope,
-                                                     peopleDownSyncOperation: PeopleDownSyncOperation): ReceiveChannel<Int> =
+                                                     peopleDownSyncOperation: PeopleDownSyncOperation): ReceiveChannel<PeopleDownSyncProgress> =
         personRepositoryDownSyncHelper.performDownSyncWithProgress(scope, peopleDownSyncOperation,
             buildEventQuery(downSyncScopeRepository.getDownSyncScope()))
 

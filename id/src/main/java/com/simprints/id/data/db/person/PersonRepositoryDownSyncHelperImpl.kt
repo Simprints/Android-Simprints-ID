@@ -5,6 +5,7 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.EventQuery
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncProgress
 import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelper.Companion.BATCH_SIZE_FOR_DOWNLOADING
 import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelper.Companion.buildPersonFromCreationPayload
 import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordCreationPayload
@@ -38,7 +39,7 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
     @ExperimentalCoroutinesApi
     override suspend fun performDownSyncWithProgress(scope: CoroutineScope,
                                                      downSyncOperation: PeopleDownSyncOperation,
-                                                     eventQuery: EventQuery): ReceiveChannel<Int> =
+                                                     eventQuery: EventQuery): ReceiveChannel<PeopleDownSyncProgress> =
         scope.produce {
 
             this@PersonRepositoryDownSyncHelperImpl.downSyncOperation = downSyncOperation
@@ -55,7 +56,7 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
                     channelFromNetwork.poll()?.let {
                         bufferToSave.add(it)
                         if (bufferToSave.size > BATCH_SIZE_FOR_DOWNLOADING) {
-                            this.send(bufferToSave.size)
+                            this.send(PeopleDownSyncProgress(bufferToSave.size))
                             saveBatch(bufferToSave)
                         }
                     }

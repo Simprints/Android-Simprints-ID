@@ -3,6 +3,7 @@ package com.simprints.id.data.db.person
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.db.people_sync.down.domain.EventQuery
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncProgress
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
@@ -13,7 +14,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 interface PersonRepositoryDownSyncHelper {
     suspend fun performDownSyncWithProgress(scope: CoroutineScope,
                                             downSyncOperation: PeopleDownSyncOperation,
-                                            eventQuery: EventQuery): ReceiveChannel<Int>
+                                            eventQuery: EventQuery): ReceiveChannel<PeopleDownSyncProgress>
 
     companion object {
         const val BATCH_SIZE_FOR_DOWNLOADING = 200

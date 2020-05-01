@@ -1,6 +1,8 @@
 package com.simprints.id.data.db.person
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth
+import com.google.gson.JsonSyntaxException
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
@@ -18,6 +20,7 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.testtools.common.channel.testChannel
+import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -34,6 +37,7 @@ import org.junit.runner.RunWith
 import java.io.InputStream
 import kotlin.math.ceil
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class PersonRepositoryDownSyncHelperImplTest {
 
@@ -136,13 +140,55 @@ class PersonRepositoryDownSyncHelperImplTest {
         }
     }
 
-    @ExperimentalCoroutinesApi
+    @Test
+    fun downloadPatients_patientSerializationFails_shouldTriggerOnError() {
+        runBlocking {
+            val nEventsToDownload = 499
+            val projectDownSyncOp = builder.buildProjectSyncOperation(DefaultTestConstants.DEFAULT_PROJECT_ID, modes, null)
+            mockEventRemoteDataSourceWithIncorrectModels(nEventsToDownload)
+
+            val downSyncHelper =
+                PersonRepositoryDownSyncHelperImpl(personLocalDataSource, eventRemoteDataSource,
+                    peopleDownSyncScopeRepository, timeHelper)
+
+            assertThrows<IllegalStateException> {
+                withContext(Dispatchers.IO) {
+                    downSyncHelper.performDownSyncWithProgress(this, projectDownSyncOp, mockk(relaxed = true)).testChannel()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun downSyncRequestFailsDueToMalformedJson_shouldSaveTheWellFormedElements() {
+        runBlocking {
+            val nEventsToDownload = 5
+            mockEventRemoteDataSourceWithOneMalformedJson(nEventsToDownload)
+
+            val downSyncHelper =
+                PersonRepositoryDownSyncHelperImpl(personLocalDataSource, eventRemoteDataSource,
+                    peopleDownSyncScopeRepository, timeHelper)
+
+            assertThrows<JsonSyntaxException> {
+                withContext(Dispatchers.IO) {
+                    downSyncHelper.performDownSyncWithProgress(this, projectSyncOp, mockk(relaxed = true)).testChannel()
+                }
+            }
+
+            coVerify(exactly = 1) {
+                personLocalDataSource.insertOrUpdate(match {
+                    Truth.assertThat(it).hasSize(4)
+                    true
+                })
+            }
+        }
+    }
+
     private fun runDownSyncAndVerifyConditions(nEventsToDownload: Int,
                                                nEventsToDelete: Int,
                                                syncOp: PeopleDownSyncOperation) {
 
         runBlocking {
-            mockLocalDataSource()
             mockEventRemoteDataSource(nEventsToDownload, nEventsToDelete)
             mockDownSyncScopeRepository()
             val numberOfBatchesToSave = calculateCorrectNumberOfBatches(nEventsToDownload)
@@ -160,24 +206,55 @@ class PersonRepositoryDownSyncHelperImplTest {
         }
     }
 
-    private fun mockLocalDataSource() {
-        coEvery { personLocalDataSource.insertOrUpdate(any()) } returns Unit
-        coEvery { personLocalDataSource.delete(any()) } returns Unit
-    }
-
     private fun mockEventRemoteDataSource(nEventsToDownload: Int, nEventsToDelete: Int) {
-        val creationEvents = getRandomEnrolmentEvents(nEventsToDownload, DefaultTestConstants.DEFAULT_PROJECT_ID,
-            DefaultTestConstants.DEFAULT_USER_ID, DefaultTestConstants.DEFAULT_MODULE_ID,
-            ENROLMENT_RECORD_CREATION).map { it.fromDomainToApi() }
-        val deletionEvents = getRandomEnrolmentEvents(nEventsToDelete, DefaultTestConstants.DEFAULT_PROJECT_ID,
-            DefaultTestConstants.DEFAULT_USER_ID, DefaultTestConstants.DEFAULT_MODULE_ID,
-            ENROLMENT_RECORD_DELETION).map { it.fromDomainToApi() }
+        val creationEvents = getRandomCreationEvents(nEventsToDownload)
+        val deletionEvents = getRandomDeletionEvents(nEventsToDelete)
 
         coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildResponse(deletionEvents + creationEvents)
     }
 
+    private fun mockEventRemoteDataSourceWithIncorrectModels(nEventsToDownload: Int) {
+        val creationEvents = getRandomCreationEvents(nEventsToDownload)
+
+        coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildIncorrectResponse(creationEvents)
+    }
+
+    private fun mockEventRemoteDataSourceWithOneMalformedJson(nEventsToDownload: Int) {
+        val creationEvents = getRandomCreationEvents(nEventsToDownload)
+
+        coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildMalformedResponse(creationEvents)
+    }
+
+    private fun getRandomCreationEvents(nEventsToDownload: Int) =
+        getRandomEnrolmentEvents(nEventsToDownload, DefaultTestConstants.DEFAULT_PROJECT_ID,
+            DefaultTestConstants.DEFAULT_USER_ID, DefaultTestConstants.DEFAULT_MODULE_ID,
+            ENROLMENT_RECORD_CREATION).map { it.fromDomainToApi() }
+
+    private fun getRandomDeletionEvents(nEventsToDelete: Int) =
+        getRandomEnrolmentEvents(nEventsToDelete, DefaultTestConstants.DEFAULT_PROJECT_ID,
+            DefaultTestConstants.DEFAULT_USER_ID, DefaultTestConstants.DEFAULT_MODULE_ID,
+            ENROLMENT_RECORD_DELETION).map { it.fromDomainToApi() }
+
     private fun buildResponse(events: List<ApiEvent>): InputStream =
         SimJsonHelper.gson.toJson(events).toString().toResponseBody().byteStream()
+
+    private fun buildIncorrectResponse(events: List<ApiEvent>): InputStream {
+        val jsonString = SimJsonHelper.gson.toJson(events).toString()
+        val incorrectJson = jsonString.replace("id", "incorrect_id")
+        return incorrectJson.toResponseBody().byteStream()
+    }
+
+    private fun buildMalformedResponse(events: List<ApiEvent>): InputStream {
+        val lastInstanceToReplace = "id"
+        val jsonString = SimJsonHelper.gson.toJson(events).toString()
+        val index = jsonString.lastIndexOf(lastInstanceToReplace)
+        val beginString: String = jsonString.substring(0, index)
+        val endString: String = jsonString.substring(index + lastInstanceToReplace.length)
+
+        val responseString = beginString + "id\"" + endString
+
+        return responseString.toResponseBody().byteStream()
+    }
 
     private fun mockDownSyncScopeRepository() {
         coEvery { peopleDownSyncScopeRepository.insertOrUpdate(any())  } returns Unit
