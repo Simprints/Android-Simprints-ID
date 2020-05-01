@@ -54,14 +54,6 @@ open class SyncModule {
     @Provides
     open fun providePeopleDownSyncOperationBuilder(): PeopleDownSyncOperationFactory = PeopleDownSyncOperationFactoryImpl()
 
-//    @Provides
-//    open fun providePeopleDownSyncDownloaderTask(personLocalDataSource: PersonLocalDataSource,
-//                                                 personRemoteDataSource: PersonRemoteDataSource,
-//                                                 downSyncScopeRepository: PeopleDownSyncScopeRepository,
-//                                                 peopleSyncCache: PeopleSyncCache,
-//                                                 timeHelper: TimeHelper): PeopleDownSyncDownloaderTask =
-//        PeopleDownSyncDownloaderTaskImpl(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, peopleSyncCache, timeHelper)
-
     @Provides
     open fun provideWorkManager(ctx: Context): WorkManager =
         WorkManager.getInstance(ctx)
