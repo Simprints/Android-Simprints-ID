@@ -13,7 +13,6 @@ import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.TAG_MASTER_SYNC_ID
@@ -65,13 +64,17 @@ class PeopleDownSyncCountWorker(val context: Context, params: WorkerParameters) 
 
         } catch (t: Throwable) {
 
-            if (t is SyncCloudIntegrationException || t is EmptyPeopleOperationsParamsException) {
-                fail(t)
-            } else if (isSyncStillRunning()) {
-                retry(t)
-            } else {
-                t.printStackTrace()
-                success(message = "Succeed because count is not required any more.")
+            when {
+                t is SyncCloudIntegrationException -> {
+                    fail(t)
+                }
+                isSyncStillRunning() -> {
+                    retry(t)
+                }
+                else -> {
+                    t.printStackTrace()
+                    success(message = "Succeed because count is not required any more.")
+                }
             }
 
         }

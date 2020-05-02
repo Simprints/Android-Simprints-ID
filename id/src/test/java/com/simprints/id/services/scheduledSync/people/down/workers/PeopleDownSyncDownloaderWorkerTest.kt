@@ -104,7 +104,7 @@ class PeopleDownSyncDownloaderWorkerTest {
 
     @Test
     fun worker_inputDataIsWrong_shouldFail() = runBlocking {
-        peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to ""))
+        peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to "error"))
         with(peopleDownSyncDownloaderWorker) {
 
             doWork()

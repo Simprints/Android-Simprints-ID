@@ -10,6 +10,7 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
+import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
@@ -62,12 +63,12 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
             Timber.d("Downsync success : $count")
             success(workDataOf(OUTPUT_DOWN_SYNC to count), "Total downloaded: $0 for $downSyncOperation")
         } catch (t: Throwable) {
-            retryOrFailIfCloudIntegrationError(t)
+            retryOrFailIfCloudIntegrationErrorOrMalformedOperation(t)
         }
     }
 
-    private fun retryOrFailIfCloudIntegrationError(t: Throwable): Result {
-        return if (t is SyncCloudIntegrationException) {
+    private fun retryOrFailIfCloudIntegrationErrorOrMalformedOperation(t: Throwable): Result {
+        return if (t is SyncCloudIntegrationException || t is MalformedDownSyncOperationException) {
             fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
         } else {
             retry(t)
@@ -75,8 +76,12 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
     }
 
     private suspend fun extractSubSyncScopeFromInput(): PeopleDownSyncOperation {
-        val op = JsonHelper.gson.fromJson(jsonForOp, PeopleDownSyncOperation::class.java)
-        return downSyncScopeRepository.refreshDownSyncOperationFromDb(op) ?: op
+        try {
+            val op = JsonHelper.gson.fromJson(jsonForOp, PeopleDownSyncOperation::class.java)
+            return downSyncScopeRepository.refreshDownSyncOperationFromDb(op) ?: op
+        } catch (t: Throwable) {
+            throw MalformedDownSyncOperationException()
+        }
     }
 
     override suspend fun reportCount(count: Int) {
