@@ -16,46 +16,11 @@ import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyn
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.id.services.scheduledSync.people.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-
-interface PeopleDownSyncDownloaderTask {
-
-    suspend fun execute(workerId: String,
-                        downSyncOperation: PeopleDownSyncOperation,
-                        peopleSyncCache: PeopleSyncCache,
-                        personRepository: PersonRepository,
-                        reporter: WorkerProgressCountReporter,
-                        downloadScope: CoroutineScope): Int
-}
-
-class PeopleDownSyncDownloaderTaskImpl : PeopleDownSyncDownloaderTask {
-
-    override suspend fun execute(workerId: String,
-                                 downSyncOperation: PeopleDownSyncOperation,
-                                 peopleSyncCache: PeopleSyncCache,
-                                 personRepository: PersonRepository,
-                                 reporter: WorkerProgressCountReporter,
-                                 downloadScope: CoroutineScope): Int {
-
-        var count = peopleSyncCache.readProgress(workerId)
-        val totalDownloaded = personRepository.performDownloadWithProgress(downloadScope, downSyncOperation)
-
-        while (!totalDownloaded.isClosedForReceive) {
-            totalDownloaded.poll()?.let {
-                count += it.progress
-                peopleSyncCache.saveProgress(workerId, count)
-                Timber.d("Downsync downloader count : $count for batch : $it")
-                reporter.reportCount(count)
-            }
-        }
-        return count
-    }
-}
 
 class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
@@ -67,16 +32,12 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
 
     override val tag: String = PeopleDownSyncDownloaderWorker::class.java.simpleName
 
-    @Inject
-    override lateinit var crashReportManager: CrashReportManager
-    @Inject
-    lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
-    @Inject
-    lateinit var personRepository: PersonRepository
-    @Inject
-    lateinit var peopleSyncCache: PeopleSyncCache
+    @Inject override lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
+    @Inject lateinit var personRepository: PersonRepository
+    @Inject lateinit var peopleSyncCache: PeopleSyncCache
 
-    var peopleDownSyncDownloaderTask: PeopleDownSyncDownloaderTask = PeopleDownSyncDownloaderTaskImpl()
+    internal var peopleDownSyncDownloaderTask: PeopleDownSyncDownloaderTask = PeopleDownSyncDownloaderTaskImpl()
 
     private val jsonForOp by lazy {
         inputData.getString(INPUT_DOWN_SYNC_OPS)
