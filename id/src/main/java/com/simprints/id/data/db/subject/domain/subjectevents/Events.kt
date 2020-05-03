@@ -1,7 +1,7 @@
-package com.simprints.id.data.db.subject.domain.personevents
+package com.simprints.id.data.db.subject.domain.subjectevents
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiEvent
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
 import com.simprints.id.domain.modality.Modes
 
 @Keep

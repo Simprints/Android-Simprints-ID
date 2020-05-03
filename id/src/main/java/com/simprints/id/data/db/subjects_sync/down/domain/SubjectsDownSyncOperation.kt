@@ -1,7 +1,7 @@
-package com.simprints.id.data.db.people_sync.down.domain
+package com.simprints.id.data.db.subjects_sync.down.domain
 
-import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationKey
-import com.simprints.id.data.db.people_sync.down.local.DbSubjectsDownSyncOperation
+import com.simprints.id.data.db.subjects_sync.down.local.DbPeopleDownSyncOperationKey
+import com.simprints.id.data.db.subjects_sync.down.local.DbSubjectsDownSyncOperation
 import com.simprints.id.domain.modality.Modes
 
 data class SubjectsDownSyncOperation(val projectId: String,

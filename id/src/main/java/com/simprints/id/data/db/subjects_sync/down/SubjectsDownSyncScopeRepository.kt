@@ -1,7 +1,7 @@
-package com.simprints.id.data.db.people_sync.down
+package com.simprints.id.data.db.subjects_sync.down
 
-import com.simprints.id.data.db.people_sync.down.domain.SubjectsDownSyncOperation
-import com.simprints.id.data.db.people_sync.down.domain.SubjectsDownSyncScope
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
 
 interface SubjectsDownSyncScopeRepository {
 

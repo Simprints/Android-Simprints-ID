@@ -1,7 +1,7 @@
-package com.simprints.id.data.db.subject.remote.models.personevents
+package com.simprints.id.data.db.subject.remote.models.subjectevents
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.subject.domain.personevents.EnrolmentRecordCreationPayload
+import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
 
 @Keep
 data class ApiEnrolmentRecordCreationPayload(

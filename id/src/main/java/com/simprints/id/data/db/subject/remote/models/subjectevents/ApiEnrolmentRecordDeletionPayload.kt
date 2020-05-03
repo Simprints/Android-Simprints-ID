@@ -1,6 +1,6 @@
-package com.simprints.id.data.db.subject.remote.models.personevents
+package com.simprints.id.data.db.subject.remote.models.subjectevents
 
-import com.simprints.id.data.db.subject.domain.personevents.EnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordDeletionPayload
 import io.realm.internal.Keep
 
 @Keep

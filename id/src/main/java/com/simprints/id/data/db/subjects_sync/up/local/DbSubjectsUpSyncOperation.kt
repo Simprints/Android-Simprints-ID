@@ -1,12 +1,12 @@
-package com.simprints.id.data.db.people_sync.up.local
+package com.simprints.id.data.db.subjects_sync.up.local
 
 import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import com.simprints.id.data.db.people_sync.up.domain.SubjectsUpSyncOperation
-import com.simprints.id.data.db.people_sync.up.domain.SubjectsUpSyncOperationResult
-import com.simprints.id.data.db.people_sync.up.domain.SubjectsUpSyncOperationResult.UpSyncState
+import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperation
+import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperationResult
+import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperationResult.UpSyncState
 
 @Entity(tableName = "UpSyncStatus")
 @Keep

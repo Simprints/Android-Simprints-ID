@@ -1,7 +1,7 @@
-package com.simprints.id.data.db.subject.domain.personevents
+package com.simprints.id.data.db.subject.domain.subjectevents
 
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiFingerIdentifier
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiFingerprintTemplate
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiFingerIdentifier
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiFingerprintTemplate
 import com.simprints.id.data.db.subject.domain.FingerIdentifier as PersonFingerIdentifier
 
 data class FingerprintTemplate(val quality: Int,

@@ -10,7 +10,7 @@ import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncProgress
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.domain.personevents.*
+import com.simprints.id.data.db.subject.domain.subjectevents.*
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
