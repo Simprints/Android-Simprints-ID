@@ -12,9 +12,9 @@ import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.CLOSE
 import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.TRY_AGAIN
-import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.data.db.PersonFetchResult.PersonSource.NOT_FOUND_IN_LOCAL_AND_REMOTE
-import com.simprints.id.data.db.PersonFetchResult.PersonSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR
+import com.simprints.id.data.db.SubjectFetchResult
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.core.requests.FetchGUIDRequest
@@ -57,8 +57,8 @@ class FetchGuidActivity : AppCompatActivity() {
         })
     }
 
-    private fun launchAlertIfPersonFetchFailedOrFinish(personSource: PersonFetchResult.PersonSource) {
-        when(personSource) {
+    private fun launchAlertIfPersonFetchFailedOrFinish(subjectSource: SubjectFetchResult.SubjectSource) {
+        when(subjectSource) {
             NOT_FOUND_IN_LOCAL_AND_REMOTE -> launchAlert(this, AlertType.GUID_NOT_FOUND_ONLINE)
             NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR -> launchAlert(this, AlertType.GUID_NOT_FOUND_OFFLINE)
             else -> {

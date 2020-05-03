@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.cache
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.commontesttools.FingerprintGeneratorUtils
-import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult

@@ -1,7 +1,7 @@
 package com.simprints.id.commontesttools
 
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.id.data.db.person.domain.personevents.*
+import com.simprints.id.data.db.subject.domain.subjectevents.*
 import com.simprints.id.domain.modality.Modes
 import java.util.*
 

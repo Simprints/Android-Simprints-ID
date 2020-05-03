@@ -11,10 +11,10 @@ import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Compa
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PROJECT_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.USER_ID
-import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.every
@@ -160,7 +160,7 @@ class CrashReportManagerImplTest : AutoCloseKoinTest() {
     fun setDownSyncTriggersCrashlyticsKey_shouldSetCorrectKeyValueInCrashlytics() {
         val crashReportManagerSpy = spyk(CrashReportManagerImpl())
         val crashlyticsInstanceMock: FirebaseCrashlytics = mockk()
-        val testDownSyncSetting = PeopleDownSyncSetting.EXTRA
+        val testDownSyncSetting = SubjectsDownSyncSetting.EXTRA
 
         every { crashReportManagerSpy.crashlyticsInstance } returns crashlyticsInstanceMock
         crashReportManagerSpy.setDownSyncTriggersCrashlyticsKey(testDownSyncSetting)

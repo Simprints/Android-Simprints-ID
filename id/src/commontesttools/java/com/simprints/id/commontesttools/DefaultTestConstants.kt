@@ -1,9 +1,9 @@
 package com.simprints.id.commontesttools
 
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
-import com.simprints.id.data.db.people_sync.down.domain.ModuleSyncScope
-import com.simprints.id.data.db.people_sync.down.domain.ProjectSyncScope
-import com.simprints.id.data.db.people_sync.down.domain.UserSyncScope
+import com.simprints.id.data.db.subjects_sync.down.domain.ModuleSyncScope
+import com.simprints.id.data.db.subjects_sync.down.domain.ProjectSyncScope
+import com.simprints.id.data.db.subjects_sync.down.domain.UserSyncScope
 import com.simprints.id.domain.modality.Modes
 
 object DefaultTestConstants {
