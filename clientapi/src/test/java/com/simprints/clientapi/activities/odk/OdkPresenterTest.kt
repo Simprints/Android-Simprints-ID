@@ -40,7 +40,7 @@ class OdkPresenterTest {
         val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
         every { view.enrollExtractor } returns enrollmentExtractor
 
-        OdkPresenter(view, Register, mockSessionManagerToCreateSession(), mockk(), mockk()).apply {
+        OdkPresenter(view, Enrol, mockSessionManagerToCreateSession(), mockk(), mockk()).apply {
             runBlocking { start() }
         }
 
@@ -87,7 +87,7 @@ class OdkPresenterTest {
 
             val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
             coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
-            OdkPresenter(view, Register, sessionEventsManagerMock, mockk(), mockk()).apply {
+            OdkPresenter(view, Enrol, sessionEventsManagerMock, mockk(), mockk()).apply {
                 handleEnrollResponse(EnrollResponse(registerId))
             }
 

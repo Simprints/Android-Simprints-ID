@@ -1,7 +1,7 @@
 package com.simprints.clientapi.activities.odk
 
 sealed class OdkAction {
-    object Register : OdkAction()
+    object Enrol : OdkAction()
     object Verify : OdkAction()
     object Identify : OdkAction()
     object ConfirmIdentity : OdkAction()
@@ -20,7 +20,7 @@ sealed class OdkAction {
 
         fun buildOdkAction(action: String?): OdkAction =
             when (action) {
-                ACTION_REGISTER -> Register
+                ACTION_REGISTER -> Enrol
                 ACTION_IDENTIFY -> Identify
                 ACTION_VERIFY -> Verify
                 ACTION_CONFIRM_IDENTITY -> ConfirmIdentity
