@@ -9,6 +9,7 @@ enum class RefusalFormReason {
     REFUSED_DATA_CONCERNS,
     REFUSED_PERMISSION,
     SCANNER_NOT_WORKING,
+    APP_NOT_WORKING,
     REFUSED_NOT_PRESENT,
     REFUSED_YOUNG,
     OTHER
@@ -41,7 +42,7 @@ fun FaceExitFormReason.fromDomainToModuleApi(): RefusalFormReason =
         FaceExitFormReason.REFUSED_RELIGION -> RefusalFormReason.REFUSED_RELIGION
         FaceExitFormReason.REFUSED_DATA_CONCERNS -> RefusalFormReason.REFUSED_DATA_CONCERNS
         FaceExitFormReason.REFUSED_PERMISSION -> RefusalFormReason.REFUSED_PERMISSION
-        FaceExitFormReason.SCANNER_NOT_WORKING -> RefusalFormReason.SCANNER_NOT_WORKING
+        FaceExitFormReason.APP_NOT_WORKING -> RefusalFormReason.APP_NOT_WORKING
         FaceExitFormReason.REFUSED_NOT_PRESENT -> RefusalFormReason.REFUSED_NOT_PRESENT
         FaceExitFormReason.REFUSED_YOUNG -> RefusalFormReason.REFUSED_YOUNG
         FaceExitFormReason.OTHER -> RefusalFormReason.OTHER
