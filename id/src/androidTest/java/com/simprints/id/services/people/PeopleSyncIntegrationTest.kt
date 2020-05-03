@@ -19,21 +19,20 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.moduleSyncScope
 import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
 import com.simprints.id.commontesttools.DefaultTestConstants.userSyncScope
+import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.commontesttools.di.TestSyncModule
-import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
-import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteInterface
-import com.simprints.id.data.db.person.remote.models.ApiGetPerson
-import com.simprints.id.data.db.person.remote.models.fromDomainToApi
-import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationCounts
-import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationGroupResponse
-import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationsResponse
+import com.simprints.id.data.db.person.remote.models.personcounts.ApiEventCount
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEvent
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEventPayloadType
+import com.simprints.id.data.db.person.remote.models.personevents.fromDomainToApi
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
@@ -76,7 +75,6 @@ class PeopleSyncIntegrationTest {
 
     private val app: Application = ApplicationProvider.getApplicationContext()
 
-    @Inject lateinit var personRemoteDataSourceSpy: PersonRemoteDataSource
     @Inject lateinit var personLocalDataSourceSpy: PersonLocalDataSource
     @Inject lateinit var downSyncScopeRepositorySpy: PeopleDownSyncScopeRepository
     @Inject lateinit var peopleSyncManager: PeopleSyncManager
@@ -95,7 +93,6 @@ class PeopleSyncIntegrationTest {
 
     private val dataModule by lazy {
         TestDataModule(
-            personRemoteDataSourceRule = DependencyRule.SpykRule,
             personLocalDataSourceRule = DependencyRule.SpykRule)
     }
 
@@ -118,7 +115,6 @@ class PeopleSyncIntegrationTest {
             "deviceId"
         ).build<EventRemoteInterface>().api
 
-        coEvery { personRemoteDataSourceSpy.getPeopleApiClient() } returns remotePeopleApi
         every { downSyncScopeRepositorySpy.getDownSyncScope() } returns projectSyncScope
         every { secureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } returns DEFAULT_LOCAL_DB_KEY
         every { legacyLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } returns DEFAULT_LOCAL_DB_KEY
@@ -258,23 +254,26 @@ class PeopleSyncIntegrationTest {
 
 private fun mockResponsesForSync(scope: PeopleDownSyncScope): Int {
     val ops = runBlocking { downSyncScopeRepositorySpy.getDownSyncOperations(scope) }
-    val apiPeopleToDownload = ops.map {
-        val peopleToDownload = getRandomPeople(N_TO_DOWNLOAD_PER_MODULE, it, listOf(false))
-        peopleToDownload.map { person ->
-            person.fromDomainToGetApi()
-        }.sortedBy { apiGetPerson ->
-            apiGetPerson.updatedAt
+    val eventsToDownload = ops.map {
+        val eventsToDownload = getRandomEnrolmentEvents(
+            N_TO_DOWNLOAD_PER_MODULE,
+            it.projectId,
+            it.userId ?: "",
+            it.moduleId ?: "",
+            ENROLMENT_RECORD_CREATION
+        )
+
+        eventsToDownload.map { event ->
+            event.fromDomainToApi()
         }
     }.flatten()
 
-    val countResponse = ApiPeopleOperationsResponse(listOf(PeopleCount(apiPeopleToDownload.size, 0, 0)).map {
-        ApiPeopleOperationGroupResponse(ApiPeopleOperationCounts(it.created, it.deleted, it.updated))
-    })
+    val countResponse = ApiEventCount(ApiEventPayloadType.ENROLMENT_RECORD_CREATION, eventsToDownload.size)
 
-    mockDispatcher.downResponse = 200 to apiPeopleToDownload
+    mockDispatcher.downResponse = 200 to eventsToDownload
     mockDispatcher.countResponse = 200 to countResponse
 
-    return apiPeopleToDownload.size
+    return eventsToDownload.size
 }
 
 
@@ -286,21 +285,21 @@ private fun mockUploadPeople() {
 
 class MockDispatcher : Dispatcher() {
 
-    var countResponse: Pair<Int, ApiPeopleOperationsResponse?>? = null
-    var downResponse: Pair<Int, List<ApiGetPerson>?>? = null
+    var countResponse: Pair<Int, ApiEventCount?>? = null
+    var downResponse: Pair<Int, List<ApiEvent>?>? = null
     var uploadResponse: Pair<Int, String>? = null
 
     override fun dispatch(request: RecordedRequest): MockResponse {
         val lastPart = request.requestUrl?.pathSegments?.last()
 
-        return if (lastPart == "patients" && request.method == "POST") {
+        return if (lastPart == "events" && request.method == "POST") {
             val code = uploadResponse?.first ?: 200
             MockResponse().setResponseCode(code)
         } else if (lastPart == "count") {
             val code = countResponse?.first ?: 200
             val response = JsonHelper.gson.toJson(countResponse?.second ?: "")
             MockResponse().setResponseCode(code).setBody(response)
-        } else if (lastPart == "patients" && request.method == "GET") {
+        } else if (lastPart == "events" && request.method == "GET") {
             val code = downResponse?.first ?: 200
             val response = JsonHelper.gson.toJson(downResponse?.second ?: "")
             MockResponse().setResponseCode(code).setBody(response)
@@ -330,15 +329,3 @@ private fun PeopleSyncState.assertSyncSucceeds(total: Int) {
     assertThat(progress).isEqualTo(total)
     assertThat((downSyncWorkersInfo.plus(upSyncWorkersInfo)).all { it.state is Succeeded }).isTrue()
 }
-
-fun Person.fromDomainToGetApi(deleted: Boolean = false): ApiGetPerson =
-    ApiGetPerson(
-        id = patientId,
-        projectId = projectId,
-        userId = userId,
-        moduleId = moduleId,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-        fingerprints = fingerprintSamples.map { it.fromDomainToApi() },
-        deleted = deleted
-    )
