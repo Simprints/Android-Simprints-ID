@@ -47,7 +47,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            Register,
+            Enrol,
             mockSessionManagerToCreateSession(),
             mockk(),
             mockk()
@@ -128,7 +128,7 @@ class LibSimprintsPresenterTest {
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns sessionId
         LibSimprintsPresenter(
             view,
-            Register,
+            Enrol,
             clientApiSessionEventsManager,
             mockk(),
             mockk()

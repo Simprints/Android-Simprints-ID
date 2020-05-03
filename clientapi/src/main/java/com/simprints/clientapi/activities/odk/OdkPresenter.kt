@@ -36,11 +36,11 @@ class OdkPresenter(
 
         runIfDeviceIsNotRooted {
             when (action) {
-                Register -> processEnrollRequest()
+                Enrol -> processEnrollRequest()
                 Identify -> processIdentifyRequest()
                 Verify -> processVerifyRequest()
                 ConfirmIdentity -> processConfirmIdentityRequest()
-                EnrolLastBiometrics -> processRegisterLastBiometrics()
+                EnrolLastBiometrics -> processEnrolLastBiometrics()
                 Invalid -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
             }.safeSealedWhens
         }

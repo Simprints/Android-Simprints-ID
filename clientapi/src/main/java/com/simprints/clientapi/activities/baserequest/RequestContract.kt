@@ -29,7 +29,7 @@ interface RequestContract {
         suspend fun processIdentifyRequest()
         suspend fun processVerifyRequest()
         suspend fun processConfirmIdentityRequest()
-        suspend fun processRegisterLastBiometrics()
+        suspend fun processEnrolLastBiometrics()
         fun handleEnrollResponse(enroll: EnrollResponse)
         fun handleIdentifyResponse(identify: IdentifyResponse)
         fun handleVerifyResponse(verify: VerifyResponse)

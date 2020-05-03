@@ -8,10 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import com.simprints.clientapi.R
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
-import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtractor
-import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
-import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
-import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
+import com.simprints.clientapi.clientrequests.extractors.*
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
 import com.simprints.clientapi.domain.responses.*
@@ -48,6 +45,9 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     override val confirmIdentityExtractor: ConfirmIdentityExtractor
         get() = ConfirmIdentityExtractor(intent)
 
+    override val enrolLastBiometricsExtractor: EnrolLastBiometricsExtractor
+        get() = EnrolLastBiometricsExtractor(intent)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.request_activity)
@@ -55,7 +55,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
 
     override fun sendSimprintsRequest(request: BaseRequest) {
         routeSimprintsRequest(this, request)
-        if(request is ConfirmIdentityRequest) {
+        if (request is ConfirmIdentityRequest) {
             guidSelectionNotifier.showMessage()
         }
     }
@@ -105,11 +105,11 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     }
 
     private fun routeAppResponse(response: IAppResponse) = when (response.type) {
-        IAppResponseType.ENROL -> presenter.handleEnrollResponse(EnrollResponse(response as IAppEnrolResponse))
+        IAppResponseType.ENROL, IAppResponseType.ENROL_LAST_BIOMETRICS -> presenter.handleEnrollResponse(EnrollResponse(response as IAppEnrolResponse))
         IAppResponseType.IDENTIFY -> presenter.handleIdentifyResponse(IdentifyResponse(response as IAppIdentifyResponse))
         IAppResponseType.VERIFY -> presenter.handleVerifyResponse(VerifyResponse(response as IAppVerifyResponse))
         IAppResponseType.REFUSAL -> presenter.handleRefusalResponse(RefusalFormResponse(response as IAppRefusalFormResponse))
-        IAppResponseType.ERROR -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
         IAppResponseType.CONFIRMATION -> presenter.handleConfirmationResponse(ConfirmationResponse(response as IAppConfirmationResponse))
+        IAppResponseType.ERROR -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
     }
 }
