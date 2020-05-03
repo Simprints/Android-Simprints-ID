@@ -1,9 +1,9 @@
-package com.simprints.id.data.db.subject.remote.models.personcounts
+package com.simprints.id.data.db.subject.remote.models.subjectcounts
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.subject.domain.personevents.EventPayloadType
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiEventPayloadType
+import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEventPayloadType
 
 @Keep
 class ApiEventCount(val type: ApiEventPayloadType, val count: Int)

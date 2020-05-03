@@ -1,12 +1,12 @@
-package com.simprints.id.data.db.people_sync.down.local
+package com.simprints.id.data.db.subjects_sync.down.local
 
 import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import com.simprints.id.data.db.people_sync.down.domain.SubjectsDownSyncOperation
-import com.simprints.id.data.db.people_sync.down.domain.SubjectsDownSyncOperationResult
-import com.simprints.id.data.db.people_sync.down.domain.SubjectsDownSyncOperationResult.DownSyncState
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationResult
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationResult.DownSyncState
 import com.simprints.id.domain.modality.Modes
 
 @Entity(tableName = "DbPeopleDownSyncOperation")

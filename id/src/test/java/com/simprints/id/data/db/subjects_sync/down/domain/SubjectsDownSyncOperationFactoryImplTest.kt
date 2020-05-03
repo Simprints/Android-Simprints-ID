@@ -1,12 +1,12 @@
-package com.simprints.id.data.db.people_sync.down.domain
+package com.simprints.id.data.db.subjects_sync.down.domain
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODES
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.data.db.people_sync.down.domain.SubjectsDownSyncOperationResult.DownSyncState.COMPLETE
-import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationKey
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationResult.DownSyncState.COMPLETE
+import com.simprints.id.data.db.subjects_sync.down.local.DbPeopleDownSyncOperationKey
 import org.junit.Test
 
 class SubjectsDownSyncOperationFactoryImplTest {

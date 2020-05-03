@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.people_sync.down.domain
+package com.simprints.id.data.db.subjects_sync.down.domain
 
 data class SubjectsDownSyncOperationResult(val state: DownSyncState,
                                            val lastEventId: String? = null,

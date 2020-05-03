@@ -1,8 +1,8 @@
-package com.simprints.id.data.db.subject.domain.personevents
+package com.simprints.id.data.db.subject.domain.subjectevents
 
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiBiometricReference
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiFaceReference
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiFingerprintReference
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiBiometricReference
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiFaceReference
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiFingerprintReference
 
 sealed class BiometricReference(val type: BiometricReferenceType)
 

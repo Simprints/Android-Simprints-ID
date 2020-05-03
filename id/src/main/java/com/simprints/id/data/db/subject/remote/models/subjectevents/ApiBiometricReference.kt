@@ -1,16 +1,16 @@
-package com.simprints.id.data.db.subject.remote.models.personevents
+package com.simprints.id.data.db.subject.remote.models.subjectevents
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.subject.domain.personevents.BiometricReference
-import com.simprints.id.data.db.subject.domain.personevents.FaceTemplate
-import com.simprints.id.data.db.subject.domain.personevents.FingerIdentifier
-import com.simprints.id.data.db.subject.domain.personevents.FingerprintTemplate
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiBiometricReferenceName.FACE_REFERENCE_SERIALISED
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiBiometricReferenceName.FINGERPRINT_REFERENCE_SERIALISED
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiBiometricReferenceType.FACE_REFERENCE
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiBiometricReferenceType.FINGERPRINT_REFERENCE
-import com.simprints.id.data.db.subject.domain.personevents.FaceReference as DomainFaceReference
-import com.simprints.id.data.db.subject.domain.personevents.FingerprintReference as DomainFingerprintReference
+import com.simprints.id.data.db.subject.domain.subjectevents.BiometricReference
+import com.simprints.id.data.db.subject.domain.subjectevents.FaceTemplate
+import com.simprints.id.data.db.subject.domain.subjectevents.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.subjectevents.FingerprintTemplate
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiBiometricReferenceName.FACE_REFERENCE_SERIALISED
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiBiometricReferenceName.FINGERPRINT_REFERENCE_SERIALISED
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiBiometricReferenceType.FACE_REFERENCE
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiBiometricReferenceType.FINGERPRINT_REFERENCE
+import com.simprints.id.data.db.subject.domain.subjectevents.FaceReference as DomainFaceReference
+import com.simprints.id.data.db.subject.domain.subjectevents.FingerprintReference as DomainFingerprintReference
 
 @Keep
 sealed class ApiBiometricReference(@Transient val type: ApiBiometricReferenceType)

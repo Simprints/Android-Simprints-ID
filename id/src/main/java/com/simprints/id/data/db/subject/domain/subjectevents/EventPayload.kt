@@ -1,9 +1,9 @@
-package com.simprints.id.data.db.subject.domain.personevents
+package com.simprints.id.data.db.subject.domain.subjectevents
 
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiEnrolmentRecordCreationPayload
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiEnrolmentRecordDeletionPayload
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiEnrolmentRecordMovePayload
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiEventPayload
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordCreationPayload
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordMovePayload
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEventPayload
 
 abstract class EventPayload(val type: EventPayloadType)
 

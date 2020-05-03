@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.subject.remote.models.personevents
+package com.simprints.id.data.db.subject.remote.models.subjectevents
 
 import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
 import com.simprints.id.data.db.subject.remote.models.ApiModes

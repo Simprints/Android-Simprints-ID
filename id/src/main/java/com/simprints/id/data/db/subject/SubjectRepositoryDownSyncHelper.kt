@@ -7,7 +7,7 @@ import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncProgre
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.domain.personevents.*
+import com.simprints.id.data.db.subject.domain.subjectevents.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 

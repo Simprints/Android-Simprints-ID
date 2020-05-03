@@ -4,9 +4,9 @@ import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
-import com.simprints.id.data.db.subject.domain.personevents.Events
-import com.simprints.id.data.db.subject.remote.models.personcounts.fromApiToDomain
-import com.simprints.id.data.db.subject.remote.models.personevents.fromDomainToApi
+import com.simprints.id.data.db.subject.domain.subjectevents.Events
+import com.simprints.id.data.db.subject.remote.models.subjectcounts.fromApiToDomain
+import com.simprints.id.data.db.subject.remote.models.subjectevents.fromDomainToApi
 import com.simprints.id.tools.utils.retrySimNetworkCalls
 import java.io.InputStream
 

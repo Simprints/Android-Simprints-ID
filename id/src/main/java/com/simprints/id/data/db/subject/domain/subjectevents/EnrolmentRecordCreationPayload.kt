@@ -1,6 +1,6 @@
-package com.simprints.id.data.db.subject.domain.personevents
+package com.simprints.id.data.db.subject.domain.subjectevents
 
-import com.simprints.id.data.db.subject.remote.models.personevents.ApiEnrolmentRecordCreationPayload
+import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordCreationPayload
 
 data class EnrolmentRecordCreationPayload(
     val subjectId: String,

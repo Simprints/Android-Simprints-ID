@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.people_sync.down.local
+package com.simprints.id.data.db.subjects_sync.down.local
 
 import androidx.room.Dao
 import androidx.room.Insert

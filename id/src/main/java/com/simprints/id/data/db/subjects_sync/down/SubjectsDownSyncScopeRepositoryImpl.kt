@@ -1,9 +1,9 @@
-package com.simprints.id.data.db.people_sync.down
+package com.simprints.id.data.db.subjects_sync.down
 
-import com.simprints.id.data.db.people_sync.down.domain.*
-import com.simprints.id.data.db.people_sync.down.local.SubjectsDownSyncOperationLocalDataSource
-import com.simprints.id.data.db.people_sync.down.local.fromDbToDomain
-import com.simprints.id.data.db.people_sync.down.local.isSameOperation
+import com.simprints.id.data.db.subjects_sync.down.domain.*
+import com.simprints.id.data.db.subjects_sync.down.local.SubjectsDownSyncOperationLocalDataSource
+import com.simprints.id.data.db.subjects_sync.down.local.fromDbToDomain
+import com.simprints.id.data.db.subjects_sync.down.local.isSameOperation
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
