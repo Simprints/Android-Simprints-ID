@@ -8,5 +8,6 @@ interface FaceResponse : Parcelable {
 
 enum class FaceResponseType {
     CAPTURE,
-    MATCH
+    MATCH,
+    EXIT_FORM,
 }

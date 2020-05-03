@@ -5,11 +5,14 @@ import com.simprints.face.capture.livefeedback.LiveFeedbackFragmentViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
 import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelperImpl
+import com.simprints.face.controllers.core.image.FaceImageManager
+import com.simprints.face.controllers.core.image.FaceImageManagerImpl
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManagerImpl
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.detection.mock.MockFaceDetector
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
+import com.simprints.face.exitform.ExitFormViewModel
 import com.simprints.id.Application
 import com.simprints.uicomponents.imageTools.LibYuvJni
 import org.koin.android.ext.koin.androidApplication
@@ -51,6 +54,7 @@ object KoinInjector {
     private fun Module.defineBuildersForFaceManagers() {
         factory<FaceAndroidResourcesHelper> { FaceAndroidResourcesHelperImpl(get()) }
         factory<FacePreferencesManager> { FacePreferencesManagerImpl(get()) }
+        factory<FaceImageManager> { FaceImageManagerImpl(get(), get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
@@ -61,7 +65,8 @@ object KoinInjector {
 
     private fun Module.defineBuildersForViewModels() {
         viewModel { FaceOrchestratorViewModel() }
-        viewModel { FaceCaptureViewModel(get<FacePreferencesManager>().maxRetries, get<FacePreferencesManager>().qualityThreshold) }
+        viewModel { FaceCaptureViewModel(get<FacePreferencesManager>().maxRetries, get()) }
         viewModel { (mainVM: FaceCaptureViewModel) -> LiveFeedbackFragmentViewModel(mainVM, get(), get(), get<FacePreferencesManager>().qualityThreshold) }
+        viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM) }
     }
 }
