@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collect
+package com.simprints.fingerprint.activities.collect.old
 
 import android.app.AlertDialog
 import android.content.Context
@@ -6,14 +6,14 @@ import android.widget.Toast
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.collect.confirmFingerprints.ConfirmFingerprintsDialog
-import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsFingerDisplayHelper
-import com.simprints.fingerprint.activities.collect.indicators.CollectFingerprintsIndicatorsHelper
-import com.simprints.fingerprint.activities.collect.models.Finger
-import com.simprints.fingerprint.activities.collect.models.FingerRes
+import com.simprints.fingerprint.activities.collect.old.confirmFingerprints.ConfirmFingerprintsDialog
+import com.simprints.fingerprint.activities.collect.old.fingers.CollectFingerprintsFingerDisplayHelper
+import com.simprints.fingerprint.activities.collect.old.indicators.CollectFingerprintsIndicatorsHelper
+import com.simprints.fingerprint.activities.collect.old.models.Finger
+import com.simprints.fingerprint.activities.collect.old.models.FingerRes
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
-import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
+import com.simprints.fingerprint.activities.collect.old.scanning.CollectFingerprintsScanningHelper
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE

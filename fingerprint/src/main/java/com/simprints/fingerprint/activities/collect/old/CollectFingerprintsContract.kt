@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collect
+package com.simprints.fingerprint.activities.collect.old
 
 import android.app.ProgressDialog
 import android.widget.Button
@@ -7,7 +7,7 @@ import android.widget.ProgressBar
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.base.BasePresenter
 import com.simprints.fingerprint.activities.base.BaseView
-import com.simprints.fingerprint.activities.collect.models.Finger
+import com.simprints.fingerprint.activities.collect.old.models.Finger
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 
 interface CollectFingerprintsContract {
@@ -35,7 +35,7 @@ interface CollectFingerprintsContract {
         // Scanning
         var scanButton: Button
         var progressBar: ProgressBar
-        var timeoutBar: com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar
+        var timeoutBar: com.simprints.fingerprint.activities.collect.old.timeoutbar.ScanningTimeoutBar
         var un20WakeupDialog: ProgressDialog
 
         // Indicators

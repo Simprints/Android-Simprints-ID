@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collect.models
+package com.simprints.fingerprint.activities.collect.old.models
 
 import android.graphics.Color
 import com.simprints.fingerprint.R

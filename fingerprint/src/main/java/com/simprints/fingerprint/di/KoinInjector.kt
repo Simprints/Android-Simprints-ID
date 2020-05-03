@@ -6,8 +6,9 @@ import android.nfc.NfcAdapter
 import com.simprints.fingerprint.activities.alert.AlertContract
 import com.simprints.fingerprint.activities.alert.AlertPresenter
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsContract
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
+import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsContract
+import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.nfcpair.NfcPairViewModel
@@ -130,6 +131,7 @@ object KoinInjector {
 
         viewModel { OrchestratorViewModel(get(), get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+        viewModel { CollectFingerprintsViewModel(get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }

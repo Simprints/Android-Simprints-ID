@@ -1,11 +1,11 @@
-package com.simprints.fingerprint.activities.collect
+package com.simprints.fingerprint.activities.collect.old
 
 import android.util.SparseArray
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.PagerAdapter
-import com.simprints.fingerprint.activities.collect.models.Finger
+import com.simprints.fingerprint.activities.collect.old.models.Finger
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 

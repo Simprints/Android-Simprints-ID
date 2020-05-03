@@ -1,10 +1,10 @@
-package com.simprints.fingerprint.activities.collect.timeoutbar
+package com.simprints.fingerprint.activities.collect.old.timeoutbar
 
 import android.content.Context
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.collect.models.FingerStatus
+import com.simprints.fingerprint.activities.collect.old.models.FingerStatus
 
 interface ScanningTimeoutBar {
 

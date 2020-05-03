@@ -1,11 +1,11 @@
-package com.simprints.fingerprint.activities.collect.indicators
+package com.simprints.fingerprint.activities.collect.old.indicators
 
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsContract
-import com.simprints.fingerprint.activities.collect.models.FingerStatus
+import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsContract
+import com.simprints.fingerprint.activities.collect.old.models.FingerStatus
 
 
 class CollectFingerprintsIndicatorsHelper(private val context: Context,
