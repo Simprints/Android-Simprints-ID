@@ -1,3 +1,4 @@
+
 package com.simprints.clientapi.activities.errors
 
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager

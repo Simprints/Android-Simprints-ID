@@ -10,7 +10,7 @@ data class FaceDetection(
     val frame: PreviewFrame,
     val face: Face?,
     val status: Status,
-    val securedImageRef: SecuredImageRef? = null,
+    var securedImageRef: SecuredImageRef? = null,
     val detectionTime: Long = System.currentTimeMillis()
 ) {
     enum class Status {
