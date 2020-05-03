@@ -2,38 +2,38 @@ package com.simprints.id.di
 
 import android.content.Context
 import androidx.work.WorkManager
-import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepositoryImpl
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactory
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactoryImpl
-import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncOperationLocalDataSource
-import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
-import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepositoryImpl
-import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncOperationLocalDataSource
-import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepositoryImpl
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationFactory
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationFactoryImpl
+import com.simprints.id.data.db.subjects_sync.down.local.SubjectsDownSyncOperationLocalDataSource
+import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepositoryImpl
+import com.simprints.id.data.db.subjects_sync.up.local.SubjectsUpSyncOperationLocalDataSource
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilderImpl
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManagerImpl
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessor
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImpl
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache.Companion.FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache.Companion.FILENAME_FOR_PROGRESSES_SHARED_PREFS
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCacheImpl
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncSubMasterWorkersBuilder
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncSubMasterWorkersBuilderImpl
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutorImpl
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilderImpl
+import com.simprints.id.services.scheduledSync.subjects.down.controllers.SubjectsDownSyncWorkersBuilder
+import com.simprints.id.services.scheduledSync.subjects.down.controllers.SubjectsDownSyncWorkersBuilderImpl
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManagerImpl
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncStateProcessor
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncStateProcessorImpl
+import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
+import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache.Companion.FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS
+import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache.Companion.FILENAME_FOR_PROGRESSES_SHARED_PREFS
+import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCacheImpl
+import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsSyncSubMasterWorkersBuilder
+import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsSyncSubMasterWorkersBuilderImpl
+import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
+import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutorImpl
+import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncWorkersBuilder
+import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncWorkersBuilderImpl
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImpl
 import dagger.Module
@@ -47,12 +47,12 @@ open class SyncModule {
     @Singleton
     open fun provideDownSyncScopeRepository(loginInfoManager: LoginInfoManager,
                                             preferencesManager: PreferencesManager,
-                                            syncStatusDatabase: PeopleSyncStatusDatabase,
-                                            peopleDownSyncOperationFactory: PeopleDownSyncOperationFactory): PeopleDownSyncScopeRepository =
-        PeopleDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, syncStatusDatabase.downSyncOperationOperationDataSource, peopleDownSyncOperationFactory)
+                                            syncStatusDatabase: SubjectsSyncStatusDatabase,
+                                            subjectsDownSyncOperationFactory: SubjectsDownSyncOperationFactory): SubjectsDownSyncScopeRepository =
+        SubjectsDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, syncStatusDatabase.downSyncOperationOperationDataSource, subjectsDownSyncOperationFactory)
 
     @Provides
-    open fun providePeopleDownSyncOperationBuilder(): PeopleDownSyncOperationFactory = PeopleDownSyncOperationFactoryImpl()
+    open fun providePeopleDownSyncOperationBuilder(): SubjectsDownSyncOperationFactory = SubjectsDownSyncOperationFactoryImpl()
 
     @Provides
     open fun provideWorkManager(ctx: Context): WorkManager =
@@ -64,65 +64,65 @@ open class SyncModule {
 
     @Provides
     open fun providePeopleSyncStateProcessor(ctx: Context,
-                                             peopleSyncCache: PeopleSyncCache,
-                                             personRepository: PersonRepository): PeopleSyncStateProcessor =
-        PeopleSyncStateProcessorImpl(ctx, personRepository, peopleSyncCache)
+                                             subjectsSyncCache: SubjectsSyncCache,
+                                             personRepository: SubjectRepository): SubjectsSyncStateProcessor =
+        SubjectsSyncStateProcessorImpl(ctx, personRepository, subjectsSyncCache)
 
     @Provides
     open fun providePeopleSyncManager(ctx: Context,
-                                      peopleSyncStateProcessor: PeopleSyncStateProcessor,
-                                      peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
-                                      peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
-                                      peopleSyncCache: PeopleSyncCache): PeopleSyncManager =
-        PeopleSyncManagerImpl(ctx, peopleSyncStateProcessor, peopleUpSyncScopeRepository, peopleDownSyncScopeRepository, peopleSyncCache)
+                                      subjectsSyncStateProcessor: SubjectsSyncStateProcessor,
+                                      subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
+                                      subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
+                                      subjectsSyncCache: SubjectsSyncCache): SubjectsSyncManager =
+        SubjectsSyncManagerImpl(ctx, subjectsSyncStateProcessor, subjectsUpSyncScopeRepository, subjectsDownSyncScopeRepository, subjectsSyncCache)
 
     @Provides
     open fun provideSyncManager(
         sessionEventsSyncManager: SessionEventsSyncManager,
-        peopleSyncManager: PeopleSyncManager,
+        subjectsSyncManager: SubjectsSyncManager,
         imageUpSyncScheduler: ImageUpSyncScheduler
     ): SyncManager = SyncSchedulerImpl(
         sessionEventsSyncManager,
-        peopleSyncManager,
+        subjectsSyncManager,
         imageUpSyncScheduler
     )
 
     @Provides
-    open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: PeopleDownSyncScopeRepository): PeopleDownSyncWorkersBuilder =
-        PeopleDownSyncWorkersBuilderImpl(downSyncScopeRepository)
+    open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: SubjectsDownSyncScopeRepository): SubjectsDownSyncWorkersBuilder =
+        SubjectsDownSyncWorkersBuilderImpl(downSyncScopeRepository)
 
 
     @Provides
-    open fun providePeopleUpSyncWorkerBuilder(): PeopleUpSyncWorkersBuilder =
-        PeopleUpSyncWorkersBuilderImpl()
+    open fun providePeopleUpSyncWorkerBuilder(): SubjectsUpSyncWorkersBuilder =
+        SubjectsUpSyncWorkersBuilderImpl()
 
     @Provides
-    open fun providePeopleUpSyncDao(database: PeopleSyncStatusDatabase): PeopleUpSyncOperationLocalDataSource =
+    open fun providePeopleUpSyncDao(database: SubjectsSyncStatusDatabase): SubjectsUpSyncOperationLocalDataSource =
         database.upSyncOperationLocalDataSource
 
     @Provides
-    open fun providePeopleDownSyncDao(database: PeopleSyncStatusDatabase): PeopleDownSyncOperationLocalDataSource =
+    open fun providePeopleDownSyncDao(database: SubjectsSyncStatusDatabase): SubjectsDownSyncOperationLocalDataSource =
         database.downSyncOperationOperationDataSource
 
     @Provides
     open fun providePeopleUpSyncManager(ctx: Context,
-                                        peopleUpSyncWorkersBuilder: PeopleUpSyncWorkersBuilder): PeopleUpSyncExecutor =
-        PeopleUpSyncExecutorImpl(ctx, peopleUpSyncWorkersBuilder)
+                                        subjectsUpSyncWorkersBuilder: SubjectsUpSyncWorkersBuilder): SubjectsUpSyncExecutor =
+        SubjectsUpSyncExecutorImpl(ctx, subjectsUpSyncWorkersBuilder)
 
 
     @Provides
     open fun provideUpSyncScopeRepository(loginInfoManager: LoginInfoManager,
-                                          operationLocalDataSource: PeopleUpSyncOperationLocalDataSource): PeopleUpSyncScopeRepository =
-        PeopleUpSyncScopeRepositoryImpl(loginInfoManager, operationLocalDataSource)
+                                          operationLocalDataSource: SubjectsUpSyncOperationLocalDataSource): SubjectsUpSyncScopeRepository =
+        SubjectsUpSyncScopeRepositoryImpl(loginInfoManager, operationLocalDataSource)
 
     @Provides
-    open fun providePeopleSyncProgressCache(builder: EncryptedSharedPreferencesBuilder): PeopleSyncCache =
-        PeopleSyncCacheImpl(
+    open fun providePeopleSyncProgressCache(builder: EncryptedSharedPreferencesBuilder): SubjectsSyncCache =
+        SubjectsSyncCacheImpl(
             builder.buildEncryptedSharedPreferences(FILENAME_FOR_PROGRESSES_SHARED_PREFS),
             builder.buildEncryptedSharedPreferences(FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS)
         )
 
     @Provides
-    open fun providePeopleSyncSubMasterWorkersBuilder(): PeopleSyncSubMasterWorkersBuilder =
-        PeopleSyncSubMasterWorkersBuilderImpl()
+    open fun providePeopleSyncSubMasterWorkersBuilder(): SubjectsSyncSubMasterWorkersBuilder =
+        SubjectsSyncSubMasterWorkersBuilderImpl()
 }

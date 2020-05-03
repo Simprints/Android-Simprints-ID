@@ -1,18 +1,18 @@
 package com.simprints.id.commontesttools
 
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
-import com.simprints.id.data.db.person.domain.FaceSample
-import com.simprints.id.data.db.person.domain.FingerprintSample
-import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
+import com.simprints.id.data.db.subject.domain.FaceSample
+import com.simprints.id.data.db.subject.domain.FingerprintSample
+import com.simprints.id.data.db.subject.domain.Subject
 import java.util.*
 import kotlin.random.Random
 
 object PeopleGeneratorUtils {
 
     fun getRandomPeople(nPeople: Int,
-                        downSyncOp: PeopleDownSyncOperation,
-                        toSync: List<Boolean>): MutableList<Person> =
-        mutableListOf<Person>().also { fakePeople ->
+                        downSyncOp: SubjectsDownSyncOperation,
+                        toSync: List<Boolean>): MutableList<Subject> =
+        mutableListOf<Subject>().also { fakePeople ->
             repeat(nPeople) {
                 fakePeople.add(
                     getRandomPerson(
@@ -28,9 +28,9 @@ object PeopleGeneratorUtils {
                         projectId: String = UUID.randomUUID().toString(),
                         userId: String = UUID.randomUUID().toString(),
                         moduleId: String = UUID.randomUUID().toString(),
-                        toSync: Boolean = false): ArrayList<Person> {
+                        toSync: Boolean = false): ArrayList<Subject> {
 
-        return arrayListOf<Person>().also { list ->
+        return arrayListOf<Subject>().also { list ->
             repeat(numberOfPeople) {
                 list.add(getRandomPerson(
                     UUID.randomUUID().toString(),
@@ -49,11 +49,11 @@ object PeopleGeneratorUtils {
                         toSync: Boolean = false,
                         createdAt: Date = getRandomTime(),
                         updateAt: Date = getRandomTime(),
-                        fingerprintSamples: Array<FingerprintSample> = arrayOf(getRandomFingerprintSample(), getRandomFingerprintSample())): Person =
-        Person(
-            patientId = patientId,
+                        fingerprintSamples: Array<FingerprintSample> = arrayOf(getRandomFingerprintSample(), getRandomFingerprintSample())): Subject =
+        Subject(
+            subjectId = patientId,
             projectId = projectId,
-            userId = userId,
+            attendantId = userId,
             moduleId = moduleId,
             createdAt = if (!toSync) createdAt else null,
             updatedAt = if (!toSync) updateAt else null,

@@ -2,7 +2,7 @@ package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
 import com.simprints.face.exceptions.FaceUnexpectedException
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import java.io.Serializable
 import com.simprints.id.data.db.session.domain.models.events.OneToOneMatchEvent as CoreOneToOneMatchEvent
 
@@ -14,13 +14,13 @@ class OneToOneMatchEvent(startTime: Long,
     fun fromDomainToCore() = CoreOneToOneMatchEvent(
         startTime,
         endTime,
-        (query as PersonLocalDataSource.Query).extractVerifyId(),
+        (query as SubjectLocalDataSource.Query).extractVerifyId(),
         result?.fromDomainToCore()
     )
 }
 
 
-fun PersonLocalDataSource.Query.extractVerifyId() =
+fun SubjectLocalDataSource.Query.extractVerifyId() =
     personId
         ?: throw FaceUnexpectedException("null personId in candidate query when saving OneToOneMatchEvent")
 

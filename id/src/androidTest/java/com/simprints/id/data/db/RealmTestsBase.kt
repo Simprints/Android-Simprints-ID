@@ -4,9 +4,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.data.db.common.realm.PeopleRealmConfig
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.db.person.local.models.DbPerson
-import com.simprints.id.data.db.person.local.models.fromDomainToDb
-import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.subject.local.models.DbSubject
+import com.simprints.id.data.db.subject.local.models.fromDomainToDb
+import com.simprints.id.data.db.subject.domain.Subject
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File
@@ -33,18 +33,18 @@ open class RealmTestsBase {
         deleteRealmFiles(config)
     }
 
-    protected fun getFakePerson(): DbPerson = PeopleGeneratorUtils.getRandomPerson().fromDomainToDb()
+    protected fun getFakePerson(): DbSubject = PeopleGeneratorUtils.getRandomPerson().fromDomainToDb()
 
-    protected fun saveFakePerson(realm: Realm, fakePerson: DbPerson): DbPerson =
-        fakePerson.also { realm.executeTransaction { realm -> realm.insertOrUpdate(fakePerson) } }
+    protected fun saveFakePerson(realm: Realm, fakeSubject: DbSubject): DbSubject =
+        fakeSubject.also { realm.executeTransaction { realm -> realm.insertOrUpdate(fakeSubject) } }
 
-    protected fun saveFakePeople(realm: Realm, people: List<Person>): List<Person> =
-        people.also { realm.executeTransaction { realm -> realm.insertOrUpdate(people.map { person -> person.fromDomainToDb() }) } }
+    protected fun saveFakePeople(realm: Realm, subjects: List<Subject>): List<Subject> =
+        subjects.also { realm.executeTransaction { realm -> realm.insertOrUpdate(subjects.map { person -> person.fromDomainToDb() }) } }
 
-    protected fun DbPerson.deepEquals(other: DbPerson): Boolean = when {
-        this.patientId != other.patientId -> false
+    protected fun DbSubject.deepEquals(other: DbSubject): Boolean = when {
+        this.subjectId != other.subjectId -> false
         this.projectId != other.projectId -> false
-        this.userId != other.userId -> false
+        this.attendantId != other.attendantId -> false
         this.moduleId != other.moduleId -> false
         this.toSync != other.toSync -> false
         this.createdAt != other.createdAt -> false

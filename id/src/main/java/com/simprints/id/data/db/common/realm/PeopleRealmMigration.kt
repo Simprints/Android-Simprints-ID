@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.common.realm
 
 import com.simprints.id.data.db.common.realm.oldschemas.*
-import com.simprints.id.data.db.person.local.models.DbFaceSample
-import com.simprints.id.data.db.person.local.models.DbFingerprintSample
-import com.simprints.id.data.db.person.local.models.DbPerson
+import com.simprints.id.data.db.subject.local.models.DbFaceSample
+import com.simprints.id.data.db.subject.local.models.DbFingerprintSample
+import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.domain.Constants
 import io.realm.*
@@ -16,7 +16,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
     @RealmModule(classes = [
         DbFingerprintSample::class,
         DbFaceSample::class,
-        DbPerson::class,
+        DbSubject::class,
         DbProject::class
     ])
     class PeopleModule

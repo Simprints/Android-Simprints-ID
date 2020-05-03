@@ -1,10 +1,10 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.subject.domain.Subject
 
 interface EnrolmentHelper {
 
-    suspend fun saveAndUpload(person: Person)
-    fun registerEvent(person: Person)
+    suspend fun saveAndUpload(subject: Subject)
+    fun registerEvent(subject: Subject)
 
 }

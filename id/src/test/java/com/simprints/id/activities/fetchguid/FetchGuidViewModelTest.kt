@@ -3,8 +3,8 @@ package com.simprints.id.activities.fetchguid
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
-import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.SubjectFetchResult
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.testtools.TestApplication
@@ -32,7 +32,7 @@ import java.util.*
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class FetchGuidViewModelTest {
 
-    @MockK private lateinit var personRepository: PersonRepository
+    @MockK private lateinit var personRepository: SubjectRepository
     @MockK private lateinit var deviceManager: DeviceManager
     @MockK private lateinit var sessionRepository: SessionRepository
     @MockK private lateinit var timeHelper: TimeHelper
@@ -59,26 +59,26 @@ class FetchGuidViewModelTest {
 
     @Test
     fun fetchGuidSucceedsFromLocal_shouldReturnCorrectPersonSource() {
-        coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } returns PersonFetchResult(PeopleGeneratorUtils.getRandomPerson(), PersonFetchResult.PersonSource.LOCAL)
+        coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } returns SubjectFetchResult(PeopleGeneratorUtils.getRandomPerson(), SubjectFetchResult.SubjectSource.LOCAL)
 
         val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionRepository, timeHelper)
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
         val testObserver = viewModel.personFetch.testObserver()
 
-        assertThat(testObserver.observedValues).contains(PersonFetchResult.PersonSource.LOCAL)
+        assertThat(testObserver.observedValues).contains(SubjectFetchResult.SubjectSource.LOCAL)
     }
 
     @Test
     fun fetchGuidSucceedsFromRemote_shouldReturnCorrectPersonSource() {
-        coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } returns PersonFetchResult(PeopleGeneratorUtils.getRandomPerson(), PersonFetchResult.PersonSource.REMOTE)
+        coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } returns SubjectFetchResult(PeopleGeneratorUtils.getRandomPerson(), SubjectFetchResult.SubjectSource.REMOTE)
 
         val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionRepository, timeHelper)
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
         val testObserver = viewModel.personFetch.testObserver()
 
-        assertThat(testObserver.observedValues).contains(PersonFetchResult.PersonSource.REMOTE)
+        assertThat(testObserver.observedValues).contains(SubjectFetchResult.SubjectSource.REMOTE)
     }
 
     @Test
@@ -91,7 +91,7 @@ class FetchGuidViewModelTest {
 
         val testObserver = viewModel.personFetch.testObserver()
 
-        assertThat(testObserver.observedValues).contains(PersonFetchResult.PersonSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR)
+        assertThat(testObserver.observedValues).contains(SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR)
     }
 
     @Test
@@ -104,6 +104,6 @@ class FetchGuidViewModelTest {
 
         val testObserver = viewModel.personFetch.testObserver()
 
-        assertThat(testObserver.observedValues).contains(PersonFetchResult.PersonSource.NOT_FOUND_IN_LOCAL_AND_REMOTE)
+        assertThat(testObserver.observedValues).contains(SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE)
     }
 }

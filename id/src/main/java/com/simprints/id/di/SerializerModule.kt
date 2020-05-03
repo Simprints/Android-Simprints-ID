@@ -1,14 +1,14 @@
 package com.simprints.id.di
 
 import com.google.gson.Gson
-import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.ScannerGenerationsSerializer
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.id.tools.serializers.*
 import dagger.Module
@@ -24,7 +24,7 @@ class SerializerModule {
     @Provides @Singleton @Named("BooleanSerializer") fun provideBooleanSerializer(): Serializer<Boolean> = BooleanSerializer()
     @Provides @Singleton @Named("FingerIdentifierSerializer") fun provideFingerIdentifierSerializer(): Serializer<FingerIdentifier> = EnumSerializer(FingerIdentifier::class.java)
     @Provides @Singleton @Named("GroupSerializer") fun provideGroupSerializer(): Serializer<GROUP> = EnumSerializer(GROUP::class.java)
-    @Provides @Singleton @Named("PeopleDownSyncSettingSerializer") fun providePeopleDownSyncSettingSerializer(): Serializer<PeopleDownSyncSetting> = EnumSerializer(PeopleDownSyncSetting::class.java)
+    @Provides @Singleton @Named("PeopleDownSyncSettingSerializer") fun providePeopleDownSyncSettingSerializer(): Serializer<SubjectsDownSyncSetting> = EnumSerializer(SubjectsDownSyncSetting::class.java)
     @Provides @Singleton @Named("ModalitiesSerializer") fun provideModalSerializer(): Serializer<List<Modality>> = ModalitiesListSerializer()
     @Provides @Singleton fun provideGson(): Gson = SimJsonHelper.gson
 

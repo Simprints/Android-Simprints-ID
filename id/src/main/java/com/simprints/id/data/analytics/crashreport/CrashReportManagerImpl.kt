@@ -8,10 +8,10 @@ import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Compa
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PROJECT_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.USER_ID
-import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.SafeException
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 
 open class CrashReportManagerImpl: CrashReportManager {
 
@@ -60,8 +60,8 @@ open class CrashReportManagerImpl: CrashReportManager {
         crashlyticsInstance.setCustomKey(MODULE_IDS, moduleIds.toString())
     }
 
-    override fun setDownSyncTriggersCrashlyticsKey(peopleDownSyncSetting: PeopleDownSyncSetting) {
-        crashlyticsInstance.setCustomKey(PEOPLE_DOWN_SYNC_TRIGGERS, peopleDownSyncSetting.toString())
+    override fun setDownSyncTriggersCrashlyticsKey(subjectsDownSyncSetting: SubjectsDownSyncSetting) {
+        crashlyticsInstance.setCustomKey(PEOPLE_DOWN_SYNC_TRIGGERS, subjectsDownSyncSetting.toString())
     }
 
     override fun setSessionIdCrashlyticsKey(sessionId: String) {

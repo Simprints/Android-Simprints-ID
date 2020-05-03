@@ -11,14 +11,14 @@ import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSourceImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
-import com.simprints.id.data.db.person.*
-import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.person.local.PersonLocalDataSourceImpl
-import com.simprints.id.data.db.person.remote.EventRemoteDataSource
-import com.simprints.id.data.db.person.remote.EventRemoteDataSourceImpl
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
+import com.simprints.id.data.db.subject.*
+import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
+import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
+import com.simprints.id.data.db.subject.remote.EventRemoteDataSourceImpl
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -28,8 +28,8 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
+import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
+import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
 import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
@@ -80,36 +80,36 @@ open class DataModule {
     @Provides
     open fun providePersonRepositoryUpSyncHelper(
         loginInfoManager: LoginInfoManager,
-        personLocalDataSource: PersonLocalDataSource,
+        subjectLocalDataSource: SubjectLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
-        peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
+        subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
         preferencesManager: PreferencesManager,
-        peopleSyncCache: PeopleSyncCache) : PersonRepositoryUpSyncHelper =
-        PersonRepositoryUpSyncHelperImpl(loginInfoManager, personLocalDataSource, eventRemoteDataSource,
-                peopleUpSyncScopeRepository, preferencesManager.modalities)
+        subjectsSyncCache: SubjectsSyncCache) : SubjectRepositoryUpSyncHelper =
+        SubjectRepositoryUpSyncHelperImpl(loginInfoManager, subjectLocalDataSource, eventRemoteDataSource,
+                subjectsUpSyncScopeRepository, preferencesManager.modalities)
 
     @Provides
-    open fun providePersonRepositoryDownSyncHelper(personLocalDataSource: PersonLocalDataSource,
+    open fun providePersonRepositoryDownSyncHelper(subjectLocalDataSource: SubjectLocalDataSource,
                                                    eventRemoteDataSource: EventRemoteDataSource,
-                                                   downSyncScopeRepository: PeopleDownSyncScopeRepository,
-                                                   timeHelper: TimeHelper): PersonRepositoryDownSyncHelper =
-        PersonRepositoryDownSyncHelperImpl(personLocalDataSource, eventRemoteDataSource, downSyncScopeRepository, timeHelper)
+                                                   downSyncScopeRepository: SubjectsDownSyncScopeRepository,
+                                                   timeHelper: TimeHelper): SubjectRepositoryDownSyncHelper =
+        SubjectRepositoryDownSyncHelperImpl(subjectLocalDataSource, eventRemoteDataSource, downSyncScopeRepository, timeHelper)
 
     @Provides
     open fun providePersonRepository(
-        personLocalDataSource: PersonLocalDataSource,
+        subjectLocalDataSource: SubjectLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
-        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
-        peopleUpSyncExecutor: PeopleUpSyncExecutor,
-        personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper,
-        personRepositoryDownSyncHelper: PersonRepositoryDownSyncHelper
-    ): PersonRepository = PersonRepositoryImpl(
+        subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
+        subjectsUpSyncExecutor: SubjectsUpSyncExecutor,
+        subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
+        subjectRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper
+    ): SubjectRepository = SubjectRepositoryImpl(
         eventRemoteDataSource,
-        personLocalDataSource,
-        peopleDownSyncScopeRepository,
-        peopleUpSyncExecutor,
-        personRepositoryUpSyncHelper,
-        personRepositoryDownSyncHelper
+        subjectLocalDataSource,
+        subjectsDownSyncScopeRepository,
+        subjectsUpSyncExecutor,
+        subjectRepositoryUpSyncHelper,
+        subjectRepositoryDownSyncHelper
     )
 
     @Provides
@@ -119,7 +119,7 @@ open class DataModule {
         ctx: Context,
         secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
         loginInfoManager: LoginInfoManager
-    ): PersonLocalDataSource = PersonLocalDataSourceImpl(
+    ): SubjectLocalDataSource = SubjectLocalDataSourceImpl(
         ctx,
         secureLocalDbKeyProvider,
         loginInfoManager
@@ -127,8 +127,8 @@ open class DataModule {
 
     @Provides
     open fun provideFingerprintRecordLocalDataSource(
-        personLocalDataSource: PersonLocalDataSource
-    ): FingerprintIdentityLocalDataSource = personLocalDataSource
+            subjectLocalDataSource: SubjectLocalDataSource
+    ): FingerprintIdentityLocalDataSource = subjectLocalDataSource
 
     @Provides
     open fun provideImageRepository(

@@ -2,24 +2,24 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import androidx.work.WorkManager
-import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactory
-import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncOperationLocalDataSource
-import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
-import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncOperationLocalDataSource
-import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationFactory
+import com.simprints.id.data.db.subjects_sync.down.local.SubjectsDownSyncOperationLocalDataSource
+import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.up.local.SubjectsUpSyncOperationLocalDataSource
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.SyncModule
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessor
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
+import com.simprints.id.services.scheduledSync.subjects.down.controllers.SubjectsDownSyncWorkersBuilder
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncStateProcessor
+import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
+import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
+import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.testtools.common.di.DependencyRule
 import javax.inject.Singleton
@@ -42,14 +42,14 @@ class TestSyncModule(
     override fun provideDownSyncScopeRepository(
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
-        syncStatusDatabase: PeopleSyncStatusDatabase,
-        peopleDownSyncOperationFactory: PeopleDownSyncOperationFactory
-    ): PeopleDownSyncScopeRepository = peopleDownSyncScopeRepositoryRule.resolveDependency {
+        syncStatusDatabase: SubjectsSyncStatusDatabase,
+        subjectsDownSyncOperationFactory: SubjectsDownSyncOperationFactory
+    ): SubjectsDownSyncScopeRepository = peopleDownSyncScopeRepositoryRule.resolveDependency {
         super.provideDownSyncScopeRepository(
             loginInfoManager,
             preferencesManager,
             syncStatusDatabase,
-            peopleDownSyncOperationFactory)
+            subjectsDownSyncOperationFactory)
     }
 
     @Singleton
@@ -59,73 +59,73 @@ class TestSyncModule(
     @Singleton
     override fun providePeopleSyncStateProcessor(
         ctx: Context,
-        peopleSyncCache: PeopleSyncCache,
-        personRepository: PersonRepository
-    ): PeopleSyncStateProcessor = peopleSyncStateProcessor.resolveDependency {
-        super.providePeopleSyncStateProcessor(ctx, peopleSyncCache, personRepository)
+        subjectsSyncCache: SubjectsSyncCache,
+        personRepository: SubjectRepository
+    ): SubjectsSyncStateProcessor = peopleSyncStateProcessor.resolveDependency {
+        super.providePeopleSyncStateProcessor(ctx, subjectsSyncCache, personRepository)
     }
 
     @Singleton
     override fun providePeopleSyncManager(
         ctx: Context,
-        peopleSyncStateProcessor: PeopleSyncStateProcessor,
-        peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
-        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
-        peopleSyncCache: PeopleSyncCache
-    ): PeopleSyncManager = peopleSyncManagerRule.resolveDependency {
-        super.providePeopleSyncManager(ctx, peopleSyncStateProcessor, peopleUpSyncScopeRepository, peopleDownSyncScopeRepository, peopleSyncCache)
+        subjectsSyncStateProcessor: SubjectsSyncStateProcessor,
+        subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
+        subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
+        subjectsSyncCache: SubjectsSyncCache
+    ): SubjectsSyncManager = peopleSyncManagerRule.resolveDependency {
+        super.providePeopleSyncManager(ctx, subjectsSyncStateProcessor, subjectsUpSyncScopeRepository, subjectsDownSyncScopeRepository, subjectsSyncCache)
     }
 
     @Singleton
     override fun provideSyncManager(
         sessionEventsSyncManager: SessionEventsSyncManager,
-        peopleSyncManager: PeopleSyncManager,
+        subjectsSyncManager: SubjectsSyncManager,
         imageUpSyncScheduler: ImageUpSyncScheduler
     ): SyncManager = syncManagerRule.resolveDependency {
         super.provideSyncManager(
             sessionEventsSyncManager,
-            peopleSyncManager,
+            subjectsSyncManager,
             imageUpSyncScheduler
         )
     }
 
     @Singleton
     override fun provideDownSyncWorkerBuilder(
-        downSyncScopeRepository: PeopleDownSyncScopeRepository
-    ): PeopleDownSyncWorkersBuilder = peopleDownSyncWorkersBuilderRule.resolveDependency {
+        downSyncScopeRepository: SubjectsDownSyncScopeRepository
+    ): SubjectsDownSyncWorkersBuilder = peopleDownSyncWorkersBuilderRule.resolveDependency {
         super.provideDownSyncWorkerBuilder(downSyncScopeRepository)
     }
 
     @Singleton
-    override fun providePeopleUpSyncWorkerBuilder(): PeopleUpSyncWorkersBuilder =
+    override fun providePeopleUpSyncWorkerBuilder(): SubjectsUpSyncWorkersBuilder =
         peopleUpSyncWorkersBuilderRule.resolveDependency {
             super.providePeopleUpSyncWorkerBuilder()
         }
 
     @Singleton
-    override fun providePeopleUpSyncDao(database: PeopleSyncStatusDatabase): PeopleUpSyncOperationLocalDataSource =
+    override fun providePeopleUpSyncDao(database: SubjectsSyncStatusDatabase): SubjectsUpSyncOperationLocalDataSource =
         peopleUpSyncDaoRule.resolveDependency { super.providePeopleUpSyncDao(database) }
 
     @Singleton
     override fun providePeopleDownSyncDao(
-        database: PeopleSyncStatusDatabase
-    ): PeopleDownSyncOperationLocalDataSource = peopleDownSyncDaoRule.resolveDependency {
+        database: SubjectsSyncStatusDatabase
+    ): SubjectsDownSyncOperationLocalDataSource = peopleDownSyncDaoRule.resolveDependency {
         super.providePeopleDownSyncDao(database)
     }
 
     @Singleton
     override fun providePeopleUpSyncManager(
         ctx: Context,
-        peopleUpSyncWorkersBuilder: PeopleUpSyncWorkersBuilder
-    ): PeopleUpSyncExecutor = peopleUpSyncManagerRule.resolveDependency {
-        super.providePeopleUpSyncManager(ctx, peopleUpSyncWorkersBuilder)
+        subjectsUpSyncWorkersBuilder: SubjectsUpSyncWorkersBuilder
+    ): SubjectsUpSyncExecutor = peopleUpSyncManagerRule.resolveDependency {
+        super.providePeopleUpSyncManager(ctx, subjectsUpSyncWorkersBuilder)
     }
 
     @Singleton
     override fun provideUpSyncScopeRepository(
         loginInfoManager: LoginInfoManager,
-        operationLocalDataSource: PeopleUpSyncOperationLocalDataSource
-    ): PeopleUpSyncScopeRepository = peopleUpSyncScopeRepositoryRule.resolveDependency {
+        operationLocalDataSource: SubjectsUpSyncOperationLocalDataSource
+    ): SubjectsUpSyncScopeRepository = peopleUpSyncScopeRepositoryRule.resolveDependency {
         super.provideUpSyncScopeRepository(loginInfoManager, operationLocalDataSource)
     }
 
