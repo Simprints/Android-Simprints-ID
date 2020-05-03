@@ -9,7 +9,6 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncProgress
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
@@ -21,9 +20,11 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -54,14 +55,15 @@ class PeopleDownSyncDownloaderWorkerTest {
         app.component = mockk(relaxed = true)
         val correctInputData = SimJsonHelper.gson.toJson(projectSyncOp)
         peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
+
         coEvery { peopleDownSyncDownloaderWorker.downSyncScopeRepository.refreshDownSyncOperationFromDb(any()) } returns null
+        peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask = mockk(relaxed = true)
     }
 
     @Test
     fun worker_shouldParseInputDataCorrectly() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
             doWork()
-            coEvery { personRepository.performDownloadWithProgress(this@runBlocking, any()) }
         }
     }
 
@@ -69,24 +71,19 @@ class PeopleDownSyncDownloaderWorkerTest {
     fun worker_shouldExecuteTheTask() {
         runBlocking {
             with(peopleDownSyncDownloaderWorker) {
-                coEvery { peopleSyncCache.readProgress(any()) } returns 0
-
-                coEvery { personRepository.performDownloadWithProgress(this@runBlocking, any()) } returns produce { PeopleDownSyncProgress(0) }
+                coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any(), any(), any(), any()) } returns 0
 
                 doWork()
 
-                coVerify { personRepository.performDownloadWithProgress(this@runBlocking, any()) }
                 verify { resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to 0)) }
-
             }
         }
     }
 
-
     @Test
     fun worker_failForCloudIntegration_shouldFail() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
-            coEvery { personRepository.performDownloadWithProgress(this@runBlocking, any()) } throws SyncCloudIntegrationException("Cloud integration", Throwable())
+            coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any(), any(), any(), any()) } throws SyncCloudIntegrationException("Cloud integration", Throwable())
 
             doWork()
 
@@ -97,7 +94,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     @Test
     fun worker_failForNetworkIssue_shouldRetry() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
-            coEvery { personRepository.performDownloadWithProgress(this@runBlocking, any()) } throws Throwable("Network Exception")
+            coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any(), any(), any(), any()) } throws Throwable("Network Exception")
 
             doWork()
 
@@ -106,8 +103,8 @@ class PeopleDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_inputDataIsWrong_shouldFail() = runBlocking<Unit> {
-        peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to ""))
+    fun worker_inputDataIsWrong_shouldFail() = runBlocking {
+        peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to "error"))
         with(peopleDownSyncDownloaderWorker) {
 
             doWork()
