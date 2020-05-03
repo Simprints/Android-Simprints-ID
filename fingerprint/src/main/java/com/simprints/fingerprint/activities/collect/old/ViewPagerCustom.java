@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collect;
+package com.simprints.fingerprint.activities.collect.old;
 
 import android.content.Context;
 import android.util.AttributeSet;

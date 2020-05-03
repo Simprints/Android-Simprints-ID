@@ -1,10 +1,10 @@
-package com.simprints.fingerprint.activities.collect
+package com.simprints.fingerprint.activities.collect.old
 
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsFingerDisplayHelper
+import com.simprints.fingerprint.activities.collect.old.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 import org.koin.android.ext.android.inject

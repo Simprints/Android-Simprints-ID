@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collect
+package com.simprints.fingerprint.activities.collect.old
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,9 +9,9 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.collect.models.Finger
-import com.simprints.fingerprint.activities.collect.models.FingerRes
-import com.simprints.fingerprint.activities.collect.models.FingerStatus
+import com.simprints.fingerprint.activities.collect.old.models.Finger
+import com.simprints.fingerprint.activities.collect.old.models.FingerRes
+import com.simprints.fingerprint.activities.collect.old.models.FingerStatus
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.tools.extensions.activityIsPresentAndFragmentIsAdded

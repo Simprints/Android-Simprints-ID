@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collect.models
+package com.simprints.fingerprint.activities.collect.old.models
 
 data class ScanConfigFingerEntry(
     val config: FingerConfig = FingerConfig.OPTIONAL,

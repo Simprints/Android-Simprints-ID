@@ -1,11 +1,11 @@
-package com.simprints.fingerprint.activities.collect.fingers
+package com.simprints.fingerprint.activities.collect.old.fingers
 
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsContract
-import com.simprints.fingerprint.activities.collect.FingerPageAdapter
-import com.simprints.fingerprint.activities.collect.models.DefaultScanConfig
-import com.simprints.fingerprint.activities.collect.models.Finger
+import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsContract
+import com.simprints.fingerprint.activities.collect.old.FingerPageAdapter
+import com.simprints.fingerprint.activities.collect.old.models.DefaultScanConfig
+import com.simprints.fingerprint.activities.collect.old.models.Finger
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
