@@ -9,7 +9,9 @@ import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
+import com.simprints.core.tools.extentions.showToast
 import com.simprints.id.Application
+import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
@@ -20,7 +22,6 @@ import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.toast
 import javax.inject.Inject
 
 
@@ -52,15 +53,17 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
     }
 
     private fun setPreferenceListeners() {
-        getDeviceIdPreference().setOnPreferenceClickListener {
-            with(activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager) {
-                val clip = ClipData.newPlainText("deviceID", deviceId)
-                primaryClip = clip
+        if (BuildConfig.DEBUG) {
+            getDeviceIdPreference().setOnPreferenceClickListener {
+                with(activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager) {
+                    val clip = ClipData.newPlainText("deviceID", deviceId)
+                    primaryClip = clip
+                }
+
+                context.showToast("Your Device Id $deviceId was copied to the clipboard")
+
+                return@setOnPreferenceClickListener true
             }
-
-            toast("Your Device Id $deviceId was copied to the clipboard")
-
-            return@setOnPreferenceClickListener true
         }
     }
 
