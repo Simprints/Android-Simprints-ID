@@ -10,8 +10,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.integration.AppConfirmIdentityRequest
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
-import com.simprints.moduleapi.app.requests.confirmations.IAppConfirmation
 import com.simprints.clientapi.integration.value
+import com.simprints.moduleapi.app.requests.IAppRequest
 import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.Test
@@ -33,11 +33,12 @@ class StandardConfirmationIdentityRequestTest : BaseStandardClientApiTest() {
 
         val expectedAppRequest = AppConfirmIdentityRequest(
             projectIdField.value(),
+            userIdField.value(),
             sessionIdField.value(),
             selectedGuidField.value())
 
         Intents.intended(IntentMatchers.hasAction(APP_CONFIRM_ACTION))
-        Intents.intended(IntentMatchers.hasExtras(BundleMatchers.hasEntry(IAppConfirmation.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
+        Intents.intended(IntentMatchers.hasExtras(BundleMatchers.hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
     }
 
     @Test

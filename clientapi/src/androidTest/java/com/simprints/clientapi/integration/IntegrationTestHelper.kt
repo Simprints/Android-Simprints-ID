@@ -1,9 +1,6 @@
 package com.simprints.clientapi.integration
 
-import com.simprints.moduleapi.app.requests.IAppEnrollRequest
-import com.simprints.moduleapi.app.requests.IAppIdentifyRequest
-import com.simprints.moduleapi.app.requests.IAppConfirmIdentityRequest
-import com.simprints.moduleapi.app.requests.IAppVerifyRequest
+import com.simprints.moduleapi.app.requests.*
 import com.simprints.moduleapi.app.responses.*
 import kotlinx.android.parcel.Parcelize
 
@@ -60,6 +57,15 @@ internal data class AppEnrollRequest(
     override val moduleId: String,
     override val metadata: String
 ) : IAppEnrollRequest
+
+@Parcelize
+internal data class AppEnrolLastBiometricsRequest(
+    override val projectId: String,
+    override val userId: String,
+    override val moduleId: String,
+    override val sessionId: String,
+    override val metadata: String
+) : IAppEnrolLastBiometricsRequest
 
 @Parcelize
 internal data class AppIdentifyRequest(

@@ -55,6 +55,7 @@
             android:launchMode="standard"
             android:screenOrientation="portrait">
             <intent-filter>
+                <action android:name="com.simprints.clientapp.REGISTER_LAST_BIOMETRICS" />
                 <action android:name="com.simprints.clientapp.REGISTER" />
                 <action android:name="com.simprints.clientapp.IDENTIFY" />
                 <action android:name="com.simprints.clientapp.VERIFY" />

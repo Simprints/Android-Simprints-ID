@@ -41,7 +41,7 @@ class CommCarePresenter(
 
         runIfDeviceIsNotRooted {
             when (action) {
-                Register -> processEnrollRequest()
+                Enrol -> processEnrollRequest()
                 Identify -> processIdentifyRequest()
                 Verify -> processVerifyRequest()
                 ConfirmIdentity -> checkAndProcessSessionId()

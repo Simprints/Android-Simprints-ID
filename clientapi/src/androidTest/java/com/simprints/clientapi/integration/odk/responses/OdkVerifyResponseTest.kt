@@ -27,7 +27,7 @@ class OdkVerifyResponseTest : BaseOdkClientApiTest() {
         mockAppModuleResponse(appVerifyResponse, APP_VERIFICATION_ACTION)
 
         val scenario =
-            ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply {
+            ActivityScenario.launch<OdkActivity>(odkBaseFlowIntentRequest.apply {
                 action = ODK_VERIFY_ACTION
                 putExtra(verifyGuidField.key(), verifyGuidField.value())
             })

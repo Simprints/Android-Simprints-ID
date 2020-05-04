@@ -44,7 +44,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            Register,
+            Enrol,
             mockSessionManagerToCreateSession(),
             mockSharedPrefs(),
             mockk(),
@@ -136,7 +136,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            Register,
+            Enrol,
             sessionEventsManagerMock,
             mockSharedPrefs(),
             mockk(),

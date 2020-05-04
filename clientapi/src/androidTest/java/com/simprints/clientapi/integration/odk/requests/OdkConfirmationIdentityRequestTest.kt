@@ -11,7 +11,7 @@ import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.integration.AppConfirmIdentityRequest
 import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
 import com.simprints.clientapi.integration.value
-import com.simprints.moduleapi.app.requests.confirmations.IAppConfirmation
+import com.simprints.moduleapi.app.requests.IAppRequest
 import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.Test
@@ -33,11 +33,12 @@ class OdkConfirmationIdentityRequestTest : BaseOdkClientApiTest() {
 
         val expectedAppRequest = AppConfirmIdentityRequest(
             projectIdField.value(),
+            userIdField.value(),
             sessionIdField.value(),
             selectedGuidField.value())
 
         Intents.intended(IntentMatchers.hasAction(APP_CONFIRM_ACTION))
-        Intents.intended(IntentMatchers.hasExtras(BundleMatchers.hasEntry(IAppConfirmation.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
+        Intents.intended(IntentMatchers.hasExtras(BundleMatchers.hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
     }
 
     @Test

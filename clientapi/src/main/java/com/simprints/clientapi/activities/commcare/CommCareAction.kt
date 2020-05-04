@@ -1,12 +1,12 @@
 package com.simprints.clientapi.activities.commcare
 
-sealed class CommCareAction {
-    object Register : CommCareAction()
-    object Verify : CommCareAction()
-    object Identify : CommCareAction()
-    object ConfirmIdentity : CommCareAction()
+sealed class CommCareAction(val action: String?) {
+    object Enrol : CommCareAction(ACTION_REGISTER)
+    object Verify : CommCareAction(ACTION_IDENTIFY)
+    object Identify : CommCareAction(ACTION_VERIFY)
+    object ConfirmIdentity : CommCareAction(ACTION_CONFIRM_IDENTITY)
 
-    object Invalid : CommCareAction()
+    object Invalid : CommCareAction(null)
 
     companion object {
         private const val PACKAGE_NAME = "com.simprints.commcare"
@@ -17,7 +17,7 @@ sealed class CommCareAction {
 
         fun buildCommCareAction(action: String?): CommCareAction =
             when (action) {
-                ACTION_REGISTER -> Register
+                ACTION_REGISTER -> Enrol
                 ACTION_IDENTIFY -> Identify
                 ACTION_VERIFY -> Verify
                 ACTION_CONFIRM_IDENTITY -> ConfirmIdentity

@@ -11,9 +11,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.integration.AppEnrollRequest
 import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
-import com.simprints.moduleapi.app.requests.IAppRequest
-import com.simprints.clientapi.integration.key
 import com.simprints.clientapi.integration.value
+import com.simprints.moduleapi.app.requests.IAppRequest
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
 import org.junit.Test
@@ -32,7 +31,7 @@ class OdkEnrolRequestTest : BaseOdkClientApiTest() {
 
     @Test
     fun callingAppSendsAnEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = ODK_ENROL_ACTION })
+        ActivityScenario.launch<OdkActivity>(odkBaseFlowIntentRequest.apply { action = ODK_ENROL_ACTION })
 
         val expectedAppRequest = AppEnrollRequest(
             projectIdField.value(),
@@ -46,13 +45,13 @@ class OdkEnrolRequestTest : BaseOdkClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<OdkActivity>(makeIntentRequestSuspicious(odkBaseIntentRequest).apply { action = ODK_ENROL_ACTION })
+        ActivityScenario.launch<OdkActivity>(makeIntentRequestSuspicious(odkBaseFlowIntentRequest).apply { action = ODK_ENROL_ACTION })
         intended(hasAction(APP_ENROL_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidEnrolRequest_shouldNotLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<OdkActivity>(makeIntentRequestInvalid(odkBaseIntentRequest).apply { action = ODK_ENROL_ACTION })
+        ActivityScenario.launch<OdkActivity>(makeIntentRequestInvalid(odkBaseFlowIntentRequest).apply { action = ODK_ENROL_ACTION })
         intended(not(hasAction(APP_ENROL_ACTION)), times(2))
     }
 }
