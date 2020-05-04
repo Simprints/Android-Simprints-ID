@@ -11,10 +11,7 @@ import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
-import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
-import com.simprints.clientapi.requestFactories.EnrollRequestFactory
-import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
-import com.simprints.clientapi.requestFactories.VerifyRequestFactory
+import com.simprints.clientapi.requestFactories.*
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
 import com.simprints.testtools.unit.BaseUnitTestConfig
@@ -106,6 +103,22 @@ class LibSimprintsPresenterTest {
         ).apply { runBlocking { start() } }
 
         verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(STANDARD)) }
+    }
+
+    @Test
+    fun startPresenterForEnrolLastBiometrics_ShouldRequestEnrolLastBiometrics() {
+        val enrolLastBiometricsExtractor = EnrolLastBiometricsFactory.getMockExtractor()
+        every { view.enrolLastBiometricsExtractor } returns enrolLastBiometricsExtractor
+
+        LibSimprintsPresenter(
+            view,
+            EnrolLastBiometrics,
+            mockSessionManagerToCreateSession(),
+            mockk(),
+            mockk()
+        ).apply { runBlocking { start() } }
+
+        verify(exactly = 1) { view.sendSimprintsRequest(EnrolLastBiometricsFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.activities.odk.OdkAction.*
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.ODK
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
@@ -10,10 +11,7 @@ import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
-import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
-import com.simprints.clientapi.requestFactories.EnrollRequestFactory
-import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
-import com.simprints.clientapi.requestFactories.VerifyRequestFactory
+import com.simprints.clientapi.requestFactories.*
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.coEvery
 import io.mockk.every
@@ -159,6 +157,22 @@ class OdkPresenterTest {
         }
 
         verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(ODK)) }
+    }
+
+    @Test
+    fun startPresenterForEnrolLastBiometrics_ShouldRequestEnrolLastBiometrics() {
+        val enrolLastBiometricsExtractor = EnrolLastBiometricsFactory.getMockExtractor()
+        every { view.enrolLastBiometricsExtractor } returns enrolLastBiometricsExtractor
+
+        OdkPresenter(
+            view,
+            EnrolLastBiometrics,
+            mockSessionManagerToCreateSession(),
+            mockk(),
+            mockk()
+        ).apply { runBlocking { start() } }
+
+        verify(exactly = 1) { view.sendSimprintsRequest(EnrolLastBiometricsFactory.getValidSimprintsRequest(IntegrationInfo.ODK)) }
     }
 
     private fun mockSessionManagerToCreateSession() = mockk<ClientApiSessionEventsManager>().apply {
