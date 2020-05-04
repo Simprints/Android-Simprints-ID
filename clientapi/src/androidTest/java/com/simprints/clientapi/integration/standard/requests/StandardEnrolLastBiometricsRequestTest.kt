@@ -9,7 +9,8 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
-import com.simprints.clientapi.integration.AppEnrollRequest
+import com.simprints.clientapi.integration.AppEnrolLastBiometricsRequest
+import com.simprints.clientapi.integration.key
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.clientapi.integration.value
 import com.simprints.moduleapi.app.requests.IAppRequest
@@ -20,38 +21,42 @@ import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4::class)
-class StandardEnrolRequestTest : BaseStandardClientApiTest() {
+class StandardEnrolLastBiometricsRequestTest : BaseStandardClientApiTest() {
 
     @Before
     override fun setUp() {
         super.setUp()
         val intentResultOk = ActivityResult(Activity.RESULT_OK, null)
-        intending(hasAction(APP_ENROL_ACTION)).respondWith(intentResultOk)
+        intending(hasAction(APP_ENROL_LAST_BIOMETRICS_ACTION)).respondWith(intentResultOk)
     }
 
     @Test
-    fun callingAppSendsAnEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardBaseFlowIntentRequest.apply { action = STANDARD_ENROL_ACTION })
+    fun callingAppSendsAnEnrolLastBiometricsRequest_shouldLaunchAnAppEnrolLastBiometricsRequest() {
+        ActivityScenario.launch<LibSimprintsActivity>(standardBaseFlowIntentRequest.apply {
+            action = STANDARD_ENROL_LAST_BIOMETRICS_ACTION
+            putExtra(sessionIdField.key(), sessionIdField.value())
+        })
 
-        val expectedAppRequest = AppEnrollRequest(
+        val expectedAppRequest = AppEnrolLastBiometricsRequest(
             projectIdField.value(),
             userIdField.value(),
             moduleIdField.value(),
+            sessionIdField.value(),
             metadataField.value())
 
-        intended(hasAction(APP_ENROL_ACTION))
+        intended(hasAction(APP_ENROL_LAST_BIOMETRICS_ACTION))
         intended(hasExtras(hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
     }
 
     @Test
     fun callingAppSendsASuspiciousEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestSuspicious(standardBaseFlowIntentRequest).apply { action = STANDARD_ENROL_ACTION })
-        intended(hasAction(APP_ENROL_ACTION))
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestSuspicious(standardBaseFlowIntentRequest).apply { action = STANDARD_ENROL_LAST_BIOMETRICS_ACTION })
+        intended(hasAction(APP_ENROL_LAST_BIOMETRICS_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidEnrolRequest_shouldNotLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestInvalid(standardBaseFlowIntentRequest).apply { action = STANDARD_ENROL_ACTION })
-        intended(not(hasAction(APP_ENROL_ACTION)), times(2))
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestInvalid(standardBaseFlowIntentRequest).apply { action = STANDARD_ENROL_LAST_BIOMETRICS_ACTION })
+        intended(not(hasAction(APP_ENROL_LAST_BIOMETRICS_ACTION)), times(2))
     }
 }
