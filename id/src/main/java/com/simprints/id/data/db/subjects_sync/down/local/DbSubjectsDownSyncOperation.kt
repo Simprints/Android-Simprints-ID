@@ -9,7 +9,7 @@ import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperat
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationResult.DownSyncState
 import com.simprints.id.domain.modality.Modes
 
-@Entity(tableName = "DbPeopleDownSyncOperation")
+@Entity(tableName = "DbSubjectsDownSyncOperation")
 @Keep
 data class DbSubjectsDownSyncOperation(
     @PrimaryKey var id: DbPeopleDownSyncOperationKey,
