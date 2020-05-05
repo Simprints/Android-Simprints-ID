@@ -30,6 +30,9 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val CONFIRM_IDENTITY_ACTION = "com.simprints.simodkadapter.CONFIRM_IDENTITY"
     }
 
+    //For some reason, Survey CTO sends the callback field in the callout Intent.
+    //Because SID doesn't expect these fields, the intent is marked as suspicious.
+    //Added these fields as "acceptable", so a Suspicious event is not generated.
     private val acceptableExtras = listOf(
         ODK_REGISTRATION_ID_KEY,
         ODK_GUIDS_KEY,
