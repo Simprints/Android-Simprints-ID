@@ -24,8 +24,7 @@ class QrCaptureActivityAndroidTest {
 
     @get:Rule var grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(CAMERA)
 
-    var mockCameraHelper: CameraHelper = mockk()
-
+    @MockK lateinit var mockCameraHelper: CameraHelper
     @MockK lateinit var mockQrPreviewBuilder: QrPreviewBuilder
     @MockK lateinit var mockQrCodeProducer: QrCodeProducer
     @MockK lateinit var mockChannel: Channel<String>
