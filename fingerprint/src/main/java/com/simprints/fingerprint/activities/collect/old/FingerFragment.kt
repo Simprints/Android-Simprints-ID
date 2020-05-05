@@ -4,21 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.core.content.ContextCompat.getColor
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
 import com.simprints.fingerprint.activities.collect.domain.Finger
-import com.simprints.fingerprint.activities.collect.old.models.FingerRes
-import com.simprints.fingerprint.activities.collect.resources.directionTextColour
-import com.simprints.fingerprint.activities.collect.resources.directionTextId
-import com.simprints.fingerprint.activities.collect.resources.resultTextColour
-import com.simprints.fingerprint.activities.collect.resources.resultTextId
+import com.simprints.fingerprint.activities.collect.resources.*
+import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.tools.extensions.activityIsPresentAndFragmentIsAdded
+import kotlinx.android.synthetic.main.fragment_finger.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
@@ -30,69 +24,49 @@ class FingerFragment : FingerprintFragment() {
     private val fingerprintPreferencesManager: FingerprintPreferencesManager by inject()
 
     lateinit var finger: Finger
-    private lateinit var fingerImage: ImageView
-    private lateinit var fingerResultText: TextView
-    private lateinit var fingerDirectionText: TextView
-    private lateinit var fingerNumberText: TextView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_finger, container, false)
-
         finger = arguments?.get(FINGER_ARG) as Finger
-
-        FingerRes.setFingerRes()
-
-        fingerImage = view.findViewById(R.id.fingerImage)
-        fingerResultText = view.findViewById(R.id.fingerResultText)
-        fingerDirectionText = view.findViewById(R.id.fingerDirectionText)
-        fingerNumberText = view.findViewById(R.id.fingerNumberText)
-
-        if (activityIsPresentAndFragmentIsAdded()) {
-            updateOrHideFingerImageAccordingToSettings()
-            updateTextAccordingToStatus()
-        }
-
-        // TODO : Start listening to updates
-
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        vm.state.fragmentObserveWith {
+            updateOrHideFingerImageAccordingToSettings()
+            updateFingerNameText()
+            it.updateFingerResultText()
+            it.updateFingerDirectionText()
+        }
     }
 
     private fun updateOrHideFingerImageAccordingToSettings() {
         if (fingerprintPreferencesManager.fingerImagesExist) {
-            updateFingerImageAccordingToStatus()
+            fingerImage.visibility = View.VISIBLE
+            fingerImage.setImageResource(finger.fingerDrawable())
         } else {
             fingerImage.visibility = View.INVISIBLE
         }
     }
 
-    private fun updateFingerImageAccordingToStatus() {
-        fingerImage.setImageResource(FingerRes.get(finger).drawableId)
-        fingerImage.visibility = View.VISIBLE
+    private fun updateFingerNameText() {
+        fingerNumberText.text = androidResourcesHelper.getString(finger.nameTextId())
+        fingerNumberText.setTextColor(resources.getColor(finger.nameTextColour(), null))
     }
 
-    fun updateTextAccordingToStatus() {
-        updateFingerResultText()
-        updateFingerNumberText()
-        updateFingerDirectionText()
-    }
-
-    private fun updateFingerResultText() {
-        with(vm.state.value?.fingerStates?.get(finger) ?: TODO("Oops")) {
+    private fun CollectFingerprintsState.updateFingerResultText() {
+        with(fingerStates.getValue(finger)) {
             fingerResultText.text = androidResourcesHelper.getString(resultTextId())
-            fingerResultText.setTextColor(getColor(requireContext(), resultTextColour()))
+            fingerResultText.setTextColor(resources.getColor(resultTextColour(), null))
         }
     }
 
-    private fun updateFingerNumberText() {
-        fingerNumberText.text = androidResourcesHelper.getString(FingerRes.get(finger).nameId)
-        fingerNumberText.setTextColor(getColor(requireContext(), R.color.simprints_blue))
-    }
-
-    private fun updateFingerDirectionText() {
-        val isLastFinger = vm.state.value?.isOnLastFinger() ?: TODO("Oops")
-        with(vm.state.value?.fingerStates?.get(finger) ?: TODO("Oops")) {
-            fingerDirectionText.text = androidResourcesHelper.getString(directionTextId(isLastFinger))
-            fingerDirectionText.setTextColor(getColor(requireContext(), directionTextColour()))
+    private fun CollectFingerprintsState.updateFingerDirectionText() {
+        with(fingerStates.getValue(finger)) {
+            fingerDirectionText.text = androidResourcesHelper.getString(directionTextId(isOnLastFinger()))
+            fingerDirectionText.setTextColor(resources.getColor(directionTextColour(), null))
         }
     }
 

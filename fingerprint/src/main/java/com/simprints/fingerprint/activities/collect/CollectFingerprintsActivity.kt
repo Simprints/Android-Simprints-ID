@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.activities.collect
 
+import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.View
@@ -16,6 +17,12 @@ import com.simprints.fingerprint.activities.collect.old.timeoutbar.ScanningOnlyT
 import com.simprints.fingerprint.activities.collect.old.timeoutbar.ScanningTimeoutBar
 import com.simprints.fingerprint.activities.collect.old.timeoutbar.ScanningWithImageTransferTimeoutBar
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
+import com.simprints.fingerprint.activities.collect.resources.buttonBackgroundColour
+import com.simprints.fingerprint.activities.collect.resources.buttonTextColour
+import com.simprints.fingerprint.activities.collect.resources.buttonTextId
+import com.simprints.fingerprint.activities.collect.resources.indicatorDrawableId
+import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
+import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
@@ -52,8 +59,7 @@ class CollectFingerprintsActivity :
         vm.start(fingerprintRequest.fingerprintsToCapture)
 
         initUiComponents()
-
-        startListeningToStateChanges()
+        observeStateChanges()
     }
 
     private fun initUiComponents() {
@@ -86,17 +92,18 @@ class CollectFingerprintsActivity :
             missingFingerText.text = getString(R.string.missing_finger)
             missingFingerText.paintFlags = missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         }
+        missingFingerText.setOnClickListener { vm.handleMissingFingerButtonPressed() }
     }
 
     private fun initScanButton() {
-        scan_button.text = getString(R.string.scan)
+        scan_button.setOnClickListener { vm.handleScanButtonPressed() }
     }
 
     private fun initTimeoutBar() {
         timeoutBar = if (isImageTransferRequired()) {
-            ScanningWithImageTransferTimeoutBar(this, pb_timeout, CollectFingerprintsPresenter.scanningTimeoutMs, CollectFingerprintsPresenter.imageTransferTimeoutMs)
+            ScanningWithImageTransferTimeoutBar(pb_timeout, CollectFingerprintsPresenter.scanningTimeoutMs, CollectFingerprintsPresenter.imageTransferTimeoutMs)
         } else {
-            ScanningOnlyTimeoutBar(this, pb_timeout, CollectFingerprintsPresenter.scanningTimeoutMs)
+            ScanningOnlyTimeoutBar(pb_timeout, CollectFingerprintsPresenter.scanningTimeoutMs)
         }
     }
 
@@ -109,10 +116,14 @@ class CollectFingerprintsActivity :
     private fun initIndicators() {
         indicator_layout.removeAllViewsInLayout()
         indicators.clear()
-        vm.state.value?.orderedFingers()?.forEach { (_, _) ->
+        vm.state().orderedFingers().forEachIndexed { index, _ ->
             val indicator = ImageView(this)
             indicator.adjustViewBounds = true
-//            indicator.setOnClickListener { handleIndicatorClick(fingerPosition) }
+            indicator.setOnClickListener {
+                if (!vm.state().currentFingerState().isBusy()) {
+                    vm.updateSelectedFingerIfNotBusy(index)
+                }
+            }
             indicators.add(indicator)
             indicator_layout.addView(indicator, LinearLayout.LayoutParams(
                 0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
@@ -122,10 +133,11 @@ class CollectFingerprintsActivity :
     private fun initPageAdapter() {
         pageAdapter = FingerPageAdapter(
             supportFragmentManager,
-            vm.state.value?.orderedFingers() ?: TODO("Oops")
+            vm.state().orderedFingers()
         )
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initViewPager() {
         view_pager.adapter = pageAdapter
         view_pager.offscreenPageLimit = 1
@@ -133,18 +145,68 @@ class CollectFingerprintsActivity :
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageScrollStateChanged(state: Int) {}
             override fun onPageSelected(position: Int) {
-//                presenter.viewPagerOnPageSelected(position)
+                vm.updateSelectedFingerIfNotBusy(position)
             }
         })
-//        view_pager.setOnTouchListener { _, _ -> presenter.isScanning() }
-//        view_pager.currentItem = presenter.currentActiveFingerNo
+        view_pager.setOnTouchListener { _, _ -> vm.state().currentFingerState().isBusy() }
 
         // If the layout is from right to left, we need to reverse the scrolling direction
         if (rightToLeft) view_pager.rotationY = 180f
     }
 
-    private fun startListeningToStateChanges() {
-        // TODO("Not yet implemented")
+    private fun observeStateChanges() {
+        vm.state.activityObserveWith {
+            it.updateIndicators()
+            it.updateScanButton()
+            it.updateViewPager()
+            it.updateProgressBar()
+        }
     }
 
+    private fun CollectFingerprintsState.updateIndicators() {
+        orderedFingers().forEachIndexed { index, finger ->
+            val selected = currentFingerIndex == index
+            indicators[index].setImageResource(fingerStates.getValue(finger).indicatorDrawableId(selected))
+        }
+    }
+
+    private fun CollectFingerprintsState.updateScanButton() {
+        with(currentFingerState()) {
+            scan_button.text = androidResourcesHelper.getString(buttonTextId())
+            scan_button.setTextColor(resources.getColor(buttonTextColour(), null))
+            scan_button.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
+        }
+    }
+
+    private fun CollectFingerprintsState.updateViewPager() {
+        view_pager.currentItem = currentFingerIndex
+
+        // If the layout is has been rotated for RtL, we need to rotate the fragment back so it's upright
+        if (rightToLeft) {
+            pageAdapter.getFragment(currentFingerIndex)?.view?.rotationY = 180f
+        }
+    }
+
+    private fun CollectFingerprintsState.updateProgressBar() {
+        when (val fingerState = currentFingerState()) {
+            FingerCollectionState.NotCollected,
+            FingerCollectionState.Skipped -> {
+                timeoutBar.progressBar.progress = 0
+                timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bar)
+            }
+            FingerCollectionState.Scanning -> timeoutBar.startTimeoutBar()
+            FingerCollectionState.TransferringImage -> timeoutBar.handleScanningFinished()
+            FingerCollectionState.NotDetected -> {
+                timeoutBar.progressBar.progress = 0
+                timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
+            }
+            is FingerCollectionState.Collected -> if (fingerState.fingerScanResult.isGoodScan()) {
+                timeoutBar.progressBar.progress = 0
+                timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_good)
+            } else {
+                timeoutBar.progressBar.progress = 0
+                timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
+            }
+        }
+    }
 }
