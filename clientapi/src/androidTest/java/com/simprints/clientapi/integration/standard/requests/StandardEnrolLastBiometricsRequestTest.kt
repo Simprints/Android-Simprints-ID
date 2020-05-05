@@ -41,8 +41,8 @@ class StandardEnrolLastBiometricsRequestTest : BaseStandardClientApiTest() {
             projectIdField.value(),
             userIdField.value(),
             moduleIdField.value(),
-            sessionIdField.value(),
-            metadataField.value())
+            metadataField.value(),
+            sessionIdField.value())
 
         intended(hasAction(APP_ENROL_LAST_BIOMETRICS_ACTION))
         intended(hasExtras(hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))

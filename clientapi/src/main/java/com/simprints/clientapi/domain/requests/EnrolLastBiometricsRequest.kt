@@ -7,8 +7,8 @@ import kotlinx.android.parcel.Parcelize
 
 data class EnrolLastBiometricsRequest(
     override val projectId: String,
-    val moduleId: String,
     override val userId: String,
+    val moduleId: String,
     val metadata: String,
     val sessionId: String,
     override val unknownExtras: Map<String, Any?>

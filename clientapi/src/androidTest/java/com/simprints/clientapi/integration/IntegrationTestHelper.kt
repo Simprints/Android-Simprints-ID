@@ -63,8 +63,8 @@ internal data class AppEnrolLastBiometricsRequest(
     override val projectId: String,
     override val userId: String,
     override val moduleId: String,
-    override val sessionId: String,
-    override val metadata: String
+    override val metadata: String,
+    override val sessionId: String
 ) : IAppEnrolLastBiometricsRequest
 
 @Parcelize

@@ -39,8 +39,8 @@ class OdkEnrolLastBiometricsRequestTest : BaseOdkClientApiTest() {
             projectIdField.value(),
             userIdField.value(),
             moduleIdField.value(),
-            sessionIdField.value(),
-            metadataField.value())
+            metadataField.value(),
+            sessionIdField.value())
 
         Intents.intended(IntentMatchers.hasAction(APP_ENROL_LAST_BIOMETRICS_ACTION))
         Intents.intended(IntentMatchers.hasExtras(BundleMatchers.hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
