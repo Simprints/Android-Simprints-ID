@@ -96,9 +96,9 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     private fun initTimeoutBar(): ScanningTimeoutBar =
         if (isImageTransferRequired()) {
-            ScanningWithImageTransferTimeoutBar(context, view.progressBar, scanningTimeoutMs, imageTransferTimeoutMs)
+            ScanningWithImageTransferTimeoutBar(view.progressBar, scanningTimeoutMs, imageTransferTimeoutMs)
         } else {
-            ScanningOnlyTimeoutBar(context, view.progressBar, scanningTimeoutMs)
+            ScanningOnlyTimeoutBar(view.progressBar, scanningTimeoutMs)
         }
 
     // Creates a progress dialog when the scan gets disconnected

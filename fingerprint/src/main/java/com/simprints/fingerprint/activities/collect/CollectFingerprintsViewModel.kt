@@ -14,9 +14,10 @@ class CollectFingerprintsViewModel(
     private val scannerManager: ScannerManager
 ) : ViewModel() {
 
-    lateinit var fingerprintsToCapture: List<FingerIdentifier>
+    private lateinit var fingerprintsToCapture: List<FingerIdentifier>
 
     val state = MutableLiveData<CollectFingerprintsState>()
+    fun state() = state.value ?: TODO("Oops")
 
     val vibrate = LiveDataEvent()
     val moveToNextFinger = LiveDataEvent()
@@ -36,7 +37,7 @@ class CollectFingerprintsViewModel(
         }.associateWith { FingerCollectionState.NotCollected })
     }
 
-    fun updateSelectedFinger(index: Int) {
+    fun updateSelectedFingerIfNotBusy(index: Int) {
         updateState { currentFingerIndex = index }
     }
 

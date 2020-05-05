@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.activities.collect.old.timeoutbar
 
-import android.content.Context
 import android.os.CountDownTimer
 import android.widget.ProgressBar
 import com.simprints.fingerprint.activities.collect.old.timeoutbar.ScanningTimeoutBar.Companion.FINISHED_PROGRESS
@@ -8,7 +7,6 @@ import com.simprints.fingerprint.activities.collect.old.timeoutbar.ScanningTimeo
 import com.simprints.fingerprint.activities.collect.old.timeoutbar.ScanningTimeoutBar.Companion.PROGRESS_INCREMENT
 
 class ScanningOnlyTimeoutBar(
-    override val context: Context,
     override val progressBar: ProgressBar,
     private val scanningTimeoutMs: Long
 ) : ScanningTimeoutBar {

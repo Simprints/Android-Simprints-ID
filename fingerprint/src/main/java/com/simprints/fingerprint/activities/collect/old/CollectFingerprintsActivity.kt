@@ -124,13 +124,13 @@ class CollectFingerprintsActivity :
         scan_button.setTextColor(activeStatus.buttonTextColor)
         scan_button.setBackgroundColor(ContextCompat.getColor(this, activeStatus.buttonBgColorRes))
 
-        timeoutBar.setProgressBar(activeStatus)
+//        timeoutBar.setProgressBar(activeStatus)
     }
 
     override fun refreshFingerFragment() {
         pageAdapter.getFragment(viewPresenter.currentActiveFingerNo)?.let {
             reverseFingerFragmentIfNeeded(it)
-            it.updateTextAccordingToStatus()
+//            it.updateTextAccordingToStatus()
         }
     }
 
