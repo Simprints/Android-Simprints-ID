@@ -84,24 +84,24 @@ publishing.publications {
     }
 }
 
-//artifactory {
-//    contextUrl = 'http://178.62.61.39:8081/artifactory'
-//    publish {
-//        repository {
-//            repoKey = 'libs-release-local'
-//
-//            username = SIMPRINTS_ARTIFACTORY_USERNAME
-//            password = SIMPRINTS_ARTIFACTORY_PASSWORD
-//        }
-//        defaults {
-//            publications('aar')
-//            publishArtifacts = true
-//
-//            properties = ['qa.level': 'basic', 'q.os': 'android', 'dev.team': 'core']
-//            publishPom = true
-//        }
-//    }
-//}
+artifactory {
+    contextUrl = 'http://178.62.61.39:8081/artifactory'
+    publish {
+        repository {
+            repoKey = 'libs-release-local'
+
+            username = SIMPRINTS_ARTIFACTORY_USERNAME
+            password = SIMPRINTS_ARTIFACTORY_PASSWORD
+        }
+        defaults {
+            publications('aar')
+            publishArtifacts = true
+
+            properties = ['qa.level': 'basic', 'q.os': 'android', 'dev.team': 'core']
+            publishPom = true
+        }
+    }
+}
 
 repositories {
     mavenCentral()
