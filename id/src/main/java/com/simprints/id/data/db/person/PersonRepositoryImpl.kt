@@ -6,7 +6,10 @@ import com.simprints.id.data.db.PersonFetchResult.PersonSource.*
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.domain.*
+import com.simprints.id.data.db.people_sync.down.domain.EventQuery
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncProgress
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelper.Companion.buildPersonFromCreationPayload
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordCreationPayload
@@ -17,7 +20,6 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEvent
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.exceptions.safe.sync.NoModulesSelectedForModuleSyncException
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.id.tools.json.SimJsonHelper
 import kotlinx.coroutines.CoroutineScope
@@ -38,8 +40,24 @@ class PersonRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSou
     EventRemoteDataSource by eventRemoteDataSource {
 
     override suspend fun countToDownSync(peopleDownSyncScope: PeopleDownSyncScope): PeopleCount {
-        val eventCounts = eventRemoteDataSource.count(buildEventQuery(peopleDownSyncScope))
-        return buildPeopleCountFromEventCounts(eventCounts)
+        val downSyncOperations = downSyncScopeRepository.getDownSyncOperations(peopleDownSyncScope)
+        val peopleCounts = makeRequestAndBuildPeopleCountList(downSyncOperations)
+        return combinePeopleCounts(peopleCounts)
+    }
+
+    private suspend fun makeRequestAndBuildPeopleCountList(downSyncOperations: List<PeopleDownSyncOperation>) =
+        downSyncOperations.map {
+            buildPeopleCountFromEventCounts(
+                eventRemoteDataSource.count(buildEventQuery(it))
+            )
+        }
+
+    private fun combinePeopleCounts(peopleCounts: List<PeopleCount>) = with(peopleCounts) {
+        PeopleCount(
+            sumBy { it.created },
+            sumBy { it.deleted },
+            sumBy { it.updated }
+        )
     }
 
     override suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult =
@@ -103,27 +121,18 @@ class PersonRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSou
     override suspend fun performDownloadWithProgress(scope: CoroutineScope,
                                                      peopleDownSyncOperation: PeopleDownSyncOperation): ReceiveChannel<PeopleDownSyncProgress> =
         personRepositoryDownSyncHelper.performDownSyncWithProgress(scope, peopleDownSyncOperation,
-            buildEventQuery(downSyncScopeRepository.getDownSyncScope()))
+            buildEventQuery(peopleDownSyncOperation))
 
-    private fun buildEventQuery(peopleDownSyncScope: PeopleDownSyncScope) =
-        with(peopleDownSyncScope) {
-            when (this) {
-                is ProjectSyncScope -> {
-                    EventQuery(projectId, modes = modes,
-                        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE))
-                }
-                is UserSyncScope -> {
-                    EventQuery(projectId, userId = userId, modes = modes,
-                        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE))
-                }
-                is ModuleSyncScope -> {
-                    if (modules.isEmpty()) {
-                        throw NoModulesSelectedForModuleSyncException()
-                    }
-                    EventQuery(projectId, moduleIds = modules, modes = modes,
-                        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE))
-                }
-            }
+    private fun buildEventQuery(peopleDownSyncOperation: PeopleDownSyncOperation) =
+        with(peopleDownSyncOperation) {
+            EventQuery(
+                projectId = projectId,
+                userId = userId,
+                moduleIds = moduleId?.let { listOf(it) },
+                lastEventId = lastResult?.lastEventId,
+                modes = modes,
+                types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE)
+            )
         }
 
     private fun buildEventQueryForPersonFetch(projectId: String, patientId: String) = EventQuery(
