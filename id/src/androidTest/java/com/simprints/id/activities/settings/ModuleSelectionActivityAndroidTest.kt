@@ -11,7 +11,7 @@ import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
 import org.junit.Before
 import org.junit.Test
 
@@ -19,7 +19,7 @@ class ModuleSelectionActivityAndroidTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val preferencesModule = TestPreferencesModule(
-        settingsPreferencesManagerRule = DependencyRule.SpyRule
+        settingsPreferencesManagerRule = DependencyRule.SpykRule
     )
 
     private lateinit var preferencesManagerSpy: PreferencesManager
@@ -108,25 +108,25 @@ class ModuleSelectionActivityAndroidTest {
 
 
     private fun launchWithModulesSelected() {
-        whenever {
+        every {
             preferencesManagerSpy.moduleIdOptions
-        } thenReturn moduleOptions
+        } returns  moduleOptions
 
-        whenever {
+        every {
             preferencesManagerSpy.selectedModules
-        } thenReturn selectedModules
+        } returns selectedModules
 
         ActivityScenario.launch(ModuleSelectionActivity::class.java)
     }
 
     private fun launchWithoutModulesSelected() {
-        whenever {
+        every {
             preferencesManagerSpy.moduleIdOptions
-        } thenReturn moduleOptions
+        } returns moduleOptions
 
-        whenever {
+        every {
             preferencesManagerSpy.selectedModules
-        } thenReturn emptySet()
+        } returns emptySet()
 
         ActivityScenario.launch(ModuleSelectionActivity::class.java)
     }
