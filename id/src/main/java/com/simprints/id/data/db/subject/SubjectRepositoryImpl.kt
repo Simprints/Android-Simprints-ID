@@ -5,8 +5,6 @@ import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.SubjectsCount
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
-import com.simprints.id.data.db.subjects_sync.down.domain.*
 import com.simprints.id.data.db.subject.SubjectRepositoryDownSyncHelper.Companion.buildPersonFromCreationPayload
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
@@ -16,8 +14,12 @@ import com.simprints.id.data.db.subject.domain.subjectevents.fromApiToDomain
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncProgress
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.exceptions.safe.sync.NoModulesSelectedForModuleSyncException
 import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
 import com.simprints.id.tools.json.SimJsonHelper
 import kotlinx.coroutines.CoroutineScope
@@ -28,18 +30,34 @@ import java.io.InputStreamReader
 import java.io.Reader
 
 class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSource,
-                            val subjectLocalDataSource: SubjectLocalDataSource,
-                            val downSyncScopeRepository: SubjectsDownSyncScopeRepository,
-                            private val subjectsUpSyncExecutor: SubjectsUpSyncExecutor,
-                            private val subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
-                            private val subjectRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper) :
+                           val subjectLocalDataSource: SubjectLocalDataSource,
+                           val downSyncScopeRepository: SubjectsDownSyncScopeRepository,
+                           private val peopleUpSyncExecutor: SubjectsUpSyncExecutor,
+                           private val personRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
+                           private val personRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper) :
     SubjectRepository,
     SubjectLocalDataSource by subjectLocalDataSource,
     EventRemoteDataSource by eventRemoteDataSource {
 
     override suspend fun countToDownSync(subjectsDownSyncScope: SubjectsDownSyncScope): SubjectsCount {
-        val eventCounts = eventRemoteDataSource.count(buildEventQuery(subjectsDownSyncScope))
-        return buildPeopleCountFromEventCounts(eventCounts)
+        val downSyncOperations = downSyncScopeRepository.getDownSyncOperations(subjectsDownSyncScope)
+        val peopleCounts = makeRequestAndBuildPeopleCountList(downSyncOperations)
+        return combinePeopleCounts(peopleCounts)
+    }
+
+    private suspend fun makeRequestAndBuildPeopleCountList(downSyncOperations: List<SubjectsDownSyncOperation>) =
+        downSyncOperations.map {
+            buildPeopleCountFromEventCounts(
+                eventRemoteDataSource.count(buildEventQuery(it))
+            )
+        }
+
+    private fun combinePeopleCounts(subjectsCounts: List<SubjectsCount>) = with(subjectsCounts) {
+        SubjectsCount(
+            sumBy { it.created },
+            sumBy { it.deleted },
+            sumBy { it.updated }
+        )
     }
 
     override suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): SubjectFetchResult =
@@ -47,8 +65,8 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
             val person = subjectLocalDataSource.load(SubjectLocalDataSource.Query(personId = patientId)).first()
             SubjectFetchResult(person, LOCAL)
         } catch (t: Throwable) {
-            tryToFetchPersonFromRemote(projectId, patientId).also { personFetchResult ->
-                personFetchResult.subject?.let { savePersonInLocal(it) }
+            tryToFetchPersonFromRemote(projectId, patientId).also { subjectFetchResult ->
+                subjectFetchResult.subject?.let { savePersonInLocal(it) }
             }
         }
 
@@ -79,7 +97,7 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
 
     override suspend fun saveAndUpload(subject: Subject) {
         subjectLocalDataSource.insertOrUpdate(listOf(subject.apply { toSync = true }))
-        subjectsUpSyncExecutor.sync()
+        peopleUpSyncExecutor.sync()
     }
 
     private fun buildPeopleCountFromEventCounts(eventCounts: List<EventCount>): SubjectsCount {
@@ -98,32 +116,23 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
     }
 
     override suspend fun performUploadWithProgress(scope: CoroutineScope) =
-        subjectRepositoryUpSyncHelper.executeUploadWithProgress(scope)
+        personRepositoryUpSyncHelper.executeUploadWithProgress(scope)
 
     override suspend fun performDownloadWithProgress(scope: CoroutineScope,
-                                                     subjectsDownSyncOperation: SubjectsDownSyncOperation): ReceiveChannel<SubjectsDownSyncProgress> =
-        subjectRepositoryDownSyncHelper.performDownSyncWithProgress(scope, subjectsDownSyncOperation,
-            buildEventQuery(downSyncScopeRepository.getDownSyncScope()))
+                                                     peopleDownSyncOperation: SubjectsDownSyncOperation): ReceiveChannel<SubjectsDownSyncProgress> =
+        personRepositoryDownSyncHelper.performDownSyncWithProgress(scope, peopleDownSyncOperation,
+            buildEventQuery(peopleDownSyncOperation))
 
-    private fun buildEventQuery(subjectsDownSyncScope: SubjectsDownSyncScope) =
-        with(subjectsDownSyncScope) {
-            when (this) {
-                is ProjectSyncScope -> {
-                    EventQuery(projectId, modes = modes,
-                        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE))
-                }
-                is UserSyncScope -> {
-                    EventQuery(projectId, userId = userId, modes = modes,
-                        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE))
-                }
-                is ModuleSyncScope -> {
-                    if (modules.isEmpty()) {
-                        throw NoModulesSelectedForModuleSyncException()
-                    }
-                    EventQuery(projectId, moduleIds = modules, modes = modes,
-                        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE))
-                }
-            }
+    private fun buildEventQuery(peopleDownSyncOperation: SubjectsDownSyncOperation) =
+        with(peopleDownSyncOperation) {
+            EventQuery(
+                projectId = projectId,
+                userId = userId,
+                moduleIds = moduleId?.let { listOf(it) },
+                lastEventId = lastResult?.lastEventId,
+                modes = modes,
+                types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE)
+            )
         }
 
     private fun buildEventQueryForPersonFetch(projectId: String, patientId: String) = EventQuery(
