@@ -1,14 +1,12 @@
 package com.simprints.fingerprint.activities.collect.old.fingers
 
 import android.os.Handler
-import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsContract
-import com.simprints.fingerprint.activities.collect.old.FingerPageAdapter
-import com.simprints.fingerprint.activities.collect.old.models.DefaultScanConfig
 import com.simprints.fingerprint.activities.collect.old.models.Finger
-import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.fingerprint.activities.collect.old.models.FingerScanConfig
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.tools.extensions.isFingerNotCollectable
 
 class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprintsContract.View,
@@ -62,12 +60,12 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
     }
 
     private fun initPageAdapter() {
-        view.pageAdapter = FingerPageAdapter(
-            (view as AppCompatActivity).supportFragmentManager,
-            presenter.activeFingers,
-            androidResourcesHelper,
-            fingerprintPreferencesManager
-        )
+//        view.pageAdapter = FingerPageAdapter(
+//            (view as AppCompatActivity).supportFragmentManager,
+//            presenter.activeFingers,
+//            androidResourcesHelper,
+//            fingerprintPreferencesManager
+//        )
     }
 
     private fun initViewPager() {
@@ -152,6 +150,6 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
 
         const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 2000
 
-        private val defaultScanConfig = DefaultScanConfig()
+        private val defaultScanConfig = FingerScanConfig.DEFAULT
     }
 }

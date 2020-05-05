@@ -15,7 +15,7 @@ public class FingerRes {
         this.nameId = nameId;
     }
 
-    public static FingerRes get(Finger finger) {
+    public static FingerRes get(com.simprints.fingerprint.activities.collect.domain.Finger finger) {
         return fingerRes[finger.getId().ordinal()];
     }
 

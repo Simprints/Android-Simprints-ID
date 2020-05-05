@@ -297,7 +297,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun createMapForScannedFingers(): MutableMap<String, Boolean> =
         mutableMapOf<String, Boolean>().also { mapOfScannedFingers ->
             activeFingers.forEach {
-                mapOfScannedFingers[androidResourcesHelper.getString(FingerRes.get(it).nameId)] = it.isGoodScan || it.isRescanGoodScan
+//                mapOfScannedFingers[androidResourcesHelper.getString(FingerRes.get(it).nameId)] = it.isGoodScan || it.isRescanGoodScan
             }
         }
 

@@ -7,19 +7,27 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat.getColor
-import androidx.fragment.app.Fragment
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.collect.old.models.Finger
+import com.simprints.fingerprint.activities.base.FingerprintFragment
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
+import com.simprints.fingerprint.activities.collect.domain.Finger
 import com.simprints.fingerprint.activities.collect.old.models.FingerRes
-import com.simprints.fingerprint.activities.collect.old.models.FingerStatus
+import com.simprints.fingerprint.activities.collect.resources.directionTextColour
+import com.simprints.fingerprint.activities.collect.resources.directionTextId
+import com.simprints.fingerprint.activities.collect.resources.resultTextColour
+import com.simprints.fingerprint.activities.collect.resources.resultTextId
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.tools.extensions.activityIsPresentAndFragmentIsAdded
+import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class FingerFragment : Fragment() {
+class FingerFragment : FingerprintFragment() {
 
-    lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
-    lateinit var fingerprintPreferencesManager: FingerprintPreferencesManager
+    private val vm: CollectFingerprintsViewModel by sharedViewModel()
+
+    private val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
+    private val fingerprintPreferencesManager: FingerprintPreferencesManager by inject()
 
     lateinit var finger: Finger
     private lateinit var fingerImage: ImageView
@@ -44,6 +52,8 @@ class FingerFragment : Fragment() {
             updateTextAccordingToStatus()
         }
 
+        // TODO : Start listening to updates
+
         return view
     }
 
@@ -67,8 +77,10 @@ class FingerFragment : Fragment() {
     }
 
     private fun updateFingerResultText() {
-        fingerResultText.text = androidResourcesHelper.getString(finger.status.textResult)
-        fingerResultText.setTextColor(getColor(requireContext(), finger.status.textResultColorRes))
+        with(vm.state.value?.fingerStates?.get(finger) ?: TODO("Oops")) {
+            fingerResultText.text = androidResourcesHelper.getString(resultTextId())
+            fingerResultText.setTextColor(getColor(requireContext(), resultTextColour()))
+        }
     }
 
     private fun updateFingerNumberText() {
@@ -77,31 +89,22 @@ class FingerFragment : Fragment() {
     }
 
     private fun updateFingerDirectionText() {
-        if (finger.isLastFinger &&
-            (finger.status == FingerStatus.GOOD_SCAN ||
-                finger.status == FingerStatus.RESCAN_GOOD_SCAN)) {
-            fingerDirectionText.text = androidResourcesHelper.getString(R.string.empty)
-        } else {
-            fingerDirectionText.text = androidResourcesHelper.getString(finger.status.textDirection)
+        val isLastFinger = vm.state.value?.isOnLastFinger() ?: TODO("Oops")
+        with(vm.state.value?.fingerStates?.get(finger) ?: TODO("Oops")) {
+            fingerDirectionText.text = androidResourcesHelper.getString(directionTextId(isLastFinger))
+            fingerDirectionText.setTextColor(getColor(requireContext(), directionTextColour()))
         }
-        fingerDirectionText.setTextColor(finger.status.textDirectionColor)
     }
 
     companion object {
 
         private const val FINGER_ARG = "finger"
 
-        fun newInstance(
-            finger: Finger,
-            androidResourcesHelper: FingerprintAndroidResourcesHelper,
-            fingerprintPreferencesManager: FingerprintPreferencesManager
-        ): FingerFragment {
+        fun newInstance(finger: Finger): FingerFragment {
             val fingerFragment = FingerFragment()
             val bundle = Bundle()
             bundle.putParcelable(FINGER_ARG, finger)
             fingerFragment.arguments = bundle
-            fingerFragment.androidResourcesHelper = androidResourcesHelper
-            fingerFragment.fingerprintPreferencesManager = fingerprintPreferencesManager
             return fingerFragment
         }
     }
