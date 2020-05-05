@@ -48,7 +48,7 @@ class CollectFingerprintsActivityTest : KoinTest {
     private fun mockScannerManagerWithScanner(scanner: ScannerWrapper) {
         declareModule {
             factory<ScannerManager> {
-                ScannerManagerImpl(DummyBluetoothAdapter(), mock(), mock()).also { it.scanner = scanner }
+                ScannerManagerImpl(DummyBluetoothAdapter(), mock(), mock(), mock()).also { it.scanner = scanner }
             }
             factory<MasterFlowManager> { setupMock { whenThis { getCurrentAction() } thenReturn Action.IDENTIFY } }
         }

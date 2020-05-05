@@ -84,7 +84,7 @@ dependencies {
     // So the tests that have references to the base module fail with java.lang.NoClassDefFoundError exceptions.
     // The following line includes the base module classes.jar into the final one.
     // To run unit tests from CL: ./gradlew fingerprint:test
-    testRuntimeOnly(files("${projectDir}/../id/build/intermediates/app_classes/debug/bundleDebugClasses/classes.jar"))
+    testRuntimeOnly (files("${projectDir}/../id/build/intermediates/app_classes/debug/classes.jar"))
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -142,16 +142,29 @@ dependencies {
     testImplementation deps.testing.androidx.core
     testImplementation deps.testing.androidx.core_testing
     testImplementation deps.testing.androidx.runner
+    testImplementation deps.testing.androidx.room
+    testImplementation deps.testing.androidx.rules
+
+    // Espresso
+    testImplementation deps.testing.espresso.core
+    testImplementation deps.testing.espresso.intents
+    testImplementation deps.testing.espresso.contrib
 
     // Kotlin
+    testImplementation deps.testing.kotlin
     testImplementation deps.testing.coroutines_test
 
-    // Mockito
+    // Mocking and assertion frameworks
     testImplementation deps.testing.mockito.kotlin
     testImplementation deps.testing.truth
+    testImplementation deps.testing.mockk.core
+
+    // Koin
+    testImplementation deps.testing.koin
 
     // Robolectric
     testImplementation deps.testing.robolectric.core
+    testImplementation deps.testing.robolectric.multidex
 
     // ######################################################
     //                      Android test
@@ -163,6 +176,7 @@ dependencies {
         exclude group: 'org.mockito'
         exclude group: 'org.robolectric'
         exclude group: 'org.jetbrains.kotlinx'
+        exclude group: 'io.mockk'
     }
 
     // Koin
@@ -182,11 +196,13 @@ dependencies {
     // Android X navigation components
     androidTestImplementation deps.testing.androidx.navigation
 
-    // Mockito
+    // Mocking and assertion frameworks
     androidTestImplementation deps.testing.mockito.core
     androidTestImplementation deps.testing.mockito.android
     androidTestImplementation deps.testing.mockito.kotlin
-    androidTestApi deps.testing.mockito.mockito_inline_androidtests
+    androidTestImplementation deps.testing.truth
+    androidTestImplementation deps.testing.mockk.core
+    androidTestImplementation deps.testing.mockk.android
 
     // Espresso
     androidTestImplementation deps.testing.espresso.core

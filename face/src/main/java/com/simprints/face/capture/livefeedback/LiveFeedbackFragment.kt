@@ -1,15 +1,15 @@
 package com.simprints.face.capture.livefeedback
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.otaliastudios.cameraview.frame.Frame
+import com.otaliastudios.cameraview.frame.FrameProcessor
 import com.simprints.core.tools.extentions.setCheckedWithLeftDrawable
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
@@ -18,31 +18,25 @@ import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
 import com.simprints.uicomponents.models.Size
 import kotlinx.android.synthetic.main.fragment_live_feedback.*
-import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+import timber.log.Timber
 import com.simprints.uicomponents.R as UCR
 
-class LiveFeedbackFragment : Fragment() {
+class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FrameProcessor {
     private val mainVm: FaceCaptureViewModel by sharedViewModel()
     private val vm: LiveFeedbackFragmentViewModel by viewModel { parametersOf(mainVm) }
     private val androidResourcesHelper: FaceAndroidResourcesHelper by inject()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(R.layout.fragment_live_feedback, container, false)
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
+        startCamera()
         bindViewModel()
         capture_feedback_txt_title.setOnClickListener { vm.startCapture() }
         capture_progress.max = mainVm.samplesToCapture
-        mainVm.startFaceDetection()
     }
 
     private fun setTextInLayout() {
@@ -71,8 +65,8 @@ class LiveFeedbackFragment : Fragment() {
             }
         })
 
-        lifecycleScope.launch {
-            for (frame in mainVm.frameChannel) {
+        lifecycleScope.launchWhenResumed {
+            for (frame in vm.frameChannel) {
                 vm.process(
                     frame, capture_overlay.rectInCanvas,
                     Size(
@@ -81,6 +75,27 @@ class LiveFeedbackFragment : Fragment() {
                     )
                 )
             }
+        }
+    }
+
+    private fun startCamera() {
+        face_capture_camera.let {
+            it.useDeviceOrientation = true
+            it.setLifecycleOwner(viewLifecycleOwner)
+            it.addFrameProcessor(this)
+        }
+    }
+
+    /**
+     * @process needs to block because frame is a singleton which cannot be released until it's
+     * converted into a preview frame.
+     * Also the frame sometimes throws IllegalStateException for null width and height
+     */
+    override fun process(frame: Frame) {
+        try {
+            vm.handlePreviewFrame(frame.freeze())
+        } catch (ex: IllegalStateException) {
+            Timber.e(ex)
         }
     }
 
