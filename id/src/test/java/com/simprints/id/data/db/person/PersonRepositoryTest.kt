@@ -23,11 +23,8 @@ import com.simprints.id.data.db.person.remote.models.personevents.fromDomainToAp
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.json.SimJsonHelper
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
@@ -127,7 +124,7 @@ class PersonRepositoryTest {
     private suspend fun assesDownSyncCount(downSyncScope: PeopleDownSyncScope) {
         val eventCounts = listOf(EventCount(ENROLMENT_RECORD_CREATION, REMOTE_PEOPLE_FOR_SUBSYNC))
 
-        coEvery { downSyncScopeRepository.getDownSyncOperations(any()) } returns emptyList()
+        coEvery { downSyncScopeRepository.getDownSyncOperations(any()) } returns listOf(mockk())
         coEvery { eventRemoteDataSource.count(any()) } returns eventCounts
 
         val counts = personRepository.countToDownSync(downSyncScope)
