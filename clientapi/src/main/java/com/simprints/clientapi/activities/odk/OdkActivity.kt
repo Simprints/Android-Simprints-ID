@@ -21,7 +21,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_SESSION_ID = "odk-session-id"
         private const val ODK_EXIT_REASON = "odk-exit-reason"
         private const val ODK_EXIT_EXTRA = "odk-exit-extra"
-        private const val CONFIRM_IDENTITY_ACTION = "com.simprints.simodkadapter.CONFIRM_IDENTITY"
+        private const val CONFIRM_IDENTITY_ACTION = "com.simprints.simodkadapter.CONFIRM_IDENTITY" 
     }
 
     override val presenter: OdkContract.Presenter by inject { parametersOf(this, action) }
