@@ -13,7 +13,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.test.mock.declare
 import org.koin.test.mock.declareModule
 
 @RunWith(AndroidJUnit4::class)
@@ -41,7 +40,7 @@ class CommCareActivityTest : BaseClientApiTest() {
     }
 
     private fun buildIntent(): Intent {
-        return Intent(CommCarePresenter.ACTION_CONFIRM_IDENTITY)
+        return Intent(CommCareAction.ACTION_CONFIRM_IDENTITY)
             .putExtra(SIMPRINTS_PROJECT_ID, "projectId")
             .putExtra(SIMPRINTS_SESSION_ID, "sessionId")
             .putExtra(SIMPRINTS_SELECTED_GUID, "selectedGuid")
