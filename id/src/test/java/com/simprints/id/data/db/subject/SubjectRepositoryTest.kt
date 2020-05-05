@@ -10,8 +10,6 @@ import com.simprints.id.commontesttools.DefaultTestConstants.userSyncScope
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
-import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
@@ -20,14 +18,13 @@ import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.EN
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subject.remote.models.subjectevents.fromDomainToApi
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
 import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.json.SimJsonHelper
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
@@ -127,7 +124,7 @@ class SubjectRepositoryTest {
     private suspend fun assesDownSyncCount(downSyncScope: SubjectsDownSyncScope) {
         val eventCounts = listOf(EventCount(ENROLMENT_RECORD_CREATION, REMOTE_PEOPLE_FOR_SUBSYNC))
 
-        coEvery { downSyncScopeRepository.getDownSyncOperations(any()) } returns emptyList()
+        coEvery { downSyncScopeRepository.getDownSyncOperations(any()) } returns listOf(mockk())
         coEvery { eventRemoteDataSource.count(any()) } returns eventCounts
 
         val counts = personRepository.countToDownSync(downSyncScope)

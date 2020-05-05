@@ -38,7 +38,9 @@ object EnrolmentRecordsGeneratorUtils {
         EventPayloadType.ENROLMENT_RECORD_DELETION -> {
             buildFakeEnrolmentDeletion(subjectId, projectId, moduleId, userId)
         }
-        EventPayloadType.ENROLMENT_RECORD_MOVE -> TODO()
+        EventPayloadType.ENROLMENT_RECORD_MOVE -> {
+            buildFakeEnrolmentMove(subjectId, projectId, moduleId, userId)
+        }
     }
 
     private fun buildFakeEnrolmentRecordCreation(subjectId: String,
@@ -73,4 +75,11 @@ object EnrolmentRecordsGeneratorUtils {
                                            attendantId: String) = EnrolmentRecordDeletionPayload(
         subjectId, projectId, moduleId, attendantId
     )
+
+    private fun buildFakeEnrolmentMove(subjectId: String,
+                                       projectId: String,
+                                       userId: String,
+                                       moduleId: String) =
+        EnrolmentRecordMovePayload(buildFakeEnrolmentRecordCreation(subjectId, projectId, userId, moduleId),
+            buildFakeEnrolmentDeletion(subjectId, projectId, userId, moduleId))
 }
