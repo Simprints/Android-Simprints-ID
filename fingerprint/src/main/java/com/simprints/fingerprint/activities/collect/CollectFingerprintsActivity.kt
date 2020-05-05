@@ -34,7 +34,7 @@ class CollectFingerprintsActivity :
     private val masterFlowManager: MasterFlowManager by inject()
     private val fingerprintPreferencesManager: FingerprintPreferencesManager by inject()
 
-    private val viewModel: CollectFingerprintsViewModel by viewModel()
+    private val vm: CollectFingerprintsViewModel by viewModel()
 
     private lateinit var pageAdapter: FingerPageAdapter
     private lateinit var timeoutBar: ScanningTimeoutBar
@@ -49,7 +49,7 @@ class CollectFingerprintsActivity :
         val fingerprintRequest = this.intent.extras?.getParcelable<CollectFingerprintsTaskRequest>(CollectFingerprintsTaskRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForCollectFingerprintsActivityException()
 
-        viewModel.start(fingerprintRequest.fingerprintsToCapture)
+        vm.start(fingerprintRequest.fingerprintsToCapture)
 
         initUiComponents()
 
@@ -59,7 +59,6 @@ class CollectFingerprintsActivity :
     private fun initUiComponents() {
         configureRightToLeft()
         initToolbar()
-        initFingerFragments()
         initPageAdapter()
         initViewPager()
         initIndicators()
@@ -110,7 +109,7 @@ class CollectFingerprintsActivity :
     private fun initIndicators() {
         indicator_layout.removeAllViewsInLayout()
         indicators.clear()
-        viewModel.activeFingers.value?.indices?.forEach { _ -> // fingerPosition ->
+        vm.state.value?.orderedFingers()?.forEach { (_, _) ->
             val indicator = ImageView(this)
             indicator.adjustViewBounds = true
 //            indicator.setOnClickListener { handleIndicatorClick(fingerPosition) }
@@ -123,9 +122,7 @@ class CollectFingerprintsActivity :
     private fun initPageAdapter() {
         pageAdapter = FingerPageAdapter(
             supportFragmentManager,
-            viewModel.activeFingers.value ?: emptyList(), // FIXME
-            androidResourcesHelper,
-            fingerprintPreferencesManager
+            vm.state.value?.orderedFingers() ?: TODO("Oops")
         )
     }
 
@@ -144,10 +141,6 @@ class CollectFingerprintsActivity :
 
         // If the layout is from right to left, we need to reverse the scrolling direction
         if (rightToLeft) view_pager.rotationY = 180f
-    }
-
-    private fun initFingerFragments() {
-        // TODO("Not yet implemented")
     }
 
     private fun startListeningToStateChanges() {
