@@ -9,7 +9,7 @@ sealed class FingerCollectionState {
     class NotDetected(val numberOfBadScans: Int = 0) : FingerCollectionState()
     class Collected(val fingerScanResult: FingerScanResult, val numberOfBadScans: Int = 0) : FingerCollectionState()
 
-    fun isBusy(): Boolean = this is Scanning || this is TransferringImage
+    fun isCommunicating(): Boolean = this is Scanning || this is TransferringImage
 
     fun toNotCollected() = NotCollected
 
