@@ -8,7 +8,7 @@ import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandom
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactoryImpl
-import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelper.Companion.BATCH_SIZE_FOR_DOWNLOADING
+import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelperImpl.Companion.BATCH_SIZE_FOR_DOWNLOADING
 import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.ENROLMENT_RECORD_DELETION
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
