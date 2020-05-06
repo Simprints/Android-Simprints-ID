@@ -98,7 +98,7 @@ class CollectFingerprintsViewModel(
 
     private fun isBusyForScanning(): Boolean = with(state()) {
         currentFingerState() is FingerCollectionState.TransferringImage ||
-            isShowingConfirmDialog
+            isShowingConfirmDialog || isShowingSplashScreen
     }
 
     private fun toggleScanning() {
@@ -178,10 +178,11 @@ class CollectFingerprintsViewModel(
         }
     }
 
-    fun resolveFingerTerminalConditionTriggered() {
+    private fun resolveFingerTerminalConditionTriggered() {
         with(state()) {
             if (isScanningEndStateAchieved()) {
-//            createMapAndShowDialog()
+//                logMessageForCrashReport("Confirm fingerprints dialog shown")
+                updateState { isShowingConfirmDialog = true }
             } else if (currentFingerState().let {
                     it is FingerCollectionState.Collected && it.fingerScanResult.isGoodScan()
                 }) {
@@ -220,6 +221,7 @@ class CollectFingerprintsViewModel(
 
     fun handleMissingFingerButtonPressed() {
         updateFingerState { toSkipped() }
+        resolveFingerTerminalConditionTriggered()
     }
 
     private fun isScanningEndStateAchieved(): Boolean = with(state()) {
@@ -259,7 +261,8 @@ class CollectFingerprintsViewModel(
     private fun numberOfOriginalFingers() = originalFingerprintsToCapture.toSet().size
 
     private fun fingerHasSatisfiedTerminalCondition(fingerState: FingerCollectionState) =
-        (fingerState is FingerCollectionState.Collected && tooManyBadScans(fingerState))
+        fingerState is FingerCollectionState.Collected &&
+            (tooManyBadScans(fingerState) || fingerState.fingerScanResult.isGoodScan())
             || fingerState is FingerCollectionState.Skipped
 
     fun handleConfirmFingerprintsAndContinue() {
@@ -311,5 +314,11 @@ class CollectFingerprintsViewModel(
         const val numberOfBadScansRequiredToAutoAddNewFinger = 3
         const val scanningTimeoutMs = 3000L
         const val imageTransferTimeoutMs = 3000L
+
+        const val AUTO_SWIPE_DELAY: Long = 500
+        const val FAST_SWIPE_SPEED = 100
+        const val SLOW_SWIPE_SPEED = 1000
+
+        const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 2000
     }
 }
