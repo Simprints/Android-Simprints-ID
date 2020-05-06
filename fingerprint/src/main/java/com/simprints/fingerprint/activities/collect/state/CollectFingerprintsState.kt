@@ -6,7 +6,8 @@ data class CollectFingerprintsState(
     val fingerStates: MutableMap<Finger, FingerCollectionState>,
     var currentFingerIndex: Int = 0,
     var isAskingRescan: Boolean = false,
-    var isShowingConfirmDialog: Boolean = false
+    var isShowingConfirmDialog: Boolean = false,
+    var isShowingSplashScreen: Boolean = false
 ) {
 
     fun orderedFingers(): List<Finger> = fingerStates.keys.sorted()

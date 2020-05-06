@@ -7,7 +7,7 @@ import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAn
 
 class ConfirmFingerprintsDialog(private val context: Context,
                                 private val androidResourcesHelper: FingerprintAndroidResourcesHelper,
-                                private val scannedFingers: MutableMap<String, Boolean>,
+                                private val scannedFingers: Map<String, Boolean>,
                                 private val callbackConfirm: () -> Unit,
                                 private val callbackRestart: () -> Unit) {
 

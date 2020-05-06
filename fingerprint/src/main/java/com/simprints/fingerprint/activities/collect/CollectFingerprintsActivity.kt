@@ -1,6 +1,8 @@
 package com.simprints.fingerprint.activities.collect
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.View
@@ -8,26 +10,31 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.lifecycle.Lifecycle
 import androidx.viewpager.widget.ViewPager
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.old.FingerPageAdapter
+import com.simprints.fingerprint.activities.collect.old.SplashScreenActivity
+import com.simprints.fingerprint.activities.collect.old.confirmFingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.activities.collect.old.timeoutbar.ScanningOnlyTimeoutBar
 import com.simprints.fingerprint.activities.collect.old.timeoutbar.ScanningTimeoutBar
 import com.simprints.fingerprint.activities.collect.old.timeoutbar.ScanningWithImageTransferTimeoutBar
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
-import com.simprints.fingerprint.activities.collect.resources.buttonBackgroundColour
-import com.simprints.fingerprint.activities.collect.resources.buttonTextColour
-import com.simprints.fingerprint.activities.collect.resources.buttonTextId
-import com.simprints.fingerprint.activities.collect.resources.indicatorDrawableId
+import com.simprints.fingerprint.activities.collect.resources.*
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
+import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
+import com.simprints.fingerprint.orchestrator.domain.RequestCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate
+import com.simprints.fingerprint.tools.extensions.setResultAndFinish
 import com.simprints.fingerprint.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -44,6 +51,7 @@ class CollectFingerprintsActivity :
 
     private lateinit var pageAdapter: FingerPageAdapter
     private lateinit var timeoutBar: ScanningTimeoutBar
+    private var confirmDialog: AlertDialog? = null
     private val indicators = ArrayList<ImageView>()
     private var rightToLeft: Boolean = false
 
@@ -153,10 +161,13 @@ class CollectFingerprintsActivity :
             it.updateScanButton()
             it.updateViewPager()
             it.updateProgressBar()
+            it.listenForConfirmDialog()
+            it.listenForSplashScreen()
         }
 
-        vm.vibrate.activityObserveWith { Vibrate.vibrate(this) }
-        vm.noFingersScannedToast.activityObserveWith { showToast(androidResourcesHelper.getString(R.string.no_fingers_scanned)) }
+        vm.vibrate.activityObserveEventWith { Vibrate.vibrate(this) }
+        vm.noFingersScannedToast.activityObserveEventWith { showToast(androidResourcesHelper.getString(R.string.no_fingers_scanned)) }
+        vm.finishWithFingerprints.activityObserveEventWith { setResultAndFinishSuccess(it) }
     }
 
     private fun CollectFingerprintsState.updateIndicators() {
@@ -202,6 +213,49 @@ class CollectFingerprintsActivity :
             } else {
                 timeoutBar.handleCancelled()
                 timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
+            }
+        }
+    }
+
+    private fun CollectFingerprintsState.listenForConfirmDialog() {
+        confirmDialog = if (isShowingConfirmDialog && confirmDialog == null) {
+            val mapOfScannedFingers = orderedFingers().associate { finger ->
+                val fingerState = fingerStates[finger]
+                androidResourcesHelper.getString(finger.nameTextId()) to
+                    (fingerState is FingerCollectionState.Collected && fingerState.fingerScanResult.isGoodScan())
+            }
+            ConfirmFingerprintsDialog(this@CollectFingerprintsActivity, androidResourcesHelper, mapOfScannedFingers,
+                callbackConfirm = { vm.handleConfirmFingerprintsAndContinue() },
+                callbackRestart = { vm.handleRestart() })
+                .create().also { it.show() }
+        } else {
+            confirmDialog?.let { if (it.isShowing) it.dismiss() }
+            null
+        }
+    }
+
+    private fun CollectFingerprintsState.listenForSplashScreen() {
+        if (isShowingSplashScreen && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            startActivity(Intent(this@CollectFingerprintsActivity, SplashScreenActivity::class.java))
+            overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
+        }
+    }
+
+    private fun setResultAndFinishSuccess(fingerprints: List<Fingerprint>) {
+        setResultAndFinish(ResultCode.OK, Intent().apply {
+            putExtra(CollectFingerprintsTaskResult.BUNDLE_KEY, CollectFingerprintsTaskResult(fingerprints))
+        })
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RequestCode.REFUSAL.value || requestCode == RequestCode.ALERT.value) {
+            when (ResultCode.fromValue(resultCode)) {
+                ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
+                ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
+                ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
+                ResultCode.OK -> {
+                }
             }
         }
     }
