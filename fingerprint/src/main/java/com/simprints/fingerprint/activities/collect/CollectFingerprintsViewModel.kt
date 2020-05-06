@@ -3,10 +3,10 @@ package com.simprints.fingerprint.activities.collect
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEvent
+import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.activities.collect.domain.Finger
 import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.old.models.FingerScanConfig
-import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
 import com.simprints.fingerprint.activities.collect.state.FingerScanResult
@@ -14,9 +14,9 @@ import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.data.domain.images.deduceFileExtension
-import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
@@ -52,18 +52,20 @@ class CollectFingerprintsViewModel(
     val vibrate = MutableLiveData<LiveDataEvent>()
     val moveToNextFinger = MutableLiveData<LiveDataEvent>()
     val noFingersScannedToast = MutableLiveData<LiveDataEvent>()
+    val finishWithFingerprints = MutableLiveData<LiveDataEventWithContent<List<Fingerprint>>>()
 
-    private lateinit var fingerprintsToCapture: List<FingerIdentifier>
+    private lateinit var originalFingerprintsToCapture: List<FingerIdentifier>
+    private val captureEventIds: MutableMap<Finger, String> = mutableMapOf()
     private var scanningTask: Disposable? = null
     private var imageTransferTask: Disposable? = null
 
     fun start(fingerprintsToCapture: List<FingerIdentifier>) {
-        this.fingerprintsToCapture = fingerprintsToCapture
+        this.originalFingerprintsToCapture = fingerprintsToCapture
         setStartingState()
     }
 
     private fun setStartingState() {
-        state.value = CollectFingerprintsState(fingerprintsToCapture.map {
+        state.value = CollectFingerprintsState(originalFingerprintsToCapture.map {
             Finger(it, FingerScanConfig.DEFAULT.getPriority(it), FingerScanConfig.DEFAULT.getOrder(it))
         }.associateWith { FingerCollectionState.NotCollected }.toMutableMap())
     }
@@ -74,12 +76,29 @@ class CollectFingerprintsViewModel(
             SaveFingerprintImagesStrategy.WSQ_15 -> true
         }
 
-    fun updateSelectedFingerIfNotBusy(index: Int) {
-        updateState { currentFingerIndex = index }
+    fun updateSelectedFinger(index: Int) {
+        updateState {
+            isAskingRescan = false
+            currentFingerIndex = index
+        }
     }
 
     fun handleScanButtonPressed() {
-        toggleScanning()
+        val fingerState = state().currentFingerState()
+        if (fingerState is FingerCollectionState.Collected && fingerState.fingerScanResult.isGoodScan()
+            && !state().isAskingRescan) {
+            updateState { isAskingRescan = true }
+        } else {
+            updateState { isAskingRescan = false }
+            if (!isBusyForScanning()) {
+                toggleScanning()
+            }
+        }
+    }
+
+    private fun isBusyForScanning(): Boolean = with(state()) {
+        currentFingerState() is FingerCollectionState.TransferringImage ||
+            isShowingConfirmDialog
     }
 
     private fun toggleScanning() {
@@ -237,8 +256,7 @@ class CollectFingerprintsViewModel(
             fingerHasSatisfiedTerminalCondition(it)
         }.size >= maximumTotalNumberOfFingersForAutoAdding
 
-    private fun numberOfOriginalFingers() =
-        fingerprintsToCapture.toSet().size
+    private fun numberOfOriginalFingers() = originalFingerprintsToCapture.toSet().size
 
     private fun fingerHasSatisfiedTerminalCondition(fingerState: FingerCollectionState) =
         (fingerState is FingerCollectionState.Collected && tooManyBadScans(fingerState))
@@ -261,31 +279,30 @@ class CollectFingerprintsViewModel(
 
     private fun saveImagesAndProceedToFinish(fingerprints: Map<Finger, FingerCollectionState.Collected>) {
         runBlocking {
-            fingerprints.forEach { (finger, state) ->
-                saveImage(finger, state)
+            val imageRefs = fingerprints.map { (finger, state) ->
+                saveImageIfExists(finger, state)
             }
-            proceedToFinish(fingerprints)
+            val domainFingerprints = fingerprints.toList().zip(imageRefs) { (finger, state), imageRef ->
+                Fingerprint(finger.id, state.fingerScanResult.template).also { it.imageRef = imageRef }
+            }
+            finishWithFingerprints.postEvent(domainFingerprints)
         }
     }
 
-    private suspend fun saveImage(finger: Finger, fingerState: FingerCollectionState) {
-        val imageBytes = finger.imageBytes
-        val captureEventId = captureEventIds[finger.id]
+    private suspend fun saveImageIfExists(finger: Finger, state: FingerCollectionState.Collected): FingerprintImageRef? {
+        val captureEventId = captureEventIds[finger]
 
-        if (imageBytes != null && captureEventId != null) {
-            finger.template?.imageRef = imageManager.save(imageBytes, captureEventId,
+        if (state.fingerScanResult.image != null && captureEventId != null) {
+            return imageManager.save(state.fingerScanResult.image, captureEventId,
                 fingerprintPreferencesManager.saveFingerprintImagesStrategy.deduceFileExtension())
-        } else if (imageBytes != null && captureEventId == null) {
-            crashReportManager.logExceptionOrSafeException(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
+        } else if (state.fingerScanResult.image != null && captureEventId == null) {
+//            crashReportManager.logExceptionOrSafeException(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
         }
-    }
-
-    private fun proceedToFinish(fingerprints: Map<Finger, FingerCollectionState.Collected>) {
-        view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(fingerprints))
+        return null
     }
 
     fun handleRestart() {
-
+        setStartingState()
     }
 
     companion object {

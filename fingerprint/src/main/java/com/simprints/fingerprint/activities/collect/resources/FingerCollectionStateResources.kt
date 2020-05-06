@@ -41,7 +41,7 @@ fun FingerCollectionState.indicatorDeselectedDrawableId(): Int =
     }
 
 @StringRes
-fun FingerCollectionState.buttonTextId(): Int =
+fun FingerCollectionState.buttonTextId(isAskingRescan: Boolean): Int =
     when (this) {
         FingerCollectionState.NotCollected -> R.string.scan_label
         is FingerCollectionState.Scanning -> R.string.cancel_button
@@ -49,7 +49,11 @@ fun FingerCollectionState.buttonTextId(): Int =
         FingerCollectionState.Skipped,
         is FingerCollectionState.NotDetected -> R.string.rescan_label
         is FingerCollectionState.Collected -> if (fingerScanResult.isGoodScan()) {
-            R.string.good_scan_message
+            if (isAskingRescan) {
+                R.string.rescan_label_question
+            } else {
+                R.string.good_scan_message
+            }
         } else {
             R.string.rescan_label
         }

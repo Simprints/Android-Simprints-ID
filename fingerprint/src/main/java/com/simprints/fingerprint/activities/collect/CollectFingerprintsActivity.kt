@@ -113,8 +113,8 @@ class CollectFingerprintsActivity :
             val indicator = ImageView(this)
             indicator.adjustViewBounds = true
             indicator.setOnClickListener {
-                if (!vm.state().currentFingerState().isBusy()) {
-                    vm.updateSelectedFingerIfNotBusy(index)
+                if (!vm.state().currentFingerState().isCommunicating()) {
+                    vm.updateSelectedFinger(index)
                 }
             }
             indicators.add(indicator)
@@ -138,10 +138,10 @@ class CollectFingerprintsActivity :
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageScrollStateChanged(state: Int) {}
             override fun onPageSelected(position: Int) {
-                vm.updateSelectedFingerIfNotBusy(position)
+                vm.updateSelectedFinger(position)
             }
         })
-        view_pager.setOnTouchListener { _, _ -> vm.state().currentFingerState().isBusy() }
+        view_pager.setOnTouchListener { _, _ -> vm.state().currentFingerState().isCommunicating() }
 
         // If the layout is from right to left, we need to reverse the scrolling direction
         if (rightToLeft) view_pager.rotationY = 180f
@@ -168,7 +168,7 @@ class CollectFingerprintsActivity :
 
     private fun CollectFingerprintsState.updateScanButton() {
         with(currentFingerState()) {
-            scan_button.text = androidResourcesHelper.getString(buttonTextId())
+            scan_button.text = androidResourcesHelper.getString(buttonTextId(isAskingRescan))
             scan_button.setTextColor(resources.getColor(buttonTextColour(), null))
             scan_button.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
         }
