@@ -14,10 +14,10 @@ fun FingerCollectionState.indicatorDrawableId(selected: Boolean): Int =
 fun FingerCollectionState.indicatorSelectedDrawableId(): Int =
     when (this) {
         FingerCollectionState.NotCollected,
-        FingerCollectionState.Scanning,
-        FingerCollectionState.TransferringImage -> R.drawable.ic_blank_selected
+        is FingerCollectionState.Scanning,
+        is FingerCollectionState.TransferringImage -> R.drawable.ic_blank_selected
         FingerCollectionState.Skipped,
-        FingerCollectionState.NotDetected -> R.drawable.ic_alert_selected
+        is FingerCollectionState.NotDetected -> R.drawable.ic_alert_selected
         is FingerCollectionState.Collected -> if (fingerScanResult.isGoodScan()) {
             R.drawable.ic_ok_selected
         } else {
@@ -29,10 +29,10 @@ fun FingerCollectionState.indicatorSelectedDrawableId(): Int =
 fun FingerCollectionState.indicatorDeselectedDrawableId(): Int =
     when (this) {
         FingerCollectionState.NotCollected,
-        FingerCollectionState.Scanning,
-        FingerCollectionState.TransferringImage -> R.drawable.ic_blank_deselected
+        is FingerCollectionState.Scanning,
+        is FingerCollectionState.TransferringImage -> R.drawable.ic_blank_deselected
         FingerCollectionState.Skipped,
-        FingerCollectionState.NotDetected -> R.drawable.ic_alert_deselected
+        is FingerCollectionState.NotDetected -> R.drawable.ic_alert_deselected
         is FingerCollectionState.Collected -> if (fingerScanResult.isGoodScan()) {
             R.drawable.ic_ok_deselected
         } else {
@@ -44,10 +44,10 @@ fun FingerCollectionState.indicatorDeselectedDrawableId(): Int =
 fun FingerCollectionState.buttonTextId(): Int =
     when (this) {
         FingerCollectionState.NotCollected -> R.string.scan_label
-        FingerCollectionState.Scanning -> R.string.cancel_button
-        FingerCollectionState.TransferringImage -> R.string.please_wait_button
+        is FingerCollectionState.Scanning -> R.string.cancel_button
+        is FingerCollectionState.TransferringImage -> R.string.please_wait_button
         FingerCollectionState.Skipped,
-        FingerCollectionState.NotDetected -> R.string.rescan_label
+        is FingerCollectionState.NotDetected -> R.string.rescan_label
         is FingerCollectionState.Collected -> if (fingerScanResult.isGoodScan()) {
             R.string.good_scan_message
         } else {
@@ -64,10 +64,10 @@ fun FingerCollectionState.buttonTextColour(): Int =
 fun FingerCollectionState.buttonBackgroundColour(): Int =
     when (this) {
         FingerCollectionState.NotCollected -> R.color.simprints_grey
-        FingerCollectionState.Scanning,
-        FingerCollectionState.TransferringImage -> R.color.simprints_blue
+        is FingerCollectionState.Scanning,
+        is FingerCollectionState.TransferringImage -> R.color.simprints_blue
         FingerCollectionState.Skipped,
-        FingerCollectionState.NotDetected -> R.color.simprints_red
+        is FingerCollectionState.NotDetected -> R.color.simprints_red
         is FingerCollectionState.Collected -> if (fingerScanResult.isGoodScan()) {
             R.color.simprints_green
         } else {
@@ -79,10 +79,14 @@ fun FingerCollectionState.buttonBackgroundColour(): Int =
 fun FingerCollectionState.resultTextId(): Int =
     when (this) {
         FingerCollectionState.NotCollected -> R.string.empty
-        FingerCollectionState.Scanning -> R.string.empty
-        FingerCollectionState.TransferringImage -> R.string.empty
+        is FingerCollectionState.Scanning -> R.string.empty
+        is FingerCollectionState.TransferringImage -> if (fingerScanResult.isGoodScan()) {
+            R.string.good_scan_message
+        } else {
+            R.string.poor_scan_message
+        }
         FingerCollectionState.Skipped -> R.string.finger_skipped_message
-        FingerCollectionState.NotDetected -> R.string.no_finger_detected_message
+        is FingerCollectionState.NotDetected -> R.string.no_finger_detected_message
         is FingerCollectionState.Collected -> if (fingerScanResult.isGoodScan()) {
             R.string.good_scan_message
         } else {
@@ -94,10 +98,14 @@ fun FingerCollectionState.resultTextId(): Int =
 fun FingerCollectionState.resultTextColour(): Int =
     when (this) {
         FingerCollectionState.NotCollected,
-        FingerCollectionState.Scanning,
-        FingerCollectionState.TransferringImage -> android.R.color.white
+        is FingerCollectionState.Scanning -> android.R.color.white
+        is FingerCollectionState.TransferringImage -> if (fingerScanResult.isGoodScan()) {
+            R.color.simprints_green
+        } else {
+            R.color.simprints_red
+        }
         FingerCollectionState.Skipped,
-        FingerCollectionState.NotDetected -> R.color.simprints_red
+        is FingerCollectionState.NotDetected -> R.color.simprints_red
         is FingerCollectionState.Collected -> if (fingerScanResult.isGoodScan()) {
             R.color.simprints_green
         } else {
@@ -109,10 +117,10 @@ fun FingerCollectionState.resultTextColour(): Int =
 fun FingerCollectionState.directionTextId(isLastFinger: Boolean): Int =
     when (this) {
         FingerCollectionState.NotCollected -> R.string.please_scan
-        FingerCollectionState.Scanning -> R.string.scanning
-        FingerCollectionState.TransferringImage -> R.string.transfering_data
+        is FingerCollectionState.Scanning -> R.string.scanning
+        is FingerCollectionState.TransferringImage -> R.string.transfering_data
         FingerCollectionState.Skipped -> R.string.good_scan_direction
-        FingerCollectionState.NotDetected -> R.string.poor_scan_direction
+        is FingerCollectionState.NotDetected -> R.string.poor_scan_direction
         is FingerCollectionState.Collected -> if (fingerScanResult.isGoodScan()) {
             if (isLastFinger) R.string.empty else R.string.good_scan_direction
         } else {

@@ -3,7 +3,7 @@ package com.simprints.fingerprint.activities.collect.state
 import com.simprints.fingerprint.activities.collect.domain.Finger
 
 data class CollectFingerprintsState(
-    val fingerStates: Map<Finger, FingerCollectionState>,
+    val fingerStates: MutableMap<Finger, FingerCollectionState>,
     var currentFingerIndex: Int = 0
 ) {
 

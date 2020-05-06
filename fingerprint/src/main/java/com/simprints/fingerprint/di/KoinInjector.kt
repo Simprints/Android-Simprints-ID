@@ -131,7 +131,7 @@ object KoinInjector {
 
         viewModel { OrchestratorViewModel(get(), get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
-        viewModel { CollectFingerprintsViewModel(get()) }
+        viewModel { CollectFingerprintsViewModel(get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }

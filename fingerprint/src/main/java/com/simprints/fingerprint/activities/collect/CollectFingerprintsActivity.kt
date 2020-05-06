@@ -26,9 +26,9 @@ import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
+import com.simprints.fingerprint.tools.Vibrate
+import com.simprints.fingerprint.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.koin.android.ext.android.inject
@@ -39,7 +39,6 @@ class CollectFingerprintsActivity :
 
     private val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
     private val masterFlowManager: MasterFlowManager by inject()
-    private val fingerprintPreferencesManager: FingerprintPreferencesManager by inject()
 
     private val vm: CollectFingerprintsViewModel by viewModel()
 
@@ -100,18 +99,12 @@ class CollectFingerprintsActivity :
     }
 
     private fun initTimeoutBar() {
-        timeoutBar = if (isImageTransferRequired()) {
+        timeoutBar = if (vm.isImageTransferRequired()) {
             ScanningWithImageTransferTimeoutBar(pb_timeout, CollectFingerprintsPresenter.scanningTimeoutMs, CollectFingerprintsPresenter.imageTransferTimeoutMs)
         } else {
             ScanningOnlyTimeoutBar(pb_timeout, CollectFingerprintsPresenter.scanningTimeoutMs)
         }
     }
-
-    private fun isImageTransferRequired(): Boolean =
-        when (fingerprintPreferencesManager.saveFingerprintImagesStrategy) {
-            SaveFingerprintImagesStrategy.NEVER -> false
-            SaveFingerprintImagesStrategy.WSQ_15 -> true
-        }
 
     private fun initIndicators() {
         indicator_layout.removeAllViewsInLayout()
@@ -161,6 +154,9 @@ class CollectFingerprintsActivity :
             it.updateViewPager()
             it.updateProgressBar()
         }
+
+        vm.vibrate.activityObserveWith { Vibrate.vibrate(this) }
+        vm.noFingersScannedToast.activityObserveWith { showToast(androidResourcesHelper.getString(R.string.no_fingers_scanned)) }
     }
 
     private fun CollectFingerprintsState.updateIndicators() {
@@ -191,20 +187,20 @@ class CollectFingerprintsActivity :
         when (val fingerState = currentFingerState()) {
             FingerCollectionState.NotCollected,
             FingerCollectionState.Skipped -> {
-                timeoutBar.progressBar.progress = 0
+                timeoutBar.handleCancelled()
                 timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bar)
             }
-            FingerCollectionState.Scanning -> timeoutBar.startTimeoutBar()
-            FingerCollectionState.TransferringImage -> timeoutBar.handleScanningFinished()
-            FingerCollectionState.NotDetected -> {
-                timeoutBar.progressBar.progress = 0
+            is FingerCollectionState.Scanning -> timeoutBar.startTimeoutBar()
+            is FingerCollectionState.TransferringImage -> timeoutBar.handleScanningFinished()
+            is FingerCollectionState.NotDetected -> {
+                timeoutBar.handleCancelled()
                 timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
             }
             is FingerCollectionState.Collected -> if (fingerState.fingerScanResult.isGoodScan()) {
-                timeoutBar.progressBar.progress = 0
+                timeoutBar.handleCancelled()
                 timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_good)
             } else {
-                timeoutBar.progressBar.progress = 0
+                timeoutBar.handleCancelled()
                 timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
             }
         }
