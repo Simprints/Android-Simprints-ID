@@ -144,9 +144,9 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
     }
 
     companion object {
-        private const val AUTO_SWIPE_DELAY: Long = 500
-        private const val FAST_SWIPE_SPEED = 100
-        private const val SLOW_SWIPE_SPEED = 1000
+        const val AUTO_SWIPE_DELAY: Long = 500
+        const val FAST_SWIPE_SPEED = 100
+        const val SLOW_SWIPE_SPEED = 1000
 
         const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 2000
 

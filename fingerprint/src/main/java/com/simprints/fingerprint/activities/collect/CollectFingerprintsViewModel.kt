@@ -1,11 +1,13 @@
 package com.simprints.fingerprint.activities.collect
 
+import android.os.Handler
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.activities.collect.domain.Finger
 import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsPresenter
+import com.simprints.fingerprint.activities.collect.old.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.fingerprint.activities.collect.old.models.FingerScanConfig
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
@@ -50,7 +52,6 @@ class CollectFingerprintsViewModel(
     }
 
     val vibrate = MutableLiveData<LiveDataEvent>()
-    val moveToNextFinger = MutableLiveData<LiveDataEvent>()
     val noFingersScannedToast = MutableLiveData<LiveDataEvent>()
     val finishWithFingerprints = MutableLiveData<LiveDataEventWithContent<List<Fingerprint>>>()
 
@@ -59,6 +60,8 @@ class CollectFingerprintsViewModel(
     private var scanningTask: Disposable? = null
     private var imageTransferTask: Disposable? = null
 
+    private val scanConfig = FingerScanConfig.DEFAULT
+
     fun start(fingerprintsToCapture: List<FingerIdentifier>) {
         this.originalFingerprintsToCapture = fingerprintsToCapture
         setStartingState()
@@ -66,7 +69,7 @@ class CollectFingerprintsViewModel(
 
     private fun setStartingState() {
         state.value = CollectFingerprintsState(originalFingerprintsToCapture.map {
-            Finger(it, FingerScanConfig.DEFAULT.getPriority(it), FingerScanConfig.DEFAULT.getOrder(it))
+            Finger(it, scanConfig.getPriority(it), scanConfig.getOrder(it))
         }.associateWith { FingerCollectionState.NotCollected }.toMutableMap())
     }
 
@@ -79,7 +82,18 @@ class CollectFingerprintsViewModel(
     fun updateSelectedFinger(index: Int) {
         updateState {
             isAskingRescan = false
+            isShowingSplashScreen = false
             currentFingerIndex = index
+        }
+    }
+
+    private fun nudgeToNextFinger() {
+        with(state()) {
+            if (currentFingerIndex < fingerStates.size - 1) {
+                Handler().postDelayed({
+                    updateSelectedFinger(currentFingerIndex + 1)
+                }, AUTO_SWIPE_DELAY)
+            }
         }
     }
 
@@ -134,7 +148,7 @@ class CollectFingerprintsViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = ::handleCaptureSuccess,
-                onError = ::handleError
+                onError = ::handleScannerCommunicationsError
             )
     }
 
@@ -161,7 +175,7 @@ class CollectFingerprintsViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = ::handleImageTransferSuccess,
-                onError = ::handleError
+                onError = ::handleScannerCommunicationsError
             )
     }
 
@@ -186,18 +200,43 @@ class CollectFingerprintsViewModel(
             } else if (currentFingerState().let {
                     it is FingerCollectionState.Collected && it.fingerScanResult.isGoodScan()
                 }) {
-//            fingerDisplayHelper.doNudge()
+                nudgeToNextFinger()
             } else {
                 if (haveNotExceedMaximumNumberOfFingersToAutoAdd()) {
-//                fingerDisplayHelper.showSplashAndNudgeAndAddNewFinger()
-                } else if (isOnLastFinger()) {
-//                fingerDisplayHelper.showSplashAndNudgeIfNecessary()
+                    showSplashAndNudgeAndAddNewFinger()
+                } else if (!isOnLastFinger()) {
+                    showSplashAndNudgeIfNecessary()
                 }
             }
         }
     }
 
-    private fun handleError(e: Throwable) {
+    private fun showSplashAndNudgeAndAddNewFinger() {
+        updateState { isShowingSplashScreen = true }
+        Handler().postDelayed({
+            handleAutoAddFinger()
+            nudgeToNextFinger()
+        }, CollectFingerprintsFingerDisplayHelper.TRY_DIFFERENT_FINGER_SPLASH_DELAY)
+    }
+
+    private fun showSplashAndNudgeIfNecessary() {
+        updateState { isShowingSplashScreen = true }
+        nudgeToNextFinger()
+    }
+
+    private fun handleAutoAddFinger() {
+        updateState {
+            val nextPriorityFinger = scanConfig.config
+                .map { (id, config) -> Finger(id, config.priority, config.order) }.toMutableList()
+                .apply { removeAll(fingerStates.keys) }
+                .minBy { it.priority }
+            if (nextPriorityFinger != null) {
+                fingerStates[nextPriorityFinger] = FingerCollectionState.NotCollected
+            }
+        }
+    }
+
+    private fun handleScannerCommunicationsError(e: Throwable) {
         when (e) {
             is ScannerOperationInterruptedException -> {
                 updateFingerState { toNotCollected() }
@@ -312,6 +351,7 @@ class CollectFingerprintsViewModel(
         const val targetNumberOfGoodScans = 2
         const val maximumTotalNumberOfFingersForAutoAdding = 4
         const val numberOfBadScansRequiredToAutoAddNewFinger = 3
+
         const val scanningTimeoutMs = 3000L
         const val imageTransferTimeoutMs = 3000L
 
