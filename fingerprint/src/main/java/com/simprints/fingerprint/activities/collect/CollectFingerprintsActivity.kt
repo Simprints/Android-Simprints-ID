@@ -247,6 +247,16 @@ class CollectFingerprintsActivity :
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+        vm.handleOnResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        vm.handleOnPause()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RequestCode.REFUSAL.value || requestCode == RequestCode.ALERT.value) {
