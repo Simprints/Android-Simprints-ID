@@ -4,10 +4,10 @@ sealed class FingerCollectionState {
 
     object NotCollected : FingerCollectionState()
     object Skipped : FingerCollectionState()
-    class Scanning(val numberOfBadScans: Int = 0) : FingerCollectionState()
-    class TransferringImage(val fingerScanResult: FingerScanResult, val numberOfBadScans: Int = 0) : FingerCollectionState()
-    class NotDetected(val numberOfBadScans: Int = 0) : FingerCollectionState()
-    class Collected(val fingerScanResult: FingerScanResult, val numberOfBadScans: Int = 0) : FingerCollectionState()
+    data class Scanning(val numberOfBadScans: Int = 0) : FingerCollectionState()
+    data class TransferringImage(val fingerScanResult: FingerScanResult, val numberOfBadScans: Int = 0) : FingerCollectionState()
+    data class NotDetected(val numberOfBadScans: Int = 0) : FingerCollectionState()
+    data class Collected(val fingerScanResult: FingerScanResult, val numberOfBadScans: Int = 0) : FingerCollectionState()
 
     fun isCommunicating(): Boolean = this is Scanning || this is TransferringImage
 

@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.collect
 import android.os.Handler
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.activities.collect.domain.Finger
@@ -22,15 +23,19 @@ import com.simprints.fingerprint.data.domain.images.deduceFileExtension
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
+import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerOperationInterruptedException
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.fingerprint.tools.mapNotNullValues
+import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.math.min
 
@@ -62,6 +67,16 @@ class CollectFingerprintsViewModel(
 
     private val scanConfig = FingerScanConfig.DEFAULT
 
+    private val scannerTriggerListener = ScannerTriggerListener {
+        viewModelScope.launch(context = Dispatchers.Main) {
+//        crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.FINGER_CAPTURE, FingerprintCrashReportTrigger.SCANNER_BUTTON, message = "Scanner button clicked")
+            if (state().isShowingConfirmDialog)
+                handleConfirmFingerprintsAndContinue()
+            else
+                handleScanButtonPressed()
+        }
+    }
+
     fun start(fingerprintsToCapture: List<FingerIdentifier>) {
         this.originalFingerprintsToCapture = fingerprintsToCapture
         setStartingState()
@@ -80,6 +95,7 @@ class CollectFingerprintsViewModel(
         }
 
     fun updateSelectedFinger(index: Int) {
+        scannerManager.scanner { setUiIdle() }.doInBackground()
         updateState {
             isAskingRescan = false
             isShowingSplashScreen = false
@@ -346,6 +362,17 @@ class CollectFingerprintsViewModel(
     fun handleRestart() {
         setStartingState()
     }
+
+    fun handleOnResume() {
+        scannerManager.onScanner { registerTriggerListener(scannerTriggerListener) }
+    }
+
+    fun handleOnPause() {
+        scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
+    }
+
+    private fun Completable.doInBackground() =
+        subscribeOn(Schedulers.io()).subscribeBy(onComplete = {}, onError = {})
 
     companion object {
         const val targetNumberOfGoodScans = 2
