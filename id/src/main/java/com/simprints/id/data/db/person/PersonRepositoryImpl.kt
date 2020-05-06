@@ -10,10 +10,9 @@ import com.simprints.id.data.db.people_sync.down.domain.EventQuery
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncProgress
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
-import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelper.Companion.buildPersonFromCreationPayload
 import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.domain.Person.Companion.buildPersonFromCreationPayload
 import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordCreationPayload
-import com.simprints.id.data.db.person.domain.personevents.Event
 import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.*
 import com.simprints.id.data.db.person.domain.personevents.fromApiToDomain
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
@@ -76,7 +75,9 @@ class PersonRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSou
         val reader = setupJsonReaderFromResponseStream(inputStream)
         return if (reader.hasNext()) {
             val apiEvent: ApiEvent = SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java)
-            createPersonFetchResultFromEvent(apiEvent.fromApiToDomain())
+            val event = apiEvent.fromApiToDomain()
+            val person = buildPersonFromCreationPayload(event.payload as EnrolmentRecordCreationPayload)
+            PersonFetchResult(person, REMOTE)
         } else {
             PersonFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
         }
@@ -87,11 +88,6 @@ class PersonRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSou
             .also {
                 it.beginArray()
             }
-
-    private fun createPersonFetchResultFromEvent(event: Event): PersonFetchResult {
-        val person = buildPersonFromCreationPayload(event.payload as EnrolmentRecordCreationPayload)
-        return PersonFetchResult(person, REMOTE)
-    }
 
     private suspend fun savePersonInLocal(person: Person) = personLocalDataSource.insertOrUpdate(listOf(person))
 

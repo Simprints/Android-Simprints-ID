@@ -5,9 +5,9 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.EventQuery
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult.DownSyncState.*
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncProgress
-import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelper.Companion.BATCH_SIZE_FOR_DOWNLOADING
-import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelper.Companion.buildPersonFromCreationPayload
+import com.simprints.id.data.db.person.domain.Person.Companion.buildPersonFromCreationPayload
 import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.person.domain.personevents.fromApiToDomain
@@ -48,10 +48,10 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
             val bufferToSave = mutableListOf<ApiEvent>()
 
             try {
-                val responseStream = makeDownSyncApiCallAndGetResponse(eventQuery)
+                val responseStream = getDownSyncStreamFromRemote(eventQuery)
                 reader = setupJsonReaderFromResponse(responseStream)
 
-                val channelFromNetwork = createPeopleChannelFromJsonReader(reader)
+                val channelFromNetwork = createChannelOfEvents(reader)
                 while (!channelFromNetwork.isClosedForReceive) {
                     channelFromNetwork.poll()?.let {
                         bufferToSave.add(it)
@@ -63,20 +63,20 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
                 }
 
                 saveBatch(bufferToSave)
-                updateDownSyncInfo(PeopleDownSyncOperationResult.DownSyncState.COMPLETE)
+                updateDownSyncInfo(COMPLETE)
+                finishDownload(reader)
 
             } catch (t: Throwable) {
+                Timber.d(t)
                 t.printStackTrace()
                 saveBatch(bufferToSave)
                 finishDownload(reader)
-                updateDownSyncInfo(PeopleDownSyncOperationResult.DownSyncState.FAILED)
+                updateDownSyncInfo(FAILED)
                 throw t
             }
-
-            finishDownload(reader)
         }
 
-    private suspend fun makeDownSyncApiCallAndGetResponse(eventQuery: EventQuery) =
+    private suspend fun getDownSyncStreamFromRemote(eventQuery: EventQuery) =
         eventRemoteDataSource.getStreaming(eventQuery)
 
     private fun setupJsonReaderFromResponse(responseStream: InputStream): JsonReader =
@@ -86,7 +86,7 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
             }
 
     @ExperimentalCoroutinesApi
-    private fun CoroutineScope.createPeopleChannelFromJsonReader(reader: JsonReader) =
+    private fun CoroutineScope.createChannelOfEvents(reader: JsonReader) =
         produce<ApiEvent>(capacity = 5 * BATCH_SIZE_FOR_DOWNLOADING) {
             while (reader.hasNext()) {
                 this.send(SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java))
@@ -102,19 +102,19 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
         filterBatchOfPeopleToSyncWithLocal(batchOfPeople)
         Timber.tag(SYNC_LOG_TAG).d("Saved batch(${batchOfPeople.size}) for $downSyncOperation")
 
-        updateDownSyncInfo(PeopleDownSyncOperationResult.DownSyncState.RUNNING, batchOfPeople.lastOrNull(), Date())
+        updateDownSyncInfo(RUNNING, batchOfPeople.lastOrNull(), Date())
     }
 
     private suspend fun filterBatchOfPeopleToSyncWithLocal(batchOfEvents: List<ApiEvent>) {
         val batchOfPeopleToSaveInLocal =
             batchOfEvents.filter { it.payload is ApiEnrolmentRecordCreationPayload }.map {
-                it.fromApiToDomain()
-            }.map { it.payload as EnrolmentRecordCreationPayload }
+                it.fromApiToDomain().payload as EnrolmentRecordCreationPayload
+            }
 
         val eventRecordsToBeDeleted =
             batchOfEvents.filter { it.payload is ApiEnrolmentRecordDeletionPayload }.map {
-                it.fromApiToDomain()
-            }.map { it.payload as EnrolmentRecordDeletionPayload }
+                it.fromApiToDomain().payload as EnrolmentRecordDeletionPayload
+            }
 
         savePeopleBatchInLocal(batchOfPeopleToSaveInLocal)
         deletePeopleBatchFromLocal(eventRecordsToBeDeleted)
@@ -164,5 +164,9 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
         Timber.tag(SYNC_LOG_TAG).d("Download finished")
         reader?.endArray()
         reader?.close()
+    }
+
+    companion object {
+        const val BATCH_SIZE_FOR_DOWNLOADING = 200
     }
 }
