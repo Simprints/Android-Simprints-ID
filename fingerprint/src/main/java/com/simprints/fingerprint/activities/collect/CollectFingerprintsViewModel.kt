@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.Finger
 import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.old.fingers.CollectFingerprintsFingerDisplayHelper
@@ -58,6 +59,9 @@ class CollectFingerprintsViewModel(
 
     val vibrate = MutableLiveData<LiveDataEvent>()
     val noFingersScannedToast = MutableLiveData<LiveDataEvent>()
+    val launchRefusal = MutableLiveData<LiveDataEvent>()
+    val launchAlert = MutableLiveData<LiveDataEventWithContent<FingerprintAlert>>()
+    val launchReconnect = MutableLiveData<LiveDataEvent>()
     val finishWithFingerprints = MutableLiveData<LiveDataEventWithContent<List<Fingerprint>>>()
 
     private lateinit var originalFingerprintsToCapture: List<FingerIdentifier>
@@ -259,7 +263,7 @@ class CollectFingerprintsViewModel(
             }
             is ScannerDisconnectedException -> {
                 updateFingerState { toNotCollected() }
-                // TODO : reconnect
+                launchReconnect.postEvent()
             }
             is NoFingerDetectedException -> handleNoFingerDetected()
             else -> {
@@ -369,6 +373,20 @@ class CollectFingerprintsViewModel(
 
     fun handleOnPause() {
         scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
+    }
+
+    fun handleOnBackPressed() {
+        if (state().currentFingerState().isCommunicating()) {
+            cancelScanning()
+        } else {
+            launchRefusal.postEvent()
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        cancelScanning()
+        scannerManager.scanner { disconnect() }.doInBackground()
     }
 
     private fun Completable.doInBackground() =

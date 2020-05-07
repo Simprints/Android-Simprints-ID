@@ -13,6 +13,7 @@ import android.widget.LinearLayout
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager.widget.ViewPager
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.old.FingerPageAdapter
@@ -26,6 +27,8 @@ import com.simprints.fingerprint.activities.collect.resources.*
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
+import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
+import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
@@ -34,6 +37,7 @@ import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestFor
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate
+import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.fingerprint.tools.extensions.setResultAndFinish
 import com.simprints.fingerprint.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
@@ -167,6 +171,9 @@ class CollectFingerprintsActivity :
 
         vm.vibrate.activityObserveEventWith { Vibrate.vibrate(this) }
         vm.noFingersScannedToast.activityObserveEventWith { showToast(androidResourcesHelper.getString(R.string.no_fingers_scanned)) }
+        vm.launchRefusal.activityObserveEventWith { launchRefusalActivity() }
+        vm.launchAlert.activityObserveEventWith { launchAlert(this, it) }
+        vm.launchReconnect.activityObserveEventWith { launchConnectScannerActivityForReconnect() }
         vm.finishWithFingerprints.activityObserveEventWith { setResultAndFinishSuccess(it) }
     }
 
@@ -241,6 +248,13 @@ class CollectFingerprintsActivity :
         }
     }
 
+    private fun launchConnectScannerActivityForReconnect() {
+        val intent = Intent(this, ConnectScannerActivity::class.java).apply {
+            putExtra(ConnectScannerTaskRequest.BUNDLE_KEY, ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.RECONNECT))
+        }
+        startActivityForResult(intent, RequestCode.CONNECT.value)
+    }
+
     private fun setResultAndFinishSuccess(fingerprints: List<Fingerprint>) {
         setResultAndFinish(ResultCode.OK, Intent().apply {
             putExtra(CollectFingerprintsTaskResult.BUNDLE_KEY, CollectFingerprintsTaskResult(fingerprints))
@@ -268,5 +282,9 @@ class CollectFingerprintsActivity :
                 }
             }
         }
+    }
+
+    override fun onBackPressed() {
+        vm.handleOnBackPressed()
     }
 }
