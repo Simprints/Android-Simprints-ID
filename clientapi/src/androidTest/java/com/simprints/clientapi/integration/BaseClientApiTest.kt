@@ -12,8 +12,6 @@ import com.simprints.clientapi.di.KoinInjector
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.moduleapi.app.responses.IAppResponse
-import com.simprints.clientapi.integration.key
-import com.simprints.clientapi.integration.value
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -22,7 +20,6 @@ import org.hamcrest.Description
 import org.junit.After
 import org.junit.Before
 import org.koin.test.KoinTest
-import org.koin.test.mock.declare
 import org.koin.test.mock.declareModule
 
 open class BaseClientApiTest : KoinTest {

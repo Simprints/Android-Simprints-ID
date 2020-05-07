@@ -4,19 +4,15 @@ import android.content.Intent
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent
-import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequestType
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
-import com.simprints.id.domain.moduleapi.core.requests.ConsentType
-import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreFaceExitFormResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreFingerprintExitFormResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
+import com.simprints.id.orchestrator.steps.core.requests.ConsentType
+import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.tools.TimeHelper
@@ -31,39 +27,19 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
 
     override val steps: MutableList<Step> = mutableListOf()
 
-    override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
-        when (appRequest.type) {
-            AppRequestType.ENROL -> addConsentStepIfRequired(ConsentType.ENROL)
-            AppRequestType.IDENTIFY -> addConsentStepIfRequired(ConsentType.IDENTIFY)
-            AppRequestType.VERIFY -> {
-                addVerifyStep(appRequest)
-                addConsentStepIfRequired(ConsentType.VERIFY)
-            }
-        }
-    }
-
-    private fun addConsentStepIfRequired(consentType: ConsentType) {
+    protected fun addCoreConsentStepIfRequired(consentType: ConsentType) {
         if (consentRequired) {
             steps.add(buildConsentStep(consentType))
         }
     }
 
-    private fun addVerifyStep(appRequest: AppRequest) {
-        with(appRequest as AppVerifyRequest) {
-            steps.add(buildVerifyCoreStep(projectId, verifyGuid))
-        }
-    }
+    private fun buildConsentStep(consentType: ConsentType) =
+        coreStepProcessor.buildStepConsent(consentType)
 
     override fun restoreState(stepsToRestore: List<Step>) {
         steps.clear()
         steps.addAll(stepsToRestore)
     }
-
-    private fun buildConsentStep(consentType: ConsentType) =
-        coreStepProcessor.buildStepConsent(consentType)
-
-    private fun buildVerifyCoreStep(projectId: String, verifyGuid: String) =
-        coreStepProcessor.buildStepVerify(projectId, verifyGuid)
 
     fun completeAllStepsIfExitFormHappened(requestCode: Int, resultCode: Int, data: Intent?) =
         tryProcessingResultFromCoreStepProcessor(data)

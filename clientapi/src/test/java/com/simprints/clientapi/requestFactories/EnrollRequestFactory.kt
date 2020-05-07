@@ -6,17 +6,17 @@ import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.domain.requests.EnrollRequest
+import com.simprints.clientapi.domain.requests.EnrolRequest
 import io.mockk.mockk
 
 object EnrollRequestFactory : RequestFactory() {
 
     override fun getValidSimprintsRequest(integrationInfo: IntegrationInfo): BaseRequest =
-        EnrollRequest(
+        EnrolRequest(
             projectId = MOCK_PROJECT_ID,
-            moduleId = MOCK_MODULE_ID,
             userId = MOCK_USER_ID,
             metadata = MOCK_METADATA,
+            moduleId = MOCK_MODULE_ID,
             unknownExtras = emptyMap()
         )
 

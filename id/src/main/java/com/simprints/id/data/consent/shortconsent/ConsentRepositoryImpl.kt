@@ -5,7 +5,7 @@ import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
+import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.tools.AndroidResourcesHelper
 
 class ConsentRepositoryImpl(private val consentLocalDataSource: ConsentLocalDataSource,

@@ -4,8 +4,8 @@ import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse

@@ -1,21 +1,21 @@
 package com.simprints.id.domain.moduleapi.app
-import com.simprints.id.domain.moduleapi.app.requests.AppBaseRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
-import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.moduleapi.app.requests.IAppEnrollRequest
-import com.simprints.moduleapi.app.requests.IAppIdentifyRequest
-import com.simprints.moduleapi.app.requests.IAppRequest
-import com.simprints.moduleapi.app.requests.IAppVerifyRequest
 
-object AppRequestToDomainRequest {
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.moduleapi.app.requests.*
 
-    fun fromAppToDomainRequest(appRequest: IAppRequest): AppBaseRequest =
-        when (appRequest) {
-            is IAppEnrollRequest -> AppEnrolRequest(appRequest)
-            is IAppVerifyRequest -> AppVerifyRequest(appRequest)
-            is IAppIdentifyRequest -> AppIdentifyRequest(appRequest)
-            else -> throw InvalidAppRequest()
-        }
-}
+fun IAppRequest.fromModuleApiToDomain(): AppRequest =
+    when (this) {
+        is IAppEnrollRequest ->
+            AppRequest.AppRequestFlow.AppEnrolRequest(projectId, userId, moduleId, metadata)
+
+        is IAppIdentifyRequest ->
+            AppRequest.AppRequestFlow.AppIdentifyRequest(projectId, userId, moduleId, metadata)
+
+        is IAppVerifyRequest ->
+            AppRequest.AppRequestFlow.AppVerifyRequest(projectId, userId, moduleId, metadata, verifyGuid)
+
+        is IAppConfirmIdentityRequest ->
+            AppRequest.AppConfirmIdentityRequest(projectId, userId, sessionId, selectedGuid)
+
+        else -> throw IllegalArgumentException("Request not recognised")
+    }

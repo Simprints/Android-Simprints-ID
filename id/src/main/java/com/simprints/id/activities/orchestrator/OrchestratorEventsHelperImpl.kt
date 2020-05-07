@@ -15,10 +15,10 @@ class OrchestratorEventsHelperImpl(private val sessionRepository: SessionReposit
             AppResponseType.REFUSAL -> buildRefusalCallbackEvent(appResponse as AppRefusalFormResponse)
             AppResponseType.VERIFY -> buildVerificationCallbackEvent(appResponse as AppVerifyResponse)
             AppResponseType.ERROR -> buildErrorCallbackEvent(appResponse as AppErrorResponse)
-            AppResponseType.CONFIRMATION -> null
+            AppResponseType.CONFIRMATION -> buildConfirmIdentityCallbackEvent(appResponse as AppConfirmationResponse)
         }
 
-        callbackEvent?.let { sessionRepository.addEventToCurrentSessionInBackground(it) }
+        callbackEvent.let { sessionRepository.addEventToCurrentSessionInBackground(it) }
     }
 
     private fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) =
@@ -50,4 +50,7 @@ class OrchestratorEventsHelperImpl(private val sessionRepository: SessionReposit
 
     private fun buildErrorCallbackEvent(appErrorResponse: AppErrorResponse) =
         ErrorCallbackEvent(timeHelper.now(), appErrorResponse.reason)
+
+    private fun buildConfirmIdentityCallbackEvent(appResponse: AppConfirmationResponse) =
+        ConfirmationCallbackEvent(timeHelper.now(), appResponse.identificationOutcome)
 }

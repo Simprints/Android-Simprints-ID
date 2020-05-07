@@ -24,9 +24,6 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (action != ConfirmIdentity)
-            showLauncherScreen()
-
         loadClientApiKoinModules()
     }
 

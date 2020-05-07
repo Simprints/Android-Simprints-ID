@@ -1,14 +1,10 @@
 package com.simprints.clientapi.routers
 
 import android.app.Activity
-import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.domain.requests.EnrollRequest
-import com.simprints.clientapi.domain.requests.IdentifyRequest
-import com.simprints.clientapi.domain.requests.VerifyRequest
-import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
-import com.simprints.clientapi.domain.requests.confirmations.IdentityConfirmation
+import com.simprints.clientapi.domain.requests.*
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
 import com.simprints.clientapi.extensions.toIntent
+import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 
 object AppRequestRouter {
 
@@ -23,32 +19,18 @@ object AppRequestRouter {
     private const val CONFIRM_IDENTITY = "com.simprints.clientapp.CONFIRM_IDENTITY"
 
     fun routeSimprintsRequest(act: Activity,
-                              request: BaseRequest) = when (request) {
-        // Regular Requests
-        is EnrollRequest -> act.route(request, REGISTER, REGISTER_REQUEST_CODE)
-        is VerifyRequest -> act.route(request, VERIFY, VERIFY_REQUEST_CODE)
-        is IdentifyRequest -> act.route(request, IDENTIFY, IDENTIFY_REQUEST_CODE)
-
-        // Handle Error
-        else -> throw InvalidClientRequestException("Invalid Action AppRequest")
-    }
-
-    fun routeSimprintsConfirmation(act: Activity,
-                                   request: BaseConfirmation) {
+                              request: BaseRequest) =
         when (request) {
             // Regular Requests
-            is IdentityConfirmation ->
-                act.route(request, CONFIRM_IDENTITY, CONFIRM_IDENTITY_REQUEST_CODE)
-
-            // Handle Error
-            else -> throw InvalidClientRequestException("Invalid Confirmation AppRequest")
+            is EnrolRequest -> act.route(request, REGISTER, REGISTER_REQUEST_CODE)
+            is VerifyRequest -> act.route(request, VERIFY, VERIFY_REQUEST_CODE)
+            is IdentifyRequest -> act.route(request, IDENTIFY, IDENTIFY_REQUEST_CODE)
+            is ConfirmIdentityRequest -> act.route(request, CONFIRM_IDENTITY, CONFIRM_IDENTITY_REQUEST_CODE)
+            else -> throw InvalidClientRequestException("Invalid Action AppRequest")
         }
+
+    private fun Activity.route(request: BaseRequest, route: String, code: Int) {
+        this.removeAnimationsToNextActivity()
+        this.startActivityForResult(request.convertToAppRequest().toIntent(route), code)
     }
-
-    private fun Activity.route(request: BaseRequest, route: String, code: Int) =
-        this.startActivityForResult(request.convertToAppRequest().toIntent(route), code)
-
-    private fun Activity.route(request: BaseConfirmation, route: String, code: Int) =
-        this.startActivityForResult(request.convertToAppRequest().toIntent(route), code)
-
 }

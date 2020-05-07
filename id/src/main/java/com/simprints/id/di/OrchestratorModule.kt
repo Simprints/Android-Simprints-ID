@@ -19,10 +19,7 @@ import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.cache.StepEncoderImpl
-import com.simprints.id.orchestrator.modality.ModalityFlow
-import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
-import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
-import com.simprints.id.orchestrator.modality.ModalityFlowVerifyImpl
+import com.simprints.id.orchestrator.modality.*
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
@@ -60,7 +57,16 @@ class OrchestratorModule {
     @Provides
     fun provideCoreStepProcessor(): CoreStepProcessor = CoreStepProcessorImpl()
 
-    // ModalFlow [Enrol, Identify, Verify]
+    // ModalFlow [ConfirmIdentity, Enrol, Identify, Verify]
+    @Provides
+    @Named("ModalityConfirmationFlow")
+    fun provideModalityFlowConfirmIdentity(
+        coreStepProcessor: CoreStepProcessor
+    ): ModalityFlow =
+        ModalityFlowConfirmIdentity(
+            coreStepProcessor
+        )
+
     @Provides
     @Named("ModalityFlowEnrol")
     fun provideModalityFlow(
@@ -119,9 +125,10 @@ class OrchestratorModule {
     fun provideModalityFlowFactory(
         @Named("ModalityFlowEnrol") enrolFlow: ModalityFlow,
         @Named("ModalityFlowVerify") verifyFlow: ModalityFlow,
-        @Named("ModalityFlowIdentify") identifyFlow: ModalityFlow
+        @Named("ModalityFlowIdentify") identifyFlow: ModalityFlow,
+        @Named("ModalityConfirmationFlow") confirmationIdentityFlow: ModalityFlow
     ): ModalityFlowFactory =
-        ModalityFlowFactoryImpl(enrolFlow, verifyFlow, identifyFlow)
+        ModalityFlowFactoryImpl(enrolFlow, verifyFlow, identifyFlow, confirmationIdentityFlow)
 
     @Provides
     fun provideOrchestratorManager(orchestratorManagerImpl: OrchestratorManagerImpl): OrchestratorManager {

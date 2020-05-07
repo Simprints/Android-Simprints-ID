@@ -5,8 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequestType
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppConfirmIdentityRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
+import com.simprints.id.orchestrator.FlowProvider.FlowType.*
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
@@ -28,7 +30,6 @@ open class OrchestratorManagerImpl(
     internal var sessionId: String = ""
 
     private lateinit var modalitiesFlow: ModalityFlow
-    private lateinit var flow: AppRequestType
 
     override suspend fun initialise(modalities: List<Modality>,
                                     appRequest: AppRequest,
@@ -38,7 +39,6 @@ open class OrchestratorManagerImpl(
         this.modalities = modalities
         modalitiesFlow = flowModalityFactory.createModalityFlow(appRequest, modalities)
         resetInternalState()
-        flow = appRequest.type
 
         proceedToNextStepOrAppResponse()
     }
@@ -65,7 +65,13 @@ open class OrchestratorManagerImpl(
         }
     }
 
-    override fun getCurrentFlow() = flow
+    override fun getCurrentFlow() =
+        when (appRequest) {
+            is AppEnrolRequest -> ENROL
+            is AppIdentifyRequest -> IDENTIFY
+            is AppVerifyRequest -> VERIFY
+            is AppConfirmIdentityRequest -> throw IllegalStateException("Not running one of the main flows")
+        }
 
     private suspend fun proceedToNextStepOrAppResponse() {
         with(modalitiesFlow) {
