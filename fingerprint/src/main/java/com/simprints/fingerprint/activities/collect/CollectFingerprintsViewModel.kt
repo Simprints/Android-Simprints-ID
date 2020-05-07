@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.activities.collect
 
-import android.os.Handler
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -46,6 +45,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import java.util.*
+import kotlin.concurrent.schedule
 import kotlin.math.min
 
 class CollectFingerprintsViewModel(
@@ -124,9 +125,9 @@ class CollectFingerprintsViewModel(
     private fun nudgeToNextFinger() {
         with(state()) {
             if (currentFingerIndex < fingerStates.size - 1) {
-                Handler().postDelayed({
+                Timer().schedule(AUTO_SWIPE_DELAY) {
                     updateSelectedFinger(currentFingerIndex + 1)
-                }, AUTO_SWIPE_DELAY)
+                }
             }
         }
     }
@@ -275,10 +276,10 @@ class CollectFingerprintsViewModel(
 
     private fun showSplashAndNudge(addNewFinger: Boolean) {
         updateState { isShowingSplashScreen = true }
-        Handler().postDelayed({
+        Timer().schedule(TRY_DIFFERENT_FINGER_SPLASH_DELAY) {
             if (addNewFinger) handleAutoAddFinger()
             nudgeToNextFinger()
-        }, TRY_DIFFERENT_FINGER_SPLASH_DELAY)
+        }
     }
 
     private fun handleAutoAddFinger() {
