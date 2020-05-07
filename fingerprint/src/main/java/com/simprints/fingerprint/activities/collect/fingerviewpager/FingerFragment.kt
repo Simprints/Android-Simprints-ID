@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collect.old
+package com.simprints.fingerprint.activities.collect.fingerviewpager
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -74,12 +74,8 @@ class FingerFragment : FingerprintFragment() {
 
         private const val FINGER_ARG = "finger"
 
-        fun newInstance(finger: Finger): FingerFragment {
-            val fingerFragment = FingerFragment()
-            val bundle = Bundle()
-            bundle.putParcelable(FINGER_ARG, finger)
-            fingerFragment.arguments = bundle
-            return fingerFragment
+        fun newInstance(finger: Finger) = FingerFragment().also {
+            it.arguments = Bundle().apply { putParcelable(FINGER_ARG, finger) }
         }
     }
 }

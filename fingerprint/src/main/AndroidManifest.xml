@@ -42,7 +42,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent"/>
         <activity
-            android:name=".activities.collect.old.SplashScreenActivity"
+            android:name=".activities.collect.tryagainsplash.SplashScreenActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
         <activity

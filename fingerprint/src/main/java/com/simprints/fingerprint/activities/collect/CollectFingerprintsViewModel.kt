@@ -10,7 +10,7 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.Finger
 import com.simprints.fingerprint.activities.collect.domain.ScanConfig
-import com.simprints.fingerprint.activities.collect.old.models.FingerScanConfig
+import com.simprints.fingerprint.activities.collect.domain.FingerConfig
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
 import com.simprints.fingerprint.activities.collect.state.FingerScanResult
@@ -82,7 +82,7 @@ class CollectFingerprintsViewModel(
     private var scanningTask: Disposable? = null
     private var imageTransferTask: Disposable? = null
 
-    private val scanConfig = FingerScanConfig.DEFAULT
+    private val scanConfig = FingerConfig.DEFAULT
 
     private val scannerTriggerListener = ScannerTriggerListener {
         viewModelScope.launch(context = Dispatchers.Main) {
@@ -459,8 +459,6 @@ class CollectFingerprintsViewModel(
         const val imageTransferTimeoutMs = 3000L
 
         const val AUTO_SWIPE_DELAY: Long = 500
-        const val FAST_SWIPE_SPEED = 100
-        const val SLOW_SWIPE_SPEED = 1000
 
         const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 2000
     }

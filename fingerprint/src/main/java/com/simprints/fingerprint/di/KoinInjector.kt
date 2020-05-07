@@ -1,15 +1,11 @@
 package com.simprints.fingerprint.di
 
 import android.bluetooth.BluetoothAdapter
-import android.content.Context
 import android.nfc.NfcAdapter
 import com.simprints.fingerprint.activities.alert.AlertContract
 import com.simprints.fingerprint.activities.alert.AlertPresenter
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
-import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsContract
-import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsPresenter
-import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.nfcpair.NfcPairViewModel
 import com.simprints.fingerprint.activities.connect.issues.serialentrypair.SerialEntryPairViewModel
@@ -40,9 +36,9 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBu
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
+import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
@@ -121,9 +117,6 @@ object KoinInjector {
     private fun Module.defineBuildersForPresentersAndViewModels() {
         factory<AlertContract.Presenter> { (view: AlertContract.View, fingerprintAlert: FingerprintAlert) ->
             AlertPresenter(view, get(), get(), get(), fingerprintAlert)
-        }
-        factory<CollectFingerprintsContract.Presenter> { (context: Context, view: CollectFingerprintsContract.View, request: CollectFingerprintsTaskRequest) ->
-            CollectFingerprintsPresenter(context, view, request, get(), get(), get(), get(), get(), get(), get(), get())
         }
         factory<RefusalContract.Presenter> { (view: RefusalContract.View) ->
             RefusalPresenter(view, get(), get(), get())

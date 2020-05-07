@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collect.old
+package com.simprints.fingerprint.activities.collect.fingerviewpager
 
 import android.util.SparseArray
 import android.view.ViewGroup
