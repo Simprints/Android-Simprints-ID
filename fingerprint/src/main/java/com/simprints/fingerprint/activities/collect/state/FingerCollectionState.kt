@@ -5,9 +5,9 @@ sealed class FingerCollectionState {
     object NotCollected : FingerCollectionState()
     object Skipped : FingerCollectionState()
     data class Scanning(val numberOfBadScans: Int = 0) : FingerCollectionState()
-    data class TransferringImage(val fingerScanResult: FingerScanResult, val numberOfBadScans: Int = 0) : FingerCollectionState()
+    data class TransferringImage(val scanResult: ScanResult, val numberOfBadScans: Int = 0) : FingerCollectionState()
     data class NotDetected(val numberOfBadScans: Int = 0) : FingerCollectionState()
-    data class Collected(val fingerScanResult: FingerScanResult, val numberOfBadScans: Int = 0) : FingerCollectionState()
+    data class Collected(val scanResult: ScanResult, val numberOfBadScans: Int = 0) : FingerCollectionState()
 
     fun isCommunicating(): Boolean = this is Scanning || this is TransferringImage
 
@@ -23,7 +23,7 @@ sealed class FingerCollectionState {
         else -> Scanning()
     }
 
-    fun toTransferringImage(scanResult: FingerScanResult): TransferringImage = when (this) {
+    fun toTransferringImage(scanResult: ScanResult): TransferringImage = when (this) {
         is TransferringImage -> TransferringImage(scanResult, numberOfBadScans)
         is Scanning -> TransferringImage(scanResult, numberOfBadScans)
         is NotDetected -> TransferringImage(scanResult, numberOfBadScans)
@@ -39,7 +39,7 @@ sealed class FingerCollectionState {
         else -> NotDetected()
     }
 
-    fun toCollected(scanResult: FingerScanResult): Collected = when (this) {
+    fun toCollected(scanResult: ScanResult): Collected = when (this) {
         is Scanning -> Collected(scanResult, numberOfBadScans + incIfBadScan(scanResult))
         is TransferringImage -> Collected(scanResult, numberOfBadScans + incIfBadScan(scanResult))
         is NotDetected -> Collected(scanResult, numberOfBadScans + incIfBadScan(scanResult))
@@ -47,12 +47,12 @@ sealed class FingerCollectionState {
         else -> Collected(scanResult, incIfBadScan(scanResult))
     }
 
-    private fun incIfBadScan(scanResult: FingerScanResult) =
+    private fun incIfBadScan(scanResult: ScanResult) =
         if (scanResult.isGoodScan()) 0 else 1
 
     fun toCollected(imageBytes: ByteArray): Collected = when (this) {
-        is TransferringImage -> toCollected(fingerScanResult.copy(image = imageBytes))
-        is Collected -> Collected(fingerScanResult.copy(image = imageBytes), numberOfBadScans)
+        is TransferringImage -> toCollected(scanResult.copy(image = imageBytes))
+        is Collected -> Collected(scanResult.copy(image = imageBytes), numberOfBadScans)
         else -> throw IllegalStateException("Illegal attempt to move to collected state without scan result")
     }
 }

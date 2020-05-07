@@ -2,7 +2,7 @@ package com.simprints.fingerprint.activities.collect.state
 
 import com.simprints.fingerprint.activities.collect.domain.ScanConfig
 
-data class FingerScanResult(
+data class ScanResult(
     val qualityScore: Int,
     val template: ByteArray,
     val image: ByteArray?
@@ -20,7 +20,7 @@ data class FingerScanResult(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as FingerScanResult
+        other as ScanResult
 
         if (qualityScore != other.qualityScore) return false
         if (!template.contentEquals(other.template)) return false

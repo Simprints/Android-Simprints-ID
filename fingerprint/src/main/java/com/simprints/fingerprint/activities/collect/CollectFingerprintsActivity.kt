@@ -15,17 +15,17 @@ import androidx.viewpager.widget.ViewPager
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
-import com.simprints.fingerprint.activities.collect.fingerviewpager.FingerPageAdapter
-import com.simprints.fingerprint.activities.collect.tryagainsplash.SplashScreenActivity
 import com.simprints.fingerprint.activities.collect.confirmfingerprints.ConfirmFingerprintsDialog
-import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningOnlyTimeoutBar
-import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar
-import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningWithImageTransferTimeoutBar
+import com.simprints.fingerprint.activities.collect.fingerviewpager.FingerPageAdapter
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.resources.*
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningOnlyTimeoutBar
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningWithImageTransferTimeoutBar
+import com.simprints.fingerprint.activities.collect.tryagainsplash.SplashScreenActivity
 import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
@@ -44,8 +44,7 @@ import kotlinx.android.synthetic.main.content_main.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class CollectFingerprintsActivity :
-    FingerprintActivity() {
+class CollectFingerprintsActivity : FingerprintActivity() {
 
     private val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
     private val masterFlowManager: MasterFlowManager by inject()
@@ -57,6 +56,7 @@ class CollectFingerprintsActivity :
     private var confirmDialog: AlertDialog? = null
     private val indicators = ArrayList<ImageView>()
     private var rightToLeft: Boolean = false
+    private var numberOfFingersCurrentlyDisplayed = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -160,6 +160,7 @@ class CollectFingerprintsActivity :
 
     private fun observeStateChanges() {
         vm.state.activityObserveWith {
+            it.updateNumberOfFingersCurrentlyDisplayed()
             it.updateIndicators()
             it.updateScanButton()
             it.updateViewPager()
@@ -174,6 +175,17 @@ class CollectFingerprintsActivity :
         vm.launchAlert.activityObserveEventWith { launchAlert(this, it) }
         vm.launchReconnect.activityObserveEventWith { launchConnectScannerActivityForReconnect() }
         vm.finishWithFingerprints.activityObserveEventWith { setResultAndFinishSuccess(it) }
+    }
+
+    private fun CollectFingerprintsState.updateNumberOfFingersCurrentlyDisplayed() {
+        val numberOfFingersToDisplay = orderedFingers().size
+        if (numberOfFingersToDisplay != numberOfFingersCurrentlyDisplayed) {
+            initIndicators()
+            initPageAdapter()
+            view_pager.adapter = pageAdapter
+            pageAdapter.notifyDataSetChanged()
+        }
+        numberOfFingersCurrentlyDisplayed = numberOfFingersToDisplay
     }
 
     private fun CollectFingerprintsState.updateIndicators() {
@@ -213,7 +225,7 @@ class CollectFingerprintsActivity :
                 timeoutBar.handleCancelled()
                 timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
             }
-            is FingerCollectionState.Collected -> if (fingerState.fingerScanResult.isGoodScan()) {
+            is FingerCollectionState.Collected -> if (fingerState.scanResult.isGoodScan()) {
                 timeoutBar.handleCancelled()
                 timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_good)
             } else {
@@ -228,7 +240,7 @@ class CollectFingerprintsActivity :
             val mapOfScannedFingers = orderedFingers().associate { finger ->
                 val fingerState = fingerStates[finger]
                 androidResourcesHelper.getString(finger.nameTextId()) to
-                    (fingerState is FingerCollectionState.Collected && fingerState.fingerScanResult.isGoodScan())
+                    (fingerState is FingerCollectionState.Collected && fingerState.scanResult.isGoodScan())
             }
             ConfirmFingerprintsDialog(this@CollectFingerprintsActivity, androidResourcesHelper, mapOfScannedFingers,
                 callbackConfirm = { vm.handleConfirmFingerprintsAndContinue() },
