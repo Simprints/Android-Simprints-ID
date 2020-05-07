@@ -4,6 +4,7 @@ import android.app.Activity
 import com.simprints.clientapi.domain.requests.*
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
 import com.simprints.clientapi.extensions.toIntent
+import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 
 object AppRequestRouter {
 
@@ -29,7 +30,7 @@ object AppRequestRouter {
         }
 
     private fun Activity.route(request: BaseRequest, route: String, code: Int) {
-        this.overridePendingTransition(0, 0)
+        this.removeAnimationsToNextActivity()
         this.startActivityForResult(request.convertToAppRequest().toIntent(route), code)
     }
 }
