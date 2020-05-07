@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager
@@ -39,7 +40,7 @@ class OrchestratorActivity : AppCompatActivity() {
         it?.let {
             with(Intent().setClassName(packageName, it.activityName)) {
                 putExtra(it.bundleKey, it.request.fromDomainToModuleApi())
-                this@OrchestratorActivity.overridePendingTransition(0, 0)
+                this@OrchestratorActivity.removeAnimationsToNextActivity()
                 startActivityForResult(this, it.requestCode)
             }
         }
