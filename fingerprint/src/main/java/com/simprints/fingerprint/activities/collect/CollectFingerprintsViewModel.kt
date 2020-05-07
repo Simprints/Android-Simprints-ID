@@ -9,7 +9,6 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.Finger
 import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsPresenter
-import com.simprints.fingerprint.activities.collect.old.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.fingerprint.activities.collect.old.models.FingerScanConfig
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
@@ -236,7 +235,7 @@ class CollectFingerprintsViewModel(
         Handler().postDelayed({
             handleAutoAddFinger()
             nudgeToNextFinger()
-        }, CollectFingerprintsFingerDisplayHelper.TRY_DIFFERENT_FINGER_SPLASH_DELAY)
+        }, TRY_DIFFERENT_FINGER_SPLASH_DELAY)
     }
 
     private fun showSplashAndNudgeIfNecessary() {
