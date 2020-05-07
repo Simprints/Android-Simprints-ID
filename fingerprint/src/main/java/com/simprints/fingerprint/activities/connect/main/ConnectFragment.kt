@@ -1,35 +1,41 @@
-package com.simprints.fingerprint.activities.connect
+package com.simprints.fingerprint.activities.connect.main
 
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.LayoutRes
 import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
+import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.confirmscannererror.ConfirmScannerErrorBuilder
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import kotlinx.android.synthetic.main.fragment_initial_connect.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class InitialConnectFragment : FingerprintFragment() {
+abstract class ConnectFragment(@LayoutRes private val layout: Int) : FingerprintFragment() {
 
-    private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
-    private val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
+    protected val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
+    protected val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
 
     private var scannerErrorConfirmationDialog: AlertDialog? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_initial_connect, container, false)
+        inflater.inflate(layout, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeLifecycleEvents()
+        initUiComponents()
         observeScannerEvents()
+        observeLifecycleEvents()
     }
+
+    protected abstract fun initUiComponents()
+
+    protected abstract fun observeScannerEvents()
 
     private fun observeLifecycleEvents() {
         connectScannerViewModel.connectScannerIssue.fragmentObserveEventWith {
@@ -40,12 +46,6 @@ class InitialConnectFragment : FingerprintFragment() {
                 connectScannerViewModel.finishConnectActivity()
             }
         }
-    }
-
-    private fun observeScannerEvents() {
-        connectScannerViewModel.progress.fragmentObserveWith { connectScannerProgressBar.progress = it }
-        connectScannerViewModel.message.fragmentObserveWith { connectScannerInfoTextView.text = androidResourcesHelper.getString(it) }
-        connectScannerViewModel.showScannerErrorDialogWithScannerId.fragmentObserveEventWith { showDialogForScannerErrorConfirmation(it) }
     }
 
     private fun navigateToScannerIssueFragment(issue: ConnectScannerIssue) {
@@ -59,7 +59,7 @@ class InitialConnectFragment : FingerprintFragment() {
         findNavController().navigate(action)
     }
 
-    private fun showDialogForScannerErrorConfirmation(scannerId: String) {
+    protected fun showDialogForScannerErrorConfirmation(scannerId: String) {
         scannerErrorConfirmationDialog = buildConfirmScannerErrorAlertDialog(scannerId).also {
             it.show()
             connectScannerViewModel.logScannerErrorDialogShownToCrashReport()
