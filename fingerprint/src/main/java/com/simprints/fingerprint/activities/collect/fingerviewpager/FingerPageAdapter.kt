@@ -7,10 +7,9 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.PagerAdapter
 import com.simprints.fingerprint.activities.collect.domain.Finger
 
-
 class FingerPageAdapter(fragmentManager: FragmentManager,
                         private val activeFingers: List<Finger>) :
-    FragmentStatePagerAdapter(fragmentManager) {
+    FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     private val fragmentSparseArray = SparseArray<FingerFragment>()
 
