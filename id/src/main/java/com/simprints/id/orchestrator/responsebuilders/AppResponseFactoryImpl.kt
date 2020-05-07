@@ -26,7 +26,7 @@ class AppResponseFactoryImpl(
             is AppEnrolRequest -> AppResponseBuilderForEnrol(enrolmentHelper, timeHelper)
             is AppIdentifyRequest -> AppResponseBuilderForIdentify()
             is AppVerifyRequest -> AppResponseBuilderForVerify()
-            is AppConfirmIdentityRequest -> AppResponseBuilderForConfirmationBuilder()
+            is AppConfirmIdentityRequest -> AppResponseBuilderForConfirmIdentity()
         }.buildAppResponse(modalities, appRequest, steps, sessionId)
 }
 
