@@ -10,11 +10,13 @@ import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncProgress
 import com.simprints.id.data.db.person.domain.Person.Companion.buildPersonFromCreationPayload
 import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordMovePayload
 import com.simprints.id.data.db.person.domain.personevents.fromApiToDomain
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordCreationPayload
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.person.remote.models.personevents.ApiEnrolmentRecordMovePayload
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEvent
 import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
 import com.simprints.id.tools.TimeHelper
@@ -116,8 +118,14 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
                 it.fromApiToDomain().payload as EnrolmentRecordDeletionPayload
             }
 
+        val eventRecordsToUpdate =
+            batchOfEvents.filter { it.payload is ApiEnrolmentRecordMovePayload }.map {
+                it.fromApiToDomain().payload as EnrolmentRecordMovePayload
+            }
+
         savePeopleBatchInLocal(batchOfPeopleToSaveInLocal)
         deletePeopleBatchFromLocal(eventRecordsToBeDeleted)
+        updatePeopleBatchesInLocal(eventRecordsToUpdate)
     }
 
     private suspend fun savePeopleBatchInLocal(batchOfEventsToSaveInLocal: List<EnrolmentRecordCreationPayload>) {
@@ -129,6 +137,13 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
     private suspend fun deletePeopleBatchFromLocal(eventRecordsToBeDeleted: List<EnrolmentRecordDeletionPayload>) {
         if (eventRecordsToBeDeleted.isNotEmpty()) {
             personLocalDataSource.delete(buildQueryForPeopleById(eventRecordsToBeDeleted))
+        }
+    }
+
+    private suspend fun updatePeopleBatchesInLocal(eventRecordsToUpdate: List<EnrolmentRecordMovePayload>) {
+        if(eventRecordsToUpdate.isNotEmpty()) {
+            deletePeopleBatchFromLocal(eventRecordsToUpdate.map { it.enrolmentRecordDeletionPayload })
+            savePeopleBatchInLocal(eventRecordsToUpdate.map { it.enrolmentRecordCreationPayload })
         }
     }
 
