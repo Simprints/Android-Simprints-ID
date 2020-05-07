@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
@@ -101,7 +102,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
             putExtra(AppRequest.BUNDLE_KEY, appRequest)
             addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
         }
-        this.overridePendingTransition(0, 0)
+        this.removeAnimationsToNextActivity()
         startActivity(intent)
         finish()
     }

@@ -7,7 +7,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.response.GuidSelectionResponse
 
-class AppResponseBuilderForConfirmationBuilder : BaseAppResponseBuilder() {
+class AppResponseBuilderForConfirmIdentity : BaseAppResponseBuilder() {
 
     override suspend fun buildAppResponse(modalities: List<Modality>,
                                           appRequest: AppRequest,

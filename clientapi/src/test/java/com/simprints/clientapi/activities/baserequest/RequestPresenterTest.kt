@@ -4,7 +4,7 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.domain.requests.EnrollRequest
+import com.simprints.clientapi.domain.requests.EnrolRequest
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.exceptions.RootedDeviceException
 import com.simprints.clientapi.tools.DeviceManager
@@ -42,7 +42,7 @@ class RequestPresenterTest {
     fun givenAnIntentWithExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldBeAdded() {
         runBlockingTest {
             val requestBuilder = mockk<ClientRequestBuilder>(relaxed = true).apply {
-                every { this@apply.build() } returns EnrollRequest(projectIdField, userIdField, moduleIdField, metadataField, extraField)
+                every { this@apply.build() } returns EnrolRequest(projectIdField, userIdField, moduleIdField, metadataField, extraField)
             }
 
             val presenter = ImplRequestPresenter(mockk(relaxed = true), clientApiSessionEventsManagerMock, mockk(relaxed = true), mockk(relaxed = true))
@@ -58,7 +58,7 @@ class RequestPresenterTest {
     fun givenAnIntentWithNoExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldNotBeAdded() {
         runBlockingTest {
             val requestBuilder = mockk<ClientRequestBuilder>().apply {
-                every { this@apply.build() } returns EnrollRequest(projectIdField, userIdField, moduleIdField, metadataField, emptyMap())
+                every { this@apply.build() } returns EnrolRequest(projectIdField, userIdField, moduleIdField, metadataField, emptyMap())
             }
 
             val presenter = ImplRequestPresenter(mockk(relaxed = true), clientApiSessionEventsManagerMock, mockk(relaxed = true), mockk(relaxed = true))

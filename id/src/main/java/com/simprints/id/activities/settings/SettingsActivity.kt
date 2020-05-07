@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.preference.PreferenceFragment
+import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
@@ -77,7 +78,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     }
 
     fun openCheckLoginFromMainLauncherActivity() {
-        overridePendingTransition(0, 0)
+        removeAnimationsToNextActivity()
         startActivity(Intent(this, CheckLoginFromMainLauncherActivity::class.java))
     }
     
