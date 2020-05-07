@@ -4,6 +4,7 @@ import android.app.Activity
 import com.simprints.clientapi.domain.requests.*
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
 import com.simprints.clientapi.extensions.toIntent
+import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import timber.log.Timber
 
 object AppRequestRouter {
@@ -24,7 +25,7 @@ object AppRequestRouter {
                               request: BaseRequest) =
         when (request) {
             // Regular Requests
-            is EnrollRequest -> act.route(request, REGISTER, REGISTER_REQUEST_CODE)
+            is EnrolRequest -> act.route(request, REGISTER, REGISTER_REQUEST_CODE)
             is VerifyRequest -> act.route(request, VERIFY, VERIFY_REQUEST_CODE)
             is IdentifyRequest -> act.route(request, IDENTIFY, IDENTIFY_REQUEST_CODE)
             is ConfirmIdentityRequest -> act.route(request, CONFIRM_IDENTITY, CONFIRM_IDENTITY_REQUEST_CODE)
@@ -33,7 +34,7 @@ object AppRequestRouter {
         }
 
     private fun Activity.route(request: BaseRequest, route: String, code: Int) {
-        this.overridePendingTransition(0, 0)
+        this.removeAnimationsToNextActivity()
         this.startActivityForResult(request.convertToAppRequest().toIntent(route), code)
     }
 }
