@@ -5,10 +5,9 @@
     android:id="@+id/connectScannerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/simprints_blue"
+    android:background="@color/transparent"
     android:orientation="vertical"
-    tools:context="com.simprints.fingerprint.activities.connect.ConnectScannerActivity"
-    tools:layout_editor_absoluteY="25dp">
+    tools:context="com.simprints.fingerprint.activities.connect.ConnectScannerActivity">
 
     <fragment
         android:id="@+id/nav_host_fragment"
@@ -19,8 +18,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-
         app:layout_constraintTop_toTopOf="parent"
-        app:navGraph="@navigation/connect_scanner_nav_graph" />
+        tools:ignore="FragmentTagUsage" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,7 +15,6 @@ import androidx.viewpager.widget.ViewPager
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
-import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.old.FingerPageAdapter
 import com.simprints.fingerprint.activities.collect.old.SplashScreenActivity
 import com.simprints.fingerprint.activities.collect.old.confirmFingerprints.ConfirmFingerprintsDialog
@@ -112,9 +111,9 @@ class CollectFingerprintsActivity :
 
     private fun initTimeoutBar() {
         timeoutBar = if (vm.isImageTransferRequired()) {
-            ScanningWithImageTransferTimeoutBar(pb_timeout, CollectFingerprintsPresenter.scanningTimeoutMs, CollectFingerprintsPresenter.imageTransferTimeoutMs)
+            ScanningWithImageTransferTimeoutBar(pb_timeout, CollectFingerprintsViewModel.scanningTimeoutMs, CollectFingerprintsViewModel.imageTransferTimeoutMs)
         } else {
-            ScanningOnlyTimeoutBar(pb_timeout, CollectFingerprintsPresenter.scanningTimeoutMs)
+            ScanningOnlyTimeoutBar(pb_timeout, CollectFingerprintsViewModel.scanningTimeoutMs)
         }
     }
 

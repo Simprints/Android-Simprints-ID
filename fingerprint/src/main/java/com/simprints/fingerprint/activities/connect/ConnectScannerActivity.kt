@@ -3,13 +3,12 @@ package com.simprints.fingerprint.activities.connect
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.navigation.findNavController
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
-import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForConnectScannerActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate
@@ -25,9 +24,7 @@ class ConnectScannerActivity : FingerprintActivity() {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val connectScannerRequest: ConnectScannerTaskRequest =
-            this.intent.extras?.getParcelable(ConnectScannerTaskRequest.BUNDLE_KEY) as ConnectScannerTaskRequest?
-                ?: throw InvalidRequestForConnectScannerActivityException()
+        findNavController(R.id.nav_host_fragment).setGraph(R.navigation.connect_scanner_nav_graph, intent.extras)
 
         viewModel.launchAlert.activityObserveEventWith { launchAlert(this, it) }
         viewModel.finish.activityObserveEventWith { vibrateAndContinueToNextActivity() }
