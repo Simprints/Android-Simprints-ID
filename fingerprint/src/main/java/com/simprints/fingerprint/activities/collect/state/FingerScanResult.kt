@@ -9,6 +9,13 @@ data class FingerScanResult(
 ) {
     fun isGoodScan() = qualityScore >= ScanConfig.qualityThreshold
 
+    override fun toString(): String {
+        val qualityScoreStr = "$qualityScore (${if (isGoodScan()) "good scan" else "bad scan"})"
+        val templateStr = "${template.size} byte template"
+        val imageStr = if (image != null) "${image.size} byte image" else "no image"
+        return "FingerScanResult(qualityScore=$qualityScoreStr, $templateStr, $imageStr)"
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
