@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
@@ -38,7 +39,8 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_check_login)
+        setContentView(R.layout.splash_screen)
+
         val component = (application as Application).component
         component.inject(this)
         title = androidResourcesHelper.getString(R.string.title_activity_front)
@@ -77,7 +79,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     }
 
     override fun parseRequest() =
-        intent.parseAppRequest() as AppRequest
+        intent.parseAppRequest()
 
     override fun getCheckCallingApp() = getCallingPackageName()
 
@@ -100,6 +102,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
             putExtra(AppRequest.BUNDLE_KEY, appRequest)
             addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
         }
+        this.removeAnimationsToNextActivity()
         startActivity(intent)
         finish()
     }

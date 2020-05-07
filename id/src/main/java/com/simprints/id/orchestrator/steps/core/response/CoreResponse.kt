@@ -1,4 +1,4 @@
-package com.simprints.id.domain.moduleapi.core.response
+package com.simprints.id.orchestrator.steps.core.response
 
 import android.os.Parcelable
 import com.simprints.id.orchestrator.steps.Step
@@ -16,5 +16,6 @@ enum class CoreResponseType {
     CORE_EXIT_FORM,
     FINGERPRINT_EXIT_FORM,
     FACE_EXIT_FORM,
-    FETCH_GUID
+    FETCH_GUID,
+    GUID_SELECTION
 }

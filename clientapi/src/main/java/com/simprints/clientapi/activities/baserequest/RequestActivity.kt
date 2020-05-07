@@ -13,11 +13,10 @@ import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
+import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
-import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmation
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.moduleapi.app.responses.*
@@ -49,12 +48,16 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     override val confirmIdentityExtractor: ConfirmIdentityExtractor
         get() = ConfirmIdentityExtractor(intent)
 
-    override fun sendSimprintsRequest(request: BaseRequest) =
-        routeSimprintsRequest(this, request)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.request_activity)
+    }
 
-    override fun sendSimprintsConfirmation(request: BaseConfirmation) {
-        routeSimprintsConfirmation(this, request)
-        guidSelectionNotifier.showMessage()
+    override fun sendSimprintsRequest(request: BaseRequest) {
+        routeSimprintsRequest(this, request)
+        if(request is ConfirmIdentityRequest) {
+            guidSelectionNotifier.showMessage()
+        }
     }
 
     override fun handleClientRequestError(clientApiAlert: ClientApiAlert) {
@@ -88,11 +91,6 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     protected fun sendOkResult(intent: Intent) {
         setResult(Activity.RESULT_OK, intent)
         finish()
-    }
-
-    protected fun showLauncherScreen() {
-        setContentView(R.layout.launcher)
-        supportActionBar?.hide()
     }
 
     private fun sendCancelResult() {

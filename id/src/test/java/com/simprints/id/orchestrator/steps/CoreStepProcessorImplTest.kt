@@ -3,15 +3,18 @@ package com.simprints.id.orchestrator.steps
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.id.data.exitform.FaceExitFormReason
 import com.simprints.id.data.exitform.FingerprintExitFormReason
-import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
-import com.simprints.id.domain.moduleapi.core.requests.ConsentType
-import com.simprints.id.domain.moduleapi.core.response.*
-import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
+import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
+import com.simprints.id.orchestrator.steps.core.requests.ConsentType
+import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
+import com.simprints.id.orchestrator.steps.core.response.*
 import com.simprints.id.testtools.TestApplication
 import org.junit.After
 import org.junit.Test
@@ -39,7 +42,35 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
         verifyCoreIntent<AskConsentRequest>(step, CoreRequestCode.CONSENT.value)
     }
 
-    //TODO: Add verify test once implemented
+    @Test
+    fun stepProcessorShouldProcessFetchGUIDResponse() {
+        val fetchActivityReturn: Intent =
+            Intent().putExtra(CORE_STEP_BUNDLE, FetchGUIDResponse(false))
+        val result = coreStepProcessor.processResult(fetchActivityReturn)
+
+        assertThat(result).isInstanceOf(FetchGUIDResponse::class.java)
+    }
+
+    @Test
+    fun buildConfirmIdentityStepShouldBuildTheRightStep() {
+        val step = coreStepProcessor.buildConfirmIdentityStep(DEFAULT_PROJECT_ID, GUID1, GUID2)
+        with(step) {
+            assertThat(activityName).isEqualTo(GUID_SELECTION_ACTIVITY_NAME)
+            assertThat(requestCode).isEqualTo(GUID_SELECTION_REQUEST_CODE)
+            assertThat(bundleKey).isEqualTo(CORE_STEP_BUNDLE)
+            assertThat(request).isEqualTo(GuidSelectionRequest(DEFAULT_PROJECT_ID, GUID1, GUID2))
+            assertThat(getStatus()).isEqualTo(Step.Status.NOT_STARTED)
+        }
+    }
+
+    @Test
+    fun stepProcessorShouldProcessGuidSelectionResponse() {
+        val guidSelectionReturn: Intent =
+            Intent().putExtra(CORE_STEP_BUNDLE, GuidSelectionResponse(true))
+        val result = coreStepProcessor.processResult(guidSelectionReturn)
+
+        assertThat(result).isInstanceOf(GuidSelectionResponse::class.java)
+    }
 
     @Test
     fun stepProcessorShouldProcessConsentResult() {
@@ -86,5 +117,11 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     @After
     fun tearDown() {
         stopKoin()
+    }
+
+    companion object {
+        const val GUID_SELECTION_ACTIVITY_NAME = "com.simprints.id.activities.guidselection.GuidSelectionActivity"
+        const val GUID_SELECTION_REQUEST_CODE = 304
+        const val CORE_STEP_BUNDLE = "core_step_bundle"
     }
 }

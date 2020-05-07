@@ -6,8 +6,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
-import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
-import com.simprints.id.domain.moduleapi.core.requests.ConsentType
+import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
+import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.AndroidResourcesHelperImpl
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex

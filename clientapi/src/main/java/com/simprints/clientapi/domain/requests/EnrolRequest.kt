@@ -5,11 +5,11 @@ import com.simprints.moduleapi.app.requests.IAppRequest
 import kotlinx.android.parcel.Parcelize
 
 
-data class EnrollRequest(
+data class EnrolRequest(
     override val projectId: String,
-    override val moduleId: String,
     override val userId: String,
-    override val metadata: String,
+    val moduleId: String,
+    val metadata: String,
     override val unknownExtras: Map<String, Any?>
 ) : BaseRequest {
 

@@ -18,7 +18,7 @@ import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.domain.moduleapi.core.response.CoreResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.tools.AndroidResourcesHelper

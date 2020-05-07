@@ -7,6 +7,7 @@ import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.view.MenuItem
 import android.widget.Toast
+import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsActivity
@@ -148,7 +149,7 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
 
     override fun clearActivityStackAndRelaunchApp() {
         activity.runOnUiThreadIfStillRunning {
-            activity.overridePendingTransition(0, 0)
+            activity.removeAnimationsToNextActivity()
             activity.finishAffinity()
             (activity as SettingsActivity).openCheckLoginFromMainLauncherActivity()
         }
