@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collect.old.timeoutbar
+package com.simprints.fingerprint.activities.collect.timeoutbar
 
 import android.widget.ProgressBar
 

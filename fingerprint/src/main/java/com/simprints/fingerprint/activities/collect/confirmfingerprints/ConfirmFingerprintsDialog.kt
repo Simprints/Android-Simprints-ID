@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collect.old.confirmFingerprints
+package com.simprints.fingerprint.activities.collect.confirmfingerprints
 
 import android.app.AlertDialog
 import android.content.Context

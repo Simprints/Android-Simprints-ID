@@ -5,8 +5,6 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsActivity
-import com.simprints.fingerprint.activities.collect.old.ViewPagerCustom
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.commontesttools.scanner.*
