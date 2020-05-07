@@ -106,7 +106,7 @@ class CollectFingerprintsActivity :
     }
 
     private fun initScanButton() {
-        scan_button.setOnClickListener { vm.handleScanButtonPressed() }
+        scan_button.setOnClickListener { vm.handleScanButtonPressed(fromTrigger = false) }
     }
 
     private fun initTimeoutBar() {

@@ -6,20 +6,28 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.core.tools.EncodingUtils
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.Finger
-import com.simprints.fingerprint.activities.collect.old.CollectFingerprintsPresenter
+import com.simprints.fingerprint.activities.collect.domain.ScanConfig
 import com.simprints.fingerprint.activities.collect.old.models.FingerScanConfig
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
 import com.simprints.fingerprint.activities.collect.state.FingerScanResult
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.data.domain.images.deduceFileExtension
+import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
@@ -37,16 +45,21 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 import kotlin.math.min
 
 class CollectFingerprintsViewModel(
     private val scannerManager: ScannerManager,
     private val fingerprintPreferencesManager: FingerprintPreferencesManager,
-    private val imageManager: FingerprintImageManager
+    private val imageManager: FingerprintImageManager,
+    private val crashReportManager: FingerprintCrashReportManager,
+    private val timeHelper: FingerprintTimeHelper,
+    private val sessionEventsManager: FingerprintSessionEventsManager
 ) : ViewModel() {
 
     val state = MutableLiveData<CollectFingerprintsState>()
-    fun state() = state.value ?: TODO("Oops")
+    fun state() = state.value
+        ?: throw IllegalStateException("No state available in CollectFingerprintsViewModel")
 
     private fun updateState(block: CollectFingerprintsState.() -> Unit) {
         state.postValue(state.value?.apply { block() })
@@ -65,6 +78,7 @@ class CollectFingerprintsViewModel(
 
     private lateinit var originalFingerprintsToCapture: List<FingerIdentifier>
     private val captureEventIds: MutableMap<Finger, String> = mutableMapOf()
+    private var lastCaptureStartedAt: Long = 0
     private var scanningTask: Disposable? = null
     private var imageTransferTask: Disposable? = null
 
@@ -72,11 +86,12 @@ class CollectFingerprintsViewModel(
 
     private val scannerTriggerListener = ScannerTriggerListener {
         viewModelScope.launch(context = Dispatchers.Main) {
-//        crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.FINGER_CAPTURE, FingerprintCrashReportTrigger.SCANNER_BUTTON, message = "Scanner button clicked")
-            if (state().isShowingConfirmDialog)
+            if (state().isShowingConfirmDialog) {
+                logScannerMessageForCrashReport("Scanner trigger clicked for confirm dialog")
                 handleConfirmFingerprintsAndContinue()
-            else
-                handleScanButtonPressed()
+            } else {
+                handleScanButtonPressed(fromTrigger = true)
+            }
         }
     }
 
@@ -116,7 +131,12 @@ class CollectFingerprintsViewModel(
         }
     }
 
-    fun handleScanButtonPressed() {
+    fun handleScanButtonPressed(fromTrigger: Boolean) {
+        if (fromTrigger) {
+            logScannerMessageForCrashReport("Scanner trigger clicked for scanning")
+        } else {
+            logUiMessageForCrashReport("Scan button clicked")
+        }
         val fingerState = state().currentFingerState()
         if (fingerState is FingerCollectionState.Collected && fingerState.fingerScanResult.isGoodScan()
             && !state().isAskingRescan) {
@@ -154,13 +174,14 @@ class CollectFingerprintsViewModel(
 
     private fun startScanning() {
         updateFingerState { toScanning() }
+        lastCaptureStartedAt = timeHelper.now()
         scanningTask?.dispose()
         scanningTask = scannerManager.scanner { setUiIdle() }
             .andThen(scannerManager.scanner<CaptureFingerprintResponse> {
                 captureFingerprint(
                     fingerprintPreferencesManager.captureFingerprintStrategy,
-                    CollectFingerprintsPresenter.scanningTimeoutMs.toInt(),
-                    CollectFingerprintsPresenter.qualityThreshold
+                    scanningTimeoutMs.toInt(),
+                    ScanConfig.qualityThreshold
                 )
             })
             .subscribeOn(Schedulers.io())
@@ -185,7 +206,7 @@ class CollectFingerprintsViewModel(
 
     private fun shouldProceedToImageTransfer(quality: Int) =
         isImageTransferRequired() &&
-            (quality >= CollectFingerprintsPresenter.qualityThreshold || tooManyBadScans(state().currentFingerState()))
+            (quality >= ScanConfig.qualityThreshold || tooManyBadScans(state().currentFingerState()))
 
     private fun proceedToImageTransfer() {
         imageTransferTask?.dispose()
@@ -205,16 +226,38 @@ class CollectFingerprintsViewModel(
     }
 
     private fun handleCaptureFinished() {
-//        addCaptureEventInSession(currentFinger())
-        if (fingerHasSatisfiedTerminalCondition(state().currentFingerState())) {
-            resolveFingerTerminalConditionTriggered()
+        with(state()) {
+            logUiMessageForCrashReport("Finger scanned - ${currentFinger().id} - ${currentFingerState()}")
+            addCaptureEventInSession()
+            if (fingerHasSatisfiedTerminalCondition(state().currentFingerState())) {
+                resolveFingerTerminalConditionTriggered()
+            }
+        }
+    }
+
+    private fun addCaptureEventInSession() {
+        with(state()) {
+            val finger = currentFinger()
+            val fingerState = currentFingerState()
+            val captureEvent = FingerprintCaptureEvent(
+                lastCaptureStartedAt,
+                timeHelper.now(),
+                finger.id,
+                ScanConfig.qualityThreshold,
+                FingerprintCaptureEvent.buildResult(fingerState),
+                (fingerState as? FingerCollectionState.Collected)?.fingerScanResult?.let {
+                    FingerprintCaptureEvent.Fingerprint(finger.id, it.qualityScore, EncodingUtils.byteArrayToBase64(it.template))
+                }
+            )
+            captureEventIds[finger] = captureEvent.id
+            sessionEventsManager.addEventInBackground(captureEvent)
         }
     }
 
     private fun resolveFingerTerminalConditionTriggered() {
         with(state()) {
             if (isScanningEndStateAchieved()) {
-//                logMessageForCrashReport("Confirm fingerprints dialog shown")
+                logUiMessageForCrashReport("Confirm fingerprints dialog shown")
                 updateState { isShowingConfirmDialog = true }
             } else if (currentFingerState().let {
                     it is FingerCollectionState.Collected && it.fingerScanResult.isGoodScan()
@@ -267,7 +310,9 @@ class CollectFingerprintsViewModel(
             is NoFingerDetectedException -> handleNoFingerDetected()
             else -> {
                 updateFingerState { toNotCollected() }
-                // TODO : handle exception
+                crashReportManager.logExceptionOrSafeException(e)
+                Timber.e(e)
+                launchAlert.postEvent(FingerprintAlert.UNEXPECTED_ERROR)
             }
         }
     }
@@ -275,10 +320,14 @@ class CollectFingerprintsViewModel(
     private fun handleNoFingerDetected() {
         vibrate.postEvent()
         updateFingerState { toNotDetected() }
+        addCaptureEventInSession()
     }
 
     fun handleMissingFingerButtonPressed() {
+        logUiMessageForCrashReport("Missing finger text clicked")
         updateFingerState { toSkipped() }
+        lastCaptureStartedAt = timeHelper.now()
+        addCaptureEventInSession()
         resolveFingerTerminalConditionTriggered()
     }
 
@@ -324,8 +373,7 @@ class CollectFingerprintsViewModel(
             || fingerState is FingerCollectionState.Skipped
 
     fun handleConfirmFingerprintsAndContinue() {
-//        logMessageForCrashReport("Confirm fingerprints clicked")
-//        dismissConfirmDialogIfStillShowing()
+        logUiMessageForCrashReport("Confirm fingerprints clicked")
 
         val fingersStates = state().fingerStates
             .mapNotNullValues { it as? FingerCollectionState.Collected }
@@ -357,12 +405,13 @@ class CollectFingerprintsViewModel(
             return imageManager.save(state.fingerScanResult.image, captureEventId,
                 fingerprintPreferencesManager.saveFingerprintImagesStrategy.deduceFileExtension())
         } else if (state.fingerScanResult.image != null && captureEventId == null) {
-//            crashReportManager.logExceptionOrSafeException(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
+            crashReportManager.logExceptionOrSafeException(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
         }
         return null
     }
 
     fun handleRestart() {
+        logUiMessageForCrashReport("Restart clicked")
         setStartingState()
     }
 
@@ -390,6 +439,16 @@ class CollectFingerprintsViewModel(
 
     private fun Completable.doInBackground() =
         subscribeOn(Schedulers.io()).subscribeBy(onComplete = {}, onError = {})
+
+    private fun logUiMessageForCrashReport(message: String) {
+        Timber.d(message)
+        crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.FINGER_CAPTURE, FingerprintCrashReportTrigger.UI, message = message)
+    }
+
+    private fun logScannerMessageForCrashReport(message: String) {
+        Timber.d(message)
+        crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.FINGER_CAPTURE, FingerprintCrashReportTrigger.SCANNER_BUTTON, message = message)
+    }
 
     companion object {
         const val targetNumberOfGoodScans = 2

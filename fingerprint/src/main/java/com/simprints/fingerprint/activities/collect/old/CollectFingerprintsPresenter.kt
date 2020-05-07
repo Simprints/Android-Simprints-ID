@@ -269,18 +269,18 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun addCaptureEventInSession(finger: Finger) {
-        val captureEvent = FingerprintCaptureEvent(
-            lastCaptureStartedAt,
-            timeHelper.now(),
-            finger.id,
-            qualityThreshold,
-            FingerprintCaptureEvent.buildResult(finger.status),
-            finger.template?.let {
-                FingerprintCaptureEvent.Fingerprint(finger.id, it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))
-            }
-        )
-        captureEventIds[finger.id] = captureEvent.id
-        sessionEventsManager.addEventInBackground(captureEvent)
+//        val captureEvent = FingerprintCaptureEvent(
+//            lastCaptureStartedAt,
+//            timeHelper.now(),
+//            finger.id,
+//            qualityThreshold,
+//            FingerprintCaptureEvent.buildResult(finger.status),
+//            finger.template?.let {
+//                FingerprintCaptureEvent.Fingerprint(finger.id, it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))
+//            }
+//        )
+//        captureEventIds[finger.id] = captureEvent.id
+//        sessionEventsManager.addEventInBackground(captureEvent)
     }
 
     private fun createMapAndShowDialog() {
