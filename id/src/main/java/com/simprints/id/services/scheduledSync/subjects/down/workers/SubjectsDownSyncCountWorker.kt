@@ -20,6 +20,7 @@ import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSy
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerType.DOWNLOADER
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerType.UPLOADER
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.id.tools.json.SimJsonHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -103,6 +104,10 @@ class SubjectsDownSyncCountWorker(val context: Context, params: WorkerParameters
 
 fun WorkInfo.getDownCountsFromOutput(): SubjectsCount? {
     val outputJson = this.outputData.getString(SubjectsDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN)
-    return JsonHelper.gson.fromJson(outputJson, SubjectsCount::class.java)
+    return try {
+        SimJsonHelper.gson.fromJson(outputJson, SubjectsCount::class.java)
+    } catch (t: Throwable) {
+        null
+    }
 }
 
