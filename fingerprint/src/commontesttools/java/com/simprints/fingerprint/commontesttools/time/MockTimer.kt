@@ -4,7 +4,7 @@ import java.util.*
 
 class MockTimer : Timer() {
 
-    var taskQueue = LinkedList<TimerTask>()
+    private var taskQueue = LinkedList<TimerTask>()
 
     override fun purge(): Int {
         val numItems = taskQueue.size
