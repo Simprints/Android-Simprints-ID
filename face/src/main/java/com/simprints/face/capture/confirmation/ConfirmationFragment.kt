@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
@@ -38,11 +37,7 @@ class ConfirmationFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        confirmation_img.setImageBitmap(mainVM.captures.value?.first()?.frame?.toBitmap())
+        confirmation_img.setImageBitmap(mainVM.faceDetections.value?.first()?.frame?.toBitmap())
         confirmation_btn.setOnClickListener { mainVM.flowFinished() }
-
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
-            mainVM.flowFinished()
-        }
     }
 }

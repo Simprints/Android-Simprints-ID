@@ -7,6 +7,7 @@ import com.simprints.fingerprint.scanner.exceptions.unexpected.NullScannerExcept
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
+import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import io.reactivex.Completable
@@ -14,7 +15,8 @@ import io.reactivex.Single
 
 class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter,
                          private val scannerFactory: ScannerFactory,
-                         private val pairingManager: ScannerPairingManager) : ScannerManager {
+                         private val pairingManager: ScannerPairingManager,
+                         private val serialNumberConverter: SerialNumberConverter) : ScannerManager {
 
     override var scanner: ScannerWrapper? = null
     override var lastPairedScannerId: String? = null
@@ -27,7 +29,7 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
         Completable.defer { delegateToScannerOrThrow(method) }
 
     override fun <T> scanner(method: ScannerWrapper.() -> Single<T>): Single<T> =
-        Single.defer { delegateToScannerOrThrow(method)}
+        Single.defer { delegateToScannerOrThrow(method) }
 
     private fun <T> delegateToScannerOrThrow(method: ScannerWrapper.() -> T) =
         scanner?.method() ?: throw NullScannerException()
@@ -41,7 +43,7 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
                 val macAddress = pairedScanners[0]
                 scanner = scannerFactory.create(macAddress)
                 lastPairedMacAddress = macAddress
-                lastPairedScannerId = pairingManager.convertAddressToSerialNumber(macAddress)
+                lastPairedScannerId = serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
                 it.onComplete()
             }
         }
