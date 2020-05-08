@@ -13,7 +13,6 @@ import com.simprints.id.di.*
 import com.simprints.id.secure.ProjectSecretManagerTest
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncWorkerTest
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorkerTest
-import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTaskImplTest
 import dagger.BindsInstance
 import dagger.Component
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -56,7 +55,6 @@ interface AppComponentForTests : AppComponent {
     fun inject(moduleViewModelTest: ModuleViewModelTest)
     fun inject(consentActivityTest: ConsentActivityTest)
     fun inject(peopleDownSyncCountWorkerTest: PeopleDownSyncCountWorkerTest)
-    fun inject(peopleDownSyncDownloaderTaskImplTest: PeopleDownSyncDownloaderTaskImplTest)
     fun inject(checkLoginFromIntentPresenterTest: CheckLoginFromIntentPresenterTest)
     fun inject(settingsPreferencePresenterTest: SettingsPreferencePresenterTest)
 

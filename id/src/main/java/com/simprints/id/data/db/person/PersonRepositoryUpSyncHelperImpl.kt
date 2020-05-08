@@ -47,7 +47,7 @@ class PersonRepositoryUpSyncHelperImpl(
 
         } catch (t: Throwable) {
             Timber.d("PersonRepository : failed uploading people")
-            Timber.d("${t.printStackTrace()}")
+            Timber.d(t)
             updateState(UpSyncState.FAILED, projectId)
             throw t
         }

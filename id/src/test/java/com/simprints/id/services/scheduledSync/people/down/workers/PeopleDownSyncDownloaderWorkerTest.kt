@@ -7,7 +7,6 @@ import androidx.work.WorkInfo
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.domain.modality.Modes
@@ -19,8 +18,13 @@ import com.simprints.id.services.scheduledSync.people.master.internal.OUTPUT_FAI
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -28,6 +32,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import java.util.*
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class PeopleDownSyncDownloaderWorkerTest {
@@ -48,36 +53,37 @@ class PeopleDownSyncDownloaderWorkerTest {
     fun setUp() {
         UnitTestConfig(this).setupWorkManager()
         app.component = mockk(relaxed = true)
-        val correctInputData = JsonHelper.gson.toJson(projectSyncOp)
+        val correctInputData = SimJsonHelper.gson.toJson(projectSyncOp)
         peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
+
         coEvery { peopleDownSyncDownloaderWorker.downSyncScopeRepository.refreshDownSyncOperationFromDb(any()) } returns null
+        peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask = mockk(relaxed = true)
     }
 
     @Test
     fun worker_shouldParseInputDataCorrectly() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
             doWork()
-            coEvery { peopleDownSyncDownloaderTask.execute(projectSyncOp, any(), any()) }
         }
     }
 
     @Test
-    fun worker_shouldExecuteTheTask() = runBlocking<Unit> {
-        with(peopleDownSyncDownloaderWorker) {
-            coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any()) } returns 0
+    fun worker_shouldExecuteTheTask() {
+        runBlocking {
+            with(peopleDownSyncDownloaderWorker) {
+                coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any(), any(), any(), any()) } returns 0
 
-            doWork()
+                doWork()
 
-            coVerify { peopleDownSyncDownloaderTask.execute(any(), any(), any()) }
-            verify { resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to 0)) }
+                verify { resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to 0)) }
+            }
         }
     }
-
 
     @Test
     fun worker_failForCloudIntegration_shouldFail() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
-            coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any()) } throws SyncCloudIntegrationException("Cloud integration", Throwable())
+            coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any(), any(), any(), any()) } throws SyncCloudIntegrationException("Cloud integration", Throwable())
 
             doWork()
 
@@ -88,7 +94,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     @Test
     fun worker_failForNetworkIssue_shouldRetry() = runBlocking<Unit> {
         with(peopleDownSyncDownloaderWorker) {
-            coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any()) } throws Throwable("Network Exception")
+            coEvery { peopleDownSyncDownloaderTask.execute(any(), any(), any(), any(), any(), any()) } throws Throwable("Network Exception")
 
             doWork()
 
@@ -97,8 +103,8 @@ class PeopleDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_inputDataIsWrong_shouldFail() = runBlocking<Unit> {
-        peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to ""))
+    fun worker_inputDataIsWrong_shouldFail() = runBlocking {
+        peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to "error"))
         with(peopleDownSyncDownloaderWorker) {
 
             doWork()
@@ -143,8 +149,9 @@ class PeopleDownSyncDownloaderWorkerTest {
         } ?: TestListenableWorkerBuilder<PeopleDownSyncDownloaderWorker>(app).build()).apply {
             crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
-            peopleDownSyncDownloaderTask = mockk(relaxed = true)
             downSyncScopeRepository = mockk(relaxed = true)
+            personRepository = mockk(relaxed = true)
+            peopleSyncCache = mockk(relaxed = true)
         }
 }
 

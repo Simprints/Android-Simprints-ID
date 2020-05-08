@@ -12,8 +12,7 @@ import org.junit.Test
 class DbPeopleDownSyncOperationTest {
 
     companion object {
-        const val LAST_PATIENT_ID = "lastPatientId"
-        const val LAST_PATIENT_UPDATED_AT = 1L
+        const val LAST_EVENT_ID = "lastEventId"
         const val LAST_SYNC_TIME = 2L
     }
 
@@ -27,8 +26,7 @@ class DbPeopleDownSyncOperationTest {
         val dbOp = DbPeopleDownSyncOperation(
             dbKey, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_MODES,
             COMPLETE,
-            LAST_PATIENT_ID,
-            LAST_PATIENT_UPDATED_AT,
+            LAST_EVENT_ID,
             LAST_SYNC_TIME)
 
         with(dbOp.fromDbToDomain()) {
@@ -36,8 +34,7 @@ class DbPeopleDownSyncOperationTest {
             assertThat(userId).isEqualTo(DEFAULT_USER_ID)
             assertThat(moduleId).isEqualTo(DEFAULT_MODULE_ID)
             assertThat(modes).isEqualTo(DEFAULT_MODES)
-            assertThat(lastResult?.lastPatientUpdatedAt).isEqualTo(LAST_PATIENT_UPDATED_AT)
-            assertThat(lastResult?.lastPatientId).isEqualTo(LAST_PATIENT_ID)
+            assertThat(lastResult?.lastEventId).isEqualTo(LAST_EVENT_ID)
             assertThat(lastResult?.lastSyncTime).isEqualTo(LAST_SYNC_TIME)
             assertThat(lastResult?.state).isEqualTo(COMPLETE)
         }

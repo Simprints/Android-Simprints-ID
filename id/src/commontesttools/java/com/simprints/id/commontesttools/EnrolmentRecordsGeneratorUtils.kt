@@ -1,16 +1,18 @@
 package com.simprints.id.commontesttools
 
+import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.db.person.domain.personevents.*
 import com.simprints.id.domain.modality.Modes
 import java.util.*
 
 object EnrolmentRecordsGeneratorUtils {
-    fun getRandomEnrolmentEvents(nPeople: Int,
+    fun getRandomEnrolmentEvents(nEvents: Int,
                                  projectId: String,
                                  userId: String,
-                                 moduleId: String) =
+                                 moduleId: String,
+                                 eventType: EventPayloadType) =
         mutableListOf<Event>().also { fakeRecords ->
-            repeat(nPeople) {
+            repeat(nEvents) {
                 val subjectId = UUID.randomUUID().toString()
                 val eventId = UUID.randomUUID().toString()
                 fakeRecords.add(
@@ -21,11 +23,25 @@ object EnrolmentRecordsGeneratorUtils {
                         listOf(userId),
                         listOf(moduleId),
                         listOf(Modes.FACE, Modes.FINGERPRINT),
-                        buildFakeEnrolmentRecordCreation(subjectId, projectId, userId, moduleId)
+                        buildFakeEventPayload(eventType, subjectId, projectId, userId, moduleId)
                     )
                 )
             }
         }
+
+    private fun buildFakeEventPayload(eventType: EventPayloadType, subjectId: String,
+                                      projectId: String, userId: String,
+                                      moduleId: String) = when(eventType) {
+        EventPayloadType.ENROLMENT_RECORD_CREATION -> {
+            buildFakeEnrolmentRecordCreation(subjectId, projectId, userId, moduleId)
+        }
+        EventPayloadType.ENROLMENT_RECORD_DELETION -> {
+            buildFakeEnrolmentDeletion(subjectId, projectId, moduleId, userId)
+        }
+        EventPayloadType.ENROLMENT_RECORD_MOVE -> {
+            buildFakeEnrolmentMove(subjectId, projectId, moduleId, userId)
+        }
+    }
 
     private fun buildFakeEnrolmentRecordCreation(subjectId: String,
                                                  projectId: String,
@@ -46,10 +62,24 @@ object EnrolmentRecordsGeneratorUtils {
             FingerprintReference(
                 listOf(
                     FingerprintTemplate(fingerprint.templateQualityScore,
-                    fingerprint.template.toString(), FingerIdentifier.LEFT_3RD_FINGER)
+                    EncodingUtils.byteArrayToBase64(fingerprint.template), FingerIdentifier.LEFT_3RD_FINGER)
                 ),
                 hashMapOf("vero" to "VERO_2")
             )
         )
     }
+
+    private fun buildFakeEnrolmentDeletion(subjectId: String,
+                                           projectId: String,
+                                           moduleId: String,
+                                           attendantId: String) = EnrolmentRecordDeletionPayload(
+        subjectId, projectId, moduleId, attendantId
+    )
+
+    private fun buildFakeEnrolmentMove(subjectId: String,
+                                       projectId: String,
+                                       userId: String,
+                                       moduleId: String) =
+        EnrolmentRecordMovePayload(buildFakeEnrolmentRecordCreation(subjectId, projectId, userId, moduleId),
+            buildFakeEnrolmentDeletion(subjectId, projectId, userId, moduleId))
 }

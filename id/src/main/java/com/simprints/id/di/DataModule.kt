@@ -13,17 +13,12 @@ import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
-import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.person.PersonRepositoryImpl
-import com.simprints.id.data.db.person.PersonRepositoryUpSyncHelper
-import com.simprints.id.data.db.person.PersonRepositoryUpSyncHelperImpl
+import com.simprints.id.data.db.person.*
 import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.local.PersonLocalDataSourceImpl
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSourceImpl
-import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.db.person.remote.PersonRemoteDataSourceImpl
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -35,6 +30,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
+import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.FlowPreview
@@ -42,16 +38,6 @@ import javax.inject.Singleton
 
 @Module
 open class DataModule {
-
-    @Provides
-    @Singleton
-    open fun providePersonRemoteDataSource(
-        remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory
-    ): PersonRemoteDataSource = PersonRemoteDataSourceImpl(
-        remoteDbManager,
-        simApiClientFactory
-    )
 
     @Provides
     @Singleton
@@ -103,20 +89,27 @@ open class DataModule {
                 peopleUpSyncScopeRepository, preferencesManager.modalities)
 
     @Provides
+    open fun providePersonRepositoryDownSyncHelper(personLocalDataSource: PersonLocalDataSource,
+                                                   eventRemoteDataSource: EventRemoteDataSource,
+                                                   downSyncScopeRepository: PeopleDownSyncScopeRepository,
+                                                   timeHelper: TimeHelper): PersonRepositoryDownSyncHelper =
+        PersonRepositoryDownSyncHelperImpl(personLocalDataSource, eventRemoteDataSource, downSyncScopeRepository, timeHelper)
+
+    @Provides
     open fun providePersonRepository(
-        personRemoteDataSource: PersonRemoteDataSource,
         personLocalDataSource: PersonLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
         peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
         peopleUpSyncExecutor: PeopleUpSyncExecutor,
-        personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper
+        personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper,
+        personRepositoryDownSyncHelper: PersonRepositoryDownSyncHelper
     ): PersonRepository = PersonRepositoryImpl(
-        personRemoteDataSource,
         eventRemoteDataSource,
         personLocalDataSource,
         peopleDownSyncScopeRepository,
         peopleUpSyncExecutor,
-        personRepositoryUpSyncHelper
+        personRepositoryUpSyncHelper,
+        personRepositoryDownSyncHelper
     )
 
     @Provides

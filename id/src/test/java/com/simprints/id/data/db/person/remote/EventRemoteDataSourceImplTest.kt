@@ -114,7 +114,9 @@ class EventRemoteDataSourceImplTest {
             coEvery { eventRemoteDataSourceSpy.getPeopleApiClient() } returns eventRemoteInterface
             mockServer.enqueue(buildSuccessfulResponseForGetEvents())
 
-            val responseString = eventRemoteDataSourceSpy.get(buildEventQuery()).string()
+            val responseString = eventRemoteDataSourceSpy.getStreaming(buildEventQuery()).bufferedReader().use {
+                it.readText()
+            }
 
             assertThat(mockServer.requestCount).isEqualTo(1)
             assertThat(mockServer.takeRequest().requestUrl.toString()).contains(expectedUrlFormat)
@@ -132,7 +134,7 @@ class EventRemoteDataSourceImplTest {
     private fun buildEnrolmentRecordEvents() = Events(buildApiEventsList())
 
     private fun buildApiEventsList() =
-        getRandomEnrolmentEvents(5, PROJECT_ID, USER_ID, "module_id")
+        getRandomEnrolmentEvents(5, PROJECT_ID, USER_ID, "module_id", ENROLMENT_RECORD_CREATION)
 
     private fun buildEventQuery() = EventQuery(
         PROJECT_ID,

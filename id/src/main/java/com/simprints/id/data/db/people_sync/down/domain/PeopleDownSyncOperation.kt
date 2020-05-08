@@ -15,6 +15,5 @@ fun PeopleDownSyncOperation.fromDomainToDb(): DbPeopleDownSyncOperation =
         DbPeopleDownSyncOperationKey(projectId, modes, userId, moduleId),
         projectId, userId, moduleId, modes,
         lastResult?.state,
-        lastResult?.lastPatientId,
-        lastResult?.lastPatientUpdatedAt,
+        lastResult?.lastEventId,
         lastResult?.lastSyncTime)
