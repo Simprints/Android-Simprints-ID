@@ -45,7 +45,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.math.min
 
@@ -125,7 +124,7 @@ class CollectFingerprintsViewModel(
     private fun nudgeToNextFinger() {
         with(state()) {
             if (currentFingerIndex < fingerStates.size - 1) {
-                Timer().schedule(AUTO_SWIPE_DELAY) {
+                timeHelper.newTimer().schedule(AUTO_SWIPE_DELAY) {
                     updateSelectedFinger(currentFingerIndex + 1)
                 }
             }
@@ -207,7 +206,7 @@ class CollectFingerprintsViewModel(
 
     private fun shouldProceedToImageTransfer(quality: Int) =
         isImageTransferRequired() &&
-            (quality >= ScanConfig.qualityThreshold || tooManyBadScans(state().currentFingerState()))
+            (quality >= ScanConfig.qualityThreshold || tooManyBadScans(state().currentFingerState(), plusBadScan = true))
 
     private fun proceedToImageTransfer() {
         imageTransferTask?.dispose()
@@ -276,7 +275,7 @@ class CollectFingerprintsViewModel(
 
     private fun showSplashAndNudge(addNewFinger: Boolean) {
         updateState { isShowingSplashScreen = true }
-        Timer().schedule(TRY_DIFFERENT_FINGER_SPLASH_DELAY) {
+        timeHelper.newTimer().schedule(TRY_DIFFERENT_FINGER_SPLASH_DELAY) {
             if (addNewFinger) handleAutoAddFinger()
             nudgeToNextFinger()
         }
@@ -339,14 +338,14 @@ class CollectFingerprintsViewModel(
     private fun CollectFingerprintsState.everyActiveFingerHasSatisfiedTerminalCondition(): Boolean =
         fingerStates.values.all { fingerHasSatisfiedTerminalCondition(it) }
 
-    private fun tooManyBadScans(fingerState: FingerCollectionState): Boolean =
+    private fun tooManyBadScans(fingerState: FingerCollectionState, plusBadScan: Boolean): Boolean =
         when (fingerState) {
             is FingerCollectionState.Scanning -> fingerState.numberOfBadScans
             is FingerCollectionState.TransferringImage -> fingerState.numberOfBadScans
             is FingerCollectionState.NotDetected -> fingerState.numberOfBadScans
             is FingerCollectionState.Collected -> fingerState.numberOfBadScans
             else -> 0
-        } >= numberOfBadScansRequiredToAutoAddNewFinger
+        } >= numberOfBadScansRequiredToAutoAddNewFinger - if (plusBadScan) 1 else 0
 
     private fun CollectFingerprintsState.haveNotExceedMaximumNumberOfFingersToAutoAdd() =
         fingerStates.size < maximumTotalNumberOfFingersForAutoAdding
@@ -365,7 +364,7 @@ class CollectFingerprintsViewModel(
 
     private fun fingerHasSatisfiedTerminalCondition(fingerState: FingerCollectionState) =
         fingerState is FingerCollectionState.Collected &&
-            (tooManyBadScans(fingerState) || fingerState.scanResult.isGoodScan())
+            (tooManyBadScans(fingerState, plusBadScan = false) || fingerState.scanResult.isGoodScan())
             || fingerState is FingerCollectionState.Skipped
 
     fun handleConfirmFingerprintsAndContinue() {
