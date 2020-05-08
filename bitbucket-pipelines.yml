@@ -72,7 +72,7 @@ pipelines:
 
         artifacts:
           - universal.apk
-          
+
     # Run the android tests in parallel
     - parallel:
         - step:
@@ -81,7 +81,7 @@ pipelines:
               - gradle
               - gradlewrapper
               - sdk
-              - googleCloud
+              - googlecloud
             script: 
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew id:assembleDebugAndroidTest
@@ -97,7 +97,7 @@ pipelines:
               - gradle
               - gradlewrapper
               - sdk
-              - googleCloud
+              - googlecloud
             script: 
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle &&
@@ -112,7 +112,7 @@ pipelines:
               - gradle
               - gradlewrapper
               - sdk
-              - googleCloud
+              - googlecloud
             script: 
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle &&
@@ -127,7 +127,7 @@ pipelines:
               - gradle
               - gradlewrapper
               - sdk
-              - googleCloud
+              - googlecloud
             script: 
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle &&
@@ -141,4 +141,4 @@ definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
         sdk: android-sdk
-        googleCloud: ~/google-cloud-sdk/bin
+        googlecloud: ~/google-cloud-sdk/bin
