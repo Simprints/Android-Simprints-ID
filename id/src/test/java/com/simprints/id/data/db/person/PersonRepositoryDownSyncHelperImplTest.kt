@@ -9,8 +9,7 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactoryImpl
 import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelperImpl.Companion.BATCH_SIZE_FOR_DOWNLOADING
-import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.ENROLMENT_RECORD_CREATION
-import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.ENROLMENT_RECORD_DELETION
+import com.simprints.id.data.db.person.domain.personevents.EventPayloadType.*
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
 import com.simprints.id.data.db.person.remote.models.personevents.ApiEvent
@@ -81,67 +80,106 @@ class PersonRepositoryDownSyncHelperImplTest {
 
 
     @Test
-    fun downloadPatientsForGlobalSync_shouldSuccess() {
+    fun downloadEventsForGlobalSync_shouldSuccess() {
         runBlocking {
             val nEventsToDownload = 407
             val nEventsToDelete = 0
+            val nEventsToMove = 0
 
-            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, projectSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, projectSyncOp)
         }
     }
 
     @Test
-    fun downloadPatientsForUserSync_shouldSuccess() {
+    fun downloadEventsForUserSync_shouldSuccess() {
+        runBlocking {
+            val nEventsToDownload = 513
+            val nEventsToDelete = 0
+            val nEventsToMove = 0
+
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, userSyncOp)
+        }
+    }
+
+    @Test
+    fun downloadEventsForModuleSync_shouldSuccess() {
         runBlocking {
             val nPeopleToDownload = 513
             val nPeopleToDelete = 0
+            val nEventsToMove = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, userSyncOp)
+            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, nEventsToMove, moduleSyncOp)
         }
     }
 
     @Test
-    fun downloadPatientsForModuleSync_shouldSuccess() {
+    fun deleteEventsForGlobalSync_shouldSuccess() {
         runBlocking {
-            val nPeopleToDownload = 513
-            val nPeopleToDelete = 0
+            val nEventsToDownload = 0
+            val nEventsToDelete = 300
+            val nEventsToMove = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, moduleSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, projectSyncOp)
         }
     }
 
     @Test
-    fun deletePatientsForGlobalSync_shouldSuccess() {
+    fun deleteEventsForUserSync_shouldSuccess() {
         runBlocking {
-            val nPeopleToDownload = 0
-            val nPeopleToDelete = 300
+            val nEventsToDownload = 0
+            val nEventsToDelete = 212
+            val nEventsToMove = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, projectSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, userSyncOp)
         }
     }
 
     @Test
-    fun deletePatientsForUserSync_shouldSuccess() {
+    fun deleteEventsForModuleSync_shouldSuccess() {
         runBlocking {
-            val nPeopleToDownload = 0
-            val nPeopleToDelete = 212
+            val nEventsToDownload = 0
+            val nEventsToDelete = 123
+            val nEventsToMove = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, userSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, moduleSyncOp)
         }
     }
 
     @Test
-    fun deletePatientsForModuleSync_shouldSuccess() {
+    fun moveEventsForGlobalSync_shouldSuccess() {
         runBlocking {
-            val nPeopleToDownload = 0
-            val nPeopleToDelete = 123
+            val nEventsToDownload = 0
+            val nEventsToDelete = 0
+            val nEventsToMove = 300
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, moduleSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, projectSyncOp)
         }
     }
 
     @Test
-    fun downloadPatients_patientSerializationFails_shouldTriggerOnError() {
+    fun moveEventsForUserSync_shouldSuccess() {
+        runBlocking {
+            val nEventsToDownload = 0
+            val nEventsToDelete = 0
+            val nEventsToMove = 212
+
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, userSyncOp)
+        }
+    }
+
+    @Test
+    fun moveEventsForModuleSync_shouldSuccess() {
+        runBlocking {
+            val nEventsToDownload = 0
+            val nEventsToDelete = 0
+            val nEventsToMove = 123
+
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, moduleSyncOp)
+        }
+    }
+
+    @Test
+    fun downloadEvents_eventSerializationFails_shouldTriggerOnError() {
         runBlocking {
             val nEventsToDownload = 499
             val projectDownSyncOp = builder.buildProjectSyncOperation(DefaultTestConstants.DEFAULT_PROJECT_ID, modes, null)
@@ -186,13 +224,16 @@ class PersonRepositoryDownSyncHelperImplTest {
 
     private fun runDownSyncAndVerifyConditions(nEventsToDownload: Int,
                                                nEventsToDelete: Int,
+                                               nEventsToMove: Int,
                                                syncOp: PeopleDownSyncOperation) {
 
         runBlocking {
-            mockEventRemoteDataSource(nEventsToDownload, nEventsToDelete)
+            mockEventRemoteDataSource(nEventsToDownload, nEventsToDelete, nEventsToMove)
             mockDownSyncScopeRepository()
-            val numberOfBatchesToSave = calculateCorrectNumberOfBatches(nEventsToDownload)
-            val numberOfBatchesToDelete = calculateCorrectNumberOfBatches(nEventsToDelete)
+
+            val numberOfBatchesToMove = calculateCorrectNumberOfBatches(nEventsToMove)
+            val numberOfBatchesToSave = calculateCorrectNumberOfBatches(nEventsToDownload) + numberOfBatchesToMove
+            val numberOfBatchesToDelete = calculateCorrectNumberOfBatches(nEventsToDelete) + numberOfBatchesToMove
 
             val downSyncHelper =
                 PersonRepositoryDownSyncHelperImpl(personLocalDataSource, eventRemoteDataSource,
@@ -206,11 +247,12 @@ class PersonRepositoryDownSyncHelperImplTest {
         }
     }
 
-    private fun mockEventRemoteDataSource(nEventsToDownload: Int, nEventsToDelete: Int) {
+    private fun mockEventRemoteDataSource(nEventsToDownload: Int, nEventsToDelete: Int, nEventsToMove: Int) {
         val creationEvents = getRandomCreationEvents(nEventsToDownload)
         val deletionEvents = getRandomDeletionEvents(nEventsToDelete)
+        val moveEvents = getRandomMoveEvents(nEventsToMove)
 
-        coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildResponse(deletionEvents + creationEvents)
+        coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildResponse(deletionEvents + creationEvents + moveEvents)
     }
 
     private fun mockEventRemoteDataSourceWithIncorrectModels(nEventsToDownload: Int) {
@@ -234,6 +276,11 @@ class PersonRepositoryDownSyncHelperImplTest {
         getRandomEnrolmentEvents(nEventsToDelete, DefaultTestConstants.DEFAULT_PROJECT_ID,
             DefaultTestConstants.DEFAULT_USER_ID, DefaultTestConstants.DEFAULT_MODULE_ID,
             ENROLMENT_RECORD_DELETION).map { it.fromDomainToApi() }
+
+    private fun getRandomMoveEvents(nEventsToMove: Int) =
+        getRandomEnrolmentEvents(nEventsToMove, DefaultTestConstants.DEFAULT_PROJECT_ID,
+            DefaultTestConstants.DEFAULT_USER_ID, DefaultTestConstants.DEFAULT_MODULE_ID,
+            ENROLMENT_RECORD_MOVE).map { it.fromDomainToApi() }
 
     private fun buildResponse(events: List<ApiEvent>): InputStream =
         SimJsonHelper.gson.toJson(events).toString().toResponseBody().byteStream()
