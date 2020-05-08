@@ -53,34 +53,33 @@ pipelines:
               - ./gradlew id:bundleDebugClasses && ./gradlew fingerprint:testDebugUnitTest
             artifacts:
               - fingerprint/build/reports/tests/testDebugUnitTest/*
-            # If the unit tests pass, build the APK used for Android tests
-            - step:
-                name: "Build and sign universal apk"
-                caches:
-                  - gradle
-                  - gradlewrapper
-                size: 2x # Double resources available for this step
-                script:
-                  - bash ./ci/pipeline/setup
-                  - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew bundleDebug --stacktrace
-                  - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
-                  - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/debug/id-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=ci/debug_keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
-                  - mv universal.apks universal.zip
-                  - unzip universal.zip
-                artifacts:
-                  - universal.apk
 
-            # If the unit tests pass, build a quality report for Simprints ID
-            - step:
-                name: "Generate quality reports"
-                caches:
-                  - gradle
-                  - gradlewrapper
-                  - sonar
-                size: 2x # Double resources available for this step
-                script:
-                  - bash ./ci/pipeline/setup
-                  - ./gradlew sonarqube
+        - step:
+            name: "Build and sign universal apk"
+            caches:
+              - gradle
+              - gradlewrapper
+            size: 2x # Double resources available for this step
+            script:
+              - bash ./ci/pipeline/setup
+              - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew bundleDebug --stacktrace
+              - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
+              - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/debug/id-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=ci/debug_keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
+              - mv universal.apks universal.zip
+              - unzip universal.zip
+            artifacts:
+              - universal.apk
+
+        - step:
+            name: "Generate quality reports"
+            caches:
+              - gradle
+              - gradlewrapper
+              - sonar
+            size: 2x # Double resources available for this step
+            script:
+              - bash ./ci/pipeline/setup
+              - ./gradlew sonarqube
 
     # Run the android tests in parallel
     - parallel:
