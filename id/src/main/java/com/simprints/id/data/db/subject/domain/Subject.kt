@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.subject.domain
 
 import android.os.Parcelable
-import com.simprints.id.data.db.person.domain.FaceSample.Companion.extractFaceSamplesFromBiometricReferences
-import com.simprints.id.data.db.person.domain.FingerprintSample.Companion.extractFingerprintSamplesFromBiometricReferences
-import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordCreationPayload
+import com.simprints.id.data.db.subject.domain.FaceSample.Companion.extractFaceSamplesFromBiometricReferences
+import com.simprints.id.data.db.subject.domain.FingerprintSample.Companion.extractFingerprintSamplesFromBiometricReferences
+import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
@@ -20,11 +20,11 @@ data class Subject(
     var faceSamples: List<FaceSample> = emptyList()) : Parcelable {
 
     companion object {
-        fun buildPersonFromCreationPayload(payload: EnrolmentRecordCreationPayload) = with(payload) {
-            Person(
-                patientId = subjectId,
+        fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload) = with(payload) {
+            Subject(
+                subjectId = subjectId,
                 projectId = projectId,
-                userId = attendantId,
+                attendantId = attendantId,
                 moduleId = moduleId,
                 toSync = false,
                 fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
