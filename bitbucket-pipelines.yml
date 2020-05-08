@@ -141,7 +141,10 @@ pipelines:
               - bash ./ci/pipeline/install_gcloud
               - gcloud firebase test android run --type instrumentation --app universal.apk --test face-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
 
-      - pipe: sonarsource/sonarcloud-quality-gate:0.1.3
+    - step:
+        name: "Check quality gateway"
+        script:
+            - pipe: sonarsource/sonarcloud-quality-gate:0.1.3
 
 definitions:
     caches:
