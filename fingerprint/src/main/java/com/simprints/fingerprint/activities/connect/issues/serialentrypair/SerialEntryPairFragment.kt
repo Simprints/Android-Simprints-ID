@@ -15,6 +15,7 @@ import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
+import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 import kotlinx.android.synthetic.main.fragment_serial_entry_pair.*
@@ -28,6 +29,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
     private val viewModel: SerialEntryPairViewModel by viewModel()
 
     private val scannerPairingManager: ScannerPairingManager by inject()
+    private val serialNumberConverter: SerialNumberConverter by inject()
     private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
 
     private val bluetoothPairStateChangeReceiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
@@ -125,7 +127,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
             serialEntryOkButton.visibility = View.VISIBLE
             serialEntryPairInstructionsDetailTextView.visibility = View.INVISIBLE
             serialEntryPairInstructionsTextView.text = resourceHelper.getString(R.string.serial_entry_pair_failed,
-                arrayOf(scannerPairingManager.convertAddressToSerialNumber(macAddressEvent.peekContent())))
+                arrayOf(serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())))
         }
     }
 

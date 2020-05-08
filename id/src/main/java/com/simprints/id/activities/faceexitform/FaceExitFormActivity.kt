@@ -130,7 +130,7 @@ class FaceExitFormActivity : AppCompatActivity() {
                 logRadioOptionForCrashReport("Does not have permission")
             }
             R.id.faceRbAppNotWorking -> {
-                faceExitFormReason = SCANNER_NOT_WORKING
+                faceExitFormReason = APP_NOT_WORKING
                 setFocusOnExitReasonAndDisableSubmit()
                 logRadioOptionForCrashReport("App not working")
             }

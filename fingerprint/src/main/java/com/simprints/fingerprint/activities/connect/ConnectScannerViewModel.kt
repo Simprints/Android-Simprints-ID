@@ -22,7 +22,7 @@ import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
+import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.tools.livedata.postEvent
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
@@ -38,7 +38,7 @@ class ConnectScannerViewModel(
     private val preferencesManager: FingerprintPreferencesManager,
     private val analyticsManager: FingerprintAnalyticsManager,
     private val nfcManager: NfcManager,
-    private val scannerPairingManager: ScannerPairingManager) : ViewModel() {
+    private val serialNumberConverter: SerialNumberConverter) : ViewModel() {
 
     val progress: MutableLiveData<Int> = MutableLiveData(0)
     val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
@@ -159,7 +159,7 @@ class ConnectScannerViewModel(
         progress.postValue(computeProgress(7))
         message.postValue(R.string.connect_scanner_finished)
         preferencesManager.lastScannerUsed = scannerManager.lastPairedMacAddress?.let {
-            scannerPairingManager.convertAddressToSerialNumber(it)
+            serialNumberConverter.convertMacAddressToSerialNumber(it)
         } ?: ""
         preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.firmwareVersion.toString()
         analyticsManager.logScannerProperties(scannerManager.lastPairedMacAddress
@@ -218,7 +218,7 @@ class ConnectScannerViewModel(
     }
 
     companion object {
-        private const val NUMBER_OF_STEPS = 7
+        const val NUMBER_OF_STEPS = 7
         private fun computeProgress(step: Int) = step * 100 / NUMBER_OF_STEPS
     }
 }

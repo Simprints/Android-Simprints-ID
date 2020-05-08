@@ -14,8 +14,8 @@ import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.testtools.common.syntax.assertThrows
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
+import io.mockk.mockk
 import io.realm.Realm
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -30,13 +30,11 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
     private lateinit var realm: Realm
     private lateinit var personLocalDataSource: PersonLocalDataSource
 
-    private val loginInfoManagerMock = mock<LoginInfoManager>().apply {
-        whenever(this) { getSignedInProjectIdOrEmpty() }
-            .thenReturn(DEFAULT_PROJECT_ID)
+    private val loginInfoManagerMock = mockk<LoginInfoManager>().apply {
+        every { this@apply.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }
-    private val secureLocalDbKeyProviderMock = mock<SecureLocalDbKeyProvider>().apply {
-        whenever(this) { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
-            .thenReturn(LocalDbKey(newDatabaseName, newDatabaseKey))
+    private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>().apply {
+        every { this@apply.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(newDatabaseName, newDatabaseKey)
     }
 
     @Before
@@ -53,9 +51,8 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
 
         val differentNewDatabaseName = "different_${Date().time}newDatabase"
         val differentDatabaseKey: ByteArray = "different_newKey".toByteArray().copyOf(KEY_LENGTH)
-        val differentSecureLocalDbKeyProviderMock = mock<SecureLocalDbKeyProvider>().apply {
-            whenever(this) { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
-                .thenReturn(LocalDbKey(differentNewDatabaseName, differentDatabaseKey))
+        val differentSecureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>().apply {
+            every { this@apply.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(differentNewDatabaseName, differentDatabaseKey)
         }
         val differentLocalDataSource = PersonLocalDataSourceImpl(testContext, differentSecureLocalDbKeyProviderMock, loginInfoManagerMock)
 
@@ -163,7 +160,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
     fun givenInvalidSerializableQuery_aThrowableIsThrown() {
         runBlocking {
             assertThrows<InvalidQueryToLoadRecordsException> {
-                (personLocalDataSource as FingerprintIdentityLocalDataSource).loadFingerprintIdentities(mock())
+                (personLocalDataSource as FingerprintIdentityLocalDataSource).loadFingerprintIdentities(mockk())
             }
         }
     }

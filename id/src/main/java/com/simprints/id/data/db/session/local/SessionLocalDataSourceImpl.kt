@@ -71,7 +71,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
                         DatabaseInfo(count))
 
                     val dbSession = DbSession(session)
-                    realm.insert(dbSession)
+                    reamInTrans.insert(dbSession)
                 }
             }
         }
