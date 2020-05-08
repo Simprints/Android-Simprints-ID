@@ -5,12 +5,16 @@
 image: circleci/android:api-29-ndk
 
 pipelines:
-  default:       
+  default:
+
+    # Build ID and all of the DFMs, and run their unit tests in parallel
     - parallel:
         - step:
             name: "Run Clientapi unit tests"
             caches:
               - gradle
+              - gradlewrapper
+              - sdk
             script: 
               - bash ./ci/pipeline/setup
               - ./gradlew id:bundleDebugClasses && ./gradlew clientapi:testDebugUnitTest
@@ -20,6 +24,8 @@ pipelines:
             name: "Run Id unit tests"
             caches:
               - gradle
+              - gradlewrapper
+              - sdk
             script: 
               - bash ./ci/pipeline/setup
               - ./gradlew id:bundleDebugClasses && ./gradlew id:testDebugUnitTest
@@ -29,6 +35,8 @@ pipelines:
             name: "Run Face unit tests"
             caches:
               - gradle
+              - gradlewrapper
+              - sdk
             script: 
               - bash ./ci/pipeline/setup
               - ./gradlew id:bundleDebugClasses && ./gradlew face:testDebugUnitTest
@@ -38,16 +46,21 @@ pipelines:
             name: "Run Fingerprint unit tests"
             caches:
               - gradle
+              - gradlewrapper
+              - sdk
             script: 
               - bash ./ci/pipeline/setup
               - ./gradlew id:bundleDebugClasses && ./gradlew fingerprint:testDebugUnitTest
             artifacts:
               - fingerprint/build/reports/tests/testDebugUnitTest/*
 
+    # If the unit tests pass, build the APK used for Android tests
     - step:
         name: "Build and sign universal apk"
         caches:
           - gradle
+          - gradlewrapper
+          - sdk
         script: 
           - bash ./ci/pipeline/setup
           - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew bundleDebug --stacktrace
@@ -58,11 +71,15 @@ pipelines:
 
         artifacts:
           - universal.apk
+          -
+    # Run the android tests in parallel
     - parallel:
         - step:
             name: "Run Id android tests"
             caches:
               - gradle
+              - gradlewrapper
+              - sdk
             script: 
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew id:assembleDebugAndroidTest
@@ -72,16 +89,17 @@ pipelines:
               - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
               - gcloud config set project simprints-android-ci
               - gcloud firebase test android run --type instrumentation --app universal.apk --test id-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
-
         - step:
             name: "Run ClientApi android tests"
             caches:
               - gradle
+              - gradlewrapper
+              - sdk
             script: 
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle &&
               - cat ci/debug_gradle_signing >> clientapi/build.gradle && ./gradlew clientapi:assembleDebugAndroidTest
-              - mv clientapi/build/outputs/apk/androidTest/debug/clientapi-debug-androidTest.apk clientapi-debug-androidTest.apk 
+              - mv clientapi/build/outputs/apk/androidTest/debug/clientapi-debug-androidTest.apk clientapi-debug-androidTest.apk
               -
               - bash ./ci/pipeline/install_gcloud
               - gcloud firebase test android run --type instrumentation --app universal.apk --test clientapi-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
@@ -89,6 +107,8 @@ pipelines:
             name: "Run Fingerprint android tests"
             caches:
               - gradle
+              - gradlewrapper
+              - sdk
             script: 
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle &&
@@ -101,6 +121,8 @@ pipelines:
             name: "Run Face android tests"
             caches:
               - gradle
+              - gradlewrapper
+              - sdk
             script: 
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle &&
@@ -109,3 +131,8 @@ pipelines:
               -
               - bash ./ci/pipeline/install_gcloud
               - gcloud firebase test android run --type instrumentation --app universal.apk --test face-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
+
+definitions:
+    caches:
+        gradlewrapper: ~/.gradle/wrapper
+        sdk: ~/opt/android/sdk
