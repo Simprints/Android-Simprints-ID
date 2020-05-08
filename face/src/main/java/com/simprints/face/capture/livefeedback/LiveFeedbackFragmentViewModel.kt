@@ -15,11 +15,13 @@ import com.simprints.face.models.SymmetricTarget
 import com.simprints.uicomponents.models.FloatRange
 import com.simprints.uicomponents.models.PreviewFrame
 import com.simprints.uicomponents.models.Size
+import kotlinx.coroutines.channels.Channel
 
 class LiveFeedbackFragmentViewModel(
     private val mainVM: FaceCaptureViewModel,
     private val faceDetector: FaceDetector,
-    private val frameProcessor: FrameProcessor
+    private val frameProcessor: FrameProcessor,
+    private val qualityThreshold: Float
 ) : ViewModel() {
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
@@ -27,13 +29,11 @@ class LiveFeedbackFragmentViewModel(
         FloatRange(0.25f, 0.5f)
     )
 
+    val captures = mutableListOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
-    val captures = mutableListOf<FaceDetection>()
-
-    // TODO: get correct information from SimprintsID managers - cameraPreferences.qualityThreshold
-    private val qualityThreshold = -1
+    val frameChannel = Channel<Frame>(Channel.CONFLATED)
 
     suspend fun process(
         frame: Frame,
@@ -60,21 +60,23 @@ class LiveFeedbackFragmentViewModel(
         capturingState.value = CapturingState.CAPTURING
     }
 
+    fun handlePreviewFrame(frame: Frame) {
+        frameChannel.offer(frame)
+    }
+
     private fun finishCapture() {
         val sortedQualifyingCaptures = captures
+            .filter { it.hasValidStatus() && it.isAboveQualityThreshold(qualityThreshold) }
             .sortedByDescending { it.face?.quality }
-            .also { mainVM.captureFinished(it) }
-            .filter { it.status == FaceDetection.Status.VALID_CAPTURING }
 
-        if (areCapturesBelowThreshold(sortedQualifyingCaptures)) {
+        mainVM.captureFinished(sortedQualifyingCaptures)
+
+        if (sortedQualifyingCaptures.isEmpty()) {
             capturingState.value = CapturingState.FINISHED_FAILED
         } else {
             capturingState.value = CapturingState.FINISHED
         }
     }
-
-    private fun areCapturesBelowThreshold(captures: List<FaceDetection>) =
-        captures.isEmpty() || captures.first().face?.quality ?: Float.NEGATIVE_INFINITY < qualityThreshold
 
     private fun getFaceDetectionFromPotentialFace(potentialFace: Face?, previewFrame: PreviewFrame): FaceDetection {
         return if (potentialFace == null) {
@@ -113,11 +115,6 @@ class LiveFeedbackFragmentViewModel(
                 if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID
             )
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        mainVM.stopFaceDetection()
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED, FINISHED_FAILED }

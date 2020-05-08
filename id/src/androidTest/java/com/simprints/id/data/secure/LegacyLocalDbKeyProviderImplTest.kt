@@ -6,10 +6,10 @@ import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.syntax.assertThrows
+import io.mockk.spyk
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.spy
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
@@ -36,7 +36,7 @@ class LegacyLocalDbKeyProviderImplTest {
     @Test
     fun invalidEncryptedData_shouldThrowAnError() {
 
-        val keystoreManager = spy(KeystoreManagerImpl())
+        val keystoreManager = spyk(KeystoreManagerImpl())
         val secureDataManager = LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager)
 
         assertThrows<MissingLocalDatabaseKeyException> {

@@ -1,11 +1,9 @@
 package com.simprints.face.data.moduleapi.face
 
-import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
-import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
-import com.simprints.face.data.moduleapi.face.responses.FaceResponse
-import com.simprints.face.data.moduleapi.face.responses.FaceResponseType
+import com.simprints.face.data.moduleapi.face.responses.*
 import com.simprints.moduleapi.face.responses.*
 import com.simprints.moduleapi.face.responses.entities.IFaceCaptureResult
+import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 object DomainToFaceResponse {
@@ -14,6 +12,7 @@ object DomainToFaceResponse {
         when (faceResponse.type) {
             FaceResponseType.CAPTURE -> fromDomainToFaceCaptureResponse(faceResponse as FaceCaptureResponse)
             FaceResponseType.MATCH -> fromDomainToFaceMatchResponse(faceResponse as FaceMatchResponse)
+            FaceResponseType.EXIT_FORM -> fromDomainToExitFormResponse(faceResponse as FaceExitFormResponse)
         }
 
     private fun fromDomainToFaceCaptureResponse(faceCaptureResponse: FaceCaptureResponse): IFaceCaptureResponseImpl =
@@ -22,6 +21,8 @@ object DomainToFaceResponse {
     private fun fromDomainToFaceMatchResponse(faceMatchResponse: FaceMatchResponse): IFaceMatchResponseImpl =
         IFaceMatchResponseImpl(faceMatchResponse.result, IFaceResponseType.MATCH)
 
+    private fun fromDomainToExitFormResponse(faceExitFormResponse: FaceExitFormResponse): IFaceExitFormResponseImpl =
+        IFaceExitFormResponseImpl(faceExitFormResponse.reason.fromDomainToExitReason(), faceExitFormResponse.extra)
 }
 
 @Parcelize
@@ -34,4 +35,12 @@ private class IFaceCaptureResponseImpl(
 private class IFaceMatchResponseImpl(
     override val result: List<IFaceMatchResult>,
     override val type: IFaceResponseType
-): IFaceMatchResponse
+) : IFaceMatchResponse
+
+@Parcelize
+private class IFaceExitFormResponseImpl(
+    override val reason: IFaceExitReason,
+    override val extra: String) : IFaceExitFormResponse {
+    @IgnoredOnParcel
+    override val type: IFaceResponseType = IFaceResponseType.EXIT_FORM
+}

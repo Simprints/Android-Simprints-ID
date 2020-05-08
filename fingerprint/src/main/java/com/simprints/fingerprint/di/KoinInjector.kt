@@ -42,6 +42,8 @@ import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
+import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
+import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
@@ -99,11 +101,14 @@ object KoinInjector {
     }
 
     private fun Module.defineBuildersForDomainClasses() {
+        factory { SerialNumberConverter() }
+        factory { ScannerGenerationDeterminer() }
+
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
         single { ScannerPairingManager(get()) }
-        single<ScannerFactory> { ScannerFactoryImpl(get(), get(), get(), get()) }
-        single<ScannerManager> { ScannerManagerImpl(get(), get(), get()) }
+        single<ScannerFactory> { ScannerFactoryImpl(get(), get(), get(), get(), get(), get()) }
+        single<ScannerManager> { ScannerManagerImpl(get(), get(), get(), get()) }
 
         single<ComponentNfcAdapter> { AndroidNfcAdapter(NfcAdapter.getDefaultAdapter(get())) }
         single { NfcManager(get()) }
@@ -127,6 +132,6 @@ object KoinInjector {
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
-        viewModel { SerialEntryPairViewModel(get()) }
+        viewModel { SerialEntryPairViewModel(get(), get()) }
     }
 }

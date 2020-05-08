@@ -5,10 +5,9 @@ import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.SubjectsCount
-import com.simprints.id.data.db.subject.SubjectRepositoryDownSyncHelper.Companion.buildPersonFromCreationPayload
 import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.domain.Subject.Companion.buildSubjectFromCreationPayload
 import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
-import com.simprints.id.data.db.subject.domain.subjectevents.Event
 import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.*
 import com.simprints.id.data.db.subject.domain.subjectevents.fromApiToDomain
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
@@ -76,7 +75,9 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
         val reader = setupJsonReaderFromResponseStream(inputStream)
         return if (reader.hasNext()) {
             val apiEvent: ApiEvent = SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java)
-            createPersonFetchResultFromEvent(apiEvent.fromApiToDomain())
+            val event = apiEvent.fromApiToDomain()
+            val subject = buildSubjectFromCreationPayload(event.payload as EnrolmentRecordCreationPayload)
+            SubjectFetchResult(subject, REMOTE)
         } else {
             SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
         }
@@ -87,11 +88,6 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
             .also {
                 it.beginArray()
             }
-
-    private fun createPersonFetchResultFromEvent(event: Event): SubjectFetchResult {
-        val person = buildPersonFromCreationPayload(event.payload as EnrolmentRecordCreationPayload)
-        return SubjectFetchResult(person, REMOTE)
-    }
 
     private suspend fun savePersonInLocal(subject: Subject) = subjectLocalDataSource.insertOrUpdate(listOf(subject))
 
