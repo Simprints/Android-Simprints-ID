@@ -112,7 +112,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
 
     companion object {
-        private fun connectScannerTaskRequest() = ConnectScannerTaskRequest()
+        private fun connectScannerTaskRequest() = ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         private fun ConnectScannerTaskRequest.toIntent() = Intent().also {
             it.setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, ConnectScannerActivity::class.qualifiedName!!)
