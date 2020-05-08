@@ -4,38 +4,41 @@ import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.viewpager.widget.ViewPager
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.commontesttools.scanner.*
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
+import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
-import com.simprints.fingerprintscannermock.dummy.DummyBluetoothAdapter
 import com.simprints.id.Application
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.syntax.failTest
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.setupMock
-import com.simprints.testtools.common.syntax.whenThis
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.KoinTest
 import org.koin.test.mock.declareModule
 
 @RunWith(AndroidJUnit4::class)
-@Ignore("These tests are flaky due to an unknown issue with FingerFragment")
 class CollectFingerprintsActivityTest : KoinTest {
 
     private lateinit var scenario: ActivityScenario<CollectFingerprintsActivity>
@@ -48,9 +51,19 @@ class CollectFingerprintsActivityTest : KoinTest {
     private fun mockScannerManagerWithScanner(scanner: ScannerWrapper) {
         declareModule {
             factory<ScannerManager> {
-                ScannerManagerImpl(DummyBluetoothAdapter(), mock(), mock(), mock()).also { it.scanner = scanner }
+                ScannerManagerImpl(mockk(), mockk(), mockk(), mockk()).also { it.scanner = scanner }
             }
-            factory<MasterFlowManager> { setupMock { whenThis { getCurrentAction() } thenReturn Action.IDENTIFY } }
+            factory<MasterFlowManager> { mockk { every { getCurrentAction() } returns Action.IDENTIFY } }
+            factory<FingerprintPreferencesManager> {
+                mockk {
+                    every { captureFingerprintStrategy } returns CaptureFingerprintStrategy.SECUGEN_ISO_500_DPI
+                    every { saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.NEVER
+                    every { fingerImagesExist } returns true
+                }
+            }
+            factory<FingerprintSessionEventsManager> { mockk(relaxed = true) }
+            factory<FingerprintImageManager> { mockk(relaxed = true) }
+            factory<CrashReportManager> { mockk(relaxed = true) }
         }
     }
 
@@ -84,7 +97,7 @@ class CollectFingerprintsActivityTest : KoinTest {
         checkIfDialogIsDisplayedAndClickRestart()
         checkFirstFingerYetToBeScanned()
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPager>(R.id.view_pager)
         assertEquals(2, viewPager?.adapter?.count)
         assertEquals(0, viewPager?.currentItem)
     }
@@ -160,7 +173,7 @@ class CollectFingerprintsActivityTest : KoinTest {
         checkNoFingersScannedToastIsShown(getCurrentActivity() ?: failTest("No activity found"))
         checkFirstFingerYetToBeScanned()
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPager>(R.id.view_pager)
         assertEquals(2, viewPager?.adapter?.count)
         assertEquals(0, viewPager?.currentItem)
     }
@@ -177,7 +190,7 @@ class CollectFingerprintsActivityTest : KoinTest {
 
         waitForSplashScreenToAppearAndDisappear()
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPager>(R.id.view_pager)
         assertEquals(3, viewPager?.adapter?.count)
         assertEquals(1, viewPager?.currentItem)
     }
@@ -188,7 +201,7 @@ class CollectFingerprintsActivityTest : KoinTest {
 
         scenario = ActivityScenario.launch(collectTaskRequest(FOUR_FINGERS).toIntent())
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPager>(R.id.view_pager)
 
         assertEquals(4, viewPager?.adapter?.count)
 
@@ -212,7 +225,7 @@ class CollectFingerprintsActivityTest : KoinTest {
         pressScan()
         pressScan()
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPager>(R.id.view_pager)
         assertEquals(2, viewPager?.adapter?.count)
         assertEquals(0, viewPager?.currentItem)
     }
@@ -227,7 +240,7 @@ class CollectFingerprintsActivityTest : KoinTest {
 
         waitForSplashScreenToAppearAndDisappear()
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPager>(R.id.view_pager)
         assertEquals(3, viewPager?.adapter?.count)
         assertEquals(1, viewPager?.currentItem)
     }
@@ -242,7 +255,7 @@ class CollectFingerprintsActivityTest : KoinTest {
 
         waitForSplashScreenToAppearAndDisappear()
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPager>(R.id.view_pager)
         assertEquals(4, viewPager?.adapter?.count)
         assertEquals(1, viewPager?.currentItem)
     }
