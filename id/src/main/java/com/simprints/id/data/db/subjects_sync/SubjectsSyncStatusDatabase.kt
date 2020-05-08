@@ -13,7 +13,7 @@ import com.simprints.id.data.db.subjects_sync.down.local.SubjectsDownSyncOperati
 import com.simprints.id.data.db.subjects_sync.up.local.DbUpSyncOperation
 import com.simprints.id.data.db.subjects_sync.up.local.SubjectsUpSyncOperationLocalDataSource
 
-@Database(entities = [DbSubjectsDownSyncOperation::class, DbUpSyncOperation::class], version = 1, exportSchema = false)
+@Database(entities = [DbSubjectsDownSyncOperation::class, DbUpSyncOperation::class], version = 2, exportSchema = false)
 @TypeConverters(DbSubjectsDownSyncOperation.Converters::class, DbUpSyncOperation.Converters::class)
 @Keep
 abstract class SubjectsSyncStatusDatabase : RoomDatabase() {
