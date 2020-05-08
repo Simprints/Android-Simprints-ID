@@ -26,6 +26,8 @@ import com.simprints.moduleapi.fingerprint.responses.IFingerprintCaptureResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintMatchResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponseType
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.whenThis
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk

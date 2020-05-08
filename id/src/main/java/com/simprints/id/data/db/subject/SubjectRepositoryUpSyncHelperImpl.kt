@@ -1,18 +1,18 @@
 package com.simprints.id.data.db.subject
 
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
-import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperation
-import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperationResult
-import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperationResult.UpSyncState
-import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperationResult.UpSyncState.RUNNING
-import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncProgress
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.subjectevents.*
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
+import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperation
+import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperationResult
+import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperationResult.UpSyncState
+import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperationResult.UpSyncState.RUNNING
+import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncProgress
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.toMode
