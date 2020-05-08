@@ -13,7 +13,6 @@ android {
     defaultConfig {
         minSdkVersion config.min_sdk
         targetSdkVersion 29
-        multiDexEnabled true
         versionCode 1
         versionName "2019.3.0-dev0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
