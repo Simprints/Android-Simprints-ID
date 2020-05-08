@@ -34,7 +34,7 @@ class ErrorPresenterTest {
                 start(ClientApiAlert.INVALID_CLIENT_REQUEST)
             }
 
-            verify(exactly = 1) { view.setErrorMessageText(any()) }
+            verify(exactly = 100) { view.setErrorMessageText(any()) }
         }
     }
 
