@@ -61,6 +61,7 @@ pipelines:
           - gradle
           - gradlewrapper
           - sdk
+        size: 2x # Double resources available for this step
         script: 
           - bash ./ci/pipeline/setup
           - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew bundleDebug --stacktrace
@@ -80,6 +81,7 @@ pipelines:
               - gradle
               - gradlewrapper
               - sdk
+              - googleCloud
             script: 
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew id:assembleDebugAndroidTest
@@ -95,6 +97,7 @@ pipelines:
               - gradle
               - gradlewrapper
               - sdk
+              - googleCloud
             script: 
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle &&
@@ -109,6 +112,7 @@ pipelines:
               - gradle
               - gradlewrapper
               - sdk
+              - googleCloud
             script: 
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle &&
@@ -123,6 +127,7 @@ pipelines:
               - gradle
               - gradlewrapper
               - sdk
+              - googleCloud
             script: 
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle &&
@@ -135,4 +140,5 @@ pipelines:
 definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
-        sdk: ~/opt/android/sdk
+        sdk: android-sdk
+        googleCloud: ~/google-cloud-sdk/bin
