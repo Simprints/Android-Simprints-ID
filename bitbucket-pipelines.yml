@@ -19,7 +19,7 @@ pipelines:
               - gradlewrapper
             script:
               - bash ./ci/pipeline/setup
-              - ./gradlew id:bundleDebugClasses && ./gradlew clientapi:testDebugUnitTest
+              - ./gradlew id:bundleDebugClasses && ./gradlew build sonarqube
             artifacts:
               - clientapi/build/reports/tests/testDebugUnitTest/*
               - build/libs/**
