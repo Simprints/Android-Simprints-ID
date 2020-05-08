@@ -79,7 +79,7 @@ pipelines:
             size: 2x # Double resources available for this step
             script:
               - bash ./ci/pipeline/setup
-              - ./gradlew build sonarqube
+              - ./gradlew sonarqube
             artifacts:
               - build/libs/**
 
