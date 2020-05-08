@@ -28,15 +28,11 @@ import com.simprints.fingerprint.activities.collect.state.ScanResult
 import com.simprints.fingerprint.activities.collect.tryagainsplash.SplashScreenActivity
 import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
-import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
-import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
-import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.testtools.FullAndroidTestConfigRule
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.id.Application
@@ -99,7 +95,6 @@ class CollectFingerprintsActivityTest : KoinTest {
     @Before
     fun setUp() {
         declareModule {
-            factory<FingerprintSessionEventsManager> { mockk(relaxed = true) }
             factory<MasterFlowManager> { mockk { every { getCurrentAction() } returns Action.IDENTIFY } }
             viewModel { vm }
         }
@@ -249,7 +244,6 @@ class CollectFingerprintsActivityTest : KoinTest {
         Intents.intending(hasComponent(AlertActivity::class.java.name))
             .respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null))
 
-
         launchAlert.postEvent(FingerprintAlert.UNEXPECTED_ERROR)
 
         Intents.intended(hasComponent(AlertActivity::class.java.name))
@@ -284,15 +278,6 @@ class CollectFingerprintsActivityTest : KoinTest {
         Intents.intended(hasComponent(ConnectScannerActivity::class.java.name))
 
         Intents.release()
-    }
-
-    @Test
-    fun activityLifecycle_callsVmOnResumeAndPause() {
-        scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS_IDS).toIntent())
-        scenario.close()
-
-        verify { vm.handleOnResume() }
-        verify { vm.handleOnPause() }
     }
 
     @Test
