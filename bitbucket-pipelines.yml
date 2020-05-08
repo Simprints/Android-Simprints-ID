@@ -4,6 +4,9 @@
 # You can specify a custom docker image from Docker Hub as your build environment.
 image: circleci/android:api-29-ndk
 
+clone:
+    depth: full # SonarCloud scanner needs the full history to assign issues properly
+
 pipelines:
   default:
 
@@ -14,19 +17,18 @@ pipelines:
             caches:
               - gradle
               - gradlewrapper
-              - sdk
-            script: 
+            script:
               - bash ./ci/pipeline/setup
               - ./gradlew id:bundleDebugClasses && ./gradlew clientapi:testDebugUnitTest
             artifacts:
               - clientapi/build/reports/tests/testDebugUnitTest/*
+              - build/libs/**
         - step:
             name: "Run Id unit tests"
             caches:
               - gradle
               - gradlewrapper
-              - sdk
-            script: 
+            script:
               - bash ./ci/pipeline/setup
               - ./gradlew id:bundleDebugClasses && ./gradlew id:testDebugUnitTest
             artifacts:
@@ -36,19 +38,17 @@ pipelines:
             caches:
               - gradle
               - gradlewrapper
-              - sdk
-            script: 
+            script:
               - bash ./ci/pipeline/setup
               - ./gradlew id:bundleDebugClasses && ./gradlew face:testDebugUnitTest
             artifacts:
-              - face/build/reports/tests/testDebugUnitTest/*           
+              - face/build/reports/tests/testDebugUnitTest/*
         - step:
             name: "Run Fingerprint unit tests"
             caches:
               - gradle
               - gradlewrapper
-              - sdk
-            script: 
+            script:
               - bash ./ci/pipeline/setup
               - ./gradlew id:bundleDebugClasses && ./gradlew fingerprint:testDebugUnitTest
             artifacts:
@@ -60,9 +60,8 @@ pipelines:
         caches:
           - gradle
           - gradlewrapper
-          - sdk
         size: 2x # Double resources available for this step
-        script: 
+        script:
           - bash ./ci/pipeline/setup
           - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew bundleDebug --stacktrace
           - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
@@ -80,12 +79,11 @@ pipelines:
             caches:
               - gradle
               - gradlewrapper
-              - sdk
               - googlecloud
-            script: 
+            script:
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew id:assembleDebugAndroidTest
-              - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk 
+              - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk
               - bash ./ci/pipeline/install_gcloud
               - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
               - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
@@ -96,9 +94,8 @@ pipelines:
             caches:
               - gradle
               - gradlewrapper
-              - sdk
               - googlecloud
-            script: 
+            script:
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle &&
               - cat ci/debug_gradle_signing >> clientapi/build.gradle && ./gradlew clientapi:assembleDebugAndroidTest
@@ -111,13 +108,12 @@ pipelines:
             caches:
               - gradle
               - gradlewrapper
-              - sdk
               - googlecloud
-            script: 
+            script:
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle &&
               - cat ci/debug_gradle_signing >> fingerprint/build.gradle && ./gradlew fingerprint:assembleDebugAndroidTest
-              - mv fingerprint/build/outputs/apk/androidTest/debug/fingerprint-debug-androidTest.apk fingerprint-debug-androidTest.apk 
+              - mv fingerprint/build/outputs/apk/androidTest/debug/fingerprint-debug-androidTest.apk fingerprint-debug-androidTest.apk
               -
               - bash ./ci/pipeline/install_gcloud
               - gcloud firebase test android run --type instrumentation --app universal.apk --test fingerprint-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
@@ -126,13 +122,12 @@ pipelines:
             caches:
               - gradle
               - gradlewrapper
-              - sdk
               - googlecloud
-            script: 
+            script:
               - bash ./ci/pipeline/setup
               - cat ci/debug_gradle_signing >> id/build.gradle &&
               - cat ci/debug_gradle_signing >> face/build.gradle && ./gradlew face:assembleDebugAndroidTest
-              - mv face/build/outputs/apk/androidTest/debug/face-debug-androidTest.apk face-debug-androidTest.apk 
+              - mv face/build/outputs/apk/androidTest/debug/face-debug-androidTest.apk face-debug-androidTest.apk
               -
               - bash ./ci/pipeline/install_gcloud
               - gcloud firebase test android run --type instrumentation --app universal.apk --test face-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
@@ -140,5 +135,5 @@ pipelines:
 definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
-        sdk: android-sdk
         googlecloud: ~/google-cloud-sdk/bin
+        sonar: ~/.sonar/cache
