@@ -58,6 +58,7 @@ captures/
 # Keystore files
 *.jks
 *.keystore
+!debug.keystore
 
 # Freeline
 freeline.py
@@ -70,6 +71,5 @@ fastlane/
 # lint
 lint/
 
-uicomponents/.cxx/
-
-fingerprintmatcher/.cxx/
+# ndk
+.cxx/
