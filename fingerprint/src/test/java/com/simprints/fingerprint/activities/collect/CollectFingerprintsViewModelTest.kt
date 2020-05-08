@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.collect
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.EncodingUtils
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockAcquireImageResult.OK
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.*
 import com.simprints.fingerprint.activities.collect.domain.Finger
@@ -29,6 +30,7 @@ import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedExce
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
 import com.simprints.fingerprint.testtools.assertEventReceived
+import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
 import io.mockk.*
 import io.reactivex.Completable
@@ -502,6 +504,135 @@ class CollectFingerprintsViewModelTest : KoinTest {
         }
     }
 
+    @Test
+    fun pressingCancel_duringScan_cancelsProperly() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(NEVER_RETURNS)
+        withImageTransfer()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Scanning())
+        vm.handleScanButtonPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.NotCollected)
+    }
+
+    @Test
+    fun pressingCancel_duringImageTransfer_doesNothing() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN)
+        acquireImageResponses(MockAcquireImageResult.NEVER_RETURNS)
+        withImageTransfer()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.TransferringImage(ScanResult(GOOD_QUALITY, TEMPLATE, null)))
+        vm.handleScanButtonPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.TransferringImage(ScanResult(GOOD_QUALITY, TEMPLATE, null)))
+    }
+
+    @Test
+    fun restartAfterScans_resetsStateCorrectly() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN)
+        acquireImageResponses(OK)
+        withImageTransfer()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+        mockTimer.executeAllTasks()
+        vm.handleMissingFingerButtonPressed()
+        mockTimer.executeAllTasks()
+        vm.handleScanButtonPressed()
+        mockTimer.executeAllTasks()
+
+        assertThat(vm.state().isShowingConfirmDialog).isTrue()
+
+        vm.handleRestart()
+
+        assertThat(vm.state()).isEqualTo(
+            CollectFingerprintsState(
+                fingerStates = TWO_FINGERS_IDS.toFingers()
+                    .associateWith { FingerCollectionState.NotCollected }.toMutableMap(),
+                currentFingerIndex = 0,
+                isAskingRescan = false,
+                isShowingConfirmDialog = false,
+                isShowingSplashScreen = false
+            )
+        )
+    }
+
+    @Test
+    fun backPressed_whileScanning_cancelsScanning() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(NEVER_RETURNS)
+        withImageTransfer()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Scanning())
+        vm.handleOnBackPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.NotCollected)
+    }
+
+    @Test
+    fun backPressed_whileTransferringImage_cancelsTransfer() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN)
+        acquireImageResponses(MockAcquireImageResult.NEVER_RETURNS)
+        withImageTransfer()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.TransferringImage(ScanResult(GOOD_QUALITY, TEMPLATE, null)))
+        vm.handleOnBackPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.NotCollected)
+    }
+
+    @Test
+    fun backPressed_whileIdle_launchesRefusalEvent() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN)
+        noImageTransfer()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+        vm.handleOnBackPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, null)))
+
+        vm.launchRefusal.assertEventReceived()
+    }
+
+    @Test
+    fun unexpectedErrorWhileScanning_launchesAlertAndReportsCrash() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(UNKNOWN_ERROR)
+        noImageTransfer()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.NotCollected)
+
+        verify { crashReportManager.logExceptionOrSafeException(any()) }
+        vm.launchAlert.assertEventReceivedWithContent(FingerprintAlert.UNEXPECTED_ERROR)
+    }
+
+    @Test
+    fun onResumeCalled_registersScannerTrigger() {
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnResume()
+
+        verify { scanner.registerTriggerListener(any()) }
+    }
+
+    @Test
+    fun onPauseCalled_unregistersScannerTrigger() {
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnPause()
+
+        verify { scanner.unregisterTriggerListener(any()) }
+    }
+
     private fun noImageTransfer() {
         every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.NEVER
     }
@@ -523,6 +654,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
                 BAD_SCAN -> Single.just(CaptureFingerprintResponse(TEMPLATE, BAD_QUALITY))
                 NO_FINGER_DETECTED -> Single.error(NoFingerDetectedException())
                 DISCONNECTED -> Single.error(ScannerDisconnectedException())
+                UNKNOWN_ERROR -> Single.error(Error("Oops!"))
                 NEVER_RETURNS -> Single.never()
             }
         }
@@ -539,7 +671,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     private enum class MockCaptureFingerprintResponse {
-        GOOD_SCAN, DIFFERENT_GOOD_SCAN, BAD_SCAN, NO_FINGER_DETECTED, DISCONNECTED, NEVER_RETURNS
+        GOOD_SCAN, DIFFERENT_GOOD_SCAN, BAD_SCAN, NO_FINGER_DETECTED, DISCONNECTED, UNKNOWN_ERROR, NEVER_RETURNS
     }
 
     private enum class MockAcquireImageResult {
