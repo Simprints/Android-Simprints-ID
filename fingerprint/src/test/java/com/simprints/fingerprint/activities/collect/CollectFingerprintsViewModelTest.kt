@@ -3,11 +3,14 @@ package com.simprints.fingerprint.activities.collect
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.EncodingUtils
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockAcquireImageResult.OK
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.*
 import com.simprints.fingerprint.activities.collect.domain.Finger
 import com.simprints.fingerprint.activities.collect.domain.FingerConfig
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
+import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprint.commontesttools.time.MockTimer
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
@@ -25,10 +28,9 @@ import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedExcepti
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.verify
+import com.simprints.fingerprint.testtools.assertEventReceived
+import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
+import io.mockk.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Before
@@ -37,7 +39,6 @@ import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declareModule
-import java.lang.Thread.sleep
 
 class CollectFingerprintsViewModelTest : KoinTest {
 
@@ -100,162 +101,154 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
     @Test
     fun scanPressed_noImageTransfer_updatesStateToScanningDuringScan() {
-        every { scanner.setUiIdle() } returns Completable.complete()
-        every { scanner.captureFingerprint(any(), any(), any()) } returns Single.never()
-        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.NEVER
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(NEVER_RETURNS)
+        noImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
-        vm.handleScanButtonPressed(false)
+        vm.handleScanButtonPressed()
 
         assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Scanning())
     }
 
     @Test
     fun scanPressed_withImageTransfer_updatesStateToTransferringImageAfterScan() {
-        val qualityScore = 80
-        val template = byteArrayOf(0x01, 0x02, 0x03)
-        every { scanner.setUiIdle() } returns Completable.complete()
-        every { scanner.captureFingerprint(any(), any(), any()) } returns Single.just(CaptureFingerprintResponse(template, qualityScore))
-        every { scanner.acquireImage(any()) } returns Single.never()
-        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.WSQ_15
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN)
+        acquireImageResponses(MockAcquireImageResult.NEVER_RETURNS)
+        withImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
-        vm.handleScanButtonPressed(false)
+        vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.TransferringImage(ScanResult(qualityScore, template, null)))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.TransferringImage(ScanResult(GOOD_QUALITY, TEMPLATE, null)))
     }
 
     @Test
     fun scanPressed_noImageTransfer_goodScan_updatesStatesCorrectlyAndCreatesEvent() {
-        val qualityScore = 80
-        val template = byteArrayOf(0x01, 0x02, 0x03)
-        every { scanner.setUiIdle() } returns Completable.complete()
-        every { scanner.captureFingerprint(any(), any(), any()) } returns Single.just(CaptureFingerprintResponse(template, qualityScore))
-        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.NEVER
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN)
+        noImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
-        vm.handleScanButtonPressed(false)
+        vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(qualityScore, template, null)))
-        assertThat(vm.vibrate.value).isNotNull()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, null)))
+        vm.vibrate.assertEventReceived()
+
+        mockTimer.executeNextTask()
+        assertThat(vm.state().currentFingerIndex).isEqualTo(1)
+
         verify { sessionEventsManager.addEventInBackground(any()) }
     }
 
     @Test
     fun scanPressed_withImageTransfer_goodScan_updatesStatesCorrectlyAndCreatesEvent() {
-        val qualityScore = 80
-        val template = byteArrayOf(0x01, 0x02, 0x03)
-        val image = byteArrayOf(0x05, 0x06, 0x07, 0x08)
-        every { scanner.setUiIdle() } returns Completable.complete()
-        every { scanner.captureFingerprint(any(), any(), any()) } returns Single.just(CaptureFingerprintResponse(template, qualityScore))
-        every { scanner.acquireImage(any()) } returns Single.just(AcquireImageResponse(image))
-        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.WSQ_15
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN)
+        acquireImageResponses(OK)
+        withImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
-        vm.handleScanButtonPressed(false)
+        vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(qualityScore, template, image)))
-        assertThat(vm.vibrate.value).isNotNull()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE)))
+        vm.vibrate.assertEventReceived()
         verify { sessionEventsManager.addEventInBackground(any()) }
+
+        mockTimer.executeNextTask()
+        assertThat(vm.state().currentFingerIndex).isEqualTo(1)
     }
 
     @Test
     fun scanPressed_noImageTransfer_badScan_updatesStatesCorrectlyAndCreatesEvent() {
-        val qualityScore = 20
-        val template = byteArrayOf(0x01, 0x02, 0x03)
-        every { scanner.setUiIdle() } returns Completable.complete()
-        every { scanner.captureFingerprint(any(), any(), any()) } returns Single.just(CaptureFingerprintResponse(template, qualityScore))
-        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.NEVER
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(BAD_SCAN)
+        noImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
-        vm.handleScanButtonPressed(false)
+        vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(qualityScore, template, null), 1))
-        assertThat(vm.vibrate.value).isNotNull()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, null), 1))
+        vm.vibrate.assertEventReceived()
         verify { sessionEventsManager.addEventInBackground(any()) }
     }
 
     @Test
     fun scanPressed_withImageTransfer_badScan_doesNotTransferImage_updatesStatesCorrectlyAndCreatesEvent() {
-        val qualityScore = 20
-        val template = byteArrayOf(0x01, 0x02, 0x03)
-        every { scanner.setUiIdle() } returns Completable.complete()
-        every { scanner.captureFingerprint(any(), any(), any()) } returns Single.just(CaptureFingerprintResponse(template, qualityScore))
-        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.WSQ_15
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(BAD_SCAN)
+        withImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
-        vm.handleScanButtonPressed(false)
+        vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(qualityScore, template, null), 1))
-        assertThat(vm.vibrate.value).isNotNull()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, null), 1))
+        vm.vibrate.assertEventReceived()
         verify { sessionEventsManager.addEventInBackground(any()) }
     }
 
     @Test
     fun scanPressed_noFingerDetected_updatesStatesCorrectlyAndCreatesEvent() {
-        every { scanner.setUiIdle() } returns Completable.complete()
-        every { scanner.captureFingerprint(any(), any(), any()) } returns Single.error(NoFingerDetectedException())
-        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.WSQ_15
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(NO_FINGER_DETECTED)
+        withImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
-        vm.handleScanButtonPressed(false)
+        vm.handleScanButtonPressed()
 
         assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.NotDetected())
-        assertThat(vm.vibrate.value).isNotNull()
+        vm.vibrate.assertEventReceived()
         verify { sessionEventsManager.addEventInBackground(any()) }
     }
 
     @Test
     fun scanPressed_scannerDisconnectedDuringScan_updatesStateCorrectlyAndReconnects() {
-        every { scanner.setUiIdle() } returns Completable.complete()
-        every { scanner.captureFingerprint(any(), any(), any()) } returns Single.error(ScannerDisconnectedException())
-        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.WSQ_15
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(DISCONNECTED)
+        withImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
-        vm.handleScanButtonPressed(false)
+        vm.handleScanButtonPressed()
 
         assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.NotCollected)
-        assertThat(vm.launchReconnect.value).isNotNull()
+        vm.launchReconnect.assertEventReceived()
     }
 
     @Test
     fun scanPressed_scannerDisconnectedDuringTransfer_updatesStateCorrectlyAndReconnects() {
-        val qualityScore = 80
-        val template = byteArrayOf(0x01, 0x02, 0x03)
-        every { scanner.setUiIdle() } returns Completable.complete()
-        every { scanner.captureFingerprint(any(), any(), any()) } returns Single.just(CaptureFingerprintResponse(template, qualityScore))
-        every { scanner.acquireImage(any()) } returns Single.error(ScannerDisconnectedException())
-        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.WSQ_15
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN)
+        acquireImageResponses(MockAcquireImageResult.DISCONNECTED)
+        withImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
-        vm.handleScanButtonPressed(false)
+        vm.handleScanButtonPressed()
 
         assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.NotCollected)
-        assertThat(vm.launchReconnect.value).isNotNull()
+        vm.launchReconnect.assertEventReceived()
     }
 
     @Test
-    fun scanPressed_withImageTransfer_badScanLastAttempt_transfersImage_updatesStatesCorrectlyAndCreatesEvent() {
-        val qualityScore = 20
-        val template = byteArrayOf(0x01, 0x02, 0x03)
-        val image = byteArrayOf(0x05, 0x06, 0x07, 0x08)
-        every { scanner.setUiIdle() } returns Completable.complete()
-        every { scanner.captureFingerprint(any(), any(), any()) } returns Single.just(CaptureFingerprintResponse(template, qualityScore))
-        every { scanner.acquireImage(any()) } returns Single.just(AcquireImageResponse(image))
-        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.WSQ_15
+    fun badScanLastAttempt_withImageTransfer_transfersImageAndUpdatesStatesCorrectly() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(BAD_SCAN)
+        acquireImageResponses(OK)
+        withImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
-        vm.handleScanButtonPressed(false)
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(qualityScore, template, null), 1))
-        vm.handleScanButtonPressed(false)
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(qualityScore, template, null), 2))
-        vm.handleScanButtonPressed(false)
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(qualityScore, template, image), 3))
+        vm.handleScanButtonPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, null), 1))
+        vm.handleScanButtonPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, null), 2))
+        vm.handleScanButtonPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, IMAGE), 3))
 
-        assertThat(vm.state().isShowingSplashScreen)
+        assertThat(vm.state().isShowingSplashScreen).isTrue()
         mockTimer.executeNextTask()
         assertThat(vm.state().fingerStates.size).isEqualTo(3)
         mockTimer.executeNextTask()
+        assertThat(vm.state().isShowingSplashScreen).isFalse()
         assertThat(vm.state().currentFingerIndex).isEqualTo(1)
 
         verify(exactly = 1) { scanner.acquireImage(any()) }
@@ -263,37 +256,313 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
-    fun scanPressed_receivesOnlyBadScans_performsImageTransferEventually_correctlyAddsFingersAndResultsInCorrectState() {
-        val qualityScore = 20
-        val template = byteArrayOf(0x01, 0x02, 0x03)
-        val image = byteArrayOf(0x05, 0x06, 0x07, 0x08)
-        every { scanner.setUiIdle() } returns Completable.complete()
-        every { scanner.captureFingerprint(any(), any(), any()) } returns Single.just(CaptureFingerprintResponse(template, qualityScore))
-        every { scanner.acquireImage(any()) } returns Single.just(AcquireImageResponse(image))
-        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.WSQ_15
+    fun receivesOnlyBadScansThenConfirm_performsImageTransferEventually_resultsInCorrectStateAndSavesFingersCorrectly() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(BAD_SCAN)
+        acquireImageResponses(OK)
+        withImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
         repeat(12) { // 3 times for each of the 4 fingers (2 original + 2 auto-added)
-            vm.handleScanButtonPressed(false)
+            vm.handleScanButtonPressed()
             mockTimer.executeAllTasks()
         }
 
         assertThat(vm.state()).isEqualTo(CollectFingerprintsState(
             fingerStates = FOUR_FINGERS_IDS.toFingers()
-                .associateWith { FingerCollectionState.Collected(ScanResult(qualityScore, template, image), numberOfBadScans = 3) }.toMutableMap(),
+                .associateWith { FingerCollectionState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, IMAGE), numberOfBadScans = 3) }.toMutableMap(),
             currentFingerIndex = 3,
             isAskingRescan = false,
             isShowingConfirmDialog = true,
             isShowingSplashScreen = false
         ))
         verify(exactly = 12) { sessionEventsManager.addEventInBackground(any()) }
+
+        vm.handleConfirmFingerprintsAndContinue()
+        coVerify(exactly = 4) { imageManager.save(any(), any(), any()) }
+
+        vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
+            assertThat(actualFingerprints).hasSize(FOUR_FINGERS_IDS.size)
+            assertThat(actualFingerprints.map { it.fingerId }).containsExactlyElementsIn(FOUR_FINGERS_IDS)
+            actualFingerprints.forEach {
+                assertThat(it.templateBytes).isEqualTo(TEMPLATE)
+                assertThat(it.imageRef).isNotNull()
+            }
+        }
+    }
+
+    @Test
+    fun receivesOnlyGoodScansThenConfirm_withImageTransfer_resultsInCorrectStateAndSavesFingersCorrectly() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN)
+        acquireImageResponses(OK)
+        withImageTransfer()
+
+        vm.start(TWO_FINGERS_IDS)
+        repeat(2) {
+            vm.handleScanButtonPressed()
+            mockTimer.executeAllTasks()
+        }
+
+        assertThat(vm.state()).isEqualTo(CollectFingerprintsState(
+            fingerStates = TWO_FINGERS_IDS.toFingers()
+                .associateWith { FingerCollectionState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE)) }.toMutableMap(),
+            currentFingerIndex = 1,
+            isAskingRescan = false,
+            isShowingConfirmDialog = true,
+            isShowingSplashScreen = false
+        ))
+        verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }
+
+        vm.handleConfirmFingerprintsAndContinue()
+        coVerify(exactly = 2) { imageManager.save(any(), any(), any()) }
+
+        vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
+            assertThat(actualFingerprints).hasSize(TWO_FINGERS_IDS.size)
+            assertThat(actualFingerprints.map { it.fingerId }).containsExactlyElementsIn(TWO_FINGERS_IDS)
+            actualFingerprints.forEach {
+                assertThat(it.templateBytes).isEqualTo(TEMPLATE)
+                assertThat(it.imageRef).isNotNull()
+            }
+        }
+    }
+
+    @Test
+    fun receivesOnlyGoodScansThenConfirm_noImageTransfer_resultsInCorrectStateAndReturnsFingersCorrectly() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN)
+        noImageTransfer()
+
+        vm.start(TWO_FINGERS_IDS)
+        repeat(2) {
+            vm.handleScanButtonPressed()
+            mockTimer.executeAllTasks()
+        }
+
+        assertThat(vm.state()).isEqualTo(CollectFingerprintsState(
+            fingerStates = TWO_FINGERS_IDS.toFingers()
+                .associateWith { FingerCollectionState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, null)) }.toMutableMap(),
+            currentFingerIndex = 1,
+            isAskingRescan = false,
+            isShowingConfirmDialog = true,
+            isShowingSplashScreen = false
+        ))
+        verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }
+
+        vm.handleConfirmFingerprintsAndContinue()
+        coVerify(exactly = 0) { imageManager.save(any(), any(), any()) }
+
+        vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
+            assertThat(actualFingerprints).hasSize(TWO_FINGERS_IDS.size)
+            assertThat(actualFingerprints.map { it.fingerId }).containsExactlyElementsIn(TWO_FINGERS_IDS)
+            actualFingerprints.forEach {
+                assertThat(it.templateBytes).isEqualTo(TEMPLATE)
+                assertThat(it.imageRef).isNull()
+            }
+        }
+    }
+
+    @Test
+    fun goodScan_swipeBackThenRescan_updatesStateCorrectly() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN, DIFFERENT_GOOD_SCAN)
+        noImageTransfer()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+        mockTimer.executeNextTask()
+        assertThat(vm.state().currentFingerIndex).isEqualTo(1)
+
+        vm.updateSelectedFinger(0)
+        assertThat(vm.state().currentFingerIndex).isEqualTo(0)
+
+        vm.handleScanButtonPressed()
+        assertThat(vm.state().isAskingRescan).isTrue()
+
+        vm.handleScanButtonPressed()
+        assertThat(vm.state().isAskingRescan).isFalse()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(ScanResult(DIFFERENT_GOOD_QUALITY, DIFFERENT_TEMPLATE, null)))
+
+        verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }
+    }
+
+    @Test
+    fun missingFinger_updatesStateCorrectly() {
+        mockScannerSetUiIdle()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleMissingFingerButtonPressed()
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Skipped)
+        assertThat(vm.state().isShowingSplashScreen).isTrue()
+        mockTimer.executeNextTask()
+        assertThat(vm.state().fingerStates.size).isEqualTo(3)
+        mockTimer.executeNextTask()
+        assertThat(vm.state().isShowingSplashScreen).isFalse()
+        assertThat(vm.state().currentFingerIndex).isEqualTo(1)
+
+        verify { sessionEventsManager.addEventInBackground(any()) }
+    }
+
+    @Test
+    fun receivesOnlyMissingFingersThenConfirm_showsToastAndResetsState() {
+        mockScannerSetUiIdle()
+
+        vm.start(TWO_FINGERS_IDS)
+        repeat(4) { // 2 original + 2 auto-added
+            vm.handleMissingFingerButtonPressed()
+            mockTimer.executeAllTasks()
+        }
+
+        assertThat(vm.state()).isEqualTo(CollectFingerprintsState(
+            fingerStates = FOUR_FINGERS_IDS.toFingers()
+                .associateWith { FingerCollectionState.Skipped }.toMutableMap(),
+            currentFingerIndex = 3,
+            isAskingRescan = false,
+            isShowingConfirmDialog = true,
+            isShowingSplashScreen = false
+        ))
+        verify(exactly = 4) { sessionEventsManager.addEventInBackground(any()) }
+
+        vm.handleConfirmFingerprintsAndContinue()
+
+        vm.noFingersScannedToast.assertEventReceived()
+        assertThat(vm.state()).isEqualTo(CollectFingerprintsState(
+            fingerStates = TWO_FINGERS_IDS.toFingers()
+                .associateWith { FingerCollectionState.NotCollected }.toMutableMap(),
+            currentFingerIndex = 0,
+            isAskingRescan = false,
+            isShowingConfirmDialog = false,
+            isShowingSplashScreen = false
+        ))
+    }
+
+    @Test
+    fun receivesMixOfScanResults_withImageTransfer_updatesStateCorrectlyAndReturnsFingersCorrectly() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(
+            BAD_SCAN, NO_FINGER_DETECTED, BAD_SCAN, GOOD_SCAN,
+            BAD_SCAN, NO_FINGER_DETECTED, NO_FINGER_DETECTED, // skipped
+            NO_FINGER_DETECTED, BAD_SCAN, BAD_SCAN, BAD_SCAN,
+            NO_FINGER_DETECTED, GOOD_SCAN
+        )
+        acquireImageResponses(OK)
+        withImageTransfer()
+
+        vm.start(TWO_FINGERS_IDS)
+
+        // Finger 1
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        mockTimer.executeAllTasks()
+
+        // Finger 2
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleMissingFingerButtonPressed()
+        mockTimer.executeAllTasks()
+
+        // Finger 3
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        mockTimer.executeAllTasks()
+
+        // Finger 4
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+
+        assertThat(vm.state()).isEqualTo(CollectFingerprintsState(
+            fingerStates = mutableMapOf(
+                FingerIdentifier.LEFT_THUMB.toFinger() to FingerCollectionState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE), numberOfBadScans = 2),
+                FingerIdentifier.LEFT_INDEX_FINGER.toFinger() to FingerCollectionState.Skipped,
+                FingerIdentifier.RIGHT_THUMB.toFinger() to FingerCollectionState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, IMAGE), numberOfBadScans = 3),
+                FingerIdentifier.RIGHT_INDEX_FINGER.toFinger() to FingerCollectionState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE), numberOfBadScans = 0)
+            ),
+            currentFingerIndex = 3,
+            isAskingRescan = false,
+            isShowingConfirmDialog = true,
+            isShowingSplashScreen = false
+        ))
+        verify(exactly = 14) { sessionEventsManager.addEventInBackground(any()) }
+
+        vm.handleConfirmFingerprintsAndContinue()
+        coVerify(exactly = 3) { imageManager.save(any(), any(), any()) }
+
+        vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
+            assertThat(actualFingerprints).hasSize(3)
+            assertThat(actualFingerprints.map { it.fingerId }).containsExactly(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_INDEX_FINGER)
+            actualFingerprints.forEach {
+                assertThat(it.templateBytes).isEqualTo(TEMPLATE)
+                assertThat(it.imageRef).isNotNull()
+            }
+        }
+    }
+
+    private fun noImageTransfer() {
+        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.NEVER
+    }
+
+    private fun withImageTransfer() {
+        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.WSQ_15
+        coEvery { imageManager.save(any(), any(), any()) } returns mockk()
+    }
+
+    private fun mockScannerSetUiIdle() {
+        every { scanner.setUiIdle() } returns Completable.complete()
+    }
+
+    private fun captureFingerprintResponses(vararg responses: MockCaptureFingerprintResponse) {
+        every { scanner.captureFingerprint(any(), any(), any()) } returnsMany responses.map {
+            when (it) {
+                GOOD_SCAN -> Single.just(CaptureFingerprintResponse(TEMPLATE, GOOD_QUALITY))
+                DIFFERENT_GOOD_SCAN -> Single.just(CaptureFingerprintResponse(DIFFERENT_TEMPLATE, DIFFERENT_GOOD_QUALITY))
+                BAD_SCAN -> Single.just(CaptureFingerprintResponse(TEMPLATE, BAD_QUALITY))
+                NO_FINGER_DETECTED -> Single.error(NoFingerDetectedException())
+                DISCONNECTED -> Single.error(ScannerDisconnectedException())
+                NEVER_RETURNS -> Single.never()
+            }
+        }
+    }
+
+    private fun acquireImageResponses(vararg responses: MockAcquireImageResult) {
+        every { scanner.acquireImage(any()) } returnsMany responses.map {
+            when (it) {
+                OK -> Single.just(AcquireImageResponse(IMAGE))
+                MockAcquireImageResult.DISCONNECTED -> Single.error(ScannerDisconnectedException())
+                MockAcquireImageResult.NEVER_RETURNS -> Single.never()
+            }
+        }
+    }
+
+    private enum class MockCaptureFingerprintResponse {
+        GOOD_SCAN, DIFFERENT_GOOD_SCAN, BAD_SCAN, NO_FINGER_DETECTED, DISCONNECTED, NEVER_RETURNS
+    }
+
+    private enum class MockAcquireImageResult {
+        OK, DISCONNECTED, NEVER_RETURNS
     }
 
     private fun List<FingerIdentifier>.toFingers(fingerConfig: FingerConfig = FingerConfig.DEFAULT) =
-        map { Finger(it, fingerConfig.getPriority(it), fingerConfig.getOrder(it)) }
+        map { it.toFinger(fingerConfig) }
+
+    private fun FingerIdentifier.toFinger(fingerConfig: FingerConfig = FingerConfig.DEFAULT) =
+        Finger(this, fingerConfig.getPriority(this), fingerConfig.getOrder(this))
 
     companion object {
         val TWO_FINGERS_IDS = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
         val FOUR_FINGERS_IDS = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER, FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_INDEX_FINGER)
+
+        const val GOOD_QUALITY = 80
+        const val DIFFERENT_GOOD_QUALITY = 80
+        const val BAD_QUALITY = 20
+
+        val TEMPLATE = FingerprintGenerator.generateRandomFingerprint().templateBytes
+        val DIFFERENT_TEMPLATE = FingerprintGenerator.generateRandomFingerprint().templateBytes
+
+        val IMAGE = byteArrayOf(0x05, 0x06, 0x07, 0x08)
     }
 }

@@ -90,7 +90,8 @@ class CollectFingerprintsViewModel(
                 logScannerMessageForCrashReport("Scanner trigger clicked for confirm dialog")
                 handleConfirmFingerprintsAndContinue()
             } else {
-                handleScanButtonPressed(fromTrigger = true)
+                logScannerMessageForCrashReport("Scanner trigger clicked for scanning")
+                handleScanButtonPressed()
             }
         }
     }
@@ -131,12 +132,7 @@ class CollectFingerprintsViewModel(
         }
     }
 
-    fun handleScanButtonPressed(fromTrigger: Boolean) {
-        if (fromTrigger) {
-            logScannerMessageForCrashReport("Scanner trigger clicked for scanning")
-        } else {
-            logUiMessageForCrashReport("Scan button clicked")
-        }
+    fun handleScanButtonPressed() {
         val fingerState = state().currentFingerState()
         if (fingerState is FingerCollectionState.Collected && fingerState.scanResult.isGoodScan()
             && !state().isAskingRescan) {
@@ -319,7 +315,6 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleMissingFingerButtonPressed() {
-        logUiMessageForCrashReport("Missing finger text clicked")
         updateFingerState { toSkipped() }
         lastCaptureStartedAt = timeHelper.now()
         addCaptureEventInSession()
@@ -368,8 +363,6 @@ class CollectFingerprintsViewModel(
             || fingerState is FingerCollectionState.Skipped
 
     fun handleConfirmFingerprintsAndContinue() {
-        logUiMessageForCrashReport("Confirm fingerprints clicked")
-
         val fingersStates = state().fingerStates
             .mapNotNullValues { it as? FingerCollectionState.Collected }
 
@@ -406,7 +399,6 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleRestart() {
-        logUiMessageForCrashReport("Restart clicked")
         setStartingState()
     }
 
@@ -435,7 +427,7 @@ class CollectFingerprintsViewModel(
     private fun Completable.doInBackground() =
         subscribeOn(Schedulers.io()).subscribeBy(onComplete = {}, onError = {})
 
-    private fun logUiMessageForCrashReport(message: String) {
+    fun logUiMessageForCrashReport(message: String) {
         Timber.d(message)
         crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.FINGER_CAPTURE, FingerprintCrashReportTrigger.UI, message = message)
     }

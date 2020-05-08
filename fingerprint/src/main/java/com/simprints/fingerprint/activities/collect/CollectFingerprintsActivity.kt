@@ -102,11 +102,17 @@ class CollectFingerprintsActivity : FingerprintActivity() {
             missingFingerText.text = getString(R.string.missing_finger)
             missingFingerText.paintFlags = missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         }
-        missingFingerText.setOnClickListener { vm.handleMissingFingerButtonPressed() }
+        missingFingerText.setOnClickListener {
+            vm.logUiMessageForCrashReport("Missing finger text clicked")
+            vm.handleMissingFingerButtonPressed()
+        }
     }
 
     private fun initScanButton() {
-        scan_button.setOnClickListener { vm.handleScanButtonPressed(fromTrigger = false) }
+        scan_button.setOnClickListener {
+            vm.logUiMessageForCrashReport("Scan button clicked")
+            vm.handleScanButtonPressed()
+        }
     }
 
     private fun initTimeoutBar() {
@@ -243,8 +249,14 @@ class CollectFingerprintsActivity : FingerprintActivity() {
                     (fingerState is FingerCollectionState.Collected && fingerState.scanResult.isGoodScan())
             }
             ConfirmFingerprintsDialog(this@CollectFingerprintsActivity, androidResourcesHelper, mapOfScannedFingers,
-                callbackConfirm = { vm.handleConfirmFingerprintsAndContinue() },
-                callbackRestart = { vm.handleRestart() })
+                callbackConfirm = {
+                    vm.logUiMessageForCrashReport("Confirm fingerprints clicked")
+                    vm.handleConfirmFingerprintsAndContinue()
+                },
+                callbackRestart = {
+                    vm.logUiMessageForCrashReport("Restart clicked")
+                    vm.handleRestart()
+                })
                 .create().also { it.show() }
         } else {
             confirmDialog?.let { if (it.isShowing) it.dismiss() }
