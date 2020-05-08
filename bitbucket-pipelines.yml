@@ -10,6 +10,19 @@ clone:
 pipelines:
   default:
 
+    - step:
+        name: "Generate quality reports"
+        caches:
+            - gradle
+            - gradlewrapper
+            - sonar
+        size: 2x # Double resources available for this step
+        script:
+            - bash ./ci/pipeline/setup
+            - ./gradlew build sonarqube
+        artifacts:
+            - build/libs/**
+
     # Build ID and all of the DFMs, and run their unit tests in parallel
     - parallel:
         - step:
