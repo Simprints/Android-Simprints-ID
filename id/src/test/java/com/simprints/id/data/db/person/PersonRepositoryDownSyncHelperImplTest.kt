@@ -84,9 +84,9 @@ class PersonRepositoryDownSyncHelperImplTest {
         runBlocking {
             val nEventsToDownload = 407
             val nEventsToDelete = 0
-            val nEventsToUpdate = 0
+            val nEventsToMove = 0
 
-            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, projectSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, projectSyncOp)
         }
     }
 
@@ -95,9 +95,9 @@ class PersonRepositoryDownSyncHelperImplTest {
         runBlocking {
             val nEventsToDownload = 513
             val nEventsToDelete = 0
-            val nEventsToUpdate = 0
+            val nEventsToMove = 0
 
-            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, userSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, userSyncOp)
         }
     }
 
@@ -106,9 +106,9 @@ class PersonRepositoryDownSyncHelperImplTest {
         runBlocking {
             val nPeopleToDownload = 513
             val nPeopleToDelete = 0
-            val nEventsToUpdate = 0
+            val nEventsToMove = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, nEventsToUpdate, moduleSyncOp)
+            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, nEventsToMove, moduleSyncOp)
         }
     }
 
@@ -117,9 +117,9 @@ class PersonRepositoryDownSyncHelperImplTest {
         runBlocking {
             val nEventsToDownload = 0
             val nEventsToDelete = 300
-            val nEventsToUpdate = 0
+            val nEventsToMove = 0
 
-            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, projectSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, projectSyncOp)
         }
     }
 
@@ -128,9 +128,9 @@ class PersonRepositoryDownSyncHelperImplTest {
         runBlocking {
             val nEventsToDownload = 0
             val nEventsToDelete = 212
-            val nEventsToUpdate = 0
+            val nEventsToMove = 0
 
-            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, userSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, userSyncOp)
         }
     }
 
@@ -139,42 +139,42 @@ class PersonRepositoryDownSyncHelperImplTest {
         runBlocking {
             val nEventsToDownload = 0
             val nEventsToDelete = 123
-            val nEventsToUpdate = 0
+            val nEventsToMove = 0
 
-            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, moduleSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, moduleSyncOp)
         }
     }
 
     @Test
-    fun updateEventsForGlobalSync_shouldSuccess() {
+    fun moveEventsForGlobalSync_shouldSuccess() {
         runBlocking {
             val nEventsToDownload = 0
             val nEventsToDelete = 0
-            val nEventsToUpdate = 300
+            val nEventsToMove = 300
 
-            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, projectSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, projectSyncOp)
         }
     }
 
     @Test
-    fun updateEventsForUserSync_shouldSuccess() {
+    fun moveEventsForUserSync_shouldSuccess() {
         runBlocking {
             val nEventsToDownload = 0
             val nEventsToDelete = 0
-            val nEventsToUpdate = 212
+            val nEventsToMove = 212
 
-            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, userSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, userSyncOp)
         }
     }
 
     @Test
-    fun updateEventsForModuleSync_shouldSuccess() {
+    fun moveEventsForModuleSync_shouldSuccess() {
         runBlocking {
             val nEventsToDownload = 0
             val nEventsToDelete = 0
-            val nEventsToUpdate = 123
+            val nEventsToMove = 123
 
-            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, moduleSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToMove, moduleSyncOp)
         }
     }
 
@@ -224,16 +224,16 @@ class PersonRepositoryDownSyncHelperImplTest {
 
     private fun runDownSyncAndVerifyConditions(nEventsToDownload: Int,
                                                nEventsToDelete: Int,
-                                               nEventsToUpdate: Int,
+                                               nEventsToMove: Int,
                                                syncOp: PeopleDownSyncOperation) {
 
         runBlocking {
-            mockEventRemoteDataSource(nEventsToDownload, nEventsToDelete, nEventsToUpdate)
+            mockEventRemoteDataSource(nEventsToDownload, nEventsToDelete, nEventsToMove)
             mockDownSyncScopeRepository()
 
-            val numberOfBatchesToUpdate = calculateCorrectNumberOfBatches(nEventsToUpdate)
-            val numberOfBatchesToSave = calculateCorrectNumberOfBatches(nEventsToDownload) + numberOfBatchesToUpdate
-            val numberOfBatchesToDelete = calculateCorrectNumberOfBatches(nEventsToDelete) + numberOfBatchesToUpdate
+            val numberOfBatchesToMove = calculateCorrectNumberOfBatches(nEventsToMove)
+            val numberOfBatchesToSave = calculateCorrectNumberOfBatches(nEventsToDownload) + numberOfBatchesToMove
+            val numberOfBatchesToDelete = calculateCorrectNumberOfBatches(nEventsToDelete) + numberOfBatchesToMove
 
             val downSyncHelper =
                 PersonRepositoryDownSyncHelperImpl(personLocalDataSource, eventRemoteDataSource,
@@ -247,12 +247,12 @@ class PersonRepositoryDownSyncHelperImplTest {
         }
     }
 
-    private fun mockEventRemoteDataSource(nEventsToDownload: Int, nEventsToDelete: Int, nEventsToUpdate: Int) {
+    private fun mockEventRemoteDataSource(nEventsToDownload: Int, nEventsToDelete: Int, nEventsToMove: Int) {
         val creationEvents = getRandomCreationEvents(nEventsToDownload)
         val deletionEvents = getRandomDeletionEvents(nEventsToDelete)
-        val updateEvents = getRandomMoveEvents(nEventsToUpdate)
+        val moveEvents = getRandomMoveEvents(nEventsToMove)
 
-        coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildResponse(deletionEvents + creationEvents + updateEvents)
+        coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildResponse(deletionEvents + creationEvents + moveEvents)
     }
 
     private fun mockEventRemoteDataSourceWithIncorrectModels(nEventsToDownload: Int) {
@@ -277,8 +277,8 @@ class PersonRepositoryDownSyncHelperImplTest {
             DefaultTestConstants.DEFAULT_USER_ID, DefaultTestConstants.DEFAULT_MODULE_ID,
             ENROLMENT_RECORD_DELETION).map { it.fromDomainToApi() }
 
-    private fun getRandomMoveEvents(nEventsToUpdate: Int) =
-        getRandomEnrolmentEvents(nEventsToUpdate, DefaultTestConstants.DEFAULT_PROJECT_ID,
+    private fun getRandomMoveEvents(nEventsToMove: Int) =
+        getRandomEnrolmentEvents(nEventsToMove, DefaultTestConstants.DEFAULT_PROJECT_ID,
             DefaultTestConstants.DEFAULT_USER_ID, DefaultTestConstants.DEFAULT_MODULE_ID,
             ENROLMENT_RECORD_MOVE).map { it.fromDomainToApi() }
 

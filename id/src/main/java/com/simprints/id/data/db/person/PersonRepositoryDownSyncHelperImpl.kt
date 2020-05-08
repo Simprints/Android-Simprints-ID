@@ -118,14 +118,14 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
                 it.fromApiToDomain().payload as EnrolmentRecordDeletionPayload
             }
 
-        val eventRecordsToUpdate =
+        val eventRecordsToMove =
             batchOfEvents.filter { it.payload is ApiEnrolmentRecordMovePayload }.map {
                 it.fromApiToDomain().payload as EnrolmentRecordMovePayload
             }
 
         savePeopleBatchInLocal(batchOfPeopleToSaveInLocal)
         deletePeopleBatchFromLocal(eventRecordsToBeDeleted)
-        updatePeopleBatchesInLocal(eventRecordsToUpdate)
+        movePeopleBatchesInLocal(eventRecordsToMove)
     }
 
     private suspend fun savePeopleBatchInLocal(batchOfEventsToSaveInLocal: List<EnrolmentRecordCreationPayload>) {
@@ -140,10 +140,10 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
         }
     }
 
-    private suspend fun updatePeopleBatchesInLocal(eventRecordsToUpdate: List<EnrolmentRecordMovePayload>) {
-        if(eventRecordsToUpdate.isNotEmpty()) {
-            deletePeopleBatchFromLocal(eventRecordsToUpdate.map { it.enrolmentRecordDeletionPayload })
-            savePeopleBatchInLocal(eventRecordsToUpdate.map { it.enrolmentRecordCreationPayload })
+    private suspend fun movePeopleBatchesInLocal(eventRecordsToMove: List<EnrolmentRecordMovePayload>) {
+        if(eventRecordsToMove.isNotEmpty()) {
+            deletePeopleBatchFromLocal(eventRecordsToMove.map { it.enrolmentRecordDeletionPayload })
+            savePeopleBatchInLocal(eventRecordsToMove.map { it.enrolmentRecordCreationPayload })
         }
     }
 
