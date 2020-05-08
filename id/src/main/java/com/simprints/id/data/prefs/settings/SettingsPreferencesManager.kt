@@ -39,6 +39,9 @@ interface SettingsPreferencesManager {
     var scannerGenerations: List<ScannerGeneration>
     var apiBaseUrl: String
 
+    var faceMaxRetries: Int
+    var faceQualityThreshold: Float
+
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
     fun getRemoteConfigFingerStatus(): Map<FingerIdentifier, Boolean>

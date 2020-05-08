@@ -1,12 +1,17 @@
 package com.simprints.id.activities.settings.fragments.settingsAbout
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
+import com.simprints.core.tools.extentions.showToast
 import com.simprints.id.Application
+import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
@@ -26,7 +31,8 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
     override lateinit var deviceId: String
     override lateinit var viewPresenter: SettingsAboutContract.Presenter
 
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject
+    lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,12 +43,28 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
         component.inject(this)
 
         setTextInLayout()
+        setPreferenceListeners()
 
         packageVersionName = activity.packageVersionName
         deviceId = activity.deviceId
 
         viewPresenter = SettingsAboutPresenter(this, component)
         viewPresenter.start()
+    }
+
+    private fun setPreferenceListeners() {
+        if (BuildConfig.DEBUG) {
+            getDeviceIdPreference().setOnPreferenceClickListener {
+                with(activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager) {
+                    val clip = ClipData.newPlainText("deviceID", deviceId)
+                    primaryClip = clip
+                }
+
+                context.showToast("Your Device Id $deviceId was copied to the clipboard")
+
+                return@setOnPreferenceClickListener true
+            }
+        }
     }
 
     private fun setTextInLayout() {
@@ -109,7 +131,7 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
                 androidResourcesHelper.getString(R.string.logout)
             ) { _, _ ->
                 CoroutineScope(Dispatchers.Main).launch {
-                     viewPresenter.logout()
+                    viewPresenter.logout()
                 }
             }
             .setNegativeButton(

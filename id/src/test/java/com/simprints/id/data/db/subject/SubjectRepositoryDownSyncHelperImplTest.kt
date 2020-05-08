@@ -5,16 +5,15 @@ import com.google.common.truth.Truth
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
-import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
-import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationFactoryImpl
-import com.simprints.id.data.db.subject.SubjectRepositoryDownSyncHelper.Companion.BATCH_SIZE_FOR_DOWNLOADING
-import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.ENROLMENT_RECORD_CREATION
-import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.ENROLMENT_RECORD_DELETION
+import com.simprints.id.data.db.subject.SubjectRepositoryDownSyncHelperImpl.Companion.BATCH_SIZE_FOR_DOWNLOADING
+import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.*
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
 import com.simprints.id.data.db.subject.remote.models.subjectevents.fromDomainToApi
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
+import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationFactoryImpl
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelperImpl
@@ -85,8 +84,9 @@ class SubjectRepositoryDownSyncHelperImplTest {
         runBlocking {
             val nEventsToDownload = 407
             val nEventsToDelete = 0
+            val nEventsToUpdate = 0
 
-            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, projectSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, projectSyncOp)
         }
     }
 
@@ -95,8 +95,9 @@ class SubjectRepositoryDownSyncHelperImplTest {
         runBlocking {
             val nPeopleToDownload = 513
             val nPeopleToDelete = 0
+            val nEventsToUpdate = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, userSyncOp)
+            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, nEventsToUpdate, userSyncOp)
         }
     }
 
@@ -105,8 +106,9 @@ class SubjectRepositoryDownSyncHelperImplTest {
         runBlocking {
             val nPeopleToDownload = 513
             val nPeopleToDelete = 0
+            val nEventsToUpdate = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, moduleSyncOp)
+            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, nEventsToUpdate, moduleSyncOp)
         }
     }
 
@@ -115,8 +117,9 @@ class SubjectRepositoryDownSyncHelperImplTest {
         runBlocking {
             val nPeopleToDownload = 0
             val nPeopleToDelete = 300
+            val nEventsToUpdate = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, projectSyncOp)
+            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, nEventsToUpdate, projectSyncOp)
         }
     }
 
@@ -125,8 +128,9 @@ class SubjectRepositoryDownSyncHelperImplTest {
         runBlocking {
             val nPeopleToDownload = 0
             val nPeopleToDelete = 212
+            val nEventsToUpdate = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, userSyncOp)
+            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, nEventsToUpdate, userSyncOp)
         }
     }
 
@@ -135,8 +139,42 @@ class SubjectRepositoryDownSyncHelperImplTest {
         runBlocking {
             val nPeopleToDownload = 0
             val nPeopleToDelete = 123
+            val nEventsToUpdate = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, moduleSyncOp)
+            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, nEventsToUpdate, moduleSyncOp)
+        }
+    }
+
+    @Test
+    fun updateEventsForGlobalSync_shouldSuccess() {
+        runBlocking {
+            val nEventsToDownload = 0
+            val nEventsToDelete = 0
+            val nEventsToUpdate = 300
+
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, projectSyncOp)
+        }
+    }
+
+    @Test
+    fun updateEventsForUserSync_shouldSuccess() {
+        runBlocking {
+            val nEventsToDownload = 0
+            val nEventsToDelete = 0
+            val nEventsToUpdate = 212
+
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, userSyncOp)
+        }
+    }
+
+    @Test
+    fun updateEventsForModuleSync_shouldSuccess() {
+        runBlocking {
+            val nEventsToDownload = 0
+            val nEventsToDelete = 0
+            val nEventsToUpdate = 123
+
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, moduleSyncOp)
         }
     }
 
@@ -186,13 +224,16 @@ class SubjectRepositoryDownSyncHelperImplTest {
 
     private fun runDownSyncAndVerifyConditions(nEventsToDownload: Int,
                                                nEventsToDelete: Int,
+                                               nEventsToUpdate: Int,
                                                syncOp: SubjectsDownSyncOperation) {
 
         runBlocking {
-            mockEventRemoteDataSource(nEventsToDownload, nEventsToDelete)
+            mockEventRemoteDataSource(nEventsToDownload, nEventsToDelete, nEventsToUpdate)
             mockDownSyncScopeRepository()
-            val numberOfBatchesToSave = calculateCorrectNumberOfBatches(nEventsToDownload)
-            val numberOfBatchesToDelete = calculateCorrectNumberOfBatches(nEventsToDelete)
+
+            val numberOfBatchesToUpdate = calculateCorrectNumberOfBatches(nEventsToUpdate)
+            val numberOfBatchesToSave = calculateCorrectNumberOfBatches(nEventsToDownload) + numberOfBatchesToUpdate
+            val numberOfBatchesToDelete = calculateCorrectNumberOfBatches(nEventsToDelete) + numberOfBatchesToUpdate
 
             val downSyncHelper =
                 SubjectRepositoryDownSyncHelperImpl(subjectLocalDataSource, eventRemoteDataSource,
@@ -206,11 +247,12 @@ class SubjectRepositoryDownSyncHelperImplTest {
         }
     }
 
-    private fun mockEventRemoteDataSource(nEventsToDownload: Int, nEventsToDelete: Int) {
+    private fun mockEventRemoteDataSource(nEventsToDownload: Int, nEventsToDelete: Int, nEventsToUpdate: Int) {
         val creationEvents = getRandomCreationEvents(nEventsToDownload)
         val deletionEvents = getRandomDeletionEvents(nEventsToDelete)
+        val updateEvents = getRandomMoveEvents(nEventsToUpdate)
 
-        coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildResponse(deletionEvents + creationEvents)
+        coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildResponse(deletionEvents + creationEvents + updateEvents)
     }
 
     private fun mockEventRemoteDataSourceWithIncorrectModels(nEventsToDownload: Int) {
@@ -234,6 +276,11 @@ class SubjectRepositoryDownSyncHelperImplTest {
         getRandomEnrolmentEvents(nEventsToDelete, DefaultTestConstants.DEFAULT_PROJECT_ID,
             DefaultTestConstants.DEFAULT_USER_ID, DefaultTestConstants.DEFAULT_MODULE_ID,
             ENROLMENT_RECORD_DELETION).map { it.fromDomainToApi() }
+
+    private fun getRandomMoveEvents(nEventsToUpdate: Int) =
+        getRandomEnrolmentEvents(nEventsToUpdate, DefaultTestConstants.DEFAULT_PROJECT_ID,
+            DefaultTestConstants.DEFAULT_USER_ID, DefaultTestConstants.DEFAULT_MODULE_ID,
+            ENROLMENT_RECORD_MOVE).map { it.fromDomainToApi() }
 
     private fun buildResponse(events: List<ApiEvent>): InputStream =
         SimJsonHelper.gson.toJson(events).toString().toResponseBody().byteStream()

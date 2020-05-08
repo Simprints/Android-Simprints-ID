@@ -22,6 +22,7 @@ import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSy
 import com.simprints.id.tools.delegates.lazyVar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class SubjectsDownSyncCountWorker(val context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
@@ -72,6 +73,7 @@ class SubjectsDownSyncCountWorker(val context: Context, params: WorkerParameters
                     retry(t)
                 }
                 else -> {
+                    Timber.d(t)
                     t.printStackTrace()
                     success(message = "Succeed because count is not required any more.")
                 }
