@@ -8,7 +8,9 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
+import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
+import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
@@ -16,7 +18,9 @@ import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyn
 import com.simprints.id.services.scheduledSync.people.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
@@ -30,41 +34,41 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
     override val tag: String = PeopleDownSyncDownloaderWorker::class.java.simpleName
 
     @Inject override lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var peopleDownSyncDownloaderTask: PeopleDownSyncDownloaderTask
     @Inject lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
+    @Inject lateinit var personRepository: PersonRepository
+    @Inject lateinit var peopleSyncCache: PeopleSyncCache
+
+    internal var peopleDownSyncDownloaderTask: PeopleDownSyncDownloaderTask = PeopleDownSyncDownloaderTaskImpl()
 
     private val jsonForOp by lazy {
         inputData.getString(INPUT_DOWN_SYNC_OPS)
             ?: throw IllegalArgumentException("input required")
     }
 
+    @ExperimentalCoroutinesApi
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
             getComponent<PeopleDownSyncDownloaderWorker> { it.inject(this@PeopleDownSyncDownloaderWorker) }
             val downSyncOperation = extractSubSyncScopeFromInput()
             crashlyticsLog("Start - Params: $downSyncOperation")
 
-            execute(downSyncOperation)
-        } catch (t: Throwable) {
-            fail(t)
-        }
-    }
-
-    private suspend fun execute(downSyncOperation: PeopleDownSyncOperation): Result {
-        return try {
-            val totalDownloaded = peopleDownSyncDownloaderTask.execute(
+            val count = peopleDownSyncDownloaderTask.execute(
+                this@PeopleDownSyncDownloaderWorker.id.toString(),
                 downSyncOperation,
-                id.toString(),
+                peopleSyncCache,
+                personRepository,
+                this@PeopleDownSyncDownloaderWorker,
                 this)
 
-            success(workDataOf(OUTPUT_DOWN_SYNC to totalDownloaded), "Total downloaded: $totalDownloaded for $downSyncOperation")
+            Timber.d("Downsync success : $count")
+            success(workDataOf(OUTPUT_DOWN_SYNC to count), "Total downloaded: $0 for $downSyncOperation")
         } catch (t: Throwable) {
-            retryOrFailIfCloudIntegrationError(t)
+            retryOrFailIfCloudIntegrationErrorOrMalformedOperation(t)
         }
     }
 
-    private fun retryOrFailIfCloudIntegrationError(t: Throwable): Result {
-        return if (t is SyncCloudIntegrationException) {
+    private fun retryOrFailIfCloudIntegrationErrorOrMalformedOperation(t: Throwable): Result {
+        return if (t is SyncCloudIntegrationException || t is MalformedDownSyncOperationException) {
             fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
         } else {
             retry(t)
@@ -72,8 +76,12 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
     }
 
     private suspend fun extractSubSyncScopeFromInput(): PeopleDownSyncOperation {
-        val op = JsonHelper.gson.fromJson(jsonForOp, PeopleDownSyncOperation::class.java)
-        return downSyncScopeRepository.refreshDownSyncOperationFromDb(op) ?: op
+        try {
+            val op = JsonHelper.gson.fromJson(jsonForOp, PeopleDownSyncOperation::class.java)
+            return downSyncScopeRepository.refreshDownSyncOperationFromDb(op) ?: op
+        } catch (t: Throwable) {
+            throw MalformedDownSyncOperationException()
+        }
     }
 
     override suspend fun reportCount(count: Int) {

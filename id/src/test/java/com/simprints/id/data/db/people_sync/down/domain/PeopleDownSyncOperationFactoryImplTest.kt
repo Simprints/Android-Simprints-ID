@@ -12,12 +12,11 @@ import org.junit.Test
 class PeopleDownSyncOperationFactoryImplTest {
 
     companion object {
-        const val LAST_PATIENT_ID = "lastPatientId"
-        const val LAST_PATIENT_UPDATED_AT = 1L
+        const val LAST_EVENT_ID = "lastEventId"
         const val LAST_SYNC_TIME = 2L
     }
 
-    val result = PeopleDownSyncOperationResult(COMPLETE, LAST_PATIENT_ID, LAST_PATIENT_UPDATED_AT, LAST_SYNC_TIME)
+    val result = PeopleDownSyncOperationResult(COMPLETE, LAST_EVENT_ID, LAST_SYNC_TIME)
     val builder = PeopleDownSyncOperationFactoryImpl()
 
     @Test
@@ -61,8 +60,7 @@ class PeopleDownSyncOperationFactoryImplTest {
             assertThat(moduleId).isNull()
             assertThat(modes).isEqualTo(DEFAULT_MODES)
             assertThat(lastState).isEqualTo(COMPLETE)
-            assertThat(lastPatientId).isEqualTo(LAST_PATIENT_ID)
-            assertThat(lastPatientUpdatedAt).isEqualTo(LAST_PATIENT_UPDATED_AT)
+            assertThat(lastEventId).isEqualTo(LAST_EVENT_ID)
             assertThat(lastSyncTime).isEqualTo(LAST_SYNC_TIME)
         }
     }

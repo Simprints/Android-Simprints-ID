@@ -11,10 +11,10 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelper
 import com.simprints.id.data.db.person.PersonRepositoryUpSyncHelper
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.EventRemoteDataSource
-import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
@@ -24,6 +24,7 @@ import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
+import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
 import kotlinx.coroutines.FlowPreview
 
@@ -31,11 +32,12 @@ class TestDataModule(
     private val projectLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val projectRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val projectRepositoryRule: DependencyRule = DependencyRule.RealRule,
-    private val personRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val personLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val eventRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val personRepositoryUpSyncHelperRule: DependencyRule = DependencyRule.RealRule,
+    private val personRepositoryDownSyncHelperRule: DependencyRule = DependencyRule.RealRule,
     private val personRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val imageRepositoryRule: DependencyRule = DependencyRule.RealRule
 ) : DataModule() {
@@ -71,6 +73,12 @@ class TestDataModule(
         )
     }
 
+    override fun provideEventRemoteDataSource(remoteDbManager: RemoteDbManager,
+                                              simApiClientFactory: SimApiClientFactory) =
+        eventRemoteDataSourceRule.resolveDependency {
+            super.provideEventRemoteDataSource(remoteDbManager, simApiClientFactory)
+        }
+
     override fun providePersonRepositoryUpSyncHelper(
         loginInfoManager: LoginInfoManager,
         personLocalDataSource: PersonLocalDataSource,
@@ -86,21 +94,31 @@ class TestDataModule(
             )
     }
 
+    override fun providePersonRepositoryDownSyncHelper(personLocalDataSource: PersonLocalDataSource,
+                                                       eventRemoteDataSource: EventRemoteDataSource,
+                                                       downSyncScopeRepository: PeopleDownSyncScopeRepository,
+                                                       timeHelper: TimeHelper): PersonRepositoryDownSyncHelper =
+        personRepositoryDownSyncHelperRule.resolveDependency {
+            super.providePersonRepositoryDownSyncHelper(personLocalDataSource, eventRemoteDataSource,
+                downSyncScopeRepository, timeHelper)
+        }
+
+
     override fun providePersonRepository(
-        personRemoteDataSource: PersonRemoteDataSource,
         personLocalDataSource: PersonLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
         peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
         peopleUpSyncExecutor: PeopleUpSyncExecutor,
-        personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper
+        personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper,
+        personRepositoryDownSyncHelper: PersonRepositoryDownSyncHelper
     ): PersonRepository = personRepositoryRule.resolveDependency {
         super.providePersonRepository(
-            personRemoteDataSource,
             personLocalDataSource,
             eventRemoteDataSource,
             peopleDownSyncScopeRepository,
             peopleUpSyncExecutor,
-            personRepositoryUpSyncHelper
+            personRepositoryUpSyncHelper,
+            personRepositoryDownSyncHelper
         )
     }
 
@@ -110,17 +128,6 @@ class TestDataModule(
     ): ImageRepository = imageRepositoryRule.resolveDependency {
         super.provideImageRepository(context, baseUrlProvider)
     }
-
-    override fun providePersonRemoteDataSource(
-        remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory
-    ): PersonRemoteDataSource =
-        personRemoteDataSourceRule.resolveDependency {
-            super.providePersonRemoteDataSource(
-                remoteDbManager,
-                simApiClientFactory
-            )
-        }
 
     override fun provideLongConsentLocalDataSource(context: Context, loginInfoManager: LoginInfoManager): LongConsentLocalDataSource =
         longConsentLocalDataSourceRule.resolveDependency { super.provideLongConsentLocalDataSource(context, loginInfoManager) }

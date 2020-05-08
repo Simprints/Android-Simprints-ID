@@ -8,7 +8,7 @@ import com.simprints.id.data.db.person.domain.personevents.Events
 import com.simprints.id.data.db.person.remote.models.personcounts.fromApiToDomain
 import com.simprints.id.data.db.person.remote.models.personevents.fromDomainToApi
 import com.simprints.id.tools.utils.retrySimNetworkCalls
-import okhttp3.ResponseBody
+import java.io.InputStream
 
 class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                                 private val simApiClientFactory: SimApiClientFactory) : EventRemoteDataSource {
@@ -27,7 +27,7 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
         }, "EventCount")
     }
 
-    override suspend fun get(query: EventQuery): ResponseBody = with(query.fromDomainToApi()) {
+    override suspend fun getStreaming(query: EventQuery): InputStream = with(query.fromDomainToApi()) {
         makeNetworkRequest({ peopleRemoteInterface ->
             peopleRemoteInterface.downloadEvents(
                 projectId = projectId,
@@ -39,7 +39,7 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                 eventType = types.map { it.apiName }
             )
         }, "EventDownload")
-    }
+    }.byteStream()
 
     override suspend fun post(projectId: String, events: Events) {
         makeNetworkRequest({
