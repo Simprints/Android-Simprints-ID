@@ -38,7 +38,10 @@ buildscript {
         // CI Scanning
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
     }
+
 }
+
+apply plugin: "org.sonarqube"
 
 allprojects {
     repositories {
@@ -52,6 +55,16 @@ allprojects {
             jvmTarget = '1.8'
         }
     }
+
+//    sonarqube {
+//        properties {
+//            property "sonar.projectKey", "simprints_android-simprints-id"
+//            property "sonar.organization", "simprints"
+//            property "sonar.host.url", "https://sonarcloud.io"
+//            property "sonar.login", "2aa4c793f75b2e47fd742e8f9c8bece57448a348"
+//            property "sonar.c.file.suffixes", "-"
+//        }
+//    }
 }
 
 task clean(type: Delete) {
@@ -61,4 +74,3 @@ task clean(type: Delete) {
 //to check newer dependencies: ./gradlew dependencyUpdates
 apply plugin: "com.github.ben-manes.versions"
 apply plugin: "android-reporting"
-apply plugin: "org.sonarqube"
