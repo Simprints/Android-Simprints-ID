@@ -6,6 +6,12 @@ apply plugin: "kotlin-kapt"
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'realm-android'
 
+// Create a variable called keystorePropertiesFile, and initialize it to your
+// keystore.properties file, in the rootProject folder.
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 androidExtensions {
     experimental = true
 }
@@ -38,6 +44,22 @@ android {
         }
     }
 
+    signingConfigs {
+        debug {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
     buildTypes {
         release {
             lintOptions {
@@ -51,6 +73,7 @@ android {
             ext.enableCrashlytics = true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
+            signingConfig signingConfigs.release
         }
         releaseWithLogfile {
             initWith release
@@ -61,6 +84,7 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
             manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
+            signingConfig signingConfigs.debug
         }
     }
 
@@ -125,6 +149,10 @@ repositories {
 }
 
 dependencies {
+    // ######################################################
+    //                      Deps
+    // ######################################################
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     api project(':core')
     implementation project(':fingerprintscanner')
@@ -133,25 +161,13 @@ dependencies {
     implementation deps.dagger.core
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
-    api deps.kotlin.coroutines_android
-    api deps.kotlin.coroutines_play_services
-    implementation deps.androidx.core
-    api deps.androidx.multidex
-    implementation deps.androidx.appcompat
     implementation deps.androidx.legacy
     implementation deps.androidx.room.core
     implementation deps.androidx.room.coroutines
-    implementation deps.androidx.lifecycle.ktx
-    implementation deps.androidx.lifecycle.ext
-    implementation deps.androidx.lifecycle.livedata
-    implementation deps.androidx.lifecycle.viewmodel
-    implementation deps.androidx.lifecycle.scope
-    implementation deps.androidx.ui.constraintlayout
     implementation deps.androidx.ui.cardview
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
     implementation deps.androidx.security
-    api deps.androidx.camerax.core
     implementation deps.androidx.camerax.camera2
     implementation deps.androidx.camerax.lifecycle
     implementation deps.androidx.camerax.view
@@ -160,23 +176,11 @@ dependencies {
     implementation deps.playservices.location
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
-
-    api deps.firebase.core
-    api deps.firebase.auth
-    api deps.firebase.config
-    api deps.firebase.perf
-    api deps.firebase.storage
-    api deps.firebase.mlkit
-    api deps.firebase.mlkit_barcode
-    api deps.firebase.crashlytics
-
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter
     implementation deps.retrofit.convertergson
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
-    api deps.gson.core
-    api deps.timber.core
     implementation deps.rxjava2.android
     implementation deps.rxjava2.core
     implementation deps.rxjava2.kotlin
@@ -185,16 +189,45 @@ dependencies {
     kapt deps.dagger.compiler
     implementation deps.koin.android
     implementation deps.fuzzywuzzy.core
-
-    // Koin
-    api deps.koin.core
-    api deps.koin.android
-    api deps.koin.viewmodel
+    implementation deps.rxjava2.tasks
 
     // RootBeer (root detection)
     implementation deps.rootbeer.core
 
-    // Test
+    // Shared
+    api deps.firebase.core
+    api deps.firebase.auth
+    api deps.firebase.config
+    api deps.firebase.perf
+    api deps.firebase.storage
+    api deps.firebase.mlkit
+    api deps.firebase.mlkit_barcode
+    api deps.firebase.crashlytics
+    api deps.gson.core
+    api deps.timber.core
+    api deps.androidx.core
+    api deps.androidx.multidex
+    api deps.androidx.appcompat
+    api deps.androidx.lifecycle.ktx
+    api deps.androidx.lifecycle.ext
+    api deps.androidx.lifecycle.livedata
+    api deps.androidx.lifecycle.viewmodel
+    api deps.androidx.lifecycle.scope
+    api deps.androidx.ui.constraintlayout
+    api deps.androidx.navigation.dynamicfeatures
+    api deps.androidx.navigation.fragment
+    api deps.androidx.navigation.ui
+    api deps.kotlin.coroutines_android
+    api deps.kotlin.coroutines_play_services
+    api deps.androidx.camerax.core
+    api deps.koin.core
+    api deps.koin.android
+    api deps.koin.viewmodel
+
+    // ######################################################
+    //                      Unit test
+    // ######################################################
+
     testImplementation project(':fingerprintscannermock')
     testImplementation deps.testing.retrofit
     testImplementation(deps.testing.junit) {
@@ -225,7 +258,10 @@ dependencies {
         exclude group: 'org.mockito:mockito-android'
     }
 
-    // Android test
+    // ######################################################
+    //                      Android test
+    // ######################################################
+
     androidTestImplementation(project(':fingerprintscannermock')) {
         exclude group: 'org.apache.maven'
         exclude group: 'org.mockito'
@@ -271,7 +307,6 @@ dependencies {
     }
     androidTestImplementation deps.testing.kappuccino
 
-    implementation deps.rxjava2.tasks
 }
 
 kapt {

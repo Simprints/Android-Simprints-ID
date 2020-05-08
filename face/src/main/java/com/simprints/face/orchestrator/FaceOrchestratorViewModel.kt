@@ -10,8 +10,8 @@ import com.simprints.face.data.moduleapi.face.FaceToDomainRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
-import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
+import com.simprints.face.data.moduleapi.face.responses.FaceResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
@@ -34,7 +34,7 @@ class FaceOrchestratorViewModel : ViewModel() {
         faceRequest = request
     }
 
-    fun captureFinished(faceCaptureResponse: FaceCaptureResponse?) {
+    fun captureFinished(faceCaptureResponse: FaceResponse?) {
         if (faceCaptureResponse == null) {
             flowFinished.value = null
         } else {
