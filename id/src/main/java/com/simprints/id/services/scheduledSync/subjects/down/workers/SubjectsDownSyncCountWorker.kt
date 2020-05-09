@@ -7,7 +7,6 @@ import androidx.work.WorkInfo.State.RUNNING
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.models.SubjectsCount
 import com.simprints.id.data.db.subject.SubjectRepository
@@ -60,7 +59,7 @@ class SubjectsDownSyncCountWorker(val context: Context, params: WorkerParameters
         return try {
 
             val downCount = getDownCount(downSyncScope)
-            val output = JsonHelper.gson.toJson(downCount)
+            val output = SimJsonHelper.gson.toJson(downCount)
 
             success(workDataOf(OUTPUT_COUNT_WORKER_DOWN to output), output)
 
