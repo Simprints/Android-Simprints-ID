@@ -17,12 +17,12 @@ class DbSubjectsDownSyncOperationTest {
     }
 
     private val converter = DbSubjectsDownSyncOperation.Converters()
-    private val peopleDownSyncOperationKey = DbPeopleDownSyncOperationKey(DEFAULT_PROJECT_ID, DEFAULT_MODES, DEFAULT_USER_ID, DEFAULT_MODULE_ID)
+    private val peopleDownSyncOperationKey = DbSubjectsDownSyncOperationKey(DEFAULT_PROJECT_ID, DEFAULT_MODES, DEFAULT_USER_ID, DEFAULT_MODULE_ID)
     private val peopleDownSyncOperationKeyAsString = "$DEFAULT_PROJECT_ID||$DEFAULT_USER_ID||$DEFAULT_MODULE_ID||${DEFAULT_MODES.joinToString("||")}"
 
     @Test
     fun testOpFromDomainToDb() {
-        val dbKey = DbPeopleDownSyncOperationKey(DEFAULT_PROJECT_ID, DEFAULT_MODES, DEFAULT_USER_ID, DEFAULT_MODULE_ID)
+        val dbKey = DbSubjectsDownSyncOperationKey(DEFAULT_PROJECT_ID, DEFAULT_MODES, DEFAULT_USER_ID, DEFAULT_MODULE_ID)
         val dbOp = DbSubjectsDownSyncOperation(
             dbKey, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_MODES,
             COMPLETE,

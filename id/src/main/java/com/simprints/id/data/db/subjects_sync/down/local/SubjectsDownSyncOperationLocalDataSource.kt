@@ -9,7 +9,7 @@ import androidx.room.Query
 interface SubjectsDownSyncOperationLocalDataSource {
 
     @Query("select * from DbSubjectsDownSyncOperation where id=:key")
-    suspend fun getDownSyncOperation(key: DbPeopleDownSyncOperationKey): List<DbSubjectsDownSyncOperation>
+    suspend fun getDownSyncOperation(key: DbSubjectsDownSyncOperationKey): List<DbSubjectsDownSyncOperation>
 
     @Query("select * from DbSubjectsDownSyncOperation")
     suspend fun getDownSyncOperationsAll(): List<DbSubjectsDownSyncOperation>

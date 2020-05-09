@@ -12,7 +12,7 @@ import com.simprints.id.domain.modality.Modes
 @Entity(tableName = "DbSubjectsDownSyncOperation")
 @Keep
 data class DbSubjectsDownSyncOperation(
-    @PrimaryKey var id: DbPeopleDownSyncOperationKey,
+    @PrimaryKey var id: DbSubjectsDownSyncOperationKey,
     var projectId: String,
     var userId: String? = null,
     var moduleId: String? = null,
@@ -48,16 +48,16 @@ data class DbSubjectsDownSyncOperation(
             downSyncState?.toString()
 
         @TypeConverter
-        fun fromDbPeopleDownSyncOperationKeyToString(DbPeopleDownSyncOperationKey: DbPeopleDownSyncOperationKey): String =
-            DbPeopleDownSyncOperationKey.key
+        fun fromDbPeopleDownSyncOperationKeyToString(DbSubjectsDownSyncOperationKey: DbSubjectsDownSyncOperationKey): String =
+            DbSubjectsDownSyncOperationKey.key
 
         @TypeConverter
-        fun fromStringToDbPeopleDownSyncOperationKey(key: String): DbPeopleDownSyncOperationKey =
-            DbPeopleDownSyncOperationKey(key)
+        fun fromStringToDbPeopleDownSyncOperationKey(key: String): DbSubjectsDownSyncOperationKey =
+            DbSubjectsDownSyncOperationKey(key)
     }
 }
 
-data class DbPeopleDownSyncOperationKey(val key: String) {
+data class DbSubjectsDownSyncOperationKey(val key: String) {
 
     companion object {
         const val SEPARATOR_PARAMS_KEY = "||"

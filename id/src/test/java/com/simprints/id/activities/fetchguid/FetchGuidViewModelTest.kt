@@ -2,7 +2,7 @@ package com.simprints.id.activities.fetchguid
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.session.SessionRepository
@@ -59,7 +59,7 @@ class FetchGuidViewModelTest {
 
     @Test
     fun fetchGuidSucceedsFromLocal_shouldReturnCorrectPersonSource() {
-        coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } returns SubjectFetchResult(PeopleGeneratorUtils.getRandomPerson(), SubjectFetchResult.SubjectSource.LOCAL)
+        coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } returns SubjectFetchResult(SubjectsGeneratorUtils.getRandomPerson(), SubjectFetchResult.SubjectSource.LOCAL)
 
         val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionRepository, timeHelper)
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
@@ -71,7 +71,7 @@ class FetchGuidViewModelTest {
 
     @Test
     fun fetchGuidSucceedsFromRemote_shouldReturnCorrectPersonSource() {
-        coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } returns SubjectFetchResult(PeopleGeneratorUtils.getRandomPerson(), SubjectFetchResult.SubjectSource.REMOTE)
+        coEvery { personRepository.loadFromRemoteIfNeeded(any(), any()) } returns SubjectFetchResult(SubjectsGeneratorUtils.getRandomPerson(), SubjectFetchResult.SubjectSource.REMOTE)
 
         val viewModel = FetchGuidViewModel(personRepository, deviceManager, sessionRepository, timeHelper)
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)

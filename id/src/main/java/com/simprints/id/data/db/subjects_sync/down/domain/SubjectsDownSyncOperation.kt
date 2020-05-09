@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.subjects_sync.down.domain
 
-import com.simprints.id.data.db.subjects_sync.down.local.DbPeopleDownSyncOperationKey
+import com.simprints.id.data.db.subjects_sync.down.local.DbSubjectsDownSyncOperationKey
 import com.simprints.id.data.db.subjects_sync.down.local.DbSubjectsDownSyncOperation
 import com.simprints.id.domain.modality.Modes
 
@@ -12,7 +12,7 @@ data class SubjectsDownSyncOperation(val projectId: String,
 
 fun SubjectsDownSyncOperation.fromDomainToDb(): DbSubjectsDownSyncOperation =
     DbSubjectsDownSyncOperation(
-        DbPeopleDownSyncOperationKey(projectId, modes, userId, moduleId),
+        DbSubjectsDownSyncOperationKey(projectId, modes, userId, moduleId),
         projectId, userId, moduleId, modes,
         lastResult?.state,
         lastResult?.lastEventId,
