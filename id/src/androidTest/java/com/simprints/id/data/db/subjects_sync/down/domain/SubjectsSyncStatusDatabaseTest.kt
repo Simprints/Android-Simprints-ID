@@ -9,7 +9,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
-import com.simprints.id.data.db.subjects_sync.down.local.DbPeopleDownSyncOperationKey
+import com.simprints.id.data.db.subjects_sync.down.local.DbSubjectsDownSyncOperationKey
 import com.simprints.id.data.db.subjects_sync.down.local.SubjectsDownSyncOperationLocalDataSource
 import com.simprints.id.data.db.subjects_sync.down.local.fromDbToDomain
 import com.simprints.id.domain.modality.Modes
@@ -123,9 +123,9 @@ class SubjectsSyncStatusDatabaseTest {
         assertThat(operation.first().fromDbToDomain()).isEqualTo(downSyncOp)
     }
 
-    private fun extractKeyFrom(downSyncOp: SubjectsDownSyncOperation): DbPeopleDownSyncOperationKey =
+    private fun extractKeyFrom(downSyncOp: SubjectsDownSyncOperation): DbSubjectsDownSyncOperationKey =
         with(downSyncOp) {
-            DbPeopleDownSyncOperationKey(
+            DbSubjectsDownSyncOperationKey(
                 projectId,
                 modes,
                 userId,

@@ -1,7 +1,7 @@
 package com.simprints.id.data.db
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.data.db.common.realm.SubjectsRealmConfig
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.db.subject.local.models.DbSubject
@@ -33,7 +33,7 @@ open class RealmTestsBase {
         deleteRealmFiles(config)
     }
 
-    protected fun getFakePerson(): DbSubject = PeopleGeneratorUtils.getRandomPerson().fromDomainToDb()
+    protected fun getFakePerson(): DbSubject = SubjectsGeneratorUtils.getRandomPerson().fromDomainToDb()
 
     protected fun saveFakePerson(realm: Realm, fakeSubject: DbSubject): DbSubject =
         fakeSubject.also { realm.executeTransaction { realm -> realm.insertOrUpdate(fakeSubject) } }

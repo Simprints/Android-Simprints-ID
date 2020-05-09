@@ -6,7 +6,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationResult.DownSyncState.COMPLETE
-import com.simprints.id.data.db.subjects_sync.down.local.DbPeopleDownSyncOperationKey
+import com.simprints.id.data.db.subjects_sync.down.local.DbSubjectsDownSyncOperationKey
 import org.junit.Test
 
 class SubjectsDownSyncOperationFactoryImplTest {
@@ -54,7 +54,7 @@ class SubjectsDownSyncOperationFactoryImplTest {
         val op = builder.buildProjectSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_MODES, result)
 
         with(op.fromDomainToDb()) {
-            assertThat(id.key).isEqualTo(DbPeopleDownSyncOperationKey(DEFAULT_PROJECT_ID, DEFAULT_MODES, null).key)
+            assertThat(id.key).isEqualTo(DbSubjectsDownSyncOperationKey(DEFAULT_PROJECT_ID, DEFAULT_MODES, null).key)
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
             assertThat(userId).isNull()
             assertThat(moduleId).isNull()

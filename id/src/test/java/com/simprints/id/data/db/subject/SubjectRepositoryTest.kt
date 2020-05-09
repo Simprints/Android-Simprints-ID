@@ -7,7 +7,7 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.moduleSyncScope
 import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
 import com.simprints.id.commontesttools.DefaultTestConstants.userSyncScope
-import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.subject.domain.FaceSample
@@ -78,7 +78,7 @@ class SubjectRepositoryTest {
 
     @Test
     fun givenANewPatient_shouldBeSavedAndUploaded() = runBlockingTest {
-        val person = PeopleGeneratorUtils.getRandomPerson()
+        val person = SubjectsGeneratorUtils.getRandomPerson()
 
         personRepository.saveAndUpload(person)
 
@@ -88,7 +88,7 @@ class SubjectRepositoryTest {
 
     @Test
     fun givenAPatientInLocal_shouldBeLoaded() = runBlockingTest {
-        val person = PeopleGeneratorUtils.getRandomPerson()
+        val person = SubjectsGeneratorUtils.getRandomPerson()
         coEvery { localDataSource.load(any()) } returns flowOf(person)
 
         val fetch = personRepository.loadFromRemoteIfNeeded(person.projectId, person.subjectId)
@@ -100,7 +100,7 @@ class SubjectRepositoryTest {
     @Test
     fun givenAPatientOnlyInRemote_shouldBeLoaded() {
         runBlocking {
-            val person = PeopleGeneratorUtils.getRandomPerson()
+            val person = SubjectsGeneratorUtils.getRandomPerson()
             coEvery { localDataSource.load(any()) } returns flowOf()
             coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildCreationEventFromPerson(person)
 
