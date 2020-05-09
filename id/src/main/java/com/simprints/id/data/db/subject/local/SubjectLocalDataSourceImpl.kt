@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.subject.local
 
 import android.content.Context
-import com.simprints.id.data.db.common.realm.PeopleRealmConfig
+import com.simprints.id.data.db.common.realm.SubjectsRealmConfig
 import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.models.DbSubject
@@ -54,7 +54,7 @@ class SubjectLocalDataSourceImpl(private val appContext: Context,
         }
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): RealmConfiguration =
-        PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        SubjectsRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
 
 
     override suspend fun insertOrUpdate(subjects: List<Subject>) {
