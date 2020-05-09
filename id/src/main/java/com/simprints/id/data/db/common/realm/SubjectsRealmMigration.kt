@@ -11,7 +11,7 @@ import io.realm.FieldAttribute.REQUIRED
 import io.realm.annotations.RealmModule
 import java.util.*
 
-internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
+internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
     @RealmModule(classes = [
         DbFingerprintSample::class,
@@ -19,7 +19,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
         DbSubject::class,
         DbProject::class
     ])
-    class PeopleModule
+    class SubjectsModule
 
     companion object {
         const val REALM_SCHEMA_VERSION: Long = 10
@@ -191,9 +191,9 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
     }
 
     private fun migrateTo10(schema: RealmSchema) {
-        schema.rename("DbPerson", SUBJECT_TABLE)
-            .renameField("patientId", "subjectId")
-            .renameField("userId", "attendantId")
+        schema.rename(SubjectsSchemaV9.PERSON_TABLE, SUBJECT_TABLE)
+            .renameField(SubjectsSchemaV9.PERSON_PATIENT_ID_FIELD, "subjectId")
+            .renameField(SubjectsSchemaV9.PERSON_USER_ID_FIELD, "attendantId")
     }
 
     private inline fun <reified T> RealmObjectSchema.addNewField(name: String, vararg attributes: FieldAttribute): RealmObjectSchema =
@@ -209,10 +209,10 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
         this.setRequired(name, true)
 
     override fun hashCode(): Int {
-        return PeopleRealmMigration.hashCode()
+        return SubjectsRealmMigration.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is PeopleRealmMigration
+        return other is SubjectsRealmMigration
     }
 }

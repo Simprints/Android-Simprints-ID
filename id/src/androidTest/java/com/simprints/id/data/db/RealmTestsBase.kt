@@ -2,7 +2,7 @@ package com.simprints.id.data.db
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
-import com.simprints.id.data.db.common.realm.PeopleRealmConfig
+import com.simprints.id.data.db.common.realm.SubjectsRealmConfig
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
@@ -29,7 +29,7 @@ open class RealmTestsBase {
 
     init {
         Realm.init(testContext)
-        config = PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        config = SubjectsRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
         deleteRealmFiles(config)
     }
 
