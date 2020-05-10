@@ -1,5 +1,6 @@
 apply from: 'dependencies.gradle'
 apply from: 'config.gradle'
+apply from: '/ci/scanning/sonnarqube.gradle'
 
 buildscript {
     ext.kotlin_version = '1.3.61'
@@ -41,8 +42,6 @@ buildscript {
 
 }
 
-apply plugin: "org.sonarqube"
-
 allprojects {
     repositories {
         google()
@@ -56,12 +55,6 @@ allprojects {
         }
     }
 
-    // Remove c files from the CI profiler
-    sonarqube {
-        properties {
-            property "sonar.c.file.suffixes", "-"
-        }
-    }
 }
 
 task clean(type: Delete) {
