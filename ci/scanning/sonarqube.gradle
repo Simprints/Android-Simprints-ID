@@ -13,16 +13,16 @@ buildscript {
 
 apply plugin: "org.sonarqube"
 
-//sonarqube {
-//    properties {
+sonarqube {
+    properties {
 //        property "sonar.projectKey", "android-simprints-id"
 //        property "sonar.organization", "simprints"
 //        property "sonar.host.url", "https://sonarcloud.io"
 //        property "sonar.login", "4cf4d28d515bffbf7566f981cb8df0fa04e648aa"
-//        property "sonar.c.file.suffixes", "-"
-//    }
-//}
-//
+        property "sonar.c.file.suffixes", "-"
+    }
+}
+
 //subprojects {
 //    apply plugin: "org.sonarqube"
 //}
