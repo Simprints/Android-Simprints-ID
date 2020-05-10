@@ -74,7 +74,6 @@ pipelines:
                         caches:
                             - gradle
                             - gradlewrapper
-                            - sonar
                         script:
                             - bash ./ci/pipeline/setup
                             - ./gradlew sonarqube --stacktrace
@@ -160,4 +159,3 @@ definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
         googlecloud: ~/google-cloud-sdk/bin
-        sonar: ~/.sonar/cache
