@@ -51,12 +51,12 @@ internal data class AppErrorResponse(
 ) : IAppErrorResponse
 
 @Parcelize
-internal data class AppEnrollRequest(
+internal data class AppEnrolRequest(
     override val projectId: String,
     override val userId: String,
     override val moduleId: String,
     override val metadata: String
-) : IAppEnrollRequest
+) : IAppEnrolRequest
 
 @Parcelize
 internal data class AppEnrolLastBiometricsRequest(

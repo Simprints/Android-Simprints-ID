@@ -12,7 +12,7 @@ interface RequestContract {
         val intentAction: String?
         val extras: Map<String, Any?>?
         val presenter: Presenter
-        val enrollExtractor: EnrollExtractor
+        val enrolExtractor: EnrolExtractor
         val verifyExtractor: VerifyExtractor
         val identifyExtractor: IdentifyExtractor
         val confirmIdentityExtractor: ConfirmIdentityExtractor
@@ -25,12 +25,12 @@ interface RequestContract {
 
     interface Presenter {
         suspend fun start()
-        suspend fun processEnrollRequest()
+        suspend fun processEnrolRequest()
         suspend fun processIdentifyRequest()
         suspend fun processVerifyRequest()
         suspend fun processConfirmIdentityRequest()
         suspend fun processEnrolLastBiometrics()
-        fun handleEnrollResponse(enroll: EnrollResponse)
+        fun handleEnrolResponse(enrol: EnrolResponse)
         fun handleIdentifyResponse(identify: IdentifyResponse)
         fun handleVerifyResponse(verify: VerifyResponse)
         fun handleRefusalResponse(refusalForm: RefusalFormResponse)

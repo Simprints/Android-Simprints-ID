@@ -4,7 +4,7 @@ import com.simprints.clientapi.activities.odk.OdkAction.*
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.ODK
-import com.simprints.clientapi.domain.responses.EnrollResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
@@ -35,14 +35,14 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
-        val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
-        every { view.enrollExtractor } returns enrollmentExtractor
+        val enrolmentExtractor = EnrolRequestFactory.getMockExtractor()
+        every { view.enrolExtractor } returns enrolmentExtractor
 
         OdkPresenter(view, Enrol, mockSessionManagerToCreateSession(), mockk(), mockk()).apply {
             runBlocking { start() }
         }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest(ODK)) }
+        verify(exactly = 1) { view.sendSimprintsRequest(EnrolRequestFactory.getValidSimprintsRequest(ODK)) }
     }
 
     @Test
@@ -86,7 +86,7 @@ class OdkPresenterTest {
             val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
             coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
             OdkPresenter(view, Enrol, sessionEventsManagerMock, mockk(), mockk()).apply {
-                handleEnrollResponse(EnrollResponse(registerId))
+                handleEnrolResponse(EnrolResponse(registerId))
             }
 
             verify(exactly = 1) { view.returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK) }

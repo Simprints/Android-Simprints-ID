@@ -1,6 +1,6 @@
 package com.simprints.id.commontesttools.moduleApi
 
-import com.simprints.moduleapi.app.requests.IAppEnrollRequest
+import com.simprints.moduleapi.app.requests.IAppEnrolRequest
 import com.simprints.moduleapi.app.requests.IAppIdentifyRequest
 import com.simprints.moduleapi.app.requests.IAppConfirmIdentityRequest
 import com.simprints.moduleapi.app.requests.IAppVerifyRequest
@@ -54,12 +54,12 @@ internal data class AppErrorResponse(
 ) : IAppErrorResponse
 
 @Parcelize
-internal data class AppEnrollRequestModuleApi(
+internal data class AppEnrolRequestModuleApi(
     override val projectId: String,
     override val userId: String,
     override val moduleId: String,
     override val metadata: String
-) : IAppEnrollRequest
+) : IAppEnrolRequest
 
 @Parcelize
 internal data class AppIdentifyRequestModuleApi(

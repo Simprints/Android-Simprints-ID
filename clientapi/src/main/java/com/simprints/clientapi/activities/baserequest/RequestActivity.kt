@@ -33,8 +33,8 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     override val extras: Map<String, Any?>?
         get() = intent?.extras?.toMap()
 
-    override val enrollExtractor: EnrollExtractor
-        get() = EnrollExtractor(intent)
+    override val enrolExtractor: EnrolExtractor
+        get() = EnrolExtractor(intent)
 
     override val verifyExtractor: VerifyExtractor
         get() = VerifyExtractor(intent)
@@ -105,7 +105,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     }
 
     private fun routeAppResponse(response: IAppResponse) = when (response.type) {
-        IAppResponseType.ENROL, IAppResponseType.ENROL_LAST_BIOMETRICS -> presenter.handleEnrollResponse(EnrollResponse(response as IAppEnrolResponse))
+        IAppResponseType.ENROL, IAppResponseType.ENROL_LAST_BIOMETRICS -> presenter.handleEnrolResponse(EnrolResponse(response as IAppEnrolResponse))
         IAppResponseType.IDENTIFY -> presenter.handleIdentifyResponse(IdentifyResponse(response as IAppIdentifyResponse))
         IAppResponseType.VERIFY -> presenter.handleVerifyResponse(VerifyResponse(response as IAppVerifyResponse))
         IAppResponseType.REFUSAL -> presenter.handleRefusalResponse(RefusalFormResponse(response as IAppRefusalFormResponse))

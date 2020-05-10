@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.*
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.STANDARD
-import com.simprints.clientapi.domain.responses.EnrollResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
@@ -39,8 +39,8 @@ class LibSimprintsPresenterTest {
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
-        val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
-        every { view.enrollExtractor } returns enrollmentExtractor
+        val enrolmentExtractor = EnrolRequestFactory.getMockExtractor()
+        every { view.enrolExtractor } returns enrolmentExtractor
 
         LibSimprintsPresenter(
             view,
@@ -52,7 +52,7 @@ class LibSimprintsPresenterTest {
             runBlocking { start() }
         }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest(STANDARD)) }
+        verify(exactly = 1) { view.sendSimprintsRequest(EnrolRequestFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test
@@ -145,7 +145,7 @@ class LibSimprintsPresenterTest {
             clientApiSessionEventsManager,
             mockk(),
             mockk()
-        ).handleEnrollResponse(EnrollResponse(registerId))
+        ).handleEnrolResponse(EnrolResponse(registerId))
 
         verify(exactly = 1) {
             view.returnRegistration(

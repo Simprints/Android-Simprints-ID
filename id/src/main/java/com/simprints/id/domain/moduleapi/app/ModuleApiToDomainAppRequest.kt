@@ -5,7 +5,7 @@ import com.simprints.moduleapi.app.requests.*
 
 fun IAppRequest.fromModuleApiToDomain(): AppRequest =
     when (this) {
-        is IAppEnrollRequest ->
+        is IAppEnrolRequest ->
             AppRequest.AppRequestFlow.AppEnrolRequest(projectId, userId, moduleId, metadata)
 
         is IAppIdentifyRequest ->

@@ -40,7 +40,7 @@ class LibSimprintsPresenter(
 
         runIfDeviceIsNotRooted {
             when (action) {
-                Enrol -> processEnrollRequest()
+                Enrol -> processEnrolRequest()
                 Identify -> processIdentifyRequest()
                 Verify -> processVerifyRequest()
                 ConfirmIdentity -> processConfirmIdentityRequest()
@@ -58,11 +58,11 @@ class LibSimprintsPresenter(
         }
     }
 
-    override fun handleEnrollResponse(enroll: EnrollResponse) {
+    override fun handleEnrolResponse(enrol: EnrolResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(Registration(enroll.guid), getCurrentSessionIdOrEmpty(), flowCompletedCheck)
+            view.returnRegistration(Registration(enrol.guid), getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
 

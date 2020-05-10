@@ -9,7 +9,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.commcare.CommCareActivity
-import com.simprints.clientapi.integration.AppEnrollRequest
+import com.simprints.clientapi.integration.AppEnrolRequest
 import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.clientapi.integration.value
@@ -33,7 +33,7 @@ class CommCareEnrolRequestTest : BaseCommCareClientApiTest() {
     fun callingAppSendsAnEnrolRequest_shouldLaunchAnAppEnrolRequest() {
         ActivityScenario.launch<CommCareActivity>(commCareBaseFlowIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
 
-        val expectedAppRequest = AppEnrollRequest(
+        val expectedAppRequest = AppEnrolRequest(
             projectIdField.value(),
             userIdField.value(),
             moduleIdField.value(),
