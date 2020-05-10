@@ -16,8 +16,8 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 protected val crashReportManager: ClientApiCrashReportManager)
     : RequestContract.Presenter {
 
-    override suspend fun processEnrollRequest() = validateAndSendRequest(
-        EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))
+    override suspend fun processEnrolRequest() = validateAndSendRequest(
+        EnrolBuilder(view.enrolExtractor, EnrolValidator(view.enrolExtractor))
     )
 
     override suspend fun processIdentifyRequest() = validateAndSendRequest(

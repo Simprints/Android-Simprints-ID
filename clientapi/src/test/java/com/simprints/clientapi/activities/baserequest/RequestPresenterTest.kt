@@ -115,7 +115,7 @@ class ImplRequestPresenter(
         runIfDeviceIsNotRooted {}
     }
 
-    override fun handleEnrollResponse(enroll: EnrollResponse) {}
+    override fun handleEnrolResponse(enrol: EnrolResponse) {}
     override fun handleIdentifyResponse(identify: IdentifyResponse) {}
     override fun handleVerifyResponse(verify: VerifyResponse) {}
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {}

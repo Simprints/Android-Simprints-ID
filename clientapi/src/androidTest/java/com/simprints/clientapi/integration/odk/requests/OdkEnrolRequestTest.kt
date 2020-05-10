@@ -9,7 +9,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
-import com.simprints.clientapi.integration.AppEnrollRequest
+import com.simprints.clientapi.integration.AppEnrolRequest
 import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
 import com.simprints.clientapi.integration.value
 import com.simprints.moduleapi.app.requests.IAppRequest
@@ -33,7 +33,7 @@ class OdkEnrolRequestTest : BaseOdkClientApiTest() {
     fun callingAppSendsAnEnrolRequest_shouldLaunchAnAppEnrolRequest() {
         ActivityScenario.launch<OdkActivity>(odkBaseFlowIntentRequest.apply { action = ODK_ENROL_ACTION })
 
-        val expectedAppRequest = AppEnrollRequest(
+        val expectedAppRequest = AppEnrolRequest(
             projectIdField.value(),
             userIdField.value(),
             moduleIdField.value(),

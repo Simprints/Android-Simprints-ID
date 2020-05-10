@@ -41,7 +41,7 @@ class CommCarePresenter(
 
         runIfDeviceIsNotRooted {
             when (action) {
-                Enrol -> processEnrollRequest()
+                Enrol -> processEnrolRequest()
                 Identify -> processIdentifyRequest()
                 Verify -> processVerifyRequest()
                 ConfirmIdentity -> checkAndProcessSessionId()
@@ -50,11 +50,11 @@ class CommCarePresenter(
         }
     }
 
-    override fun handleEnrollResponse(enroll: EnrollResponse) {
+    override fun handleEnrolResponse(enrol: EnrolResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(enroll.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
+            view.returnRegistration(enrol.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
 

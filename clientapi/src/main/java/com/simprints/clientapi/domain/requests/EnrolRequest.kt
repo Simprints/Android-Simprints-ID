@@ -1,6 +1,6 @@
 package com.simprints.clientapi.domain.requests
 
-import com.simprints.moduleapi.app.requests.IAppEnrollRequest
+import com.simprints.moduleapi.app.requests.IAppEnrolRequest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import kotlinx.android.parcel.Parcelize
 
@@ -13,17 +13,17 @@ data class EnrolRequest(
     override val unknownExtras: Map<String, Any?>
 ) : BaseRequest {
 
-    override fun convertToAppRequest(): IAppRequest = AppEnrollRequest(
+    override fun convertToAppRequest(): IAppRequest = AppEnrolRequest(
         this.projectId, this.userId, this.moduleId, this.metadata
     )
 
     @Parcelize
-    private data class AppEnrollRequest(
+    private data class AppEnrolRequest(
         override val projectId: String,
         override val userId: String,
         override val moduleId: String,
         override val metadata: String
-    ) : IAppEnrollRequest
+    ) : IAppEnrolRequest
 
 }
 

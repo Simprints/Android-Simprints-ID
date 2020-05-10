@@ -1,13 +1,13 @@
 package com.simprints.clientapi.clientrequests.builders
 
-import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
-import com.simprints.clientapi.clientrequests.validators.EnrollValidator
+import com.simprints.clientapi.clientrequests.extractors.EnrolExtractor
+import com.simprints.clientapi.clientrequests.validators.EnrolValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrolRequest
 
 
-class EnrollBuilder(private val extractor: EnrollExtractor,
-                    validator: EnrollValidator)
+class EnrolBuilder(private val extractor: EnrolExtractor,
+                   validator: EnrolValidator)
     : ClientRequestBuilder(validator) {
 
     override fun buildAppRequest(): BaseRequest = EnrolRequest(
