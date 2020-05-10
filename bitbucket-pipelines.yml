@@ -19,7 +19,7 @@ pipelines:
                 size: 2x # Double resources available for this step
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew sonarqube
+                    - ./gradlew sonarqube --stacktrace
                     -   pipe: sonarsource/sonarcloud-quality-gate:0.1.3
                 artifacts:
                     - build/libs/**
