@@ -11,7 +11,7 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.lifecycle.Lifecycle
-import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
@@ -142,7 +142,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     private fun initPageAdapter() {
         pageAdapter = FingerPageAdapter(
-            supportFragmentManager,
+            this,
             vm.state().fingerStates.map { it.id }
         )
     }
@@ -151,9 +151,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private fun initViewPager() {
         view_pager.adapter = pageAdapter
         view_pager.offscreenPageLimit = 1
-        view_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
-            override fun onPageScrollStateChanged(state: Int) {}
+        view_pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 vm.updateSelectedFinger(position)
             }
@@ -214,7 +212,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
         // If the layout is has been rotated for RtL, we need to rotate the fragment back so it's upright
         if (rightToLeft) {
-            pageAdapter.getFragment(currentFingerIndex)?.view?.rotationY = 180f
+//            pageAdapter.getFragment(currentFingerIndex)?.view?.rotationY = 180f // FIXME
         }
     }
 
