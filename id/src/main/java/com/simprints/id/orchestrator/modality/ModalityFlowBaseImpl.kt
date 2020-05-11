@@ -27,11 +27,13 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
                                     private val faceStepProcessor: FaceStepProcessor,
                                     private val timeHelper: TimeHelper,
                                     private val sessionRepository: SessionRepository,
-                                    private val consentRequired: Boolean) : ModalityFlow {
+                                    private val consentRequired: Boolean,
+                                    private val locationRequired: Boolean) : ModalityFlow {
 
     override val steps: MutableList<Step> = mutableListOf()
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
+        addSetupStepIfRequired()
         when (appRequest.type) {
             AppRequestType.ENROL -> addConsentStepIfRequired(ConsentType.ENROL)
             AppRequestType.IDENTIFY -> addConsentStepIfRequired(ConsentType.IDENTIFY)
@@ -39,6 +41,12 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
                 addVerifyStep(appRequest)
                 addConsentStepIfRequired(ConsentType.VERIFY)
             }
+        }
+    }
+
+    private fun addSetupStepIfRequired() {
+        if (locationRequired) {
+            steps.add(buildSetupStep())
         }
     }
 
@@ -58,6 +66,8 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         steps.clear()
         steps.addAll(stepsToRestore)
     }
+
+    private fun buildSetupStep() = coreStepProcessor.buildStepSetup()
 
     private fun buildConsentStep(consentType: ConsentType) =
         coreStepProcessor.buildStepConsent(consentType)
