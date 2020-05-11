@@ -40,9 +40,8 @@ open class LoginModule {
 
     @Provides
     open fun provideAuthManager(
-        apiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider
-    ): AuthManager = AuthManagerImpl(apiClientFactory, baseUrlProvider)
+        apiClientFactory: SimApiClientFactory
+    ): AuthManager = AuthManagerImpl(apiClientFactory)
 
     @Provides
     open fun provideAuthenticationDataManager(apiClientFactory: SimApiClientFactory,
