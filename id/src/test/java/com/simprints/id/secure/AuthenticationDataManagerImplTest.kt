@@ -79,7 +79,7 @@ class AuthenticationDataManagerImplTest: AutoCloseKoinTest() {
     }
 
     private suspend fun makeTestRequestForAuthenticationData(): AuthenticationData {
-        val authenticationDataManagerSpy = spyk(AuthenticationDataManagerImpl(mockk(), mockk()))
+        val authenticationDataManagerSpy = spyk(AuthenticationDataManagerImpl(mockk()))
         every { authenticationDataManagerSpy.apiClient } returns apiClient.api
 
         return authenticationDataManagerSpy.requestAuthenticationData(PROJECT_ID, USER_ID)
