@@ -21,3 +21,12 @@ The detection phase is when the app analyzes a PreviewFrame (already cropped by 
 ### MockFaceDetector
 
 This is a mock detector that always return true and wait a bit (200ms) before returning a face with an empty template.
+
+## RankOne
+
+RankOne is the SDK of choice for face recognition - after we did some extensive testing with lots of other providers. RankOne gives an SDK to copy to inside Simprints. It lives inside the [face module](src/main/java/io/rankone/rocsdk/embedded).
+
+RankOne files are split in 3 places:
+- assets - this is where the license should stay
+- jniLibs - these is ROC C code compiled
+- io/rankone/rocsdk/embedded - this is where the ROC API stays and we can make the bridge between Kotlin and C code
