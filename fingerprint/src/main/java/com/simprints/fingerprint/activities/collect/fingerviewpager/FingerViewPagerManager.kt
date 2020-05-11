@@ -50,7 +50,7 @@ class FingerViewPagerManager(
         viewPager.setOnTouchListener { _, _ -> !isAbleToSelectNewFinger() }
     }
 
-    fun setCurrentPageAndFingerIds(fingerStates: List<FingerCollectionState>, currentFingerIndex: Int) {
+    fun setCurrentPageAndFingerStates(fingerStates: List<FingerCollectionState>, currentFingerIndex: Int) {
         val oldFingerIds = this.activeFingers
         val newFingerIds = fingerStates.map { it.id }
         if (oldFingerIds != newFingerIds) {

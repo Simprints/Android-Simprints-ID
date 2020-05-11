@@ -23,11 +23,11 @@ class FingerFragment : FingerprintFragment() {
     private val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
     private val fingerprintPreferencesManager: FingerprintPreferencesManager by inject()
 
-    lateinit var fingerId: FingerIdentifier
+    private lateinit var fingerId: FingerIdentifier
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_finger, container, false)
-        fingerId = FingerIdentifier.values()[arguments?.getInt(FINGER_ARG)
+        fingerId = FingerIdentifier.values()[arguments?.getInt(FINGER_ID_BUNDLE_KEY)
             ?: throw IllegalArgumentException()]
         return view
     }
@@ -73,10 +73,10 @@ class FingerFragment : FingerprintFragment() {
 
     companion object {
 
-        private const val FINGER_ARG = "finger"
+        private const val FINGER_ID_BUNDLE_KEY = "finger_id"
 
         fun newInstance(fingerId: FingerIdentifier) = FingerFragment().also {
-            it.arguments = Bundle().apply { putInt(FINGER_ARG, fingerId.ordinal) }
+            it.arguments = Bundle().apply { putInt(FINGER_ID_BUNDLE_KEY, fingerId.ordinal) }
         }
     }
 }
