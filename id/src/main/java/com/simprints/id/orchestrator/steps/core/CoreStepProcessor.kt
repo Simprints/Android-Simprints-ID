@@ -6,6 +6,8 @@ import com.simprints.id.orchestrator.steps.Step
 
 interface CoreStepProcessor {
 
+    fun buildStepSetup(): Step
+
     fun buildStepConsent(consentType: ConsentType): Step
 
     fun buildStepVerify(projectId: String, verifyGuid: String): Step
