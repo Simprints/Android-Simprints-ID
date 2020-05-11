@@ -1,11 +1,11 @@
 package com.simprints.core.images.repository
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.images.local.ImageLocalDataSource
-import com.simprints.core.images.model.Path
-import com.simprints.core.images.model.SecuredImageRef
-import com.simprints.core.images.remote.ImageRemoteDataSource
-import com.simprints.core.images.remote.UploadResult
+import com.simprints.id.data.images.local.ImageLocalDataSource
+import com.simprints.id.data.images.model.Path
+import com.simprints.id.data.images.model.SecuredImageRef
+import com.simprints.id.data.images.remote.ImageRemoteDataSource
+import com.simprints.id.data.images.remote.UploadResult
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,15 +17,15 @@ import java.io.FileInputStream
 @ExperimentalCoroutinesApi
 internal class ImageRepositoryTest {
 
-    @MockK lateinit var localDataSource: ImageLocalDataSource
-    @MockK lateinit var remoteDataSource: ImageRemoteDataSource
+    @MockK lateinit var localDataSource: com.simprints.id.data.images.local.ImageLocalDataSource
+    @MockK lateinit var remoteDataSource: com.simprints.id.data.images.remote.ImageRemoteDataSource
 
-    private lateinit var repository: ImageRepository
+    private lateinit var repository: com.simprints.id.data.images.repository.ImageRepository
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        repository = ImageRepositoryImpl(localDataSource, remoteDataSource)
+        repository = com.simprints.id.data.images.repository.ImageRepositoryImpl(localDataSource, remoteDataSource)
         initialiseMocks()
     }
 
@@ -88,21 +88,21 @@ internal class ImageRepositoryTest {
 
         coEvery {
             remoteDataSource.uploadImage(mockStream, validImage)
-        } returns UploadResult(
-            validImage,
-            UploadResult.Status.SUCCESSFUL
+        } returns com.simprints.id.data.images.remote.UploadResult(
+                validImage,
+                com.simprints.id.data.images.remote.UploadResult.Status.SUCCESSFUL
         )
 
         coEvery {
             remoteDataSource.uploadImage(mockStream, invalidImage)
-        } returns UploadResult(
-            invalidImage,
-            UploadResult.Status.FAILED
+        } returns com.simprints.id.data.images.remote.UploadResult(
+                invalidImage,
+                com.simprints.id.data.images.remote.UploadResult.Status.FAILED
         )
     }
 
     private fun configureLocalImageFiles(numberOfValidFiles: Int = 3, includeInvalidFile: Boolean) {
-        val files = mutableListOf<SecuredImageRef>().apply {
+        val files = mutableListOf<com.simprints.id.data.images.model.SecuredImageRef>().apply {
             repeat(numberOfValidFiles) {
                 add(mockValidImage())
             }
@@ -115,18 +115,18 @@ internal class ImageRepositoryTest {
     }
 
     private fun mockValidImage() =
-        SecuredImageRef(
-            Path(
-                VALID_PATH
+            com.simprints.id.data.images.model.SecuredImageRef(
+                    com.simprints.id.data.images.model.Path(
+                            VALID_PATH
+                    )
             )
-        )
 
     private fun mockInvalidImage() =
-        SecuredImageRef(
-            Path(
-                INVALID_PATH
+            com.simprints.id.data.images.model.SecuredImageRef(
+                    com.simprints.id.data.images.model.Path(
+                            INVALID_PATH
+                    )
             )
-        )
 
     companion object {
         private const val VALID_PATH = "valid.txt"

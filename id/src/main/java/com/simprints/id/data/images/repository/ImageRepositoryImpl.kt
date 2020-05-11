@@ -1,23 +1,23 @@
-package com.simprints.core.images.repository
+package com.simprints.id.data.images.repository
 
 import android.content.Context
-import com.simprints.core.images.local.ImageLocalDataSource
-import com.simprints.core.images.local.ImageLocalDataSourceImpl
-import com.simprints.core.images.model.Path
-import com.simprints.core.images.model.SecuredImageRef
-import com.simprints.core.images.remote.ImageRemoteDataSource
-import com.simprints.core.images.remote.ImageRemoteDataSourceImpl
-import com.simprints.core.images.remote.UploadResult
+import com.simprints.id.data.images.local.ImageLocalDataSource
+import com.simprints.id.data.images.local.ImageLocalDataSourceImpl
+import com.simprints.id.data.images.model.Path
+import com.simprints.id.data.images.model.SecuredImageRef
+import com.simprints.id.data.images.remote.ImageRemoteDataSource
+import com.simprints.id.data.images.remote.ImageRemoteDataSourceImpl
+import com.simprints.id.data.images.remote.UploadResult
 import com.simprints.id.network.BaseUrlProvider
 
 class ImageRepositoryImpl internal constructor(
-    private val localDataSource: ImageLocalDataSource,
-    private val remoteDataSource: ImageRemoteDataSource
+        private val localDataSource: ImageLocalDataSource,
+        private val remoteDataSource: ImageRemoteDataSource
 ) : ImageRepository {
 
     constructor(context: Context, baseUrlProvider: com.simprints.id.network.BaseUrlProvider) : this(
-        ImageLocalDataSourceImpl(context),
-        ImageRemoteDataSourceImpl(baseUrlProvider)
+            ImageLocalDataSourceImpl(context),
+            ImageRemoteDataSourceImpl(baseUrlProvider)
     )
 
     override fun storeImageSecurely(imageBytes: ByteArray, relativePath: Path): SecuredImageRef? {
@@ -35,8 +35,8 @@ class ImageRepositoryImpl internal constructor(
             localDataSource.decryptImage(imageRef)?.let { stream ->
                 remoteDataSource.uploadImage(stream, imageRef)
             } ?: UploadResult(
-                imageRef,
-                UploadResult.Status.FAILED
+                    imageRef,
+                    UploadResult.Status.FAILED
             )
         }
     }
