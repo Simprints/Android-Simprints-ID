@@ -47,7 +47,7 @@ open class LoginModule {
     open fun provideAuthenticationDataManager(apiClientFactory: SimApiClientFactory,
                                               baseUrlProvider: BaseUrlProvider
     ): AuthenticationDataManager =
-        AuthenticationDataManagerImpl(apiClientFactory, baseUrlProvider)
+        AuthenticationDataManagerImpl(apiClientFactory)
 
     @Provides
     open fun provideAttestationManager(): AttestationManager = AttestationManagerImpl()
