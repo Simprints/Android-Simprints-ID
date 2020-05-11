@@ -37,6 +37,6 @@ class AuthenticationDataManagerImpl(private val apiClientFactory: SimApiClientFa
         retrySimNetworkCalls(apiClient, block, traceName)
 
     internal val apiClient by lazy {
-        apiClientFactory.build<SecureApiInterface>(baseUrlProvider.getApiBaseUrl()).api
+        apiClientFactory.build<SecureApiInterface>().api
     }
 }
