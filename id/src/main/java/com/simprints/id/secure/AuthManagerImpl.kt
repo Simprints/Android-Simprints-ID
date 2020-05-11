@@ -39,5 +39,5 @@ class AuthManagerImpl(private val apiClientFactory: SimApiClientFactory,
         retrySimNetworkCalls(buildApiClient(), block, traceName)
 
     private fun buildApiClient() =
-        apiClientFactory.build<SecureApiInterface>(baseUrlProvider.getApiBaseUrl()).api
+        apiClientFactory.build<SecureApiInterface>().api
 }
