@@ -11,7 +11,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
@@ -289,8 +289,8 @@ class CollectFingerprintsActivityTest : KoinTest {
         }
 
     private fun CollectFingerprintsActivity.assertViewPager(count: Int, currentIndex: Int) {
-        val viewPager = findViewById<ViewPager>(R.id.view_pager)
-        assertThat(viewPager.adapter?.count).isEqualTo(count)
+        val viewPager = findViewById<ViewPager2>(R.id.view_pager)
+        assertThat(viewPager.adapter?.itemCount).isEqualTo(count)
         assertThat(viewPager.currentItem).isEqualTo(currentIndex)
     }
 
