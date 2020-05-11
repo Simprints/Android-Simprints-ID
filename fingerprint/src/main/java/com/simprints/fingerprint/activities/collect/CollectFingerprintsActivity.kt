@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import androidx.lifecycle.Lifecycle
 import com.simprints.fingerprint.R
@@ -137,7 +136,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun CollectFingerprintsState.updateViewPagerManager() {
-        fingerViewPagerManager.setCurrentPageAndFingerIds(fingerStates, currentFingerIndex)
+        fingerViewPagerManager.setCurrentPageAndFingerStates(fingerStates, currentFingerIndex)
     }
 
     private fun CollectFingerprintsState.updateScanButton() {
