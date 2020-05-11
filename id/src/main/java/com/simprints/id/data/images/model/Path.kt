@@ -1,4 +1,4 @@
-package com.simprints.core.images.model
+package com.simprints.id.data.images.model
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

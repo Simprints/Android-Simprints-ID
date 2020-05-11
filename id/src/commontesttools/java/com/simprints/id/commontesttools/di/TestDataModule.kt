@@ -1,7 +1,7 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
-import com.simprints.core.images.repository.ImageRepository
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager

@@ -1,7 +1,7 @@
-package com.simprints.core.images.repository
+package com.simprints.id.data.images.repository
 
-import com.simprints.core.images.model.Path
-import com.simprints.core.images.model.SecuredImageRef
+import com.simprints.id.data.images.model.Path
+import com.simprints.id.data.images.model.SecuredImageRef
 
 /**
  * Repository for handling local and remote image file operations
