@@ -126,7 +126,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private fun initIndicators() {
         indicator_layout.removeAllViewsInLayout()
         indicators.clear()
-        vm.state().orderedFingers().forEachIndexed { index, _ ->
+        vm.state().fingerStates.forEachIndexed { index, _ ->
             val indicator = ImageView(this)
             indicator.adjustViewBounds = true
             indicator.setOnClickListener {
@@ -143,7 +143,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private fun initPageAdapter() {
         pageAdapter = FingerPageAdapter(
             supportFragmentManager,
-            vm.state().orderedFingers()
+            vm.state().fingerStates.map { it.id }
         )
     }
 
@@ -184,7 +184,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun CollectFingerprintsState.updateNumberOfFingersCurrentlyDisplayed() {
-        val numberOfFingersToDisplay = orderedFingers().size
+        val numberOfFingersToDisplay = fingerStates.size
         if (numberOfFingersToDisplay != numberOfFingersCurrentlyDisplayed) {
             initIndicators()
             initPageAdapter()
@@ -195,9 +195,9 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun CollectFingerprintsState.updateIndicators() {
-        orderedFingers().forEachIndexed { index, finger ->
+        fingerStates.forEachIndexed { index, fingerState ->
             val selected = currentFingerIndex == index
-            indicators[index].setImageResource(fingerStates.getValue(finger).indicatorDrawableId(selected))
+            indicators[index].setImageResource(fingerState.indicatorDrawableId(selected))
         }
     }
 
@@ -220,8 +220,8 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     private fun CollectFingerprintsState.updateProgressBar() {
         when (val fingerState = currentFingerState()) {
-            FingerCollectionState.NotCollected,
-            FingerCollectionState.Skipped -> {
+            is FingerCollectionState.NotCollected,
+            is FingerCollectionState.Skipped -> {
                 timeoutBar.handleCancelled()
                 timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bar)
             }
@@ -243,9 +243,8 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     private fun CollectFingerprintsState.listenForConfirmDialog() {
         confirmDialog = if (isShowingConfirmDialog && confirmDialog == null) {
-            val mapOfScannedFingers = orderedFingers().associate { finger ->
-                val fingerState = fingerStates[finger]
-                androidResourcesHelper.getString(finger.nameTextId()) to
+            val mapOfScannedFingers = fingerStates.associate { fingerState ->
+                androidResourcesHelper.getString(fingerState.id.nameTextId()) to
                     (fingerState is FingerCollectionState.Collected && fingerState.scanResult.isGoodScan())
             }
             ConfirmFingerprintsDialog(this@CollectFingerprintsActivity, androidResourcesHelper, mapOfScannedFingers,

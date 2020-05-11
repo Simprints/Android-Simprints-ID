@@ -38,7 +38,7 @@ class FingerprintCaptureEvent(
 
     companion object {
         fun buildResult(status: FingerCollectionState): Result = when (status) {
-            FingerCollectionState.Skipped -> Result.SKIPPED
+            is FingerCollectionState.Skipped -> Result.SKIPPED
             is FingerCollectionState.NotDetected -> Result.NO_FINGER_DETECTED
             is FingerCollectionState.Collected -> if (status.scanResult.isGoodScan()) {
                 Result.GOOD_SCAN

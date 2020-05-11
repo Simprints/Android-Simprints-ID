@@ -4,12 +4,11 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.collect.domain.Finger
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 
 @DrawableRes
-fun Finger.fingerDrawable(): Int =
-    when (id) {
+fun FingerIdentifier.fingerDrawable(): Int =
+    when (this) {
         FingerIdentifier.RIGHT_5TH_FINGER -> R.drawable.hand_bb_r5_c4
         FingerIdentifier.RIGHT_4TH_FINGER -> R.drawable.hand_bb_r4_c4
         FingerIdentifier.RIGHT_3RD_FINGER -> R.drawable.hand_bb_r3_c4
@@ -23,8 +22,8 @@ fun Finger.fingerDrawable(): Int =
     }
 
 @StringRes
-fun Finger.nameTextId(): Int =
-    when (id) {
+fun FingerIdentifier.nameTextId(): Int =
+    when (this) {
         FingerIdentifier.RIGHT_5TH_FINGER -> R.string.r_5_finger_name
         FingerIdentifier.RIGHT_4TH_FINGER -> R.string.r_4_finger_name
         FingerIdentifier.RIGHT_3RD_FINGER -> R.string.r_3_finger_name
@@ -39,5 +38,5 @@ fun Finger.nameTextId(): Int =
 
 @Suppress("unused")
 @ColorRes
-fun Finger.nameTextColour(): Int =
+fun FingerIdentifier.nameTextColour(): Int =
     R.color.simprints_blue

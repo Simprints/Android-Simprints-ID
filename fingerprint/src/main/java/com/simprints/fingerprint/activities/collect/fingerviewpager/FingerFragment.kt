@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
-import com.simprints.fingerprint.activities.collect.domain.Finger
 import com.simprints.fingerprint.activities.collect.resources.*
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import kotlinx.android.synthetic.main.fragment_finger.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -23,11 +23,12 @@ class FingerFragment : FingerprintFragment() {
     private val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
     private val fingerprintPreferencesManager: FingerprintPreferencesManager by inject()
 
-    lateinit var finger: Finger
+    lateinit var fingerId: FingerIdentifier
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_finger, container, false)
-        finger = arguments?.get(FINGER_ARG) as Finger
+        fingerId = FingerIdentifier.values()[arguments?.getInt(FINGER_ARG)
+            ?: throw IllegalArgumentException()]
         return view
     }
 
@@ -45,26 +46,26 @@ class FingerFragment : FingerprintFragment() {
     private fun updateOrHideFingerImageAccordingToSettings() {
         if (fingerprintPreferencesManager.fingerImagesExist) {
             fingerImage.visibility = View.VISIBLE
-            fingerImage.setImageResource(finger.fingerDrawable())
+            fingerImage.setImageResource(fingerId.fingerDrawable())
         } else {
             fingerImage.visibility = View.INVISIBLE
         }
     }
 
     private fun updateFingerNameText() {
-        fingerNumberText.text = androidResourcesHelper.getString(finger.nameTextId())
-        fingerNumberText.setTextColor(resources.getColor(finger.nameTextColour(), null))
+        fingerNumberText.text = androidResourcesHelper.getString(fingerId.nameTextId())
+        fingerNumberText.setTextColor(resources.getColor(fingerId.nameTextColour(), null))
     }
 
     private fun CollectFingerprintsState.updateFingerResultText() {
-        with(fingerStates.getValue(finger)) {
+        with(fingerStates.first { it.id == fingerId }) {
             fingerResultText.text = androidResourcesHelper.getString(resultTextId())
             fingerResultText.setTextColor(resources.getColor(resultTextColour(), null))
         }
     }
 
     private fun CollectFingerprintsState.updateFingerDirectionText() {
-        with(fingerStates.getValue(finger)) {
+        with(fingerStates.first { it.id == fingerId }) {
             fingerDirectionText.text = androidResourcesHelper.getString(directionTextId(isOnLastFinger()))
             fingerDirectionText.setTextColor(resources.getColor(directionTextColour(), null))
         }
@@ -74,8 +75,8 @@ class FingerFragment : FingerprintFragment() {
 
         private const val FINGER_ARG = "finger"
 
-        fun newInstance(finger: Finger) = FingerFragment().also {
-            it.arguments = Bundle().apply { putParcelable(FINGER_ARG, finger) }
+        fun newInstance(fingerId: FingerIdentifier) = FingerFragment().also {
+            it.arguments = Bundle().apply { putInt(FINGER_ARG, fingerId.ordinal) }
         }
     }
 }
