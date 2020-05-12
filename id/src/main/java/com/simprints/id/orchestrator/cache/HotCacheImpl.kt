@@ -4,10 +4,15 @@ import android.content.SharedPreferences
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.Base64
+import android.util.Base64.DEFAULT
+import android.util.Base64.encodeToString
+import android.util.Base64.decode
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.cache.HotCacheImpl.AppRequestWrapper.Companion.CREATOR
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.tools.ParcelableConverter
+import com.simprints.id.tools.ParcelableConverter.unmarshall
+import com.simprints.id.tools.ParcelableConverter.marshall
 import com.simprints.id.tools.extensions.getMap
 import com.simprints.id.tools.extensions.putMap
 import com.simprints.id.tools.extensions.save
@@ -19,14 +24,13 @@ class HotCacheImpl(private val sharedPrefs: SharedPreferences,
     override var appRequest: AppRequest
         set(value) {
             saveInSharedPrefs {
-                val data = ParcelableConverter.marshall(AppRequestWrapper(value))
-                val bytes = Base64.encodeToString(data, Base64.DEFAULT)
-                it.putString(KEY_APP_REQUEST, bytes)
+                val appRequestBytes = marshall(AppRequestWrapper(value))
+                it.putString(KEY_APP_REQUEST, encodeToString(appRequestBytes, DEFAULT))
             }
         }
         get() = with(sharedPrefs) {
-            this.getString(KEY_APP_REQUEST, null)?.let {
-                ParcelableConverter.unmarshall(Base64.decode(it, Base64.DEFAULT), CREATOR).appRequest
+            getString(KEY_APP_REQUEST, null)?.let {
+                unmarshall(decode(it, DEFAULT), CREATOR).appRequest
             } ?: throw IllegalStateException("No AppRequest stored in HotCache")
         }
 
@@ -67,7 +71,7 @@ class HotCacheImpl(private val sharedPrefs: SharedPreferences,
     }
 
     /**
-     * It wraps the AppRequest, so we can use `readParcelable` to unmarshall
+     * It wraps an AppRequest class, so CREATOR can use `readParcelable` to unmarshall
      * the AppRequest as Parcel
      */
     @Parcelize
