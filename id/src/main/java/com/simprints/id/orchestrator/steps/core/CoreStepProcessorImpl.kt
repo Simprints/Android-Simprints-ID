@@ -15,7 +15,7 @@ class CoreStepProcessorImpl : CoreStepProcessor {
     companion object {
         const val CONSENT_ACTIVITY_NAME = "com.simprints.id.activities.consent.ConsentActivity"
         const val VERIFY_ACTIVITY_NAME = "com.simprints.id.activities.fetchguid.FetchGuidActivity"
-        const val SETUP_ACTIVITY_NAME = ""
+        const val SETUP_ACTIVITY_NAME = "com.simprints.id.activities.setup.SetupActivity"
     }
 
     override fun buildStepSetup(): Step = buildSetupStep()
