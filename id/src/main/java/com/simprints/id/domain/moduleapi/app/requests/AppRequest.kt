@@ -1,6 +1,8 @@
 package com.simprints.id.domain.moduleapi.app.requests
 
+import android.os.Parcel
 import android.os.Parcelable
+import com.simprints.id.orchestrator.steps.Step
 import kotlinx.android.parcel.Parcelize
 
 sealed class AppRequest(open val projectId: String,
@@ -21,7 +23,7 @@ sealed class AppRequest(open val projectId: String,
                                    val metadata: String) : AppRequestFlow(projectId, userId, moduleId)
 
         @Parcelize
-        class AppIdentifyRequest(override val projectId: String,
+        data class AppIdentifyRequest(override val projectId: String,
                                  override val userId: String,
                                  override val moduleId: String,
                                  val metadata: String) : AppRequestFlow(projectId, userId, moduleId)
