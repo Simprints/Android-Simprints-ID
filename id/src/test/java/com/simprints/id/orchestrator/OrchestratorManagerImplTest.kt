@@ -8,7 +8,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
-import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
