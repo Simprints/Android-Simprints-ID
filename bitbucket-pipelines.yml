@@ -15,6 +15,7 @@ definitions:
         -   step: &compile-build-files
                 name: "Compile debug build"
                 caches:
+                    - gradle
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
@@ -34,6 +35,7 @@ definitions:
         -   step: &run-clientapi-unit-tests
                 name: "Run Clientapi unit tests"
                 caches:
+                    - gradle
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
@@ -44,6 +46,7 @@ definitions:
         -   step: &run-id-unit-tests
                 name: "Run Id unit tests"
                 caches:
+                    - gradle
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
@@ -53,6 +56,7 @@ definitions:
         -   step: &run-face-unit-tests
                 name: "Run Face unit tests"
                 caches:
+                    - gradle
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
@@ -62,6 +66,7 @@ definitions:
         -   step: &run-fingerprint-unit-tests
                 name: "Run Fingerprint unit tests"
                 caches:
+                    - gradle
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
@@ -71,6 +76,7 @@ definitions:
         -   step: &upload-sonar-scan-and-check-quality-gate
                 name: "Upload scan and check quality gateway"
                 caches:
+                    - gradle
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
@@ -80,6 +86,7 @@ definitions:
         -   step: &build-and-sign-universal-apk
                 name: "Build and sign universal apk"
                 caches:
+                    - gradle
                     - gradlewrapper
                 size: 2x # Double resources available for this step
                 script:
@@ -94,6 +101,7 @@ definitions:
         -   step: &run-id-android-tests
                 name: "Run Id android tests"
                 caches:
+                    - gradle
                     - gradlewrapper
                     - googlecloud
                 script:
@@ -108,6 +116,7 @@ definitions:
         -   step: &run-clientapi-android-tests
                 name: "Run ClientApi android tests"
                 caches:
+                    - gradle
                     - gradlewrapper
                     - googlecloud
                 script:
@@ -121,6 +130,7 @@ definitions:
         -   step: &run-fingerprint-android-tests
                 name: "Run Fingerprint android tests"
                 caches:
+                    - gradle
                     - gradlewrapper
                     - googlecloud
                 script:
@@ -134,6 +144,7 @@ definitions:
         -   step: &run-face-android-tests
                 name: "Run Face android tests"
                 caches:
+                    - gradle
                     - gradlewrapper
                     - googlecloud
                 script:
