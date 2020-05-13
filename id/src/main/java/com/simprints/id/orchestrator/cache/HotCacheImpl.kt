@@ -3,20 +3,18 @@ package com.simprints.id.orchestrator.cache
 import android.content.SharedPreferences
 import android.os.Parcel
 import android.os.Parcelable
-import android.util.Base64
-import android.util.Base64.DEFAULT
-import android.util.Base64.encodeToString
-import android.util.Base64.decode
+import android.util.Base64.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.cache.HotCacheImpl.AppRequestWrapper.Companion.CREATOR
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.tools.ParcelableConverter
-import com.simprints.id.tools.ParcelableConverter.unmarshall
 import com.simprints.id.tools.ParcelableConverter.marshall
+import com.simprints.id.tools.ParcelableConverter.unmarshall
 import com.simprints.id.tools.extensions.getMap
 import com.simprints.id.tools.extensions.putMap
 import com.simprints.id.tools.extensions.save
 import kotlinx.android.parcel.Parcelize
+import com.simprints.core.tools.EncodingUtils.base64ToBytes
+import com.simprints.core.tools.EncodingUtils.byteArrayToBase64
 
 class HotCacheImpl(private val sharedPrefs: SharedPreferences,
                    private val stepEncoder: StepEncoder) : HotCache {
@@ -25,12 +23,12 @@ class HotCacheImpl(private val sharedPrefs: SharedPreferences,
         set(value) {
             saveInSharedPrefs {
                 val appRequestBytes = marshall(AppRequestWrapper(value))
-                it.putString(KEY_APP_REQUEST, encodeToString(appRequestBytes, DEFAULT))
+                it.putString(KEY_APP_REQUEST, byteArrayToBase64(appRequestBytes))
             }
         }
         get() = with(sharedPrefs) {
             getString(KEY_APP_REQUEST, null)?.let {
-                unmarshall(decode(it, DEFAULT), CREATOR).appRequest
+                unmarshall(base64ToBytes(it), CREATOR).appRequest
             } ?: throw IllegalStateException("No AppRequest stored in HotCache")
         }
 
