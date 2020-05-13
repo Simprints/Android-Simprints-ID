@@ -1,4 +1,4 @@
-package com.simprints.core.network
+package com.simprints.id.network
 
 import com.google.gson.Gson
 import com.simprints.core.tools.json.JsonHelper

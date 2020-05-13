@@ -1,11 +1,10 @@
-package com.simprints.core.images.repository
-
+package com.simprints.id.data.images.repository
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.images.local.ImageLocalDataSource
-import com.simprints.core.images.model.Path
-import com.simprints.core.images.model.SecuredImageRef
-import com.simprints.core.images.remote.ImageRemoteDataSource
-import com.simprints.core.images.remote.UploadResult
+import com.simprints.id.data.images.local.ImageLocalDataSource
+import com.simprints.id.data.images.model.Path
+import com.simprints.id.data.images.model.SecuredImageRef
+import com.simprints.id.data.images.remote.ImageRemoteDataSource
+import com.simprints.id.data.images.remote.UploadResult
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,7 +14,7 @@ import org.junit.Test
 import java.io.FileInputStream
 
 @ExperimentalCoroutinesApi
-internal class ImageRepositoryTest {
+internal class ImageRepositoryImplTest {
 
     @MockK lateinit var localDataSource: ImageLocalDataSource
     @MockK lateinit var remoteDataSource: ImageRemoteDataSource
@@ -134,3 +133,4 @@ internal class ImageRepositoryTest {
     }
 
 }
+

@@ -1,4 +1,4 @@
-package com.simprints.core.network
+package com.simprints.id.network
 
 import com.test.core.BuildConfig
 
