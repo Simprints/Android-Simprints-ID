@@ -9,6 +9,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
@@ -47,6 +48,8 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class)
 class OrchestratorManagerImplTest {
+
+    private lateinit var hotCache: HotCacheImpl
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -93,13 +96,21 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun modalityFlowCompletes_orchestratorShouldTryToBuildAppResponse() = runBlockingTest {
+    fun initialise_shouldStoreAppRequestInHotCache() = runBlockingTest {
         with(orchestrator) {
             startFlowForEnrol(modalities)
             progressWitFaceCapture()
         }
 
         verifyOrchestratorTriedToBuildFinalAppResponse()
+    }
+
+    @Test
+    fun modalityFlowCompletes_orchestratorShouldTryToBuildAppResponse() = runBlockingTest {
+        with(orchestrator) {
+            startFlowForEnrol(modalities)
+            Truth.assertThat(hotCache.appRequest).isEqualTo(enrolAppRequest)
+        }
     }
 
     @Test
@@ -170,7 +181,8 @@ class OrchestratorManagerImplTest {
         every { preferences.edit() } returns mockk()
 
         val stepEncoder = mockk<StepEncoder>()
-        val hotCache = HotCacheImpl(preferences, stepEncoder)
+        hotCache = HotCacheImpl(preferences, stepEncoder)
+
         coEvery { appResponseFactoryMock.buildAppResponse(any(), any(), any(), any()) } returns mockk()
         return OrchestratorManagerImpl(
             modalityFlowFactoryMock,
