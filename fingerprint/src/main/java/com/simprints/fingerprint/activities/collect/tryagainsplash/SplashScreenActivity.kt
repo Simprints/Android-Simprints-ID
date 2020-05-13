@@ -1,10 +1,10 @@
-package com.simprints.fingerprint.activities.collect
+package com.simprints.fingerprint.activities.collect.tryagainsplash
 
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsFingerDisplayHelper
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel.Companion.TRY_DIFFERENT_FINGER_SPLASH_DELAY
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 import org.koin.android.ext.android.inject
@@ -22,7 +22,7 @@ class SplashScreenActivity : AppCompatActivity() {
         Handler().postDelayed({
             finish()
             overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
-        }, CollectFingerprintsFingerDisplayHelper.TRY_DIFFERENT_FINGER_SPLASH_DELAY)
+        }, TRY_DIFFERENT_FINGER_SPLASH_DELAY)
     }
 
     private fun setTextInLayout() {
