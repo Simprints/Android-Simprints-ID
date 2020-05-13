@@ -142,15 +142,26 @@ class PersonRepositoryDownSyncHelperImpl(val personLocalDataSource: PersonLocalD
 
     private suspend fun movePeopleBatchesInLocal(eventRecordsToMove: List<EnrolmentRecordMovePayload>, moduleId: String?) {
         if (eventRecordsToMove.isNotEmpty()) {
-            if (moduleId != null) {
-                deletePeopleBatchFromLocal(eventRecordsToMove.map { it.enrolmentRecordDeletion }.filter { it.moduleId == moduleId })
-                savePeopleBatchInLocal(eventRecordsToMove.map { it.enrolmentRecordCreation }.filter { it.moduleId == moduleId })
-            } else {
-                deletePeopleBatchFromLocal(eventRecordsToMove.map { it.enrolmentRecordDeletion })
-                savePeopleBatchInLocal(eventRecordsToMove.map { it.enrolmentRecordCreation })
-            }
+            deletePeopleBatchFromLocal(getRecordsToBeDeletedFilteredByModuleIfNotNull(eventRecordsToMove, moduleId))
+            savePeopleBatchInLocal(getRecordsToBeSavedFilteredByModuleIfNotNull(eventRecordsToMove, moduleId))
         }
     }
+
+    private fun getRecordsToBeDeletedFilteredByModuleIfNotNull(eventRecordsToMove: List<EnrolmentRecordMovePayload>,
+                                                               moduleId: String?) =
+        if (moduleId != null) {
+            eventRecordsToMove.map { it.enrolmentRecordDeletion }.filter { it.moduleId == moduleId }
+        } else {
+            eventRecordsToMove.map { it.enrolmentRecordDeletion }
+        }
+
+    private fun getRecordsToBeSavedFilteredByModuleIfNotNull(eventRecordsToMove: List<EnrolmentRecordMovePayload>,
+                                                             moduleId: String?) =
+        if (moduleId != null) {
+            eventRecordsToMove.map { it.enrolmentRecordCreation }.filter { it.moduleId == moduleId }
+        } else {
+            eventRecordsToMove.map { it.enrolmentRecordCreation }
+        }
 
     private fun buildQueryForPeopleById(batchOfPeopleToBeDeleted: List<EnrolmentRecordDeletionPayload>) =
         batchOfPeopleToBeDeleted.map {
