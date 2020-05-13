@@ -74,7 +74,6 @@ class CollectFingerprintsViewModel(
 
     val vibrate = MutableLiveData<LiveDataEvent>()
     val noFingersScannedToast = MutableLiveData<LiveDataEvent>()
-    val launchRefusal = MutableLiveData<LiveDataEvent>()
     val launchAlert = MutableLiveData<LiveDataEventWithContent<FingerprintAlert>>()
     val launchReconnect = MutableLiveData<LiveDataEvent>()
     val finishWithFingerprints = MutableLiveData<LiveDataEventWithContent<List<Fingerprint>>>()
@@ -411,8 +410,6 @@ class CollectFingerprintsViewModel(
     fun handleOnBackPressed() {
         if (state().currentFingerState().isCommunicating()) {
             cancelScanning()
-        } else {
-            launchRefusal.postEvent()
         }
     }
 

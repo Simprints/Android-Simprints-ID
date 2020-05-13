@@ -132,7 +132,6 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
         vm.vibrate.activityObserveEventWith { Vibrate.vibrate(this) }
         vm.noFingersScannedToast.activityObserveEventWith { showToast(androidResourcesHelper.getString(R.string.no_fingers_scanned)) }
-        vm.launchRefusal.activityObserveEventWith { launchRefusalActivity() }
         vm.launchAlert.activityObserveEventWith { launchAlert(this, it) }
         vm.launchReconnect.activityObserveEventWith { launchConnectScannerActivityForReconnect() }
         vm.finishWithFingerprints.activityObserveEventWith { setResultAndFinishSuccess(it) }
@@ -242,5 +241,8 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     override fun onBackPressed() {
         vm.handleOnBackPressed()
+        if (!vm.state().currentFingerState().isCommunicating()) {
+            launchRefusalActivity()
+        }
     }
 }

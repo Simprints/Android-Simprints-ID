@@ -8,6 +8,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -56,7 +57,6 @@ class CollectFingerprintsActivityTest : KoinTest {
     private val state = MutableLiveData<CollectFingerprintsState>()
     private val vibrate = MutableLiveData<LiveDataEvent>()
     private val noFingersScannedToast = MutableLiveData<LiveDataEvent>()
-    private val launchRefusal = MutableLiveData<LiveDataEvent>()
     private val launchAlert = MutableLiveData<LiveDataEventWithContent<FingerprintAlert>>()
     private val launchReconnect = MutableLiveData<LiveDataEvent>()
     private val finishWithFingerprints = MutableLiveData<LiveDataEventWithContent<List<Fingerprint>>>()
@@ -65,7 +65,6 @@ class CollectFingerprintsActivityTest : KoinTest {
         every { state } returns this@CollectFingerprintsActivityTest.state
         every { vibrate } returns this@CollectFingerprintsActivityTest.vibrate
         every { noFingersScannedToast } returns this@CollectFingerprintsActivityTest.noFingersScannedToast
-        every { launchRefusal } returns this@CollectFingerprintsActivityTest.launchRefusal
         every { launchAlert } returns this@CollectFingerprintsActivityTest.launchAlert
         every { launchReconnect } returns this@CollectFingerprintsActivityTest.launchReconnect
         every { finishWithFingerprints } returns this@CollectFingerprintsActivityTest.finishWithFingerprints
@@ -243,14 +242,14 @@ class CollectFingerprintsActivityTest : KoinTest {
     }
 
     @Test
-    fun receivesLaunchRefusalEvent_launchesRefusalActivity() {
+    fun pressBack_launchesRefusalActivity() {
         scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS_IDS).toIntent())
         Intents.init()
 
         Intents.intending(hasComponent(RefusalActivity::class.java.name))
             .respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null))
 
-        launchRefusal.postEvent()
+        pressBackUnconditionally()
 
         Intents.intended(hasComponent(RefusalActivity::class.java.name))
 
