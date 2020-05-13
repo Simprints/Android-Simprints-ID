@@ -18,6 +18,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
+                    - bash ./ci/pipeline/setup_submodules
                     - bash ./ci/pipeline/setup
                     - ./gradlew assembleDebug
                     - ./gradlew id:bundleDebugClasses
