@@ -19,9 +19,9 @@ open class FaceSample(
     }
 
     companion object {
-        fun extractFaceSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>) =
-            biometricReferences.filterIsInstance(FaceReference::class.java)
-                .firstOrNull()?.templates?.map { buildFaceSample(it) } ?: emptyList()
+        fun extractFaceSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) =
+            biometricReferences?.filterIsInstance(FaceReference::class.java)
+                ?.firstOrNull()?.templates?.map { buildFaceSample(it) } ?: emptyList()
 
         private fun buildFaceSample(template: FaceTemplate) =
             FaceSample(EncodingUtils.base64ToBytes(template.template))
