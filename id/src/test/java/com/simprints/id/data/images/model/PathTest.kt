@@ -1,4 +1,4 @@
-package com.simprints.core.images.model
+package com.simprints.id.data.images.model
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
@@ -8,7 +8,7 @@ class PathTest {
 
     @Test
     fun shouldComposePathOutOfString() {
-        val path = com.simprints.id.data.images.model.Path("dir/file.txt")
+        val path = Path("dir/file.txt")
 
         assertThat(path.compose()).isEqualTo("dir/file.txt")
     }
@@ -16,7 +16,7 @@ class PathTest {
     @Test
     fun shouldComposePathOutOfMultipleParts() {
         val dirs = arrayOf("dir1", "dir2", "file.txt")
-        val path = com.simprints.id.data.images.model.Path(dirs)
+        val path = Path(dirs)
 
         assertThat(path.compose()).isEqualTo("dir1/dir2/file.txt")
     }
@@ -24,15 +24,15 @@ class PathTest {
     @Test
     fun shouldCombinePaths() {
         val first = "/home/test"
-        val subDirs = com.simprints.id.data.images.model.Path(
-                arrayOf(
-                        "dir1",
-                        "dir2",
-                        "file.txt"
-                )
+        val subDirs = Path(
+            arrayOf(
+                "dir1",
+                "dir2",
+                "file.txt"
+            )
         )
 
-        val result = com.simprints.id.data.images.model.Path.combine(first, subDirs)
+        val result = Path.combine(first, subDirs)
 
         assertThat(result.compose()).isEqualTo("/home/test/dir1/dir2/file.txt")
     }
@@ -42,20 +42,20 @@ class PathTest {
         val file = File("my/test/directory").apply { mkdirs() }
         val pathString = file.path
 
-        val actual = com.simprints.id.data.images.model.Path.parse(pathString).compose()
+        val actual = Path.parse(pathString).compose()
 
         assertThat(actual).isEqualTo("my/test/directory")
     }
 
     @Test
     fun shouldRemoveSubsetFromPath() {
-        val originalPath = com.simprints.id.data.images.model.Path(
-                arrayOf(
-                        "dir1",
-                        "dir2",
-                        "dir3",
-                        "file.txt"
-                )
+        val originalPath = Path(
+            arrayOf(
+                "dir1",
+                "dir2",
+                "dir3",
+                "file.txt"
+            )
         )
 
         val subset = arrayOf("dir1", "dir2")
@@ -66,13 +66,13 @@ class PathTest {
 
     @Test
     fun whenSubsetToRemoveIsNotContainedInPath_shouldNotRemoveAnything() {
-        val originalPath = com.simprints.id.data.images.model.Path(
-                arrayOf(
-                        "dir1",
-                        "dir2",
-                        "dir3",
-                        "file.txt"
-                )
+        val originalPath = Path(
+            arrayOf(
+                "dir1",
+                "dir2",
+                "dir3",
+                "file.txt"
+            )
         )
 
         val actual = originalPath.remove("dir700").compose()
@@ -82,17 +82,17 @@ class PathTest {
 
     @Test
     fun shouldRemoveSubPathFromPath() {
-        val originalPath = com.simprints.id.data.images.model.Path(
-                arrayOf(
-                        "dir1",
-                        "dir2",
-                        "dir3",
-                        "file.txt"
-                )
+        val originalPath = Path(
+            arrayOf(
+                "dir1",
+                "dir2",
+                "dir3",
+                "file.txt"
+            )
         )
 
         val subPath =
-                com.simprints.id.data.images.model.Path(arrayOf("dir1", "dir2"))
+            Path(arrayOf("dir1", "dir2"))
         val actual = originalPath.remove(subPath).compose()
 
         assertThat(actual).isEqualTo("dir3/file.txt")
@@ -100,16 +100,16 @@ class PathTest {
 
     @Test
     fun whenSubPathToRemoveIsNotContainedInPath_shouldNotRemoveAnything() {
-        val originalPath = com.simprints.id.data.images.model.Path(
-                arrayOf(
-                        "dir1",
-                        "dir2",
-                        "dir3",
-                        "file.txt"
-                )
+        val originalPath = Path(
+            arrayOf(
+                "dir1",
+                "dir2",
+                "dir3",
+                "file.txt"
+            )
         )
 
-        val subPath = com.simprints.id.data.images.model.Path("dir700")
+        val subPath = Path("dir700")
         val actual = originalPath.remove(subPath).compose()
 
         assertThat(actual).isEqualTo("dir1/dir2/dir3/file.txt")
