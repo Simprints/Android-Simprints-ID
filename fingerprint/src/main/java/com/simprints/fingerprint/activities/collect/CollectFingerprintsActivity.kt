@@ -83,7 +83,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     private fun initViewPagerManager() {
         fingerViewPagerManager = FingerViewPagerManager(
-            vm.state().fingerStates.map { it.id },
+            vm.state().fingerStates.map { it.id }.toMutableList(),
             this,
             view_pager,
             indicator_layout,

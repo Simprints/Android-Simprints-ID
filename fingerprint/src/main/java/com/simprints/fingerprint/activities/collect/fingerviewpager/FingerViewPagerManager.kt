@@ -12,7 +12,7 @@ import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 
 class FingerViewPagerManager(
-    var activeFingers: List<FingerIdentifier>,
+    private val activeFingers: MutableList<FingerIdentifier>,
     private val activity: FragmentActivity,
     private val viewPager: ViewPager2,
     private val indicatorLayout: LinearLayout,
@@ -38,7 +38,7 @@ class FingerViewPagerManager(
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initViewPager() {
-        pageAdapter = FingerPageAdapter(activity, this)
+        pageAdapter = FingerPageAdapter(activity, activeFingers)
         viewPager.adapter = pageAdapter
         viewPager.offscreenPageLimit = 1
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -59,7 +59,8 @@ class FingerViewPagerManager(
         val oldFingerIds = this.activeFingers
         val newFingerIds = fingerStates.map { it.id }
         if (oldFingerIds != newFingerIds) {
-            activeFingers = newFingerIds
+            activeFingers.clear()
+            activeFingers.addAll(newFingerIds)
             initIndicators()
             pageAdapter.notifyDataSetChanged()
         }
