@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.session.remote
 
-import com.simprints.core.network.SimRemoteInterface
+import com.simprints.id.network.SimRemoteInterface
 import com.simprints.id.data.db.session.remote.session.ApiSessionEvents
 import retrofit2.http.Body
 import retrofit2.http.POST

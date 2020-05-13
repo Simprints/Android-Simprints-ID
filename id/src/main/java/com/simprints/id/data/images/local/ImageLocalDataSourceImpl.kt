@@ -1,12 +1,12 @@
-package com.simprints.core.images.local
+package com.simprints.id.data.images.local
 
 import android.content.Context
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
 import androidx.security.crypto.MasterKeys
 import androidx.security.crypto.MasterKeys.AES256_GCM_SPEC
-import com.simprints.core.images.model.Path
-import com.simprints.core.images.model.SecuredImageRef
+import com.simprints.id.data.images.model.Path
+import com.simprints.id.data.images.model.SecuredImageRef
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream

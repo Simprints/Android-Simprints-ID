@@ -1,6 +1,6 @@
-package com.simprints.core.images.remote
+package com.simprints.id.data.images.remote
 
-import com.simprints.core.images.model.SecuredImageRef
+import com.simprints.id.data.images.model.SecuredImageRef
 import java.io.FileInputStream
 
 /**

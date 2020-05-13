@@ -1,4 +1,4 @@
-package com.simprints.core.network
+package com.simprints.id.network
 
 import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber

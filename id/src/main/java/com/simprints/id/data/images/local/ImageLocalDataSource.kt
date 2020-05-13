@@ -1,7 +1,7 @@
-package com.simprints.core.images.local
+package com.simprints.id.data.images.local
 
-import com.simprints.core.images.model.Path
-import com.simprints.core.images.model.SecuredImageRef
+import com.simprints.id.data.images.model.Path
+import com.simprints.id.data.images.model.SecuredImageRef
 import java.io.FileInputStream
 
 /**

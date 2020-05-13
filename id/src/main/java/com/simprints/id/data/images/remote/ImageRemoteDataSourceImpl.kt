@@ -1,9 +1,9 @@
-package com.simprints.core.images.remote
+package com.simprints.id.data.images.remote
 
 import com.google.firebase.FirebaseApp
 import com.google.firebase.storage.FirebaseStorage
-import com.simprints.core.images.model.SecuredImageRef
-import com.simprints.core.network.BaseUrlProvider
+import com.simprints.id.data.images.model.SecuredImageRef
+import com.simprints.id.network.BaseUrlProvider
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import java.io.FileInputStream
