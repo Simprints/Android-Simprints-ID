@@ -3,5 +3,6 @@ apply plugin: "org.sonarqube"
 sonarqube {
     properties {
         property "sonar.c.file.suffixes", "-"
+        property "sonar.java.coveragePlugin", "jacoco"
     }
 }

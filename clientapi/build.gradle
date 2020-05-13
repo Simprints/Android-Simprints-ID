@@ -1,7 +1,8 @@
 apply plugin: 'com.android.dynamic-feature'
 apply plugin: 'kotlin-android'
-apply plugin: "kotlin-kapt"
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
+apply from: '../ci/scanning/jacoco.gradle'
 
 sonarqube {
     properties {
@@ -34,6 +35,9 @@ android {
         }
         releaseWithLogfile {
             initWith release
+        }
+        debug {
+            testCoverageEnabled true
         }
     }
 
@@ -130,5 +134,3 @@ dependencies {
 configurations {
     all*.exclude group: 'com.google.guava', module: 'listenablefuture'
 }
-
-apply plugin: "org.sonarqube"
