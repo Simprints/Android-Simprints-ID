@@ -18,7 +18,6 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup_submodules
                     - bash ./ci/pipeline/setup
                     - ./gradlew assembleDebug
                     - ./gradlew id:bundleDebugClasses
@@ -30,7 +29,6 @@ definitions:
                     - fingerprintmatcher/.cxx/**
                     - fingerprintscanner/build/**
                     - id/build/**
-                    - libsimprints/build/**
                     - moduleapi/build/**
                     - uicomponents/build/**
                     - uicomponents/.cxx/**
