@@ -3,12 +3,13 @@ package com.simprints.id.data.images.remote
 import com.google.firebase.FirebaseApp
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.data.images.model.SecuredImageRef
+import com.simprints.id.network.BaseUrlProvider
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import java.io.FileInputStream
 
 internal class ImageRemoteDataSourceImpl(
-    private val baseUrlProvider: com.simprints.id.network.BaseUrlProvider
+    private val baseUrlProvider: BaseUrlProvider
 ) : ImageRemoteDataSource {
 
     private val firebaseProjectName = FirebaseApp.getInstance().options.projectId
