@@ -19,7 +19,6 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew assembleDebug
                     - ./gradlew id:bundleDebugClasses
                 artifacts:
                     - build/**
@@ -39,9 +38,10 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew clientapi:testDebugUnitTest
+                    - ./gradlew clientapi:testDebugUnitTest clientapi:jacocoTestReportDebug
                 artifacts:
-                    - clientapi/build/reports/tests/testDebugUnitTest/*
+                    - clientapi/build/reports/**
+                    - clientapi/build/jacoco/**
                     - build/libs/**
         -   step: &run-id-unit-tests
                 name: "Run Id unit tests"
@@ -157,48 +157,9 @@ definitions:
                     - bash ./ci/pipeline/install_gcloud
                     - gcloud firebase test android run --type instrumentation --app universal.apk --test face-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
 
-        ######################################
-        # Fake step for speed checks
-        ######################################
-        -   step: &do-a-full-run
-                name: "Compile debug build"
-                caches:
-                    - gradle
-                    - gradlewrapper
-                    - googlecloud
-                script:
-                    - bash ./ci/pipeline/setup
-                    - ./gradlew assembleDebug
-                    - ./gradlew id:bundleDebugClasses
-                    - ./gradlew clientapi:testDebugUnitTest
-                    - ./gradlew id:testDebugUnitTest
-                    - ./gradlew face:testDebugUnitTest
-                    - ./gradlew fingerprint:testDebugUnitTest
-                    - ./gradlew sonarqube --stacktrace
-                    -   pipe: sonarsource/sonarcloud-scan:1.0.1
-                    -   pipe: sonarsource/sonarcloud-quality-gate:0.1.3
-                    - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew bundleDebug --stacktrace
-                    - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
-                    - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/debug/id-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=ci/debug_keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
-                    - mv universal.apks universal.zip
-                    - unzip universal.zip
-                    - bash ./ci/pipeline/install_gcloud
-                    - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
-                    - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
-                    - gcloud config set project simprints-android-ci
-                    - ./gradlew id:assembleDebugAndroidTest
-                    - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk
-                    - gcloud firebase test android run --type instrumentation --app universal.apk --test id-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
-                artifacts:
-                    - universal.apk
-
-
-
 pipelines:
     default:
-        -   parallel:
-                -   step: *compile-build-files
-                -   step: *do-a-full-run
+        -   step: *compile-build-files
         -   parallel:
                 -   step: *run-clientapi-unit-tests
                 -   step: *run-id-unit-tests
