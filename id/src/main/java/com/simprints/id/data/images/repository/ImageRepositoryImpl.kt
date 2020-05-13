@@ -15,7 +15,7 @@ class ImageRepositoryImpl internal constructor(
         private val remoteDataSource: ImageRemoteDataSource
 ) : ImageRepository {
 
-    constructor(context: Context, baseUrlProvider: com.simprints.id.network.BaseUrlProvider) : this(
+    constructor(context: Context, baseUrlProvider: BaseUrlProvider) : this(
             ImageLocalDataSourceImpl(context),
             ImageRemoteDataSourceImpl(baseUrlProvider)
     )
