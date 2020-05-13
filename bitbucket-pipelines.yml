@@ -19,7 +19,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew assembleDebug && id:bundleDebugClasses
+                    - ./gradlew assembleDebug
+                    - ./gradlew id:bundleDebugClasses
                 artifacts:
                     - build/**
                     - clientapi/build/**
