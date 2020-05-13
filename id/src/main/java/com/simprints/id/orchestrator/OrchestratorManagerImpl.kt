@@ -26,7 +26,6 @@ open class OrchestratorManagerImpl(
     override val appResponse = MutableLiveData<AppResponse?>()
 
     internal lateinit var modalities: List<Modality>
-    internal lateinit var appRequest: AppRequest
     internal var sessionId: String = ""
 
     private lateinit var modalitiesFlow: ModalityFlow
@@ -35,7 +34,7 @@ open class OrchestratorManagerImpl(
                                     appRequest: AppRequest,
                                     sessionId: String) {
         this.sessionId = sessionId
-        this.appRequest = appRequest
+        hotCache.appRequest = appRequest
         this.modalities = modalities
         modalitiesFlow = flowModalityFactory.createModalityFlow(appRequest, modalities)
         resetInternalState()
@@ -55,18 +54,18 @@ open class OrchestratorManagerImpl(
     }
 
     override fun clearState() {
-        hotCache.clear()
+        hotCache.clearSteps()
     }
 
     override fun saveState() {
-        hotCache.clear()
+        hotCache.clearSteps()
         modalitiesFlow.steps.forEach {
             hotCache.save(it)
         }
     }
 
     override fun getCurrentFlow() =
-        when (appRequest) {
+        when (hotCache.appRequest) {
             is AppEnrolRequest -> ENROL
             is AppIdentifyRequest -> IDENTIFY
             is AppVerifyRequest -> VERIFY
@@ -97,7 +96,7 @@ open class OrchestratorManagerImpl(
     private suspend fun buildAppResponseAndUpdateDailyActivity() {
         val steps = modalitiesFlow.steps
         val appResponseToReturn = appResponseFactory.buildAppResponse(
-            modalities, appRequest, steps, sessionId
+            modalities, hotCache.appRequest, steps, sessionId
         )
         ongoingStep.value = null
         appResponse.value = appResponseToReturn
