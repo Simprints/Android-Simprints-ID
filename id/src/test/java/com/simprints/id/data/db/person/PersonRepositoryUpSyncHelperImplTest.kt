@@ -1,9 +1,11 @@
 package com.simprints.id.data.db.person
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.person.domain.FaceSample
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.domain.personevents.*
@@ -25,8 +27,10 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import java.util.*
 
+@RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
 class PersonRepositoryUpSyncHelperImplTest {
     @RelaxedMockK lateinit var loginInfoManager: LoginInfoManager
@@ -42,7 +46,9 @@ class PersonRepositoryUpSyncHelperImplTest {
     private val batchSize = 2
 
     private val notYetSyncedPerson1 = Person(
-        "patientId1", "projectId", "userId", "moduleId", Date(1), null, true
+        "patientId1", "projectId", "userId", "moduleId", Date(1), null, true,
+        listOf(FingerprintSample(FingerIdentifier.LEFT_THUMB, EncodingUtils.base64ToBytes("finger_template"), 70)),
+        listOf(FaceSample(EncodingUtils.base64ToBytes("face_template")))
     )
     private val notYetSyncedPerson2 = notYetSyncedPerson1.copy(patientId = "patientId2")
     private val notYetSyncedPerson3 = notYetSyncedPerson1.copy(patientId = "patientId3")

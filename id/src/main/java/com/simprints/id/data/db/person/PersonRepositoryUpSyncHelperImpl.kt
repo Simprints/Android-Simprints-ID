@@ -96,21 +96,42 @@ class PersonRepositoryUpSyncHelperImpl(
             biometricReferences = buildBiometricReferences(person.fingerprintSamples, person.faceSamples)
         )
 
-    private fun buildBiometricReferences(fingerprintSamples: List<FingerprintSample>, faceSamples: List<FaceSample>) =
-        listOf(
+    private fun buildBiometricReferences(fingerprintSamples: List<FingerprintSample>,
+                                         faceSamples: List<FaceSample>): List<BiometricReference> {
+        val biometricReferences = mutableListOf<BiometricReference>()
+
+        buildFingerprintReference(fingerprintSamples)?.let {
+            biometricReferences.add(it)
+        }
+
+        buildFaceReference(faceSamples)?.let {
+            biometricReferences.add(it)
+        }
+
+        return biometricReferences
+    }
+
+    private fun buildFingerprintReference(fingerprintSamples: List<FingerprintSample>) =
+        if (fingerprintSamples.isNotEmpty()) {
             FingerprintReference(
                 fingerprintSamples.map {
                     FingerprintTemplate(it.templateQualityScore,
                         EncodingUtils.byteArrayToBase64(it.template),
                         it.fingerIdentifier.fromPersonToEvent())
-                }),
+                }
+            )
+        } else { null }
+
+    private fun buildFaceReference(faceSamples: List<FaceSample>) =
+        if (faceSamples.isNotEmpty()) {
             FaceReference(
                 faceSamples.map {
                     FaceTemplate(
                         EncodingUtils.byteArrayToBase64(it.template)
                     )
-                })
-        )
+                }
+            )
+        } else { null }
 
     private suspend fun markPeopleAsSynced(people: List<Person>) {
         val updatedPeople = people.map { it.copy(toSync = false) }
