@@ -2,6 +2,14 @@ apply plugin: 'com.android.dynamic-feature'
 apply plugin: 'kotlin-android'
 apply plugin: "kotlin-kapt"
 apply plugin: 'kotlin-android-extensions'
+apply from: '../ci/scanning/jacoco.gradle'
+
+sonarqube {
+    properties {
+        property "sonar.projectName", "clientapi"
+        property "sonar.sources", "src/main/java"
+    }
+}
 
 androidExtensions {
     experimental = true
