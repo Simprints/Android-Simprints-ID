@@ -5,11 +5,11 @@ import com.simprints.id.data.db.person.domain.personevents.EnrolmentRecordMovePa
 
 @Keep
 data class ApiEnrolmentRecordMovePayload(
-    val enrolmentRecordCreationPayload: ApiEnrolmentRecordCreationPayload,
-    val enrolmentRecordDeletionPayload: ApiEnrolmentRecordDeletionPayload
+    val enrolmentRecordCreation: ApiEnrolmentRecordCreationPayload,
+    val enrolmentRecordDeletion: ApiEnrolmentRecordDeletionPayload
 ) : ApiEventPayload(ApiEventPayloadType.ENROLMENT_RECORD_MOVE) {
 
     constructor(payload: EnrolmentRecordMovePayload) :
-        this(ApiEnrolmentRecordCreationPayload(payload.enrolmentRecordCreationPayload),
-            ApiEnrolmentRecordDeletionPayload(payload.enrolmentRecordDeletionPayload))
+        this(ApiEnrolmentRecordCreationPayload(payload.enrolmentRecordCreation),
+            ApiEnrolmentRecordDeletionPayload(payload.enrolmentRecordDeletion))
 }
