@@ -16,13 +16,19 @@ pipelines:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew id:bundleDebugClasses
+                    - ./gradlew assembleDebug
                 artifacts:
                     - build/**
                     - clientapi/build/**
                     - face/build/**
                     - fingerprint/build/**
+                    - fingerprintmatcher/.cxx/**
+                    - fingerprintscanner/build/**
                     - id/build/**
+                    - libsimprints/build/**
+                    - moduleapi/build/**
+                    - uicomponents/build/**
+                    - uicomponents/.cxx/**
 
         # Build ID and all of the DFMs, and run their unit tests in parallel
         -   parallel:
