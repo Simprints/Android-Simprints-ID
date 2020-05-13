@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.core.view.children
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.simprints.fingerprint.activities.collect.resources.indicatorDrawableId
@@ -19,7 +20,6 @@ class FingerViewPagerManager(
     private val isAbleToSelectNewFinger: () -> Boolean) {
 
     private lateinit var pageAdapter: FingerPageAdapter
-    private val indicators = ArrayList<ImageView>()
 
     init {
         initIndicators()
@@ -28,15 +28,14 @@ class FingerViewPagerManager(
 
     private fun initIndicators() {
         indicatorLayout.removeAllViewsInLayout()
-        indicators.clear()
         activeFingers.forEachIndexed { index, _ ->
             val indicator = ImageView(activity)
             indicator.adjustViewBounds = true
             indicator.setOnClickListener { if (isAbleToSelectNewFinger()) onFingerSelected(index) }
-            indicators.add(indicator)
             indicatorLayout.addView(indicator, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
         }
     }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun initViewPager() {
         pageAdapter = FingerPageAdapter(activity, this)
@@ -51,6 +50,12 @@ class FingerViewPagerManager(
     }
 
     fun setCurrentPageAndFingerStates(fingerStates: List<FingerCollectionState>, currentFingerIndex: Int) {
+        refreshActiveFingersIfChanged(fingerStates)
+        updateIndicatorImages(fingerStates, currentFingerIndex)
+        viewPager.currentItem = currentFingerIndex
+    }
+
+    private fun refreshActiveFingersIfChanged(fingerStates: List<FingerCollectionState>) {
         val oldFingerIds = this.activeFingers
         val newFingerIds = fingerStates.map { it.id }
         if (oldFingerIds != newFingerIds) {
@@ -58,12 +63,16 @@ class FingerViewPagerManager(
             initIndicators()
             pageAdapter.notifyDataSetChanged()
         }
+    }
 
+    private fun updateIndicatorImages(fingerStates: List<FingerCollectionState>, currentFingerIndex: Int) {
         fingerStates.forEachIndexed { index, fingerState ->
             val selected = currentFingerIndex == index
-            indicators[index].setImageResource(fingerState.indicatorDrawableId(selected))
+            indicatorLayout.children.iterator().withIndex().forEach { (i, view) ->
+                if (i == index && view is ImageView) {
+                    view.setImageResource(fingerState.indicatorDrawableId(selected))
+                }
+            }
         }
-
-        viewPager.currentItem = currentFingerIndex
     }
 }
