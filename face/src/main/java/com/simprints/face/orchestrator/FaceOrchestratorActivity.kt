@@ -6,9 +6,13 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.core.tools.extentions.showToast
+import com.simprints.core.tools.whenNonNull
+import com.simprints.core.tools.whenNull
 import com.simprints.face.capture.FaceCaptureActivity
 import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException
+import com.simprints.face.models.RankOneInitializer
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -25,7 +29,23 @@ class FaceOrchestratorActivity : AppCompatActivity() {
 
         observeViewModel()
 
-        viewModel.start(iFaceRequest)
+        getRankOneLicense()
+            .whenNull { viewModel.missingLicense() }
+            .whenNonNull { tryInitWithLicense(this, iFaceRequest) }
+    }
+
+    private fun tryInitWithLicense(rankOneLicense: String, iFaceRequest: IFaceRequest) {
+        if (RankOneInitializer.init(this, rankOneLicense)) {
+            viewModel.start(iFaceRequest)
+        } else {
+            viewModel.invalidLicense()
+        }
+    }
+
+    private fun getRankOneLicense(): String? = try {
+        String(assets.open("ROC.lic").readBytes())
+    } catch (t: Throwable) {
+        null
     }
 
     override fun onDestroy() {
@@ -44,9 +64,20 @@ class FaceOrchestratorActivity : AppCompatActivity() {
             setResult(Activity.RESULT_OK, intent)
             finish()
         })
-
         viewModel.startMatching.observe(this, LiveDataEventObserver {
             viewModel.matchFinished()
+        })
+        viewModel.missingLicenseEvent.observe(this, LiveDataEventObserver {
+            // TODO: this is temporary, should route user the an error screen
+            showToast("RankOne license is missing")
+            setResult(Activity.RESULT_CANCELED)
+            finish()
+        })
+        viewModel.invalidLicenseEvent.observe(this, LiveDataEventObserver {
+            // TODO: this is temporary, should route user the an error screen
+            showToast("RankOne license is invalid")
+            setResult(Activity.RESULT_CANCELED)
+            finish()
         })
     }
 
