@@ -12,10 +12,13 @@ import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.collect.confirmfingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.activities.collect.fingerviewpager.FingerViewPagerManager
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
-import com.simprints.fingerprint.activities.collect.resources.*
+import com.simprints.fingerprint.activities.collect.resources.buttonBackgroundColour
+import com.simprints.fingerprint.activities.collect.resources.buttonTextColour
+import com.simprints.fingerprint.activities.collect.resources.buttonTextId
+import com.simprints.fingerprint.activities.collect.resources.nameTextId
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
-import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
+import com.simprints.fingerprint.activities.collect.state.FingerCollectionState.*
 import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningOnlyTimeoutBar
 import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar
 import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningWithImageTransferTimeoutBar
@@ -148,24 +151,26 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun CollectFingerprintsState.updateProgressBar() {
-        when (val fingerState = currentFingerState()) {
-            is FingerCollectionState.NotCollected,
-            is FingerCollectionState.Skipped -> {
-                timeoutBar.handleCancelled()
-                timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bar)
-            }
-            is FingerCollectionState.Scanning -> timeoutBar.startTimeoutBar()
-            is FingerCollectionState.TransferringImage -> timeoutBar.handleScanningFinished()
-            is FingerCollectionState.NotDetected -> {
-                timeoutBar.handleCancelled()
-                timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
-            }
-            is FingerCollectionState.Collected -> if (fingerState.scanResult.isGoodScan()) {
-                timeoutBar.handleCancelled()
-                timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_good)
-            } else {
-                timeoutBar.handleCancelled()
-                timeoutBar.progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
+        with(timeoutBar) {
+            when (val fingerState = currentFingerState()) {
+                is NotCollected,
+                is Skipped -> {
+                    handleCancelled()
+                    progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bar)
+                }
+                is Scanning -> startTimeoutBar()
+                is TransferringImage -> handleScanningFinished()
+                is NotDetected -> {
+                    handleCancelled()
+                    progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
+                }
+                is Collected -> if (fingerState.scanResult.isGoodScan()) {
+                    handleCancelled()
+                    progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_good)
+                } else {
+                    handleCancelled()
+                    progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
+                }
             }
         }
     }
@@ -174,7 +179,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
         confirmDialog = if (isShowingConfirmDialog && confirmDialog == null) {
             val mapOfScannedFingers = fingerStates.associate { fingerState ->
                 androidResourcesHelper.getString(fingerState.id.nameTextId()) to
-                    (fingerState is FingerCollectionState.Collected && fingerState.scanResult.isGoodScan())
+                    (fingerState is Collected && fingerState.scanResult.isGoodScan())
             }
             ConfirmFingerprintsDialog(this@CollectFingerprintsActivity, androidResourcesHelper, mapOfScannedFingers,
                 callbackConfirm = {
