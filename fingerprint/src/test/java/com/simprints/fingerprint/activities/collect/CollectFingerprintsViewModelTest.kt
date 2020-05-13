@@ -583,7 +583,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
-    fun backPressed_whileIdle_launchesRefusalEvent() {
+    fun backPressed_whileIdle_doesNothing() {
         mockScannerSetUiIdle()
         captureFingerprintResponses(GOOD_SCAN)
         noImageTransfer()
@@ -592,8 +592,6 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.handleScanButtonPressed()
         vm.handleOnBackPressed()
         assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null)))
-
-        vm.launchRefusal.assertEventReceived()
     }
 
     @Test
