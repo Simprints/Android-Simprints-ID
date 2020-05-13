@@ -1,5 +1,6 @@
-package com.simprints.fingerprint.activities.collect.confirmFingerprints
+package com.simprints.fingerprint.activities.collect.confirmfingerprints
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import com.simprints.fingerprint.R
@@ -7,7 +8,7 @@ import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAn
 
 class ConfirmFingerprintsDialog(private val context: Context,
                                 private val androidResourcesHelper: FingerprintAndroidResourcesHelper,
-                                private val scannedFingers: MutableMap<String, Boolean>,
+                                private val scannedFingers: Map<String, Boolean>,
                                 private val callbackConfirm: () -> Unit,
                                 private val callbackRestart: () -> Unit) {
 
@@ -19,6 +20,7 @@ class ConfirmFingerprintsDialog(private val context: Context,
             .setNegativeButton(androidResourcesHelper.getString(R.string.restart)) { _, _ -> callbackRestart() }
             .setCancelable(false).create()
 
+    @SuppressLint("DefaultLocale")
     private fun getMapOfFingersAndQualityAsText(): String =
         StringBuilder().also {
             scannedFingers.forEach { (fingerName, scanThresholdPassed) ->
