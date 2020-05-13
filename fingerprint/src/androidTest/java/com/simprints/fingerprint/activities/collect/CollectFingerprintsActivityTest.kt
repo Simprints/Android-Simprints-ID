@@ -189,7 +189,7 @@ class CollectFingerprintsActivityTest : KoinTest {
     }
 
     @Test
-    fun numberOfFingersChanges_addsNewFingersCorrectly() {
+    fun numberOfFingersIncreases_addsNewFingersCorrectly() {
         scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS_IDS).toIntent())
 
         scenario.onActivity {
@@ -197,6 +197,18 @@ class CollectFingerprintsActivityTest : KoinTest {
             it.assertViewPager(count = 2, currentIndex = 0)
             state.value = startingState(FOUR_FINGERS_IDS)
             it.assertViewPager(count = 4, currentIndex = 0)
+        }
+    }
+
+    @Test
+    fun numberOfFingersDecreases_removesFingersCorrectly() {
+        scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS_IDS).toIntent())
+
+        scenario.onActivity {
+            state.value = startingState(FOUR_FINGERS_IDS)
+            it.assertViewPager(count = 4, currentIndex = 0)
+            state.value = startingState(TWO_FINGERS_IDS)
+            it.assertViewPager(count = 2, currentIndex = 0)
         }
     }
 

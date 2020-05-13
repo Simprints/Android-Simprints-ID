@@ -58,14 +58,14 @@ class FingerFragment : FingerprintFragment() {
     }
 
     private fun CollectFingerprintsState.updateFingerResultText() {
-        with(fingerStates.first { it.id == fingerId }) {
+        fingerStates.find { it.id == fingerId }?.run {
             fingerResultText.text = androidResourcesHelper.getString(resultTextId())
             fingerResultText.setTextColor(resources.getColor(resultTextColour(), null))
         }
     }
 
     private fun CollectFingerprintsState.updateFingerDirectionText() {
-        with(fingerStates.first { it.id == fingerId }) {
+        fingerStates.find { it.id == fingerId }?.run {
             fingerDirectionText.text = androidResourcesHelper.getString(directionTextId(isOnLastFinger()))
             fingerDirectionText.setTextColor(resources.getColor(directionTextColour(), null))
         }
