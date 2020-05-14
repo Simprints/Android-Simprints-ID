@@ -4,7 +4,6 @@ apply plugin: 'kotlin-android-extensions'
 
 sonarqube {
     properties {
-        property "sonar.projectName", "face"
         property "sonar.sources", "src/main/java"
     }
 }
