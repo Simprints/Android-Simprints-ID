@@ -17,13 +17,13 @@ object EnrolmentRecordsGeneratorUtils {
                 val eventId = UUID.randomUUID().toString()
                 fakeRecords.add(
                     Event(
-                        eventId,
-                        listOf(projectId),
-                        listOf(subjectId),
-                        listOf(userId),
-                        listOf(moduleId),
-                        listOf(Modes.FACE, Modes.FINGERPRINT),
-                        buildFakeEventPayload(eventType, subjectId, projectId, userId, moduleId)
+                        id = eventId,
+                        projectId = listOf(projectId),
+                        subjectId = listOf(subjectId),
+                        attendantId = listOf(userId),
+                        moduleId = listOf(moduleId),
+                        mode = listOf(Modes.FACE, Modes.FINGERPRINT),
+                        payload = buildFakeEventPayload(eventType, subjectId, projectId, userId, moduleId)
                     )
                 )
             }
@@ -39,7 +39,7 @@ object EnrolmentRecordsGeneratorUtils {
             buildFakeEnrolmentDeletion(subjectId, projectId, moduleId, userId)
         }
         EventPayloadType.ENROLMENT_RECORD_MOVE -> {
-            buildFakeEnrolmentMove(subjectId, projectId, moduleId, userId)
+            buildFakeEnrolmentMove(subjectId, projectId, userId, moduleId)
         }
     }
 
@@ -71,8 +71,8 @@ object EnrolmentRecordsGeneratorUtils {
 
     private fun buildFakeEnrolmentDeletion(subjectId: String,
                                            projectId: String,
-                                           moduleId: String,
-                                           attendantId: String) = EnrolmentRecordDeletionPayload(
+                                           attendantId: String,
+                                           moduleId: String) = EnrolmentRecordDeletionPayload(
         subjectId, projectId, moduleId, attendantId
     )
 
@@ -80,6 +80,8 @@ object EnrolmentRecordsGeneratorUtils {
                                        projectId: String,
                                        userId: String,
                                        moduleId: String) =
-        EnrolmentRecordMovePayload(buildFakeEnrolmentRecordCreation(subjectId, projectId, userId, moduleId),
-            buildFakeEnrolmentDeletion(subjectId, projectId, userId, moduleId))
+        EnrolmentRecordMovePayload(
+            buildFakeEnrolmentRecordCreation(subjectId, projectId, userId, moduleId),
+            buildFakeEnrolmentDeletion(subjectId, projectId, userId, moduleId)
+        )
 }
