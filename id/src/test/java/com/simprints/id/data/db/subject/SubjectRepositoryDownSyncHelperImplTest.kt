@@ -93,55 +93,55 @@ class SubjectRepositoryDownSyncHelperImplTest {
     @Test
     fun downloadPatientsForUserSync_shouldSuccess() {
         runBlocking {
-            val nPeopleToDownload = 513
-            val nPeopleToDelete = 0
+            val nEventsToDownload = 513
+            val nEventsToDelete = 0
             val nEventsToUpdate = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, nEventsToUpdate, userSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, userSyncOp)
         }
     }
 
     @Test
     fun downloadPatientsForModuleSync_shouldSuccess() {
         runBlocking {
-            val nPeopleToDownload = 513
-            val nPeopleToDelete = 0
+            val nEventsToDownload = 513
+            val nEventsToDelete = 0
             val nEventsToUpdate = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, nEventsToUpdate, moduleSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, moduleSyncOp)
         }
     }
 
     @Test
     fun deletePatientsForGlobalSync_shouldSuccess() {
         runBlocking {
-            val nPeopleToDownload = 0
-            val nPeopleToDelete = 300
+            val nEventsToDownload = 0
+            val nEventsToDelete = 300
             val nEventsToUpdate = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, nEventsToUpdate, projectSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, projectSyncOp)
         }
     }
 
     @Test
     fun deletePatientsForUserSync_shouldSuccess() {
         runBlocking {
-            val nPeopleToDownload = 0
-            val nPeopleToDelete = 212
+            val nEventsToDownload = 0
+            val nEventsToDelete = 212
             val nEventsToUpdate = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, nEventsToUpdate, userSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, userSyncOp)
         }
     }
 
     @Test
     fun deletePatientsForModuleSync_shouldSuccess() {
         runBlocking {
-            val nPeopleToDownload = 0
-            val nPeopleToDelete = 123
+            val nEventsToDownload = 0
+            val nEventsToDelete = 123
             val nEventsToUpdate = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, nEventsToUpdate, moduleSyncOp)
+            runDownSyncAndVerifyConditions(nEventsToDownload, nEventsToDelete, nEventsToUpdate, moduleSyncOp)
         }
     }
 
