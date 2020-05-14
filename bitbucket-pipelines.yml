@@ -41,8 +41,6 @@ definitions:
                     - ./gradlew clientapi:testDebugUnitTest clientapi:jacocoTestReportDebug
                 artifacts:
                     - clientapi/build/reports/**
-                    - clientapi/build/jacoco/**
-                    - build/libs/**
         -   step: &run-id-unit-tests
                 name: "Run Id unit tests"
                 caches:
@@ -50,9 +48,9 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew id:testDebugUnitTest
+                    - ./gradlew id:testDebugUnitTest id:jacocoTestReportDebug
                 artifacts:
-                    - id/build/reports/tests/testDebugUnitTest/*
+                    - id/build/reports/**
         -   step: &run-face-unit-tests
                 name: "Run Face unit tests"
                 caches:
@@ -60,9 +58,9 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew face:testDebugUnitTest
+                    - ./gradlew face:testDebugUnitTest face:jacocoTestReportDebug
                 artifacts:
-                    - face/build/reports/tests/testDebugUnitTest/*
+                    - face/build/reports/**
         -   step: &run-fingerprint-unit-tests
                 name: "Run Fingerprint unit tests"
                 caches:
