@@ -10,7 +10,7 @@ import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperationR
 
 @Entity(tableName = "UpSyncStatus")
 @Keep
-data class DbUpSyncOperation(
+data class DbSubjectsUpSyncOperation(
     @PrimaryKey val id: DbUpSyncOperationKey,
     val projectId: String,
     val lastState: UpSyncState?,
@@ -41,7 +41,7 @@ data class DbUpSyncOperation(
 
 class DbUpSyncOperationKey(val key: String)
 
-fun DbUpSyncOperation.fromDbToDomain() =
+fun DbSubjectsUpSyncOperation.fromDbToDomain() =
     SubjectsUpSyncOperation(
         projectId,
         lastState?.let {

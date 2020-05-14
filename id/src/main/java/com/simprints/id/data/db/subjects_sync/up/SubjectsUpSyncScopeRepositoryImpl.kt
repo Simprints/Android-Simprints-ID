@@ -4,7 +4,7 @@ import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperation
 import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperationResult.UpSyncState.RUNNING
 import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncScope
 import com.simprints.id.data.db.subjects_sync.up.domain.fromDbToDomain
-import com.simprints.id.data.db.subjects_sync.up.local.DbUpSyncOperation
+import com.simprints.id.data.db.subjects_sync.up.local.DbSubjectsUpSyncOperation
 import com.simprints.id.data.db.subjects_sync.up.local.DbUpSyncOperationKey
 import com.simprints.id.data.db.subjects_sync.up.local.SubjectsUpSyncOperationLocalDataSource
 import com.simprints.id.data.db.subjects_sync.up.local.fromDbToDomain
@@ -24,7 +24,7 @@ class SubjectsUpSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
         val key = DbUpSyncOperationKey(syncScope.projectId)
         var storedOp = upSyncOperationOperationLocalDataSource.getUpSyncOperation(key)
         if (storedOp == null) {
-            storedOp = DbUpSyncOperation(key, syncScope.projectId, RUNNING, Date().time)
+            storedOp = DbSubjectsUpSyncOperation(key, syncScope.projectId, RUNNING, Date().time)
             upSyncOperationOperationLocalDataSource.insertOrReplaceUpSyncOperation(storedOp)
         }
 
