@@ -28,10 +28,10 @@ import com.simprints.id.data.consent.shortconsent.ConsentRepository
 import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
@@ -68,7 +68,7 @@ import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.*
 import com.simprints.id.tools.device.ConnectivityHelper
@@ -109,14 +109,14 @@ open class AppModule {
         remoteDbManager: RemoteDbManager,
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
-        peopleSyncManager: PeopleSyncManager,
+        subjectsSyncManager: SubjectsSyncManager,
         syncManager: SyncManager
     ): SignerManager = SignerManagerImpl(
         projectRepository,
         remoteDbManager,
         loginInfoManager,
         preferencesManager,
-        peopleSyncManager,
+        subjectsSyncManager,
         syncManager
     )
 
@@ -272,8 +272,8 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSyncStatusDatabase(ctx: Context): PeopleSyncStatusDatabase =
-        PeopleSyncStatusDatabase.getDatabase(ctx)
+    open fun provideSyncStatusDatabase(ctx: Context): SubjectsSyncStatusDatabase =
+        SubjectsSyncStatusDatabase.getDatabase(ctx)
 
 
     @Provides
@@ -351,7 +351,7 @@ open class AppModule {
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
 
     @Provides
-    open fun provideFetchGuidViewModelFactory(personRepository: PersonRepository,
+    open fun provideFetchGuidViewModelFactory(personRepository: SubjectRepository,
                                               deviceManager: DeviceManager,
                                               sessionRepository: SessionRepository,
                                               timeHelper: TimeHelper) =
@@ -359,15 +359,15 @@ open class AppModule {
 
     @Provides
     open fun provideSyncInformationViewModelFactory(
-        personRepository: PersonRepository,
-        personLocalDataSource: PersonLocalDataSource,
+        personRepository: SubjectRepository,
+        subjectLocalDataSource: SubjectLocalDataSource,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
-        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository
+        subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository
     ) =
         SyncInformationViewModelFactory(
-            personRepository, personLocalDataSource, preferencesManager,
-            loginInfoManager.getSignedInProjectIdOrEmpty(), peopleDownSyncScopeRepository
+            personRepository, subjectLocalDataSource, preferencesManager,
+            loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository
         )
 
     @Provides

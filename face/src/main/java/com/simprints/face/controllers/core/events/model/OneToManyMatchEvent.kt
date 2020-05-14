@@ -1,7 +1,7 @@
 package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import java.io.Serializable
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent as CoreOneToManyMatchEvent
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPool as CoreMatchPool
@@ -17,15 +17,15 @@ class OneToManyMatchEvent(startTime: Long,
     fun fromDomainToCore() = CoreOneToManyMatchEvent(
         startTime,
         endTime,
-        (query as PersonLocalDataSource.Query).asCoreMatchPool(count),
+        (query as SubjectLocalDataSource.Query).asCoreMatchPool(count),
         result?.map { it.fromDomainToCore() }
     )
 }
 
-fun PersonLocalDataSource.Query.asCoreMatchPool(count: Int) =
+fun SubjectLocalDataSource.Query.asCoreMatchPool(count: Int) =
     CoreMatchPool(this.parseQueryAsCoreMatchPoolType(), count)
 
-fun PersonLocalDataSource.Query.parseQueryAsCoreMatchPoolType(): CoreMatchPoolType =
+fun SubjectLocalDataSource.Query.parseQueryAsCoreMatchPoolType(): CoreMatchPoolType =
     when {
         this.userId != null -> CoreMatchPoolType.USER
         this.moduleId != null -> CoreMatchPoolType.MODULE

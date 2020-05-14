@@ -2,32 +2,32 @@ package com.simprints.id.activities.dashboard.cards.sync
 
 import androidx.lifecycle.MediatorLiveData
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.domain.ModuleSyncScope
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.down.domain.ModuleSyncScope
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.EXTRA
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.ON
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState
+import com.simprints.id.services.scheduledSync.subjects.common.SYNC_LOG_TAG
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.ON
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.*
 
-class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncManager,
+class DashboardSyncCardStateRepositoryImpl(val subjectsSyncManager: SubjectsSyncManager,
                                            val deviceManager: DeviceManager,
                                            private val preferencesManager: PreferencesManager,
-                                           private val syncScopeRepository: PeopleDownSyncScopeRepository,
-                                           private val cacheSync: PeopleSyncCache,
+                                           private val syncScopeRepository: SubjectsDownSyncScopeRepository,
+                                           private val cacheSync: SubjectsSyncCache,
                                            private val timeHelper: TimeHelper) : DashboardSyncCardStateRepository {
 
     override val syncCardStateLiveData = MediatorLiveData<DashboardSyncCardState>()
 
-    private var syncStateLiveData = peopleSyncManager.getLastSyncState()
+    private var syncStateLiveData = subjectsSyncManager.getLastSyncState()
     private var isConnectedLiveData = deviceManager.isConnectedLiveData
 
     private var lastTimeSyncRun: Date? = null
@@ -39,7 +39,7 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
 
     private fun emitNewCardState(isConnected: Boolean,
                                  isModuleSelectionRequired: Boolean,
-                                 syncState: PeopleSyncState?) {
+                                 syncState: SubjectsSyncState?) {
 
         val syncRunningAndInfoNotReadyYet = syncState == null && syncCardStateLiveData.value is SyncConnecting
         val syncNoRunningAndInfoNotReadyYet = syncState == null && syncCardStateLiveData.value !is SyncConnecting
@@ -61,7 +61,7 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
         }
     }
 
-    private fun processRecentSyncState(syncState: PeopleSyncState): DashboardSyncCardState {
+    private fun processRecentSyncState(syncState: SubjectsSyncState): DashboardSyncCardState {
 
         val downSyncStates = syncState.downSyncWorkersInfo
         val upSyncStates = syncState.upSyncWorkersInfo
@@ -85,7 +85,7 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
         var delayBeforeObserve = 0L
         if (shouldForceOneTimeSync()) {
             Timber.tag(SYNC_LOG_TAG).d("Re-launching one time sync")
-            peopleSyncManager.sync()
+            subjectsSyncManager.sync()
             delayBeforeObserve = 6000
         }
 
@@ -127,25 +127,25 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
         syncCardStateLiveData.value = newState
     }
 
-    private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<PeopleSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is PeopleSyncWorkerState.Failed && it.state.failedBecauseCloudIntegration }
+    private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) =
+        allSyncStates.any { it.state is SubjectsSyncWorkerState.Failed && it.state.failedBecauseCloudIntegration }
 
-    private fun isThereNotSyncHistory(allSyncStates: List<PeopleSyncState.SyncWorkerInfo>) = allSyncStates.isEmpty()
+    private fun isThereNotSyncHistory(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) = allSyncStates.isEmpty()
 
-    private fun isSyncProcess(allSyncStates: List<PeopleSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is PeopleSyncWorkerState.Running }
+    private fun isSyncProcess(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) =
+        allSyncStates.any { it.state is SubjectsSyncWorkerState.Running }
 
-    private fun isSyncFailed(allSyncStates: List<PeopleSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is PeopleSyncWorkerState.Failed || it.state is PeopleSyncWorkerState.Blocked || it.state is PeopleSyncWorkerState.Cancelled }
+    private fun isSyncFailed(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) =
+        allSyncStates.any { it.state is SubjectsSyncWorkerState.Failed || it.state is SubjectsSyncWorkerState.Blocked || it.state is SubjectsSyncWorkerState.Cancelled }
 
-    private fun isSyncConnecting(allSyncStates: List<PeopleSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is PeopleSyncWorkerState.Enqueued }
+    private fun isSyncConnecting(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) =
+        allSyncStates.any { it.state is SubjectsSyncWorkerState.Enqueued }
 
-    private fun isSyncCompleted(allSyncStates: List<PeopleSyncState.SyncWorkerInfo>) =
-        allSyncStates.all { it.state is PeopleSyncWorkerState.Succeeded }
+    private fun isSyncCompleted(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) =
+        allSyncStates.all { it.state is SubjectsSyncWorkerState.Succeeded }
 
 
-    private fun isSyncRunning(allSyncStates: List<PeopleSyncState.SyncWorkerInfo>) =
+    private fun isSyncRunning(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) =
         isSyncProcess(allSyncStates) || isSyncConnecting(allSyncStates)
 
 
@@ -153,7 +153,7 @@ class DashboardSyncCardStateRepositoryImpl(val peopleSyncManager: PeopleSyncMana
         isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
 
     private fun isDownSyncAllowed() = with(preferencesManager) {
-        peopleDownSyncSetting == ON || peopleDownSyncSetting == EXTRA
+        subjectsDownSyncSetting == ON || subjectsDownSyncSetting == EXTRA
     }
 
     private fun isSelectedModulesEmpty() = preferencesManager.selectedModules.isEmpty()

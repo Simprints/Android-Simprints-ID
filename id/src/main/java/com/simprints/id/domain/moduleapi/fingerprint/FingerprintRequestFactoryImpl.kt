@@ -1,6 +1,6 @@
 package com.simprints.id.domain.moduleapi.fingerprint
 
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
@@ -20,6 +20,6 @@ class FingerprintRequestFactoryImpl : FingerprintRequestFactory {
             )
         }
 
-    override fun buildFingerprintMatchRequest(probeSamples: List<FingerprintCaptureSample>, query: PersonLocalDataSource.Query): FingerprintMatchRequest =
+    override fun buildFingerprintMatchRequest(probeSamples: List<FingerprintCaptureSample>, query: SubjectLocalDataSource.Query): FingerprintMatchRequest =
         FingerprintMatchRequest(probeSamples, query)
 }
