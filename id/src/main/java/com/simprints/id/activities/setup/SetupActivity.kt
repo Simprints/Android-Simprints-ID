@@ -15,6 +15,7 @@ import com.simprints.id.domain.moduleapi.core.response.CoreResponse
 import com.simprints.id.domain.moduleapi.core.response.SetupResponse
 import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.tools.LocationManager
+import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +35,7 @@ class SetupActivity: AppCompatActivity() {
         injectDependencies()
         super.onCreate(savedInstanceState)
 
-        askLocationPermissionIfRequired()
+        askLocationPermissionIfRequiredAndFinish()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -54,9 +55,16 @@ class SetupActivity: AppCompatActivity() {
         component.inject(this)
     }
 
-    private fun askLocationPermissionIfRequired() {
-        requestPermissionsIfRequired(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            LOCATION_PERMISSION_REQUEST_CODE)
+    private fun askLocationPermissionIfRequiredAndFinish() {
+        val permission = Manifest.permission.ACCESS_FINE_LOCATION
+
+        if (hasPermission(permission)) {
+            storeUserLocationIntoCurrentSession()
+            setResultAndFinish()
+        } else {
+            requestPermissionsIfRequired(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE)
+        }
     }
 
     private fun storeUserLocationIntoCurrentSession() {
