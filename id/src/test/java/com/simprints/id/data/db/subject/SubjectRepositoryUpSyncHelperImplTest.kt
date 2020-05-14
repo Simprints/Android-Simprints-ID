@@ -1,14 +1,16 @@
 package com.simprints.id.data.db.subject
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
 import com.simprints.id.data.db.subject.domain.FaceSample
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.subjectevents.*
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
+import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.toMode
@@ -25,8 +27,10 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import java.util.*
 
+@RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
 class SubjectRepositoryUpSyncHelperImplTest {
     @RelaxedMockK lateinit var loginInfoManager: LoginInfoManager
@@ -42,7 +46,9 @@ class SubjectRepositoryUpSyncHelperImplTest {
     private val batchSize = 2
 
     private val notYetSyncedPerson1 = Subject(
-        "patientId1", "projectId", "userId", "moduleId", Date(1), null, true
+        "patientId1", "projectId", "userId", "moduleId", Date(1), null, true,
+        listOf(FingerprintSample(FingerIdentifier.LEFT_THUMB, EncodingUtils.base64ToBytes("finger_template"), 70)),
+        listOf(FaceSample(EncodingUtils.base64ToBytes("face_template")))
     )
     private val notYetSyncedPerson2 = notYetSyncedPerson1.copy(subjectId = "patientId2")
     private val notYetSyncedPerson3 = notYetSyncedPerson1.copy(subjectId = "patientId3")

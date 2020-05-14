@@ -191,8 +191,8 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
     private fun migrateTo10(schema: RealmSchema) {
         schema.rename(PeopleSchemaV6.PERSON_TABLE, SubjectsSchemaV10.SUBJECT_TABLE)
-            .renameField(SubjectsSchemaV9.PERSON_PATIENT_ID_FIELD, SubjectsSchemaV10.SUBJECT_ID)
-            .renameField(SubjectsSchemaV9.PERSON_USER_ID_FIELD, SubjectsSchemaV10.ATTENDANT_ID)
+            .renameField(PeopleSchemaV9.PERSON_PATIENT_ID_FIELD, SubjectsSchemaV10.SUBJECT_ID)
+            .renameField(PeopleSchemaV9.PERSON_USER_ID_FIELD, SubjectsSchemaV10.ATTENDANT_ID)
     }
 
     private inline fun <reified T> RealmObjectSchema.addNewField(name: String, vararg attributes: FieldAttribute): RealmObjectSchema =
