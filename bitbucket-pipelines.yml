@@ -82,8 +82,6 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - ./gradlew sonarqube --stacktrace
-                    -   pipe: sonarsource/sonarcloud-scan:1.0.1
-                    -   pipe: sonarsource/sonarcloud-quality-gate:0.1.3
         -   step: &build-and-sign-universal-apk
                 name: "Build and sign universal apk"
                 caches:
