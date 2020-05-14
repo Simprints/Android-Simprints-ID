@@ -21,15 +21,15 @@ class DbSubjectTest {
         val fingerprintSample = getRandomFingerprintSample()
         val faceSample = getRandomFaceSample()
 
-        val domainPerson = Subject(
+        val domainSubject = Subject(
             "guid", DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, Date(0), Date(1), true,
             listOf(fingerprintSample),
             listOf(faceSample)
         )
 
-        val dbPerson = domainPerson.fromDomainToDb()
+        val dbSubject = domainSubject.fromDomainToDb()
 
-        with(dbPerson) {
+        with(dbSubject) {
             assertThat(subjectId).isEqualTo("guid")
             assertThat(attendantId).isEqualTo(DEFAULT_USER_ID)
             assertThat(createdAt).isEqualTo(Date(0))

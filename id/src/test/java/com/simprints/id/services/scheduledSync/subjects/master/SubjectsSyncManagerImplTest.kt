@@ -9,8 +9,8 @@ import androidx.work.WorkInfo.State.ENQUEUED
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
-import com.simprints.id.services.scheduledSync.subjects.common.TAG_PEOPLE_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.subjects.common.TAG_SCHEDULED_AT
+import com.simprints.id.services.scheduledSync.subjects.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.subjects.down.workers.SubjectsDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.subjects.down.workers.SubjectsDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
@@ -30,7 +30,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SubjectsSyncManagerImplTest {
 
-    private lateinit var peopleSyncManager: SubjectsSyncManagerImpl
+    private lateinit var subjectsSyncManager: SubjectsSyncManagerImpl
     @MockK lateinit var subjectsSyncStateProcessor: SubjectsSyncStateProcessor
     @MockK lateinit var subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository
     @MockK lateinit var subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository
@@ -44,7 +44,7 @@ class SubjectsSyncManagerImplTest {
         get() = wm.getWorkInfosByTag(MASTER_SYNC_SCHEDULERS).get()
 
     private val syncWorkers
-        get() = wm.getWorkInfosByTag(TAG_PEOPLE_SYNC_ALL_WORKERS).get()
+        get() = wm.getWorkInfosByTag(TAG_SUBJECTS_SYNC_ALL_WORKERS).get()
 
     @Before
     fun setUp() {
@@ -53,18 +53,18 @@ class SubjectsSyncManagerImplTest {
             .setupFirebase()
 
         MockKAnnotations.init(this, relaxed = true)
-        peopleSyncManager = SubjectsSyncManagerImpl(ctx, subjectsSyncStateProcessor, subjectsUpSyncScopeRepository, subjectsDownSyncScopeRepository, subjectsSyncCache)
+        subjectsSyncManager = SubjectsSyncManagerImpl(ctx, subjectsSyncStateProcessor, subjectsUpSyncScopeRepository, subjectsDownSyncScopeRepository, subjectsSyncCache)
     }
 
     @Test
     fun getLastSyncState_shouldUseProcessor() {
-        peopleSyncManager.getLastSyncState()
+        subjectsSyncManager.getLastSyncState()
         verify { subjectsSyncStateProcessor.getLastSyncState() }
     }
 
     @Test
     fun sync_shouldEnqueueAOneTimeSyncMasterWorker() {
-        peopleSyncManager.sync()
+        subjectsSyncManager.sync()
 
         assertThat(masterSyncWorkers).hasSize(1)
         masterSyncWorkers.first().verifyOneTimeMasterWorker()
@@ -72,7 +72,7 @@ class SubjectsSyncManagerImplTest {
 
     @Test
     fun sync_shouldEnqueuePeriodicSyncMasterWorker() {
-        peopleSyncManager.scheduleSync()
+        subjectsSyncManager.scheduleSync()
 
         assertThat(masterSyncWorkers).hasSize(1)
         masterSyncWorkers.first().verifyPeriodicMasterWorker()
@@ -80,10 +80,10 @@ class SubjectsSyncManagerImplTest {
 
     @Test
     fun cancelScheduledSync_shouldClearPeriodicMasterWorkers() {
-        peopleSyncManager.scheduleSync()
+        subjectsSyncManager.scheduleSync()
         assertThat(masterSyncWorkers.first().state).isEqualTo(ENQUEUED)
 
-        peopleSyncManager.cancelScheduledSync()
+        subjectsSyncManager.cancelScheduledSync()
 
         assertThat(masterSyncWorkers.first().state).isEqualTo(CANCELLED)
         assertThat(masterSyncWorkers).hasSize(1)
@@ -93,7 +93,7 @@ class SubjectsSyncManagerImplTest {
     fun stop_shouldStopAllWorkers() {
         enqueueDownSyncWorkers()
 
-        peopleSyncManager.stop()
+        subjectsSyncManager.stop()
 
         syncWorkers.forEach {
             assertThat(it.state).isEqualTo(CANCELLED)
@@ -103,7 +103,7 @@ class SubjectsSyncManagerImplTest {
     @Test
     fun deleteSyncInfo_shouldDeleteAnyInfoRelatedToSync() = runBlockingTest {
 
-        peopleSyncManager.deleteSyncInfo()
+        subjectsSyncManager.deleteSyncInfo()
 
         coVerify { subjectsUpSyncScopeRepository.deleteAll() }
         coVerify { subjectsDownSyncScopeRepository.deleteAll() }
@@ -115,12 +115,12 @@ class SubjectsSyncManagerImplTest {
         val counterWorkerRequest =
             OneTimeWorkRequestBuilder<SubjectsDownSyncCountWorker>()
                 .setConstraints(constraintsForWorkers())
-                .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
+                .addTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
                 .build()
 
         val downSyncWorkerRequest =
             OneTimeWorkRequestBuilder<SubjectsDownSyncDownloaderWorker>()
-                .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
+                .addTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
                 .setConstraints(constraintsForWorkers())
                 .build()
 

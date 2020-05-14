@@ -117,7 +117,7 @@ class SubjectRepositoryUpSyncHelperImpl(
                 fingerprintSamples.map {
                     FingerprintTemplate(it.templateQualityScore,
                         EncodingUtils.byteArrayToBase64(it.template),
-                        it.fingerIdentifier.fromPersonToEvent())
+                        it.fingerIdentifier.fromSubjectToEvent())
                 }
             )
         } else { null }

@@ -73,11 +73,11 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
 
     private suspend fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, appRequest: AppVerifyRequest) {
         if (result is FingerprintCaptureResponse) {
-            val query = Query(personId = appRequest.verifyGuid)
+            val query = Query(subjectId = appRequest.verifyGuid)
             addMatchingStep(result.captureResult.mapNotNull { it.sample }, query)
             extractFingerprintAndAddPersonCreationEvent(result)
         } else if (result is FaceCaptureResponse) {
-            val query = Query(personId = appRequest.verifyGuid)
+            val query = Query(subjectId = appRequest.verifyGuid)
             addMatchingStepForFace(result.capturingResult.mapNotNull { it.result }, query)
         }
     }

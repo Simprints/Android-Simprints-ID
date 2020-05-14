@@ -115,7 +115,7 @@ class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInto()
-        mockResumePeopleSync()
+        mockResumeSubjectsSync()
 
         signIn()
     }
@@ -171,7 +171,7 @@ class SignerManagerTest {
             }
         }
 
-    private fun mockResumePeopleSync(error: Boolean = false) =
+    private fun mockResumeSubjectsSync(error: Boolean = false) =
         coEvery { syncManager.scheduleBackgroundSyncs() }.apply {
             if (!error) {
                 this.returns(Unit)

@@ -10,8 +10,8 @@ import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.workDataOf
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.services.scheduledSync.subjects.common.TAG_MASTER_SYNC_ID
-import com.simprints.id.services.scheduledSync.subjects.common.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
-import com.simprints.id.services.scheduledSync.subjects.common.TAG_PEOPLE_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.subjects.common.TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.subjects.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.subjects.common.TAG_SCHEDULED_AT
 import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
 import com.simprints.id.services.scheduledSync.subjects.master.internal.SyncWorkersLiveDataProvider
@@ -57,7 +57,7 @@ class SubjectsSyncStateProcessorImplTest {
     private var syncWorkersLiveData = MutableLiveData<List<WorkInfo>>()
 
     lateinit var subjectsSyncStateProcessor: SubjectsSyncStateProcessor
-    @RelaxedMockK lateinit var personRepository: SubjectRepository
+    @RelaxedMockK lateinit var subjectRepository: SubjectRepository
     @RelaxedMockK lateinit var syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider
     @RelaxedMockK lateinit var subjectsSyncCache: SubjectsSyncCache
 
@@ -65,7 +65,7 @@ class SubjectsSyncStateProcessorImplTest {
     fun setUp() {
         UnitTestConfig(this).setupWorkManager()
         MockKAnnotations.init(this)
-        subjectsSyncStateProcessor = SubjectsSyncStateProcessorImpl(ctx, personRepository, subjectsSyncCache, syncWorkersLiveDataProvider)
+        subjectsSyncStateProcessor = SubjectsSyncStateProcessorImpl(ctx, subjectRepository, subjectsSyncCache, syncWorkersLiveDataProvider)
         mockDependencies()
     }
 
@@ -138,8 +138,8 @@ class SubjectsSyncStateProcessorImplTest {
             workDataOf(SYNC_ID_STARTED to uniqueMasterSyncId),
             listOf(
                 "$TAG_SCHEDULED_AT${Date().time}",
-                TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS,
-                TAG_PEOPLE_SYNC_ALL_WORKERS,
+                TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS,
+                TAG_SUBJECTS_SYNC_ALL_WORKERS,
                 "$TAG_MASTER_SYNC_ID${uniqueMasterSyncId}") + listOf(tagForType(START_SYNC_REPORTER))
         )
 

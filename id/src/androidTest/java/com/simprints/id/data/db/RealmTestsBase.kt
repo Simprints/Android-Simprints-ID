@@ -33,7 +33,7 @@ open class RealmTestsBase {
         deleteRealmFiles(config)
     }
 
-    protected fun getFakePerson(): DbSubject = SubjectsGeneratorUtils.getRandomPerson().fromDomainToDb()
+    protected fun getFakePerson(): DbSubject = SubjectsGeneratorUtils.getRandomSubject().fromDomainToDb()
 
     protected fun saveFakePerson(realm: Realm, fakeSubject: DbSubject): DbSubject =
         fakeSubject.also { realm.executeTransaction { realm -> realm.insertOrUpdate(fakeSubject) } }

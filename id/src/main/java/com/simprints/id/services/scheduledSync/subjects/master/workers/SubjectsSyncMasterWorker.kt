@@ -42,7 +42,7 @@ open class SubjectsSyncMasterWorker(private val appContext: Context,
         get() = WorkManager.getInstance(appContext)
 
     private val syncWorkers
-        get() = wm.getAllPeopleSyncWorkersInfo().get().apply {
+        get() = wm.getAllSubjectsSyncWorkersInfo().get().apply {
             if (this.isNullOrEmpty()) {
                 this.sortByScheduledTime()
             }
@@ -99,7 +99,7 @@ open class SubjectsSyncMasterWorker(private val appContext: Context,
         upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID)
 
     private fun clearWorkerHistory(uniqueId: String) {
-        val workersRelatedToOtherSync = syncWorkers.filter { !it.isPartOfPeopleSync(uniqueId) }
+        val workersRelatedToOtherSync = syncWorkers.filter { !it.isPartOfSubjectsSync(uniqueId) }
         val syncWorkersWithoutSyncId = syncWorkers.filter { it.getUniqueSyncId() == null && it.state != WorkInfo.State.CANCELLED }
         (workersRelatedToOtherSync + syncWorkersWithoutSyncId).forEach {
             wm.cancelWorkById(it.id)

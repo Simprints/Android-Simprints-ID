@@ -150,7 +150,7 @@ class SubjectsDownSyncDownloaderWorkerTest {
             crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
             downSyncScopeRepository = mockk(relaxed = true)
-            personRepository = mockk(relaxed = true)
+            subjectRepository = mockk(relaxed = true)
             subjectsSyncCache = mockk(relaxed = true)
         }
 }

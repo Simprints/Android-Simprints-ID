@@ -54,7 +54,7 @@ interface AppComponentForTests : AppComponent {
     fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)
     fun inject(moduleViewModelTest: ModuleViewModelTest)
     fun inject(consentActivityTest: ConsentActivityTest)
-    fun inject(peopleDownSyncCountWorkerTest: SubjectsDownSyncCountWorkerTest)
+    fun inject(subjectsDownSyncCountWorkerTest: SubjectsDownSyncCountWorkerTest)
     fun inject(checkLoginFromIntentPresenterTest: CheckLoginFromIntentPresenterTest)
     fun inject(settingsPreferencePresenterTest: SettingsPreferencePresenterTest)
 

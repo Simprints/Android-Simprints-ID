@@ -17,18 +17,18 @@ import org.junit.Test
 
 class SubjectBuilderTest {
 
-    private val personBuilder = AppResponseBuilderForEnrol.PersonBuilder
+    private val subjectBuilder = AppResponseBuilderForEnrol.SubjectBuilder
     private val timeHelper: TimeHelper = mockk(relaxed = true)
 
     @Test
-    fun withFingerprintResponse_shouldBuildPerson() {
+    fun withFingerprintResponse_shouldBuildSubject() {
         val request = mockRequest()
         val fingerprintResponse = mockFingerprintResponse()
 
-        val person = personBuilder.buildPerson(request, fingerprintResponse, null, timeHelper)
+        val subject = subjectBuilder.buildSubject(request, fingerprintResponse, null, timeHelper)
         val expectedFingerprints = fingerprintResponse.captureResult
 
-        with(person) {
+        with(subject) {
             assertThat(projectId).isEqualTo(request.projectId)
             assertThat(moduleId).isEqualTo(request.moduleId)
             assertThat(attendantId).isEqualTo(request.userId)
@@ -46,18 +46,18 @@ class SubjectBuilderTest {
     }
 
     @Test
-    fun withFaceResponse_shouldBuildPerson() {
+    fun withFaceResponse_shouldBuildSubject() {
         val request = mockRequest()
         val faceResponse = mockFaceResponse()
 
-        val person = personBuilder.buildPerson(request, null, faceResponse, timeHelper)
+        val subject = subjectBuilder.buildSubject(request, null, faceResponse, timeHelper)
         val expectedFaceSamples = faceResponse.capturingResult.mapNotNull {
             it.result?.template?.let { template ->
                 FaceSample(template)
             }
         }
 
-        with(person) {
+        with(subject) {
             assertThat(projectId).isEqualTo(request.projectId)
             assertThat(moduleId).isEqualTo(request.moduleId)
             assertThat(attendantId).isEqualTo(request.userId)
@@ -70,12 +70,12 @@ class SubjectBuilderTest {
     }
 
     @Test
-    fun withFingerprintAndFaceResponses_shouldBuildPerson() {
+    fun withFingerprintAndFaceResponses_shouldBuildSubject() {
         val request = mockRequest()
         val fingerprintResponse = mockFingerprintResponse()
         val faceResponse = mockFaceResponse()
 
-        val person = personBuilder.buildPerson(request, fingerprintResponse, faceResponse, timeHelper)
+        val subject = subjectBuilder.buildSubject(request, fingerprintResponse, faceResponse, timeHelper)
         val expectedFingerprints = fingerprintResponse.captureResult
         val expectedFaceSamples = faceResponse.capturingResult.mapNotNull {
             it.result?.template?.let { template ->
@@ -83,7 +83,7 @@ class SubjectBuilderTest {
             }
         }
 
-        with(person) {
+        with(subject) {
             assertThat(projectId).isEqualTo(request.projectId)
             assertThat(moduleId).isEqualTo(request.moduleId)
             assertThat(attendantId).isEqualTo(request.userId)
@@ -108,7 +108,7 @@ class SubjectBuilderTest {
         val request = mockRequest()
 
         shouldThrow<Throwable> {
-            personBuilder.buildPerson(request, null, null, timeHelper)
+            subjectBuilder.buildSubject(request, null, null, timeHelper)
         }
     }
 

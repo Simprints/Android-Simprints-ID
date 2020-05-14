@@ -4,7 +4,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MALFUNCTION_MESSAGE
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MODULE_IDS
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PEOPLE_DOWN_SYNC_TRIGGERS
+import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SUBJECTS_DOWN_SYNC_TRIGGERS
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PROJECT_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.USER_ID
@@ -61,7 +61,7 @@ open class CrashReportManagerImpl: CrashReportManager {
     }
 
     override fun setDownSyncTriggersCrashlyticsKey(subjectsDownSyncSetting: SubjectsDownSyncSetting) {
-        crashlyticsInstance.setCustomKey(PEOPLE_DOWN_SYNC_TRIGGERS, subjectsDownSyncSetting.toString())
+        crashlyticsInstance.setCustomKey(SUBJECTS_DOWN_SYNC_TRIGGERS, subjectsDownSyncSetting.toString())
     }
 
     override fun setSessionIdCrashlyticsKey(sessionId: String) {

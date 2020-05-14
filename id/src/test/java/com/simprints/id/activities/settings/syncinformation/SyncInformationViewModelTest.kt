@@ -5,10 +5,10 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
 import com.simprints.id.data.db.common.models.SubjectsCount
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.testtools.TestApplication
@@ -30,7 +30,7 @@ class SyncInformationViewModelTest {
     @MockK lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
     @MockK lateinit var preferencesManagerMock: PreferencesManager
     @MockK lateinit var subjectsDownSyncScopeRepositoryMock: SubjectsDownSyncScopeRepository
-    private lateinit var personRepositoryMock: SubjectRepository
+    private lateinit var subjectRepositoryMock: SubjectRepository
 
     private val projectId = "projectId"
     private lateinit var viewModel: SyncInformationViewModel
@@ -38,14 +38,14 @@ class SyncInformationViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        personRepositoryMock = mockk()
-        viewModel = SyncInformationViewModel(personRepositoryMock, subjectLocalDataSourceMock, preferencesManagerMock, projectId, subjectsDownSyncScopeRepositoryMock)
+        subjectRepositoryMock = mockk()
+        viewModel = SyncInformationViewModel(subjectRepositoryMock, subjectLocalDataSourceMock, preferencesManagerMock, projectId, subjectsDownSyncScopeRepositoryMock)
     }
 
     @Test
     fun fetchCountFromLocal_shouldUpdateValue() = runBlocking {
         val totalRecordsInLocal = 322
-        mockPersonLocalDataSourceCount(totalRecordsInLocal)
+        mockSubjectLocalDataSourceCount(totalRecordsInLocal)
 
         viewModel.fetchAndUpdateLocalRecordCount()
 
@@ -57,10 +57,10 @@ class SyncInformationViewModelTest {
         val countInRemoteForCreate = 123
         val countInRemoteForMove = 0
         val countInRemoteForDelete = 22
-        val peopleCount = SubjectsCount(countInRemoteForCreate, countInRemoteForDelete, countInRemoteForMove)
+        val subjectsCount = SubjectsCount(countInRemoteForCreate, countInRemoteForDelete, countInRemoteForMove)
 
         every { subjectsDownSyncScopeRepositoryMock.getDownSyncScope() } returns projectSyncScope
-        coEvery { personRepositoryMock.countToDownSync(any()) } returns peopleCount
+        coEvery { subjectRepositoryMock.countToDownSync(any()) } returns subjectsCount
 
         viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount()
 
@@ -71,7 +71,7 @@ class SyncInformationViewModelTest {
     @Test
     fun fetchRecordsToUpSyncCount_shouldUpdateValue() = runBlockingTest {
         val recordsToUpSyncCount = 123
-        mockPersonLocalDataSourceCount(recordsToUpSyncCount)
+        mockSubjectLocalDataSourceCount(recordsToUpSyncCount)
 
         viewModel.fetchAndUpdateRecordsToUpSyncCount()
 
@@ -83,7 +83,7 @@ class SyncInformationViewModelTest {
         val moduleName = "module1"
         val countForModule = 123
         every { preferencesManagerMock.selectedModules } returns setOf(moduleName)
-        mockPersonLocalDataSourceCount(countForModule)
+        mockSubjectLocalDataSourceCount(countForModule)
 
         viewModel.fetchAndUpdateSelectedModulesCount()
 
@@ -108,14 +108,14 @@ class SyncInformationViewModelTest {
             moduleId = unselectedModuleName
         )
 
-        val peopleRecords = flowOf(
+        val subjectsRecords = flowOf(
             recordWithSelectedModule,
             recordWithUnselectedModule,
             recordWithUnselectedModule
         )
         val selectedModuleSet = setOf(selectedModuleName)
 
-        coEvery { subjectLocalDataSourceMock.load(any()) } returns peopleRecords
+        coEvery { subjectLocalDataSourceMock.load(any()) } returns subjectsRecords
         every { preferencesManagerMock.selectedModules } returns selectedModuleSet
 
         viewModel.fetchAndUpdatedUnselectedModulesCount()
@@ -135,10 +135,10 @@ class SyncInformationViewModelTest {
             "some_user_id",
             selectedModuleName
         )
-        val peopleRecords = flowOf(recordWithSelectedModule, recordWithSelectedModule)
+        val subjectsRecords = flowOf(recordWithSelectedModule, recordWithSelectedModule)
         val selectedModuleSet = setOf(selectedModuleName)
 
-        coEvery { subjectLocalDataSourceMock.load(any()) } returns peopleRecords
+        coEvery { subjectLocalDataSourceMock.load(any()) } returns subjectsRecords
         every { preferencesManagerMock.selectedModules } returns selectedModuleSet
 
         viewModel.fetchAndUpdatedUnselectedModulesCount()
@@ -173,7 +173,7 @@ class SyncInformationViewModelTest {
         coVerify(exactly = 0) { viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount() }
     }
 
-    private fun mockPersonLocalDataSourceCount(recordCount: Int) {
+    private fun mockSubjectLocalDataSourceCount(recordCount: Int) {
         coEvery { subjectLocalDataSourceMock.count(any()) } returns recordCount
     }
 

@@ -37,7 +37,7 @@ fun ApiFingerIdentifier.fromApiToDomain() = when(this) {
     ApiFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
 }
 
-fun PersonFingerIdentifier.fromPersonToEvent() = when(this) {
+fun PersonFingerIdentifier.fromSubjectToEvent() = when(this) {
     PersonFingerIdentifier.RIGHT_5TH_FINGER -> FingerIdentifier.RIGHT_5TH_FINGER
     PersonFingerIdentifier.RIGHT_4TH_FINGER -> FingerIdentifier.RIGHT_4TH_FINGER
     PersonFingerIdentifier.RIGHT_3RD_FINGER -> FingerIdentifier.RIGHT_3RD_FINGER

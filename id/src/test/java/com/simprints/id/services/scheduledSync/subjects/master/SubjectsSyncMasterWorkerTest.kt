@@ -72,7 +72,7 @@ class SubjectsSyncMasterWorkerTest {
             subjectsSyncCache = mockk(relaxed = true)
             subjectsSyncSubMasterWorkersBuilder = mockk(relaxed = true)
         }
-        mockPeopleDownSyncSetting(ON)
+        mockSubjectsDownSyncSetting(ON)
     }
 
     @Test
@@ -92,7 +92,7 @@ class SubjectsSyncMasterWorkerTest {
         with(masterWorker) {
             val uniqueSyncId = masterWorker.uniqueSyncId
             prepareSyncWorkers(uniqueSyncId)
-            mockPeopleDownSyncSetting(OFF)
+            mockSubjectsDownSyncSetting(OFF)
 
             masterWorker.doWork()
 
@@ -112,7 +112,7 @@ class SubjectsSyncMasterWorkerTest {
     fun doWork_syncNotGoingAndBackgroundOn_shouldEnqueueAllWorkers() = runBlocking {
         val uniqueSyncId = masterWorker.uniqueSyncId
         prepareSyncWorkers(uniqueSyncId)
-        mockPeopleDownSyncSetting(ON)
+        mockSubjectsDownSyncSetting(ON)
 
         masterWorker.doWork()
 
@@ -124,7 +124,7 @@ class SubjectsSyncMasterWorkerTest {
     @Test
     fun doWorkAsOneTimeSync_shouldEnqueueAllWorkers() = runBlocking {
         buildOneTimeMasterWorker()
-        mockPeopleDownSyncSetting(ON)
+        mockSubjectsDownSyncSetting(ON)
         val uniqueSyncId = masterWorker.uniqueSyncId
         prepareSyncWorkers(uniqueSyncId)
 
@@ -157,8 +157,8 @@ class SubjectsSyncMasterWorkerTest {
     private fun enqueueASyncWorker(): String {
         wm.enqueue(OneTimeWorkRequestBuilder<SubjectsDownSyncDownloaderWorker>()
             .setConstraints(constraintsForWorkers())
-            .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
-            .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
+            .addTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
+            .addTag(TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS)
             .addTag("${TAG_MASTER_SYNC_ID}$UNIQUE_SYNC_ID")
             .build())
         return UNIQUE_SYNC_ID
@@ -234,15 +234,15 @@ class SubjectsSyncMasterWorkerTest {
             OneTimeWorkRequestBuilder<SubjectsDownSyncDownloaderWorker>()
                 .setConstraints(constraintsForWorkers())
                 .addTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId")
-                .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
-                .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
+                .addTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
+                .addTag(TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS)
                 .addTag(tagForType(DOWNLOADER))
                 .build(),
             OneTimeWorkRequestBuilder<SubjectsDownSyncCountWorker>()
                 .setConstraints(constraintsForWorkers())
                 .addTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId")
-                .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
-                .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
+                .addTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
+                .addTag(TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS)
                 .addTag(tagForType(DOWN_COUNTER))
                 .build()
         )
@@ -252,15 +252,15 @@ class SubjectsSyncMasterWorkerTest {
             OneTimeWorkRequestBuilder<SubjectsUpSyncUploaderWorker>()
                 .setConstraints(constraintsForWorkers())
                 .addTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId")
-                .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
-                .addTag(TAG_PEOPLE_UP_SYNC_ALL_WORKERS)
+                .addTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
+                .addTag(TAG_SUBJECTS_UP_SYNC_ALL_WORKERS)
                 .addTag(tagForType(UPLOADER))
                 .build(),
             OneTimeWorkRequestBuilder<SubjectsUpSyncCountWorker>()
                 .setConstraints(constraintsForWorkers())
                 .addTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId")
-                .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
-                .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
+                .addTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
+                .addTag(TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS)
                 .addTag(tagForType(UP_COUNTER))
                 .build()
         )
@@ -269,7 +269,7 @@ class SubjectsSyncMasterWorkerTest {
         verify { masterWorker.resultSetter.success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId)) }
     }
 
-    private fun mockPeopleDownSyncSetting(subjectsDownSyncSetting: SubjectsDownSyncSetting) {
+    private fun mockSubjectsDownSyncSetting(subjectsDownSyncSetting: SubjectsDownSyncSetting) {
         masterWorker.preferenceManager = mockk<PreferencesManager>(relaxed = true).apply {
             every { this@apply.subjectsDownSyncSetting } returns subjectsDownSyncSetting
         }

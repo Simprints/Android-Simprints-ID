@@ -51,10 +51,10 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
             block: suspend (client: EventRemoteInterface) -> T,
             traceName: String
     ): T =
-        retrySimNetworkCalls(getPeopleApiClient(), block, traceName)
+        retrySimNetworkCalls(getSubjectsApiClient(), block, traceName)
 
 
-    internal suspend fun getPeopleApiClient(): EventRemoteInterface {
+    internal suspend fun getSubjectsApiClient(): EventRemoteInterface {
         val token = remoteDbManager.getCurrentToken()
         return simApiClientFactory.build<EventRemoteInterface>(token).api
     }

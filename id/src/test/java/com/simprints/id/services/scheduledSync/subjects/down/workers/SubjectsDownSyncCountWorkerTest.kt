@@ -49,7 +49,7 @@ class SubjectsDownSyncCountWorkerTest {
         with(countWorker) {
             downSyncScopeRepository = mockk(relaxed = true)
             crashReportManager = mockk(relaxed = true)
-            personRepository = mockk(relaxed = true)
+            subjectRepository = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
         }
     }
@@ -84,7 +84,7 @@ class SubjectsDownSyncCountWorkerTest {
 
     @Test
     fun countWorkerFailed_syncStillRunning_shouldRetry() = runBlocking {
-        coEvery { countWorker.personRepository.countToDownSync(any()) } throws Throwable("IO Error")
+        coEvery { countWorker.subjectRepository.countToDownSync(any()) } throws Throwable("IO Error")
         coEvery { countWorker.downSyncScopeRepository.getDownSyncScope() } returns ProjectSyncScope(DEFAULT_PROJECT_ID, listOf(Modes.FINGERPRINT))
         mockDependenciesToHaveSyncStillRunning()
 
@@ -95,7 +95,7 @@ class SubjectsDownSyncCountWorkerTest {
 
     @Test
     fun countWorkerFailed_syncIsNotRunning_shouldSucceed() = runBlocking {
-        coEvery { countWorker.personRepository.countToDownSync(any()) } throws Throwable("IO Error")
+        coEvery { countWorker.subjectRepository.countToDownSync(any()) } throws Throwable("IO Error")
         coEvery { countWorker.downSyncScopeRepository.getDownSyncScope() } returns ProjectSyncScope(DEFAULT_PROJECT_ID, listOf(Modes.FINGERPRINT))
         mockDependenciesToHaveSyncNotRunning()
 
@@ -105,7 +105,7 @@ class SubjectsDownSyncCountWorkerTest {
     }
 
     private fun mockDependenciesToSucceed(counts: SubjectsCount) {
-        coEvery { countWorker.personRepository.countToDownSync(any()) } returns counts
+        coEvery { countWorker.subjectRepository.countToDownSync(any()) } returns counts
         coEvery { countWorker.downSyncScopeRepository.getDownSyncScope() } returns ProjectSyncScope(DEFAULT_PROJECT_ID, listOf(Modes.FINGERPRINT))
     }
 

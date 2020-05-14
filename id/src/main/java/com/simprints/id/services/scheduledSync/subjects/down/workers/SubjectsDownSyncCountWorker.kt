@@ -38,7 +38,7 @@ class SubjectsDownSyncCountWorker(val context: Context, params: WorkerParameters
     }
 
     @Inject override lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var personRepository: SubjectRepository
+    @Inject lateinit var subjectRepository: SubjectRepository
     @Inject lateinit var downSyncScopeRepository: SubjectsDownSyncScopeRepository
 
     override suspend fun doWork(): Result =
@@ -97,7 +97,7 @@ class SubjectsDownSyncCountWorker(val context: Context, params: WorkerParameters
     }
 
     private suspend fun getDownCount(syncScope: SubjectsDownSyncScope) =
-        personRepository.countToDownSync(syncScope)
+        subjectRepository.countToDownSync(syncScope)
 
 }
 

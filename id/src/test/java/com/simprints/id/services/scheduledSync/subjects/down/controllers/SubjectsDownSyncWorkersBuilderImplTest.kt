@@ -46,7 +46,7 @@ class SubjectsDownSyncWorkersBuilderImplTest {
 
         val chain = subjectsDownSyncWorkersFactory.buildDownSyncWorkerChain("")
         chain.assertNumberOfDownSyncDownloaderWorker(1)
-        chain.assertPeopleDownSyncCountWorkerTagsForPeriodic(1)
+        chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
         assertThat(chain.size).isEqualTo(2)
     }
 
@@ -56,7 +56,7 @@ class SubjectsDownSyncWorkersBuilderImplTest {
 
         val chain = subjectsDownSyncWorkersFactory.buildDownSyncWorkerChain("")
         chain.assertNumberOfDownSyncDownloaderWorker(1)
-        chain.assertPeopleDownSyncCountWorkerTagsForPeriodic(1)
+        chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
         assertThat(chain.size).isEqualTo(2)
     }
 
@@ -66,7 +66,7 @@ class SubjectsDownSyncWorkersBuilderImplTest {
 
         val chain = subjectsDownSyncWorkersFactory.buildDownSyncWorkerChain("")
         chain.assertNumberOfDownSyncDownloaderWorker(2)
-        chain.assertPeopleDownSyncCountWorkerTagsForPeriodic(1)
+        chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
         assertThat(chain.size).isEqualTo(3)
     }
 
@@ -76,9 +76,9 @@ class SubjectsDownSyncWorkersBuilderImplTest {
         val uniqueSyncId = "uniqueSyncId"
         val chain = subjectsDownSyncWorkersFactory.buildDownSyncWorkerChain(uniqueSyncId)
         chain.assertNumberOfDownSyncDownloaderWorker(1)
-        chain.assertPeopleDownSyncCountWorkerTagsForPeriodic(1)
-        chain.first { it.tags.contains(SubjectsDownSyncDownloaderWorker::class.qualifiedName) }.assertPeopleDownSyncDownloaderWorkerTagsForPeriodic()
-        chain.first { it.tags.contains(SubjectsDownSyncCountWorker::class.qualifiedName) }.assertPeopleDownSyncCountWorkerTagsForPeriodic()
+        chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
+        chain.first { it.tags.contains(SubjectsDownSyncDownloaderWorker::class.qualifiedName) }.assertSubjectsDownSyncDownloaderWorkerTagsForPeriodic()
+        chain.first { it.tags.contains(SubjectsDownSyncCountWorker::class.qualifiedName) }.assertSubjectsDownSyncCountWorkerTagsForPeriodic()
     }
 
     @Test
@@ -87,13 +87,13 @@ class SubjectsDownSyncWorkersBuilderImplTest {
 
         val chain = subjectsDownSyncWorkersFactory.buildDownSyncWorkerChain(null)
         chain.assertNumberOfDownSyncDownloaderWorker(1)
-        chain.assertPeopleDownSyncCountWorkerTagsForPeriodic(1)
-        chain.first { it.tags.contains(SubjectsDownSyncDownloaderWorker::class.qualifiedName) }.assertPeopleDownSyncDownloaderWorkerTagsForOneTime()
-        chain.first { it.tags.contains(SubjectsDownSyncCountWorker::class.qualifiedName) }.assertPeopleDownSyncCountWorkerTagsForOneTime()
+        chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
+        chain.first { it.tags.contains(SubjectsDownSyncDownloaderWorker::class.qualifiedName) }.assertSubjectsDownSyncDownloaderWorkerTagsForOneTime()
+        chain.first { it.tags.contains(SubjectsDownSyncCountWorker::class.qualifiedName) }.assertSubjectsDownSyncCountWorkerTagsForOneTime()
     }
 }
 
-private fun WorkRequest.assertPeopleDownSyncDownloaderWorkerTagsForPeriodic() {
+private fun WorkRequest.assertSubjectsDownSyncDownloaderWorkerTagsForPeriodic() {
     assertThat(tags.size).isEqualTo(7)
     assertUniqueMasterIdTag()
 
@@ -101,7 +101,7 @@ private fun WorkRequest.assertPeopleDownSyncDownloaderWorkerTagsForPeriodic() {
     assertCommonDownSyncDownloadersWorkersTag()
 }
 
-private fun WorkRequest.assertPeopleDownSyncCountWorkerTagsForPeriodic() {
+private fun WorkRequest.assertSubjectsDownSyncCountWorkerTagsForPeriodic() {
     assertThat(tags.size).isEqualTo(7)
     assertUniqueMasterIdTag()
 
@@ -109,13 +109,13 @@ private fun WorkRequest.assertPeopleDownSyncCountWorkerTagsForPeriodic() {
     assertCommonDownSyncCounterWorkersTag()
 }
 
-private fun WorkRequest.assertPeopleDownSyncDownloaderWorkerTagsForOneTime() {
+private fun WorkRequest.assertSubjectsDownSyncDownloaderWorkerTagsForOneTime() {
     assertThat(tags.size).isEqualTo(6)
     assertCommonDownSyncWorkersTags()
     assertCommonDownSyncDownloadersWorkersTag()
 }
 
-private fun WorkRequest.assertPeopleDownSyncCountWorkerTagsForOneTime() {
+private fun WorkRequest.assertSubjectsDownSyncCountWorkerTagsForOneTime() {
     assertThat(tags.size).isEqualTo(6)
     assertCommonDownSyncWorkersTags()
     assertCommonDownSyncCounterWorkersTag()
@@ -138,10 +138,10 @@ private fun WorkRequest.assertUniqueMasterIdTag() =
     assertThat(tags.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }).isNotNull()
 
 private fun WorkRequest.assertCommonSyncTag() =
-    assertThat(tags).contains(TAG_PEOPLE_SYNC_ALL_WORKERS)
+    assertThat(tags).contains(TAG_SUBJECTS_SYNC_ALL_WORKERS)
 
 private fun WorkRequest.assertCommonDownSyncTag() =
-    assertThat(tags).contains(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
+    assertThat(tags).contains(TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS)
 
 private fun WorkRequest.assertScheduleAtTag() =
     assertThat(tags.firstOrNull { it.contains(TAG_SCHEDULED_AT) }).isNotNull()
@@ -152,5 +152,5 @@ private fun WorkRequest.assertUniqueDownSyncMasterTag() =
 private fun List<WorkRequest>.assertNumberOfDownSyncDownloaderWorker(count: Int) =
     assertThat(count { it.tags.contains(SubjectsDownSyncDownloaderWorker::class.qualifiedName) }).isEqualTo(count)
 
-private fun List<WorkRequest>.assertPeopleDownSyncCountWorkerTagsForPeriodic(count: Int) =
+private fun List<WorkRequest>.assertSubjectsDownSyncCountWorkerTagsForPeriodic(count: Int) =
     assertThat(count { it.tags.contains(SubjectsDownSyncCountWorker::class.qualifiedName) }).isEqualTo(count)
