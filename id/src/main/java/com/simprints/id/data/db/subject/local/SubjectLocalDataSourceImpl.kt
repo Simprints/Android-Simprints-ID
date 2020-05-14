@@ -34,7 +34,7 @@ class SubjectLocalDataSourceImpl(private val appContext: Context,
         const val SYNC_ID_FIELD = "syncGroupId"
         const val PROJECT_ID_FIELD = "projectId"
         const val USER_ID_FIELD = "userId"
-        const val PATIENT_ID_FIELD = "patientId"
+        const val SUBJECT_ID_FIELD = "subjectId"
         const val MODULE_ID_FIELD = "moduleId"
         const val TO_SYNC_FIELD = "toSync"
     }
@@ -70,7 +70,7 @@ class SubjectLocalDataSourceImpl(private val appContext: Context,
     override suspend fun load(query: SubjectLocalDataSource.Query?): Flow<Subject> =
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use {
-                it.buildRealmQueryForPerson(query)
+                it.buildRealmQueryForSubject(query)
                     .await()
                     ?.map { it.fromDbToDomain() }
                     ?.asFlow()
@@ -80,8 +80,8 @@ class SubjectLocalDataSourceImpl(private val appContext: Context,
 
     override suspend fun loadFingerprintIdentities(query: Serializable): Flow<FingerprintIdentity> =
         if (query is SubjectLocalDataSource.Query) {
-            load(query).map { person ->
-                FingerprintIdentity(person.subjectId, person.fingerprintSamples)
+            load(query).map { subject ->
+                FingerprintIdentity(subject.subjectId, subject.fingerprintSamples)
             }
         } else {
             throw InvalidQueryToLoadRecordsException()
@@ -92,7 +92,7 @@ class SubjectLocalDataSourceImpl(private val appContext: Context,
             Realm.getInstance(config).use { realmInstance ->
                 realmInstance.transactAwait {  realm ->
                     queries.forEach {
-                        realm.buildRealmQueryForPerson(it)
+                        realm.buildRealmQueryForSubject(it)
                             .findAll()
                             .deleteAllFromRealm()
                     }
@@ -104,18 +104,18 @@ class SubjectLocalDataSourceImpl(private val appContext: Context,
     override suspend fun count(query: SubjectLocalDataSource.Query): Int =
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use { realm ->
-                realm.buildRealmQueryForPerson(query)
+                realm.buildRealmQueryForSubject(query)
                     .await()
                     ?.size ?: 0
             }
         }
 
-    private fun Realm.buildRealmQueryForPerson(query: SubjectLocalDataSource.Query?): RealmQuery<DbSubject> =
+    private fun Realm.buildRealmQueryForSubject(query: SubjectLocalDataSource.Query?): RealmQuery<DbSubject> =
         where(DbSubject::class.java)
             .apply {
                 query?.let { query ->
                     query.projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
-                    query.subjectId?.let { this.equalTo(PATIENT_ID_FIELD, it) }
+                    query.subjectId?.let { this.equalTo(SUBJECT_ID_FIELD, it) }
                     query.userId?.let { this.equalTo(USER_ID_FIELD, it) }
                     query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
                     query.toSync?.let { this.equalTo(TO_SYNC_FIELD, it) }
