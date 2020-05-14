@@ -7,10 +7,10 @@ data class EnrolmentRecordCreationPayload(
     val projectId: String,
     val moduleId: String,
     val attendantId: String,
-    val biometricReferences: List<BiometricReference>
+    val biometricReferences: List<BiometricReference>?
 ) : EventPayload(EventPayloadType.ENROLMENT_RECORD_CREATION) {
 
     constructor(payload: ApiEnrolmentRecordCreationPayload) :
         this(payload.subjectId, payload.projectId, payload.moduleId,
-            payload.attendantId, payload.biometricReferences.map { it.fromApiToDomain() })
+            payload.attendantId, payload.biometricReferences?.map { it.fromApiToDomain() })
 }

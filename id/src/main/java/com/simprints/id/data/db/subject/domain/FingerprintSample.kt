@@ -22,9 +22,9 @@ open class FingerprintSample(
     }
 
     companion object {
-        fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>) =
-            biometricReferences.filterIsInstance(FingerprintReference::class.java)
-                .firstOrNull()?.templates?.map { buildFingerprintSample(it) } ?: emptyList()
+        fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) =
+            biometricReferences?.filterIsInstance(FingerprintReference::class.java)
+                ?.firstOrNull()?.templates?.map { buildFingerprintSample(it) } ?: emptyList()
 
         private fun buildFingerprintSample(template: FingerprintTemplate): FingerprintSample {
             return FingerprintSample(
