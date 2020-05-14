@@ -81,6 +81,7 @@ android {
         debug {
             minifyEnabled false
             ext.enableCrashlytics = false
+            testCoverageEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
             manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
