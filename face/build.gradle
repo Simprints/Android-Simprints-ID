@@ -2,6 +2,13 @@ apply plugin: 'com.android.dynamic-feature'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
+sonarqube {
+    properties {
+        property "sonar.projectName", "face"
+        property "sonar.sources", "src/main/java"
+    }
+}
+
 androidExtensions {
     experimental = true
 }
@@ -19,6 +26,9 @@ android {
     buildTypes {
         releaseWithLogfile {
             initWith release
+        }
+        debug {
+            testCoverageEnabled true
         }
     }
 
