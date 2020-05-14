@@ -4,6 +4,7 @@ def jacocoDir = "${File.separator}build${File.separator}reports${File.separator}
 
 sonarqube {
     properties {
+        property "sonar.projectName", "Simprints ID"
         property "sonar.c.file.suffixes", "-"
         property "sonar.java.coveragePlugin", "jacoco"
     }

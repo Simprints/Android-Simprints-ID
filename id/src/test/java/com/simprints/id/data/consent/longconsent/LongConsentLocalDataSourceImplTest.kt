@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import org.junit.Before
 import org.junit.Test
+import java.io.File
 
 class LongConsentLocalDataSourceImplTest {
 
@@ -14,11 +15,12 @@ class LongConsentLocalDataSourceImplTest {
         private const val DEFAULT_LANGUAGE = "EN"
         private const val PROJECT_ID_TEST = "project_id_test"
         const val ABSOLUTE_PATH = "app_root_folder"
-        private const val LONG_CONSENTS_PATH = "$ABSOLUTE_PATH/long-consents"
     }
 
     @MockK lateinit var loginInfoManagerMock: LoginInfoManager
     private lateinit var longConsentLocalDataSource: LongConsentLocalDataSourceImpl
+
+    private val longConsentsPath = "$ABSOLUTE_PATH${File.separator}long-consents"
 
     @Before
     fun setUp() {
@@ -32,20 +34,20 @@ class LongConsentLocalDataSourceImplTest {
     fun createBaseFilePath_shouldHaveTheRightPath() {
         val actualBaseFilePath = longConsentLocalDataSource.baseFilePath.toString()
 
-        assertThat(actualBaseFilePath).isEqualTo(LONG_CONSENTS_PATH)
+        assertThat(actualBaseFilePath).isEqualTo(longConsentsPath)
     }
 
     @Test
     fun createLocalFilePath_shouldHaveTheRightPath() {
         val actualFilePathForProject = longConsentLocalDataSource.filePathForProject.toString()
 
-        assertThat(actualFilePathForProject).contains("${LONG_CONSENTS_PATH}/${PROJECT_ID_TEST}")
+        assertThat(actualFilePathForProject).contains("${longConsentsPath}${File.separator}${PROJECT_ID_TEST}")
     }
 
     @Test
     fun createFileForLanguage_shouldHaveTheRightPath() {
         val actualFile = longConsentLocalDataSource.createFileForLanguage(DEFAULT_LANGUAGE).toString()
 
-        assertThat(actualFile).contains("${LONG_CONSENTS_PATH}/${PROJECT_ID_TEST}/${DEFAULT_LANGUAGE}.txt")
+        assertThat(actualFile).contains("${longConsentsPath}${File.separator}${PROJECT_ID_TEST}${File.separator}${DEFAULT_LANGUAGE}.txt")
     }
 }
