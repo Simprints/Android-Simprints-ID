@@ -38,6 +38,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
         const val PROJECT_UPDATED_AT = "updatedAt"
 
         const val FINGERPRINT_PERSON = "person"
+        const val PERSON_TABLE_UNTIL_V9 = "DbPerson"
     }
 
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
@@ -59,7 +60,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
     private fun migrateTo1(schema: RealmSchema) {
         with(PeopleSchemaV1) {
-            schema.get(SUBJECT_TABLE)?.addField(MODULE_FIELD, String::class.java)?.transform {
+            schema.get(PERSON_TABLE_UNTIL_V9)?.addField(MODULE_FIELD, String::class.java)?.transform {
                 it.set(MODULE_FIELD, Constants.GLOBAL_ID)
             }
 
@@ -78,7 +79,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
     private fun migratePersonTo2(schema: RealmSchema) {
         with(PeopleSchemaV2) {
-            schema.get(SUBJECT_TABLE)?.addField(PERSON_PROJECT_ID, String::class.java)?.transform {
+            schema.get(PERSON_TABLE_UNTIL_V9)?.addField(PERSON_PROJECT_ID, String::class.java)?.transform {
                 it.setString(PERSON_PROJECT_ID, projectId)
             }?.setRequired(PERSON_PROJECT_ID, true)
 
@@ -93,7 +94,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
                 }
             }
 
-            schema.get(SUBJECT_TABLE)
+            schema.get(PERSON_TABLE_UNTIL_V9)
                 ?.setRequired(PERSON_USER_ID, true)
                 ?.setRequired(PERSON_MODULE_ID, true)
                 ?.addField(PERSON_CREATE_TIME_TEMP, Date::class.java)
@@ -103,9 +104,9 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
             // It's null. The record is marked toSync = true, so having updatedAt = null is
             // even consistent with toSync = person.updatedAt == null || person.createdAt == null
-            schema.get(SUBJECT_TABLE)?.addField(UPDATE_FIELD, Date::class.java)
+            schema.get(PERSON_TABLE_UNTIL_V9)?.addField(UPDATE_FIELD, Date::class.java)
 
-            schema.get(SUBJECT_TABLE)?.addField(SYNC_FIELD, Boolean::class.java)?.transform {
+            schema.get(PERSON_TABLE_UNTIL_V9)?.addField(SYNC_FIELD, Boolean::class.java)?.transform {
                 it.set(SYNC_FIELD, true)
             }
         }
@@ -133,7 +134,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
     private fun migrateTo3(schema: RealmSchema) {
         with(PeopleSchemaV3) {
-            schema.get(SUBJECT_TABLE)?.transform {
+            schema.get(PERSON_TABLE_UNTIL_V9)?.transform {
                 it.set(SYNC_FIELD, true)
             }
         }
@@ -191,9 +192,9 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
     }
 
     private fun migrateTo10(schema: RealmSchema) {
-        schema.rename(SubjectsSchemaV9.PERSON_TABLE, SUBJECT_TABLE)
-            .renameField(SubjectsSchemaV9.PERSON_PATIENT_ID_FIELD, "subjectId")
-            .renameField(SubjectsSchemaV9.PERSON_USER_ID_FIELD, "attendantId")
+        schema.rename(PeopleSchemaV9.PERSON_TABLE, SUBJECT_TABLE)
+            .renameField(PeopleSchemaV9.PERSON_PATIENT_ID_FIELD, SubjectsSchemaV10.SUBJECT_ID)
+            .renameField(PeopleSchemaV9.PERSON_USER_ID_FIELD, SubjectsSchemaV10.ATTENDANT_ID)
     }
 
     private inline fun <reified T> RealmObjectSchema.addNewField(name: String, vararg attributes: FieldAttribute): RealmObjectSchema =
