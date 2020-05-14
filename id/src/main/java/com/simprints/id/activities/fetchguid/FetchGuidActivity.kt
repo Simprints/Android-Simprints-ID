@@ -52,7 +52,7 @@ class FetchGuidActivity : AppCompatActivity() {
     }
 
     private fun setupObserversForUi() {
-        viewModel.personFetch.observe(this, Observer {
+        viewModel.subjectFetch.observe(this, Observer {
             launchAlertIfPersonFetchFailedOrFinish(it)
         })
     }

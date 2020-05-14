@@ -48,11 +48,11 @@ data class DbSubjectsDownSyncOperation(
             downSyncState?.toString()
 
         @TypeConverter
-        fun fromDbPeopleDownSyncOperationKeyToString(DbSubjectsDownSyncOperationKey: DbSubjectsDownSyncOperationKey): String =
+        fun fromDbSubjectsDownSyncOperationKeyToString(DbSubjectsDownSyncOperationKey: DbSubjectsDownSyncOperationKey): String =
             DbSubjectsDownSyncOperationKey.key
 
         @TypeConverter
-        fun fromStringToDbPeopleDownSyncOperationKey(key: String): DbSubjectsDownSyncOperationKey =
+        fun fromStringToDbSubjectsDownSyncOperationKey(key: String): DbSubjectsDownSyncOperationKey =
             DbSubjectsDownSyncOperationKey(key)
     }
 }

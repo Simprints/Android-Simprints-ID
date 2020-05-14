@@ -33,7 +33,7 @@ class SubjectsSyncManagerImpl(private val ctx: Context,
         subjectsSyncStateProcessor.getLastSyncState()
 
     override fun hasSyncEverRunBefore(): Boolean =
-        wm.getAllPeopleSyncWorkersInfo().get().size > 0
+        wm.getAllSubjectsSyncWorkersInfo().get().size > 0
 
     override fun sync() {
         Timber.tag(SYNC_LOG_TAG).d("Sync one time people master worker")
@@ -58,7 +58,7 @@ class SubjectsSyncManagerImpl(private val ctx: Context,
     }
 
     override fun stop() {
-        wm.cancelAllPeopleSyncWorkers()
+        wm.cancelAllSubjectsSyncWorkers()
     }
 
     private fun cleanScheduledHistory() {

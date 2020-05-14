@@ -21,7 +21,7 @@ class OneToOneMatchEvent(startTime: Long,
 
 
 fun SubjectLocalDataSource.Query.extractVerifyId() =
-    personId
+    subjectId
         ?: throw FaceUnexpectedException("null personId in candidate query when saving OneToOneMatchEvent")
 
 

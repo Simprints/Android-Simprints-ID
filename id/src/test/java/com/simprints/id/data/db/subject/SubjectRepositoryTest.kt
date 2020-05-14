@@ -40,7 +40,7 @@ import java.io.InputStream
 class SubjectRepositoryTest {
 
     companion object {
-        const val REMOTE_PEOPLE_FOR_SUBSYNC = 100
+        const val REMOTE_SUBJECTS_FOR_SUBSYNC = 100
     }
 
     @RelaxedMockK lateinit var localDataSource: SubjectLocalDataSource
@@ -50,13 +50,13 @@ class SubjectRepositoryTest {
     @RelaxedMockK lateinit var subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper
     @RelaxedMockK lateinit var subjectRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper
 
-    private lateinit var personRepository: SubjectRepository
+    private lateinit var subjectRepository: SubjectRepository
 
     @Before
     fun setup() {
         UnitTestConfig(this).coroutinesMainThread()
         MockKAnnotations.init(this, relaxUnitFun = true)
-        personRepository = SubjectRepositoryImpl(eventRemoteDataSource,
+        subjectRepository = SubjectRepositoryImpl(eventRemoteDataSource,
             localDataSource, downSyncScopeRepository, subjectsUpSyncExecutor,
             subjectRepositoryUpSyncHelper, subjectRepositoryDownSyncHelper)
     }
@@ -77,40 +77,40 @@ class SubjectRepositoryTest {
     }
 
     @Test
-    fun givenANewPatient_shouldBeSavedAndUploaded() = runBlockingTest {
-        val person = SubjectsGeneratorUtils.getRandomPerson()
+    fun givenANewSubject_shouldBeSavedAndUploaded() = runBlockingTest {
+        val subject = SubjectsGeneratorUtils.getRandomSubject()
 
-        personRepository.saveAndUpload(person)
+        subjectRepository.saveAndUpload(subject)
 
-        coVerify { localDataSource.insertOrUpdate(listOf(person)) }
+        coVerify { localDataSource.insertOrUpdate(listOf(subject)) }
         verify { subjectsUpSyncExecutor.sync() }
     }
 
     @Test
-    fun givenAPatientInLocal_shouldBeLoaded() = runBlockingTest {
-        val person = SubjectsGeneratorUtils.getRandomPerson()
-        coEvery { localDataSource.load(any()) } returns flowOf(person)
+    fun givenASubjectInLocal_shouldBeLoaded() = runBlockingTest {
+        val subject = SubjectsGeneratorUtils.getRandomSubject()
+        coEvery { localDataSource.load(any()) } returns flowOf(subject)
 
-        val fetch = personRepository.loadFromRemoteIfNeeded(person.projectId, person.subjectId)
+        val fetch = subjectRepository.loadFromRemoteIfNeeded(subject.projectId, subject.subjectId)
 
-        assertThat(fetch.subject).isEqualTo(person)
+        assertThat(fetch.subject).isEqualTo(subject)
         assertThat(fetch.subjectSource).isEqualTo(SubjectFetchResult.SubjectSource.LOCAL)
     }
 
     @Test
-    fun givenAPatientOnlyInRemote_shouldBeLoaded() {
+    fun givenASubjectOnlyInRemote_shouldBeLoaded() {
         runBlocking {
-            val person = SubjectsGeneratorUtils.getRandomPerson()
+            val subject = SubjectsGeneratorUtils.getRandomSubject()
             coEvery { localDataSource.load(any()) } returns flowOf()
-            coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildCreationEventFromPerson(person)
+            coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildCreationEventFromSubject(subject)
 
-            val fetch = personRepository.loadFromRemoteIfNeeded(person.projectId, person.subjectId)
+            val fetch = subjectRepository.loadFromRemoteIfNeeded(subject.projectId, subject.subjectId)
 
             with(fetch.subject) {
-                assertThat(this?.subjectId).isEqualTo(person.subjectId)
-                assertThat(this?.attendantId).isEqualTo(person.attendantId)
-                assertThat(this?.moduleId).isEqualTo(person.moduleId)
-                assertThat(this?.projectId).isEqualTo(person.projectId)
+                assertThat(this?.subjectId).isEqualTo(subject.subjectId)
+                assertThat(this?.attendantId).isEqualTo(subject.attendantId)
+                assertThat(this?.moduleId).isEqualTo(subject.moduleId)
+                assertThat(this?.projectId).isEqualTo(subject.projectId)
             }
             assertThat(fetch.subjectSource).isEqualTo(SubjectFetchResult.SubjectSource.REMOTE)
 
@@ -122,17 +122,17 @@ class SubjectRepositoryTest {
 
 
     private suspend fun assesDownSyncCount(downSyncScope: SubjectsDownSyncScope) {
-        val eventCounts = listOf(EventCount(ENROLMENT_RECORD_CREATION, REMOTE_PEOPLE_FOR_SUBSYNC))
+        val eventCounts = listOf(EventCount(ENROLMENT_RECORD_CREATION, REMOTE_SUBJECTS_FOR_SUBSYNC))
 
         coEvery { downSyncScopeRepository.getDownSyncOperations(any()) } returns listOf(mockk())
         coEvery { eventRemoteDataSource.count(any()) } returns eventCounts
 
-        val counts = personRepository.countToDownSync(downSyncScope)
+        val counts = subjectRepository.countToDownSync(downSyncScope)
 
-        assertThat(counts.created).isEqualTo(REMOTE_PEOPLE_FOR_SUBSYNC)
+        assertThat(counts.created).isEqualTo(REMOTE_SUBJECTS_FOR_SUBSYNC)
     }
 
-    private fun buildCreationEventFromPerson(subject: Subject): InputStream {
+    private fun buildCreationEventFromSubject(subject: Subject): InputStream {
         val event = with(subject) {
             Event(
                 randomUUID(),

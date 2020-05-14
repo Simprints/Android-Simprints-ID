@@ -17,8 +17,8 @@ class DbSubjectsDownSyncOperationTest {
     }
 
     private val converter = DbSubjectsDownSyncOperation.Converters()
-    private val peopleDownSyncOperationKey = DbSubjectsDownSyncOperationKey(DEFAULT_PROJECT_ID, DEFAULT_MODES, DEFAULT_USER_ID, DEFAULT_MODULE_ID)
-    private val peopleDownSyncOperationKeyAsString = "$DEFAULT_PROJECT_ID||$DEFAULT_USER_ID||$DEFAULT_MODULE_ID||${DEFAULT_MODES.joinToString("||")}"
+    private val subjectsDownSyncOperationKey = DbSubjectsDownSyncOperationKey(DEFAULT_PROJECT_ID, DEFAULT_MODES, DEFAULT_USER_ID, DEFAULT_MODULE_ID)
+    private val subjectsDownSyncOperationKeyAsString = "$DEFAULT_PROJECT_ID||$DEFAULT_USER_ID||$DEFAULT_MODULE_ID||${DEFAULT_MODES.joinToString("||")}"
 
     @Test
     fun testOpFromDomainToDb() {
@@ -66,20 +66,20 @@ class DbSubjectsDownSyncOperationTest {
     }
 
     @Test
-    fun testConverterStringToDbPeopleDownSyncOperationKey() {
-        val downSyncOpKeyString = converter.fromDbPeopleDownSyncOperationKeyToString(peopleDownSyncOperationKey)
-        assertThat(downSyncOpKeyString).isEqualTo(peopleDownSyncOperationKey.key)
+    fun testConverterStringToDbSubjectsDownSyncOperationKey() {
+        val downSyncOpKeyString = converter.fromDbSubjectsDownSyncOperationKeyToString(subjectsDownSyncOperationKey)
+        assertThat(downSyncOpKeyString).isEqualTo(subjectsDownSyncOperationKey.key)
     }
 
     @Test
-    fun testConverterDbPeopleDownSyncOperationKeyToString() {
-        val downSyncOpKey = converter.fromStringToDbPeopleDownSyncOperationKey(peopleDownSyncOperationKeyAsString)
-        assertThat(downSyncOpKey).isEqualTo(peopleDownSyncOperationKey)
+    fun testConverterDbSubjectsDownSyncOperationKeyToString() {
+        val downSyncOpKey = converter.fromStringToDbSubjectsDownSyncOperationKey(subjectsDownSyncOperationKeyAsString)
+        assertThat(downSyncOpKey).isEqualTo(subjectsDownSyncOperationKey)
     }
 
 
     @Test
-    fun testDbPeopleDownSyncOperationKey() {
-        assertThat(peopleDownSyncOperationKey.key).isEqualTo(peopleDownSyncOperationKeyAsString)
+    fun testDbSubjectsDownSyncOperationKey() {
+        assertThat(subjectsDownSyncOperationKey.key).isEqualTo(subjectsDownSyncOperationKeyAsString)
     }
 }

@@ -15,7 +15,7 @@ object SubjectsGeneratorUtils {
         mutableListOf<Subject>().also { fakePeople ->
             repeat(nPeople) {
                 fakePeople.add(
-                    getRandomPerson(
+                    getRandomSubject(
                         UUID.randomUUID().toString(),
                         downSyncOp.projectId,
                         downSyncOp.userId ?: "",
@@ -32,7 +32,7 @@ object SubjectsGeneratorUtils {
 
         return arrayListOf<Subject>().also { list ->
             repeat(numberOfPeople) {
-                list.add(getRandomPerson(
+                list.add(getRandomSubject(
                     UUID.randomUUID().toString(),
                     projectId,
                     userId,
@@ -42,14 +42,14 @@ object SubjectsGeneratorUtils {
         }.also { people -> people.sortBy { it.updatedAt } }
     }
 
-    fun getRandomPerson(patientId: String = UUID.randomUUID().toString(),
-                        projectId: String = UUID.randomUUID().toString(),
-                        userId: String = UUID.randomUUID().toString(),
-                        moduleId: String = UUID.randomUUID().toString(),
-                        toSync: Boolean = false,
-                        createdAt: Date = getRandomTime(),
-                        updateAt: Date = getRandomTime(),
-                        fingerprintSamples: Array<FingerprintSample> = arrayOf(getRandomFingerprintSample(), getRandomFingerprintSample())): Subject =
+    fun getRandomSubject(patientId: String = UUID.randomUUID().toString(),
+                         projectId: String = UUID.randomUUID().toString(),
+                         userId: String = UUID.randomUUID().toString(),
+                         moduleId: String = UUID.randomUUID().toString(),
+                         toSync: Boolean = false,
+                         createdAt: Date = getRandomTime(),
+                         updateAt: Date = getRandomTime(),
+                         fingerprintSamples: Array<FingerprintSample> = arrayOf(getRandomFingerprintSample(), getRandomFingerprintSample())): Subject =
         Subject(
             subjectId = patientId,
             projectId = projectId,

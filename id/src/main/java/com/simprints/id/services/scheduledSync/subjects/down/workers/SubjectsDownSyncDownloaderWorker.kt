@@ -35,7 +35,7 @@ class SubjectsDownSyncDownloaderWorker(context: Context, params: WorkerParameter
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var downSyncScopeRepository: SubjectsDownSyncScopeRepository
-    @Inject lateinit var personRepository: SubjectRepository
+    @Inject lateinit var subjectRepository: SubjectRepository
     @Inject lateinit var subjectsSyncCache: SubjectsSyncCache
 
     internal var subjectsDownSyncDownloaderTask: SubjectsDownSyncDownloaderTask = SubjectsDownSyncDownloaderTaskImpl()
@@ -56,7 +56,7 @@ class SubjectsDownSyncDownloaderWorker(context: Context, params: WorkerParameter
                 this@SubjectsDownSyncDownloaderWorker.id.toString(),
                 downSyncOperation,
                 subjectsSyncCache,
-                personRepository,
+                subjectRepository,
                 this@SubjectsDownSyncDownloaderWorker,
                 this)
 

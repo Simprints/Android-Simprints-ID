@@ -29,11 +29,11 @@ import java.io.InputStreamReader
 import java.io.Reader
 
 class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSource,
-                           val subjectLocalDataSource: SubjectLocalDataSource,
-                           val downSyncScopeRepository: SubjectsDownSyncScopeRepository,
-                           private val peopleUpSyncExecutor: SubjectsUpSyncExecutor,
-                           private val personRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
-                           private val personRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper) :
+                            val subjectLocalDataSource: SubjectLocalDataSource,
+                            val downSyncScopeRepository: SubjectsDownSyncScopeRepository,
+                            private val peopleUpSyncExecutor: SubjectsUpSyncExecutor,
+                            private val subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
+                            private val subjectRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper) :
     SubjectRepository,
     SubjectLocalDataSource by subjectLocalDataSource,
     EventRemoteDataSource by eventRemoteDataSource {
@@ -59,18 +59,18 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
         )
     }
 
-    override suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): SubjectFetchResult =
+    override suspend fun loadFromRemoteIfNeeded(projectId: String, subjectId: String): SubjectFetchResult =
         try {
-            val person = subjectLocalDataSource.load(SubjectLocalDataSource.Query(personId = patientId)).first()
-            SubjectFetchResult(person, LOCAL)
+            val subject = subjectLocalDataSource.load(SubjectLocalDataSource.Query(subjectId = subjectId)).first()
+            SubjectFetchResult(subject, LOCAL)
         } catch (t: Throwable) {
-            tryToFetchPersonFromRemote(projectId, patientId).also { subjectFetchResult ->
-                subjectFetchResult.subject?.let { savePersonInLocal(it) }
+            tryToFetchSubjectFromRemote(projectId, subjectId).also { subjectFetchResult ->
+                subjectFetchResult.subject?.let { saveSubjectInLocal(it) }
             }
         }
 
-    private suspend fun tryToFetchPersonFromRemote(projectId: String, patientId: String): SubjectFetchResult {
-        val eventQuery = buildEventQueryForPersonFetch(projectId, patientId)
+    private suspend fun tryToFetchSubjectFromRemote(projectId: String, subjectId: String): SubjectFetchResult {
+        val eventQuery = buildEventQueryForSubjectFetch(projectId, subjectId)
         val inputStream = eventRemoteDataSource.getStreaming(eventQuery)
         val reader = setupJsonReaderFromResponseStream(inputStream)
         return if (reader.hasNext()) {
@@ -89,7 +89,7 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
                 it.beginArray()
             }
 
-    private suspend fun savePersonInLocal(subject: Subject) = subjectLocalDataSource.insertOrUpdate(listOf(subject))
+    private suspend fun saveSubjectInLocal(subject: Subject) = subjectLocalDataSource.insertOrUpdate(listOf(subject))
 
     override suspend fun saveAndUpload(subject: Subject) {
         subjectLocalDataSource.insertOrUpdate(listOf(subject.apply { toSync = true }))
@@ -112,11 +112,11 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
     }
 
     override suspend fun performUploadWithProgress(scope: CoroutineScope) =
-        personRepositoryUpSyncHelper.executeUploadWithProgress(scope)
+        subjectRepositoryUpSyncHelper.executeUploadWithProgress(scope)
 
     override suspend fun performDownloadWithProgress(scope: CoroutineScope,
                                                      peopleDownSyncOperation: SubjectsDownSyncOperation): ReceiveChannel<SubjectsDownSyncProgress> =
-        personRepositoryDownSyncHelper.performDownSyncWithProgress(scope, peopleDownSyncOperation,
+        subjectRepositoryDownSyncHelper.performDownSyncWithProgress(scope, peopleDownSyncOperation,
             buildEventQuery(peopleDownSyncOperation))
 
     private fun buildEventQuery(peopleDownSyncOperation: SubjectsDownSyncOperation) =
@@ -131,9 +131,9 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
             )
         }
 
-    private fun buildEventQueryForPersonFetch(projectId: String, patientId: String) = EventQuery(
+    private fun buildEventQueryForSubjectFetch(projectId: String, subjectId: String) = EventQuery(
         projectId = projectId,
-        subjectId = patientId,
+        subjectId = subjectId,
         modes = listOf(Modes.FINGERPRINT),
         types = listOf(ENROLMENT_RECORD_CREATION)
     )

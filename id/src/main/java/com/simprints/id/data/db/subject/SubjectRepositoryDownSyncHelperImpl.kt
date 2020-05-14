@@ -165,7 +165,7 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
 
     private fun buildQueryForPeopleById(batchOfPeopleToBeDeleted: List<EnrolmentRecordDeletionPayload>) =
         batchOfPeopleToBeDeleted.map {
-            SubjectLocalDataSource.Query(personId = it.subjectId)
+            SubjectLocalDataSource.Query(subjectId = it.subjectId)
         }
 
     private suspend fun updateDownSyncInfo(state: SubjectsDownSyncOperationResult.DownSyncState,

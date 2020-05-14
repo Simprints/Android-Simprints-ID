@@ -7,13 +7,13 @@ import com.simprints.core.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
 import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
 import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.*
 import com.simprints.id.data.db.subject.domain.subjectevents.Events
 import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordCreationPayload
 import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordMovePayload
 import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
+import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.json.SimJsonHelper
@@ -65,7 +65,7 @@ class EventRemoteDataSourceImplTest {
             eventRemoteInterface = SimApiClientFactory(
                 mockBaseUrlProvider, DEVICE_ID, gson
             ).build<EventRemoteInterface>().api
-            coEvery { eventRemoteDataSourceSpy.getPeopleApiClient() } returns eventRemoteInterface
+            coEvery { eventRemoteDataSourceSpy.getSubjectsApiClient() } returns eventRemoteInterface
             mockServer.enqueue(mockSuccessfulResponse())
 
             eventRemoteDataSourceSpy.post(PROJECT_ID, buildEnrolmentRecordEvents())
@@ -90,7 +90,7 @@ class EventRemoteDataSourceImplTest {
                 mockBaseUrlProvider, DEVICE_ID, gson
             ).build<EventRemoteInterface>().api
 
-            coEvery { eventRemoteDataSourceSpy.getPeopleApiClient() } returns eventRemoteInterface
+            coEvery { eventRemoteDataSourceSpy.getSubjectsApiClient() } returns eventRemoteInterface
             mockServer.enqueue(buildSuccessfulResponseForCount())
 
             val counts = eventRemoteDataSourceSpy.count(buildEventQuery())
@@ -111,7 +111,7 @@ class EventRemoteDataSourceImplTest {
             eventRemoteInterface = SimApiClientFactory(
                 mockBaseUrlProvider, "deviceId", gson
             ).build<EventRemoteInterface>().api
-            coEvery { eventRemoteDataSourceSpy.getPeopleApiClient() } returns eventRemoteInterface
+            coEvery { eventRemoteDataSourceSpy.getSubjectsApiClient() } returns eventRemoteInterface
             mockServer.enqueue(buildSuccessfulResponseForGetEvents())
 
             val responseString = eventRemoteDataSourceSpy.getStreaming(buildEventQuery()).bufferedReader().use {

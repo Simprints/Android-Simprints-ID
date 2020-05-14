@@ -110,7 +110,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = subjectLocalDataSource.count(SubjectLocalDataSource.Query(personId = fakePerson.subjectId))
+        val count = subjectLocalDataSource.count(SubjectLocalDataSource.Query(subjectId = fakePerson.subjectId))
         assertThat(count).isEqualTo(1)
     }
 

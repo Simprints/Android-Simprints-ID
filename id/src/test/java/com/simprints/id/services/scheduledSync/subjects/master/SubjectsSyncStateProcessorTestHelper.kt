@@ -149,8 +149,8 @@ fun createCommonDownSyncTags(uniqueMasterSyncId: String?,
                              uniqueSyncId: String?) = listOf(
     "${TAG_DOWN_MASTER_SYNC_ID}${uniqueSyncId}",
     "${TAG_SCHEDULED_AT}${Date().time}",
-    TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS,
-    TAG_PEOPLE_SYNC_ALL_WORKERS,
+    TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS,
+    TAG_SUBJECTS_SYNC_ALL_WORKERS,
     "${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
 )
 
@@ -158,8 +158,8 @@ private fun createCommonUpSyncTags(uniqueMasterSyncId: String?,
                                    uniqueSyncId: String?) = listOf(
     "${TAG_UP_MASTER_SYNC_ID}${uniqueSyncId}",
     "${TAG_SCHEDULED_AT}${Date().time}",
-    TAG_PEOPLE_UP_SYNC_ALL_WORKERS,
-    TAG_PEOPLE_SYNC_ALL_WORKERS,
+    TAG_SUBJECTS_UP_SYNC_ALL_WORKERS,
+    TAG_SUBJECTS_SYNC_ALL_WORKERS,
     "${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
 )
 

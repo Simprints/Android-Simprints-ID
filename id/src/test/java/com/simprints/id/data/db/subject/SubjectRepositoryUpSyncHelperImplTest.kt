@@ -39,23 +39,23 @@ class SubjectRepositoryUpSyncHelperImplTest {
     @RelaxedMockK lateinit var subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository
     private val modalities = listOf(Modality.FACE, Modality.FINGER)
 
-    private lateinit var personRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelperImpl
+    private lateinit var subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelperImpl
 
     private val projectIdToSync = "projectIdToSync"
     private val userIdToSync = "userIdToSync"
     private val batchSize = 2
 
-    private val notYetSyncedPerson1 = Subject(
-        "patientId1", "projectId", "userId", "moduleId", Date(1), null, true,
+    private val notYetSyncedSubject1 = Subject(
+        "subjectId1", "projectId", "userId", "moduleId", Date(1), null, true,
         listOf(FingerprintSample(FingerIdentifier.LEFT_THUMB, EncodingUtils.base64ToBytes("finger_template"), 70)),
         listOf(FaceSample(EncodingUtils.base64ToBytes("face_template")))
     )
-    private val notYetSyncedPerson2 = notYetSyncedPerson1.copy(subjectId = "patientId2")
-    private val notYetSyncedPerson3 = notYetSyncedPerson1.copy(subjectId = "patientId3")
+    private val notYetSyncedSubject2 = notYetSyncedSubject1.copy(subjectId = "subjectId2")
+    private val notYetSyncedSubject3 = notYetSyncedSubject1.copy(subjectId = "subjectId3")
 
-    private val syncedPerson1 = notYetSyncedPerson1.copy(toSync = false)
-    private val syncedPerson2 = notYetSyncedPerson2.copy(toSync = false)
-    private val syncedPerson3 = notYetSyncedPerson3.copy(toSync = false)
+    private val syncedSubject1 = notYetSyncedSubject1.copy(toSync = false)
+    private val syncedSubject2 = notYetSyncedSubject2.copy(toSync = false)
+    private val syncedSubject3 = notYetSyncedSubject3.copy(toSync = false)
 
     @Before
     fun setUp() {
@@ -63,7 +63,7 @@ class SubjectRepositoryUpSyncHelperImplTest {
             .coroutinesMainThread()
         MockKAnnotations.init(this)
 
-        personRepositoryUpSyncHelper = spyk(SubjectRepositoryUpSyncHelperImpl(loginInfoManager,
+        subjectRepositoryUpSyncHelper = spyk(SubjectRepositoryUpSyncHelperImpl(loginInfoManager,
             subjectLocalDataSource, eventRemoteDataSource, subjectsUpSyncScopeRepository, modalities))
         setupBatchSize()
         mockHelperToGenerateSameUuidForEvents()
@@ -76,7 +76,7 @@ class SubjectRepositoryUpSyncHelperImplTest {
             
             val exceptionMessage = assertThrows<IllegalStateException> {
                 withContext(Dispatchers.IO) {
-                    personRepositoryUpSyncHelper.executeUploadWithProgress(this)
+                    subjectRepositoryUpSyncHelper.executeUploadWithProgress(this)
                 }
             }.message
             assertThat(exceptionMessage).isEqualTo(expectedExceptionMessage)
@@ -87,82 +87,82 @@ class SubjectRepositoryUpSyncHelperImplTest {
     fun simprintsInternalServerException_shouldWrapInSyncCloudIntegrationException() {
         runBlocking {
             mockSignedInUser(projectIdToSync, userIdToSync)
-            mockSuccessfulLocalPeopleQueries(listOf(notYetSyncedPerson1))
+            mockSuccessfulLocalSubjectsQueries(listOf(notYetSyncedSubject1))
             coEvery { eventRemoteDataSource.post(projectIdToSync, any()) } throws SyncCloudIntegrationException("", Throwable())
 
             assertThrows<SyncCloudIntegrationException> {
                 withContext(Dispatchers.IO) {
-                    personRepositoryUpSyncHelper.executeUploadWithProgress(this)
+                    subjectRepositoryUpSyncHelper.executeUploadWithProgress(this)
                 }
             }
         }
     }
 
     @Test
-    fun singleBatchOfPeople_uploadIt_shouldSucceed() {
-        val peopleBatches = arrayOf(listOf(notYetSyncedPerson1, notYetSyncedPerson2))
-        val events = createEventsFromPeople(
+    fun singleBatchOfSubjects_uploadIt_shouldSucceed() {
+        val subjectsBatches = arrayOf(listOf(notYetSyncedSubject1, notYetSyncedSubject2))
+        val events = createEventsFromSubjects(
             arrayOf(
-                listOf(notYetSyncedPerson1, notYetSyncedPerson2)
+                listOf(notYetSyncedSubject1, notYetSyncedSubject2)
             )
         )
 
         testSuccessfulUpSync(
-            localQueryResults = peopleBatches,
+            localQueryResults = subjectsBatches,
             expectedUploadBatches = events,
-            expectedLocalUpdates = arrayOf(listOf(syncedPerson1, syncedPerson2))
+            expectedLocalUpdates = arrayOf(listOf(syncedSubject1, syncedSubject2))
         )
     }
 
     @Test
     fun moreThanBatchSizeFromLocal_uploadIt_shouldSucceedByCreatingBatches() {
-        val peopleBatches = arrayOf(listOf(notYetSyncedPerson1, notYetSyncedPerson2, notYetSyncedPerson3))
-        val events = createEventsFromPeople(
+        val subjectsBatches = arrayOf(listOf(notYetSyncedSubject1, notYetSyncedSubject2, notYetSyncedSubject3))
+        val events = createEventsFromSubjects(
             arrayOf(
-                listOf(notYetSyncedPerson1, notYetSyncedPerson2),
-                listOf(notYetSyncedPerson3)
+                listOf(notYetSyncedSubject1, notYetSyncedSubject2),
+                listOf(notYetSyncedSubject3)
             )
         )
 
         testSuccessfulUpSync(
-            localQueryResults = peopleBatches,
+            localQueryResults = subjectsBatches,
             expectedUploadBatches = events,
             expectedLocalUpdates = arrayOf(
-                listOf(syncedPerson1, syncedPerson2),
-                listOf(syncedPerson3)
+                listOf(syncedSubject1, syncedSubject2),
+                listOf(syncedSubject3)
             )
         )
     }
 
     @Test
     fun multipleBatchesFromLocal_uploadIt_shouldSucceed() {
-        val peopleBatches = arrayOf(
-            listOf(notYetSyncedPerson1, notYetSyncedPerson2),
-            listOf(notYetSyncedPerson3)
+        val subjectsBatches = arrayOf(
+            listOf(notYetSyncedSubject1, notYetSyncedSubject2),
+            listOf(notYetSyncedSubject3)
         )
-        val events = createEventsFromPeople(
+        val events = createEventsFromSubjects(
             arrayOf(
-                listOf(notYetSyncedPerson1, notYetSyncedPerson2),
-                listOf(notYetSyncedPerson3)
+                listOf(notYetSyncedSubject1, notYetSyncedSubject2),
+                listOf(notYetSyncedSubject3)
             )
         )
 
         testSuccessfulUpSync(
-            localQueryResults = peopleBatches,
+            localQueryResults = subjectsBatches,
             expectedUploadBatches = events,
             expectedLocalUpdates = arrayOf(
-                listOf(syncedPerson1, syncedPerson2),
-                listOf(syncedPerson3)
+                listOf(syncedSubject1, syncedSubject2),
+                listOf(syncedSubject3)
             )
         )
     }
 
     private fun setupBatchSize() {
-        every { personRepositoryUpSyncHelper.batchSize } returns batchSize
+        every { subjectRepositoryUpSyncHelper.batchSize } returns batchSize
     }
 
     private fun mockHelperToGenerateSameUuidForEvents() {
-        every { personRepositoryUpSyncHelper.getRandomUuid() } returns "random_uuid"
+        every { subjectRepositoryUpSyncHelper.getRandomUuid() } returns "random_uuid"
     }
 
     private fun testSuccessfulUpSync(
@@ -173,24 +173,24 @@ class SubjectRepositoryUpSyncHelperImplTest {
         runBlocking {
 
             mockSignedInUser(projectIdToSync, userIdToSync)
-            mockSuccessfulLocalPeopleQueries(*localQueryResults)
+            mockSuccessfulLocalSubjectsQueries(*localQueryResults)
 
             withContext(Dispatchers.IO) {
-                personRepositoryUpSyncHelper.executeUploadWithProgress(this).testChannel()
-                verifyLocalPeopleQueries()
-                verifyPeopleUploads(expectedUploadBatches)
-                verifyLocalPeopleUpdates(*expectedLocalUpdates)
+                subjectRepositoryUpSyncHelper.executeUploadWithProgress(this).testChannel()
+                verifyLocalSubjectsQueries()
+                verifySubjectsUploads(expectedUploadBatches)
+                verifyLocalSubjectsUpdates(*expectedLocalUpdates)
             }
         }
 
     }
 
-    private fun createEventsFromPeople(subjects: Array<List<Subject>>) =
+    private fun createEventsFromSubjects(subjects: Array<List<Subject>>) =
         subjects.map {
-            Events(it.map { createEventFromPerson(it) })
+            Events(it.map { createEventFromSubject(it) })
         }.toTypedArray()
 
-    private fun createEventFromPerson(subject: Subject): Event =
+    private fun createEventFromSubject(subject: Subject): Event =
         with(subject) {
             Event(
                 "random_uuid",
@@ -218,7 +218,7 @@ class SubjectRepositoryUpSyncHelperImplTest {
                 fingerprintSamples.map {
                     FingerprintTemplate(it.templateQualityScore,
                         EncodingUtils.byteArrayToBase64(it.template),
-                        it.fingerIdentifier.fromPersonToEvent())
+                        it.fingerIdentifier.fromSubjectToEvent())
                 }),
             FaceReference(
                 faceSamples.map {
@@ -233,13 +233,13 @@ class SubjectRepositoryUpSyncHelperImplTest {
         every { loginInfoManager.getSignedInUserIdOrEmpty() } returns userId
     }
 
-    private fun mockSuccessfulLocalPeopleQueries(vararg queryResults: List<Subject>) {
+    private fun mockSuccessfulLocalSubjectsQueries(vararg queryResults: List<Subject>) {
         coEvery { subjectLocalDataSource.load(any()) } coAnswers {
             queryResults.fold(emptyList<Subject>()) { aggr, new -> aggr + new }.toList().asFlow()
         }
     }
 
-    private fun verifyLocalPeopleQueries() {
+    private fun verifyLocalSubjectsQueries() {
         coVerify(exactly = 1) {
             subjectLocalDataSource.load(withArg {
                 assertThat(it.toSync).isEqualTo(true)
@@ -247,13 +247,13 @@ class SubjectRepositoryUpSyncHelperImplTest {
         }
     }
 
-    private fun verifyPeopleUploads(events: Array<Events>) {
+    private fun verifySubjectsUploads(events: Array<Events>) {
         events.forEach {
             coVerify(exactly = 1) { eventRemoteDataSource.post(projectIdToSync, it) }
         }
     }
 
-    private fun verifyLocalPeopleUpdates(vararg updates: List<Subject>) {
+    private fun verifyLocalSubjectsUpdates(vararg updates: List<Subject>) {
         updates.forEach { update ->
             coVerify(exactly = 1) { subjectLocalDataSource.insertOrUpdate(update) }
         }

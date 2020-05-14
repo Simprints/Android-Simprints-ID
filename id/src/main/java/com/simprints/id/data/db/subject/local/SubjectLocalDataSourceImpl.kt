@@ -115,7 +115,7 @@ class SubjectLocalDataSourceImpl(private val appContext: Context,
             .apply {
                 query?.let { query ->
                     query.projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
-                    query.personId?.let { this.equalTo(PATIENT_ID_FIELD, it) }
+                    query.subjectId?.let { this.equalTo(PATIENT_ID_FIELD, it) }
                     query.userId?.let { this.equalTo(USER_ID_FIELD, it) }
                     query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
                     query.toSync?.let { this.equalTo(TO_SYNC_FIELD, it) }

@@ -7,7 +7,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MALFUNCTION_MESSAGE
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MODULE_IDS
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PEOPLE_DOWN_SYNC_TRIGGERS
+import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SUBJECTS_DOWN_SYNC_TRIGGERS
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PROJECT_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.USER_ID
@@ -165,7 +165,7 @@ class CrashReportManagerImplTest : AutoCloseKoinTest() {
         every { crashReportManagerSpy.crashlyticsInstance } returns crashlyticsInstanceMock
         crashReportManagerSpy.setDownSyncTriggersCrashlyticsKey(testDownSyncSetting)
 
-        verify(atLeast = 1) { crashlyticsInstanceMock.setCustomKey(PEOPLE_DOWN_SYNC_TRIGGERS, testDownSyncSetting.toString()) }
+        verify(atLeast = 1) { crashlyticsInstanceMock.setCustomKey(SUBJECTS_DOWN_SYNC_TRIGGERS, testDownSyncSetting.toString()) }
     }
 
     @Test

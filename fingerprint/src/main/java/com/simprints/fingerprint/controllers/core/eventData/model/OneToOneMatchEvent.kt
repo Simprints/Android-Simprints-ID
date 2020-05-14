@@ -21,5 +21,5 @@ fun OneToOneMatchEvent.fromDomainToCore() =
     )
 
 fun SubjectLocalDataSource.Query.extractVerifyId() =
-    personId
+    subjectId
         ?: throw FingerprintUnexpectedException("null personId in candidate query when saving OneToOneMatchEvent")
