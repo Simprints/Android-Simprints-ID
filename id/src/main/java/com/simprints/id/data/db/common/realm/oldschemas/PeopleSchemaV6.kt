@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.common.realm.oldschemas
 
 object PeopleSchemaV6{
+    const val PERSON_TABLE = "DbPerson"
     const val FINGERPRINT_TABLE: String = "DbFingerprint"
     const val PROJECT_ID = "id"
     const val PERSON_FIELD_FINGERPRINT_SAMPLES = "fingerprints"

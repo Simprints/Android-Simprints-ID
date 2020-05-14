@@ -24,7 +24,6 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
     companion object {
         const val REALM_SCHEMA_VERSION: Long = 10
 
-        const val SUBJECT_TABLE: String = "DbSubject"
         const val FINGERPRINT_TABLE: String = "DbFingerprint"
         const val SYNC_INFO_TABLE: String = "DbSyncInfo"
         const val PROJECT_TABLE: String = "DbProject"
@@ -38,7 +37,6 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
         const val PROJECT_UPDATED_AT = "updatedAt"
 
         const val FINGERPRINT_PERSON = "person"
-        const val PERSON_TABLE_UNTIL_V9 = "DbPerson"
     }
 
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
@@ -60,7 +58,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
     private fun migrateTo1(schema: RealmSchema) {
         with(PeopleSchemaV1) {
-            schema.get(PERSON_TABLE_UNTIL_V9)?.addField(MODULE_FIELD, String::class.java)?.transform {
+            schema.get(PERSON_TABLE)?.addField(MODULE_FIELD, String::class.java)?.transform {
                 it.set(MODULE_FIELD, Constants.GLOBAL_ID)
             }
 
@@ -79,13 +77,13 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
     private fun migratePersonTo2(schema: RealmSchema) {
         with(PeopleSchemaV2) {
-            schema.get(PERSON_TABLE_UNTIL_V9)?.addField(PERSON_PROJECT_ID, String::class.java)?.transform {
+            schema.get(PeopleSchemaV1.PERSON_TABLE)?.addField(PERSON_PROJECT_ID, String::class.java)?.transform {
                 it.setString(PERSON_PROJECT_ID, projectId)
             }?.setRequired(PERSON_PROJECT_ID, true)
 
             // Workaround to make primary key required (kotlin not nullable)
             // https://github.com/realm/realm-java/issues/5235
-            schema.get(SUBJECT_TABLE)?.run {
+            schema.get(PeopleSchemaV1.PERSON_TABLE)?.run {
                 if (isPrimaryKey(PERSON_PATIENT_ID) && !isRequired(PERSON_PATIENT_ID)) {
                     removePrimaryKey()
                     setRequired(PERSON_PATIENT_ID, true)
@@ -94,7 +92,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
                 }
             }
 
-            schema.get(PERSON_TABLE_UNTIL_V9)
+            schema.get(PeopleSchemaV1.PERSON_TABLE)
                 ?.setRequired(PERSON_USER_ID, true)
                 ?.setRequired(PERSON_MODULE_ID, true)
                 ?.addField(PERSON_CREATE_TIME_TEMP, Date::class.java)
@@ -104,9 +102,9 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
             // It's null. The record is marked toSync = true, so having updatedAt = null is
             // even consistent with toSync = person.updatedAt == null || person.createdAt == null
-            schema.get(PERSON_TABLE_UNTIL_V9)?.addField(UPDATE_FIELD, Date::class.java)
+            schema.get(PeopleSchemaV1.PERSON_TABLE)?.addField(UPDATE_FIELD, Date::class.java)
 
-            schema.get(PERSON_TABLE_UNTIL_V9)?.addField(SYNC_FIELD, Boolean::class.java)?.transform {
+            schema.get(PeopleSchemaV1.PERSON_TABLE)?.addField(SYNC_FIELD, Boolean::class.java)?.transform {
                 it.set(SYNC_FIELD, true)
             }
         }
@@ -134,7 +132,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
     private fun migrateTo3(schema: RealmSchema) {
         with(PeopleSchemaV3) {
-            schema.get(PERSON_TABLE_UNTIL_V9)?.transform {
+            schema.get(PeopleSchemaV1.PERSON_TABLE)?.transform {
                 it.set(SYNC_FIELD, true)
             }
         }
@@ -153,7 +151,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
     }
 
     private fun migrateTo6(schema: RealmSchema) {
-        schema.rename(PeopleSchemaV5.PERSON_TABLE, SUBJECT_TABLE)
+        schema.rename(PeopleSchemaV1.PERSON_TABLE, PeopleSchemaV6.PERSON_TABLE)
         schema.rename(PeopleSchemaV5.FINGERPRINT_TABLE, FINGERPRINT_TABLE)
         schema.rename(PeopleSchemaV5.PROJECT_TABLE, PROJECT_TABLE)
         schema.get(PROJECT_TABLE)?.removeField(PROJECT_LEGACY_ID)
@@ -192,7 +190,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
     }
 
     private fun migrateTo10(schema: RealmSchema) {
-        schema.rename(SubjectsSchemaV9.PERSON_TABLE, SUBJECT_TABLE)
+        schema.rename(PeopleSchemaV6.PERSON_TABLE, SubjectsSchemaV10.SUBJECT_TABLE)
             .renameField(SubjectsSchemaV9.PERSON_PATIENT_ID_FIELD, SubjectsSchemaV10.SUBJECT_ID)
             .renameField(SubjectsSchemaV9.PERSON_USER_ID_FIELD, SubjectsSchemaV10.ATTENDANT_ID)
     }
