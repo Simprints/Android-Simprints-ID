@@ -9,7 +9,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -25,7 +25,7 @@ class SignerManagerTest {
     @MockK lateinit var loginInfoManager: LoginInfoManager
     @MockK lateinit var preferencesManager: PreferencesManager
     @MockK lateinit var syncManager: SyncManager
-    @MockK lateinit var peopleSyncManager: PeopleSyncManager
+    @MockK lateinit var subjectsSyncManager: SubjectsSyncManager
 
     private lateinit var signerManager: SignerManagerImpl
 
@@ -40,7 +40,7 @@ class SignerManagerTest {
             remoteDbManager,
             loginInfoManager,
             preferencesManager,
-            peopleSyncManager,
+            subjectsSyncManager,
             syncManager
         )
 
@@ -115,7 +115,7 @@ class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInto()
-        mockResumePeopleSync()
+        mockResumeSubjectsSync()
 
         signIn()
     }
@@ -171,7 +171,7 @@ class SignerManagerTest {
             }
         }
 
-    private fun mockResumePeopleSync(error: Boolean = false) =
+    private fun mockResumeSubjectsSync(error: Boolean = false) =
         coEvery { syncManager.scheduleBackgroundSyncs() }.apply {
             if (!error) {
                 this.returns(Unit)
@@ -183,6 +183,6 @@ class SignerManagerTest {
     private fun verifyUpSyncGotPaused() = verify { syncManager.cancelBackgroundSyncs() }
     private fun verifyStoredCredentialsGotCleaned() = verify { loginInfoManager.cleanCredentials() }
     private fun verifyRemoteManagerGotSignedOut() = verify { remoteDbManager.signOut() }
-    private fun verifyLastSyncInfoGotDeleted() = coVerify { peopleSyncManager.deleteSyncInfo() }
+    private fun verifyLastSyncInfoGotDeleted() = coVerify { subjectsSyncManager.deleteSyncInfo() }
     private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() = verify { preferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
 }

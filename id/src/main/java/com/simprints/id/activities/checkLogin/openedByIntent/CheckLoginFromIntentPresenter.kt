@@ -3,7 +3,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import android.annotation.SuppressLint
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.AuthorizationEvent
 import com.simprints.id.data.db.session.domain.models.events.ConnectivitySnapshotEvent
@@ -42,7 +42,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private var setupFailed: Boolean = false
 
     @Inject lateinit var sessionRepository: SessionRepository
-    @Inject lateinit var personLocalDataSource: PersonLocalDataSource
+    @Inject lateinit var subjectLocalDataSource: SubjectLocalDataSource
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     internal lateinit var appRequest: AppRequest
 
@@ -177,7 +177,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
         ignoreException {
-            val peopleInDb = personLocalDataSource.count()
+            val peopleInDb = subjectLocalDataSource.count()
             sessionRepository.updateCurrentSession { currentSession ->
                 val authorisationEvent = buildAuthorizationEvent(AuthorizationEvent.Result.AUTHORIZED)
 
@@ -198,7 +198,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
             setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
             setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
-            setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncSetting)
+            setDownSyncTriggersCrashlyticsKey(preferencesManager.subjectsDownSyncSetting)
             setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
         }
     }

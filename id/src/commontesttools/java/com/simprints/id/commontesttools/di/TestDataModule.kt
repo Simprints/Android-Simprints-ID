@@ -8,13 +8,13 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
-import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.person.PersonRepositoryDownSyncHelper
-import com.simprints.id.data.db.person.PersonRepositoryUpSyncHelper
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.person.remote.EventRemoteDataSource
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.SubjectRepositoryDownSyncHelper
+import com.simprints.id.data.db.subject.SubjectRepositoryUpSyncHelper
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
@@ -22,8 +22,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
-import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
+import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
+import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
 import kotlinx.coroutines.FlowPreview
@@ -81,44 +81,44 @@ class TestDataModule(
 
     override fun providePersonRepositoryUpSyncHelper(
         loginInfoManager: LoginInfoManager,
-        personLocalDataSource: PersonLocalDataSource,
+        subjectLocalDataSource: SubjectLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
-        peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
+        subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
         preferencesManager: PreferencesManager,
-        peopleSyncCache: PeopleSyncCache
-    ): PersonRepositoryUpSyncHelper =
+        subjectsSyncCache: SubjectsSyncCache
+    ): SubjectRepositoryUpSyncHelper =
         personRepositoryUpSyncHelperRule.resolveDependency {
             super.providePersonRepositoryUpSyncHelper(
-                loginInfoManager, personLocalDataSource, eventRemoteDataSource,
-                peopleUpSyncScopeRepository, preferencesManager, peopleSyncCache
+                loginInfoManager, subjectLocalDataSource, eventRemoteDataSource,
+                subjectsUpSyncScopeRepository, preferencesManager, subjectsSyncCache
             )
     }
 
-    override fun providePersonRepositoryDownSyncHelper(personLocalDataSource: PersonLocalDataSource,
+    override fun providePersonRepositoryDownSyncHelper(subjectLocalDataSource: SubjectLocalDataSource,
                                                        eventRemoteDataSource: EventRemoteDataSource,
-                                                       downSyncScopeRepository: PeopleDownSyncScopeRepository,
-                                                       timeHelper: TimeHelper): PersonRepositoryDownSyncHelper =
+                                                       downSyncScopeRepository: SubjectsDownSyncScopeRepository,
+                                                       timeHelper: TimeHelper): SubjectRepositoryDownSyncHelper =
         personRepositoryDownSyncHelperRule.resolveDependency {
-            super.providePersonRepositoryDownSyncHelper(personLocalDataSource, eventRemoteDataSource,
+            super.providePersonRepositoryDownSyncHelper(subjectLocalDataSource, eventRemoteDataSource,
                 downSyncScopeRepository, timeHelper)
         }
 
 
     override fun providePersonRepository(
-        personLocalDataSource: PersonLocalDataSource,
+        subjectLocalDataSource: SubjectLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
-        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
-        peopleUpSyncExecutor: PeopleUpSyncExecutor,
-        personRepositoryUpSyncHelper: PersonRepositoryUpSyncHelper,
-        personRepositoryDownSyncHelper: PersonRepositoryDownSyncHelper
-    ): PersonRepository = personRepositoryRule.resolveDependency {
+        subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
+        subjectsUpSyncExecutor: SubjectsUpSyncExecutor,
+        subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
+        subjectRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper
+    ): SubjectRepository = personRepositoryRule.resolveDependency {
         super.providePersonRepository(
-            personLocalDataSource,
+            subjectLocalDataSource,
             eventRemoteDataSource,
-            peopleDownSyncScopeRepository,
-            peopleUpSyncExecutor,
-            personRepositoryUpSyncHelper,
-            personRepositoryDownSyncHelper
+            subjectsDownSyncScopeRepository,
+            subjectsUpSyncExecutor,
+            subjectRepositoryUpSyncHelper,
+            subjectRepositoryDownSyncHelper
         )
     }
 
@@ -141,7 +141,7 @@ class TestDataModule(
         ctx: Context,
         secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
         loginInfoManager: LoginInfoManager
-    ): PersonLocalDataSource =
+    ): SubjectLocalDataSource =
         personLocalDataSourceRule.resolveDependency {
             super.providePersonLocalDataSource(
                 ctx,

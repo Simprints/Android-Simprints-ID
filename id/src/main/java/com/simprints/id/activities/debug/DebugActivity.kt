@@ -12,18 +12,18 @@ import androidx.lifecycle.Observer
 import androidx.work.WorkManager
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncOperationLocalDataSource
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.*
+import com.simprints.id.data.db.subjects_sync.down.local.SubjectsDownSyncOperationLocalDataSource
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState.*
 import kotlinx.android.synthetic.main.activity_debug.*
 import javax.inject.Inject
 
 
 class DebugActivity : AppCompatActivity() {
 
-    @Inject lateinit var peopleSyncManager: PeopleSyncManager
-    @Inject lateinit var peopleDownSyncOperationLocalDataSource: PeopleDownSyncOperationLocalDataSource
+    @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
+    @Inject lateinit var subjectsDownSyncOperationLocalDataSource: SubjectsDownSyncOperationLocalDataSource
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(this)
@@ -35,7 +35,7 @@ class DebugActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_debug)
 
-        peopleSyncManager.getLastSyncState().observe(this, Observer {
+        subjectsSyncManager.getLastSyncState().observe(this, Observer {
             val states = (it.downSyncWorkersInfo.map { it.state } + it.upSyncWorkersInfo.map { it.state })
             val message =
                 "${it.syncId.takeLast(3)} - " +
@@ -49,23 +49,23 @@ class DebugActivity : AppCompatActivity() {
         })
 
         syncSchedule.setOnClickListener {
-            peopleSyncManager.scheduleSync()
+            subjectsSyncManager.scheduleSync()
         }
 
         syncStart.setOnClickListener {
-            peopleSyncManager.sync()
+            subjectsSyncManager.sync()
         }
 
         syncStop.setOnClickListener {
-            peopleSyncManager.stop()
+            subjectsSyncManager.stop()
         }
 
         cleanAll.setOnClickListener {
-            peopleSyncManager.cancelScheduledSync()
-            peopleSyncManager.stop()
+            subjectsSyncManager.cancelScheduledSync()
+            subjectsSyncManager.stop()
             wm.pruneWork()
 
-            peopleDownSyncOperationLocalDataSource.deleteAll()
+            subjectsDownSyncOperationLocalDataSource.deleteAll()
         }
     }
 
@@ -84,7 +84,7 @@ class DebugActivity : AppCompatActivity() {
         return spannableString
     }
 
-    private fun List<PeopleSyncWorkerState>.toDebugActivitySyncState(): DebugActivitySyncState =
+    private fun List<SubjectsSyncWorkerState>.toDebugActivitySyncState(): DebugActivitySyncState =
         when {
             isEmpty() -> DebugActivitySyncState.NOT_RUNNING
             this.any { it is Running } -> DebugActivitySyncState.RUNNING
