@@ -9,10 +9,10 @@ import androidx.room.Query
 interface SubjectsUpSyncOperationLocalDataSource {
 
     @Query("select * from UpSyncStatus where id LIKE :key")
-    suspend fun getUpSyncOperation(key: DbUpSyncOperationKey): DbUpSyncOperation?
+    suspend fun getUpSyncOperation(key: DbUpSyncOperationKey): DbSubjectsUpSyncOperation?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrReplaceUpSyncOperation(upSyncStatus: DbUpSyncOperation)
+    suspend fun insertOrReplaceUpSyncOperation(subjectsUpSyncStatus: DbSubjectsUpSyncOperation)
 
     @Query("delete from UpSyncStatus")
     suspend fun deleteAll()

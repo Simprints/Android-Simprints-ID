@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.subjects_sync.up.domain
 
-import com.simprints.id.data.db.subjects_sync.up.local.DbUpSyncOperation
+import com.simprints.id.data.db.subjects_sync.up.local.DbSubjectsUpSyncOperation
 import com.simprints.id.data.db.subjects_sync.up.local.DbUpSyncOperationKey
 
 data class SubjectsUpSyncOperation(val projectId: String,
@@ -8,7 +8,7 @@ data class SubjectsUpSyncOperation(val projectId: String,
 
 
 fun SubjectsUpSyncOperation.fromDbToDomain() =
-    DbUpSyncOperation(
+    DbSubjectsUpSyncOperation(
         DbUpSyncOperationKey(projectId),
         projectId,
         lastResult?.lastState,
