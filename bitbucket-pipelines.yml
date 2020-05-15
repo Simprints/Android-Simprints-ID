@@ -106,11 +106,12 @@ definitions:
                 size: 2x # Double resources available for this step
                 script:
                     - bash ./ci/pipeline/setup
+                    - ./gradlew assembleDebug
                     - ./gradlew sonarqube --stacktrace
-#                    -   pipe: sonarsource/sonarcloud-scan:1.0.1
-#                        variables:
-#                            EXTRA_ARGS: '-X'
-#                            DEBUG: 'true'
+                    -   pipe: sonarsource/sonarcloud-scan:1.0.1
+                        variables:
+                            EXTRA_ARGS: '-X'
+                            DEBUG: 'true'
                     -   pipe: sonarsource/sonarcloud-quality-gate:0.1.3
 
         ######################################################################
