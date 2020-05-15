@@ -11,9 +11,12 @@ import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.Location
+import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
+import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse
 import com.simprints.id.domain.moduleapi.core.response.SetupResponse
 import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
+import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
@@ -27,6 +30,8 @@ import javax.inject.Inject
 
 class SetupActivity: AppCompatActivity() {
 
+    private lateinit var setupRequest: SetupRequest
+
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionRepository: SessionRepository
@@ -35,19 +40,21 @@ class SetupActivity: AppCompatActivity() {
         injectDependencies()
         super.onCreate(savedInstanceState)
 
-        askLocationPermissionIfRequiredAndFinish()
+        setupRequest = intent.extras?.getParcelable(CoreResponse.CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
+
+        askPermissionsOrPerformSpecificActions()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when(requestCode) {
-            LOCATION_PERMISSION_REQUEST_CODE -> {
+            PERMISSIONS_REQUEST_CODE -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     storeUserLocationIntoCurrentSession()
                 }
-                setResultAndFinish()
             }
         }
+        setResultAndFinish()
     }
 
     private fun injectDependencies() {
@@ -55,16 +62,25 @@ class SetupActivity: AppCompatActivity() {
         component.inject(this)
     }
 
-    private fun askLocationPermissionIfRequiredAndFinish() {
-        val permission = Manifest.permission.ACCESS_FINE_LOCATION
+    private fun askPermissionsOrPerformSpecificActions() {
+        val permissions = extractPermissionsFromRequest()
 
-        if (hasPermission(permission)) {
-            storeUserLocationIntoCurrentSession()
-            setResultAndFinish()
+        if (permissions.all { hasPermission(it) }) {
+            performPermissionActionsAndFinish()
         } else {
-            requestPermissionsIfRequired(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_PERMISSION_REQUEST_CODE)
+            requestPermissionsIfRequired(permissions, PERMISSIONS_REQUEST_CODE)
         }
+    }
+
+    private fun extractPermissionsFromRequest(): List<String> = setupRequest.requiredPermissions.map {
+        when (it) {
+            SetupPermission.LOCATION -> Manifest.permission.ACCESS_FINE_LOCATION
+        }
+    }
+
+    private fun performPermissionActionsAndFinish() {
+        storeUserLocationIntoCurrentSession()
+        setResultAndFinish()
     }
 
     private fun storeUserLocationIntoCurrentSession() {
@@ -97,6 +113,6 @@ class SetupActivity: AppCompatActivity() {
     }
 
     companion object {
-        const val LOCATION_PERMISSION_REQUEST_CODE = 99
+        const val PERMISSIONS_REQUEST_CODE = 99
     }
 }
