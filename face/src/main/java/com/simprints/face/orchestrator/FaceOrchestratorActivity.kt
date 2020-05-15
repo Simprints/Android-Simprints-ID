@@ -35,7 +35,7 @@ class FaceOrchestratorActivity : AppCompatActivity() {
     }
 
     private fun tryInitWithLicense(rankOneLicense: String, iFaceRequest: IFaceRequest) {
-        if (RankOneInitializer.init(this, rankOneLicense)) {
+        if (RankOneInitializer.tryInitWithLicense(this, rankOneLicense)) {
             viewModel.start(iFaceRequest)
         } else {
             viewModel.invalidLicense()
