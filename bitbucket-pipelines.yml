@@ -108,7 +108,7 @@ definitions:
                     - bash ./ci/pipeline/setup
                     - ./gradlew assembleDebug
                     - ./gradlew sonarqube --stacktrace
-                    -   pipe: sonarsource/sonarcloud-scan:1.0.1
+                    -   pipe: sonarsource/sonarcloud-scan:1.1.0
                         variables:
                             EXTRA_ARGS: '-X'
                             DEBUG: 'true'
