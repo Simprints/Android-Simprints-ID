@@ -30,6 +30,9 @@ import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.TimeHelper
 import kotlinx.android.synthetic.main.activity_consent.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ConsentActivity : AppCompatActivity() {
@@ -178,8 +181,17 @@ class ConsentActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        deleteLocationInfoFromSession()
         exitFormHelper.buildExitFormResponseForCore(data)?.let {
             setResultAndFinish(it)
+        }
+    }
+
+    private fun deleteLocationInfoFromSession() {
+        CoroutineScope(Dispatchers.Main).launch {
+            sessionRepository.updateCurrentSession {
+                it.location = null
+            }
         }
     }
 
@@ -199,6 +211,5 @@ class ConsentActivity : AppCompatActivity() {
     companion object {
         const val GENERAL_CONSENT_TAB_TAG = "General"
         const val PARENTAL_CONSENT_TAB_TAG = "Parental"
-        const val LOCATION_PERMISSION_REQUEST_CODE = 99
     }
 }
