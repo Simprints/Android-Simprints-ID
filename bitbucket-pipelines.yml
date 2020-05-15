@@ -23,7 +23,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew id:bundleDebugClasses
+                    - ./gradlew bundleDebugClasses
                 artifacts:
                     - build/**
                     - clientapi/build/**
