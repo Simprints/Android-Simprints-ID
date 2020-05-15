@@ -38,7 +38,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew clientapi:testDebugUnitTest clientapi:jacocoTestReportDebug
+                    - ./gradlew clientapi:jacocoTestReportDebug
                 artifacts:
                     - clientapi/build/reports/**
         -   step: &run-id-unit-tests
@@ -48,7 +48,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew id:testDebugUnitTest id:jacocoTestReportDebug
+                    - ./gradlew id:jacocoTestReportDebug
                 artifacts:
                     - id/build/reports/**
         -   step: &run-face-unit-tests
@@ -58,7 +58,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew face:testDebugUnitTest face:jacocoTestReportDebug
+                    - ./gradlew face:jacocoTestReportDebug
                 artifacts:
                     - face/build/reports/**
         -   step: &run-fingerprint-unit-tests
@@ -83,16 +83,13 @@ definitions:
                     -   pipe: sonarsource/sonarcloud-scan:1.0.1
                     -   pipe: sonarsource/sonarcloud-quality-gate:0.1.3
         -   step: &build-and-sign-universal-apk
-                name: "Check code quality & build apk"
+                name: "Build universal APK"
                 caches:
                     - gradle
                     - gradlewrapper
                 size: 2x # Double resources available for this step
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew sonarqube --stacktrace
-                    -   pipe: sonarsource/sonarcloud-scan:1.0.1
-                    -   pipe: sonarsource/sonarcloud-quality-gate:0.1.3
                     - cat ci/debug_gradle_signing >> id/build.gradle && ./gradlew bundleDebug --stacktrace
                     - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
                     - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/debug/id-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=ci/debug_keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
@@ -167,8 +164,9 @@ pipelines:
                 -   step: *run-id-unit-tests
                 -   step: *run-face-unit-tests
                 -   step: *run-fingerprint-unit-tests
-        -   step: *build-and-sign-universal-apk
+                -   step: *build-and-sign-universal-apk
         -   parallel:
+                -   step: *upload-sonar-scan-and-check-quality-gate
                 -   step: *run-clientapi-android-tests
                 -   step: *run-id-android-tests
                 -   step: *run-face-android-tests
