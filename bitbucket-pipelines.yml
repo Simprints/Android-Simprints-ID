@@ -116,7 +116,7 @@ definitions:
         # APK and upload it to artifacts.
         ######################################################################
         -   step: &build-and-sign-universal-apk
-                name: "Build universal APK"
+                name: "Build test & universal APKs"
                 caches:
                     - gradle
                     - gradlewrapper
@@ -192,18 +192,43 @@ definitions:
                     - bash ./ci/pipeline/setup_gcloud
                     - gcloud firebase test android run --type instrumentation --app universal.apk --test face-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
 
+Flow:
+    -   flow: &main-flow
+            -   step: *compile-build-files
+            -   parallel:
+                    -   step: *run-clientapi-unit-tests
+                    -   step: *run-id-unit-tests
+                    -   step: *run-face-unit-tests
+                    -   step: *run-fingerprint-unit-tests
+                    -   step: *build-and-sign-universal-apk
+            -   parallel:
+                    -   step: *upload-sonar-scan-and-check-quality-gate
+                    -   step: *run-clientapi-android-tests-on-gcloud-image
+                    -   step: *run-id-android-tests-on-gcloud-image
+                    -   step: *run-face-android-tests
+                    -   step: *run-fingerprint-android-tests
+
 pipelines:
-    default:
-        -   step: *compile-build-files
-        -   parallel:
-                -   step: *run-clientapi-unit-tests
-                -   step: *run-id-unit-tests
-                -   step: *run-face-unit-tests
-                -   step: *run-fingerprint-unit-tests
-                -   step: *build-and-sign-universal-apk
-        -   parallel:
-                -   step: *upload-sonar-scan-and-check-quality-gate
-                -   step: *run-clientapi-android-tests-on-gcloud-image
-                -   step: *run-id-android-tests-on-gcloud-image
-                -   step: *run-face-android-tests
-                -   step: *run-fingerprint-android-tests
+#    default:
+#        -   step: *compile-build-files
+#        -   parallel:
+#                -   step: *run-clientapi-unit-tests
+#                -   step: *run-id-unit-tests
+#                -   step: *run-face-unit-tests
+#                -   step: *run-fingerprint-unit-tests
+#                -   step: *build-and-sign-universal-apk
+#        -   parallel:
+#                -   step: *upload-sonar-scan-and-check-quality-gate
+#                -   step: *run-clientapi-android-tests-on-gcloud-image
+#                -   step: *run-id-android-tests-on-gcloud-image
+#                -   step: *run-face-android-tests
+#                -   step: *run-fingerprint-android-tests
+    branches:
+        master:
+        develop:
+        test_ci_flow: *main-flow
+    pull-requests:
+        master:
+        develop:
+        test_ci_flow:
+
