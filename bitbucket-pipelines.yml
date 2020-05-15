@@ -200,7 +200,7 @@ definitions:
 ######################################################################
 flows:
     -   flow: &main-flow
-            -   step: *compile-build-files
+            #-   step: *compile-build-files
             -   parallel:
                     -   step: *run-clientapi-unit-tests
                     -   step: *run-id-unit-tests
