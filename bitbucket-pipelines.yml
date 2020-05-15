@@ -156,7 +156,7 @@ definitions:
                     - cat ci/debug_gradle_signing >> id/build.gradle
                     - ./gradlew id:assembleDebugAndroidTest
                     - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk
-                    - bash ./ci/pipeline/install_gcloud
+                    - bash ./ci/pipeline/setup_gcloud
                     - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
                     - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
                     - gcloud config set project simprints-android-ci
@@ -170,7 +170,7 @@ definitions:
                 name: "Run Id android tests"
                 image: google/cloud-sdk:slim
                 script:
-                    - bash ./ci/pipeline/install_gcloud
+                    - bash ./ci/pipeline/setup_gcloud
                     - gcloud firebase test android run --type instrumentation --app universal.apk --test id-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
 
         ######################################################################
@@ -181,7 +181,7 @@ definitions:
                 name: "Run ClientApi android tests"
                 image: google/cloud-sdk:slim
                 script:
-                    - bash ./ci/pipeline/install_gcloud
+                    - bash ./ci/pipeline/setup_gcloud
                     - gcloud firebase test android run --type instrumentation --app universal.apk --test clientapi-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
 
         ######################################################################
@@ -201,7 +201,7 @@ definitions:
                     - ./gradlew clientapi:assembleDebugAndroidTest
                     - mv clientapi/build/outputs/apk/androidTest/debug/clientapi-debug-androidTest.apk clientapi-debug-androidTest.apk
                     -
-                    - bash ./ci/pipeline/install_gcloud
+                    - bash ./ci/pipeline/setup_gcloud
                     - gcloud firebase test android run --type instrumentation --app universal.apk --test clientapi-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
 
         ######################################################################
@@ -221,7 +221,7 @@ definitions:
                     - ./gradlew fingerprint:assembleDebugAndroidTest
                     - mv fingerprint/build/outputs/apk/androidTest/debug/fingerprint-debug-androidTest.apk fingerprint-debug-androidTest.apk
                     -
-                    - bash ./ci/pipeline/install_gcloud
+                    - bash ./ci/pipeline/setup_gcloud
                     - gcloud firebase test android run --type instrumentation --app universal.apk --test fingerprint-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
 
         ######################################################################
@@ -241,7 +241,7 @@ definitions:
                     - ./gradlew face:assembleDebugAndroidTest
                     - mv face/build/outputs/apk/androidTest/debug/face-debug-androidTest.apk face-debug-androidTest.apk
                     -
-                    - bash ./ci/pipeline/install_gcloud
+                    - bash ./ci/pipeline/setup_gcloud
                     - gcloud firebase test android run --type instrumentation --app universal.apk --test face-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
 
 
