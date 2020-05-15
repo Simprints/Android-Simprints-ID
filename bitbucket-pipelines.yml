@@ -110,7 +110,7 @@ definitions:
                     - ./gradlew sonarqube --stacktrace
                     -   pipe: sonarsource/sonarcloud-scan:1.1.0
                         variables:
-                            EXTRA_ARGS: '-X'
+                            EXTRA_ARGS: -Dsonar.java.binaries=\"**\"
                             DEBUG: 'true'
                     -   pipe: sonarsource/sonarcloud-quality-gate:0.1.3
 
