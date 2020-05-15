@@ -13,7 +13,7 @@ object RankOneInitializer {
      *
      * @return true if initializing was successful, false otherwise
      */
-    fun init(activity: Activity, license: String): Boolean {
+    fun tryInitWithLicense(activity: Activity, license: String): Boolean {
         try {
             System.loadLibrary("_roc_embedded")
         } catch (t: Throwable) {
