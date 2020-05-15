@@ -15,6 +15,7 @@ import com.simprints.face.data.moduleapi.face.responses.FaceResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
+import timber.log.Timber
 import java.util.*
 
 class FaceOrchestratorViewModel : ViewModel() {
@@ -24,6 +25,9 @@ class FaceOrchestratorViewModel : ViewModel() {
     val startMatching: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
     val flowFinished: MutableLiveData<LiveDataEventWithContent<IFaceResponse>> = MutableLiveData()
+
+    val missingLicenseEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val invalidLicenseEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
     fun start(iFaceRequest: IFaceRequest) {
         val request = FaceToDomainRequest.fromFaceToDomainRequest(iFaceRequest)
@@ -55,6 +59,18 @@ class FaceOrchestratorViewModel : ViewModel() {
         )
 
         return FaceMatchResponse(faceMatchResults)
+    }
+
+    fun missingLicense() {
+        // TODO: log on Crashlytics that the license is inexistent
+        Timber.d("RankOne license is missing")
+        missingLicenseEvent.send()
+    }
+
+    fun invalidLicense() {
+        // TODO: log on Crashlytics that the license is invalid
+        Timber.d("RankOne license is invalid")
+        invalidLicenseEvent.send()
     }
 
 }
