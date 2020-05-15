@@ -3,20 +3,17 @@ package com.simprints.fingerprint.scanner.wrapper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
+import com.simprints.fingerprint.scanner.controllers.v2.ConnectionHelper
+import com.simprints.fingerprint.scanner.controllers.v2.ScannerInitialSetupHelper
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ScannerVersionInformation
-import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
 import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
@@ -28,16 +25,14 @@ import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 import java.io.IOException
 import java.util.*
-import java.util.concurrent.TimeUnit
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
 class ScannerWrapperV2(private val scannerV2: ScannerV2,
                        private val scannerUiHelper: ScannerUiHelper,
                        private val macAddress: String,
-                       private val bluetoothAdapter: ComponentBluetoothAdapter,
+                       private val scannerInitialSetupHelper: ScannerInitialSetupHelper,
+                       private val connectionHelper: ConnectionHelper,
                        private val crashReportManager: FingerprintCrashReportManager) : ScannerWrapper {
-
-    private lateinit var socket: ComponentBluetoothSocket
 
     private var unifiedVersionInformation: UnifiedVersionInformation? = null
 
@@ -50,42 +45,15 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                     (it.un20AppVersion.firmwareMinorVersion.toLong()))
         } ?: ScannerVersionInformation(2, -1, -1)
 
-    override fun connect(): Completable {
-        if (bluetoothAdapter.isNull()) throw BluetoothNotSupportedException()
-        if (!bluetoothAdapter.isEnabled()) throw BluetoothNotEnabledException()
-
-        val device = bluetoothAdapter.getRemoteDevice(macAddress)
-
-        if (!device.isBonded()) throw ScannerNotPairedException()
-
-        return Single.fromCallable {
-            try {
-                Timber.d("Attempting connect...")
-                socket = device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
-                bluetoothAdapter.cancelDiscovery()
-                socket.connect()
-                socket
-            } catch (e: IOException) {
-                throw ScannerDisconnectedException()
-            }
-        }.retry(CONNECT_MAX_RETRIES)
-            .flatMapCompletable { socket ->
-                Timber.d("Socket connected. Setting up scanner...")
-                scannerV2.connect(socket.getInputStream(), socket.getOutputStream())
-                    .delay(100, TimeUnit.MILLISECONDS) // Speculatively needed
-                    .andThen(scannerV2.getVersionInformation())
-                    .map {
-                        unifiedVersionInformation = it
-                    }
-                    .ignoreElement()
-                    .andThen(scannerV2.enterMainMode())
-                    .delay(100, TimeUnit.MILLISECONDS) // Speculatively needed
-            }.wrapErrorsFromScanner()
-    }
+    override fun connect(): Completable =
+        connectionHelper.connectScanner(scannerV2, macAddress)
+            .andThen(scannerInitialSetupHelper.setupScanner(scannerV2, null))
+            .doOnSuccess { unifiedVersionInformation = it }
+            .ignoreElement()
+            .wrapErrorsFromScanner()
 
     override fun disconnect(): Completable =
-        scannerV2.disconnect()
-            .doOnComplete { socket.close() }
+        connectionHelper.disconnectScanner(scannerV2)
             .wrapErrorsFromScanner()
 
     override fun sensorWakeUp(): Completable =
