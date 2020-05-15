@@ -31,7 +31,7 @@ class ConnectScannerActivity : FingerprintActivity() {
 
         viewModel.launchAlert.activityObserveEventWith { launchAlert(this, it) }
         viewModel.finish.activityObserveEventWith { vibrateAndContinueToNextActivity() }
-        viewModel.start()
+        viewModel.start(connectScannerRequest.connectMode)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

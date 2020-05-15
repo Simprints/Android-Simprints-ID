@@ -4,8 +4,15 @@ This is the activity that handles the setup with the scanner, and any associated
 The desired side-effect of this activity is creating a connected instance of `Scanner` in the `ScannerManager` singleton, which can then be used by proceeding activities.
 
 It is a single Activity design using the [Navigation Architecture Component](https://developer.android.com/guide/navigation) to switch between fragments.
-There is a shared view model for all fragments, `ConnectScannerViewModel`, which handles the setup flow with the scanner. The more complex fragments additionally have their own view models.
-The primary fragment is `ConnectScannerMainFragment`. During the setup flow, `FingerpintAlert`s can be triggered by the `ScannerManager`.
+There is a shared view model for all fragments, `ConnectScannerViewModel`, which handles the setup flow with the scanner.
+The more complex fragments additionally have their own view models.
+
+The primary fragment is `ConnectScannerMainFragment`.
+This fragment acts as a container for either the `InitialConnectFragment` when it's launched for the first time during the flow, or the `ReconnectFragment` when we need to reconnect mid-flow.
+The choice is fragment is determined by the `connectionMode` included in the `ConnectScannerTaskRequest`.
+The `InitialConnectFragment` has more UI and info for the user, whereas the `ReconnectFragment` is minimum and mostly translucent.
+
+During the setup flow, `FingerpintAlert`s can be triggered by the `ScannerManager`.
 Most of these are turned into `ConnectScannerIssue`s, which represents a particular screen to show to the user for them to deal with.
 There is a fragment for each issue, and they can be launched from the main fragment during the flow and sometimes launch each other.
 
