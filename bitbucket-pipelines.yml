@@ -107,9 +107,10 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - ./gradlew sonarqube --stacktrace
-                    -   pipe: sonarsource/sonarcloud-scan:1.0.1
-                        variables:
-                            DEBUG: 'true'
+#                    -   pipe: sonarsource/sonarcloud-scan:1.0.1
+#                        variables:
+#                            EXTRA_ARGS: '-X'
+#                            DEBUG: 'true'
                     -   pipe: sonarsource/sonarcloud-quality-gate:0.1.3
 
         ######################################################################
@@ -200,7 +201,6 @@ definitions:
 ######################################################################
 flows:
     -   flow: &main-flow
-            #-   step: *compile-build-files
             -   parallel:
                     -   step: *run-clientapi-unit-tests
                     -   step: *run-id-unit-tests
