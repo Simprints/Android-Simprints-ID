@@ -1,10 +1,7 @@
 package com.simprints.id.orchestrator.steps.core
 
 import android.content.Intent
-import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
-import com.simprints.id.domain.moduleapi.core.requests.ConsentType
-import com.simprints.id.domain.moduleapi.core.requests.FetchGUIDRequest
-import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
+import com.simprints.id.domain.moduleapi.core.requests.*
 import com.simprints.id.domain.moduleapi.core.response.*
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.Step
@@ -18,7 +15,7 @@ class CoreStepProcessorImpl : CoreStepProcessor {
         const val SETUP_ACTIVITY_NAME = "com.simprints.id.activities.setup.SetupActivity"
     }
 
-    override fun buildStepSetup(): Step = buildSetupStep()
+    override fun buildStepSetup(permissions: List<SetupPermission>): Step = buildSetupStep(permissions)
 
     override fun buildStepConsent(consentType: ConsentType) =
         buildConsentStep(consentType)
@@ -26,11 +23,11 @@ class CoreStepProcessorImpl : CoreStepProcessor {
     override fun buildStepVerify(projectId: String, verifyGuid: String): Step =
         buildVerifyStep(projectId, verifyGuid)
 
-    private fun buildSetupStep() = Step(
+    private fun buildSetupStep(permissions: List<SetupPermission>) = Step(
         requestCode = SETUP.value,
         activityName = SETUP_ACTIVITY_NAME,
         bundleKey = CORE_STEP_BUNDLE,
-        request = SetupRequest(),
+        request = SetupRequest(permissions),
         status = Step.Status.NOT_STARTED
     )
 
