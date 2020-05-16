@@ -10,31 +10,7 @@ clone:
 definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
-        googlecloud: ~/google-cloud-sdk/bin
     steps:
-        ######################################################################
-        # Compile the ID classes and store them in artifacts for the unit
-        # tests.
-        ######################################################################
-        -   step: &compile-build-files
-                name: "Compile debug build"
-                caches:
-                    - gradle
-                    - gradlewrapper
-                script:
-                    - bash ./ci/pipeline/setup
-                    - ./gradlew bundleDebugClasses
-                artifacts:
-                    - build/**
-                    - clientapi/build/**
-                    - face/build/**
-                    - fingerprint/build/**
-                    - fingerprintmatcher/.cxx/**
-                    - fingerprintscanner/build/**
-                    - id/build/**
-                    - moduleapi/build/**
-                    - uicomponents/build/**
-                    - uicomponents/.cxx/**
 
         ######################################################################
         # Run the Client API unit tests with coverage and upload report to
@@ -106,12 +82,10 @@ definitions:
                 size: 2x # Double resources available for this step
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew assembleDebug
-                    - ./gradlew sonarqube --stacktrace
+                    - ./gradlew sonarqube
                     -   pipe: sonarsource/sonarcloud-scan:1.1.0
                         variables:
                             EXTRA_ARGS: -Dsonar.java.binaries=\"**\"
-                            DEBUG: 'true'
                     -   pipe: sonarsource/sonarcloud-quality-gate:0.1.3
 
         ######################################################################
