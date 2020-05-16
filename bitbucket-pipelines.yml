@@ -148,9 +148,7 @@ definitions:
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
-                    - gcloud firebase test android run --type instrumentation --app universal.apk --test clientapi-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator --verbosity debug > ./firebase_test_log
-                    - cat ./firebase_test_log
-                    - cat ./firebase_test_log | grep -o 'gs.*test_result_1.xml' |  xargs -I{} gsutil cp {} .
+                    - gcloud firebase test android run --type instrumentation --app universal.apk --test clientapi-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator 
 
         ######################################################################
         # Run Fingerprint Android tests on Firebase test lab.
@@ -170,7 +168,9 @@ definitions:
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
-                    - gcloud firebase test android run --type instrumentation --app universal.apk --test face-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
+                    - gcloud firebase test android run --type instrumentation --app universal.apk --test face-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator --verbosity debug > ./firebase_test_log
+                    - cat ./firebase_test_log
+                    - cat ./firebase_test_log | grep -o 'gs.*test_result_1.xml' |  xargs -I{} gsutil cp {} .
 
 ######################################################################
 # Define the different pipelines flows as anchors.
