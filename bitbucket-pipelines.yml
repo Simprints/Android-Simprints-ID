@@ -165,8 +165,6 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup_gcloud
                     - bash ./ci/pipeline/run_firebase_test_lab universal.apk face-debug-androidTest.apk 
-                artifacts:
-                    - ./*merged.xml
 
 ######################################################################
 # Define the different pipelines flows as anchors.
