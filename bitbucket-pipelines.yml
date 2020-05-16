@@ -85,7 +85,7 @@ definitions:
                     - ./gradlew sonarqube
                     -   pipe: sonarsource/sonarcloud-scan:1.1.0
                         variables:
-                            EXTRA_ARGS: -Dsonar.java.binaries=\"**\"
+                            EXTRA_ARGS: -Dsonar.java.binaries=\"**\" -Dsonar.exclusions=\"fingerprintmatcher/src/main/java/com/simprints/fingerprintmatcher/sourceafis\"
                     -   pipe: sonarsource/sonarcloud-quality-gate:0.1.3
 
         ######################################################################
