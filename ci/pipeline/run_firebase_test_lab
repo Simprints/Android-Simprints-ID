@@ -1,4 +1,4 @@
 #!/bin/bash
-gcloud firebase test android run --type instrumentation --app $1 --test $2 --device model=Nexus6P,version=27,locale=en,orientation=portrait --timeout 20m --use-orchestrator --num-flaky-test-attempts 2 --verbosity debug 2>&1 | tee ./firebase_test_log
+gcloud firebase test android run --type instrumentation --app $1 --test $2 --device model=Nexus6P,version=27,locale=en,orientation=portrait --timeout 20m --use-orchestrator --num-flaky-test-attempts 2 --verbosity info 2>&1 | tee ./firebase_test_log
 mkdir test-reports
 cat ./firebase_test_log | grep -o 'gs:.*/' | head -n 1 |  xargs -I{} gsutil cp "{}**merged.xml" ./test-reports
