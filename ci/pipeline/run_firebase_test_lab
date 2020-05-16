@@ -1,0 +1,2 @@
+#!/bin/bash
+gcloud firebase test android run --type instrumentation --app $1 --test $2 --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator --num-flaky-test-attempts 2 
