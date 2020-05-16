@@ -82,12 +82,8 @@ definitions:
                 size: 2x # Double resources available for this step
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew sonarqube
-                    -   pipe: sonarsource/sonarcloud-scan:1.1.0
-                        variables:
-                            EXTRA_ARGS: -Dsonar.java.binaries=\"**/src/main/java/**\" -Dsonar.exclusions=\"fingerprintmatcher/**\"
-                    -   pipe: sonarsource/sonarcloud-quality-gate:0.1.3
-
+                    - ./gradlew sonarqube -Dsonar.qualitygate.wait=true
+                  
         ######################################################################
         # Build all of the test APKs for the different modules, then Download
         # the google bundle tool, and use it to create an universal
