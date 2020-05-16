@@ -170,7 +170,6 @@ definitions:
                     - bash ./ci/pipeline/setup_gcloud
                     - gcloud firebase test android run --type instrumentation --app universal.apk --test face-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
 
-
 ######################################################################
 # Define the different pipelines flows as anchors.
 ######################################################################
