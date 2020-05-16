@@ -79,11 +79,11 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                size: 2x # Double resources available for this step
+                max-time: 15
                 script:
                     - bash ./ci/pipeline/setup
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true
-                  
+
         ######################################################################
         # Build all of the test APKs for the different modules, then Download
         # the google bundle tool, and use it to create an universal
@@ -144,7 +144,7 @@ definitions:
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
-                    - gcloud firebase test android run --type instrumentation --app universal.apk --test clientapi-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator 
+                    - gcloud firebase test android run --type instrumentation --app universal.apk --test clientapi-debug-androidTest.apk --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator
 
         ######################################################################
         # Run Fingerprint Android tests on Firebase test lab.
