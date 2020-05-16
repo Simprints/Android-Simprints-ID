@@ -90,7 +90,7 @@ definitions:
         # APK and upload it to artifacts.
         ######################################################################
         -   step: &build-and-sign-universal-apk
-                name: "Build test & universal APKs"
+                name: "Build universal & test APKs"
                 caches:
                     - gradle
                     - gradlewrapper
@@ -134,7 +134,7 @@ definitions:
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk id-debug-androidTest.apk 
+                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk id-debug-androidTest.apk
 
         ######################################################################
         # Run Client API Android tests on Firebase test lab.
@@ -144,7 +144,7 @@ definitions:
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk clientapi-debug-androidTest.apk 
+                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk clientapi-debug-androidTest.apk
 
         ######################################################################
         # Run Fingerprint Android tests on Firebase test lab.
@@ -154,7 +154,7 @@ definitions:
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk fingerprint-debug-androidTest.apk 
+                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk fingerprint-debug-androidTest.apk
 
         ######################################################################
         # Run Face Android tests on Firebase test lab.
@@ -164,7 +164,7 @@ definitions:
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk face-debug-androidTest.apk 
+                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk face-debug-androidTest.apk
 
 ######################################################################
 # Define the different pipelines flows as anchors.
@@ -198,4 +198,3 @@ pipelines:
         test_ci_flow: *main-flow
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere
-
