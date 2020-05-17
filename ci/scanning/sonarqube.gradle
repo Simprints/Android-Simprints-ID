@@ -1,20 +1,26 @@
 apply plugin: "org.sonarqube"
 
 def jacocoDir = "${File.separator}build${File.separator}reports${File.separator}jacoco${File.separator}debug${File.separator}jacoco.xml"
-def sourceDir = "${File.separator}src${File.separator}main${File.separator}java${File.separator}com${File.separator}simprints${File.separator}**"
+def sourceDir = "${File.separator}src${File.separator}main${File.separator}java${File.separator}com${File.separator}simprints"
+def binariesDir = "${File.separator}build${File.separator}intermediates${File.separator}**"
 
 sonarqube {
     properties {
+        property "sonar.projectKey", "test4556"
+        property "sonar.organization", "simprints"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.login", "fad58db79eb7955aecaf391cb4aa2eb75fcf41ed"
+
         property "sonar.c.file.suffixes", "-"
         property "sonar.java.coveragePlugin", "jacoco"
-        property "sonar.exclusions", ["${projectDir}fingerprint${File.separator}**"]
     }
 }
 
-allprojects {
+subprojects {
     sonarqube {
         properties {
             property "sonar.sources", "$projectDir$sourceDir"
+            property "sonar.java.binaries", "$projectDir$binariesDir"
             property "sonar.coverage.jacoco.xmlReportPaths", [
                 "$projectDir$jacocoDir",
             ]
