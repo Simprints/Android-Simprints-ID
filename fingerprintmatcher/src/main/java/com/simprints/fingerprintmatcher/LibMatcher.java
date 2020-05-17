@@ -3,13 +3,13 @@ package com.simprints.fingerprintmatcher;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener;
-import com.simprints.fingerprintmatcher.sourceafis.matching.ParallelMatcher;
-import com.simprints.fingerprintmatcher.sourceafis.simple.SourceAfisEngine;
-import com.simprints.fingerprintmatcher.sourceafis.simple.SourceFinger;
-import com.simprints.fingerprintmatcher.sourceafis.simple.SourceFingerprint;
-import com.simprints.fingerprintmatcher.sourceafis.simple.SourcePerson;
-import com.simprints.fingerprintmatcher.sourceafis.templates.Template;
+import sourceafis.MatcherEventListener;
+import sourceafis.matching.ParallelMatcher;
+import sourceafis.simple.SourceAfisEngine;
+import sourceafis.simple.SourceFinger;
+import sourceafis.simple.SourceFingerprint;
+import sourceafis.simple.SourcePerson;
+import sourceafis.templates.Template;
 import com.simprints.libsimprints.FingerIdentifier;
 
 import java.util.ArrayList;
