@@ -66,9 +66,9 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew fingerprint:testDebugUnitTest
+                    - ./gradlew fingerprint:jacocoTestReportDebug
                 artifacts:
-                    - fingerprint/build/reports/tests/testDebugUnitTest/*
+                    - fingerprint/build/reports/**
 
         ######################################################################
         # Get all of the test and coverage reports from artifacts, upload
