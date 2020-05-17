@@ -10,6 +10,7 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
+import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
@@ -40,6 +41,8 @@ class ConnectScannerViewModel(
     private val nfcManager: NfcManager,
     private val serialNumberConverter: SerialNumberConverter) : ViewModel() {
 
+    lateinit var connectMode: ConnectScannerTaskRequest.ConnectMode
+
     val progress: MutableLiveData<Int> = MutableLiveData(0)
     val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
 
@@ -52,7 +55,8 @@ class ConnectScannerViewModel(
 
     private var setupFlow: Disposable? = null
 
-    fun start() {
+    fun start(connectMode: ConnectScannerTaskRequest.ConnectMode) {
+        this.connectMode = connectMode
         startSetup()
     }
 
