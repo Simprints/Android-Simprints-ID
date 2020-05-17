@@ -191,10 +191,8 @@ pipelines:
     branches:
         master: *main-flow
         develop: *main-flow
-        test_ci_flow: *main-flow
     pull-requests:
         master: *main-flow
         develop: *main-flow
-        test_ci_flow: *main-flow
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere
