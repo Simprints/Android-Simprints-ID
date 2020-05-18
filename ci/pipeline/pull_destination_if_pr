@@ -1,5 +1,7 @@
 #!/bin/bash
 
+git remote add origin https://x-token-auth:$REPOSITORY_OAUTH_ACCESS_TOKEN@bitbucket.org/$BITBUCKET_REPO_FULL_NAME.git
+
 if [ -z "$BITBUCKET_PR_DESTINATION_BRANCH" ]; then
     echo "Not a pull request, skipping target branch pull"
     echo "FOR NOW PULL ANYWAYS"
