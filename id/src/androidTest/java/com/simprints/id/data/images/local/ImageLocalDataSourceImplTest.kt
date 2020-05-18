@@ -1,12 +1,12 @@
-package com.simprints.core.images.local
+package com.simprints.id.data.images.local
 
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.data.images.model.Path
 import com.simprints.id.data.images.model.SecuredImageRef
-import com.simprints.core.tools.utils.randomUUID
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -23,8 +23,8 @@ class ImageLocalDataSourceImplTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val imagesFolder = "${app.filesDir}/$IMAGES_FOLDER"
-    private val path = com.simprints.id.data.images.model.Path("test/$FILE_NAME")
-    private val imageLocalDataSource = com.simprints.id.data.images.local.ImageLocalDataSourceImpl(app)
+    private val path = Path("test/$FILE_NAME")
+    private val imageLocalDataSource = ImageLocalDataSourceImpl(app)
 
     @Before
     fun setUp() {
@@ -58,7 +58,7 @@ class ImageLocalDataSourceImplTest {
     fun encryptThrowsAnException_shouldBeHandled() {
         val securedImageRef = imageLocalDataSource.encryptAndStoreImage(
             emptyArray<Byte>().toByteArray(),
-                com.simprints.id.data.images.model.Path("")
+            Path("")
         )
         assertThat(securedImageRef).isNull()
     }
@@ -75,8 +75,8 @@ class ImageLocalDataSourceImplTest {
     fun shouldListImageFilesStoredAtDifferentSubDirs() {
         val bytes = Random.nextBytes(SIZE_IMAGE)
         with(imageLocalDataSource) {
-            encryptAndStoreImage(bytes, com.simprints.id.data.images.model.Path("dir1/$FILE_NAME"))
-            encryptAndStoreImage(bytes, com.simprints.id.data.images.model.Path("dir2/$FILE_NAME"))
+            encryptAndStoreImage(bytes, Path("dir1/$FILE_NAME"))
+            encryptAndStoreImage(bytes, Path("dir2/$FILE_NAME"))
         }
 
         val images = imageLocalDataSource.listImages()
@@ -98,19 +98,19 @@ class ImageLocalDataSourceImplTest {
 
     @Test
     fun shouldHandleDeletionOfNonExistingImageFiles() {
-        val file = com.simprints.id.data.images.model.SecuredImageRef(com.simprints.id.data.images.model.Path("non/existing/path/file.txt"))
+        val file = SecuredImageRef(Path("non/existing/path/file.txt"))
 
         assertThat(imageLocalDataSource.deleteImage(file)).isFalse()
     }
 
-    private fun createImageFiles(count: Int): List<com.simprints.id.data.images.model.SecuredImageRef> {
-        val createdFiles = arrayListOf<com.simprints.id.data.images.model.SecuredImageRef>()
+    private fun createImageFiles(count: Int): List<SecuredImageRef> {
+        val createdFiles = arrayListOf<SecuredImageRef>()
 
         for (i in 0 until count) {
             val byteArray = Random.nextBytes(SIZE_IMAGE)
             imageLocalDataSource.encryptAndStoreImage(
                 byteArray,
-                    com.simprints.id.data.images.model.Path("test/${randomUUID()}")
+                Path("test/${randomUUID()}")
             )?.let(createdFiles::add)
         }
 
