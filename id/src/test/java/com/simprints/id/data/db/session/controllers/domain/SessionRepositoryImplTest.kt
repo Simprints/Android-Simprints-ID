@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -136,6 +137,7 @@ class SessionRepositoryImplTest {
         }
     }
 
+    @Ignore("Fabio to take a look next week at flakey test")
     @Test
     fun addEventToCurrentSessionInBackground_shouldReportException() {
         runBlockingTest {
