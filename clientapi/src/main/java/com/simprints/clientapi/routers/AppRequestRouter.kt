@@ -2,7 +2,6 @@ package com.simprints.clientapi.routers
 
 import android.app.Activity
 import com.simprints.clientapi.domain.requests.*
-import com.simprints.clientapi.exceptions.InvalidClientRequestException
 import com.simprints.clientapi.extensions.toIntent
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import timber.log.Timber
@@ -30,7 +29,7 @@ object AppRequestRouter {
             is IdentifyRequest -> act.route(request, IDENTIFY, IDENTIFY_REQUEST_CODE)
             is ConfirmIdentityRequest -> act.route(request, CONFIRM_IDENTITY, CONFIRM_IDENTITY_REQUEST_CODE)
             is EnrolLastBiometricsRequest -> act.route(request, ENROL_LAST_BIOMETRICS, ENROL_LAST_BIOMETRICS_REQUEST_CODE)
-            else -> throw InvalidClientRequestException("Invalid Action AppRequest $request")
+            else -> throw Throwable("Invalid Action AppRequest $request")
         }
 
     private fun Activity.route(request: BaseRequest, route: String, code: Int) {

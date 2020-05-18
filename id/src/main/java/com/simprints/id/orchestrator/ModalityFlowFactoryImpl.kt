@@ -8,7 +8,8 @@ import com.simprints.id.orchestrator.modality.ModalityFlow
 class ModalityFlowFactoryImpl(private val enrolFlow: ModalityFlow,
                               private val verifyFlow: ModalityFlow,
                               private val identifyFlow: ModalityFlow,
-                              private val confirmationIdentityFlow: ModalityFlow) : ModalityFlowFactory {
+                              private val confirmationIdentityFlow: ModalityFlow,
+                              private val enrolLastBiometricsFlow: ModalityFlow) : ModalityFlowFactory {
 
 
     override fun createModalityFlow(appRequest: AppRequest,
@@ -23,5 +24,6 @@ class ModalityFlowFactoryImpl(private val enrolFlow: ModalityFlow,
             is AppIdentifyRequest -> identifyFlow
             is AppVerifyRequest -> verifyFlow
             is AppRequest.AppConfirmIdentityRequest -> confirmationIdentityFlow
+            is AppRequest.AppEnrolLastBiometricsRequest -> enrolLastBiometricsFlow
         }
 }

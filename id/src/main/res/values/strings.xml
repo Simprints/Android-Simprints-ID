@@ -272,6 +272,8 @@
     <string name="confirm_module_selection_yes">Confirm</string>
     <string name="confirm_module_selection_cancel">Cancel</string>
     <string name="dashboard_sync_card_try_again_button">Try again</string>
+    <string name="enrol_last_biometrics_failed_title">enrol_last_biometrics_failed_title</string>
+    <string name="enrol_last_biometrics_failed_message">enrol_last_biometrics_failed_message</string>
     <!-- endregion -->
 
 </resources>

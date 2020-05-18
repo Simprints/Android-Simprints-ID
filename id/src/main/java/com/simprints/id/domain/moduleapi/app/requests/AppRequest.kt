@@ -24,9 +24,9 @@ sealed class AppRequest(open val projectId: String,
 
         @Parcelize
         data class AppIdentifyRequest(override val projectId: String,
-                                 override val userId: String,
-                                 override val moduleId: String,
-                                 val metadata: String) : AppRequestFlow(projectId, userId, moduleId)
+                                      override val userId: String,
+                                      override val moduleId: String,
+                                      val metadata: String) : AppRequestFlow(projectId, userId, moduleId)
 
         @Parcelize
         data class AppVerifyRequest(override val projectId: String,
@@ -35,6 +35,13 @@ sealed class AppRequest(open val projectId: String,
                                     val metadata: String,
                                     val verifyGuid: String) : AppRequestFlow(projectId, userId, moduleId)
     }
+
+    @Parcelize
+    data class AppEnrolLastBiometricsRequest(override val projectId: String,
+                                             override val userId: String,
+                                             val moduleId: String,
+                                             val metadata: String,
+                                             val identificationSessionId: String) : AppRequest(projectId, userId)
 
     @Parcelize
     data class AppConfirmIdentityRequest(override val projectId: String,

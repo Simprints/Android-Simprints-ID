@@ -33,7 +33,14 @@ class AppResponseBuilderForEnrol(
         val faceResponse = getFaceCaptureResponse(results)
         val fingerprintResponse = getFingerprintCaptureResponse(results)
 
-        val person = enrolmentHelper.buildPerson(request, fingerprintResponse, faceResponse, timeHelper)
+        val person = enrolmentHelper.buildPerson(
+            request.projectId,
+            request.userId,
+            request.moduleId,
+            fingerprintResponse,
+            faceResponse,
+            timeHelper)
+
         enrolmentHelper.enrol(person)
         return AppEnrolResponse(person.patientId)
     }

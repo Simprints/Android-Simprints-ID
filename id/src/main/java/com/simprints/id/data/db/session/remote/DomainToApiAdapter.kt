@@ -4,10 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.EventType.*
 import com.simprints.id.data.db.session.domain.models.events.callback.*
-import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
+import com.simprints.id.data.db.session.domain.models.events.callout.*
 import com.simprints.id.data.db.session.remote.events.*
 
 @Keep
@@ -36,6 +33,7 @@ fun Event.toApiEvent(): ApiEvent =
         CALLOUT_IDENTIFICATION ->  ApiCalloutEvent(this as IdentificationCalloutEvent)
         CALLOUT_ENROLMENT -> ApiCalloutEvent(this as EnrolmentCalloutEvent)
         CALLOUT_VERIFICATION ->  ApiCalloutEvent(this as VerificationCalloutEvent)
+        CALLOUT_LAST_BIOMETRICS -> ApiCalloutEvent(this as EnrolmentLastBiometricsCalloutEvent)
         CALLBACK_IDENTIFICATION -> ApiCallbackEvent(this as IdentificationCallbackEvent)
         CALLBACK_ENROLMENT -> ApiCallbackEvent(this as EnrolmentCallbackEvent)
         CALLBACK_REFUSAL -> ApiCallbackEvent(this as RefusalCallbackEvent)

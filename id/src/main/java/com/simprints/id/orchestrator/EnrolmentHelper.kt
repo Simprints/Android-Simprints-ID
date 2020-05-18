@@ -9,7 +9,9 @@ import com.simprints.id.tools.TimeHelper
 
 interface EnrolmentHelper {
 
-    fun buildPerson(request: AppRequest.AppRequestFlow,
+    fun buildPerson(projectId: String,
+                    userId: String,
+                    moduleId: String,
                     fingerprintResponse: FingerprintCaptureResponse?,
                     faceResponse: FaceCaptureResponse?,
                     timeHelper: TimeHelper): Person
