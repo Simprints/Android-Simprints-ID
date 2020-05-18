@@ -181,8 +181,8 @@ class ConsentActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        deleteLocationInfoFromSession()
         exitFormHelper.buildExitFormResponseForCore(data)?.let {
+            deleteLocationInfoFromSession()
             setResultAndFinish(it)
         }
     }
