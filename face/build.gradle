@@ -7,10 +7,10 @@ androidExtensions {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         minSdkVersion config.min_sdk
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -19,6 +19,9 @@ android {
     buildTypes {
         releaseWithLogfile {
             initWith release
+        }
+        debug {
+            testCoverageEnabled true
         }
     }
 
@@ -63,7 +66,7 @@ dependencies {
     // The following line includes the base module classes.jar into the final one.
     // To run unit tests from CL: ./gradlew fingerprint:test
     testRuntimeOnly (files("${projectDir}/../id/build/intermediates/app_classes/debug/classes.jar"))
-
+    
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':id')
     implementation project(':uicomponents')
