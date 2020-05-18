@@ -4,7 +4,7 @@
 
 There are submodules in this repository [LibSimprints](https://github.com/Simprints/LibSimprints) and [SimMatcher](https://github.com/Simprints/Fingerprint-SimMatcher), so recursive cloning is necessary:
 
-`git clone --recursive git@github.com:Simprints/Android-Simprints-ID.git`
+`git clone --recursive git@bitbucket.org:simprints/android-simprints-id.git`
 
 
 ## Bitrise CI
