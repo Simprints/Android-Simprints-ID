@@ -8,15 +8,13 @@ import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.AuthorizationEvent
 import com.simprints.id.data.db.session.domain.models.events.ConnectivitySnapshotEvent
 import com.simprints.id.data.db.session.domain.models.events.Event
-import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
+import com.simprints.id.data.db.session.domain.models.events.callout.*
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
@@ -36,14 +34,18 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     CheckLoginPresenter(view, component),
     CheckLoginFromIntentContract.Presenter {
 
-    @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
+    @Inject
+    lateinit var remoteConfigFetcher: RemoteConfigFetcher
 
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var setupFailed: Boolean = false
 
-    @Inject lateinit var sessionRepository: SessionRepository
-    @Inject lateinit var personLocalDataSource: PersonLocalDataSource
-    @Inject lateinit var simNetworkUtils: SimNetworkUtils
+    @Inject
+    lateinit var sessionRepository: SessionRepository
+    @Inject
+    lateinit var personLocalDataSource: PersonLocalDataSource
+    @Inject
+    lateinit var simNetworkUtils: SimNetworkUtils
     internal lateinit var appRequest: AppRequest
 
     init {
@@ -87,7 +89,17 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStarTime)
             is AppIdentifyRequest -> buildIdentificationCalloutEvent(request, relativeStarTime)
             is AppConfirmIdentityRequest -> addConfirmationCalloutEvent(request, relativeStarTime)
+            is AppEnrolLastBiometricsRequest -> addEnrolLastBiometricsCalloutEvent(request, relativeStarTime)
         }
+
+    internal fun addEnrolLastBiometricsCalloutEvent(request: AppEnrolLastBiometricsRequest, relativeStarTime: Long) =
+        EnrolmentLastBiometricsCalloutEvent(
+            relativeStarTime,
+            request.projectId,
+            request.userId,
+            request.moduleId,
+            request.metadata,
+            request.identificationSessionId)
 
     internal fun addConfirmationCalloutEvent(request: AppConfirmIdentityRequest, relativeStarTime: Long) =
         ConfirmationCalloutEvent(
@@ -153,7 +165,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
         // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
         // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
-        if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest) {
+        if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest && appRequest !is AppEnrolLastBiometricsRequest) {
             sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(AuthorizationEvent.Result.NOT_AUTHORIZED))
 
             loginAlreadyTried.set(true)

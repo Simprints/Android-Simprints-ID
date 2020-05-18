@@ -15,7 +15,8 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         UNEXPECTED_ERROR,
         LOGIN_NOT_COMPLETE,
         BLUETOOTH_NOT_SUPPORTED,
-        GUID_NOT_FOUND_ONLINE;
+        GUID_NOT_FOUND_ONLINE,
+        ENROLMENT_LAST_BIOMETRIC_FAILED;
 
         companion object {
             fun fromDomainAlertTypeToAppErrorType(alertType: AlertType) =
@@ -27,6 +28,7 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                     AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
                     AlertType.GUID_NOT_FOUND_OFFLINE ->
                         throw Throwable("No ErrorType associated. GUID_NOT_FOUND_OFFLINE should return a ExitForm, not a Error Response.")
+                    AlertType.ENROLMENT_LAST_BIOMETRIC_FAILED -> ENROLMENT_LAST_BIOMETRIC_FAILED
                 }
         }
     }

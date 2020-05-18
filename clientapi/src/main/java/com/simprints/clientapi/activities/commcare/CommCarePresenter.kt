@@ -9,6 +9,7 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
@@ -45,7 +46,7 @@ class CommCarePresenter(
                 Identify -> processIdentifyRequest()
                 Verify -> processVerifyRequest()
                 ConfirmIdentity -> checkAndProcessSessionId()
-                Invalid -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+                Invalid -> throw InvalidIntentActionException()
             }.safeSealedWhens
         }
     }

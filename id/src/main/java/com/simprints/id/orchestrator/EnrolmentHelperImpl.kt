@@ -34,66 +34,74 @@ class EnrolmentHelperImpl(private val repository: PersonRepository,
         }
     }
 
-    override fun buildPerson(request: AppRequest.AppRequestFlow,
+    override fun buildPerson(projectId: String,
+                             userId: String,
+                             moduleId: String,
                              fingerprintResponse: FingerprintCaptureResponse?,
                              faceResponse: FaceCaptureResponse?,
                              timeHelper: TimeHelper): Person =
         when {
             fingerprintResponse != null && faceResponse != null -> {
-                buildPersonFromFingerprintAndFace(request, fingerprintResponse, faceResponse, timeHelper)
+                buildPersonFromFingerprintAndFace(projectId, userId, moduleId, fingerprintResponse, faceResponse, timeHelper)
             }
 
             fingerprintResponse != null -> {
-                buildPersonFromFingerprint(request, fingerprintResponse, timeHelper)
+                buildPersonFromFingerprint(projectId, userId, moduleId, fingerprintResponse, timeHelper)
             }
 
             faceResponse != null -> {
-                buildPersonFromFace(request, faceResponse, timeHelper)
+                buildPersonFromFace(projectId, userId, moduleId, faceResponse, timeHelper)
             }
 
             else -> throw Throwable("Invalid response. Must be either fingerprint, face or both")
         }
 
 
-    private fun buildPersonFromFingerprintAndFace(request: AppRequest.AppRequestFlow,
+    private fun buildPersonFromFingerprintAndFace(projectId: String,
+                                                  userId: String,
+                                                  moduleId: String,
                                                   fingerprintResponse: FingerprintCaptureResponse,
                                                   faceResponse: FaceCaptureResponse,
                                                   timeHelper: TimeHelper): Person {
         val patientId = UUID.randomUUID().toString()
         return Person(
             patientId,
-            request.projectId,
-            request.userId,
-            request.moduleId,
+            projectId,
+            userId,
+            moduleId,
             createdAt = Date(timeHelper.now()),
             fingerprintSamples = extractFingerprintSamples(fingerprintResponse),
             faceSamples = extractFaceSamples(faceResponse)
         )
     }
 
-    private fun buildPersonFromFingerprint(request: AppRequest.AppRequestFlow,
+    private fun buildPersonFromFingerprint(projectId: String,
+                                           userId: String,
+                                           moduleId: String,
                                            fingerprintResponse: FingerprintCaptureResponse,
                                            timeHelper: TimeHelper): Person {
         val patientId = UUID.randomUUID().toString()
         return Person(
             patientId,
-            request.projectId,
-            request.userId,
-            request.moduleId,
+            projectId,
+            userId,
+            moduleId,
             createdAt = Date(timeHelper.now()),
             fingerprintSamples = extractFingerprintSamples(fingerprintResponse)
         )
     }
 
-    private fun buildPersonFromFace(request: AppRequest.AppRequestFlow,
+    private fun buildPersonFromFace(projectId: String,
+                                    userId: String,
+                                    moduleId: String,
                                     faceResponse: FaceCaptureResponse,
                                     timeHelper: TimeHelper): Person {
         val patientId = UUID.randomUUID().toString()
         return Person(
             patientId,
-            request.projectId,
-            request.userId,
-            request.moduleId,
+            projectId,
+            userId,
+            moduleId,
             createdAt = Date(timeHelper.now()),
             faceSamples = extractFaceSamples(faceResponse)
         )

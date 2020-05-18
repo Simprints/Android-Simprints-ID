@@ -12,5 +12,7 @@ interface CoreStepProcessor {
 
     fun buildConfirmIdentityStep(projectId: String, sessionId: String, selectedGuid: String): Step
 
+    fun buildAppEnrolLastBiometricsStep(projectId: String, userId:String, moduleId: String, metadata: String, sessionId: String?): Step
+
     fun processResult(data: Intent?): Step.Result?
 }

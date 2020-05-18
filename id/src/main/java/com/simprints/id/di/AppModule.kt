@@ -59,6 +59,12 @@ import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
+import com.simprints.id.orchestrator.EnrolmentHelper
+import com.simprints.id.orchestrator.EnrolmentHelperImpl
+import com.simprints.id.orchestrator.cache.HotCache
+import com.simprints.id.orchestrator.cache.HotCacheImpl
+import com.simprints.id.orchestrator.cache.StepEncoder
+import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
@@ -418,5 +424,21 @@ open class AppModule {
         longConsentRepository: LongConsentRepository,
         preferencesManager: PreferencesManager
     ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager)
+
+    @Provides
+    fun provideHotCache(
+        @Named("EncryptedSharedPreferences") sharedPrefs: SharedPreferences,
+        stepEncoder: StepEncoder
+    ): HotCache = HotCacheImpl(sharedPrefs, stepEncoder)
+
+    @Provides
+    fun provideStepEncoder(): StepEncoder = StepEncoderImpl()
+
+    @Provides
+    fun provideEnrolmentHelper(
+        repository: PersonRepository,
+        sessionRepository: SessionRepository,
+        timeHelper: TimeHelper
+    ): EnrolmentHelper = EnrolmentHelperImpl(repository, sessionRepository, timeHelper)
 }
 

@@ -38,7 +38,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
     override suspend fun processEnrolLastBiometrics() = validateAndSendRequest(
         EnrolLastBiometricsBuilder(
             view.enrolLastBiometricsExtractor,
-            EnrolLastBiometricsValidator(view.enrolLastBiometricsExtractor)
+            EnrolLastBiometricsValidator(view.enrolLastBiometricsExtractor, eventsManager.isCurrentSessionAnIdentification())
         )
     )
 
@@ -68,7 +68,6 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
 
     private fun handleInvalidRequest(exception: InvalidRequestException) {
         when (exception) {
-            is InvalidClientRequestException -> INVALID_CLIENT_REQUEST
             is InvalidMetadataException -> INVALID_METADATA
             is InvalidModuleIdException -> INVALID_MODULE_ID
             is InvalidProjectIdException -> INVALID_PROJECT_ID
@@ -76,6 +75,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
             is InvalidSessionIdException -> INVALID_SESSION_ID
             is InvalidUserIdException -> INVALID_USER_ID
             is InvalidVerifyIdException -> INVALID_VERIFY_ID
+            is InvalidStateForIntentAction -> INVALID_STATE_FOR_INTENT_ACTION
         }.also {
             view.handleClientRequestError(it)
         }

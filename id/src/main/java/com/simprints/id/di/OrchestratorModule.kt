@@ -57,13 +57,22 @@ class OrchestratorModule {
     @Provides
     fun provideCoreStepProcessor(): CoreStepProcessor = CoreStepProcessorImpl()
 
-    // ModalFlow [ConfirmIdentity, Enrol, Identify, Verify]
+    // ModalFlow [ConfirmIdentity, Enrol, Identify, Verify, EnrolLastBiometrics]
     @Provides
     @Named("ModalityConfirmationFlow")
     fun provideModalityFlowConfirmIdentity(
         coreStepProcessor: CoreStepProcessor
     ): ModalityFlow =
         ModalityFlowConfirmIdentity(
+            coreStepProcessor
+        )
+
+    @Provides
+    @Named("ModalityEnrolLastBiometricsFlow")
+    fun provideModalityEnrolLastBiometricsFlow(
+        coreStepProcessor: CoreStepProcessor
+    ): ModalityFlow =
+        ModalityFlowEnrolLastBiometrics(
             coreStepProcessor
         )
 
@@ -126,9 +135,10 @@ class OrchestratorModule {
         @Named("ModalityFlowEnrol") enrolFlow: ModalityFlow,
         @Named("ModalityFlowVerify") verifyFlow: ModalityFlow,
         @Named("ModalityFlowIdentify") identifyFlow: ModalityFlow,
-        @Named("ModalityConfirmationFlow") confirmationIdentityFlow: ModalityFlow
+        @Named("ModalityConfirmationFlow") confirmationIdentityFlow: ModalityFlow,
+        @Named("ModalityEnrolLastBiometricsFlow") enrolLastBiometricsFlow: ModalityFlow
     ): ModalityFlowFactory =
-        ModalityFlowFactoryImpl(enrolFlow, verifyFlow, identifyFlow, confirmationIdentityFlow)
+        ModalityFlowFactoryImpl(enrolFlow, verifyFlow, identifyFlow, confirmationIdentityFlow, enrolLastBiometricsFlow)
 
     @Provides
     fun provideOrchestratorManager(orchestratorManagerImpl: OrchestratorManagerImpl): OrchestratorManager {
@@ -175,26 +185,10 @@ class OrchestratorModule {
     }
 
     @Provides
-    fun provideHotCache(
-        @Named("EncryptedSharedPreferences") sharedPrefs: SharedPreferences,
-        stepEncoder: StepEncoder
-    ): HotCache = HotCacheImpl(sharedPrefs, stepEncoder)
-
-    @Provides
-    fun provideStepEncoder(): StepEncoder = StepEncoderImpl()
-
-    @Provides
     open fun provideAppResponseBuilderFactory(
         enrolmentHelper: EnrolmentHelper,
         timeHelper: TimeHelper
     ): AppResponseFactory = AppResponseFactoryImpl(enrolmentHelper, timeHelper)
-
-    @Provides
-    fun provideEnrolmentHelper(
-        repository: PersonRepository,
-        sessionRepository: SessionRepository,
-        timeHelper: TimeHelper
-    ): EnrolmentHelper = EnrolmentHelperImpl(repository, sessionRepository, timeHelper)
 
     @Provides
     fun provideFlowManager(

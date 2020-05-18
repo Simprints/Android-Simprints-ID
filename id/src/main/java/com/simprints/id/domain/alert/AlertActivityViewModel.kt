@@ -61,6 +61,16 @@ enum class AlertActivityViewModel(val type: Type,
         leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
         message = R.string.unforeseen_error_message
+    ),
+
+    ENROLMENT_LAST_BIOMETRIC_FAILED(
+        type = Type.DataError(
+            title = R.string.enrol_last_biometrics_failed_title,
+            hintDrawable = null
+        ),
+        leftButton = ButtonAction.Close,
+        rightButton = ButtonAction.None,
+        message = R.string.enrol_last_biometrics_failed_message
     );
 
     companion object {
@@ -72,13 +82,21 @@ enum class AlertActivityViewModel(val type: Type,
                 AlertType.SAFETYNET_ERROR -> SAFETYNET_ERROR
                 AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
                 AlertType.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
+                AlertType.ENROLMENT_LAST_BIOMETRIC_FAILED -> ENROLMENT_LAST_BIOMETRIC_FAILED
             }
     }
 
-    @StringRes val title: Int = type.title
-    @ColorRes val backgroundColor: Int = type.backgroundColor
-    @DrawableRes val mainDrawable: Int = type.mainDrawable
-    @DrawableRes val hintDrawable: Int? = type.hintDrawable
+    @StringRes
+    val title: Int = type.title
+
+    @ColorRes
+    val backgroundColor: Int = type.backgroundColor
+
+    @DrawableRes
+    val mainDrawable: Int = type.mainDrawable
+
+    @DrawableRes
+    val hintDrawable: Int? = type.hintDrawable
 
     @Keep
     sealed class Type(@StringRes val title: Int,

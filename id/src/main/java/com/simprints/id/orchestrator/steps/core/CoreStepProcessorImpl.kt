@@ -3,10 +3,7 @@ package com.simprints.id.orchestrator.steps.core
 import android.content.Intent
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.*
-import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
-import com.simprints.id.orchestrator.steps.core.requests.ConsentType
-import com.simprints.id.orchestrator.steps.core.requests.FetchGUIDRequest
-import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
+import com.simprints.id.orchestrator.steps.core.requests.*
 import com.simprints.id.orchestrator.steps.core.response.*
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 
@@ -16,7 +13,7 @@ class CoreStepProcessorImpl : CoreStepProcessor {
         const val CONSENT_ACTIVITY_NAME = "com.simprints.id.activities.consent.ConsentActivity"
         const val FETCH_GUID_ACTIVITY_NAME = "com.simprints.id.activities.fetchguid.FetchGuidActivity"
         const val GUID_SELECTION_ACTIVITY_NAME = "com.simprints.id.activities.guidselection.GuidSelectionActivity"
-
+        const val LAST_BIOMETRICS_CORE_ACTIVITY_NAME = "com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity"
     }
 
     override fun buildStepConsent(consentType: ConsentType) =
@@ -46,6 +43,18 @@ class CoreStepProcessorImpl : CoreStepProcessor {
         activityName = GUID_SELECTION_ACTIVITY_NAME,
         bundleKey = CORE_STEP_BUNDLE,
         request = GuidSelectionRequest(projectId, sessionId, selectedGuid),
+        status = Step.Status.NOT_STARTED
+    )
+
+    override fun buildAppEnrolLastBiometricsStep(projectId: String,
+                                                 userId: String,
+                                                 moduleId: String,
+                                                 metadata: String,
+                                                 sessionId: String?) = Step(
+        requestCode = LAST_BIOMETRICS_CORE.value,
+        activityName = LAST_BIOMETRICS_CORE_ACTIVITY_NAME,
+        bundleKey = CORE_STEP_BUNDLE,
+        request = EnrolLastBiometricsRequest(projectId, userId, moduleId, metadata, sessionId),
         status = Step.Status.NOT_STARTED
     )
 

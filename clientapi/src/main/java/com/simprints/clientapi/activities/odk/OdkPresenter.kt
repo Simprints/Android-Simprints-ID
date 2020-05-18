@@ -8,6 +8,7 @@ import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReport
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
@@ -41,7 +42,7 @@ class OdkPresenter(
                 Verify -> processVerifyRequest()
                 ConfirmIdentity -> processConfirmIdentityRequest()
                 EnrolLastBiometrics -> processEnrolLastBiometrics()
-                Invalid -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+                Invalid -> throw InvalidIntentActionException()
             }.safeSealedWhens
         }
     }

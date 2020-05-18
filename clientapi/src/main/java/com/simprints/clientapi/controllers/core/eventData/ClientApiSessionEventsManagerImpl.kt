@@ -6,6 +6,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.*
+import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
 import com.simprints.libsimprints.BuildConfig
 import kotlinx.coroutines.runBlocking
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
@@ -41,11 +42,14 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionRepository: Sessi
     }
 
     override suspend fun getCurrentSessionId(): String = coreSessionRepository.getCurrentSession().id
+
+    override suspend fun isCurrentSessionAnIdentification(): Boolean =
+        coreSessionRepository.getCurrentSession().getEvents().filterIsInstance(IdentificationCalloutEvent::class.java).isNotEmpty()
 }
 
 fun ClientApiAlert.fromAlertToAlertTypeEvent(): CoreAlertScreenEventType =
     when (this) {
-        ClientApiAlert.INVALID_CLIENT_REQUEST -> CoreAlertScreenEventType.INVALID_INTENT_ACTION
+        ClientApiAlert.INVALID_STATE_FOR_INTENT_ACTION -> CoreAlertScreenEventType.INVALID_INTENT_ACTION
         ClientApiAlert.INVALID_METADATA -> CoreAlertScreenEventType.INVALID_METADATA
         ClientApiAlert.INVALID_MODULE_ID -> CoreAlertScreenEventType.INVALID_MODULE_ID
         ClientApiAlert.INVALID_PROJECT_ID -> CoreAlertScreenEventType.INVALID_PROJECT_ID
