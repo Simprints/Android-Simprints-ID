@@ -26,6 +26,7 @@ class AlertScreenEvent(starTime: Long,
         INVALID_SESSION_ID,
         INVALID_USER_ID,
         INVALID_VERIFY_ID,
+        INVALID_ACTION_INTENT,
         SAFETYNET_ERROR
     }
 }
