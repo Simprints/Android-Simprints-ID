@@ -1,5 +1,6 @@
 package com.simprints.id.activities.setup
 
+import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -7,6 +8,9 @@ import androidx.test.rule.GrantPermissionRule
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
+import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
+import com.simprints.id.domain.moduleapi.core.response.CoreResponse
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
@@ -44,7 +48,14 @@ class SetupActivityTest {
 
     @Test
     fun launchSetupActivityWithLocationPermissions_shouldAddLocationToSession() {
-        ActivityScenario.launch(SetupActivity::class.java)
+        val request = SetupRequest(listOf(SetupPermission.LOCATION))
+        val intent = Intent().apply {
+            setClassName(ApplicationProvider.getApplicationContext<android.app.Application>().packageName,
+                SetupActivity::class.qualifiedName!!)
+            putExtra(CoreResponse.CORE_STEP_BUNDLE, request)
+        }
+
+        ActivityScenario.launch<SetupActivity>(intent)
 
         coVerify(exactly = 1) { mockSessionRepository.updateCurrentSession(any())}
     }
