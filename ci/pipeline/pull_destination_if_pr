@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ -z "$BITBUCKET_PR_DESTINATION_BRANCH" ]
+then
+      echo "Not a pull request, skipping desitnation pull"
+else
+      echo "Pull request aginst $BITBUCKET_PR_DESTINATION_BRANCH"
+      git fetch +refs/heads/$BITBUCKET_PR_DESTINATION_BRANCH:refs/remotes/origin/$BITBUCKET_PR_DESTINATION_BRANCH
+fi

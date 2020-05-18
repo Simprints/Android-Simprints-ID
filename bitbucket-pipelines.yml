@@ -81,6 +81,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - bash ./ci/pipeline/pull_destination_if_pr
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
 
         ######################################################################
@@ -190,6 +191,7 @@ pipelines:
     branches:
         master: *main-flow
         develop: *main-flow
+        ci/*: *main-flow
     pull-requests:
         master: *main-flow
         develop: *main-flow
