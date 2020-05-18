@@ -3,6 +3,7 @@ package com.simprints.id.activities.setup
 import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.intent.Intents
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.id.Application
@@ -16,6 +17,7 @@ import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.RelaxedMockK
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -58,5 +60,10 @@ class SetupActivityTest {
         ActivityScenario.launch<SetupActivity>(intent)
 
         coVerify(exactly = 1) { mockSessionRepository.updateCurrentSession(any())}
+    }
+
+    @After
+    fun tearDown() {
+        Intents.release()
     }
 }
