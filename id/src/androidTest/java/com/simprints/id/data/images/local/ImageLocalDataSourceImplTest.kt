@@ -1,6 +1,7 @@
 package com.simprints.id.data.images.local
 
 import android.app.Application
+import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
@@ -17,7 +18,7 @@ class ImageLocalDataSourceImplTest {
 
     companion object {
         private const val FILE_NAME = "test.png"
-        private const val SIZE_IMAGE = 500 * 1024 //500kB
+        private const val SIZE_IMAGE = 100 * 1024 //100kB
         private const val IMAGES_FOLDER = "images"
     }
 
@@ -32,16 +33,12 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun givenAByteArray_storeIt_shouldCreateAFile() {
+    fun givenAByteArray_storeIt_shouldReturnASecuredImageRef() {
         val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
         val securedImageRef = imageLocalDataSource.encryptAndStoreImage(byteArray, path)
         require(securedImageRef != null)
 
-        val file = File(securedImageRef.relativePath.compose())
-
-        assertThat(file.absolutePath).isEqualTo("$imagesFolder/test/$FILE_NAME")
         assertThat(securedImageRef.relativePath.compose()).contains(FILE_NAME)
-        assertThat(file.readBytes()).isNotEqualTo(byteArray)
     }
 
     @Test
@@ -49,6 +46,8 @@ class ImageLocalDataSourceImplTest {
         val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
         val securedImageRef = imageLocalDataSource.encryptAndStoreImage(byteArray, path)
         require(securedImageRef != null)
+
+        Log.d("TEST2", securedImageRef.toString())
 
         val encryptedInputStream = imageLocalDataSource.decryptImage(securedImageRef)
         assertThat(encryptedInputStream?.readBytes()).isEqualTo(byteArray)
@@ -88,9 +87,13 @@ class ImageLocalDataSourceImplTest {
     @Test
     fun shouldDeleteImageFiles() {
         val files = createImageFiles(3)
+        files.forEach { Log.d("TEST2", it.relativePath.toString()) }
+
         val fileToDelete = files.first()
         imageLocalDataSource.deleteImage(fileToDelete)
         val remainingFiles = imageLocalDataSource.listImages()
+
+        remainingFiles.forEach { Log.d("TEST2", it.relativePath.toString()) }
 
         assertThat(remainingFiles.none { it.relativePath == fileToDelete.relativePath }).isTrue()
         assertThat(remainingFiles.size).isEqualTo(2)

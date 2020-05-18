@@ -36,7 +36,9 @@ internal class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDa
 
             getEncryptedFile(file).openFileOutput().use { stream ->
                 stream.write(imageBytes)
-                SecuredImageRef(Path.parse(file.absolutePath))
+                val subsetToRemove = Path.parse(imageRootPath)
+                val path = Path.parse(file.path).remove(subsetToRemove)
+                SecuredImageRef(path)
             }
         } catch (t: Throwable) {
             t.printStackTrace()
