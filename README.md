@@ -85,3 +85,14 @@ To use Mockito in DF modules for android tests, a different dexer is required: c
 ### Technical documentation on features
 
 More about each feature or how each module work can be seen inside every module README files or inside respective folders. Higher level features that touch all modules are documented in the [id module](id/README.md).
+
+## Creation of debug app
+To create an universal apk that can be shared you need to:
+
+1. Create a bundle of the app  
+`./gradlew clean bundleDebug`
+
+2. Create an universal apk that can be installed in any device (warning: this is a big app)  
+`bundletool build-apks --bundle=id/build/outputs/bundle/debug/id-debug.aab --output=id-debug.apks --ks=debug.keystore --ks-pass=pass:android --ks-key-alias=androiddebugkey --mode=universal --overwrite`
+
+To install [bundletool](https://github.com/google/bundletool) you can download the jar from Github and execute it using `java -jar bundletool` or install using Homebrew (on macOS).

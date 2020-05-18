@@ -3,9 +3,11 @@ package com.simprints.id.activities.longConsent
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
+import com.simprints.id.testtools.UnitTestConfig
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
@@ -19,9 +21,11 @@ class PrivacyNoticeViewModelTest {
 
     @MockK lateinit var longConsentRepository: LongConsentRepository
 
+    @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
-        MockKAnnotations.init(this)
+        MockKAnnotations.init(this, relaxed = true)
+        UnitTestConfig(this).coroutinesMainThread()
     }
 
     @Test

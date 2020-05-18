@@ -1,2 +1,9 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.simprints.moduleapi" />
+<manifest xmlns:dist="http://schemas.android.com/apk/distribution"
+    package="com.simprints.moduleapi">
+
+    <dist:module
+        dist:instant="false"
+        dist:onDemand="false">
+        <dist:fusing dist:include="true" />
+    </dist:module>
+</manifest>
