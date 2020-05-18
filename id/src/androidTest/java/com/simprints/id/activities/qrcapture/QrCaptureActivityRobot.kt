@@ -6,10 +6,9 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.verifyBlocking
 import com.simprints.id.activities.qrcapture.QrCaptureActivity.Companion.QR_RESULT_KEY
 import com.simprints.id.activities.qrcapture.tools.CameraHelper
+import io.mockk.coVerify
 
 const val VALID_QR_SCAN_RESULT = "mock_qr_code"
 const val INVALID_QR_SCAN_RESULT = ""
@@ -46,9 +45,7 @@ class QrCaptureActivityAssertions(
 ) {
 
     fun cameraIsStarted() {
-        verifyBlocking(mockCameraHelper) {
-            startCamera(any(), any(), any())
-        }
+        coVerify { mockCameraHelper.startCamera(any(), any(), any()) }
     }
 
     fun resultIsOk() {

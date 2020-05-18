@@ -9,11 +9,10 @@ androidExtensions {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         minSdkVersion config.min_sdk
-        targetSdkVersion 28
-        multiDexEnabled true
+        targetSdkVersion 29
         versionCode 1
         versionName "2019.3.0-dev0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
