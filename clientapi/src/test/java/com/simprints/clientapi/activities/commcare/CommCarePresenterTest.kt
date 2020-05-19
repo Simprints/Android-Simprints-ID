@@ -1,6 +1,7 @@
 package com.simprints.clientapi.activities.commcare
 
 import com.simprints.clientapi.activities.commcare.CommCareAction.*
+import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
@@ -10,6 +11,7 @@ import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier
+import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
 import com.simprints.clientapi.requestFactories.EnrolRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
@@ -17,6 +19,7 @@ import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SE
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.libsimprints.Constants
 import com.simprints.testtools.unit.BaseUnitTestConfig
+import io.kotlintest.shouldThrow
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -121,9 +124,13 @@ class CommCarePresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk()
-        ).apply { runBlocking { start() } }
-
-        verify(exactly = 1) { view.handleClientRequestError(any()) }
+        ).apply {
+            runBlocking {
+                shouldThrow<InvalidIntentActionException> {
+                    start()
+                }
+            }
+        }
     }
 
     @Test
