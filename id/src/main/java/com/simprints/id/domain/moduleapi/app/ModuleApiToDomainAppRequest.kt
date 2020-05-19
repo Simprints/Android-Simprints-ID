@@ -17,5 +17,8 @@ fun IAppRequest.fromModuleApiToDomain(): AppRequest =
         is IAppConfirmIdentityRequest ->
             AppRequest.AppConfirmIdentityRequest(projectId, userId, sessionId, selectedGuid)
 
+        is IAppEnrolLastBiometricsRequest ->
+            AppRequest.AppEnrolLastBiometricsRequest(projectId, userId, moduleId, metadata, sessionId)
+
         else -> throw IllegalArgumentException("Request not recognised")
     }

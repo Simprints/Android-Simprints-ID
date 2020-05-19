@@ -1,6 +1,8 @@
 package com.simprints.id.orchestrator.steps.core
 
 import android.content.Intent
+import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.*
 import com.simprints.id.orchestrator.steps.core.requests.*
@@ -49,12 +51,13 @@ class CoreStepProcessorImpl : CoreStepProcessor {
     override fun buildAppEnrolLastBiometricsStep(projectId: String,
                                                  userId: String,
                                                  moduleId: String,
-                                                 metadata: String,
+                                                 fingerprintCaptureResponse: FingerprintCaptureResponse?,
+                                                 faceCaptureResponse: FaceCaptureResponse?,
                                                  sessionId: String?) = Step(
         requestCode = LAST_BIOMETRICS_CORE.value,
         activityName = LAST_BIOMETRICS_CORE_ACTIVITY_NAME,
         bundleKey = CORE_STEP_BUNDLE,
-        request = EnrolLastBiometricsRequest(projectId, userId, moduleId, metadata, sessionId),
+        request = EnrolLastBiometricsRequest(projectId, userId, moduleId, fingerprintCaptureResponse, faceCaptureResponse, sessionId),
         status = Step.Status.NOT_STARTED
     )
 
