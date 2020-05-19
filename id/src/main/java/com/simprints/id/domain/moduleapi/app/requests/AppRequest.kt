@@ -36,16 +36,21 @@ sealed class AppRequest(open val projectId: String,
                                     val verifyGuid: String) : AppRequestFlow(projectId, userId, moduleId)
     }
 
-    @Parcelize
-    data class AppEnrolLastBiometricsRequest(override val projectId: String,
-                                             override val userId: String,
-                                             val moduleId: String,
-                                             val metadata: String,
-                                             val identificationSessionId: String) : AppRequest(projectId, userId)
+    sealed class AppRequestFollowUp(override val projectId: String,
+                                    override val userId: String) : AppRequest(projectId, userId) {
 
-    @Parcelize
-    data class AppConfirmIdentityRequest(override val projectId: String,
-                                         override val userId: String,
-                                         val sessionId: String,
-                                         val selectedGuid: String) : AppRequest(projectId, userId)
+        @Parcelize
+        data class AppEnrolLastBiometricsRequest(override val projectId: String,
+                                                 override val userId: String,
+                                                 val moduleId: String,
+                                                 val metadata: String,
+                                                 val identificationSessionId: String) : AppRequest(projectId, userId)
+
+
+        @Parcelize
+        data class AppConfirmIdentityRequest(override val projectId: String,
+                                             override val userId: String,
+                                             val sessionId: String,
+                                             val selectedGuid: String) : AppRequest(projectId, userId)
+    }
 }

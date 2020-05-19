@@ -2,8 +2,8 @@ package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.odk.OdkAction.*
+import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.*
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
@@ -30,7 +30,7 @@ class OdkPresenter(
 ), OdkContract.Presenter {
 
     override suspend fun start() {
-        if (action != ConfirmIdentity && action != EnrolLastBiometrics) {
+        if (action !is OdkActionFollowUpAction) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.ODK)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }

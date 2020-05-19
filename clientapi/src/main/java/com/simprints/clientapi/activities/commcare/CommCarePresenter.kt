@@ -3,6 +3,7 @@ package com.simprints.clientapi.activities.commcare
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.commcare.CommCareAction.*
+import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.*
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
@@ -35,7 +36,7 @@ class CommCarePresenter(
 ), CommCareContract.Presenter {
 
     override suspend fun start() {
-        if (action != ConfirmIdentity) {
+        if (action !is CommCareActionFollowUpAction) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }

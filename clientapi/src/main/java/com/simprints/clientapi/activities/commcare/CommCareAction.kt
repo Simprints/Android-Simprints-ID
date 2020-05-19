@@ -1,10 +1,15 @@
 package com.simprints.clientapi.activities.commcare
 
-sealed class CommCareAction(val action: String?) {
+
+sealed class CommCareAction(open val action: String?) {
+
+    sealed class CommCareActionFollowUpAction(override val action: String?): CommCareAction(action) {
+        object ConfirmIdentity : CommCareActionFollowUpAction(ACTION_CONFIRM_IDENTITY)
+    }
+
     object Enrol : CommCareAction(ACTION_REGISTER)
     object Verify : CommCareAction(ACTION_IDENTIFY)
     object Identify : CommCareAction(ACTION_VERIFY)
-    object ConfirmIdentity : CommCareAction(ACTION_CONFIRM_IDENTITY)
 
     object Invalid : CommCareAction(null)
 
@@ -20,8 +25,9 @@ sealed class CommCareAction(val action: String?) {
                 ACTION_REGISTER -> Enrol
                 ACTION_IDENTIFY -> Identify
                 ACTION_VERIFY -> Verify
-                ACTION_CONFIRM_IDENTITY -> ConfirmIdentity
+                ACTION_CONFIRM_IDENTITY -> CommCareActionFollowUpAction.ConfirmIdentity
                 else -> Invalid
             }
     }
 }
+
