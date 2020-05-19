@@ -117,6 +117,6 @@ class OrchestratorActivityAndroidTest : KoinTest {
     }
 
     companion object {
-        private fun launchTaskRequest() = ConnectScannerTaskRequest()
+        private fun launchTaskRequest() = ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
     }
 }

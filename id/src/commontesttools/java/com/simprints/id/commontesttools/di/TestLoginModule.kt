@@ -2,7 +2,7 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -16,7 +16,7 @@ import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.LoginModule
 import com.simprints.id.secure.*
 import com.simprints.id.secure.AuthenticationHelper
-import com.simprints.core.network.BaseUrlProvider
+import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.tools.TimeHelper
@@ -46,20 +46,20 @@ class TestLoginModule(
     }
 
     override fun provideProjectAuthenticator(
-        authManager: AuthManager,
-        projectSecretManager: ProjectSecretManager,
-        loginInfoManager: LoginInfoManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider,
-        safetyNetClient: SafetyNetClient,
-        secureDataManager: SecureLocalDbKeyProvider,
-        projectRemoteDataSource: ProjectRemoteDataSource,
-        signerManager: SignerManager,
-        remoteConfigWrapper: RemoteConfigWrapper,
-        longConsentRepository: LongConsentRepository,
-        preferencesManager: PreferencesManager,
-        attestationManager: AttestationManager,
-        authenticationDataManager: AuthenticationDataManager
+            authManager: AuthManager,
+            projectSecretManager: ProjectSecretManager,
+            loginInfoManager: LoginInfoManager,
+            simApiClientFactory: SimApiClientFactory,
+            baseUrlProvider: BaseUrlProvider,
+            safetyNetClient: SafetyNetClient,
+            secureDataManager: SecureLocalDbKeyProvider,
+            projectRemoteDataSource: ProjectRemoteDataSource,
+            signerManager: SignerManager,
+            remoteConfigWrapper: RemoteConfigWrapper,
+            longConsentRepository: LongConsentRepository,
+            preferencesManager: PreferencesManager,
+            attestationManager: AttestationManager,
+            authenticationDataManager: AuthenticationDataManager
     ) : ProjectAuthenticator {
         return projectAuthenticatorRule.resolveDependency {
             super.provideProjectAuthenticator(

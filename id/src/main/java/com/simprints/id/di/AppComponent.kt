@@ -1,6 +1,6 @@
 package com.simprints.id.di
 
-import com.simprints.core.images.repository.ImageRepository
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter

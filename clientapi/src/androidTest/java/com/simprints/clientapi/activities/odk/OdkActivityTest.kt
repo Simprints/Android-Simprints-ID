@@ -26,7 +26,7 @@ class OdkActivityTest : BaseClientApiTest() {
     override fun setUp() {
         super.setUp()
         declareModule {
-            factory { (context: Context) -> mockk<OdkGuidSelectionNotifier>(relaxed = true) }
+            factory { (_: Context) -> mockk<OdkGuidSelectionNotifier>(relaxed = true) }
         }
         rule.launchActivity(buildIntent())
     }
@@ -36,6 +36,30 @@ class OdkActivityTest : BaseClientApiTest() {
         odk {
         } assert {
             toastMessageIsDisplayed()
+        }
+    }
+
+    @Test
+    fun enrolExtractorShouldBeOdkEnrolExtractor() {
+        odk {
+        } assert {
+            enrolExtractorIsOdkEnrolExtractor()
+        }
+    }
+
+    @Test
+    fun identifyExtractorShouldBeOdkIdentifyExtractor() {
+        odk {
+        } assert {
+            identifyExtractorIsOdkIdentifyExtractor()
+        }
+    }
+
+    @Test
+    fun verifyExtractorShouldBeOdkVerifyExtractor() {
+        odk {
+        } assert {
+            verifyExtractorIsOdkVerifyExtractor()
         }
     }
 

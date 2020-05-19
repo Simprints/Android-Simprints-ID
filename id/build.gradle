@@ -6,18 +6,23 @@ apply plugin: "kotlin-kapt"
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'realm-android'
 
+// Create a variable called keystorePropertiesFile, and initialize it to your
+// keystore.properties file, in the rootProject folder.
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 androidExtensions {
     experimental = true
 }
 
 android {
+    compileSdkVersion 29
+    buildToolsVersion '29.0.3'
 
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
     defaultConfig {
         minSdkVersion config.min_sdk
-        targetSdkVersion 28
-        multiDexEnabled true
+        targetSdkVersion 29
         vectorDrawables.useSupportLibrary = true
         versionName "2020.2.0"
         versionCode 222
@@ -38,6 +43,22 @@ android {
         }
     }
 
+    signingConfigs {
+        debug {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
     buildTypes {
         release {
             lintOptions {
@@ -51,6 +72,7 @@ android {
             ext.enableCrashlytics = true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
+            signingConfig signingConfigs.release
         }
         releaseWithLogfile {
             initWith release
@@ -58,9 +80,11 @@ android {
         debug {
             minifyEnabled false
             ext.enableCrashlytics = false
+            testCoverageEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
             manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
+            signingConfig signingConfigs.debug
         }
     }
 
