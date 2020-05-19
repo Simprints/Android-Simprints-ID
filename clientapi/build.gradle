@@ -99,6 +99,7 @@ dependencies {
     testImplementation deps.testing.androidx.core
     testImplementation deps.testing.androidx.ext_junit
     testImplementation deps.testing.mockk.core
+    testImplementation deps.testing.kotlin
 
     testImplementation deps.testing.espresso.intents
     testImplementation deps.koin.core_ext
