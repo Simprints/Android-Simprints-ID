@@ -19,7 +19,7 @@ fun SharedPreferences.getMap(key: String, default: Map<String, String> = emptyMa
     val values = getStringSet("${key}_values", emptySet())
     sharedCounterLock.unlock()
 
-    return keys?.zip(values)?.toMap() ?: default
+    return values?.let { keys?.zip(values)?.toMap() } ?: default
 }
 
 

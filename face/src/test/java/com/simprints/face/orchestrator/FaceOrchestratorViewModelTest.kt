@@ -49,6 +49,18 @@ class FaceOrchestratorViewModelTest {
 
     }
 
+    @Test
+    fun `route user to invalid license flow if needed`() {
+        viewModel.invalidLicense()
+        assertThat(viewModel.invalidLicenseEvent.value).isNotNull()
+    }
+
+    @Test
+    fun `route user to missing license flow if needed`() {
+        viewModel.missingLicense()
+        assertThat(viewModel.missingLicenseEvent.value).isNotNull()
+    }
+
     private fun generateCaptureRequest(captures: Int) = mockk<IFaceCaptureRequest> {
         every { nFaceSamplesToCapture } returns captures
     }

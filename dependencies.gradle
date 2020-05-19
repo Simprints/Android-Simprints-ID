@@ -41,7 +41,8 @@ def androidx = [
         constraintlayout: "androidx.constraintlayout:constraintlayout:2.0.0-beta4",
         cardview        : "androidx.cardview:cardview:1.0.0",
         fragment        : "androidx.fragment:fragment:1.1.0-alpha04",
-        preference      : "androidx.preference:preference:1.1.0-alpha03"
+        preference      : "androidx.preference:preference:1.1.0-alpha03",
+        viewpager2      : "androidx.viewpager2:viewpager2:1.0.0"
     ],
     security  : ['androidx.security:security-crypto:1.0.0-alpha02'],
     camerax   : [
@@ -141,7 +142,7 @@ def circleImageView = "de.hdodenhof:circleimageview:3.0.1"
 // Testing
 def mockito_version = "3.2.4"
 def espresso_version = "3.2.0-alpha04"
-def robolectric_version = "4.1"
+def robolectric_version = "4.3.1"
 def androidx_version = "1.3.0-beta01"
 def testing = [
     junit          : "junit:junit:4.13-beta-2",
