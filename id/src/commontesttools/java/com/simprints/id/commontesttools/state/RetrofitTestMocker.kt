@@ -1,8 +1,8 @@
 package com.simprints.id.commontesttools.state
 
-import com.simprints.core.network.BaseUrlProvider
-import com.simprints.core.network.NetworkConstants
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.NetworkConstants
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import io.mockk.every

@@ -21,7 +21,7 @@ import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
-import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
+import sourceafis.MatcherEventListener
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers

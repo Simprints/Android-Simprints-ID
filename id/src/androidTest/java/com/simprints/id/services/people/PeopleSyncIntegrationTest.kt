@@ -8,8 +8,8 @@ import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.network.BaseUrlProvider
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -115,8 +115,8 @@ class PeopleSyncIntegrationTest {
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns mockServer.url("/").toString()
         val remotePeopleApi = SimApiClientFactory(
-            mockBaseUrlProvider,
-            "deviceId"
+                mockBaseUrlProvider,
+                "deviceId"
         ).build<PeopleRemoteInterface>().api
 
         coEvery { personRemoteDataSourceSpy.getPeopleApiClient() } returns remotePeopleApi
