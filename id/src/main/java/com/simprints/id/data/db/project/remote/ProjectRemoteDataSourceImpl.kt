@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.project.remote
 
 import com.google.gson.JsonElement
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.tools.utils.retrySimNetworkCalls
