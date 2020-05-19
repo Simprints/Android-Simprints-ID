@@ -3,21 +3,18 @@ package com.simprints.id.orchestrator
 import android.app.Activity
 import android.app.Instrumentation.ActivityResult
 import android.content.Intent
-import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
-import com.simprints.id.orchestrator.cache.HotCacheImpl
-import com.simprints.id.orchestrator.cache.StepEncoder
+import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.steps.Step
@@ -49,7 +46,6 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class)
 class OrchestratorManagerImplTest {
 
-    private lateinit var hotCache: HotCacheImpl
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -57,6 +53,8 @@ class OrchestratorManagerImplTest {
     @MockK private lateinit var appResponseFactoryMock: AppResponseFactory
     @MockK private lateinit var modalityFlowMock: ModalityFlow
     @MockK private lateinit var dashboardDailyActivityRepositoryMock: DashboardDailyActivityRepository
+    @MockK private lateinit var hotCache: HotCache
+
     private lateinit var orchestrator: OrchestratorManager
     private val mockSteps = mutableListOf<Step>()
     private val modalities = listOf(FACE)
@@ -81,6 +79,8 @@ class OrchestratorManagerImplTest {
         mockSteps.clear()
         every { modalityFlowMock.steps } answers { mockSteps }
 
+        every { hotCache.appRequest } returns appEnrolRequest
+
         orchestrator = buildOrchestratorManager()
         prepareModalFlowForFaceEnrol()
 
@@ -103,14 +103,6 @@ class OrchestratorManagerImplTest {
         }
 
         verifyOrchestratorTriedToBuildFinalAppResponse()
-    }
-
-    @Test
-    fun modalityFlowCompletes_orchestratorShouldTryToBuildAppResponse() = runBlockingTest {
-        with(orchestrator) {
-            startFlowForEnrol(modalities)
-            Truth.assertThat(hotCache.appRequest).isEqualTo(enrolAppRequest)
-        }
     }
 
     @Test
@@ -177,12 +169,6 @@ class OrchestratorManagerImplTest {
         val modalityFlowFactoryMock = mockk<ModalityFlowFactory>().apply {
             every { this@apply.createModalityFlow(any(), any()) } returns modalityFlowMock
         }
-        val preferences = mockk<SharedPreferences>()
-        every { preferences.edit() } returns mockk()
-
-        val stepEncoder = mockk<StepEncoder>()
-        hotCache = HotCacheImpl(preferences, stepEncoder)
-
         coEvery { appResponseFactoryMock.buildAppResponse(any(), any(), any(), any()) } returns mockk()
         return OrchestratorManagerImpl(
             modalityFlowFactoryMock,

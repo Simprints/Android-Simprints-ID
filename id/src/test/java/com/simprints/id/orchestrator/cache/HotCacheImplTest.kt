@@ -9,8 +9,8 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_METADATA
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.orchestrator.SOME_GUID
 import com.simprints.id.orchestrator.steps.Step
@@ -67,7 +67,7 @@ class HotCacheImplTest : AutoCloseKoinTest() {
 
     @Test
     fun shouldReadConfirmIdentityAppRequest() {
-        val appRequest = AppRequest.AppConfirmIdentityRequest(
+        val appRequest = AppConfirmIdentityRequest(
             DEFAULT_PROJECT_ID,
             DEFAULT_USER_ID,
             DEFAULT_MODULE_ID,

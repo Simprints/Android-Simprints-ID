@@ -1,9 +1,11 @@
-package com.simprints.id.orchestrator.responsebuilders
+package com.simprints.id.orchestrator
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerIdentifier
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
+import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
@@ -12,22 +14,36 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.tools.TimeHelper
 import io.kotlintest.shouldThrow
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
-import io.mockk.mockk
+import io.mockk.MockKAnnotations
+import io.mockk.impl.annotations.MockK
+import org.junit.Before
 import org.junit.Test
 
-class PersonBuilderTest {
+class EnrolmentHelperImplTest {
 
-    private val personBuilder = AppResponseBuilderForEnrol.PersonBuilder
-    private val timeHelper: TimeHelper = mockk(relaxed = true)
+    lateinit var enrolmentHelper: EnrolmentHelper
+
+    @MockK
+    lateinit var personRepository: PersonRepository
+
+    @MockK
+    lateinit var sessionRepository: SessionRepository
+
+    @MockK
+    lateinit var timeHelper: TimeHelper
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+        enrolmentHelper = EnrolmentHelperImpl(personRepository, sessionRepository, timeHelper)
+    }
 
     @Test
     fun withFingerprintResponse_shouldBuildPerson() {
         val request = mockRequest()
         val fingerprintResponse = mockFingerprintResponse()
 
-        val person = personBuilder.buildPerson(request, fingerprintResponse, null, timeHelper)
+        val person = enrolmentHelper.buildPerson(request.projectId, request.userId, request.moduleId, fingerprintResponse, null, timeHelper)
         val expectedFingerprints = fingerprintResponse.captureResult
 
         with(person) {
@@ -52,7 +68,7 @@ class PersonBuilderTest {
         val request = mockRequest()
         val faceResponse = mockFaceResponse()
 
-        val person = personBuilder.buildPerson(request, null, faceResponse, timeHelper)
+        val person = enrolmentHelper.buildPerson(request.projectId, request.userId, request.moduleId, null, faceResponse, timeHelper)
         val expectedFaceSamples = faceResponse.capturingResult.mapNotNull {
             it.result?.template?.let { template ->
                 FaceSample(template)
@@ -77,7 +93,7 @@ class PersonBuilderTest {
         val fingerprintResponse = mockFingerprintResponse()
         val faceResponse = mockFaceResponse()
 
-        val person = personBuilder.buildPerson(request, fingerprintResponse, faceResponse, timeHelper)
+        val person = enrolmentHelper.buildPerson(request.projectId, request.userId, request.moduleId, fingerprintResponse, faceResponse, timeHelper)
         val expectedFingerprints = fingerprintResponse.captureResult
         val expectedFaceSamples = faceResponse.capturingResult.mapNotNull {
             it.result?.template?.let { template ->
@@ -110,11 +126,11 @@ class PersonBuilderTest {
         val request = mockRequest()
 
         shouldThrow<Throwable> {
-            personBuilder.buildPerson(request, null, null, timeHelper)
+            enrolmentHelper.buildPerson(request.projectId, request.userId, request.moduleId, null, null, timeHelper)
         }
     }
 
-    private fun mockRequest() = AppEnrolRequest(
+    private fun mockRequest() = AppRequest.AppRequestFlow.AppEnrolRequest(
         "projectId", "userId", "moduleId", "metadata"
     )
 

@@ -9,8 +9,8 @@ import com.simprints.id.commontesttools.moduleApi.AppConfirmaConfirmIdentityRequ
 import com.simprints.id.commontesttools.moduleApi.AppEnrolRequestModuleApi
 import com.simprints.id.commontesttools.moduleApi.AppIdentifyRequestModuleApi
 import com.simprints.id.commontesttools.moduleApi.AppVerifyRequestModuleApi
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import org.junit.Test
 import java.util.*
 
@@ -59,7 +59,7 @@ class ModuleApiToDomainAppRequestKtTest {
         val selectedGuid = UUID.randomUUID().toString()
         val sessionId = UUID.randomUUID().toString()
         val iAppRequest = AppConfirmaConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, sessionId, selectedGuid)
-        val domainRequest = iAppRequest.fromModuleApiToDomain() as AppRequest.AppConfirmIdentityRequest
+        val domainRequest = iAppRequest.fromModuleApiToDomain() as AppConfirmIdentityRequest
         with(domainRequest) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
             assertThat(userId).isEqualTo(DEFAULT_USER_ID)
