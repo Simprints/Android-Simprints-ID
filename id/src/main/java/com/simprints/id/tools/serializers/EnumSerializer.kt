@@ -6,8 +6,8 @@ import java.security.InvalidParameterException
 class EnumSerializer<T : Enum<*>>(private val enumClass: Class<T>): Serializer<T> {
 
     private val stringToEnumValue = enumClass.enumConstants
-            .map { Pair(it.name, it) }
-            .toMap()
+            ?.map { Pair(it.name, it) }
+            ?.toMap() ?: emptyMap()
 
     override fun serialize(value: T): String =
             value.name
@@ -16,6 +16,6 @@ class EnumSerializer<T : Enum<*>>(private val enumClass: Class<T>): Serializer<T
             stringToEnumValue[string] ?: throw InvalidParameterException("Invalid serialized enum value")
 
     fun deserialize(index: Int): T {
-        return enumClass.enumConstants[index]
+        return enumClass.enumConstants?.get(index) ?: throw InvalidParameterException("Invalid index")
     }
 }
