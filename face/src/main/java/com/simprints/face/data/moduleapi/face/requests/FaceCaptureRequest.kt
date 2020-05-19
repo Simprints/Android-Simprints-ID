@@ -6,5 +6,3 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class FaceCaptureRequest(val nFaceSamplesToCapture: Int) : FaceRequest
-
-fun IFaceSample.fromModuleApiToDomainFaceSample() = FaceSample(template)
