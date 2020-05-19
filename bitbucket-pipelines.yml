@@ -23,7 +23,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew clientapi:jacocoTestReportDebug
+                    - ./gradlew clientapi:jacocoTestReportDebug --no-daemon
                 artifacts:
                     - clientapi/build/reports/**
 
@@ -31,12 +31,13 @@ definitions:
         # Run the ID unit tests with coverage and upload report to artifacts.
         ######################################################################
         -   step: &run-id-unit-tests
-                name: "Run Id unit tests"
+                name: "Run Id & Core unit tests"
                 caches:
                     - gradle
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - ./gradlew core:jacocoTestReportDebug
                     - ./gradlew id:jacocoTestReportDebug
                 artifacts:
                     - id/build/reports/**
@@ -51,7 +52,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew face:jacocoTestReportDebug
+                    - ./gradlew face:jacocoTestReportDebug --no-daemon
                 artifacts:
                     - face/build/reports/**
 
@@ -67,6 +68,8 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - ./gradlew fingerprint:jacocoTestReportDebug
+                    - ./gradlew fingerprintscanner:jacocoTestReportDebug
+                    - ./gradlew fingerprintscannermock:jacocoTestReportDebug
                 artifacts:
                     - fingerprint/build/reports/**
 
@@ -82,7 +85,7 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - bash ./ci/pipeline/pull_destination_if_pr
-                    - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
+                    - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600 --no-daemon
 
         ######################################################################
         # Build all of the test APKs for the different modules, then Download
