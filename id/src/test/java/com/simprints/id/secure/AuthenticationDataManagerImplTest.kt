@@ -2,10 +2,10 @@ package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.network.BaseUrlProvider
-import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
-import com.simprints.core.network.SimApiClient
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
+import com.simprints.id.network.SimApiClient
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.secure.SecureApiInterface.Companion.API_KEY
 import com.simprints.id.secure.models.AuthenticationData
@@ -79,7 +79,7 @@ class AuthenticationDataManagerImplTest: AutoCloseKoinTest() {
     }
 
     private suspend fun makeTestRequestForAuthenticationData(): AuthenticationData {
-        val authenticationDataManagerSpy = spyk(AuthenticationDataManagerImpl(mockk(), mockk()))
+        val authenticationDataManagerSpy = spyk(AuthenticationDataManagerImpl(mockk()))
         every { authenticationDataManagerSpy.apiClient } returns apiClient.api
 
         return authenticationDataManagerSpy.requestAuthenticationData(PROJECT_ID, USER_ID)

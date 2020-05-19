@@ -3,7 +3,12 @@ package com.simprints.clientapi.activities.odk
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
-import com.simprints.clientapi.activities.odk.OdkAction.Companion.buildOdkAction
+import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
+import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
+import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
+import com.simprints.clientapi.clientrequests.extractors.odk.OdkEnrolExtractor
+import com.simprints.clientapi.clientrequests.extractors.odk.OdkIdentifyExtractor
+import com.simprints.clientapi.clientrequests.extractors.odk.OdkVerifyExtractor
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
@@ -24,6 +29,20 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_EXIT_EXTRA = "odk-exit-extra"
     }
 
+    //For some reason, Survey CTO sends the callback field in the callout Intent.
+    //Because SID doesn't expect these fields, the intent is marked as suspicious.
+    //Added these fields as "acceptable", so a Suspicious event is not generated.
+    private val acceptableExtras = listOf(
+        ODK_REGISTRATION_ID_KEY,
+        ODK_GUIDS_KEY,
+        ODK_BIOMETRICS_COMPLETE_CHECK_KEY,
+        ODK_CONFIDENCES_KEY,
+        ODK_TIERS_KEY,
+        ODK_SESSION_ID,
+        ODK_EXIT_REASON,
+        ODK_EXIT_EXTRA
+    )
+
     private val action: OdkAction
         get() = buildOdkAction(intent.action)
 
@@ -32,6 +51,15 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     override val guidSelectionNotifier: OdkGuidSelectionNotifier by inject {
         parametersOf(this)
     }
+
+    override val enrollExtractor: EnrollExtractor
+        get() = OdkEnrolExtractor(intent, acceptableExtras)
+
+    override val identifyExtractor: IdentifyExtractor
+        get() = OdkIdentifyExtractor(intent, acceptableExtras)
+
+    override val verifyExtractor: VerifyExtractor
+        get() = OdkVerifyExtractor(intent, acceptableExtras)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

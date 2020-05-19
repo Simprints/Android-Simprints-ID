@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.testtools
 
+import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
@@ -12,4 +13,18 @@ fun <T> TestObserver<LiveDataEventWithContent<T>>.assertEventReceivedWithContent
 
 fun TestObserver<LiveDataEvent>.assertEventReceived() {
     assertThat(this.observedValues.count()).isEqualTo(1)
+}
+
+fun MutableLiveData<LiveDataEvent>.assertEventReceived() {
+    assertThat(this.value).isNotNull()
+}
+
+fun <T> MutableLiveData<LiveDataEventWithContent<T>>.assertEventReceivedWithContent(expected: T) {
+    assertThat(this.value?.peekContent()).isEqualTo(expected)
+}
+
+fun <T> MutableLiveData<LiveDataEventWithContent<T>>.assertEventReceivedWithContentAssertions(assertions: (T) -> Unit) {
+    with(this.value!!.peekContent()) {
+        assertions(this)
+    }
 }
