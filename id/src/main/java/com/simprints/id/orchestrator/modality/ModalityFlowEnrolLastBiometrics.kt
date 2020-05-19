@@ -4,8 +4,6 @@ import android.content.Intent
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
-import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.Companion.isCoreResult
@@ -27,13 +25,9 @@ class ModalityFlowEnrolLastBiometrics(private val coreStepProcessor: CoreStepPro
             appRequest.projectId,
             appRequest.userId,
             appRequest.moduleId,
-            getCaptureResponse<FingerprintCaptureResponse>(previousSteps),
-            getCaptureResponse<FaceCaptureResponse>(previousSteps),
+            previousSteps,
             appRequest.identificationSessionId
         ))
-
-    private inline fun <reified T> getCaptureResponse(steps: List<Step>) =
-        steps.firstOrNull { it.getResult() is T }?.getResult() as T?
 
     override fun restoreState(stepsToRestore: List<Step>) {
         steps.clear()
