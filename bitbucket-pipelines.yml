@@ -71,6 +71,21 @@ definitions:
                     - fingerprint/build/reports/**
 
         ######################################################################
+        # Run the Fingerprint unit tests with coverage and upload report to
+        # artifacts.
+        ######################################################################
+        -   step: &run-fingerprintscanner-unit-tests
+                name: "Run Fingerprint Scanner unit tests"
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - bash ./ci/pipeline/setup
+                    - ./gradlew fingerprintscanner:jacocoTestReportDebug
+                artifacts:
+                    - fingerprintscanner/build/reports/**
+
+        ######################################################################
         # Get all of the test and coverage reports from artifacts, upload
         # them to sonarcloud.io, and check that they pass the quality gateway.
         ######################################################################
@@ -175,6 +190,7 @@ flows:
                     -   step: *run-id-unit-tests
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
+                    -   step: *run-fingerprintscanner-unit-tests
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
