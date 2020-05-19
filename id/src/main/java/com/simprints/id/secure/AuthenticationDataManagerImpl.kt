@@ -1,6 +1,6 @@
 package com.simprints.id.secure
 
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.secure.models.AuthenticationData

@@ -1,10 +1,10 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.core.images.repository.ImageRepository
-import com.simprints.core.images.repository.ImageRepositoryImpl
-import com.simprints.core.network.BaseUrlProvider
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.data.images.repository.ImageRepository
+import com.simprints.id.data.images.repository.ImageRepositoryImpl
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSourceImpl

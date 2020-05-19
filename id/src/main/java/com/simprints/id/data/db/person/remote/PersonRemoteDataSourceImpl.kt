@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.person.remote
 
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation

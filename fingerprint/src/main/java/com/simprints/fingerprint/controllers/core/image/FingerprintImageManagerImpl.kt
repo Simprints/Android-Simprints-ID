@@ -1,11 +1,11 @@
 package com.simprints.fingerprint.controllers.core.image
 
-import com.simprints.core.images.repository.ImageRepository
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.fingerprint.data.domain.images.Path
 import com.simprints.id.data.db.session.SessionRepository
 import timber.log.Timber
-import com.simprints.core.images.model.Path as CorePath
+import com.simprints.id.data.images.model.Path as CorePath
 
 class FingerprintImageManagerImpl(private val coreImageRepository: ImageRepository,
                                   private val coreSessionRepository: SessionRepository) : FingerprintImageManager {
