@@ -5,7 +5,7 @@ git remote add targetremote https://x-token-auth:$REPOSITORY_OAUTH_ACCESS_TOKEN@
 if [ -z "$BITBUCKET_PR_DESTINATION_BRANCH" ]; then
     echo "Not a pull request, skipping target branch pull"
     echo "FOR NOW PULL ANYWAYS"
-    git fetch +refs/heads/master:refs/remotes/origin/master
+    git fetch +refs/heads/master:refs/remotes/targetremote/master
 else
     echo "Pull request aginst $BITBUCKET_PR_DESTINATION_BRANCH"
     git fetch +refs/heads/$BITBUCKET_PR_DESTINATION_BRANCH:refs/remotes/targetremote/$BITBUCKET_PR_DESTINATION_BRANCH
