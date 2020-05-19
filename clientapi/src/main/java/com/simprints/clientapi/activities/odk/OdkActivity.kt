@@ -3,7 +3,8 @@ package com.simprints.clientapi.activities.odk
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
-import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
+import com.simprints.clientapi.activities.odk.OdkAction.Companion.buildOdkAction
+import com.simprints.clientapi.clientrequests.extractors.EnrolExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkEnrolExtractor
@@ -52,7 +53,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         parametersOf(this)
     }
 
-    override val enrollExtractor: EnrollExtractor
+    override val enrolExtractor: EnrolExtractor
         get() = OdkEnrolExtractor(intent, acceptableExtras)
 
     override val identifyExtractor: IdentifyExtractor
