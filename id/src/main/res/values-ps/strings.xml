@@ -74,7 +74,7 @@
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
     <!-- Screen Text -->
-    <string name="why_did_you_skip_fingerprinting">د گوتي د نښان ورکولو څخه مو ولې ډډه وکړه؟</string>
+    <string name="reasons_for_leaving_fingerprint">د گوتي د نښان ورکولو څخه مو ولې ډډه وکړه؟</string>
     <!-- Button Labels -->
     <string name="button_submit">سپارل</string>
     <string name="button_scan_prints">اوکی</string>
