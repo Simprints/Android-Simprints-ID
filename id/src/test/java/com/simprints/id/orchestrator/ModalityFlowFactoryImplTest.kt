@@ -15,12 +15,13 @@ class ModalityFlowFactoryImplTest {
     @MockK lateinit var identifyFlow: ModalityFlow
     @MockK lateinit var verifyFlow: ModalityFlow
     @MockK lateinit var confirmationIdentityFlow: ModalityFlow
+    @MockK lateinit var enrolLastBiometricsFlow: ModalityFlow
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
 
-        modalityFlowFactory = ModalityFlowFactoryImpl(enrolFlow, verifyFlow, identifyFlow, confirmationIdentityFlow)
+        modalityFlowFactory = ModalityFlowFactoryImpl(enrolFlow, verifyFlow, identifyFlow, confirmationIdentityFlow, enrolLastBiometricsFlow)
     }
 
     @Test
