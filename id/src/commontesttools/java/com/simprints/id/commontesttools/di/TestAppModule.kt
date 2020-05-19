@@ -33,6 +33,7 @@ import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.ConnectivityHelper
@@ -64,6 +65,7 @@ class TestAppModule(
     private val deviceManagerRule: DependencyRule = RealRule,
     private val recentEventsPreferencesManagerRule: DependencyRule = RealRule,
     private val remoteProjectInfoProviderRule: DependencyRule = RealRule,
+    private val locationManagerRule: DependencyRule = RealRule,
     private val baseUrlProviderRule: DependencyRule = RealRule,
     private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule {
         setupFakeEncryptedSharedPreferences(
@@ -192,6 +194,10 @@ class TestAppModule(
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
 
+    override fun provideLocationManager(ctx: Context): LocationManager =
+        locationManagerRule.resolveDependency {
+            super.provideLocationManager(ctx)
+        }
 
     override fun provideSyncStatusDatabase(ctx: Context): PeopleSyncStatusDatabase =
         syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase(ctx) }
