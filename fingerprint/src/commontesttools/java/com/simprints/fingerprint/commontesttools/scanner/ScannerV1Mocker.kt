@@ -1,73 +1,71 @@
 package com.simprints.fingerprint.commontesttools.scanner
 
-import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
 import com.simprints.fingerprintscanner.v1.ScannerCallback
 import com.simprints.fingerprintscanner.v1.enums.UN20_STATE
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.anyOrNull
-import com.simprints.testtools.common.syntax.setupMock
-import com.simprints.testtools.common.syntax.whenThis
-import org.mockito.ArgumentMatchers.*
+import io.mockk.MockKMatcherScope
+import io.mockk.every
+import io.mockk.mockk
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 
 fun createMockedScannerV1(also: ScannerV1.() -> Unit = {}): ScannerV1 =
-    setupMock {
-        makeCallbackSucceeding { connect(anyOrNull()) }
-        makeCallbackSucceeding { disconnect(anyOrNull()) }
-        makeCallbackSucceeding { switchToFactoryResetBank(anyOrNull()) }
-        makeCallbackSucceeding { switchToProductionBank(anyOrNull()) }
-        makeCallbackSucceeding { sendFirmwareMetadata(anyString(), anyOrNull()) }
-        makeCallbackSucceeding { sendFirmwareHex(anyString(), anyOrNull()) }
-        makeCallbackSucceeding { getFirmwareInfo(anyOrNull()) }
-        makeCallbackSucceeding { un20Wakeup(anyOrNull()) }
-        makeCallbackSucceeding { un20Shutdown(anyOrNull()) }
-        makeCallbackSucceeding { updateSensorInfo(anyOrNull()) }
-        makeCallbackSucceeding { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
-        whenThis { stopContinuousCapture() } thenReturn true
-        whenThis { registerButtonListener(anyNotNull()) } thenReturn true
-        whenThis { unregisterButtonListener(anyNotNull()) } thenReturn true
-        makeCallbackSucceeding { forceCapture(anyInt(), anyOrNull()) }
-        makeCallbackSucceeding { resetUI(anyNotNull()) }
-        whenThis { setHardwareConfig(anyNotNull(), anyOrNull()) }
-        whenThis { isConnected } thenReturn true
-        whenThis { scannerId } thenReturn DEFAULT_SCANNER_ID
-        whenThis { ucVersion } thenReturn DEFAULT_UC_VERSION
-        whenThis { bankId } thenReturn DEFAULT_BANK_ID
-        whenThis { unVersion } thenReturn DEFAULT_UN_VERSION
-        whenThis { macAddress } thenReturn DEFAULT_MAC_ADDRESS
-        whenThis { batteryLevel1 } thenReturn DEFAULT_BATTERY_LEVEL_1
-        whenThis { batteryLevel2 } thenReturn DEFAULT_BATTERY_LEVEL_2
-        whenThis { hardwareVersion } thenReturn DEFAULT_HARDWARE_VERSION
-        whenThis { crashLogValid } thenReturn true
-        whenThis { un20State } thenReturn UN20_STATE.READY
-        whenThis { imageQuality } thenReturn DEFAULT_GOOD_IMAGE_QUALITY
-        whenThis { template } thenReturn FingerprintGenerator.generateRandomFingerprint().templateBytes
-        whenThis { connection_sendOtaPacket(anyInt(), anyInt(), anyString()) } thenReturn true
-        whenThis { connection_sendOtaMeta(anyInt(), anyShort()) } thenReturn true
-        whenThis { connection_setBank(anyChar(), anyChar(), anyChar()) } thenReturn true
+    mockk {
+        makeCallbackSucceeding { connect(any()) }
+        makeCallbackSucceeding { disconnect(any()) }
+        makeCallbackSucceeding { switchToFactoryResetBank(any()) }
+        makeCallbackSucceeding { switchToProductionBank(any()) }
+        makeCallbackSucceeding { sendFirmwareMetadata(any(), any()) }
+        makeCallbackSucceeding { sendFirmwareHex(any(), any()) }
+        makeCallbackSucceeding { getFirmwareInfo(any()) }
+        makeCallbackSucceeding { un20Wakeup(any()) }
+        makeCallbackSucceeding { un20Shutdown(any()) }
+        makeCallbackSucceeding { updateSensorInfo(any()) }
+        makeCallbackSucceeding { startContinuousCapture(any(), any(), any()) }
+        every { stopContinuousCapture() } returns true
+        every { registerButtonListener(any()) } returns true
+        every { unregisterButtonListener(any()) } returns true
+        makeCallbackSucceeding { forceCapture(any(), any()) }
+        makeCallbackSucceeding { resetUI(any()) }
+        every { setHardwareConfig(any(), any()) }
+        every { isConnected } returns true
+        every { scannerId } returns DEFAULT_SCANNER_ID
+        every { ucVersion } returns DEFAULT_UC_VERSION
+        every { bankId } returns DEFAULT_BANK_ID
+        every { unVersion } returns DEFAULT_UN_VERSION
+        every { macAddress } returns DEFAULT_MAC_ADDRESS
+        every { batteryLevel1 } returns DEFAULT_BATTERY_LEVEL_1
+        every { batteryLevel2 } returns DEFAULT_BATTERY_LEVEL_2
+        every { hardwareVersion } returns DEFAULT_HARDWARE_VERSION
+        every { crashLogValid } returns true
+        every { un20State } returns UN20_STATE.READY
+        every { imageQuality } returns DEFAULT_GOOD_IMAGE_QUALITY
+        every { template } returns FingerprintGenerator.generateRandomFingerprint().templateBytes
+        every { connection_sendOtaPacket(any(), any(), any()) } returns true
+        every { connection_sendOtaMeta(any(), any()) } returns true
+        every { connection_setBank(any(), any(), any()) } returns true
         also(this)
     }
 
-fun ScannerV1.makeCallbackSucceeding(method: (ScannerV1) -> Unit) {
-    whenThis(method) then { onMock ->
-        val callback = onMock.arguments.find { it is ScannerCallback } as ScannerCallback?
+fun ScannerV1.makeCallbackSucceeding(method: MockKMatcherScope.(ScannerV1) -> Unit) {
+    every { this.method(this@makeCallbackSucceeding) } answers { call ->
+        val callback = call.invocation.args.find { it is ScannerCallback } as ScannerCallback?
         callback?.onSuccess()
     }
 }
 
-fun ScannerV1.makeCallbackFailing(error: SCANNER_ERROR, method: (ScannerV1) -> Unit) {
-    whenThis(method) then { onMock ->
-        val callback = onMock.arguments.find { it is ScannerCallback } as ScannerCallback?
+fun ScannerV1.makeCallbackFailing(error: SCANNER_ERROR, method: MockKMatcherScope.(ScannerV1) -> Unit) {
+    every { this.method(this@makeCallbackFailing) } answers { call ->
+        val callback = call.invocation.args.find { it is ScannerCallback } as ScannerCallback?
         callback?.onFailure(error)
     }
 }
 
 fun ScannerV1.queueFinger(fingerIdentifier: FingerIdentifier, qualityScore: Int) {
     makeScansSuccessful()
-    whenThis { imageQuality } thenReturn qualityScore
-    whenThis { template } thenReturn FingerprintGenerator.generateRandomFingerprint(fingerIdentifier, qualityScore.toByte()).templateBytes
+    every { imageQuality } returns qualityScore
+    every { template } returns FingerprintGenerator.generateRandomFingerprint(fingerIdentifier, qualityScore.toByte()).templateBytes
 }
 
 fun ScannerV1.queueGoodFinger(fingerIdentifier: FingerIdentifier = FingerIdentifier.LEFT_THUMB) =
@@ -78,13 +76,13 @@ fun ScannerV1.queueBadFinger(fingerIdentifier: FingerIdentifier = FingerIdentifi
 
 fun ScannerV1.queueFingerNotDetected() {
     // SCANNER_ERROR.UN20_SDK_ERROR corresponds to no finger detected on sensor
-    makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
-    makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { forceCapture(anyInt(), anyOrNull()) }
+    makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { startContinuousCapture(any(), any(), any()) }
+    makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { forceCapture(any(), any()) }
 }
 
 fun ScannerV1.makeScansSuccessful() {
-    makeCallbackSucceeding { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
-    makeCallbackSucceeding { forceCapture(anyInt(), anyOrNull()) }
+    makeCallbackSucceeding { startContinuousCapture(any(), any(), any()) }
+    makeCallbackSucceeding { forceCapture(any(), any()) }
 }
 
 const val DEFAULT_SCANNER_ID = "scannerId"

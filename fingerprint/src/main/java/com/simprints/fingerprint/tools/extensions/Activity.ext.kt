@@ -6,6 +6,7 @@ import android.content.Intent
 import android.widget.Toast
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 
@@ -37,4 +38,9 @@ fun Activity.logActivityCreated() {
 
 fun Activity.logActivityDestroyed() {
     Timber.d("Fingerprint Activity Log : destroyed ${this::class.simpleName}")
+}
+
+fun Activity.setResultAndFinish(resultCode: ResultCode, data: Intent?) {
+    setResult(resultCode.value, data)
+    finish()
 }
