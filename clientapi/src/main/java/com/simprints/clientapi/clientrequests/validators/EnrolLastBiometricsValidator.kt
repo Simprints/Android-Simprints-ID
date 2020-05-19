@@ -3,9 +3,9 @@ package com.simprints.clientapi.clientrequests.validators
 import com.simprints.clientapi.clientrequests.extractors.EnrolLastBiometricsExtractor
 import com.simprints.clientapi.exceptions.InvalidSessionIdException
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
-import com.simprints.id.data.db.session.domain.models.events.InvalidIntentEvent
 
 class EnrolLastBiometricsValidator(val extractor: EnrolLastBiometricsExtractor,
+                                   private val currentSession: String,
                                    private val isCurrentSessionAnIdentification: Boolean)
     : ClientRequestValidator(extractor) {
 
@@ -20,5 +20,9 @@ class EnrolLastBiometricsValidator(val extractor: EnrolLastBiometricsExtractor,
     private fun validateSessionId(sessionId: String) {
         if (sessionId.isBlank())
             throw InvalidSessionIdException("Missing Session ID")
+
+        if(currentSession != sessionId)
+            throw InvalidSessionIdException("Invalid Session ID")
+
     }
 }

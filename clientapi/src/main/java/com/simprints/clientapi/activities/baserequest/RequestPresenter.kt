@@ -38,7 +38,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
     override suspend fun processEnrolLastBiometrics() = validateAndSendRequest(
         EnrolLastBiometricsBuilder(
             view.enrolLastBiometricsExtractor,
-            EnrolLastBiometricsValidator(view.enrolLastBiometricsExtractor, eventsManager.isCurrentSessionAnIdentification())
+            EnrolLastBiometricsValidator(view.enrolLastBiometricsExtractor, eventsManager.getCurrentSessionId(), eventsManager.isCurrentSessionAnIdentification())
         )
     )
 

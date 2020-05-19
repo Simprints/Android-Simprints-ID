@@ -51,13 +51,12 @@ class CoreStepProcessorImpl : CoreStepProcessor {
     override fun buildAppEnrolLastBiometricsStep(projectId: String,
                                                  userId: String,
                                                  moduleId: String,
-                                                 fingerprintCaptureResponse: FingerprintCaptureResponse?,
-                                                 faceCaptureResponse: FaceCaptureResponse?,
+                                                 previousSteps: List<Step>,
                                                  sessionId: String?) = Step(
         requestCode = LAST_BIOMETRICS_CORE.value,
         activityName = LAST_BIOMETRICS_CORE_ACTIVITY_NAME,
         bundleKey = CORE_STEP_BUNDLE,
-        request = EnrolLastBiometricsRequest(projectId, userId, moduleId, fingerprintCaptureResponse, faceCaptureResponse, sessionId),
+        request = EnrolLastBiometricsRequest(projectId, userId, moduleId,previousSteps, sessionId),
         status = Step.Status.NOT_STARTED
     )
 
