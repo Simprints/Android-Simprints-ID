@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.person.remote
 
-import com.simprints.core.network.SimRemoteInterface
+import com.simprints.id.network.SimRemoteInterface
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.ApiModes
 import com.simprints.id.data.db.person.remote.models.ApiPostPerson
