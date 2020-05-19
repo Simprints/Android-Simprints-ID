@@ -120,7 +120,7 @@
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
     <!-- Screen Text -->
-    <string name="why_did_you_skip_fingerprinting">Why did you skip fingerprinting?</string>
+    <string name="reasons_for_leaving_fingerprint">Reasons for leaving fingerprint flow</string>
     <!-- Button Labels -->
     <string name="button_submit">Submit</string>
     <string name="button_scan_prints">Scan Fingerprints</string>
@@ -260,8 +260,8 @@
     <string name="refusal_too_young">Too young</string>
     <string name="refusal_other">Other</string>
     <string name="exit_form_return_to_simprints">Return to Simprints</string>
-    <string name="why_did_you_skip_biometrics">Why did you skip Biometrics?</string>
-    <string name="why_did_you_skip_face">Why did you skip face capture?</string>
+    <string name="reasons_for_leaving_biometrics">Reasons for leaving biometrics flow</string>
+    <string name="reasons_for_leaving_camera">Reasons for leaving camera flow</string>
     <string name="fetch_guid_checking_person_in_database">Checking person in database</string>
     <!-- region Module selection -->
     <string name="hint_search_modules">Search modules</string>
