@@ -3,9 +3,9 @@ package com.simprints.id.data.db.session.remote
 import android.net.NetworkInfo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.network.BaseUrlProvider
-import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
@@ -69,7 +69,7 @@ class SessionRemoteDataSourceImplAndroidTest {
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         sessionRemoteDataSource = SessionRemoteDataSourceImpl(
             remoteDbManager,
-            SimApiClientFactory(mockBaseUrlProvider, "some_device")
+                SimApiClientFactory(mockBaseUrlProvider, "some_device")
         )
     }
 

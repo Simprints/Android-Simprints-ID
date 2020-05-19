@@ -145,7 +145,7 @@
             android:id="@+id/whySkipFingerprintText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/why_did_you_skip_fingerprinting"
+            android:text="@string/reasons_for_leaving_fingerprint"
             android:textAlignment="center"
             android:textColor="@color/simprints_white"
             android:textSize="25sp"

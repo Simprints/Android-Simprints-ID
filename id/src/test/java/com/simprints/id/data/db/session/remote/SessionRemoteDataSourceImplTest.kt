@@ -2,8 +2,8 @@ package com.simprints.id.data.db.session.remote
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.network.BaseUrlProvider
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.data.db.session.remote.session.ApiSessionEvents
 import com.simprints.id.testtools.TestApplication
@@ -47,8 +47,8 @@ class SessionRemoteDataSourceImplTest {
     fun successfulResponseOnUpload() {
         runBlocking {
             sessionsRemoteInterface = SimApiClientFactory(
-                mockBaseUrlProvider,
-                "deviceId"
+                    mockBaseUrlProvider,
+                    "deviceId"
             ).build<SessionsRemoteInterface>().api
             coEvery { sessionRemoteDataSourceSpy.getSessionsApiClient() } returns sessionsRemoteInterface
             mockServer.enqueue(mockSuccessfulResponse())
@@ -93,8 +93,8 @@ class SessionRemoteDataSourceImplTest {
     @Suppress("UNCHECKED_CAST")
     private fun buildSessionApiToThrowFirstThenCall(): SessionsRemoteInterface {
         val api = SimApiClientFactory(
-            mockBaseUrlProvider,
-            "deviceId"
+                mockBaseUrlProvider,
+                "deviceId"
         ).build<SessionsRemoteInterface>().api
         return mockk {
             coEvery { uploadSessions(any(), any()) } throws Throwable("Network issue") coAndThen {

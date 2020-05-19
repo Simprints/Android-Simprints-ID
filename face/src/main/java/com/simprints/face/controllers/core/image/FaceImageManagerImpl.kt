@@ -1,11 +1,11 @@
 package com.simprints.face.controllers.core.image
 
-import com.simprints.core.images.repository.ImageRepository
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.id.data.db.session.SessionRepository
 import timber.log.Timber
-import com.simprints.core.images.model.Path as CorePath
+import com.simprints.id.data.images.model.Path as CorePath
 
 class FaceImageManagerImpl(private val coreImageRepository: ImageRepository,
                            private val coreSessionRepository: SessionRepository) : FaceImageManager {

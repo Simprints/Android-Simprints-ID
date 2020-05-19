@@ -162,7 +162,7 @@
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
     <!-- Screen Text -->
-    <string name="why_did_you_skip_fingerprinting">Why did you skip fingerprinting?</string>
+    <string name="why_did_you_skip_fingerprinting">Reasons for leaving fingerprint flow</string>
     <!-- Button Labels -->
     <string name="button_submit">Submit</string>
     <string name="button_scan_prints">Scan Fingerprints</string>

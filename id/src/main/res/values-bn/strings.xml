@@ -71,7 +71,7 @@
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
     <!-- Screen Text -->
-    <string name="why_did_you_skip_fingerprinting">আপনি কেন আঙুলের ছাপ দেয়া এড়িয়ে গেছেন?</string>
+    <string name="reasons_for_leaving_fingerprint">আপনি কেন আঙুলের ছাপ দেয়া এড়িয়ে গেছেন?</string>
     <!-- Button Labels -->
     <string name="button_submit">জমা দিন</string>
     <string name="button_scan_prints">আঙুলের ছাপ স্ক্যান করুন</string>
