@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
+import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.robots.odk
 import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
 import com.simprints.clientapi.integration.BaseClientApiTest
@@ -64,7 +65,7 @@ class OdkActivityTest : BaseClientApiTest() {
     }
 
     private fun buildIntent(): Intent {
-        return Intent(OdkAction.ConfirmIdentity.action)
+        return Intent(ConfirmIdentity.action)
             .putExtra(SIMPRINTS_PROJECT_ID, "projectId")
             .putExtra(SIMPRINTS_SESSION_ID, "sessionId")
             .putExtra(SIMPRINTS_SELECTED_GUID, "selectedGuid")
