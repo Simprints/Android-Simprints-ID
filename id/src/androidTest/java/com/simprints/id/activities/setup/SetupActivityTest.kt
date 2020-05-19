@@ -61,9 +61,4 @@ class SetupActivityTest {
 
         coVerify(exactly = 1) { mockSessionRepository.updateCurrentSession(any())}
     }
-
-    @After
-    fun tearDown() {
-        Intents.release()
-    }
 }
