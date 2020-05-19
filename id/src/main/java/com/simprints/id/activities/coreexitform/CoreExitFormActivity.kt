@@ -64,7 +64,7 @@ class CoreExitFormActivity : AppCompatActivity() {
 
     private fun setTextInLayout() {
         with(androidResourcesHelper) {
-            whySkipBiometricsText.text = getString(R.string.why_did_you_skip_biometrics)
+            whySkipBiometricsText.text = getString(R.string.reasons_for_leaving_biometrics)
             rbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
             rbDataConcerns.text = getString(R.string.refusal_data_concerns)
             rbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
