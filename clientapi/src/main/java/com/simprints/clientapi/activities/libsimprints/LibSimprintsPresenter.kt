@@ -2,8 +2,8 @@ package com.simprints.clientapi.activities.libsimprints
 
 import com.simprints.clientapi.Constants
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.*
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.*
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
@@ -12,7 +12,6 @@ import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
-import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
@@ -35,7 +34,7 @@ class LibSimprintsPresenter(
 ), LibSimprintsContract.Presenter {
 
     override suspend fun start() {
-        if (action != ConfirmIdentity) {
+        if (action !is LibSimprintsActionFollowUpAction) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }

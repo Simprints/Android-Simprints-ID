@@ -1,11 +1,19 @@
 package com.simprints.clientapi.activities.odk
 
-sealed class OdkAction(val action: String?) {
+import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.*
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction
+import com.simprints.id.domain.Constants
+
+sealed class OdkAction(open val action: String?) {
+
+    sealed class OdkActionFollowUpAction(override val action: String?) : OdkAction(action) {
+        object ConfirmIdentity : OdkActionFollowUpAction(ACTION_CONFIRM_IDENTITY)
+        object EnrolLastBiometrics : OdkActionFollowUpAction(ACTION_ENROL_LAST_BIOMETRICS)
+    }
+
     object Enrol : OdkAction(ACTION_ENROL)
     object Verify : OdkAction(ACTION_IDENTIFY)
     object Identify : OdkAction(ACTION_VERIFY)
-    object ConfirmIdentity : OdkAction(ACTION_CONFIRM_IDENTITY)
-    object EnrolLastBiometrics : OdkAction(ACTION_ENROL_LAST_BIOMETRICS)
 
     object Invalid : OdkAction(null)
 

@@ -125,6 +125,12 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
+            android:name=".activities.enrollast.EnrolLastBiometricsActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
             android:name=".activities.settings.syncinformation.SyncInformationActivity"
             android:screenOrientation="portrait" />
 
