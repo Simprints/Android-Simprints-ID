@@ -1,12 +1,10 @@
 package com.simprints.id.di
 
-import android.content.SharedPreferences
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
@@ -16,9 +14,6 @@ import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.orchestrator.*
 import com.simprints.id.orchestrator.cache.HotCache
-import com.simprints.id.orchestrator.cache.HotCacheImpl
-import com.simprints.id.orchestrator.cache.StepEncoder
-import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import com.simprints.id.orchestrator.modality.*
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
@@ -70,10 +65,12 @@ class OrchestratorModule {
     @Provides
     @Named("ModalityEnrolLastBiometricsFlow")
     fun provideModalityEnrolLastBiometricsFlow(
-        coreStepProcessor: CoreStepProcessor
+        coreStepProcessor: CoreStepProcessor,
+        hotCache: HotCache
     ): ModalityFlow =
         ModalityFlowEnrolLastBiometrics(
-            coreStepProcessor
+            coreStepProcessor,
+            hotCache
         )
 
     @Provides

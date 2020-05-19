@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator.modality
 import android.content.Intent
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppConfirmIdentityRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.cache.HotCache
@@ -17,11 +17,11 @@ class ModalityFlowEnrolLastBiometrics(private val coreStepProcessor: CoreStepPro
     override val steps: MutableList<Step> = mutableListOf()
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
-        require(appRequest is AppRequest.AppEnrolLastBiometricsRequest)
+        require(appRequest is AppEnrolLastBiometricsRequest)
         steps.addAll(buildStepsList(appRequest, hotCache.load()))
     }
 
-    private fun buildStepsList(appRequest: AppRequest.AppEnrolLastBiometricsRequest,
+    private fun buildStepsList(appRequest: AppEnrolLastBiometricsRequest,
                                previousSteps: List<Step>) =
         listOf(coreStepProcessor.buildAppEnrolLastBiometricsStep(
             appRequest.projectId,

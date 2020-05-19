@@ -14,9 +14,8 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppEnrolLastBiometricsRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason

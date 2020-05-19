@@ -3,6 +3,8 @@ package com.simprints.id.orchestrator
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.modality.ModalityFlow
 
 class ModalityFlowFactoryImpl(private val enrolFlow: ModalityFlow,
@@ -23,7 +25,7 @@ class ModalityFlowFactoryImpl(private val enrolFlow: ModalityFlow,
             is AppEnrolRequest -> enrolFlow
             is AppIdentifyRequest -> identifyFlow
             is AppVerifyRequest -> verifyFlow
-            is AppRequest.AppConfirmIdentityRequest -> confirmationIdentityFlow
-            is AppRequest.AppEnrolLastBiometricsRequest -> enrolLastBiometricsFlow
+            is AppConfirmIdentityRequest -> confirmationIdentityFlow
+            is AppEnrolLastBiometricsRequest -> enrolLastBiometricsFlow
         }
 }
