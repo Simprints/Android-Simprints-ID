@@ -6,4 +6,4 @@ import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 @Parcelize
-class CoreEnrolLastBiometricsResponse(val newSubjectId: String) : Parcelable, CoreResponse(CoreResponseType.ENROL_LAST_BIOMETRICS)
+class EnrolLastBiometricsResponse(val newSubjectId: String) : Parcelable, CoreResponse(CoreResponseType.ENROL_LAST_BIOMETRICS)
