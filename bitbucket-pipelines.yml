@@ -79,10 +79,9 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                max-time: 15
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew sonarqube -Dsonar.qualitygate.wait=true
+                    - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
 
         ######################################################################
         # Build all of the test APKs for the different modules, then Download
