@@ -41,6 +41,7 @@ definitions:
                     - ./gradlew id:jacocoTestReportDebug
                 artifacts:
                     - id/build/reports/**
+                    - core/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
@@ -113,6 +114,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - echo "org.gradle.daemon=true" >>gradle.properties
                     # Build ID Android Test APK
                     - cat ci/debug_gradle_signing >> id/build.gradle
                     - ./gradlew id:assembleDebugAndroidTest
