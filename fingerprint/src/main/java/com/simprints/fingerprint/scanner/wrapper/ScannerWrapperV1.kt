@@ -8,6 +8,7 @@ import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
+import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
@@ -159,6 +160,9 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
         Observable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.OTA))
 
     override fun performStmOta(): Observable<StmOtaStep> =
+        Observable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.OTA))
+
+    override fun performUn20Ota(): Observable<Un20OtaStep> =
         Observable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.OTA))
 
     private class ScannerCallbackWrapper(val success: () -> Unit, val failure: (scannerError: SCANNER_ERROR?) -> Unit) : ScannerCallback {

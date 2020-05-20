@@ -2,10 +2,7 @@ package com.simprints.fingerprint.scanner.factory
 
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.scanner.controllers.v2.ConnectionHelper
-import com.simprints.fingerprint.scanner.controllers.v2.CypressOtaHelper
-import com.simprints.fingerprint.scanner.controllers.v2.ScannerInitialSetupHelper
-import com.simprints.fingerprint.scanner.controllers.v2.StmOtaHelper
+import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
@@ -64,7 +61,8 @@ class ScannerFactoryImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
                          private val scannerInitialSetupHelper: ScannerInitialSetupHelper,
                          private val connectionHelper: ConnectionHelper,
                          private val cypressOtaHelper: CypressOtaHelper,
-                         private val stmOtaHelper: StmOtaHelper) : ScannerFactory {
+                         private val stmOtaHelper: StmOtaHelper,
+                         private val un20OtaHelper: Un20OtaHelper) : ScannerFactory {
 
     override fun create(macAddress: String): ScannerWrapper {
         val availableScannerGenerations = preferencesManager.scannerGenerations
@@ -146,6 +144,7 @@ class ScannerFactoryImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
             connectionHelper,
             cypressOtaHelper,
             stmOtaHelper,
+            un20OtaHelper,
             crashReportManager
         )
 }
