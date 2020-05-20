@@ -84,10 +84,8 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - ./gradlew fingerprintscanner:jacocoTestReportDebug
-                    - ./gradlew fingerprintscannermock:jacocoTestReportDebug
                 artifacts:
                     - fingerprintscanner/build/reports/**
-                    - fingerprintscannermock/build/reports/**
 
         ######################################################################
         # Get all of the test and coverage reports from artifacts, upload
