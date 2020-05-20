@@ -44,7 +44,7 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
             val expectedFirmwareVersion = firmwareFileManager.getAvailableScannerFirmwareVersions()?.stm
             val actualFirmwareVersion = it.toChipFirmwareVersion()
             if (expectedFirmwareVersion != actualFirmwareVersion) {
-                Completable.error(OtaFailedException("OTA did not increment firmware version. Expected $expectedFirmwareVersion, but was $actualFirmwareVersion"))
+                Completable.error(OtaFailedException("STM OTA did not increment firmware version. Expected $expectedFirmwareVersion, but was $actualFirmwareVersion"))
             } else {
                 newFirmwareVersion = it.toChipFirmwareVersion()
                 newApiVersion = it.toChipApiVersion()

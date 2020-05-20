@@ -115,7 +115,7 @@ object KoinInjector {
         single { ConnectionHelper(get()) }
         single { CypressOtaHelper(get(), get()) }
         single { StmOtaHelper(get(), get()) }
-        single<ScannerFactory> { ScannerFactoryImpl(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+        single<ScannerFactory> { ScannerFactoryImpl(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
         single<ScannerManager> { ScannerManagerImpl(get(), get(), get(), get()) }
 
         single<ComponentNfcAdapter> { AndroidNfcAdapter(NfcAdapter.getDefaultAdapter(get())) }

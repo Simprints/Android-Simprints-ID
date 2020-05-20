@@ -41,7 +41,7 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
             val expectedFirmwareVersion = firmwareFileManager.getAvailableScannerFirmwareVersions()?.cypress
             val actualFirmwareVersion = it.toChipFirmwareVersion()
             if (expectedFirmwareVersion != actualFirmwareVersion) {
-                Completable.error(OtaFailedException("OTA did not increment firmware version. Expected $expectedFirmwareVersion, but was $actualFirmwareVersion"))
+                Completable.error(OtaFailedException("Cypress OTA did not increment firmware version. Expected $expectedFirmwareVersion, but was $actualFirmwareVersion"))
             } else {
                 newFirmwareVersion = it.toChipFirmwareVersion()
                 newApiVersion = it.toChipApiVersion()
