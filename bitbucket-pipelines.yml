@@ -111,7 +111,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                size: 2x # Double resources available for this step
                 script:
                     - bash ./ci/pipeline/setup
                     # Build ID Android Test APK
