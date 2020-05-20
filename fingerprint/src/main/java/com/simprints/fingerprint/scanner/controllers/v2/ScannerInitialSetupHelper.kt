@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
+import com.simprints.fingerprint.scanner.data.FirmwareFileManager
 import com.simprints.fingerprint.scanner.domain.AvailableOta
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
@@ -10,20 +11,20 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.concurrent.TimeUnit
 
-class ScannerInitialSetupHelper {
+class ScannerInitialSetupHelper(private val firmwareFileManager: FirmwareFileManager) {
 
-    fun setupScanner(scanner: Scanner, availableVersions: ScannerVersion?, withScannerVersion: (ScannerVersion) -> Unit): Completable =
+    fun setupScannerWithOtaCheck(scanner: Scanner, withScannerVersion: (ScannerVersion) -> Unit): Completable =
         Completable.complete()
             .delay(100, TimeUnit.MILLISECONDS) // Speculatively needed
             .andThen(scanner.getVersionInformation())
             .map { unifiedVersion -> unifiedVersion.toScannerVersion().also { withScannerVersion(it) } }
-            .ifAvailableOtasThenThrow(availableVersions)
+            .ifAvailableOtasThenThrow(firmwareFileManager.getAvailableScannerFirmwareVersions())
             .andThen(scanner.enterMainMode())
             .delay(100, TimeUnit.MILLISECONDS) // Speculatively needed
 
-    private fun Single<ScannerVersion>.ifAvailableOtasThenThrow(availableVersions: ScannerVersion?): Completable =
+    private fun Single<ScannerVersion>.ifAvailableOtasThenThrow(availableVersions: ScannerFirmwareVersions?): Completable =
         flatMapCompletable { scannerVersions ->
-            val availableOtas = availableVersions?.firmware?.let { determineAvailableOtas(scannerVersions.firmware, it) }
+            val availableOtas = availableVersions?.let { determineAvailableOtas(scannerVersions.firmware, it) }
                 ?: emptyList()
             if (availableOtas.isEmpty()) {
                 Completable.complete()
