@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.FirmwareFileManager
-import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
+import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.CypressFirmwareVersion
@@ -23,35 +23,37 @@ import org.junit.Before
 import org.junit.Test
 import java.io.IOException
 
-class CypressOtaHelperTest {
+class StmOtaHelperTest {
 
     private val scannerMock = mockk<Scanner>()
     private val connectionHelperMock = mockk<ConnectionHelper>()
     private val firmwareFileManagerMock = mockk<FirmwareFileManager>()
-    private val cypressOtaHelper = CypressOtaHelper(connectionHelperMock, firmwareFileManagerMock)
+    private val stmOtaHelper = StmOtaHelper(connectionHelperMock, firmwareFileManagerMock)
 
     @Before
     fun setup() {
         every { connectionHelperMock.reconnect(any(), any()) } returns Completable.complete()
 
-        every { scannerMock.enterCypressOtaMode() } returns Completable.complete()
-        every { scannerMock.startCypressOta(any()) } returns Observable.fromIterable(OTA_PROGRESS_VALUES)
+        every { scannerMock.enterStmOtaMode() } returns Completable.complete()
+        every { scannerMock.startStmOta(any()) } returns Observable.fromIterable(OTA_PROGRESS_VALUES)
         every { scannerMock.getVersionInformation() } returns Single.just(OLD_SCANNER_VERSION)
         every { scannerMock.setVersionInformation(any()) } returns Completable.complete()
-        every { scannerMock.getCypressFirmwareVersion() } returns Single.just(NEW_CYPRESS_VERSION)
+        every { scannerMock.enterMainMode() } returns Completable.complete()
+        every { scannerMock.getStmFirmwareVersion() } returns Single.just(NEW_STM_VERSION)
 
         every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns NEW_SCANNER_VERSION.toScannerFirmwareVersions()
-        every { firmwareFileManagerMock.getCypressFirmwareBytes() } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
+        every { firmwareFileManagerMock.getStmFirmwareBytes() } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
     }
 
     @Test
-    fun performCypressOta_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() {
-        val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
-            OTA_PROGRESS_VALUES.map { CypressOtaStep.TransferInProgress(it) } +
-            listOf(CypressOtaStep.ReconnectingAfterTransfer, CypressOtaStep.ValidatingNewFirmwareVersion,
-                CypressOtaStep.ReconnectingAfterValidating, CypressOtaStep.UpdatingUnifiedVersionInformation)
+    fun performStmOta_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() {
+        val expectedSteps = listOf(StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
+            StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer) +
+            OTA_PROGRESS_VALUES.map { StmOtaStep.TransferInProgress(it) } +
+            listOf(StmOtaStep.ReconnectingAfterTransfer, StmOtaStep.EnteringMainMode, StmOtaStep.ValidatingNewFirmwareVersion,
+                StmOtaStep.ReconnectingAfterValidating, StmOtaStep.UpdatingUnifiedVersionInformation)
 
-        val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address").test()
 
         testObserver.awaitAndAssertSuccess()
 
@@ -67,16 +69,17 @@ class CypressOtaHelperTest {
     }
 
     @Test
-    fun cypressOtaFailsDuringTransfer_propagatesError() {
+    fun stmOtaFailsDuringTransfer_propagatesError() {
         val progressValues = listOf(0.0f, 0.2f, 0.4f)
-        val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
-            progressValues.map { CypressOtaStep.TransferInProgress(it) }
+        val expectedSteps = listOf(StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
+            StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer) +
+            progressValues.map { StmOtaStep.TransferInProgress(it) }
         val error = OtaFailedException("oops!")
 
-        every { scannerMock.startCypressOta(any()) } returns
+        every { scannerMock.startStmOta(any()) } returns
             Observable.fromIterable(progressValues).concatWith(Observable.error(error))
 
-        val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address").test()
 
         testObserver.awaitTerminalEvent()
 
@@ -88,15 +91,17 @@ class CypressOtaHelperTest {
     }
 
     @Test
-    fun cypressOtaFailsDuringConnect_propagatesError() {
-        val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
-            OTA_PROGRESS_VALUES.map { CypressOtaStep.TransferInProgress(it) } +
-            listOf(CypressOtaStep.ReconnectingAfterTransfer)
+    fun stmOtaFailsDuringConnectSecondTime_propagatesError() {
+        val expectedSteps = listOf(StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
+            StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer) +
+            OTA_PROGRESS_VALUES.map { StmOtaStep.TransferInProgress(it) } +
+            listOf(StmOtaStep.ReconnectingAfterTransfer)
         val error = IOException("oops!")
 
-        every { connectionHelperMock.reconnect(any(), any()) } returns Completable.error(error)
+        every { connectionHelperMock.reconnect(any(), any()) } returnsMany
+            listOf(Completable.complete(), Completable.error(error))
 
-        val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address").test()
 
         testObserver.awaitTerminalEvent()
 
@@ -108,14 +113,15 @@ class CypressOtaHelperTest {
     }
 
     @Test
-    fun cypressOtaFailsToValidate_throwsOtaError() {
-        val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
-            OTA_PROGRESS_VALUES.map { CypressOtaStep.TransferInProgress(it) } +
-            listOf(CypressOtaStep.ReconnectingAfterTransfer, CypressOtaStep.ValidatingNewFirmwareVersion)
+    fun stmOtaFailsToValidate_throwsOtaError() {
+        val expectedSteps = listOf(StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
+            StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer) +
+            OTA_PROGRESS_VALUES.map { StmOtaStep.TransferInProgress(it) } +
+            listOf(StmOtaStep.ReconnectingAfterTransfer, StmOtaStep.EnteringMainMode, StmOtaStep.ValidatingNewFirmwareVersion)
 
-        every { scannerMock.getCypressFirmwareVersion() } returns Single.just(OLD_CYPRESS_VERSION)
+        every { scannerMock.getStmFirmwareVersion() } returns Single.just(OLD_STM_VERSION)
 
-        val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address").test()
 
         testObserver.awaitTerminalEvent()
 
@@ -128,13 +134,13 @@ class CypressOtaHelperTest {
 
     companion object {
         private val OTA_PROGRESS_VALUES = listOf(0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f)
-        private val OLD_CYPRESS_VERSION = CypressFirmwareVersion(12, 13, 14, 15)
-        private val NEW_CYPRESS_VERSION = CypressFirmwareVersion(18, 3, 14, 16)
+        private val OLD_STM_VERSION = StmFirmwareVersion(12, 13, 14, 15)
+        private val NEW_STM_VERSION = StmFirmwareVersion(18, 3, 14, 16)
 
-        private val STM_VERSION = StmFirmwareVersion(1, 2, 3, 4)
+        private val CYPRESS_VERSION = CypressFirmwareVersion(1, 2, 3, 4)
         private val UN20_VERSION = Un20AppVersion(5, 6, 7, 8)
 
-        private val OLD_SCANNER_VERSION = UnifiedVersionInformation(5066639776677915L, OLD_CYPRESS_VERSION, STM_VERSION, UN20_VERSION)
-        private val NEW_SCANNER_VERSION = UnifiedVersionInformation(6755446687268892L, NEW_CYPRESS_VERSION, STM_VERSION, UN20_VERSION)
+        private val OLD_SCANNER_VERSION = UnifiedVersionInformation(5066639776677915L, CYPRESS_VERSION, OLD_STM_VERSION, UN20_VERSION)
+        private val NEW_SCANNER_VERSION = UnifiedVersionInformation(6755446687268892L, CYPRESS_VERSION, NEW_STM_VERSION, UN20_VERSION)
     }
 }

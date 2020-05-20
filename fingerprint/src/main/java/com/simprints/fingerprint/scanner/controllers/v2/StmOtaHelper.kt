@@ -5,7 +5,7 @@ import com.simprints.fingerprint.scanner.adapters.v2.toChipFirmwareVersion
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.adapters.v2.toUnifiedVersionInformation
 import com.simprints.fingerprint.scanner.data.FirmwareFileManager
-import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
+import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ChipApiVersion
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
@@ -16,8 +16,8 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
-class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
-                       private val firmwareFileManager: FirmwareFileManager) {
+class StmOtaHelper(private val connectionHelper: ConnectionHelper,
+                   private val firmwareFileManager: FirmwareFileManager) {
 
     private var newFirmwareVersion: ChipFirmwareVersion? = null
     private var newApiVersion: ChipApiVersion? = null
@@ -26,19 +26,22 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
      * Expects a connected scanner in root mode
      * If completes successfully, will finish with a connected scanner in root mode
      */
-    fun performOtaSteps(scanner: Scanner, macAddress: String): Observable<CypressOtaStep> =
-        Observable.just<CypressOtaStep>(CypressOtaStep.EnteringOtaMode)
-            .concatWith(scanner.enterCypressOtaMode() thenEmitStep CypressOtaStep.CommencingTransfer)
-            .concatWith(scanner.startCypressOta(firmwareFileManager.getCypressFirmwareBytes()).map { CypressOtaStep.TransferInProgress(it) })
-            .concatWith(emitStep(CypressOtaStep.ReconnectingAfterTransfer))
-            .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep CypressOtaStep.ValidatingNewFirmwareVersion)
-            .concatWith(validateCypressFirmwareVersion(scanner) thenEmitStep CypressOtaStep.ReconnectingAfterValidating)
-            .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep CypressOtaStep.UpdatingUnifiedVersionInformation)
+    fun performOtaSteps(scanner: Scanner, macAddress: String): Observable<StmOtaStep> =
+        Observable.just<StmOtaStep>(StmOtaStep.EnteringOtaModeFirstTime)
+            .concatWith(scanner.enterStmOtaMode() thenEmitStep StmOtaStep.ReconnectingAfterEnteringOtaMode)
+            .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep StmOtaStep.EnteringOtaModeSecondTime)
+            .concatWith(scanner.enterStmOtaMode() thenEmitStep StmOtaStep.CommencingTransfer)
+            .concatWith(scanner.startStmOta(firmwareFileManager.getStmFirmwareBytes()).map { StmOtaStep.TransferInProgress(it) })
+            .concatWith(emitStep(StmOtaStep.ReconnectingAfterTransfer))
+            .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep StmOtaStep.EnteringMainMode)
+            .concatWith(scanner.enterMainMode() thenEmitStep StmOtaStep.ValidatingNewFirmwareVersion)
+            .concatWith(validateStmFirmwareVersion(scanner) thenEmitStep StmOtaStep.ReconnectingAfterValidating)
+            .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep StmOtaStep.UpdatingUnifiedVersionInformation)
             .concatWith(updateUnifiedVersionInformation(scanner))
 
-    private fun validateCypressFirmwareVersion(scanner: Scanner): Completable =
-        scanner.getCypressFirmwareVersion().flatMapCompletable {
-            val expectedFirmwareVersion = firmwareFileManager.getAvailableScannerFirmwareVersions()?.cypress
+    private fun validateStmFirmwareVersion(scanner: Scanner): Completable =
+        scanner.getStmFirmwareVersion().flatMapCompletable {
+            val expectedFirmwareVersion = firmwareFileManager.getAvailableScannerFirmwareVersions()?.stm
             val actualFirmwareVersion = it.toChipFirmwareVersion()
             if (expectedFirmwareVersion != actualFirmwareVersion) {
                 Completable.error(OtaFailedException("OTA did not increment firmware version. Expected $expectedFirmwareVersion, but was $actualFirmwareVersion"))
@@ -53,15 +56,15 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
         scanner.getVersionInformation().flatMapCompletable {
             doIfNotNull(newFirmwareVersion, newApiVersion) { newFirmwareVersion, newApiVersion ->
                 val oldVersion = it.toScannerVersion()
-                val newVersion = oldVersion.updatedWithCypressVersion(newFirmwareVersion, newApiVersion)
+                val newVersion = oldVersion.updatedWithStmVersion(newFirmwareVersion, newApiVersion)
                 scanner.setVersionInformation(newVersion.toUnifiedVersionInformation())
             }
                 ?: Completable.error(OtaFailedException("Was not able to determine the appropriate new unified version"))
         }
 
-    private fun ScannerVersion.updatedWithCypressVersion(cypressFirmware: ChipFirmwareVersion, cypressApi: ChipApiVersion) =
-        copy(firmware = firmware.copy(cypress = cypressFirmware), api = api.copy(cypress = cypressApi))
+    private fun ScannerVersion.updatedWithStmVersion(stmFirmware: ChipFirmwareVersion, stmApi: ChipApiVersion) =
+        copy(firmware = firmware.copy(stm = stmFirmware), api = api.copy(stm = stmApi))
 
-    private fun emitStep(step: CypressOtaStep) = Single.just(step)
-    private infix fun Completable.thenEmitStep(step: CypressOtaStep) = andThen(emitStep(step))
+    private fun emitStep(step: StmOtaStep) = Single.just(step)
+    private infix fun Completable.thenEmitStep(step: StmOtaStep) = andThen(emitStep(step))
 }
