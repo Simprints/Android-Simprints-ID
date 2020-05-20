@@ -4,31 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".matching.FaceMatchActivity">
-
-    <TextView
-        android:id="@+id/match_txt_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:gravity="center"
-        android:text="Loading records"
-        app:layout_constraintBottom_toTopOf="@id/match_progress"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+    android:padding="@dimen/margin_large"
+    tools:context="com.simprints.face.match.FaceMatchActivity">
 
     <ProgressBar
-        android:id="@+id/match_progress"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:id="@+id/face_match_progress"
+        style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:indeterminate="true"
+        android:layout_margin="20dp"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="0"
+        android:progressDrawable="@drawable/matching_progress_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/match_txt_title" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,8 +11,9 @@ import com.simprints.face.controllers.core.preferencesManager.FacePreferencesMan
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManagerImpl
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.detection.mock.MockFaceDetector
-import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.face.exitform.ExitFormViewModel
+import com.simprints.face.match.FaceMatchViewModel
+import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.id.Application
 import com.simprints.uicomponents.imageTools.LibYuvJni
 import org.koin.android.ext.koin.androidApplication
@@ -66,6 +67,8 @@ object KoinInjector {
     private fun Module.defineBuildersForViewModels() {
         viewModel { FaceOrchestratorViewModel() }
         viewModel { FaceCaptureViewModel(get<FacePreferencesManager>().maxRetries, get()) }
+        viewModel { FaceMatchViewModel() }
+
         viewModel { (mainVM: FaceCaptureViewModel) -> LiveFeedbackFragmentViewModel(mainVM, get(), get(), get<FacePreferencesManager>().qualityThreshold) }
         viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM) }
     }
