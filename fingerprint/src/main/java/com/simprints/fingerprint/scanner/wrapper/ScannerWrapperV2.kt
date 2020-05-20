@@ -46,7 +46,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     override fun connect(): Completable =
         connectionHelper.connectScanner(scannerV2, macAddress)
-            .andThen(scannerInitialSetupHelper.setupScanner(scannerV2, null) { scannerVersion = it })
+            .andThen(scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerV2) { scannerVersion = it })
             .wrapErrorsFromScanner()
 
     override fun disconnect(): Completable =

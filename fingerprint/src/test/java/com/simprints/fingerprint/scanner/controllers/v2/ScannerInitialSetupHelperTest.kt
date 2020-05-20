@@ -1,7 +1,10 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
+import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
+import com.simprints.fingerprint.scanner.data.FirmwareFileManager
 import com.simprints.fingerprint.scanner.domain.AvailableOta
+import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
@@ -19,7 +22,8 @@ import org.junit.Test
 class ScannerInitialSetupHelperTest {
 
     private val scannerMock = mockk<Scanner>()
-    private val scannerInitialSetupHelper = ScannerInitialSetupHelper()
+    private val firmwareFileManagerMock = mockk<FirmwareFileManager>()
+    private val scannerInitialSetupHelper = ScannerInitialSetupHelper(firmwareFileManagerMock)
 
     @Before
     fun setup() {
@@ -29,17 +33,33 @@ class ScannerInitialSetupHelperTest {
     @Test
     fun ifNoAvailableVersions_completesNormally() {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+        every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns null
 
-        val testSubscriber = scannerInitialSetupHelper.setupScanner(scannerMock, null) {}.test()
+        val testSubscriber = scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock) {}.test()
 
         testSubscriber.awaitAndAssertSuccess()
     }
 
     @Test
+    fun setupScannerWithOtaCheck_savesVersionNumber() {
+        every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+        every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns null
+
+        var version: ScannerVersion? = null
+
+        val testSubscriber = scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock) { version = it }.test()
+
+        testSubscriber.awaitAndAssertSuccess()
+
+        assertThat(version).isEqualTo(SCANNER_VERSION_LOW.toScannerVersion())
+    }
+
+    @Test
     fun ifAvailableVersionMatchesExistingVersion_completesNormally() {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+        every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns SCANNER_VERSION_LOW.toScannerVersion().firmware
 
-        val testSubscriber = scannerInitialSetupHelper.setupScanner(scannerMock, SCANNER_VERSION_LOW.toScannerVersion()) {}.test()
+        val testSubscriber = scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock) {}.test()
 
         testSubscriber.awaitAndAssertSuccess()
     }
@@ -47,8 +67,9 @@ class ScannerInitialSetupHelperTest {
     @Test
     fun ifAvailableVersionGreaterThanExistingVersion_throwsOtaAvailableException() {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+        every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns SCANNER_VERSION_HIGH.toScannerVersion().firmware
 
-        val testSubscriber = scannerInitialSetupHelper.setupScanner(scannerMock, SCANNER_VERSION_HIGH.toScannerVersion()) {}.test()
+        val testSubscriber = scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock) {}.test()
 
         testSubscriber.awaitTerminalEvent()
         testSubscriber.assertError { e ->
