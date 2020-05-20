@@ -22,7 +22,7 @@ class FaceOrchestratorViewModel : ViewModel() {
     lateinit var faceRequest: FaceRequest
 
     val startCapture: MutableLiveData<LiveDataEventWithContent<FaceCaptureRequest>> = MutableLiveData()
-    val startMatching: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val startMatching: MutableLiveData<LiveDataEventWithContent<FaceMatchRequest>> = MutableLiveData()
 
     val flowFinished: MutableLiveData<LiveDataEventWithContent<IFaceResponse>> = MutableLiveData()
 
@@ -33,7 +33,7 @@ class FaceOrchestratorViewModel : ViewModel() {
         val request = FaceToDomainRequest.fromFaceToDomainRequest(iFaceRequest)
         when (request) {
             is FaceCaptureRequest -> startCapture.send(request)
-            is FaceMatchRequest -> startMatching.send()
+            is FaceMatchRequest -> startMatching.send(request)
         }
         faceRequest = request
     }

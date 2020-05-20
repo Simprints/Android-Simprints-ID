@@ -12,6 +12,7 @@ import com.simprints.core.tools.whenNull
 import com.simprints.face.capture.FaceCaptureActivity
 import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException
+import com.simprints.face.match.FaceMatchActivity
 import com.simprints.face.models.RankOneInitializer
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
@@ -55,17 +56,15 @@ class FaceOrchestratorActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         viewModel.startCapture.observe(this, LiveDataEventWithContentObserver {
-            val intent = Intent(this, FaceCaptureActivity::class.java)
-            intent.putExtra(IFaceRequest.BUNDLE_KEY, it)
-            startActivityForResult(intent, CAPTURE_REQUEST)
+            startActivityForResult(FaceCaptureActivity.getStartingIntent(this, it), CAPTURE_REQUEST)
         })
         viewModel.flowFinished.observe(this, LiveDataEventWithContentObserver {
             val intent = Intent().putExtra(IFaceResponse.BUNDLE_KEY, it)
             setResult(Activity.RESULT_OK, intent)
             finish()
         })
-        viewModel.startMatching.observe(this, LiveDataEventObserver {
-            viewModel.matchFinished()
+        viewModel.startMatching.observe(this, LiveDataEventWithContentObserver {
+            startActivityForResult(FaceMatchActivity.getStartingIntent(this, it), MATCH_REQUEST)
         })
         viewModel.missingLicenseEvent.observe(this, LiveDataEventObserver {
             // TODO: this is temporary, should route user the an error screen
@@ -95,5 +94,6 @@ class FaceOrchestratorActivity : AppCompatActivity() {
 
     companion object {
         const val CAPTURE_REQUEST = 100
+        const val MATCH_REQUEST = 101
     }
 }
