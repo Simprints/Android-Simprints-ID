@@ -107,7 +107,7 @@ class ConnectScannerViewModel(
 
     private fun updateBluetoothConnectivityEventWithVeroInfo() {
         scannerManager.let {
-            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.onScanner { versionInformation() }.firmwareVersion.toString())
+            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.onScanner { versionInformation() }.firmware.toString()) // TODO : Determine appropriate firmware versions for sessions
         }
     }
 
@@ -165,7 +165,7 @@ class ConnectScannerViewModel(
         preferencesManager.lastScannerUsed = scannerManager.lastPairedMacAddress?.let {
             serialNumberConverter.convertMacAddressToSerialNumber(it)
         } ?: ""
-        preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.firmwareVersion.toString()
+        preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.firmware.toString() // TODO : Determine appropriate firmware versions for sessions
         analyticsManager.logScannerProperties(scannerManager.lastPairedMacAddress
             ?: "", scannerManager.lastPairedScannerId ?: "")
         scannerConnected.postEvent(true)
@@ -199,7 +199,7 @@ class ConnectScannerViewModel(
                     ScannerConnectionEvent.ScannerInfo(
                         lastPairedScannerId ?: "",
                         lastPairedMacAddress ?: "",
-                        onScanner { versionInformation() }.firmwareVersion.toString())))
+                        onScanner { versionInformation() }.firmware.toString()))) // TODO : Determine appropriate firmware versions for sessions
         }
     }
 
