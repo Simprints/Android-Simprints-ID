@@ -21,7 +21,7 @@ data class ScannerVersion(val generation: ScannerGeneration,
                     throw IllegalArgumentException("Scanner version contains unknown quantity when computing master version: $this")
                 }
 
-                api.combined() * (2L shl 32) + firmware.combined()
+                (api.combined().toLong() shl 32) + firmware.combined()
             }
         }
 }
