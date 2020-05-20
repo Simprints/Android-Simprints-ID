@@ -12,10 +12,9 @@ import retrofit2.Response
 
 class AuthenticationDataManagerImpl(private val apiClientFactory: SimApiClientFactory): AuthenticationDataManager {
 
-
     override suspend fun requestAuthenticationData(projectId: String, userId: String): AuthenticationData {
         val response = makeNetworkRequest({
-            it.requestAuthenticationData(projectId, userId)
+            it.requestAuthenticationData(projectId, userId, apiClientFactory.deviceId)
         }, "requestAuthData")
 
         response.body()?.let {
