@@ -6,6 +6,7 @@ import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
+import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
@@ -18,6 +19,7 @@ import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
 import com.simprints.fingerprintscanner.v1.SCANNER_ERROR.*
 import com.simprints.fingerprintscanner.v1.ScannerCallback
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import com.simprints.fingerprintscanner.v1.ButtonListener as ScannerTriggerListenerV1
@@ -52,6 +54,8 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
             } ?: result.onComplete()
         }))
     }
+
+    override fun setup(): Completable = Completable.complete()
 
     override fun disconnect(): Completable = Completable.create { result ->
         scannerV1.disconnect(ScannerCallbackWrapper({
@@ -149,6 +153,9 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
             scannerV1.unregisterButtonListener(it)
         }
     }
+
+    override fun performCypressOta(): Observable<CypressOtaStep> =
+        Observable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.OTA))
 
     private class ScannerCallbackWrapper(val success: () -> Unit, val failure: (scannerError: SCANNER_ERROR?) -> Unit) : ScannerCallback {
         override fun onSuccess() {

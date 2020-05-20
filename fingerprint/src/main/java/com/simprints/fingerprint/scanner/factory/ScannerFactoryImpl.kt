@@ -3,6 +3,7 @@ package com.simprints.fingerprint.scanner.factory
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.controllers.v2.ConnectionHelper
+import com.simprints.fingerprint.scanner.controllers.v2.CypressOtaHelper
 import com.simprints.fingerprint.scanner.controllers.v2.ScannerInitialSetupHelper
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
@@ -60,7 +61,8 @@ class ScannerFactoryImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
                          private val serialNumberConverter: SerialNumberConverter,
                          private val scannerGenerationDeterminer: ScannerGenerationDeterminer,
                          private val scannerInitialSetupHelper: ScannerInitialSetupHelper,
-                         private val connectionHelper: ConnectionHelper) : ScannerFactory {
+                         private val connectionHelper: ConnectionHelper,
+                         private val cypressOtaHelper: CypressOtaHelper) : ScannerFactory {
 
     override fun create(macAddress: String): ScannerWrapper {
         val availableScannerGenerations = preferencesManager.scannerGenerations
@@ -140,6 +142,7 @@ class ScannerFactoryImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
             macAddress,
             scannerInitialSetupHelper,
             connectionHelper,
+            cypressOtaHelper,
             crashReportManager
         )
 }

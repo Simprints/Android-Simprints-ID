@@ -4,11 +4,13 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.controllers.v2.ConnectionHelper
+import com.simprints.fingerprint.scanner.controllers.v2.CypressOtaHelper
 import com.simprints.fingerprint.scanner.controllers.v2.ScannerInitialSetupHelper
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
+import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
@@ -21,6 +23,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Captu
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.Single
 import io.reactivex.observers.DisposableObserver
@@ -33,6 +36,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                        private val macAddress: String,
                        private val scannerInitialSetupHelper: ScannerInitialSetupHelper,
                        private val connectionHelper: ConnectionHelper,
+                       private val cypressOtaHelper: CypressOtaHelper,
                        private val crashReportManager: FingerprintCrashReportManager) : ScannerWrapper {
 
     private var scannerVersion: ScannerVersion? = null
@@ -46,7 +50,10 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     override fun connect(): Completable =
         connectionHelper.connectScanner(scannerV2, macAddress)
-            .andThen(scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerV2) { scannerVersion = it })
+            .wrapErrorsFromScanner()
+
+    override fun setup(): Completable =
+        scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerV2) { scannerVersion = it }
             .wrapErrorsFromScanner()
 
     override fun disconnect(): Completable =
@@ -166,6 +173,10 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
         }
     }
 
+    override fun performCypressOta(): Observable<CypressOtaStep> =
+        cypressOtaHelper.performOtaSteps(scannerV2, macAddress)
+            .wrapErrorsFromScanner()
+
     private fun CaptureFingerprintStrategy.deduceCaptureDpi(): Dpi =
         when (this) {
             CaptureFingerprintStrategy.SECUGEN_ISO_500_DPI -> Dpi(500)
@@ -185,6 +196,9 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     private fun <T> Single<T>.wrapErrorsFromScanner() =
         onErrorResumeNext { Single.error(wrapErrorFromScanner(it)) }
+
+    private fun <T> Observable<T>.wrapErrorsFromScanner() =
+        onErrorResumeNext { e: Throwable -> Observable.error(wrapErrorFromScanner(e)) }
 
     private fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
         is IOException -> { // Disconnected or timed-out communications with Scanner

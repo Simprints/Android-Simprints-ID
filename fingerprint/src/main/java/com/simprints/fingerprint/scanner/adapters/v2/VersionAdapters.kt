@@ -14,27 +14,27 @@ fun UnifiedVersionInformation.toScannerVersion() =
         toScannerApiVersions()
     )
 
-private fun UnifiedVersionInformation.toScannerFirmwareVersions() =
+fun UnifiedVersionInformation.toScannerFirmwareVersions() =
     ScannerFirmwareVersions(
         cypress = cypressFirmwareVersion.toChipFirmwareVersion(),
         stm = stmFirmwareVersion.toChipFirmwareVersion(),
         un20 = un20AppVersion.toChipFirmwareVersion()
     )
 
-private fun UnifiedVersionInformation.toScannerApiVersions() =
+fun UnifiedVersionInformation.toScannerApiVersions() =
     ScannerApiVersions(
         cypress = cypressFirmwareVersion.toChipApiVersion(),
         stm = stmFirmwareVersion.toChipApiVersion(),
         un20 = un20AppVersion.toChipApiVersion()
     )
 
-private fun CypressFirmwareVersion.toChipFirmwareVersion() = ChipFirmwareVersion(firmwareMajorVersion.toInt(), firmwareMinorVersion.toInt())
-private fun StmFirmwareVersion.toChipFirmwareVersion() = ChipFirmwareVersion(firmwareMajorVersion.toInt(), firmwareMinorVersion.toInt())
-private fun Un20AppVersion.toChipFirmwareVersion() = ChipFirmwareVersion(firmwareMajorVersion.toInt(), firmwareMinorVersion.toInt())
+fun CypressFirmwareVersion.toChipFirmwareVersion() = ChipFirmwareVersion(firmwareMajorVersion.toInt(), firmwareMinorVersion.toInt())
+fun StmFirmwareVersion.toChipFirmwareVersion() = ChipFirmwareVersion(firmwareMajorVersion.toInt(), firmwareMinorVersion.toInt())
+fun Un20AppVersion.toChipFirmwareVersion() = ChipFirmwareVersion(firmwareMajorVersion.toInt(), firmwareMinorVersion.toInt())
 
-private fun CypressFirmwareVersion.toChipApiVersion() = ChipApiVersion(apiMajorVersion.toInt(), apiMinorVersion.toInt())
-private fun StmFirmwareVersion.toChipApiVersion() = ChipApiVersion(apiMajorVersion.toInt(), apiMinorVersion.toInt())
-private fun Un20AppVersion.toChipApiVersion() = ChipApiVersion(apiMajorVersion.toInt(), apiMinorVersion.toInt())
+fun CypressFirmwareVersion.toChipApiVersion() = ChipApiVersion(apiMajorVersion.toInt(), apiMinorVersion.toInt())
+fun StmFirmwareVersion.toChipApiVersion() = ChipApiVersion(apiMajorVersion.toInt(), apiMinorVersion.toInt())
+fun Un20AppVersion.toChipApiVersion() = ChipApiVersion(apiMajorVersion.toInt(), apiMinorVersion.toInt())
 
 /** @throws IllegalArgumentException if any of the versions are UNKNOWN */
 fun ScannerVersion.toUnifiedVersionInformation() =
