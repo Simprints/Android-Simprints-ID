@@ -123,8 +123,7 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
             }
 
         val eventRecordsToMove =
-            batchOfEvents.filter { it.payload is ApiEnrolmentRecordMovePayload &&
-            it.payload.enrolmentRecordCreation.biometricReferences != null }.mapNotNull { apiEvent ->
+            batchOfEvents.filter { it.payload is ApiEnrolmentRecordMovePayload }.mapNotNull { apiEvent ->
                 apiEvent.fromApiToDomainOrNullIfNoBiometricReferences()?.let {
                     it.payload as EnrolmentRecordMovePayload
                 }
