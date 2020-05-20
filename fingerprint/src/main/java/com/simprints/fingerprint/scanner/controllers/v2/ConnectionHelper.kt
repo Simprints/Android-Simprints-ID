@@ -27,27 +27,29 @@ class ConnectionHelper(private val bluetoothAdapter: ComponentBluetoothAdapter) 
         establishConnectedSocket(macAddress, maxRetries)
             .flatMapCompletable { socket -> connectScannerObjectWithSocket(scanner, socket) }
 
-    private fun establishConnectedSocket(macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES): Single<ComponentBluetoothSocket> {
-        if (bluetoothAdapter.isNull()) throw BluetoothNotSupportedException()
-        if (!bluetoothAdapter.isEnabled()) throw BluetoothNotEnabledException()
+    private fun establishConnectedSocket(macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES): Single<ComponentBluetoothSocket> =
+        Single.fromCallable {
+            if (bluetoothAdapter.isNull()) throw BluetoothNotSupportedException()
+            if (!bluetoothAdapter.isEnabled()) throw BluetoothNotEnabledException()
 
-        val device = bluetoothAdapter.getRemoteDevice(macAddress)
+            val device = bluetoothAdapter.getRemoteDevice(macAddress)
 
-        if (!device.isBonded()) throw ScannerNotPairedException()
-
-        return Single.fromCallable {
-            try {
-                Timber.d("Attempting connect...")
-                val socket = device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
-                bluetoothAdapter.cancelDiscovery()
-                socket.connect()
-                this.socket = socket
-                socket
-            } catch (e: IOException) {
-                throw ScannerDisconnectedException()
-            }
-        }.retry(maxRetries)
-    }
+            if (!device.isBonded()) throw ScannerNotPairedException()
+            device
+        }.flatMap { device ->
+            Single.fromCallable {
+                try {
+                    Timber.d("Attempting connect...")
+                    val socket = device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
+                    bluetoothAdapter.cancelDiscovery()
+                    socket.connect()
+                    this.socket = socket
+                    socket
+                } catch (e: IOException) {
+                    throw ScannerDisconnectedException()
+                }
+            }.retry(maxRetries)
+        }
 
     private fun connectScannerObjectWithSocket(scanner: Scanner, socket: ComponentBluetoothSocket): Completable {
         Timber.d("Socket connected. Setting up scanner...")
