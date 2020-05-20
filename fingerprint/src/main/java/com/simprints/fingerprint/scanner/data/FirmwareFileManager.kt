@@ -7,4 +7,8 @@ class FirmwareFileManager {
     fun getAvailableScannerFirmwareVersions(): ScannerFirmwareVersions? = null
 
     fun getCypressFirmwareBytes(): ByteArray = byteArrayOf()
+
+    fun getStmFirmwareBytes(): ByteArray = byteArrayOf()
+
+    fun getUn20FirmwareBytes(): ByteArray = byteArrayOf()
 }

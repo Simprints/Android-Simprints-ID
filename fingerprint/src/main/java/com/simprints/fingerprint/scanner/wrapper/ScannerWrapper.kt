@@ -6,6 +6,7 @@ import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
+import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -31,4 +32,5 @@ interface ScannerWrapper {
     fun versionInformation(): ScannerVersion
 
     fun performCypressOta(): Observable<CypressOtaStep>
+    fun performStmOta(): Observable<StmOtaStep>
 }

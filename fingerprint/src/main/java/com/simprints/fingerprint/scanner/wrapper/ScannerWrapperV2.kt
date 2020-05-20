@@ -6,11 +6,13 @@ import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrateg
 import com.simprints.fingerprint.scanner.controllers.v2.ConnectionHelper
 import com.simprints.fingerprint.scanner.controllers.v2.CypressOtaHelper
 import com.simprints.fingerprint.scanner.controllers.v2.ScannerInitialSetupHelper
+import com.simprints.fingerprint.scanner.controllers.v2.StmOtaHelper
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
+import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
@@ -37,6 +39,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                        private val scannerInitialSetupHelper: ScannerInitialSetupHelper,
                        private val connectionHelper: ConnectionHelper,
                        private val cypressOtaHelper: CypressOtaHelper,
+                       private val stmOtaHelper: StmOtaHelper,
                        private val crashReportManager: FingerprintCrashReportManager) : ScannerWrapper {
 
     private var scannerVersion: ScannerVersion? = null
@@ -175,6 +178,10 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     override fun performCypressOta(): Observable<CypressOtaStep> =
         cypressOtaHelper.performOtaSteps(scannerV2, macAddress)
+            .wrapErrorsFromScanner()
+
+    override fun performStmOta(): Observable<StmOtaStep> =
+        stmOtaHelper.performOtaSteps(scannerV2, macAddress)
             .wrapErrorsFromScanner()
 
     private fun CaptureFingerprintStrategy.deduceCaptureDpi(): Dpi =
