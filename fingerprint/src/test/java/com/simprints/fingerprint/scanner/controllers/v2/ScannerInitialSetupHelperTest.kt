@@ -1,5 +1,8 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
+import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
+import com.simprints.fingerprint.scanner.domain.AvailableOta
+import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.CypressFirmwareVersion
@@ -27,7 +30,7 @@ class ScannerInitialSetupHelperTest {
     fun ifNoAvailableVersions_completesNormally() {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
 
-        val testSubscriber = scannerInitialSetupHelper.setupScanner(scannerMock, null).test()
+        val testSubscriber = scannerInitialSetupHelper.setupScanner(scannerMock, null) {}.test()
 
         testSubscriber.awaitAndAssertSuccess()
     }
@@ -36,7 +39,7 @@ class ScannerInitialSetupHelperTest {
     fun ifAvailableVersionMatchesExistingVersion_completesNormally() {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
 
-        val testSubscriber = scannerInitialSetupHelper.setupScanner(scannerMock, SCANNER_VERSION_LOW).test()
+        val testSubscriber = scannerInitialSetupHelper.setupScanner(scannerMock, SCANNER_VERSION_LOW.toScannerVersion()) {}.test()
 
         testSubscriber.awaitAndAssertSuccess()
     }
@@ -45,7 +48,7 @@ class ScannerInitialSetupHelperTest {
     fun ifAvailableVersionGreaterThanExistingVersion_throwsOtaAvailableException() {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
 
-        val testSubscriber = scannerInitialSetupHelper.setupScanner(scannerMock, SCANNER_VERSION_HIGH).test()
+        val testSubscriber = scannerInitialSetupHelper.setupScanner(scannerMock, SCANNER_VERSION_HIGH.toScannerVersion()) {}.test()
 
         testSubscriber.awaitTerminalEvent()
         testSubscriber.assertError { e ->

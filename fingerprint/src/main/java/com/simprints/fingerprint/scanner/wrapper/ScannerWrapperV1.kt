@@ -4,8 +4,12 @@ import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrat
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
-import com.simprints.fingerprint.scanner.domain.ScannerVersionInformation
+import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
+import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
@@ -21,11 +25,15 @@ import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 
 class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
 
-    override fun versionInformation(): ScannerVersionInformation =
-        ScannerVersionInformation(
-            veroVersion = 1,
-            firmwareVersion = scannerV1.ucVersion.toLong(),
-            un20Version = scannerV1.unVersion.toLong()
+    override fun versionInformation(): ScannerVersion =
+        ScannerVersion(
+            ScannerGeneration.VERO_1,
+            ScannerFirmwareVersions(
+                cypress = ChipFirmwareVersion.UNKNOWN,
+                stm = ChipFirmwareVersion(scannerV1.ucVersion.toInt(), 0),
+                un20 = ChipFirmwareVersion(scannerV1.unVersion.toInt(), 0)
+            ),
+            ScannerApiVersions.UNKNOWN
         )
 
     override fun connect(): Completable = Completable.create { result ->

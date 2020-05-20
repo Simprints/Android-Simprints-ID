@@ -7,8 +7,11 @@ import com.simprints.fingerprint.scanner.controllers.v2.ConnectionHelper
 import com.simprints.fingerprint.scanner.controllers.v2.ScannerInitialSetupHelper
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
-import com.simprints.fingerprint.scanner.domain.ScannerVersionInformation
+import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
@@ -17,14 +20,12 @@ import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
-import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import io.reactivex.Completable
 import io.reactivex.Observer
 import io.reactivex.Single
 import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 import java.io.IOException
-import java.util.*
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
 class ScannerWrapperV2(private val scannerV2: ScannerV2,
@@ -34,22 +35,18 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                        private val connectionHelper: ConnectionHelper,
                        private val crashReportManager: FingerprintCrashReportManager) : ScannerWrapper {
 
-    private var unifiedVersionInformation: UnifiedVersionInformation? = null
+    private var scannerVersion: ScannerVersion? = null
 
-    override fun versionInformation(): ScannerVersionInformation =
-        unifiedVersionInformation?.let {
-            ScannerVersionInformation(2, it.masterFirmwareVersion,
-                (it.un20AppVersion.apiMajorVersion.toLong() shl 48) or
-                    (it.un20AppVersion.apiMinorVersion.toLong() shl 32) or
-                    (it.un20AppVersion.firmwareMajorVersion.toLong() shl 16) or
-                    (it.un20AppVersion.firmwareMinorVersion.toLong()))
-        } ?: ScannerVersionInformation(2, -1, -1)
+    override fun versionInformation(): ScannerVersion =
+        scannerVersion ?: ScannerVersion(
+            ScannerGeneration.VERO_2,
+            ScannerFirmwareVersions.UNKNOWN,
+            ScannerApiVersions.UNKNOWN
+        )
 
     override fun connect(): Completable =
         connectionHelper.connectScanner(scannerV2, macAddress)
-            .andThen(scannerInitialSetupHelper.setupScanner(scannerV2, null))
-            .doOnSuccess { unifiedVersionInformation = it }
-            .ignoreElement()
+            .andThen(scannerInitialSetupHelper.setupScanner(scannerV2, null) { scannerVersion = it })
             .wrapErrorsFromScanner()
 
     override fun disconnect(): Completable =
@@ -206,8 +203,6 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     }
 
     companion object {
-        private val DEFAULT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
-        private const val CONNECT_MAX_RETRIES = 1L
         private const val NO_FINGER_IMAGE_QUALITY_THRESHOLD = 10 // The image quality at which we decide a fingerprint wasn't detected
     }
 }

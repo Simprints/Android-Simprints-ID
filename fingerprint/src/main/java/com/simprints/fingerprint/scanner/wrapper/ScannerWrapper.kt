@@ -5,7 +5,7 @@ import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrateg
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
-import com.simprints.fingerprint.scanner.domain.ScannerVersionInformation
+import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -24,5 +24,5 @@ interface ScannerWrapper {
 
     fun registerTriggerListener(triggerListener: ScannerTriggerListener)
     fun unregisterTriggerListener(triggerListener: ScannerTriggerListener)
-    fun versionInformation(): ScannerVersionInformation
+    fun versionInformation(): ScannerVersion
 }
