@@ -114,6 +114,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - echo "org.gradle.daemon=true" >> gradle.properties
                     # Build ID Android Test APK
                     - cat ci/debug_gradle_signing >> id/build.gradle
                     - ./gradlew id:assembleDebugAndroidTest
