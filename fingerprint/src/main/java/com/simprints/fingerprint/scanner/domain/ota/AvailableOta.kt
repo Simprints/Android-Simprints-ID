@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.scanner.domain
+package com.simprints.fingerprint.scanner.domain.ota
 
 enum class AvailableOta {
     CYPRESS,

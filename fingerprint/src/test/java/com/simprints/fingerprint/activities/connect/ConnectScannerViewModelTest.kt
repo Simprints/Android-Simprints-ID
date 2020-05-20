@@ -69,6 +69,7 @@ class ConnectScannerViewModelTest : KoinTest {
     private fun mockScannerWrapper(connectFailException: Throwable? = null) = mockk<ScannerWrapper> {
         every { disconnect() } returns Completable.complete()
         every { connect() } returns if (connectFailException == null) Completable.complete() else Completable.error(connectFailException)
+        every { setup() } returns Completable.complete()
         every { sensorWakeUp() } returns Completable.complete()
         every { setUiIdle() } returns Completable.complete()
         every { versionInformation() } returns mockk(relaxed = true)

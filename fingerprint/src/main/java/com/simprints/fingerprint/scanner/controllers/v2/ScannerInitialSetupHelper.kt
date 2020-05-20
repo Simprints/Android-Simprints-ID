@@ -2,7 +2,7 @@ package com.simprints.fingerprint.scanner.controllers.v2
 
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.FirmwareFileManager
-import com.simprints.fingerprint.scanner.domain.AvailableOta
+import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException

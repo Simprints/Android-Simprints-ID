@@ -67,6 +67,7 @@ class ConnectScannerViewModel(
             .andThen(checkIfBluetoothIsEnabled())
             .andThen(initVero())
             .andThen(connectToVero())
+            .andThen(setupVero())
             .andThen(resetVeroUI())
             .andThen(wakeUpVero())
             .subscribeOn(Schedulers.io())
@@ -97,12 +98,16 @@ class ConnectScannerViewModel(
         veroTask(computeProgress(4), R.string.connect_scanner_bt_connect, "ScannerManager: connectToVero",
             scannerManager.scanner { connect() }) { addBluetoothConnectivityEvent() }
 
+    private fun setupVero() =
+        veroTask(computeProgress(5), R.string.connect_scanner_setup, "ScannerManager: setupVero",
+            scannerManager.scanner { setup() })
+
     private fun resetVeroUI() =
-        veroTask(computeProgress(5), R.string.connect_scanner_setup, "ScannerManager: resetVeroUI",
+        veroTask(computeProgress(6), R.string.connect_scanner_setup, "ScannerManager: resetVeroUI",
             scannerManager.scanner { setUiIdle() })
 
     private fun wakeUpVero() =
-        veroTask(computeProgress(6), R.string.connect_scanner_wake_un20, "ScannerManager: wakeUpVero",
+        veroTask(computeProgress(7), R.string.connect_scanner_wake_un20, "ScannerManager: wakeUpVero",
             scannerManager.scanner { sensorWakeUp() }) { updateBluetoothConnectivityEventWithVeroInfo() }
 
     private fun updateBluetoothConnectivityEventWithVeroInfo() {
@@ -222,7 +227,7 @@ class ConnectScannerViewModel(
     }
 
     companion object {
-        const val NUMBER_OF_STEPS = 7
+        const val NUMBER_OF_STEPS = 8
         private fun computeProgress(step: Int) = step * 100 / NUMBER_OF_STEPS
     }
 }
