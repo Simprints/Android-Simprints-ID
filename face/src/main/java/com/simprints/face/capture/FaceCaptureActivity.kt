@@ -1,6 +1,7 @@
 package com.simprints.face.capture
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +11,7 @@ import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.whenNonNull
 import com.simprints.core.tools.whenNull
 import com.simprints.face.R
+import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceRequest
@@ -26,7 +28,7 @@ class FaceCaptureActivity : AppCompatActivity() {
         bindViewModel()
 
         val faceRequest: FaceRequest = this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
-            ?: throw InvalidFaceRequestException("No IFaceRequest found for FaceOrchestratorActivity")
+            ?: throw InvalidFaceRequestException("No IFaceRequest found for FaceCaptureActivity")
 
         vm.setupCapture(faceRequest)
     }
@@ -73,4 +75,12 @@ class FaceCaptureActivity : AppCompatActivity() {
             }
         }
     }
+
+    companion object {
+        fun getStartingIntent(context: Context, faceCaptureRequest: FaceCaptureRequest): Intent =
+            Intent(context, FaceCaptureActivity::class.java).apply {
+                putExtra(IFaceRequest.BUNDLE_KEY, faceCaptureRequest)
+            }
+    }
+
 }
