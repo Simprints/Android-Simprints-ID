@@ -17,14 +17,16 @@ data class Event(val id: String,
                  val payload: EventPayload) {
 }
 
-fun ApiEvent.fromApiToDomain() = try {
-    Event(id,
-        labels.getValue(ApiEvent.PROJECT_ID_LABEL),
-        labels.getValue(ApiEvent.SUBJECT_ID_LABEL),
-        labels.getValue(ApiEvent.ATTENDANT_ID_LABEL),
-        labels.getValue(ApiEvent.MODULE_ID_LABEL),
-        labels.getValue(ApiEvent.MODE_LABEL).map { Modes.valueOf(it) },
-        payload.fromApiToDomain())
+fun ApiEvent.fromApiToDomainOrNullIfNoBiometricReferences() = try {
+    payload.fromApiToDomainOrNullIfNoBiometricReferences()?.let {
+        Event(id,
+            labels.getValue(ApiEvent.PROJECT_ID_LABEL),
+            labels.getValue(ApiEvent.SUBJECT_ID_LABEL),
+            labels.getValue(ApiEvent.ATTENDANT_ID_LABEL),
+            labels.getValue(ApiEvent.MODULE_ID_LABEL),
+            labels.getValue(ApiEvent.MODE_LABEL).map { Modes.valueOf(it) },
+            it)
+    }
 } catch (t: Throwable) {
     throw IllegalStateException("Did not get all the labels from cloud")
 }
