@@ -77,7 +77,7 @@
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
     <!-- Screen Text -->
-    <string name="why_did_you_skip_fingerprinting">چرا شما از دادن نشان انگشت اجتناب کردید؟</string>
+    <string name="reasons_for_leaving_fingerprint">چرا شما از دادن نشان انگشت اجتناب کردید؟</string>
     <!-- Button Labels -->
     <string name="button_submit">سپردن</string>
     <string name="button_scan_prints">اسکن نمودن نشان انگشتان</string>

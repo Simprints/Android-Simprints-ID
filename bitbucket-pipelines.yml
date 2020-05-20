@@ -23,7 +23,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew clientapi:jacocoTestReportDebug
+                    - ./gradlew clientapi:jacocoTestReportDebug --no-daemon
                 artifacts:
                     - clientapi/build/reports/**
 
@@ -31,12 +31,13 @@ definitions:
         # Run the ID unit tests with coverage and upload report to artifacts.
         ######################################################################
         -   step: &run-id-unit-tests
-                name: "Run Id unit tests"
+                name: "Run Id & Core unit tests"
                 caches:
                     - gradle
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - ./gradlew core:jacocoTestReportDebug
                     - ./gradlew id:jacocoTestReportDebug
                 artifacts:
                     - id/build/reports/**
@@ -51,7 +52,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew face:jacocoTestReportDebug
+                    - ./gradlew face:jacocoTestReportDebug --no-daemon
                 artifacts:
                     - face/build/reports/**
 
@@ -66,13 +67,13 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew fingerprint:jacocoTestReportDebug
+                    - ./gradlew fingerprint:jacocoTestReportDebug --no-daemon
                 artifacts:
                     - fingerprint/build/reports/**
 
         ######################################################################
-        # Run the Fingerprint unit tests with coverage and upload report to
-        # artifacts.
+        # Run the Fingerprint Scanner unit tests with coverage and upload
+        # report to artifacts.
         ######################################################################
         -   step: &run-fingerprintscanner-unit-tests
                 name: "Run Fingerprint Scanner unit tests"
@@ -82,8 +83,10 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - ./gradlew fingerprintscanner:jacocoTestReportDebug
+                    - ./gradlew fingerprintscannermock:jacocoTestReportDebug
                 artifacts:
                     - fingerprintscanner/build/reports/**
+                    - fingerprintscannermock/build/reports/**
 
         ######################################################################
         # Get all of the test and coverage reports from artifacts, upload
@@ -96,7 +99,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
+                    - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600 --no-daemon
 
         ######################################################################
         # Build all of the test APKs for the different modules, then Download
@@ -206,6 +209,7 @@ pipelines:
     branches:
         master: *main-flow
         develop: *main-flow
+        ci/*: *main-flow
     pull-requests:
         master: *main-flow
         develop: *main-flow
