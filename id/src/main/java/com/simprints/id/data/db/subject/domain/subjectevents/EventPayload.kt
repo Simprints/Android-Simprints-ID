@@ -7,9 +7,9 @@ import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEventPayl
 
 abstract class EventPayload(val type: EventPayloadType)
 
-fun ApiEventPayload.fromApiToDomain() = when(this) {
-    is ApiEnrolmentRecordCreationPayload -> EnrolmentRecordCreationPayload(this)
-    is ApiEnrolmentRecordDeletionPayload -> EnrolmentRecordDeletionPayload(this)
-    is ApiEnrolmentRecordMovePayload -> EnrolmentRecordMovePayload(this)
+fun ApiEventPayload.fromApiToDomainOrNullIfNoBiometricReferences() = when(this) {
+    is ApiEnrolmentRecordCreationPayload -> this.fromApiToDomainOrNullIfNoBiometricReferences()
+    is ApiEnrolmentRecordDeletionPayload -> this.fromApiToDomain()
+    is ApiEnrolmentRecordMovePayload -> this.fromApiToDomainAndNullForCreationIfBiometricRefsAreNull()
     else -> throw IllegalStateException("Invalid payload type for events")
 }

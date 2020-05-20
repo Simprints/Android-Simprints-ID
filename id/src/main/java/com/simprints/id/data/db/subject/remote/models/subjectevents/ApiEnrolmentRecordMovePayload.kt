@@ -10,6 +10,6 @@ data class ApiEnrolmentRecordMovePayload(
 ) : ApiEventPayload(ApiEventPayloadType.ENROLMENT_RECORD_MOVE) {
 
     constructor(payload: EnrolmentRecordMovePayload) :
-        this(ApiEnrolmentRecordCreationPayload(payload.enrolmentRecordCreation),
+        this(ApiEnrolmentRecordCreationPayload(payload.enrolmentRecordCreation ?: throw IllegalStateException("Domain creation payload should always have biometric references")),
             ApiEnrolmentRecordDeletionPayload(payload.enrolmentRecordDeletion))
 }
