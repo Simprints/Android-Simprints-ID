@@ -102,7 +102,7 @@ class SubjectRepositoryTest {
         runBlocking {
             val subject = SubjectsGeneratorUtils.getRandomSubject()
             coEvery { localDataSource.load(any()) } returns flowOf()
-            coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildCreationEventFromSubject(subject)
+            coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildCreationEventStreamFromSubject(subject)
 
             val fetch = subjectRepository.loadFromRemoteIfNeeded(subject.projectId, subject.subjectId)
 
@@ -120,6 +120,20 @@ class SubjectRepositoryTest {
         }
     }
 
+    @Test
+    fun givenADeletedSubjectInRemote_shouldNotBeLoaded() {
+        runBlocking {
+            val subject = SubjectsGeneratorUtils.getRandomSubject()
+            coEvery { localDataSource.load(any()) } returns flowOf()
+            coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildDeletionEventsStreamForSubject(subject)
+
+            val fetch = subjectRepository.loadFromRemoteIfNeeded(subject.projectId, subject.subjectId)
+
+            assertThat(fetch.subject).isNull()
+            assertThat(fetch.subjectSource).isEqualTo(SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE)
+        }
+    }
+
 
     private suspend fun assesDownSyncCount(downSyncScope: SubjectsDownSyncScope) {
         val eventCounts = listOf(EventCount(ENROLMENT_RECORD_CREATION, REMOTE_SUBJECTS_FOR_SUBSYNC))
@@ -132,7 +146,7 @@ class SubjectRepositoryTest {
         assertThat(counts.created).isEqualTo(REMOTE_SUBJECTS_FOR_SUBSYNC)
     }
 
-    private fun buildCreationEventFromSubject(subject: Subject): InputStream {
+    private fun buildCreationEventStreamFromSubject(subject: Subject): InputStream {
         val event = with(subject) {
             Event(
                 randomUUID(),
@@ -148,6 +162,36 @@ class SubjectRepositoryTest {
         return responseString.toResponseBody().byteStream()
     }
 
+    private fun buildDeletionEventsStreamForSubject(subject: Subject): InputStream {
+        val uuid = randomUUID()
+        val creationEvent = with(subject) {
+            Event(
+                uuid,
+                listOf(projectId),
+                listOf(subjectId),
+                listOf(attendantId),
+                listOf(moduleId),
+                listOf(),
+                buildCreationPayload(this)
+            ).fromDomainToApi()
+        }
+
+        val deletionEvent = with(subject) {
+            Event(
+                uuid,
+                listOf(projectId),
+                listOf(subjectId),
+                listOf(attendantId),
+                listOf(moduleId),
+                listOf(),
+                buildDeletionPayload(this)
+            ).fromDomainToApi()
+        }
+
+        val responseString = SimJsonHelper.gson.toJson(listOf(creationEvent, deletionEvent))
+        return responseString.toResponseBody().byteStream()
+    }
+
     private fun buildCreationPayload(subject: Subject) = with(subject) {
         EnrolmentRecordCreationPayload(
             subjectId,
@@ -155,6 +199,15 @@ class SubjectRepositoryTest {
             moduleId,
             attendantId,
             buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples)
+        )
+    }
+
+    private fun buildDeletionPayload(subject: Subject) = with(subject) {
+        EnrolmentRecordDeletionPayload(
+            subjectId,
+            projectId,
+            moduleId,
+            attendantId
         )
     }
 
