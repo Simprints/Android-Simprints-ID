@@ -30,6 +30,7 @@ import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAbou
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
+import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.db.person.PersonRepository
@@ -129,6 +130,7 @@ interface AppComponent {
     fun inject(peopleEndSyncReporterWorker: PeopleEndSyncReporterWorker)
     fun inject(peopleStartSyncWorker: PeopleStartSyncReporterWorker)
     fun inject(qrCaptureActivity: QrCaptureActivity)
+    fun inject(setupActivity: SetupActivity)
 
     fun getSessionEventsManager(): SessionRepository
     fun getCrashReportManager(): CoreCrashReportManager
