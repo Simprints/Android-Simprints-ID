@@ -44,7 +44,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
                     IAppErrorReason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                     IAppErrorReason.LOGIN_NOT_COMPLETE -> LOGIN_NOT_COMPLETE
                     IAppErrorReason.ROOTED_DEVICE -> ROOTED_DEVICE
-                    IAppErrorReason.ENROLMENT_LAST_BIOMETRIC_FAILED -> INVALID_STATE_FOR_INTENT_ACTION
+                    IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED -> INVALID_STATE_FOR_INTENT_ACTION
                 }
 
             fun fromAlertTypeToDomain(clientApiAlert: ClientApiAlert): Reason =

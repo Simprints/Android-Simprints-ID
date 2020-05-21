@@ -61,7 +61,7 @@ class EnrolLastBiometricsActivity : AppCompatActivity() {
                     sendOkResult(person.patientId)
                 } catch (t: Throwable) {
                     Timber.d(t)
-                    AlertActivityHelper.launchAlert(this@EnrolLastBiometricsActivity, AlertType.ENROLMENT_LAST_BIOMETRIC_FAILED)
+                    AlertActivityHelper.launchAlert(this@EnrolLastBiometricsActivity, AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED)
                 }
             }
         }
