@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.data.db.RealmTestsBase
+import com.simprints.id.data.db.person.domain.FaceRecord
 import com.simprints.id.data.db.person.domain.FingerprintIdentity
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.person.local.models.fromDbToDomain
@@ -151,9 +152,31 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         }
     }
 
+    @Test
+    fun givenManyPeopleSaved_loadWithSerializableShouldReturnFaceRecords() = runBlocking {
+        val fakePerson1 = getFakePerson()
+        val fakePerson2 = getFakePerson()
+        personLocalDataSource.insertOrUpdate(listOf(fakePerson1.fromDbToDomain()))
+        personLocalDataSource.insertOrUpdate(listOf(fakePerson2.fromDbToDomain()))
+
+        val faceRecordDataSource = (personLocalDataSource as FaceRecordLocalDataSource)
+        val faceRecords = faceRecordDataSource.loadFaceRecords(PersonLocalDataSource.Query()).toList()
+        realm.executeTransaction {
+            with(faceRecords) {
+                verifyIdentity(fakePerson1, get(0))
+                verifyIdentity(fakePerson2, get(1))
+            }
+        }
+    }
+
     private fun verifyIdentity(person: DbPerson, fingerprintIdentity: FingerprintIdentity) {
         assertThat(fingerprintIdentity.fingerprints.count()).isEqualTo(person.fingerprintSamples.count())
         assertThat(fingerprintIdentity.patientId).isEqualTo(person.patientId)
+    }
+
+    private fun verifyIdentity(person: DbPerson, faceRecord: FaceRecord) {
+        assertThat(faceRecord.faces.count()).isEqualTo(person.faceSamples.count())
+        assertThat(faceRecord.personId).isEqualTo(person.patientId)
     }
 
     @Test

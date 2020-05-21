@@ -2,6 +2,7 @@ package com.simprints.id.data.db.person.local
 
 import android.content.Context
 import com.simprints.id.data.db.common.realm.PeopleRealmConfig
+import com.simprints.id.data.db.person.domain.FaceRecord
 import com.simprints.id.data.db.person.domain.FingerprintIdentity
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.models.DbPerson
@@ -87,10 +88,19 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
             throw InvalidQueryToLoadRecordsException()
         }
 
+    override suspend fun loadFaceRecords(query: Serializable): Flow<FaceRecord> =
+        if (query is PersonLocalDataSource.Query) {
+            load(query).map { person ->
+                FaceRecord(person.patientId, person.faceSamples)
+            }
+        } else {
+            throw InvalidQueryToLoadRecordsException()
+        }
+
     override suspend fun delete(queries: List<PersonLocalDataSource.Query>) {
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use { realmInstance ->
-                realmInstance.transactAwait {  realm ->
+                realmInstance.transactAwait { realm ->
                     queries.forEach {
                         realm.buildRealmQueryForPerson(it)
                             .findAll()
