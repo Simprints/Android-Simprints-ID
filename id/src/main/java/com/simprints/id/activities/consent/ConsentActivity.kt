@@ -1,6 +1,5 @@
 package com.simprints.id.activities.consent
 
-import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Paint.UNDERLINE_TEXT_FLAG
@@ -11,22 +10,18 @@ import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.ConsentEvent
-import com.simprints.id.data.db.session.domain.models.session.Location
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.ConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
@@ -34,15 +29,10 @@ import com.simprints.id.orchestrator.steps.core.CoreResponseCode
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.extensions.getNotGrantedPermissions
-import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import kotlinx.android.synthetic.main.activity_consent.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 class ConsentActivity : AppCompatActivity() {
@@ -77,7 +67,6 @@ class ConsentActivity : AppCompatActivity() {
             .get(ConsentViewModel::class.java)
 
         showLogoIfNecessary()
-        requestLocationPermission()
         setupTextInUi()
         setupTabs()
         setupObserversForUi()
@@ -93,15 +82,6 @@ class ConsentActivity : AppCompatActivity() {
             simprintsLogoWithTagLine.visibility = View.VISIBLE
         } else {
             simprintsLogoWithTagLine.visibility = View.GONE
-        }
-    }
-
-    private fun requestLocationPermission() {
-        val requestingPermissions = requestPermissionsIfRequired(arrayOf(ACCESS_FINE_LOCATION),
-            LOCATION_PERMISSION_REQUEST_CODE)
-
-        if (!requestingPermissions) {
-            storeUserLocationIntoCurrentSession()
         }
     }
 
@@ -202,33 +182,15 @@ class ConsentActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         exitFormHelper.buildExitFormResponseForCore(data)?.let {
+            deleteLocationInfoFromSession()
             setResultAndFinish(it)
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && getNotGrantedPermissions(arrayOf(ACCESS_FINE_LOCATION)).isEmpty()) {
-            storeUserLocationIntoCurrentSession()
-        }
-    }
-
-    private fun storeUserLocationIntoCurrentSession() {
+    private fun deleteLocationInfoFromSession() {
         CoroutineScope(Dispatchers.Main).launch {
-            try {
-                val locationRequest = LocationRequest().apply {
-                    priority = PRIORITY_HIGH_ACCURACY
-                }
-                val locationsFlow = locationManager.requestLocation(locationRequest).take(1)
-                locationsFlow.collect { locations ->
-                    val lastLocation = locations.last()
-                    sessionRepository.updateCurrentSession {
-                        Timber.d("Saving user's location into the current session")
-                        it.location = Location(lastLocation.latitude, lastLocation.longitude)
-                    }
-                }
-            } catch (t: Throwable) {
-                crashReportManager.logExceptionOrSafeException(FailedToRetrieveUserLocation(t))
+            sessionRepository.updateCurrentSession {
+                it.location = null
             }
         }
     }
@@ -249,6 +211,5 @@ class ConsentActivity : AppCompatActivity() {
     companion object {
         const val GENERAL_CONSENT_TAB_TAG = "General"
         const val PARENTAL_CONSENT_TAB_TAG = "Parental"
-        const val LOCATION_PERMISSION_REQUEST_CODE = 99
     }
 }
