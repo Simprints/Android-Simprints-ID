@@ -15,9 +15,11 @@ class AuthManagerImpl(private val apiClientFactory: SimApiClientFactory): AuthMa
 
     override suspend fun requestAuthToken(authRequest: AuthRequest): Token {
         val response = makeNetworkRequest({
-            it.requestCustomTokens(authRequest.projectId,
+            it.requestCustomTokens(
+                authRequest.projectId,
                 authRequest.userId,
-                authRequest.authRequestBody)
+                authRequest.authRequestBody
+            )
         }, "requestAuthToken")
 
         response.body()?.let {
