@@ -8,6 +8,3 @@ mkdir -p $logs_path
 
 gcloud firebase test android run --type instrumentation --app $2 --test $3 --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator --num-flaky-test-attempts 1 --verbosity info &> $log_file
 cat $log_file | grep -o 'gs:.*/' | head -n 1 |  xargs -I{} gsutil cp "{}**merged.xml" $root_path
-
-#Fail step if any test failed
-for file in $root_path/*; do if [ "$(grep -c '<failure' "${file}")" -gt 0 ]; then exit 1; fi; done

@@ -1,6 +1,40 @@
 #!/bin/bash
-modules=('id' 'face' 'fingerprint')
 
-for module in ${modules[@]}; do
-  ./pipeline universal.apk module
+device=walleye,version=28,locale=en,orientation=portrait
+n_attemps_per_module=1
+
+rm -Rf test-reports
+
+main_apk=$1
+
+function get_module_name {
+    echo $1 | tr ':' $'\n' | sed -n 1p
+} 
+
+function get_module_apk {
+    echo $1 | tr ':' $'\n' | sed -n 2p
+} 
+
+function monitor {
+	output=$1
+	echo "output = (" ${output[@]} ") and is " ${#output[@]} " long "
+
+	
+}
+
+
+for arg in "$@"
+do
+	if [ "$arg" = "$main_apk" ]; then
+	    continue
+	else
+		echo "Processing $arg"
+		module=$(get_module_name $arg)
+		modules+=("$module")
+		test_apk=$(get_module_apk $arg)
+	    #nohup ./run_firebase_test_lab $module $main_apk $test_apk $device $n_attemps_per_module &>/dev/null &
+	fi
 done
+
+echo $(monitor $modules)
+exit 1
