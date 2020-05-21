@@ -13,7 +13,7 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
+import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
@@ -84,7 +84,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
-        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.BLUETOOTH_OFF)
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.BluetoothOff)
     }
 
     @Test
@@ -126,7 +126,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
-        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NFC_PAIR)
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NfcPair)
     }
 
     @Test
@@ -139,7 +139,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
-        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NFC_OFF)
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NfcOff)
     }
 
     @Test
@@ -152,7 +152,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
-        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.SERIAL_ENTRY_PAIR)
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.SerialEntryPair)
     }
 
     @Test
@@ -165,7 +165,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
-        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.SERIAL_ENTRY_PAIR)
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.SerialEntryPair)
     }
 
     @Test
@@ -178,7 +178,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
-        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.SERIAL_ENTRY_PAIR)
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.SerialEntryPair)
     }
 
     @Test
@@ -191,7 +191,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
-        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NFC_PAIR)
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NfcPair)
     }
 
     @Test
@@ -228,7 +228,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         viewModel.handleScannerDisconnectedYesClick()
 
-        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.SCANNER_OFF)
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.ScannerOff)
     }
 
     @Test
@@ -240,7 +240,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         viewModel.handleScannerDisconnectedNoClick()
 
-        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NFC_PAIR)
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NfcPair)
     }
 
     @Test
@@ -252,7 +252,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         viewModel.handleIncorrectScanner()
 
-        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NFC_PAIR)
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NfcPair)
     }
 
     @Test

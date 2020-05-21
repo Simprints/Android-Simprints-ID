@@ -10,6 +10,7 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
+import com.simprints.fingerprint.activities.connect.issues.ota.OtaFragmentRequest
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
@@ -23,6 +24,8 @@ import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.scanner.exceptions.safe.*
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.tools.livedata.postEvent
 import io.reactivex.Completable
@@ -128,25 +131,33 @@ class ConnectScannerViewModel(
                 logMessageForCrashReport(crashReportMessage)
             }
 
-    private fun manageVeroErrors(it: Throwable) {
-        Timber.d(it)
+    private fun manageVeroErrors(e: Throwable) {
+        Timber.d(e)
         scannerConnected.postEvent(false)
-        launchAlertOrScannerIssueOrShowDialog(scannerManager.getAlertType(it))
-        if (it !is FingerprintSafeException) {
-            crashReportManager.logExceptionOrSafeException(it)
+        launchAlertOrScannerIssueOrShowDialog(e)
+        if (e !is FingerprintSafeException) {
+            crashReportManager.logExceptionOrSafeException(e)
         }
     }
 
-    private fun launchAlertOrScannerIssueOrShowDialog(alert: FingerprintAlert) {
-        when (alert) {
-            BLUETOOTH_NOT_ENABLED ->
-                connectScannerIssue.postEvent(ConnectScannerIssue.BLUETOOTH_OFF)
-            NOT_PAIRED, MULTIPLE_PAIRED_SCANNERS ->
+    private fun launchAlertOrScannerIssueOrShowDialog(e: Throwable) {
+        when (e) {
+            is BluetoothNotEnabledException ->
+                connectScannerIssue.postEvent(ConnectScannerIssue.BluetoothOff)
+            is ScannerNotPairedException, is MultipleScannersPairedException ->
                 connectScannerIssue.postEvent(determineAppropriateScannerIssueForPairing())
-            DISCONNECTED ->
+            is ScannerDisconnectedException, is UnknownScannerIssueException ->
                 scannerManager.lastPairedScannerId?.let { showScannerErrorDialogWithScannerId.postEvent(it) }
-            BLUETOOTH_NOT_SUPPORTED, LOW_BATTERY, UNEXPECTED_ERROR ->
-                launchAlert.postEvent(alert)
+            is OtaAvailableException ->
+                connectScannerIssue.postEvent(ConnectScannerIssue.Ota(OtaFragmentRequest(e.availableOtas)))
+            is OtaFailedException ->
+                TODO()
+            is BluetoothNotSupportedException ->
+                launchAlert.postEvent(BLUETOOTH_NOT_SUPPORTED)
+            is ScannerLowBatteryException ->
+                launchAlert.postEvent(LOW_BATTERY)
+            else ->
+                launchAlert.postEvent(UNEXPECTED_ERROR)
         }
     }
 
@@ -155,12 +166,12 @@ class ConnectScannerViewModel(
 
         return if (couldNotBeVero1 && nfcManager.doesDeviceHaveNfcCapability()) {
             if (nfcManager.isNfcEnabled()) {
-                ConnectScannerIssue.NFC_PAIR
+                ConnectScannerIssue.NfcPair
             } else {
-                ConnectScannerIssue.NFC_OFF
+                ConnectScannerIssue.NfcOff
             }
         } else {
-            ConnectScannerIssue.SERIAL_ENTRY_PAIR
+            ConnectScannerIssue.SerialEntryPair
         }
     }
 
@@ -181,7 +192,7 @@ class ConnectScannerViewModel(
     }
 
     fun handleScannerDisconnectedYesClick() {
-        connectScannerIssue.postEvent(ConnectScannerIssue.SCANNER_OFF)
+        connectScannerIssue.postEvent(ConnectScannerIssue.ScannerOff)
     }
 
     fun handleScannerDisconnectedNoClick() {

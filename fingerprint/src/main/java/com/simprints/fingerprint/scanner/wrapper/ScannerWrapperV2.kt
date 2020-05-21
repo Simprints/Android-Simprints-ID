@@ -15,6 +15,7 @@ import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
+import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
@@ -22,6 +23,7 @@ import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
+import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -220,6 +222,9 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             Timber.e(e)
             crashReportManager.logExceptionOrSafeException(e)
             UnexpectedScannerException(e)
+        }
+        is ScannerV2OtaFailedException -> { // Wrap the OTA failed exception to fingerprint domain exception
+            OtaFailedException("Wrapped OTA failed exception from scanner", e)
         }
         else -> { // Propagate error
             e

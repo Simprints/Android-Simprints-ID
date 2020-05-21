@@ -5,11 +5,12 @@ import com.simprints.fingerprint.scanner.adapters.v2.toScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.FirmwareFileManager
 import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
+import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.CypressFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
-import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
+import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.CapturingSlot
@@ -73,7 +74,7 @@ class Un20OtaHelperTest {
         val progressValues = listOf(0.0f, 0.2f, 0.4f)
         val expectedSteps = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
             progressValues.map { Un20OtaStep.TransferInProgress(it) }
-        val error = OtaFailedException("oops!")
+        val error = ScannerV2OtaFailedException("oops!")
 
         every { scannerMock.startUn20Ota(any()) } returns
             Observable.fromIterable(progressValues).concatWith(Observable.error(error))
