@@ -183,24 +183,32 @@ definitions:
                     - bash ./ci/pipeline/setup_gcloud
                     - bash ./ci/pipeline/run_firebase_test_lab universal.apk face-debug-androidTest.apk
 
+        -   step: &run-all-android-tests
+                name: "Run Face android tests"
+                image: google/cloud-sdk:slim
+                script:
+                    - bash ./ci/pipeline/setup_gcloud
+                    - bash ./ci/pipeline/run_all_android_tests universal.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk id:id-debug-androidTest.apk
+
 ######################################################################
 # Define the different pipelines flows as anchors.
 ######################################################################
 flows:
     -   flow: &main-flow
             -   parallel:
-                    -   step: *run-clientapi-unit-tests
-                    -   step: *run-id-unit-tests
-                    -   step: *run-face-unit-tests
-                    -   step: *run-fingerprint-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
+                    #-   step: *run-clientapi-unit-tests
+                    #-   step: *run-id-unit-tests
+                    #-   step: *run-face-unit-tests
+                    #-   step: *run-fingerprint-unit-tests
+                    #-   step: *run-fingerprintscanner-unit-tests
                     -   step: *build-and-sign-universal-apk
             -   parallel:
-                    -   step: *upload-sonar-scan-and-check-quality-gate
-                    -   step: *run-clientapi-android-tests-on-gcloud-image
-                    -   step: *run-id-android-tests-on-gcloud-image
-                    -   step: *run-face-android-tests
-                    -   step: *run-fingerprint-android-tests
+                    #-   step: *upload-sonar-scan-and-check-quality-gate
+                    #-   step: *run-clientapi-android-tests-on-gcloud-image
+                    #-   step: *run-id-android-tests-on-gcloud-image
+                    #-   step: *run-face-android-tests
+                    #-   step: *run-fingerprint-android-tests
+                    -   step: *run-all-android-tests
 
 ######################################################################
 # Define the triggers that launch the pipeline.

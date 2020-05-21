@@ -128,6 +128,7 @@ function monitor {
 		local result=`ps aux | grep -i "$single_runner" | grep -v "grep" | wc -l`
 		if [ $result -le 0 ]
 	   	then
+	   		"Tests done!"
 	        exit 1
 		fi		
 	done
