@@ -1,9 +1,9 @@
 package com.simprints.id.commontesttools
 
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import java.util.*
 import kotlin.random.Random
 
@@ -49,7 +49,8 @@ object PeopleGeneratorUtils {
                         toSync: Boolean = false,
                         createdAt: Date = getRandomTime(),
                         updateAt: Date = getRandomTime(),
-                        fingerprintSamples: Array<FingerprintSample> = arrayOf(getRandomFingerprintSample(), getRandomFingerprintSample())): Person =
+                        fingerprintSamples: Array<FingerprintSample> = arrayOf(getRandomFingerprintSample(), getRandomFingerprintSample()),
+                        faceSamples: List<FaceSample> = listOf(getRandomFaceSample(), getRandomFaceSample())): Person =
         Person(
             patientId = patientId,
             projectId = projectId,
@@ -58,7 +59,8 @@ object PeopleGeneratorUtils {
             createdAt = if (!toSync) createdAt else null,
             updatedAt = if (!toSync) updateAt else null,
             toSync = toSync,
-            fingerprintSamples = fingerprintSamples.toList()
+            fingerprintSamples = fingerprintSamples.toList(),
+            faceSamples = faceSamples
         )
 
 
