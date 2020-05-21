@@ -2,11 +2,11 @@ package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.secure.SecureApiInterface.Companion.API_KEY
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.Nonce
@@ -32,18 +32,20 @@ class AuthenticationDataManagerImplTest: AutoCloseKoinTest() {
     companion object {
         private const val PROJECT_ID = "projectId"
         private const val USER_ID = "userId"
+        private const val DEVICE_ID = "deviceId"
     }
 
     private val nonceFromServer = "nonce_from_server"
     private val publicKeyFromServer = "public_key_from_server"
     private val validAuthenticationJsonResponse = "{\"nonce\":\"$nonceFromServer\", \"publicKey\":\"$publicKeyFromServer\"}"
     private val expectedAuthenticationData = AuthenticationData(Nonce(nonceFromServer), PublicKeyString(publicKeyFromServer))
-    private val expectedUrl = DEFAULT_BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?key=$API_KEY"
+    private val expectedUrl = DEFAULT_BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?deviceId=$DEVICE_ID&key=$API_KEY"
 
     private val validateUrl: (url: String) -> Unit  = {
         assertThat(it).isEqualTo(expectedUrl)
     }
 
+    private lateinit var apiClientFactory: SimApiClientFactory
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
 
     @Before
@@ -53,7 +55,8 @@ class AuthenticationDataManagerImplTest: AutoCloseKoinTest() {
 
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
-        apiClient = SimApiClientFactory(mockBaseUrlProvider, "deviceId").build()
+        apiClientFactory = SimApiClientFactory(mockBaseUrlProvider, DEVICE_ID)
+        apiClient = apiClientFactory.build()
     }
 
     @Test
@@ -79,7 +82,7 @@ class AuthenticationDataManagerImplTest: AutoCloseKoinTest() {
     }
 
     private suspend fun makeTestRequestForAuthenticationData(): AuthenticationData {
-        val authenticationDataManagerSpy = spyk(AuthenticationDataManagerImpl(mockk()))
+        val authenticationDataManagerSpy = spyk(AuthenticationDataManagerImpl(apiClientFactory))
         every { authenticationDataManagerSpy.apiClient } returns apiClient.api
 
         return authenticationDataManagerSpy.requestAuthenticationData(PROJECT_ID, USER_ID)
