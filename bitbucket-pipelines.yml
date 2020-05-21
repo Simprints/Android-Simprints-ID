@@ -10,7 +10,7 @@ clone:
 definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
-        
+
     steps:
 
         ######################################################################
@@ -202,6 +202,12 @@ flows:
                     -   step: *run-face-android-tests
                     -   step: *run-fingerprint-android-tests
 
+    -   flow: &pr-flow
+            -   step:
+                    script:
+                        - if [ "${BITBUCKET_PR_DESTINATION_BRANCH}" != "master" ] || [ "${BITBUCKET_PR_DESTINATION_BRANCH}" != "develop" ]; then printf 'not a target branch we want to check'; exit; fi
+            - *main-flow
+
 ######################################################################
 # Define the triggers that launch the pipeline.
 ######################################################################
@@ -211,7 +217,6 @@ pipelines:
         develop: *main-flow
         ci/*: *main-flow
     pull-requests:
-        master: *main-flow
-        develop: *main-flow
+        '**': *pr-flow
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere
