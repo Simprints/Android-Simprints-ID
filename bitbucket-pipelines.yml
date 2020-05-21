@@ -10,7 +10,7 @@ clone:
 definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
-        
+
     steps:
 
         ######################################################################
@@ -211,7 +211,6 @@ pipelines:
         develop: *main-flow
         ci/*: *main-flow
     pull-requests:
-        master: *main-flow
-        develop: *main-flow
+        '**': *main-flow
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere

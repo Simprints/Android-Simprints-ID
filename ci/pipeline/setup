@@ -15,7 +15,7 @@ echo "org.gradle.caching=true" >>gradle.properties
 echo "org.gradle.daemon=false" >>gradle.properties
 
 #########################################################################################
-# https://confluence.atlassian.com/bitbucket/use-services-and-databases-in-bitbucket-pipelines-874786688.html
+# https://confluence.atlassian.com/bitbucket/configure-bitbucket-pipelines-yml-792298910.html
 #########################################################################################
 echo "org.gradle.jvmargs=-Xmx4g"
 
