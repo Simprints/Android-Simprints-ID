@@ -16,11 +16,16 @@ class LoginViewModel(private val authenticationHelper: AuthenticationHelper) : V
 
     fun getSignInResult(): LiveData<AuthenticationEvent.Result> = signInResultLiveData
 
-    fun signIn(userId: String, projectId: String, projectSecret: String) {
+    fun signIn(userId: String, projectId: String, projectSecret: String, deviceId: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-            val result = authenticationHelper.authenticateSafely(userId, projectId, projectSecret)
-            signInResultLiveData.postValue(result)
+                val result = authenticationHelper.authenticateSafely(
+                    userId,
+                    projectId,
+                    projectSecret,
+                    deviceId
+                )
+                signInResultLiveData.postValue(result)
             }
         }
     }
