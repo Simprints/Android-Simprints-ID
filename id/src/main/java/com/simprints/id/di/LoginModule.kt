@@ -47,7 +47,6 @@ open class LoginModule {
     @Provides
     open fun provideAuthenticationDataManager(
         apiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider,
         context: Context
     ): AuthenticationDataManager = AuthenticationDataManagerImpl(apiClientFactory, context.deviceId)
 

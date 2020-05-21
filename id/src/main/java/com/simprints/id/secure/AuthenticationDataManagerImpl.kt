@@ -2,23 +2,23 @@ package com.simprints.id.secure
 
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
+import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.toDomainAuthData
-import com.simprints.id.tools.utils.retrySimNetworkCalls
 import retrofit2.HttpException
 import retrofit2.Response
 
 class AuthenticationDataManagerImpl(
-    private val apiClientFactory: SimApiClientFactory,
+    private val simApiClientFactory: SimApiClientFactory,
     private val deviceId: String
 ): AuthenticationDataManager {
 
     override suspend fun requestAuthenticationData(projectId: String, userId: String): AuthenticationData {
-        val response = makeNetworkRequest({
+        val response = executeCall("requestAuthData") {
             it.requestAuthenticationData(projectId, userId, deviceId)
-        }, "requestAuthData")
+        }
 
         response.body()?.let {
             return it.toDomainAuthData()
@@ -32,10 +32,14 @@ class AuthenticationDataManagerImpl(
             else -> throw HttpException(response)
         }
 
-    private suspend fun <T> makeNetworkRequest(block: suspend (client: SecureApiInterface) -> T, traceName: String): T =
-        retrySimNetworkCalls(apiClient, block, traceName)
+    private suspend fun <T> executeCall(nameCall: String, block: suspend (SecureApiInterface) -> T): T =
+        with(getSecureApiClient()) {
+            executeCall(nameCall) {
+                block(it)
+            }
+        }
 
-    internal val apiClient by lazy {
-        apiClientFactory.build<SecureApiInterface>().api
-    }
+    private fun getSecureApiClient(): SimApiClient<SecureApiInterface> =
+        simApiClientFactory.buildUnauthenticatedClient(SecureApiInterface::class)
+
 }
