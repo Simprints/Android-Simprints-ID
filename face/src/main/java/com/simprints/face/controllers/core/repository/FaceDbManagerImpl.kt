@@ -1,7 +1,7 @@
 package com.simprints.face.controllers.core.repository
 
 import com.simprints.face.data.db.person.FaceIdentity
-import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
+import com.simprints.face.data.db.person.FaceSample
 import com.simprints.id.data.db.person.local.FaceIdentityLocalDataSource
 import kotlinx.coroutines.flow.toList
 import java.io.Serializable
@@ -18,4 +18,4 @@ class FaceDbManagerImpl(private val coreFaceIdentityLocalDataSource: FaceIdentit
             }
 }
 
-fun CoreFaceSample.fromCoreToDomain() = FaceSample(id, template, null)
+fun CoreFaceSample.fromCoreToDomain() = FaceSample(id, template)
