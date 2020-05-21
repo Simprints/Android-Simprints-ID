@@ -5,6 +5,8 @@ import com.simprints.face.capture.livefeedback.LiveFeedbackFragmentViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
 import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelperImpl
+import com.simprints.face.controllers.core.flow.MasterFlowManager
+import com.simprints.face.controllers.core.flow.MasterFlowManagerImpl
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.controllers.core.image.FaceImageManagerImpl
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
@@ -56,6 +58,7 @@ object KoinInjector {
         factory<FaceAndroidResourcesHelper> { FaceAndroidResourcesHelperImpl(get()) }
         factory<FacePreferencesManager> { FacePreferencesManagerImpl(get()) }
         factory<FaceImageManager> { FaceImageManagerImpl(get(), get()) }
+        factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
@@ -67,7 +70,7 @@ object KoinInjector {
     private fun Module.defineBuildersForViewModels() {
         viewModel { FaceOrchestratorViewModel() }
         viewModel { FaceCaptureViewModel(get<FacePreferencesManager>().maxRetries, get()) }
-        viewModel { FaceMatchViewModel() }
+        viewModel { FaceMatchViewModel(get()) }
 
         viewModel { (mainVM: FaceCaptureViewModel) -> LiveFeedbackFragmentViewModel(mainVM, get(), get(), get<FacePreferencesManager>().qualityThreshold) }
         viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM) }
