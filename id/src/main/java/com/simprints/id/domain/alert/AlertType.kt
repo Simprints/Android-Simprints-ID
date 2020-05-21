@@ -1,12 +1,11 @@
 package com.simprints.id.domain.alert
 
-import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
-import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.*
+import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType
 
 enum class AlertType {
     GUID_NOT_FOUND_ONLINE,
     GUID_NOT_FOUND_OFFLINE,
-    ENROLMENT_LAST_BIOMETRIC_FAILED,
+    ENROLMENT_LAST_BIOMETRICS_FAILED,
     DIFFERENT_PROJECT_ID_SIGNED_IN,
     DIFFERENT_USER_ID_SIGNED_IN,
     SAFETYNET_ERROR,
@@ -20,5 +19,5 @@ fun AlertType.fromAlertToAlertTypeEvent() = when (this) {
     AlertType.SAFETYNET_ERROR -> AlertScreenEventType.SAFETYNET_ERROR
     AlertType.GUID_NOT_FOUND_ONLINE -> AlertScreenEventType.GUID_NOT_FOUND_ONLINE
     AlertType.GUID_NOT_FOUND_OFFLINE -> AlertScreenEventType.GUID_NOT_FOUND_OFFLINE
-    AlertType.ENROLMENT_LAST_BIOMETRIC_FAILED -> AlertScreenEventType.ENROLMENT_LAST_BIOMETRIC_FAILED
+    AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED -> AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED
 }

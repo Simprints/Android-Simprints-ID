@@ -33,7 +33,7 @@ object DomainToModuleApiAppResponse {
             UNEXPECTED_ERROR -> IAppErrorReason.UNEXPECTED_ERROR
             BLUETOOTH_NOT_SUPPORTED -> IAppErrorReason.BLUETOOTH_NOT_SUPPORTED
             LOGIN_NOT_COMPLETE -> IAppErrorReason.LOGIN_NOT_COMPLETE
-            ENROLMENT_LAST_BIOMETRIC_FAILED -> IAppErrorReason.ENROLMENT_LAST_BIOMETRIC_FAILED
+            ENROLMENT_LAST_BIOMETRICS_FAILED -> IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED
         }
 
     private fun fromDomainToModuleApiAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)
