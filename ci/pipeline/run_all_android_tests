@@ -1,40 +1,166 @@
 #!/bin/bash
+if [ "help" = "$1" ]; then
+    echo "Tool to run SID modules' tests on Firebase Test Lab."
+    echo "Run - ./run_all_android_tests universal.apk module1_name:module1_test_apk ...."
+    exit 1
+fi
 
-device=walleye,version=28,locale=en,orientation=portrait
-n_attemps_per_module=1
+clear 
 
-rm -Rf test-reports
+######################################################################
+# Common config for all tests
+######################################################################
+        
+single_runner="run_firebase_test_lab"
+device="walleye,version=28,locale=en,orientation=portrait"
+n_attemps_per_module="1"
+root_path="test-reports"
+logs="$root_path/@/logs/firebase_logs"
 
+# Initialisations
+rm -Rf $root_path
+modules=()
 main_apk=$1
 
+# Creates a file and all required folders if they don't exist
+function mkfile() { 
+	mkdir -p $( dirname "$1") && touch "$1" 
+}
+
+# Given module_name:apk, extracts module_name
 function get_module_name {
     echo $1 | tr ':' $'\n' | sed -n 1p
 } 
 
+# Given module_name:apk, extracts apk
 function get_module_apk {
-    echo $1 | tr ':' $'\n' | sed -n 2p
+    echo $1 | tr ':' $'\n' | sed -n 2p  
 } 
 
-function monitor {
-	output=$1
-	echo "output = (" ${output[@]} ") and is " ${#output[@]} " long "
-
-	
+# Check if a string($2) is present in a file($1)
+function exist_in_file {
+	if grep "$2" $1 > /dev/null; then echo 1; else echo 0; fi;
 }
 
+# Figures out the state of the FTL instance for a specific module: 
+# Uploading/Running/Failed/Completed
+function get_test_state {	
+	local logs=$(echo $logs | sed "s/@/$1/")
+
+	local to_search="TEST_AXIS_VALUE"
+	local found=$(exist_in_file $logs "$to_search") 
+	if [ $found -eq 1 ]; then echo "\xE2\x9C\x85 Completed"; return; fi
+
+	local to_search="Error"
+	local found=$(exist_in_file $logs "$to_search") 
+	if [ $found -eq 1 ]; then echo "\xE2\x9D\x8C Failed"; return; fi
+
+	local to_search="Test results will be streamed"
+	local found=$(exist_in_file $logs "$to_search") 
+	if [ $found -eq 1 ]; then echo "\xE2\x8C\x9B Running"; return; fi
+
+	echo "\xE2\x8C\x9B Uploading"
+} 
+
+# Extracts the tests results from the FTL output
+function get_test_output {
+    local module_logs=$(echo $logs | sed "s/@/$1/")
+
+	local to_search="TEST_DETAILS"
+	local found=$(exist_in_file $module_logs "$to_search") 
+	if [ $found -eq 1 ]; then 
+		local output_result=`tail -5 $module_logs | sed -n 4p`
+	fi
+
+	echo "# Results: $output_result"
+} 
+
+# Extracts Firebase URL with the test results
+function get_firebase_url {
+    local module_logs=$(echo $logs | sed "s/@/$1/")
+    local url=`grep -o 'https://console.firebase.google.com/project/simprints-android-ci/.*]' $module_logs | head -n 1 | sed 's/.$//'`
+    echo "Firebase: $url"
+} 
+
+# Extracts Google Storage URL with the test results
+function get_gs_url {
+    local module_logs=$(echo $logs | sed "s/@/$1/")
+    local url=`grep -o 'https://console.developers.google.com/storage/.*/' $module_logs | head -n 1`
+    echo "Google Storage: $url"
+} 
+
+function check_if_still_running {
+	local result=`ps aux | grep -i "single_runner" | grep -v "grep" | wc -l`
+	if [ $result -ge 1 ]
+   	then
+        echo 0
+   	else
+        echo 1
+	fi
+}
+
+function print_state {
+	tput rc
+	tput cup 1 0
+	tput clear
+	
+	for module in "${modules_arg[@]}"
+    do
+    	local name_text="# Module: $module"
+    	local state_text="# State: $(get_test_state $module)"
+    	local report_text="# Reports:"
+    	local report_firebase_text="\t$(get_firebase_url $module)"
+    	local report_gs_text="\t$(get_gs_url $module)"
+    	local output_text="$(get_test_output $module)"
+
+    	printf "$name_text \n$state_text \n$output_text \n$report_text \n$report_gs_text \n$report_firebase_text \n\n"
+    done	
+}
+
+function monitor {
+	local modules_arg=("$@")
+	printf "\n\n"
+	tput sc
+
+	while sleep 1; do
+		print_state $modules_arg	
+
+		local result=`ps aux | grep -i "$single_runner" | grep -v "grep" | wc -l`
+		if [ $result -le 0 ]
+	   	then
+	        exit 1
+		fi		
+	done
+}
+
+
+if [ ! -f $main_apk ]; then
+    echo "Main apk doesn't exist"
+    exit 1
+fi
 
 for arg in "$@"
 do
 	if [ "$arg" = "$main_apk" ]; then
 	    continue
 	else
-		echo "Processing $arg"
 		module=$(get_module_name $arg)
 		modules+=("$module")
 		test_apk=$(get_module_apk $arg)
-	    #nohup ./run_firebase_test_lab $module $main_apk $test_apk $device $n_attemps_per_module &>/dev/null &
+
+		logs_module=$(echo $logs | sed "s/@/$module/")
+		mkfile $logs_module
+		echo "Processing $arg $logs_module"
+
+
+		if [ ! -f $test_apk ]; then
+    		echo "Test apk $test_apk doesn't exist"
+    		exit 1
+		else 
+	    	nohup ./run_firebase_test_lab $module $main_apk $test_apk $device $n_attemps_per_module &>/dev/null &
+	    fi
 	fi
 done
 
-echo $(monitor $modules)
+monitor "${modules[@]}"
 exit 1
