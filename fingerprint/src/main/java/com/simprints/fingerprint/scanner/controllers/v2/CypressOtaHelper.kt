@@ -32,8 +32,7 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
             .concatWith(scanner.startCypressOta(firmwareFileManager.getCypressFirmwareBytes()).map { CypressOtaStep.TransferInProgress(it) })
             .concatWith(emitStep(CypressOtaStep.ReconnectingAfterTransfer))
             .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep CypressOtaStep.ValidatingNewFirmwareVersion)
-            .concatWith(validateCypressFirmwareVersion(scanner) thenEmitStep CypressOtaStep.ReconnectingAfterValidating)
-            .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep CypressOtaStep.UpdatingUnifiedVersionInformation)
+            .concatWith(validateCypressFirmwareVersion(scanner) thenEmitStep CypressOtaStep.UpdatingUnifiedVersionInformation)
             .concatWith(updateUnifiedVersionInformation(scanner))
 
     private fun validateCypressFirmwareVersion(scanner: Scanner): Completable =

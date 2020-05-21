@@ -7,10 +7,9 @@ sealed class OtaStep(val totalProgress: Float)
 sealed class CypressOtaStep(totalProgress: Float) : OtaStep(totalProgress) {
     object EnteringOtaMode : CypressOtaStep(0.00f)
     object CommencingTransfer : CypressOtaStep(0.05f)
-    data class TransferInProgress(val otaProgress: Float) : CypressOtaStep(otaProgress.mapProgress(0.05f, 0.70f))
-    object ReconnectingAfterTransfer : CypressOtaStep(0.70f)
-    object ValidatingNewFirmwareVersion : CypressOtaStep(0.80f)
-    object ReconnectingAfterValidating : CypressOtaStep(0.85f)
+    data class TransferInProgress(val otaProgress: Float) : CypressOtaStep(otaProgress.mapProgress(0.05f, 0.85f))
+    object ReconnectingAfterTransfer : CypressOtaStep(0.85f)
+    object ValidatingNewFirmwareVersion : CypressOtaStep(0.90f)
     object UpdatingUnifiedVersionInformation : CypressOtaStep(0.95f)
 }
 
