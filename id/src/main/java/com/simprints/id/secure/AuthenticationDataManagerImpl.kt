@@ -1,8 +1,8 @@
 package com.simprints.id.secure
 
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.toDomainAuthData
@@ -10,11 +10,14 @@ import com.simprints.id.tools.utils.retrySimNetworkCalls
 import retrofit2.HttpException
 import retrofit2.Response
 
-class AuthenticationDataManagerImpl(private val apiClientFactory: SimApiClientFactory): AuthenticationDataManager {
+class AuthenticationDataManagerImpl(
+    private val apiClientFactory: SimApiClientFactory,
+    private val deviceId: String
+): AuthenticationDataManager {
 
     override suspend fun requestAuthenticationData(projectId: String, userId: String): AuthenticationData {
         val response = makeNetworkRequest({
-            it.requestAuthenticationData(projectId, userId, apiClientFactory.deviceId)
+            it.requestAuthenticationData(projectId, userId, deviceId)
         }, "requestAuthData")
 
         response.body()?.let {
