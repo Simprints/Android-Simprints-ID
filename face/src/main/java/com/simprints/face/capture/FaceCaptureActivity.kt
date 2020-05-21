@@ -12,7 +12,6 @@ import com.simprints.core.tools.whenNonNull
 import com.simprints.core.tools.whenNull
 import com.simprints.face.R
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
-import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
@@ -27,7 +26,7 @@ class FaceCaptureActivity : AppCompatActivity() {
         setContentView(R.layout.activity_face_capture)
         bindViewModel()
 
-        val faceRequest: FaceRequest = this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
+        val faceRequest: FaceCaptureRequest = this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
             ?: throw InvalidFaceRequestException("No IFaceRequest found for FaceCaptureActivity")
 
         vm.setupCapture(faceRequest)

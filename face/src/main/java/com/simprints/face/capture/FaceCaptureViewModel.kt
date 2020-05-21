@@ -11,7 +11,6 @@ import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.*
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
-import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
@@ -43,12 +42,8 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
         viewModelScope.launch { startNewAnalyticsSession() }
     }
 
-    fun setupCapture(faceRequest: FaceRequest) {
-        when (faceRequest) {
-            is FaceCaptureRequest -> {
-                samplesToCapture = faceRequest.nFaceSamplesToCapture
-            }
-        }
+    fun setupCapture(faceRequest: FaceCaptureRequest) {
+        samplesToCapture = faceRequest.nFaceSamplesToCapture
     }
 
     fun flowFinished() {
