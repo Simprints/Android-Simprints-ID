@@ -17,6 +17,6 @@ echo "org.gradle.daemon=false" >>gradle.properties
 #########################################################################################
 # https://confluence.atlassian.com/bitbucket/use-services-and-databases-in-bitbucket-pipelines-874786688.html
 #########################################################################################
-echo "org.gradle.jvmargs=-Xmx1000m"
+echo "org.gradle.jvmargs=-Xmx4g"
 
 touch /opt/atlassian/pipelines/agent/build/local.properties
