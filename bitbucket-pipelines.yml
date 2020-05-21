@@ -210,7 +210,5 @@ pipelines:
         master: *main-flow
         develop: *main-flow
         ci/*: *main-flow
-    pull-requests:
-        '**': *main-flow
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere
