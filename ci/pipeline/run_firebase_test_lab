@@ -1,6 +1,13 @@
 #!/bin/bash
-gcloud firebase test android run --type instrumentation --app $1 --test $2 --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator --num-flaky-test-attempts 1 --verbosity info 2>&1 | tee ./firebase_test_log
-mkdir test-reports
-cat ./firebase_test_log | grep -o 'gs:.*/' | head -n 1 |  xargs -I{} gsutil cp "{}**merged.xml" ./test-reports
+root_path=./test-reports/$1
+logs_path=$root_path/logs
+log_file=$logs_path/firebase_logs
+
+mkdir -p $root_path
+mkdir -p $logs_path
+
+gcloud firebase test android run --type instrumentation --app $2 --test $3 --device model=walleye,version=28,locale=en,orientation=portrait --timeout 20m --use-orchestrator --num-flaky-test-attempts 1 --verbosity info &> $log_file
+cat $log_file | grep -o 'gs:.*/' | head -n 1 |  xargs -I{} gsutil cp "{}**merged.xml" $root_path
+
 #Fail step if any test failed
-for file in test-reports/*; do if [ "$(grep -c '<failure' "${file}")" -gt 0 ]; then exit 1; fi; done
+for file in $root_path/*; do if [ "$(grep -c '<failure' "${file}")" -gt 0 ]; then exit 1; fi; done

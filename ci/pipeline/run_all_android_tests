@@ -1,0 +1,6 @@
+#!/bin/bash
+modules=('id' 'face' 'fingerprint')
+
+for module in ${modules[@]}; do
+  ./pipeline universal.apk module
+done
