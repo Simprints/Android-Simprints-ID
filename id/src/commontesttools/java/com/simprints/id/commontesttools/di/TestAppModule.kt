@@ -4,8 +4,6 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
@@ -29,6 +27,8 @@ import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
@@ -181,12 +181,10 @@ class TestAppModule(
         }
 
     override fun provideSessionEventsRemoteDbManager(
-        remoteDbManager: RemoteDbManager,
         simApiClientFactory: SimApiClientFactory
     ): SessionRemoteDataSource =
         sessionEventsRemoteDbManagerRule.resolveDependency {
             super.provideSessionEventsRemoteDbManager(
-                remoteDbManager,
                 simApiClientFactory
             )
         }

@@ -1,13 +1,14 @@
 package com.simprints.id.testtools.testingapi.remote
 
 import com.simprints.id.BuildConfig
+import com.simprints.id.network.SimRemoteInterface
 import com.simprints.id.testtools.testingapi.models.*
 import io.reactivex.Observable
 import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
 import retrofit2.http.*
 
-interface RemoteTestingApi {
+interface RemoteTestingApi: SimRemoteInterface {
 
     companion object {
         const val baseUrl = "https://dev.simprints-apis.com/androidapi/v2/"
