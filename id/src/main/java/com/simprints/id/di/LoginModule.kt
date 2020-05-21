@@ -3,8 +3,6 @@ package com.simprints.id.di
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
@@ -16,8 +14,11 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.*
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.extensions.deviceId
 import dagger.Module
 import dagger.Provides
 
@@ -44,10 +45,11 @@ open class LoginModule {
     ): AuthManager = AuthManagerImpl(apiClientFactory)
 
     @Provides
-    open fun provideAuthenticationDataManager(apiClientFactory: SimApiClientFactory,
-                                              baseUrlProvider: BaseUrlProvider
-    ): AuthenticationDataManager =
-        AuthenticationDataManagerImpl(apiClientFactory)
+    open fun provideAuthenticationDataManager(
+        apiClientFactory: SimApiClientFactory,
+        baseUrlProvider: BaseUrlProvider,
+        context: Context
+    ): AuthenticationDataManager = AuthenticationDataManagerImpl(apiClientFactory, context.deviceId)
 
     @Provides
     open fun provideAttestationManager(): AttestationManager = AttestationManagerImpl()
@@ -68,7 +70,7 @@ open class LoginModule {
         preferencesManager: PreferencesManager,
         attestationManager: AttestationManager,
         authenticationDataManager: AuthenticationDataManager
-    ) : ProjectAuthenticator = ProjectAuthenticatorImpl(
+    ): ProjectAuthenticator = ProjectAuthenticatorImpl(
         authManager,
         projectSecretManager,
         safetyNetClient,
