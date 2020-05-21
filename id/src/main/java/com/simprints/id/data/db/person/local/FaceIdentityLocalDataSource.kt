@@ -1,12 +1,12 @@
 package com.simprints.id.data.db.person.local
 
-import com.simprints.id.data.db.person.domain.FaceRecord
+import com.simprints.id.data.db.person.domain.FaceIdentity
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import kotlinx.coroutines.flow.Flow
 import java.io.Serializable
 
-interface FaceRecordLocalDataSource {
+interface FaceIdentityLocalDataSource {
 
     @Throws(InvalidQueryToLoadRecordsException::class)
-    suspend fun loadFaceRecords(query: Serializable): Flow<FaceRecord>
+    suspend fun loadFaceIdentities(query: Serializable): Flow<FaceIdentity>
 }
