@@ -11,6 +11,8 @@ import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.controllers.core.image.FaceImageManagerImpl
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManagerImpl
+import com.simprints.face.controllers.core.repository.FaceDbManager
+import com.simprints.face.controllers.core.repository.FaceDbManagerImpl
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.detection.mock.MockFaceDetector
 import com.simprints.face.exitform.ExitFormViewModel
@@ -59,6 +61,7 @@ object KoinInjector {
         factory<FacePreferencesManager> { FacePreferencesManagerImpl(get()) }
         factory<FaceImageManager> { FaceImageManagerImpl(get(), get()) }
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
+        factory<FaceDbManager> { FaceDbManagerImpl(get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
@@ -70,7 +73,7 @@ object KoinInjector {
     private fun Module.defineBuildersForViewModels() {
         viewModel { FaceOrchestratorViewModel() }
         viewModel { FaceCaptureViewModel(get<FacePreferencesManager>().maxRetries, get()) }
-        viewModel { FaceMatchViewModel(get()) }
+        viewModel { FaceMatchViewModel(get(), get()) }
 
         viewModel { (mainVM: FaceCaptureViewModel) -> LiveFeedbackFragmentViewModel(mainVM, get(), get(), get<FacePreferencesManager>().qualityThreshold) }
         viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM) }

@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.controllers.core.flow.Action
 import com.simprints.face.controllers.core.flow.MasterFlowManager
+import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import io.mockk.every
@@ -15,14 +16,15 @@ import org.junit.Test
 import java.io.Serializable
 
 class FaceMatchViewModelTest {
-    private val masterFlowManager: MasterFlowManager = mockk()
     private val mockQuery: Serializable = mockk()
     private val verifyProbe = FaceSample("tsu-123-verify", "tsu-123-verify".toByteArray())
     private val identifyProbe = FaceSample("tsu-123-identify", "tsu-123-identify".toByteArray())
     private val verifyRequest = FaceMatchRequest(listOf(verifyProbe), mockQuery)
     private val identifyRequest = FaceMatchRequest(listOf(identifyProbe), mockQuery)
 
-    private val viewModel: FaceMatchViewModel = FaceMatchViewModel(masterFlowManager)
+    private val faceDbManager: FaceDbManager = mockk()
+    private val masterFlowManager: MasterFlowManager = mockk()
+    private val viewModel: FaceMatchViewModel = FaceMatchViewModel(masterFlowManager, faceDbManager)
 
     @get:Rule
     val rule = InstantTaskExecutorRule()

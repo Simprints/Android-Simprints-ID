@@ -4,11 +4,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.face.controllers.core.flow.Action
 import com.simprints.face.controllers.core.flow.MasterFlowManager
+import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import java.io.Serializable
 
-class FaceMatchViewModel(private val masterFlowManager: MasterFlowManager) : ViewModel() {
+class FaceMatchViewModel(
+    private val masterFlowManager: MasterFlowManager,
+    private val faceDbManager: FaceDbManager
+) : ViewModel() {
     private lateinit var probeFaceSamples: List<FaceSample>
     private lateinit var queryForCandidates: Serializable
 
