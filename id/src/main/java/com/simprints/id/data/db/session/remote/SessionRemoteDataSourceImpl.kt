@@ -1,14 +1,12 @@
 package com.simprints.id.data.db.session.remote
 
-import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.remote.session.ApiSessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
-import com.simprints.id.tools.utils.retrySimNetworkCalls
+import com.simprints.id.network.SimApiClient
+import com.simprints.id.network.SimApiClientFactory
 
 class SessionRemoteDataSourceImpl(
-    private val remoteDbManager: RemoteDbManager,
     private val simApiClientFactory: SimApiClientFactory
 ) : SessionRemoteDataSource {
 
@@ -18,20 +16,21 @@ class SessionRemoteDataSourceImpl(
             throw NoSessionsFoundException()
         }
 
-        makeNetworkRequest({ sessionsRemoteInterface ->
+        executeCall("uploadSessionsBatch") { sessionsRemoteInterface ->
             sessionsRemoteInterface.uploadSessions(
                 projectId,
                 hashMapOf("sessions" to sessions.map { ApiSessionEvents(it) }.toTypedArray())
             )
-        }, "uploadSessionsBatch")
+        }
     }
 
-    private suspend fun <T> makeNetworkRequest(block: suspend (client: SessionsRemoteInterface) -> T, traceName: String): T =
-        retrySimNetworkCalls(getSessionsApiClient(), block, traceName)
+    private suspend fun <T> executeCall(nameCall: String, block: suspend (SessionsRemoteInterface) -> T): T =
+        with(getSessionsApiClient()) {
+            executeCall(nameCall) {
+                block(it)
+            }
+        }
 
-    internal suspend fun getSessionsApiClient(): SessionsRemoteInterface {
-        val token = remoteDbManager.getCurrentToken()
-        return simApiClientFactory.build<SessionsRemoteInterface>(token).api
-    }
-
+    suspend fun getSessionsApiClient(): SimApiClient<SessionsRemoteInterface> =
+        simApiClientFactory.buildClient(SessionsRemoteInterface::class)
 }
