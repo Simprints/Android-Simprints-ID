@@ -202,24 +202,6 @@ flows:
                     -   step: *run-face-android-tests
                     -   step: *run-fingerprint-android-tests
 
-    -   flow: &pr-flow
-            -   step:
-                    script:
-                        - if [ "${BITBUCKET_PR_DESTINATION_BRANCH}" != "master" ] || [ "${BITBUCKET_PR_DESTINATION_BRANCH}" != "develop" ]; then printf 'not a target branch we want to check'; exit; fi
-            -   parallel:
-                    -   step: *run-clientapi-unit-tests
-                    -   step: *run-id-unit-tests
-                    -   step: *run-face-unit-tests
-                    -   step: *run-fingerprint-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *build-and-sign-universal-apk
-            -   parallel:
-                    -   step: *upload-sonar-scan-and-check-quality-gate
-                    -   step: *run-clientapi-android-tests-on-gcloud-image
-                    -   step: *run-id-android-tests-on-gcloud-image
-                    -   step: *run-face-android-tests
-                    -   step: *run-fingerprint-android-tests
-
 ######################################################################
 # Define the triggers that launch the pipeline.
 ######################################################################
@@ -229,6 +211,6 @@ pipelines:
         develop: *main-flow
         ci/*: *main-flow
     pull-requests:
-        '**': *pr-flow
+        '**': *main-flow
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere
