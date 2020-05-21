@@ -8,8 +8,6 @@ import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -23,6 +21,7 @@ import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.commontesttools.di.TestSyncModule
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
@@ -38,6 +37,8 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.response.A
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.*
@@ -77,14 +78,21 @@ class PeopleSyncIntegrationTest {
 
     private val app: Application = ApplicationProvider.getApplicationContext()
 
-    @Inject lateinit var personRemoteDataSourceSpy: PersonRemoteDataSource
-    @Inject lateinit var personLocalDataSourceSpy: PersonLocalDataSource
-    @Inject lateinit var downSyncScopeRepositorySpy: PeopleDownSyncScopeRepository
-    @Inject lateinit var peopleSyncManager: PeopleSyncManager
+    @Inject
+    lateinit var personRemoteDataSourceSpy: PersonRemoteDataSource
+    @Inject
+    lateinit var personLocalDataSourceSpy: PersonLocalDataSource
+    @Inject
+    lateinit var downSyncScopeRepositorySpy: PeopleDownSyncScopeRepository
+    @Inject
+    lateinit var peopleSyncManager: PeopleSyncManager
 
-    @MockK lateinit var loginInfoManagerMock: LoginInfoManager
-    @MockK lateinit var secureLocalDbKeyProviderMock: SecureLocalDbKeyProvider
-    @MockK lateinit var legacyLocalDbKeyProviderMock: LegacyLocalDbKeyProvider
+    @MockK
+    lateinit var loginInfoManagerMock: LoginInfoManager
+    @MockK
+    lateinit var secureLocalDbKeyProviderMock: SecureLocalDbKeyProvider
+    @MockK
+    lateinit var legacyLocalDbKeyProviderMock: LegacyLocalDbKeyProvider
 
     private val appModule by lazy {
         TestAppModule(
@@ -112,20 +120,26 @@ class PeopleSyncIntegrationTest {
         mockServer.start()
         mockServer.dispatcher = mockDispatcher
 
-        val mockBaseUrlProvider = mockk<BaseUrlProvider>()
-        every { mockBaseUrlProvider.getApiBaseUrl() } returns mockServer.url("/").toString()
-        val remotePeopleApi = SimApiClientFactory(
+        runBlocking {
+            val mockBaseUrlProvider = mockk<BaseUrlProvider>()
+            every { mockBaseUrlProvider.getApiBaseUrl() } returns mockServer.url("/").toString()
+
+            val mockRemoteDbManager = mockk<RemoteDbManager>()
+            coEvery { mockRemoteDbManager.getCurrentToken() } returns "token"
+
+            val remotePeopleApi = SimApiClientFactoryImpl(
                 mockBaseUrlProvider,
-                "deviceId"
-        ).build<PeopleRemoteInterface>().api
-
-        coEvery { personRemoteDataSourceSpy.getPeopleApiClient() } returns remotePeopleApi
-        every { downSyncScopeRepositorySpy.getDownSyncScope() } returns projectSyncScope
-        every { secureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } returns DEFAULT_LOCAL_DB_KEY
-        every { legacyLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } returns DEFAULT_LOCAL_DB_KEY
-        every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
-        every { loginInfoManagerMock.getSignedInUserIdOrEmpty() } returns DEFAULT_USER_ID
-
+                "deviceId",
+                mockRemoteDbManager
+            ).buildClient(PeopleRemoteInterface::class)
+            
+            coEvery { personRemoteDataSourceSpy.getPeopleApiClient() } returns remotePeopleApi
+            every { downSyncScopeRepositorySpy.getDownSyncScope() } returns projectSyncScope
+            every { secureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } returns DEFAULT_LOCAL_DB_KEY
+            every { legacyLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } returns DEFAULT_LOCAL_DB_KEY
+            every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+            every { loginInfoManagerMock.getSignedInUserIdOrEmpty() } returns DEFAULT_USER_ID
+        }
     }
 
     @Test
@@ -257,32 +271,32 @@ class PeopleSyncIntegrationTest {
         }
 
 
-private fun mockResponsesForSync(scope: PeopleDownSyncScope): Int {
-    val ops = runBlocking { downSyncScopeRepositorySpy.getDownSyncOperations(scope) }
-    val apiPeopleToDownload = ops.map {
-        val peopleToDownload = getRandomPeople(N_TO_DOWNLOAD_PER_MODULE, it, listOf(false))
-        peopleToDownload.map { person ->
-            person.fromDomainToGetApi()
-        }.sortedBy { apiGetPerson ->
-            apiGetPerson.updatedAt
-        }
-    }.flatten()
+    private fun mockResponsesForSync(scope: PeopleDownSyncScope): Int {
+        val ops = runBlocking { downSyncScopeRepositorySpy.getDownSyncOperations(scope) }
+        val apiPeopleToDownload = ops.map {
+            val peopleToDownload = getRandomPeople(N_TO_DOWNLOAD_PER_MODULE, it, listOf(false))
+            peopleToDownload.map { person ->
+                person.fromDomainToGetApi()
+            }.sortedBy { apiGetPerson ->
+                apiGetPerson.updatedAt
+            }
+        }.flatten()
 
-    val countResponse = ApiPeopleOperationsResponse(listOf(PeopleCount(apiPeopleToDownload.size, 0, 0)).map {
-        ApiPeopleOperationGroupResponse(ApiPeopleOperationCounts(it.created, it.deleted, it.updated))
-    })
+        val countResponse = ApiPeopleOperationsResponse(listOf(PeopleCount(apiPeopleToDownload.size, 0, 0)).map {
+            ApiPeopleOperationGroupResponse(ApiPeopleOperationCounts(it.created, it.deleted, it.updated))
+        })
 
-    mockDispatcher.downResponse = 200 to apiPeopleToDownload
-    mockDispatcher.countResponse = 200 to countResponse
+        mockDispatcher.downResponse = 200 to apiPeopleToDownload
+        mockDispatcher.countResponse = 200 to countResponse
 
-    return apiPeopleToDownload.size
-}
+        return apiPeopleToDownload.size
+    }
 
 
-private fun mockUploadPeople() {
-    val ops = runBlocking { downSyncScopeRepositorySpy.getDownSyncOperations(projectSyncScope) }
-    coEvery { personLocalDataSourceSpy.load(any()) } returns getRandomPeople(N_TO_UPLOAD, ops.first(), listOf(true)).asFlow()
-}
+    private fun mockUploadPeople() {
+        val ops = runBlocking { downSyncScopeRepositorySpy.getDownSyncOperations(projectSyncScope) }
+        coEvery { personLocalDataSourceSpy.load(any()) } returns getRandomPeople(N_TO_UPLOAD, ops.first(), listOf(true)).asFlow()
+    }
 }
 
 class MockDispatcher : Dispatcher() {

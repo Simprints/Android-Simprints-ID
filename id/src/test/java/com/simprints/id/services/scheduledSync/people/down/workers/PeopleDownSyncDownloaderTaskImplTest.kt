@@ -3,8 +3,6 @@ package com.simprints.id.services.scheduledSync.people.down.workers
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
@@ -28,6 +26,8 @@ import com.simprints.id.data.db.person.remote.models.ApiModes
 import com.simprints.id.data.db.person.remote.models.fromDomainToGetApi
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -92,11 +92,16 @@ class PeopleDownSyncDownloaderTaskImplTest {
     private val syncOpsInFakeDb = mutableListOf<PeopleDownSyncOperation>()
 
     private lateinit var remoteDbManagerSpy: RemoteDbManager
-    @RelaxedMockK lateinit var personRemoteDataSourceMock: PersonRemoteDataSource
-    @RelaxedMockK lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
-    @RelaxedMockK lateinit var personLocalDataSourceMock: PersonLocalDataSource
-    @RelaxedMockK lateinit var peopleSyncCache: PeopleSyncCache
-    @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
+    @RelaxedMockK
+    lateinit var personRemoteDataSourceMock: PersonRemoteDataSource
+    @RelaxedMockK
+    lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
+    @RelaxedMockK
+    lateinit var personLocalDataSourceMock: PersonLocalDataSource
+    @RelaxedMockK
+    lateinit var peopleSyncCache: PeopleSyncCache
+    @MockK
+    lateinit var mockBaseUrlProvider: BaseUrlProvider
 
     private val module by lazy {
         TestAppModule(app,
@@ -123,12 +128,15 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
         every { mockBaseUrlProvider.getApiBaseUrl() } returns mockServer.url("/").toString()
 
-        val remotePeopleApi = SimApiClientFactory(
-            mockBaseUrlProvider,
-            "deviceId"
-        ).build<PeopleRemoteInterface>().api
+        runBlocking {
+            val client = SimApiClientFactoryImpl(
+                mockBaseUrlProvider,
+                "deviceId",
+                remoteDbManagerSpy
+            ).buildClient(PeopleRemoteInterface::class)
 
-        coEvery { personRemoteDataSourceMock.getPeopleApiClient() } returns remotePeopleApi
+            coEvery { personRemoteDataSourceMock.getPeopleApiClient() } returns client
+        }
     }
 
     @Test
@@ -269,20 +277,6 @@ class PeopleDownSyncDownloaderTaskImplTest {
         }
     }
 
-
-    @Test
-    fun downSyncRequestFailsDueToNetworkIssue_shouldRetry() {
-        runBlocking {
-            val clientMock = mockClientToThrowFirstAndThenExecuteNetworkCall()
-            coEvery { personRemoteDataSourceMock.getPeopleApiClient() } returns clientMock
-
-            runDownSyncAndVerifyConditions(100, 0, projectSyncOp)
-
-            assertThat(mockServer.requestCount).isEqualTo(1)
-            coVerify(exactly = 2) { clientMock.downSync(any(), any(), any(), any(), any(), any()) }
-        }
-    }
-
     @Test
     fun downSyncRequestFailsDueToMalformedJson_shouldSaveTheWellFormedElements() {
         runBlocking {
@@ -319,11 +313,13 @@ class PeopleDownSyncDownloaderTaskImplTest {
         return response
     }
 
-    private fun mockClientToThrowFirstAndThenExecuteNetworkCall(): PeopleRemoteInterface {
-        val remotePeopleApi = SimApiClientFactory(
+    private suspend fun mockClientToThrowFirstAndThenExecuteNetworkCall(): PeopleRemoteInterface {
+        val remotePeopleApi = SimApiClientFactoryImpl(
             mockBaseUrlProvider,
-            "deviceId"
-        ).build<PeopleRemoteInterface>().api
+            "deviceId",
+            remoteDbManagerSpy
+        ).buildClient(PeopleRemoteInterface::class).api
+
         return mockk {
             coEvery { downSync(any(), any(), any(), any(), any(), any()) } throws Throwable("Network issue") coAndThen {
                 remotePeopleApi.downSync(
