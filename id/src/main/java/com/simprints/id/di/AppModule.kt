@@ -3,8 +3,6 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
@@ -59,6 +57,9 @@ import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactory
+import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
@@ -195,8 +196,9 @@ open class AppModule {
     @Provides
     open fun provideSimApiClientFactory(
         ctx: Context,
+        remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider
-    ) = SimApiClientFactory(baseUrlProvider, ctx.deviceId)
+    ): SimApiClientFactory = SimApiClientFactoryImpl(baseUrlProvider, ctx.deviceId, remoteDbManager)
 
     @Provides
     @Singleton
@@ -237,10 +239,8 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideSessionEventsRemoteDbManager(
-        remoteDbManager: RemoteDbManager,
         simApiClientFactory: SimApiClientFactory
     ): SessionRemoteDataSource = SessionRemoteDataSourceImpl(
-        remoteDbManager,
         simApiClientFactory
     )
 

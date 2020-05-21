@@ -1,22 +1,20 @@
 package com.simprints.id.commontesttools.state
 
-import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.NetworkConstants
-import com.simprints.id.network.SimApiClientFactory
+import com.simprints.id.network.*
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import io.mockk.every
 import io.mockk.mockk
 
-fun replaceSecureApiClientWithFailingClientProvider() = createFailingApiClient<SecureApiInterface>()
+suspend fun replaceSecureApiClientWithFailingClientProvider() = createFailingApiClient<SecureApiInterface>()
 
-inline fun <reified T> createFailingApiClient(): T {
+suspend inline fun <reified T : SimRemoteInterface> createFailingApiClient(): T {
     val mockBaseUrlProvider: BaseUrlProvider = mockk()
     every { mockBaseUrlProvider.getApiBaseUrl() } returns NetworkConstants.DEFAULT_BASE_URL
-    val apiClient = SimApiClientFactory(mockBaseUrlProvider, "deviceId")
+    val apiClient = SimApiClientFactoryImpl(mockBaseUrlProvider, "deviceId", mockk(relaxed = true)).buildClient(T::class) as SimApiClientImpl<T>
 
     return createMockBehaviorService(
-        apiClient.build<SecureApiInterface>().retrofit,
+        apiClient.retrofit,
         100,
         T::class.java
     ).returningResponse(null)
