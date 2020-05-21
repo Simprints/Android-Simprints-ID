@@ -49,8 +49,7 @@ class CypressOtaHelperTest {
     fun performCypressOta_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() {
         val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { CypressOtaStep.TransferInProgress(it) } +
-            listOf(CypressOtaStep.ReconnectingAfterTransfer, CypressOtaStep.ValidatingNewFirmwareVersion,
-                CypressOtaStep.ReconnectingAfterValidating, CypressOtaStep.UpdatingUnifiedVersionInformation)
+            listOf(CypressOtaStep.ReconnectingAfterTransfer, CypressOtaStep.ValidatingNewFirmwareVersion, CypressOtaStep.UpdatingUnifiedVersionInformation)
 
         val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address").test()
 

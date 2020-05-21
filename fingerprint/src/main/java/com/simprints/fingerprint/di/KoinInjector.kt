@@ -9,6 +9,7 @@ import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
 import com.simprints.fingerprint.activities.collect.domain.FingerOrderDeterminer
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.nfcpair.NfcPairViewModel
+import com.simprints.fingerprint.activities.connect.issues.ota.OtaViewModel
 import com.simprints.fingerprint.activities.connect.issues.serialentrypair.SerialEntryPairViewModel
 import com.simprints.fingerprint.activities.matching.MatchingViewModel
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorViewModel
@@ -37,10 +38,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBu
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.controllers.v2.ConnectionHelper
-import com.simprints.fingerprint.scanner.controllers.v2.CypressOtaHelper
-import com.simprints.fingerprint.scanner.controllers.v2.ScannerInitialSetupHelper
-import com.simprints.fingerprint.scanner.controllers.v2.StmOtaHelper
+import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.data.FirmwareFileManager
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
@@ -52,6 +50,7 @@ import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
+import org.koin.android.ext.koin.androidContext
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
@@ -110,11 +109,12 @@ object KoinInjector {
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
         single { ScannerPairingManager(get()) }
-        single { FirmwareFileManager() }
+        single { FirmwareFileManager(androidContext()) }
         single { ScannerInitialSetupHelper(get()) }
         single { ConnectionHelper(get()) }
         single { CypressOtaHelper(get(), get()) }
         single { StmOtaHelper(get(), get()) }
+        single { Un20OtaHelper(get(), get()) }
         single<ScannerFactory> { ScannerFactoryImpl(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
         single<ScannerManager> { ScannerManagerImpl(get(), get(), get(), get()) }
 
@@ -141,5 +141,6 @@ object KoinInjector {
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
+        viewModel { OtaViewModel(get()) }
     }
 }

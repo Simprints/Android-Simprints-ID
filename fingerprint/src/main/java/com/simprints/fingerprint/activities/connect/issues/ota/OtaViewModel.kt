@@ -22,16 +22,26 @@ class OtaViewModel(
 
     @SuppressLint("CheckResult")
     fun startOta(availableOtas: List<AvailableOta>) {
-        Observable.concat(availableOtas.map {
-            when (it) {
-                AvailableOta.CYPRESS -> scannerManager.scannerObservable { performCypressOta() }
-                AvailableOta.STM -> scannerManager.scannerObservable { performStmOta() }
-                AvailableOta.UN20 -> scannerManager.scannerObservable { performUn20Ota() }
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
-            onNext = { otaStep -> progress.postValue(otaStep.totalProgress) },
-            onComplete = { otaComplete.postEvent() },
-            onError = { Timber.e(it) }
-        )
+        scannerManager.scanner { disconnect() }
+            .andThen(scannerManager.scanner { connect() })
+            .andThen(Observable.concat(availableOtas.map {
+                when (it) {
+                    AvailableOta.CYPRESS -> scannerManager.scannerObservable { performCypressOta() }
+                    AvailableOta.STM -> scannerManager.scannerObservable { performStmOta() }
+                    AvailableOta.UN20 -> scannerManager.scannerObservable { performUn20Ota() }
+                }
+            })).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
+                onNext = { otaStep -> progress.postValue(otaStep.totalProgress) },
+                onComplete = {
+                    progress.postValue(1f)
+                    otaComplete.postEvent()
+                },
+                onError = ::handleScannerError
+            )
+    }
+
+    private fun handleScannerError(e: Throwable) {
+        // TODO : Show OTA failed cases
+        Timber.e(e)
     }
 }

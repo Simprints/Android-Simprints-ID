@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.FirmwareFileManager
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
+import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
@@ -38,6 +39,21 @@ class ScannerInitialSetupHelperTest {
         val testSubscriber = scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock) {}.test()
 
         testSubscriber.awaitAndAssertSuccess()
+    }
+
+    @Test
+    fun ifVersionsContainsUnknowns_throwsCorrectOtaAvailableException() {
+        every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+        every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns SCANNER_VERSION_HIGH.toScannerVersion().firmware.copy(
+            stm = ChipFirmwareVersion.UNKNOWN, un20 = ChipFirmwareVersion.UNKNOWN
+        )
+
+        val testSubscriber = scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock) {}.test()
+
+        testSubscriber.awaitTerminalEvent()
+        testSubscriber.assertError { e ->
+            e is OtaAvailableException && e.availableOtas.containsAll(listOf(AvailableOta.CYPRESS))
+        }
     }
 
     @Test

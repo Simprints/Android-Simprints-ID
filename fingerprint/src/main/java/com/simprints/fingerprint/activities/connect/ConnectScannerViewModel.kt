@@ -150,8 +150,6 @@ class ConnectScannerViewModel(
                 scannerManager.lastPairedScannerId?.let { showScannerErrorDialogWithScannerId.postEvent(it) }
             is OtaAvailableException ->
                 connectScannerIssue.postEvent(ConnectScannerIssue.Ota(OtaFragmentRequest(e.availableOtas)))
-            is OtaFailedException ->
-                TODO()
             is BluetoothNotSupportedException ->
                 launchAlert.postEvent(BLUETOOTH_NOT_SUPPORTED)
             is ScannerLowBatteryException ->

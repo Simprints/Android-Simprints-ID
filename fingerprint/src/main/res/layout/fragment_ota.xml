@@ -75,7 +75,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="@string/scanner_off_instructions"
+        android:text="Updating scanner..."
         android:textColor="@color/simprints_white"
         android:textSize="22sp"
         android:visibility="invisible"
