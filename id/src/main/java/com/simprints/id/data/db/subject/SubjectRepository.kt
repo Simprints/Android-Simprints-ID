@@ -17,7 +17,7 @@ interface SubjectRepository : SubjectLocalDataSource, FingerprintIdentityLocalDa
     suspend fun countToDownSync(subjectsDownSyncScope: SubjectsDownSyncScope): SubjectsCount
 
     suspend fun saveAndUpload(subject: Subject)
-    suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): SubjectFetchResult
+    suspend fun loadFromRemoteIfNeeded(projectId: String, subjectId: String): SubjectFetchResult
 
 
     suspend fun performUploadWithProgress(scope: CoroutineScope): ReceiveChannel<SubjectsUpSyncProgress>
