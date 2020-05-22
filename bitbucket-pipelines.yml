@@ -187,8 +187,9 @@ definitions:
                 name: "Run Face android tests"
                 image: google/cloud-sdk:slim
                 script:
+                    - unzip apks.zip
                     - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_all_android_tests universal.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk id:id-debug-androidTest.apk
+                    - bash ./ci/pipeline/run_all_android_tests universal.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
                 artifacts:
                     - ci/pipeline/test-reports/**
 
@@ -197,14 +198,15 @@ definitions:
 ######################################################################
 flows:
     -   flow: &main-flow
-            -   parallel:
+            step: *run-all-android-tests
+            #-   parallel:
                     #-   step: *run-clientapi-unit-tests
                     #-   step: *run-id-unit-tests
                     #-   step: *run-face-unit-tests
                     #-   step: *run-fingerprint-unit-tests
                     #-   step: *run-fingerprintscanner-unit-tests
-                    -   step: *build-and-sign-universal-apk
-            -   parallel:
+                    #-   step: *build-and-sign-universal-apk
+            #-   parallel:
                     #-   step: *upload-sonar-scan-and-check-quality-gate
                     #-   step: *run-clientapi-android-tests-on-gcloud-image
                     #-   step: *run-id-android-tests-on-gcloud-image
