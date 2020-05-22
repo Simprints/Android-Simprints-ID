@@ -135,6 +135,8 @@ function print_state {
 		cat $root_path/logs_tmp
 		cp $root_path/logs_tmp $root_path/logs
 	fi
+
+	cat $root_path/fingerprint/logs/firebase_logs
 }
 
 # Prints an overview of the test runners
@@ -143,7 +145,7 @@ function monitor {
 	printf "\n\n"
 	mkfile "$root_path/logs"
 
-	while sleep 1; do
+	while sleep 10; do
 		print_state $modules_arg	
 
 		local modules_still_running=`cat $root_path/logs | grep -e "Running" -e "Uploading" | wc -l`
