@@ -154,13 +154,13 @@ definitions:
         # Run All Android tests on Firebase test lab.
         ######################################################################
         -   step: &run-all-android-tests
-                name: "Run Face android tests"
+                name: "Run android tests"
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
                     - mv ./*.apk ./ci/pipeline/
                     - cd ./ci/pipeline/
-                    - ./run_all_android_tests universal.apk id:id-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
+                    - ./run_all_android_tests.sh universal.apk id:id-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
                 artifacts:
                     - ci/pipeline/test-reports/**
 
