@@ -73,10 +73,9 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
             signingConfig signingConfigs.release
+            buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
         }
-        releaseWithLogfile {
-            initWith release
-        }
+
         debug {
             minifyEnabled false
             ext.enableCrashlytics = false
@@ -85,15 +84,19 @@ android {
             versionNameSuffix "-dev"
             manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
             signingConfig signingConfigs.debug
+            buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
         }
     }
 
-    applicationVariants.all { variant ->
-        if (variant.buildType.name == "release" ||
-            variant.buildType.name == "releaseWithLogfile") {
-            buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
-        } else if (variant.buildType.name == "debug") {
-            buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
+    flavorDimensions "mode"
+
+    productFlavors {
+        standard {
+            dimension "mode"
+        }
+
+        withLogFile {
+            dimension "mode"
         }
     }
 

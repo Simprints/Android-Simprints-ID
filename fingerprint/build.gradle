@@ -23,8 +23,17 @@ android {
         release {
             proguardFiles 'proguard-rules-dynamic-features.pro'
         }
-        releaseWithLogfile {
-            initWith release
+    }
+
+    flavorDimensions "mode"
+
+    productFlavors {
+        standard {
+            dimension "mode"
+        }
+
+        withLogFile {
+            dimension "mode"
         }
     }
 

@@ -25,11 +25,21 @@ android {
             // in Dynamic Features, aapt doesn't pull them out from the Manifest as it does with the base model
             //proguardFiles 'proguard-rules-dynamic-features.pro'
         }
-        releaseWithLogfile {
-            initWith release
-        }
+
         debug {
             testCoverageEnabled true
+        }
+    }
+
+    flavorDimensions "mode"
+
+    productFlavors {
+        standard {
+            dimension "mode"
+        }
+
+        withLogFile {
+            dimension "mode"
         }
     }
 
