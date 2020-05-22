@@ -44,10 +44,22 @@ class FaceMatchViewModel(
             }
         }
 
+        val candidates = loadCandidates()
+        val results = matchCandidates(candidates)
+        sendSortedResults(results)
+    }
+
+    private suspend fun loadCandidates(): List<FaceIdentity> {
         matchState.value = MatchState.LOADING_CANDIDATES
-        val candidates = faceDbManager.loadPeople(queryForCandidates)
+        return faceDbManager.loadPeople(queryForCandidates)
+    }
+
+    private suspend fun matchCandidates(candidates: List<FaceIdentity>): List<FaceMatchResult> {
         matchState.value = MatchState.MATCHING
-        val results = getMatchResultsForCandidates(candidates)
+        return getMatchResultsForCandidates(candidates)
+    }
+
+    private fun sendSortedResults(results: List<FaceMatchResult>) {
         matchState.value = MatchState.FINISHED
         sortedResults.send(results.sortedByDescending { it.confidence })
     }
