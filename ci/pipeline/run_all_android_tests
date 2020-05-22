@@ -137,7 +137,7 @@ function monitor {
 	local modules_arg=("$@")
 	printf "\n\n"
 
-	while sleep 1; do
+	while sleep 30; do
 		print_state $modules_arg	
 
 		local result=`cat $root_path/logs | grep -e "Running" -e "Uploading" | wc -l`
