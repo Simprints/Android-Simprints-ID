@@ -189,6 +189,8 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup_gcloud
                     - bash ./ci/pipeline/run_all_android_tests universal.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk id:id-debug-androidTest.apk
+                artifacts:
+                    - ci/pipeline/test-reports/**
 
 ######################################################################
 # Define the different pipelines flows as anchors.

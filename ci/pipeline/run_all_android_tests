@@ -46,10 +46,13 @@ function exist_in_file {
 # Uploading/Running/Failed/Completed
 function get_test_state {	
 	local logs=$(echo $logs | sed "s/@/$1/")
+	local reports_path=$(echo $root_path/$1)
+
+	if [ -d $reports_path ] && [$(find $reports_path -name "*xml" | wc -l) -eq 1 ]; then echo "\xE2\x9C\x85 Completed"; return; fi
 
 	local to_search="TEST_AXIS_VALUE"
 	local found=$(exist_in_file $logs "$to_search") 
-	if [ $found -eq 1 ]; then echo "\xE2\x9C\x85 Completed"; return; fi
+	if [ $found -eq 1 ]; then echo "\xE2\x9C\x85 Storing results"; return; fi
 
 	local to_search="Error"
 	local found=$(exist_in_file $logs "$to_search") 
@@ -89,6 +92,11 @@ function get_gs_url {
     echo "Google Storage: $url"
 } 
 
+# Extracts log file for a specific module ($1)
+function get_log_file {
+	echo $(echo $logs | sed "s/@/$module/")
+}
+
 function check_if_still_running {
 	local result=`ps aux | grep -i "single_runner" | grep -v "grep" | wc -l`
 	if [ $result -ge 1 ]
@@ -100,21 +108,24 @@ function check_if_still_running {
 }
 
 function print_state {
-	tput rc
-	tput cup 1 0
-	tput clear
 	
+	echo "" > $root_path/logs
+
 	for module in "${modules_arg[@]}"
     do
     	local name_text="# Module: $module"
+    	local log_text="# Log file: $(get_log_file $module)"
     	local state_text="# State: $(get_test_state $module)"
     	local report_text="# Reports:"
     	local report_firebase_text="\t$(get_firebase_url $module)"
     	local report_gs_text="\t$(get_gs_url $module)"
     	local output_text="$(get_test_output $module)"
 
-    	printf "$name_text \n$state_text \n$output_text \n$report_text \n$report_gs_text \n$report_firebase_text \n\n"
+    	printf "$name_text \n$log_text \n$state_text \n$output_text \n$report_text \n$report_gs_text \n$report_firebase_text \n\n" >> $root_path/logs
     done	
+
+	clear && printf '\e[3J'
+   	cat $root_path/logs
 }
 
 function monitor {
@@ -125,10 +136,10 @@ function monitor {
 	while sleep 1; do
 		print_state $modules_arg	
 
-		local result=`ps aux | grep -i "$single_runner" | grep -v "grep" | wc -l`
+		local result=`cat $root_path/logs | grep -e "Running" -e "Uploading" | wc -l`
 		if [ $result -le 0 ]
 	   	then
-	   		"Tests done!"
+	   		echo "Tests done!"
 	        exit 1
 		fi		
 	done
@@ -149,7 +160,7 @@ do
 		modules+=("$module")
 		test_apk=$(get_module_apk $arg)
 
-		logs_module=$(echo $logs | sed "s/@/$module/")
+		logs_module=$(get_log_file $module)
 		mkfile $logs_module
 		echo "Processing $arg $logs_module"
 
