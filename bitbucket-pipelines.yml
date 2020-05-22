@@ -188,10 +188,8 @@ definitions:
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
-                    - apt-get update && apt-get install --yes watch
                     - cd ./ci/pipeline/
-                    - nohup bash ./run_all_android_tests universal.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk &>/dev/null &
-                    - watch -n 5 -d cat test-reports/logs
+                    - ./run_all_android_tests universal.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
                 artifacts:
                     - ci/pipeline/test-reports/**
 
