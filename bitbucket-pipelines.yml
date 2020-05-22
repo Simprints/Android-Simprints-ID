@@ -204,7 +204,7 @@ flows:
                     #-   step: *run-face-unit-tests
                     #-   step: *run-fingerprint-unit-tests
                     #-   step: *run-fingerprintscanner-unit-tests
-                    #-   step: *build-and-sign-universal-apk
+                    -   step: *build-and-sign-universal-apk
             -   parallel:
                     #-   step: *upload-sonar-scan-and-check-quality-gate
                     #-   step: *run-clientapi-android-tests-on-gcloud-image
