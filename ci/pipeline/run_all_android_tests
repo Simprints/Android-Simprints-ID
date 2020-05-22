@@ -131,7 +131,6 @@ function print_state {
 
 	clear && printf '\e[3J'
    	cat $root_path/logs
-   	cat test-reports/face/logs/firebase_logs
 }
 
 function monitor {
