@@ -188,7 +188,8 @@ definitions:
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_all_android_tests universal.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
+                    - cd ./ci/pipeline/
+                    - bash ./run_all_android_tests universal.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
                 artifacts:
                     - ci/pipeline/test-reports/**
 
