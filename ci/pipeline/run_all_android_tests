@@ -7,7 +7,9 @@ if [ "help" = "$1" ]; then
 fi
 
 if [ "stop" = "$1" ]; then 
+	echo "Stopping all gcloud instances...."
 	for pid in $(ps -ef | awk '/gcloud/ {print $2}'); do kill -9 $pid; done
+	exit 1
 fi
 
 clear 
@@ -114,8 +116,14 @@ function check_if_still_running {
 
 function print_state {
 	
-	echo "" > $root_path/logs
 
+	echo "" > $root_path/logs_tmp
+
+	printf "\n\n\n" >> $root_path/logs_tmp
+	echo "######################################################################" >> $root_path/logs_tmp
+    echo "# Run Android tests on Firebase test lab." >> $root_path/logs_tmp
+    echo "######################################################################" >> $root_path/logs_tmp
+        
 	for module in "${modules_arg[@]}"
     do
     	local name_text="# Module: $module"
@@ -126,26 +134,30 @@ function print_state {
     	local report_gs_text="\t$(get_gs_url $module)"
     	local output_text="$(get_test_output $module)"
 
-    	printf "$name_text \n$log_text \n$state_text \n$output_text \n$report_text \n$report_gs_text \n$report_firebase_text \n\n" >> $root_path/logs
+    	printf "$name_text \n$log_text \n$state_text \n$output_text \n$report_text \n$report_gs_text \n$report_firebase_text \n\n" >> $root_path/logs_tmp
     done	
-
-	clear && printf '\e[3J'
-   	cat $root_path/logs
-   	#cat test-reports/clientapi/logs/firebase_logs
+ 
+    if ! diff -q "$root_path/logs" "$root_path/logs_tmp"; then
+		clear && printf '\e[3J'
+		cat $root_path/logs
+		cat $root_path/logs_tmp
+		cp $root_path/logs_tmp $root_path/logs
+	fi
 }
 
 function monitor {
 	local modules_arg=("$@")
 	printf "\n\n"
+	mkfile "$root_path/logs"
 
-	while sleep 30; do
+	while sleep 1; do
 		print_state $modules_arg	
 
 		local result=`cat $root_path/logs | grep -e "Running" -e "Uploading" | wc -l`
 		if [ $result -le 0 ]
 	   	then
 	   		echo "Tests done!"
-	        for file in $root_path/*; do if [ "$(grep -c '<failure' "${file}")" -gt 0 ]; then exit 1; fi; done
+	        if [ "$(grep -c 'Failed' "${root_path/logs}")" -gt 0 ]; then exit 1; fi 
 	        exit 0
 		fi		
 	done

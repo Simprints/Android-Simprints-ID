@@ -144,45 +144,8 @@ definitions:
                     - face-debug-androidTest.apk
 
         ######################################################################
-        # Run ID Android tests on Firebase test lab.
+        # Run All Android tests on Firebase test lab.
         ######################################################################
-        -   step: &run-id-android-tests-on-gcloud-image
-                name: "Run Id android tests"
-                image: google/cloud-sdk:slim
-                script:
-                    - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk id-debug-androidTest.apk
-
-        ######################################################################
-        # Run Client API Android tests on Firebase test lab.
-        ######################################################################
-        -   step: &run-clientapi-android-tests-on-gcloud-image
-                name: "Run ClientApi android tests"
-                image: google/cloud-sdk:slim
-                script:
-                    - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk clientapi-debug-androidTest.apk
-
-        ######################################################################
-        # Run Fingerprint Android tests on Firebase test lab.
-        ######################################################################
-        -   step: &run-fingerprint-android-tests
-                name: "Run Fingerprint android tests"
-                image: google/cloud-sdk:slim
-                script:
-                    - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk fingerprint-debug-androidTest.apk
-
-        ######################################################################
-        # Run Face Android tests on Firebase test lab.
-        ######################################################################
-        -   step: &run-face-android-tests
-                name: "Run Face android tests"
-                image: google/cloud-sdk:slim
-                script:
-                    - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk face-debug-androidTest.apk
-
         -   step: &run-all-android-tests
                 name: "Run Face android tests"
                 image: google/cloud-sdk:slim
@@ -200,18 +163,13 @@ definitions:
 flows:
     -   flow: &main-flow
             -   parallel:
-                    #-   step: *run-clientapi-unit-tests
-                    #-   step: *run-id-unit-tests
-                    #-   step: *run-face-unit-tests
-                    #-   step: *run-fingerprint-unit-tests
-                    #-   step: *run-fingerprintscanner-unit-tests
+                    -   step: *run-clientapi-unit-tests
+                    -   step: *run-id-unit-tests
+                    -   step: *run-face-unit-tests
+                    -   step: *run-fingerprint-unit-tests
+                    -   step: *run-fingerprintscanner-unit-tests
                     -   step: *build-and-sign-universal-apk
             -   parallel:
-                    #-   step: *upload-sonar-scan-and-check-quality-gate
-                    #-   step: *run-clientapi-android-tests-on-gcloud-image
-                    #-   step: *run-id-android-tests-on-gcloud-image
-                    #-   step: *run-face-android-tests
-                    #-   step: *run-fingerprint-android-tests
                      -   step: *run-all-android-tests
 
 ######################################################################
