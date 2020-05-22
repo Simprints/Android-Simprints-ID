@@ -198,7 +198,6 @@ definitions:
 ######################################################################
 flows:
     -   flow: &main-flow
-            step: *run-all-android-tests
             #-   parallel:
                     #-   step: *run-clientapi-unit-tests
                     #-   step: *run-id-unit-tests
@@ -206,13 +205,13 @@ flows:
                     #-   step: *run-fingerprint-unit-tests
                     #-   step: *run-fingerprintscanner-unit-tests
                     #-   step: *build-and-sign-universal-apk
-            #-   parallel:
+            -   parallel:
                     #-   step: *upload-sonar-scan-and-check-quality-gate
                     #-   step: *run-clientapi-android-tests-on-gcloud-image
                     #-   step: *run-id-android-tests-on-gcloud-image
                     #-   step: *run-face-android-tests
                     #-   step: *run-fingerprint-android-tests
-                    # -   step: *run-all-android-tests
+                     -   step: *run-all-android-tests
 
 ######################################################################
 # Define the triggers that launch the pipeline.
