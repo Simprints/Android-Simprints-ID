@@ -34,7 +34,6 @@ testing/logs/
 google-services.json
 
 # Built application files
-*.apk
 *.ap_
 *.aab
 

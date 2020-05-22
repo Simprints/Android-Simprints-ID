@@ -187,7 +187,6 @@ definitions:
                 name: "Run Face android tests"
                 image: google/cloud-sdk:slim
                 script:
-                    - unzip apks.zip
                     - bash ./ci/pipeline/setup_gcloud
                     - bash ./ci/pipeline/run_all_android_tests universal.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
                 artifacts:
