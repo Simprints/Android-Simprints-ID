@@ -189,7 +189,7 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup_gcloud
                     - cd ./ci/pipeline/
-                    - ./run_all_android_tests universal.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
+                    - ./run_all_android_tests universal.apk id:id-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
                 artifacts:
                     - ci/pipeline/test-reports/**
 
