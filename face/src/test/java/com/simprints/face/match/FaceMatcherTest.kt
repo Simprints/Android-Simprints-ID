@@ -12,7 +12,6 @@ import org.junit.Test
 class FaceMatcherTest {
     private val faceMatcher = spyk(MockFaceMatcher())
     private val candidate1 = PeopleGenerator.getFaceIdentity(2)
-    private val candidate2 = PeopleGenerator.getFaceIdentity(2)
     private val probes = generateSequenceN(2) { PeopleGenerator.getFaceSample() }.toList()
 
     @Test
