@@ -35,6 +35,8 @@ google-services.json
 
 # Built application files
 *.ap_
+*.apk
+*.apks
 *.aab
 
 # Files for the ART/Dalvik VM
