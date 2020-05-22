@@ -149,7 +149,7 @@ function monitor {
 		if [ $modules_still_running -le 0 ]
 	   	then
 	   		echo "Tests done!"
-			local found=$(exist_in_file $root_path/logs "Passed") 
+			local found=$(exist_in_file $root_path/logs "Failed") 
 			if [ $found -eq 1 ]; then 
 				exit 1
 			fi 
