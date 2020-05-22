@@ -148,12 +148,14 @@ function monitor {
 		local modules_still_running=`cat $root_path/logs | grep -e "Running" -e "Uploading" | wc -l`
 		if [ $modules_still_running -le 0 ]
 	   	then
-	   		echo "Tests done!"
-			local found=$(exist_in_file $root_path/logs "Failed") 
-			if [ $found -eq 1 ]; then 
+			local found_failed=$(exist_in_file $root_path/logs "Failed")
+			local found_error=$(exist_in_file $root_path/logs "Error")  
+			if [ $found_failed -eq 1 ] || [ $found_error -eq 1 ]; then
+				echo "Tests failed!"
 				exit 1
 			fi 
-
+			
+			echo "Tests passed!"
 			exit 0
 		fi		
 	done
