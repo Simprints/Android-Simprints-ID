@@ -131,12 +131,9 @@ function print_state {
  	
     if ! diff -q "$root_path/logs" "$root_path/logs_tmp"; then
 		clear && printf '\e[3J'
-		cat $root_path/logs
-		cat $root_path/logs_tmp
 		cp $root_path/logs_tmp $root_path/logs
+		cat $root_path/logs
 	fi
-
-	cat $root_path/fingerprint/logs/firebase_logs
 }
 
 # Prints an overview of the test runners
@@ -152,8 +149,12 @@ function monitor {
 		if [ $modules_still_running -le 0 ]
 	   	then
 	   		echo "Tests done!"
-	        if [ "$(grep -c 'Failed' "${root_path/logs}")" -gt 0 ]; then exit 1; fi 
-	        exit 0
+			local found=$(exist_in_file $root_path/logs "Passed") 
+			if [ $found -eq 1 ]; then 
+				exit 1
+			fi 
+
+			exit 0
 		fi		
 	done
 }
@@ -181,7 +182,7 @@ do
     		echo "Test apk $test_apk doesn't exist"
     		exit 1
 		else 
-	    	nohup ./run_firebase_test_lab $module $main_apk $test_apk $device $n_attemps_per_module &>/dev/null &
+	    	nohup ./$single_runner $module $main_apk $test_apk $device $n_attemps_per_module &>/dev/null &
 	    fi
 	fi
 done
