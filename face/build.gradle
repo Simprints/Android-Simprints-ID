@@ -17,11 +17,20 @@ android {
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
     buildTypes {
-        releaseWithLogfile {
-            initWith release
-        }
         debug {
             testCoverageEnabled true
+        }
+    }
+
+    flavorDimensions "mode"
+
+    productFlavors {
+        standard {
+            dimension "mode"
+        }
+
+        withLogFile {
+            dimension "mode"
         }
     }
 
