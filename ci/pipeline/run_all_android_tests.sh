@@ -15,14 +15,17 @@ fi
 clear 
 
 ######################################################################
-# Common config for all tests
+# Config
 ######################################################################
         
-single_runner="run_firebase_test_lab"
+single_runner="run_firebase_test_lab.sh"
 device="walleye,version=28,locale=en,orientation=portrait"
 n_attemps_per_module="1"
 root_path="test-reports"
-logs="$root_path/@/logs/firebase_logs"
+template_module_log_file="$root_path/@/logs/firebase_logs"
+
+######################################################################
+
 
 # Initialisations
 rm -Rf $root_path
@@ -52,7 +55,7 @@ function exist_in_file {
 # Figures out the state of the FTL instance for a specific module: 
 # Uploading/Running/Failed/Completed
 function get_test_state {	
-	local logs=$(echo $logs | sed "s/@/$1/")
+	local logs=$(echo $template_module_log_file | sed "s/@/$1/")
 	local reports_path=$(echo $root_path/$1)
 
 	if [ -d $reports_path ] && [ $(find $reports_path -name "*xml" | wc -l) -eq 1 ]; then echo "\xE2\x9C\x85 Completed"; return; fi
@@ -74,7 +77,7 @@ function get_test_state {
 
 # Extracts the tests results from the FTL output
 function get_test_output {
-    local module_logs=$(echo $logs | sed "s/@/$1/")
+    local module_logs=$(echo $template_module_log_file | sed "s/@/$1/")
 
 	local to_search="TEST_DETAILS"
 	local found=$(exist_in_file $module_logs "$to_search") 
@@ -87,35 +90,24 @@ function get_test_output {
 
 # Extracts Firebase URL with the test results
 function get_firebase_url {
-    local module_logs=$(echo $logs | sed "s/@/$1/")
+    local module_logs=$(echo $template_module_log_file | sed "s/@/$1/")
     local url=`grep -o 'https://console.firebase.google.com/project/simprints-android-ci/.*]' $module_logs | head -n 1 | sed 's/.$//'`
     echo "Firebase: $url"
 } 
 
 # Extracts Google Storage URL with the test results
 function get_gs_url {
-    local module_logs=$(echo $logs | sed "s/@/$1/")
+    local module_logs=$(echo $template_module_log_file | sed "s/@/$1/")
     local url=`grep -o 'https://console.developers.google.com/storage/.*/' $module_logs | head -n 1`
     echo "Google Storage: $url"
 } 
 
 # Extracts log file for a specific module ($1)
 function get_log_file {
-	echo $(echo $logs | sed "s/@/$module/")
-}
-
-function check_if_still_running {
-	local result=`ps aux | grep -i "single_runner" | grep -v "grep" | wc -l`
-	if [ $result -ge 1 ]
-   	then
-        echo 0
-   	else
-        echo 1
-	fi
+	echo $(echo $template_module_log_file | sed "s/@/$module/")
 }
 
 function print_state {
-	
 
 	echo "" > $root_path/logs_tmp
 
@@ -136,7 +128,7 @@ function print_state {
 
     	printf "$name_text \n$log_text \n$state_text \n$output_text \n$report_text \n$report_gs_text \n$report_firebase_text \n\n" >> $root_path/logs_tmp
     done	
- 
+ 	
     if ! diff -q "$root_path/logs" "$root_path/logs_tmp"; then
 		clear && printf '\e[3J'
 		cat $root_path/logs
@@ -145,6 +137,7 @@ function print_state {
 	fi
 }
 
+# Prints an overview of the test runners
 function monitor {
 	local modules_arg=("$@")
 	printf "\n\n"
@@ -153,8 +146,8 @@ function monitor {
 	while sleep 1; do
 		print_state $modules_arg	
 
-		local result=`cat $root_path/logs | grep -e "Running" -e "Uploading" | wc -l`
-		if [ $result -le 0 ]
+		local modules_still_running=`cat $root_path/logs | grep -e "Running" -e "Uploading" | wc -l`
+		if [ $modules_still_running -le 0 ]
 	   	then
 	   		echo "Tests done!"
 	        if [ "$(grep -c 'Failed' "${root_path/logs}")" -gt 0 ]; then exit 1; fi 
@@ -175,13 +168,12 @@ do
 	    continue
 	else
 		module=$(get_module_name $arg)
-		modules+=("$module")
 		test_apk=$(get_module_apk $arg)
+		modules+=("$module")
 
 		logs_module=$(get_log_file $module)
 		mkfile $logs_module
 		echo "Processing $arg $logs_module"
-
 
 		if [ ! -f $test_apk ]; then
     		echo "Test apk $test_apk doesn't exist"
@@ -193,4 +185,4 @@ do
 done
 
 monitor "${modules[@]}"
-exit 1
+exit 0
