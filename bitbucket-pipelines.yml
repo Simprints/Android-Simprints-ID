@@ -188,6 +188,7 @@ definitions:
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
+                    - mv ./*.apk ./ci/pipeline/
                     - cd ./ci/pipeline/
                     - ./run_all_android_tests universal.apk id:id-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
                 artifacts:
@@ -198,7 +199,7 @@ definitions:
 ######################################################################
 flows:
     -   flow: &main-flow
-            #-   parallel:
+            -   parallel:
                     #-   step: *run-clientapi-unit-tests
                     #-   step: *run-id-unit-tests
                     #-   step: *run-face-unit-tests
