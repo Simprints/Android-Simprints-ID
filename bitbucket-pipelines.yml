@@ -177,7 +177,8 @@ flows:
                     -   step: *run-fingerprintscanner-unit-tests
                     -   step: *build-and-sign-universal-apk
             -   parallel:
-                     -   step: *run-all-android-tests
+                    -   step: *upload-sonar-scan-and-check-quality-gate
+                    -   step: *run-all-android-tests
 
 ######################################################################
 # Define the triggers that launch the pipeline.
