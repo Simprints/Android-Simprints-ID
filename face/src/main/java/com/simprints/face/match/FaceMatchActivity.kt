@@ -28,7 +28,7 @@ class FaceMatchActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        vm.sortedResults.observe(this, LiveDataEventWithContentObserver {
+        vm.faceMatchResponse.observe(this, LiveDataEventWithContentObserver {
             val intent = Intent().apply { putExtra(IFaceResponse.BUNDLE_KEY, it) }
             setResult(Activity.RESULT_OK, intent)
             finish()
