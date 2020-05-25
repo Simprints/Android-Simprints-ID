@@ -39,17 +39,9 @@ class FaceMatchViewModel(
         probeFaceSamples = faceRequest.probeFaceSamples
         queryForCandidates = faceRequest.queryForCandidates
 
-        when (masterFlowManager.getCurrentAction()) {
-            Action.IDENTIFY -> {
-                matchState.value = MatchState.NOT_STARTED_IDENTIFY
-            }
-            Action.VERIFY -> {
-                matchState.value = MatchState.NOT_STARTED_VERIFY
-            }
-            else -> {
-                matchState.value = MatchState.ERROR
-                return@launch
-            }
+        if (masterFlowManager.getCurrentAction() == Action.ENROL) {
+            matchState.value = MatchState.ERROR
+            return@launch
         }
 
         val candidates = loadCandidates()
@@ -89,6 +81,6 @@ class FaceMatchViewModel(
         }
 
     enum class MatchState {
-        NOT_STARTED_IDENTIFY, NOT_STARTED_VERIFY, LOADING_CANDIDATES, MATCHING, FINISHED, ERROR
+        NOT_STARTED, LOADING_CANDIDATES, MATCHING, FINISHED, ERROR
     }
 }
