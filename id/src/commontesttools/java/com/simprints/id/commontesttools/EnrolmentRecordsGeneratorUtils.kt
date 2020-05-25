@@ -81,7 +81,8 @@ object EnrolmentRecordsGeneratorUtils {
                                        userId: String,
                                        moduleId: String) =
         EnrolmentRecordMovePayload(
-            buildFakeEnrolmentRecordCreation(subjectId, projectId, userId, moduleId),
+            buildFakeEnrolmentRecordCreation(subjectId, projectId,
+                DefaultTestConstants.DEFAULT_USER_ID_2, DefaultTestConstants.DEFAULT_MODULE_ID_2),
             buildFakeEnrolmentDeletion(subjectId, projectId, userId, moduleId)
         )
 }
