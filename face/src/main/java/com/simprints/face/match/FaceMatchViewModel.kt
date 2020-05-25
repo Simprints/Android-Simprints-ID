@@ -12,6 +12,7 @@ import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.data.db.person.FaceIdentity
 import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
+import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -28,8 +29,9 @@ class FaceMatchViewModel(
     private lateinit var queryForCandidates: Serializable
 
     val matchState: MutableLiveData<MatchState> = MutableLiveData()
-    val sortedResults: MutableLiveData<LiveDataEventWithContent<List<FaceMatchResult>>> =
+    val sortedResults: MutableLiveData<LiveDataEventWithContent<FaceMatchResponse>> =
         MutableLiveData()
+    private val returnCount = 10
 
     fun setupMatch(faceRequest: FaceMatchRequest) = viewModelScope.launch {
         probeFaceSamples = faceRequest.probeFaceSamples
@@ -65,7 +67,9 @@ class FaceMatchViewModel(
 
     private suspend fun sendSortedResults(results: Flow<FaceMatchResult>) {
         matchState.value = MatchState.FINISHED
-        sortedResults.send(results.toList().sortedByDescending { it.confidence })
+        val response = FaceMatchResponse(results.toList().sortedByDescending { it.confidence }
+            .take(returnCount))
+        sortedResults.send(response)
     }
 
     /**

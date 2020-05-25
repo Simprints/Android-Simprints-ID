@@ -83,8 +83,9 @@ class FaceOrchestratorActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == CAPTURE_REQUEST) {
-                viewModel.captureFinished(data?.getParcelableExtra(IFaceResponse.BUNDLE_KEY))
+            when (requestCode) {
+                CAPTURE_REQUEST -> viewModel.captureFinished(data?.getParcelableExtra(IFaceResponse.BUNDLE_KEY))
+                MATCH_REQUEST -> viewModel.matchFinished(data?.getParcelableExtra(IFaceResponse.BUNDLE_KEY))
             }
         } else {
             setResult(Activity.RESULT_CANCELED)
