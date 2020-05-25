@@ -7,6 +7,18 @@
     android:padding="@dimen/margin_large"
     tools:context="com.simprints.face.match.FaceMatchActivity">
 
+    <TextView
+        android:id="@+id/face_match_please_wait"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/face_match_progress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Loading candidates…" />
+
     <ProgressBar
         android:id="@+id/face_match_progress"
         style="@android:style/Widget.ProgressBar.Horizontal"
@@ -17,9 +29,68 @@
         android:max="100"
         android:progress="0"
         android:progressDrawable="@drawable/matching_progress_bar"
+        app:layout_constraintBottom_toTopOf="@+id/face_match_tv_matchingProgressStatus1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/face_match_please_wait"
+        tools:progress="50" />
+
+    <TextView
+        android:id="@+id/face_match_tv_matchingProgressStatus1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/face_match_tv_matchingProgressStatus2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/face_match_progress"
+        tools:text="Loaded 100 candidates" />
+
+    <TextView
+        android:id="@+id/face_match_tv_matchingProgressStatus2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/face_match_tv_matchingResultStatus1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/face_match_tv_matchingProgressStatus1"
+        tools:text="Matching candidates…" />
+
+    <TextView
+        android:id="@+id/face_match_tv_matchingResultStatus1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/face_match_tv_matchingResultStatus2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/face_match_tv_matchingProgressStatus2"
+        tools:text="10 very good matches" />
+
+    <TextView
+        android:id="@+id/face_match_tv_matchingResultStatus2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/face_match_tv_matchingResultStatus3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/face_match_tv_matchingResultStatus1"
+        tools:text="10 good matches" />
+
+    <TextView
+        android:id="@+id/face_match_tv_matchingResultStatus3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/face_match_tv_matchingResultStatus2"
+        tools:text="10 matches" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
