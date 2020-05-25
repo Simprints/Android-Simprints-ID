@@ -37,4 +37,28 @@
     <string name="matching_x_records">Matching against %s records</string>
     <string name="why_did_you_skip_face_capture">Why did you skip face capture?</string>
     <string name="exit_form_return_to_face_capture">Capture face</string>
+
+    <!--  Matching activity  -->
+    <string name="face_match_please_wait">Please wait while we proceed to identification</string>
+    <string name="face_match_loading_candidates">Loading candidates…</string>
+    <string name="face_match_matching_candidates">Matching candidates</string>
+    <string name="face_match_matched_candidates_quantity_key" translatable="false">face_match_matched_candidates</string>
+    <string name="face_match_matched_candidates_one">Compared to %d candidate.</string>
+    <string name="face_match_matched_candidates_other">Compared to %d candidates.</string>
+
+    <string name="face_match_returned_results_quantity_key" translatable="false">face_match_returned_results</string>
+    <string name="face_match_returned_results_one">Returned %d results.</string>
+    <string name="face_match_returned_results_other">Returned %d results.</string>
+    <string name="face_match_tier1or2_matches_quantity_key" translatable="false">face_match_tier1or2_matches</string>
+    <string name="face_match_tier1or2_matches_zero">No very good matches</string>
+    <string name="face_match_tier1or2_matches_one">%d very good match</string>
+    <string name="face_match_tier1or2_matches_other">%d very good matches</string>
+    <string name="face_match_tier3_matches_quantity_key" translatable="false">face_match_tier3_matches</string>
+    <string name="face_match_tier3_matches_zero">No good matches</string>
+    <string name="face_match_tier3_matches_one">%d good match</string>
+    <string name="face_match_tier3_matches_other">%d good matches</string>
+    <string name="face_match_tier4_matches_quantity_key" translatable="false">face_match_tier4_matches</string>
+    <string name="face_match_tier4_matches_zero">No matches</string>
+    <string name="face_match_tier4_matches_one">%d match</string>
+    <string name="face_match_tier4_matches_other">%d matches</string>
 </resources>
