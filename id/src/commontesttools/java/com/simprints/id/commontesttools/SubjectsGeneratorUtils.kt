@@ -18,7 +18,7 @@ object SubjectsGeneratorUtils {
                     getRandomSubject(
                         UUID.randomUUID().toString(),
                         downSyncOp.projectId,
-                        downSyncOp.userId ?: "",
+                        downSyncOp.attendantId ?: "",
                         downSyncOp.moduleId ?: "",
                         toSync.takeRandom()))
             }

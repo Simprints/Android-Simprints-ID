@@ -23,7 +23,7 @@ class SubjectsDownSyncOperationFactoryImplTest {
     fun testBuildProjectSyncOperation() {
         val op = builder.buildProjectSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_MODES, null)
         assertThat(op.projectId).isEqualTo(DEFAULT_PROJECT_ID)
-        assertThat(op.userId).isNull()
+        assertThat(op.attendantId).isNull()
         assertThat(op.moduleId).isNull()
         assertThat(op.modes).isEqualTo(DEFAULT_MODES)
         assertThat(op.lastResult).isNull()
@@ -33,7 +33,7 @@ class SubjectsDownSyncOperationFactoryImplTest {
     fun testBuildUserSyncOperation() {
         val op = builder.buildUserSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODES, null)
         assertThat(op.projectId).isEqualTo(DEFAULT_PROJECT_ID)
-        assertThat(op.userId).isEqualTo(DEFAULT_USER_ID)
+        assertThat(op.attendantId).isEqualTo(DEFAULT_USER_ID)
         assertThat(op.moduleId).isNull()
         assertThat(op.modes).isEqualTo(DEFAULT_MODES)
         assertThat(op.lastResult).isNull()
@@ -43,7 +43,7 @@ class SubjectsDownSyncOperationFactoryImplTest {
     fun testBuildModuleSyncOperation() {
         val op = builder.buildModuleSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_MODES, result)
         assertThat(op.projectId).isEqualTo(DEFAULT_PROJECT_ID)
-        assertThat(op.userId).isNull()
+        assertThat(op.attendantId).isNull()
         assertThat(op.moduleId).isEqualTo(DEFAULT_MODULE_ID)
         assertThat(op.modes).isEqualTo(DEFAULT_MODES)
         assertThat(op.lastResult).isEqualTo(result)
