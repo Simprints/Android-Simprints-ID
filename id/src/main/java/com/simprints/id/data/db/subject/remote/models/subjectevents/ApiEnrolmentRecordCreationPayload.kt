@@ -14,5 +14,5 @@ data class ApiEnrolmentRecordCreationPayload(
 
     constructor(payload: EnrolmentRecordCreationPayload) :
         this(payload.subjectId, payload.projectId, payload.moduleId,
-            payload.attendantId, payload.biometricReferences?.map { it.fromDomainToApi() })
+            payload.attendantId, payload.biometricReferences.map { it.fromDomainToApi() })
 }

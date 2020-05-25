@@ -2,6 +2,7 @@ package com.simprints.id.data.db.subject
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
+import com.google.gson.JsonArray
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
@@ -222,6 +223,23 @@ class SubjectRepositoryDownSyncHelperImplTest {
         }
     }
 
+    @Test
+    fun downloadingSubjectsWithNoBiometricRefs_shouldNotSave() {
+        runBlocking {
+            val nEventsWithBiometricRefs = 30
+            mockEventRemoteDataSourceWithNullBiometricRefs(nEventsWithBiometricRefs)
+
+            val downSyncHelper =
+                SubjectRepositoryDownSyncHelperImpl(subjectLocalDataSource, eventRemoteDataSource,
+                    subjectsDownSyncScopeRepository, timeHelper)
+
+            withContext(Dispatchers.IO) {
+                downSyncHelper.performDownSyncWithProgress(this, projectSyncOp, mockk(relaxed = true)).testChannel()
+                coVerify(exactly = 0) { subjectLocalDataSource.insertOrUpdate(any()) }
+            }
+        }
+    }
+
     private fun runDownSyncAndVerifyConditions(nEventsToDownload: Int,
                                                nEventsToDelete: Int,
                                                nEventsToUpdate: Int,
@@ -301,6 +319,23 @@ class SubjectRepositoryDownSyncHelperImplTest {
         val responseString = beginString + "id\"" + endString
 
         return responseString.toResponseBody().byteStream()
+    }
+
+    private fun mockEventRemoteDataSourceWithNullBiometricRefs(nEventsToDownload: Int) {
+        val creationEvents = getRandomCreationEvents(nEventsToDownload)
+
+        coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildResponseWithoutBiometricRefs(creationEvents)
+    }
+
+    private fun buildResponseWithoutBiometricRefs(events: List<ApiEvent>): InputStream {
+        val jsonArray = SimJsonHelper.gson.toJsonTree(events).asJsonArray
+        jsonArray.forEach {
+            it.asJsonObject.get("payload").asJsonObject.remove("biometricReferences")
+        }
+
+        val jsonString = jsonArray.toString()
+
+        return jsonString.toResponseBody().byteStream()
     }
 
     private fun mockDownSyncScopeRepository() {
