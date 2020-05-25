@@ -26,6 +26,9 @@ class FlowKtTest {
      *
      * The test also uses virtual time to check the real time elapsed since it is running inside a
      * blockingTest block.
+     *
+     * Unfortunately, there is no way to run the test in real world time to make sure the overhead
+     * of creating the parallel flows will account for less than the sequential processing.
      */
     @Test
     fun `compare sequential vs parallel processing`() = testCoroutineRule.runBlockingTest {

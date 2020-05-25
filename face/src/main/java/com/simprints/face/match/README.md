@@ -24,9 +24,17 @@ For response, SimprintsID expects a MatchResult comprising of a guid and confide
 What is being done is during a comparison of probes against a candidate, only the highest score of all is kept and added to the MatchResult.
 
 Example:
+```
 probe1 x candidate1.face1 = 0.7
 probe1 x candidate1.face2 = 0.6
 probe2 x candidate1.face1 = 0.8
 probe2 x candidate1.face2 = 0.1
+```
 
 The value 0.8 will be the one assigned to candidate1 MatchResult.
+
+# Concurrency
+
+Because the process of matching can be expensive - it needs to match `n` probes against `f` candidate faces - we tried to run it in parallel. That way, we can run multiple matchings at the same time. Also, since the list will be ordered later, we don't need to care about the order that the results are returned as well.
+
+There is a bit of overhead when creating a new flow so there is a [test](../../../../../../../../core/src/test/java/com/simprints/core/tools/extentions/FlowKtTest.kt) that proves that even if the operation takes 1 millisecond, running in parallel it is times faster than sequential (not counting the overhead).
