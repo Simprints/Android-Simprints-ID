@@ -8,7 +8,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.extentions.concurrentMap
-import com.simprints.face.controllers.core.flow.Action
+import com.simprints.face.controllers.core.flow.Action.*
 import com.simprints.face.controllers.core.flow.MasterFlowManager
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.data.db.person.FaceIdentity
@@ -28,27 +28,39 @@ class FaceMatchViewModel(
     private val faceMatcher: FaceMatcher,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
+    companion object {
+        const val verifyReturnCount = 1
+        const val identifyReturnCount = 10
+        const val veryGoodMatchThreshold = 50.0
+        const val goodMatchThreshold = 35.0
+        const val fairMatchThreshold = 20.0
+        const val matchingEndWaitTimeInMillis = 1000L
+    }
+
     private lateinit var probeFaceSamples: List<FaceSample>
     private lateinit var queryForCandidates: Serializable
 
     val matchState: MutableLiveData<MatchState> = MutableLiveData(MatchState.NotStarted)
     val faceMatchResponse: MutableLiveData<LiveDataEventWithContent<FaceMatchResponse>> =
         MutableLiveData()
-    private val returnCount = 10
-    private val veryGoodMatchThreshold = 50.0
-    private val goodMatchThreshold = 35.0
-    private val fairMatchThreshold = 20.0
-    private val matchingEndWaitTimeInMillis = 1000L
-
+    var returnCount = 1
     private var candidatesMatched = 0
 
     fun setupMatch(faceRequest: FaceMatchRequest) = viewModelScope.launch {
         probeFaceSamples = faceRequest.probeFaceSamples
         queryForCandidates = faceRequest.queryForCandidates
 
-        if (masterFlowManager.getCurrentAction() == Action.ENROL) {
-            matchState.value = MatchState.Error
-            return@launch
+        when (masterFlowManager.getCurrentAction()) {
+            ENROL -> {
+                matchState.value = MatchState.Error
+                return@launch
+            }
+            IDENTIFY -> {
+                returnCount = identifyReturnCount
+            }
+            VERIFY -> {
+                returnCount = verifyReturnCount
+            }
         }
 
         val candidates = loadCandidates()
