@@ -5,7 +5,7 @@ import com.simprints.id.data.db.subject.domain.Subject.Companion.buildSubjectFro
 import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordMovePayload
-import com.simprints.id.data.db.subject.domain.subjectevents.fromApiToDomain
+import com.simprints.id.data.db.subject.domain.subjectevents.fromApiToDomainOrNullIfNoBiometricReferences
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordCreationPayload
@@ -109,18 +109,24 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
 
     private suspend fun filterBatchOfPeopleToSyncWithLocal(batchOfEvents: List<ApiEvent>, moduleId: String?) {
         val batchOfPeopleToSaveInLocal =
-            batchOfEvents.filter { it.payload is ApiEnrolmentRecordCreationPayload }.map {
-                it.fromApiToDomain().payload as EnrolmentRecordCreationPayload
+            batchOfEvents.filter { it.payload is ApiEnrolmentRecordCreationPayload }.mapNotNull { apiEvent ->
+                apiEvent.fromApiToDomainOrNullIfNoBiometricReferences()?.let {
+                    it.payload as EnrolmentRecordCreationPayload
+                }
             }
 
         val eventRecordsToBeDeleted =
-            batchOfEvents.filter { it.payload is ApiEnrolmentRecordDeletionPayload }.map {
-                it.fromApiToDomain().payload as EnrolmentRecordDeletionPayload
+            batchOfEvents.filter { it.payload is ApiEnrolmentRecordDeletionPayload }.mapNotNull { apiEvent ->
+                apiEvent.fromApiToDomainOrNullIfNoBiometricReferences()?.let {
+                    it.payload as EnrolmentRecordDeletionPayload
+                }
             }
 
         val eventRecordsToMove =
-            batchOfEvents.filter { it.payload is ApiEnrolmentRecordMovePayload }.map {
-                it.fromApiToDomain().payload as EnrolmentRecordMovePayload
+            batchOfEvents.filter { it.payload is ApiEnrolmentRecordMovePayload }.mapNotNull { apiEvent ->
+                apiEvent.fromApiToDomainOrNullIfNoBiometricReferences()?.let {
+                    it.payload as EnrolmentRecordMovePayload
+                }
             }
 
         savePeopleBatchInLocal(batchOfPeopleToSaveInLocal)
@@ -143,7 +149,7 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
     private suspend fun movePeopleBatchesInLocal(eventRecordsToMove: List<EnrolmentRecordMovePayload>, moduleId: String?) {
         if (eventRecordsToMove.isNotEmpty()) {
             deletePeopleBatchFromLocal(getRecordsToBeDeletedFilteredByModuleIfNotNull(eventRecordsToMove, moduleId))
-            savePeopleBatchInLocal(getRecordsToBeSavedFilteredByModuleIfNotNull(eventRecordsToMove, moduleId))
+            savePeopleBatchInLocal(getRecordsToBeSavedFilteredByModuleIfNotNull(eventRecordsToMove, moduleId).filterNotNull())
         }
     }
 
@@ -158,7 +164,7 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
     private fun getRecordsToBeSavedFilteredByModuleIfNotNull(eventRecordsToMove: List<EnrolmentRecordMovePayload>,
                                                              moduleId: String?) =
         if (moduleId != null) {
-            eventRecordsToMove.map { it.enrolmentRecordCreation }.filter { it.moduleId == moduleId }
+            eventRecordsToMove.mapNotNull { it.enrolmentRecordCreation }.filter { it.moduleId == moduleId }
         } else {
             eventRecordsToMove.map { it.enrolmentRecordCreation }
         }

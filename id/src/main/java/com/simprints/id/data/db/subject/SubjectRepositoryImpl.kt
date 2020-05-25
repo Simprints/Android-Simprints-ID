@@ -9,7 +9,7 @@ import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.Subject.Companion.buildSubjectFromCreationPayload
 import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.*
-import com.simprints.id.data.db.subject.domain.subjectevents.fromApiToDomain
+import com.simprints.id.data.db.subject.domain.subjectevents.fromApiToDomainOrNullIfNoBiometricReferences
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
@@ -75,9 +75,11 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
         val reader = setupJsonReaderFromResponseStream(inputStream)
         return if (reader.hasNext()) {
             val apiEvent: ApiEvent = SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java)
-            val event = apiEvent.fromApiToDomain()
-            val subject = buildSubjectFromCreationPayload(event.payload as EnrolmentRecordCreationPayload)
-            SubjectFetchResult(subject, REMOTE)
+            val event = apiEvent.fromApiToDomainOrNullIfNoBiometricReferences()
+            event?.let {
+                val subject = buildSubjectFromCreationPayload(event.payload as EnrolmentRecordCreationPayload)
+                SubjectFetchResult(subject, REMOTE)
+            } ?: SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
         } else {
             SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
         }
