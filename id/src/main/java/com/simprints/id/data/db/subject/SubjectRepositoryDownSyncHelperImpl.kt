@@ -59,19 +59,19 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
                         bufferToSave.add(it)
                         if (bufferToSave.size > BATCH_SIZE_FOR_DOWNLOADING) {
                             this.send(SubjectsDownSyncProgress(bufferToSave.size))
-                            saveBatch(bufferToSave, downSyncOperation.moduleId)
+                            saveBatch(bufferToSave, downSyncOperation.moduleId, downSyncOperation.attendantId)
                         }
                     }
                 }
 
-                saveBatch(bufferToSave, downSyncOperation.moduleId)
+                saveBatch(bufferToSave, downSyncOperation.moduleId, downSyncOperation.attendantId)
                 updateDownSyncInfo(COMPLETE)
                 finishDownload(reader)
 
             } catch (t: Throwable) {
                 Timber.d(t)
                 t.printStackTrace()
-                saveBatch(bufferToSave, downSyncOperation.moduleId)
+                saveBatch(bufferToSave, downSyncOperation.moduleId, downSyncOperation.attendantId)
                 finishDownload(reader)
                 updateDownSyncInfo(FAILED)
                 throw t
@@ -95,19 +95,21 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
             }
         }
 
-    private suspend fun saveBatch(batch: MutableList<ApiEvent>, moduleId: String?) {
-        saveBatchAndUpdateDownSyncStatus(batch, moduleId)
+    private suspend fun saveBatch(batch: MutableList<ApiEvent>, moduleId: String?, attendantId: String?) {
+        saveBatchAndUpdateDownSyncStatus(batch, moduleId, attendantId)
         batch.clear()
     }
 
-    private suspend fun saveBatchAndUpdateDownSyncStatus(batchOfPeople: List<ApiEvent>, moduleId: String?) {
-        filterBatchOfPeopleToSyncWithLocal(batchOfPeople, moduleId)
+    private suspend fun saveBatchAndUpdateDownSyncStatus(batchOfPeople: List<ApiEvent>,
+                                                         moduleId: String?, attendantId: String?) {
+        filterBatchOfPeopleToSyncWithLocal(batchOfPeople, moduleId, attendantId)
         Timber.tag(SYNC_LOG_TAG).d("Saved batch(${batchOfPeople.size}) for $downSyncOperation")
 
         updateDownSyncInfo(RUNNING, batchOfPeople.lastOrNull(), Date())
     }
 
-    private suspend fun filterBatchOfPeopleToSyncWithLocal(batchOfEvents: List<ApiEvent>, moduleId: String?) {
+    private suspend fun filterBatchOfPeopleToSyncWithLocal(batchOfEvents: List<ApiEvent>,
+                                                           moduleId: String?, attendantId: String?) {
         val batchOfPeopleToSaveInLocal =
             batchOfEvents.filter { it.payload is ApiEnrolmentRecordCreationPayload }.mapNotNull { apiEvent ->
                 apiEvent.fromApiToDomainOrNullIfNoBiometricReferences()?.let {
@@ -131,7 +133,7 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
 
         savePeopleBatchInLocal(batchOfPeopleToSaveInLocal)
         deletePeopleBatchFromLocal(eventRecordsToBeDeleted)
-        movePeopleBatchesInLocal(eventRecordsToMove, moduleId)
+        movePeopleBatchesInLocal(eventRecordsToMove, moduleId, attendantId)
     }
 
     private suspend fun savePeopleBatchInLocal(batchOfEventsToSaveInLocal: List<EnrolmentRecordCreationPayload>) {
@@ -146,28 +148,41 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
         }
     }
 
-    private suspend fun movePeopleBatchesInLocal(eventRecordsToMove: List<EnrolmentRecordMovePayload>, moduleId: String?) {
+    private suspend fun movePeopleBatchesInLocal(eventRecordsToMove: List<EnrolmentRecordMovePayload>,
+                                                 moduleId: String?, attendantId: String?) {
         if (eventRecordsToMove.isNotEmpty()) {
-            deletePeopleBatchFromLocal(getRecordsToBeDeletedFilteredByModuleIfNotNull(eventRecordsToMove, moduleId))
-            savePeopleBatchInLocal(getRecordsToBeSavedFilteredByModuleIfNotNull(eventRecordsToMove, moduleId).filterNotNull())
+            when {
+                moduleId != null -> {
+                    deletePeopleBatchFromLocal(getRecordsToBeDeletedFilteredByModule(eventRecordsToMove, moduleId))
+                    savePeopleBatchInLocal(getRecordsToBeSavedFilteredByModule(eventRecordsToMove, moduleId))
+                }
+                attendantId != null -> {
+                    deletePeopleBatchFromLocal(getRecordsToBeDeletedFilteredByUser(eventRecordsToMove, attendantId))
+                    savePeopleBatchInLocal(getRecordsToBeSavedFilteredByUser(eventRecordsToMove, attendantId))
+                }
+                else -> {
+                    deletePeopleBatchFromLocal(eventRecordsToMove.map { it.enrolmentRecordDeletion })
+                    savePeopleBatchInLocal(eventRecordsToMove.mapNotNull { it.enrolmentRecordCreation })
+                }
+            }
         }
     }
 
-    private fun getRecordsToBeDeletedFilteredByModuleIfNotNull(eventRecordsToMove: List<EnrolmentRecordMovePayload>,
-                                                               moduleId: String?) =
-        if (moduleId != null) {
+    private fun getRecordsToBeDeletedFilteredByModule(eventRecordsToMove: List<EnrolmentRecordMovePayload>,
+                                                      moduleId: String) =
             eventRecordsToMove.map { it.enrolmentRecordDeletion }.filter { it.moduleId == moduleId }
-        } else {
-            eventRecordsToMove.map { it.enrolmentRecordDeletion }
-        }
 
-    private fun getRecordsToBeSavedFilteredByModuleIfNotNull(eventRecordsToMove: List<EnrolmentRecordMovePayload>,
-                                                             moduleId: String?) =
-        if (moduleId != null) {
+    private fun getRecordsToBeSavedFilteredByModule(eventRecordsToMove: List<EnrolmentRecordMovePayload>,
+                                                    moduleId: String) =
             eventRecordsToMove.mapNotNull { it.enrolmentRecordCreation }.filter { it.moduleId == moduleId }
-        } else {
-            eventRecordsToMove.map { it.enrolmentRecordCreation }
-        }
+
+    private fun getRecordsToBeDeletedFilteredByUser(eventRecordsToMove: List<EnrolmentRecordMovePayload>,
+                                                    attendantId: String) =
+        eventRecordsToMove.map { it.enrolmentRecordDeletion }.filter { it.attendantId == attendantId }
+
+    private fun getRecordsToBeSavedFilteredByUser(eventRecordsToMove: List<EnrolmentRecordMovePayload>,
+                                                  attendantId: String) =
+        eventRecordsToMove.mapNotNull { it.enrolmentRecordCreation }.filter { it.attendantId == attendantId }
 
     private fun buildQueryForPeopleById(batchOfPeopleToBeDeleted: List<EnrolmentRecordDeletionPayload>) =
         batchOfPeopleToBeDeleted.map {

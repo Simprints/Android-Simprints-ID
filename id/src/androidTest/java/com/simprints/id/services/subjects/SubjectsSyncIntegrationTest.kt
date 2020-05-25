@@ -258,7 +258,7 @@ private fun mockResponsesForSync(scope: SubjectsDownSyncScope): Int {
         val eventsToDownload = getRandomEnrolmentEvents(
             N_TO_DOWNLOAD_PER_MODULE,
             it.projectId,
-            it.userId ?: "",
+            it.attendantId ?: "",
             it.moduleId ?: "",
             ENROLMENT_RECORD_CREATION
         )
