@@ -33,6 +33,7 @@ import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.images.repository.ImageRepository
@@ -138,6 +139,7 @@ interface AppComponent {
     fun getTimeHelper(): TimeHelper
     fun getPersonRepository(): PersonRepository
     fun getFingerprintRecordLocalDataSource(): FingerprintIdentityLocalDataSource
+    fun getFaceIdentityLocalDataSource(): FaceIdentityLocalDataSource
     fun getPreferencesManager(): PreferencesManager
     fun getAnalyticsManager(): AnalyticsManager
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
