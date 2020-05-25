@@ -85,7 +85,7 @@ class FaceMatchViewModelTest {
 
         assertThat(matchStateObserver.observedValues.size).isEqualTo(4)
         with(matchStateObserver.observedValues) {
-            assertThat(get(0)).isEqualTo(FaceMatchViewModel.MatchState.NOT_STARTED_IDENTIFY)
+            assertThat(get(0)).isEqualTo(FaceMatchViewModel.MatchState.NOT_STARTED)
             assertThat(get(1)).isEqualTo(FaceMatchViewModel.MatchState.LOADING_CANDIDATES)
             assertThat(get(2)).isEqualTo(FaceMatchViewModel.MatchState.MATCHING)
             assertThat(get(3)).isEqualTo(FaceMatchViewModel.MatchState.FINISHED)
@@ -117,7 +117,7 @@ class FaceMatchViewModelTest {
 
         assertThat(matchStateObserver.observedValues.size).isEqualTo(4)
         with(matchStateObserver.observedValues) {
-            assertThat(get(0)).isEqualTo(FaceMatchViewModel.MatchState.NOT_STARTED_VERIFY)
+            assertThat(get(0)).isEqualTo(FaceMatchViewModel.MatchState.NOT_STARTED)
             assertThat(get(1)).isEqualTo(FaceMatchViewModel.MatchState.LOADING_CANDIDATES)
             assertThat(get(2)).isEqualTo(FaceMatchViewModel.MatchState.MATCHING)
             assertThat(get(3)).isEqualTo(FaceMatchViewModel.MatchState.FINISHED)
