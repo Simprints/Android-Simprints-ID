@@ -58,7 +58,7 @@ class FaceMatchViewModelTest {
 
         viewModel.setupMatch(identifyRequest)
 
-        assertThat(viewModel.matchState.value).isEqualTo(FaceMatchViewModel.MatchState.ERROR)
+        assertThat(viewModel.matchState.value).isEqualTo(FaceMatchViewModel.MatchState.Error)
     }
 
     @Test
@@ -68,16 +68,16 @@ class FaceMatchViewModelTest {
         val candidates = generateSequenceN(5) { PeopleGenerator.getFaceIdentity(2) }.toList()
         coEvery { faceDbManager.loadPeople(any()) } returns candidates.asFlow()
         coEvery { faceMatcher.getComparisonScore(any(), any()) } returnsMany listOf(
-            0.9f, // person 1
-            0.8f,
-            0.6f, // person 2
-            0.6f,
-            0.7f, // person 3
-            0.7f,
-            0.1f, // person 4
-            0.2f,
-            0.5f, // person 5
-            0.55f
+            90f, // person 1
+            80f,
+            60f, // person 2
+            60f,
+            70f, // person 3
+            70f,
+            10f, // person 4
+            20f,
+            50f, // person 5
+            55f
         )
         val matchStateObserver = viewModel.matchState.testObserver()
 
@@ -85,20 +85,20 @@ class FaceMatchViewModelTest {
 
         assertThat(matchStateObserver.observedValues.size).isEqualTo(4)
         with(matchStateObserver.observedValues) {
-            assertThat(get(0)).isEqualTo(FaceMatchViewModel.MatchState.NOT_STARTED)
-            assertThat(get(1)).isEqualTo(FaceMatchViewModel.MatchState.LOADING_CANDIDATES)
-            assertThat(get(2)).isEqualTo(FaceMatchViewModel.MatchState.MATCHING)
-            assertThat(get(3)).isEqualTo(FaceMatchViewModel.MatchState.FINISHED)
+            assertThat(get(0)).isEqualTo(FaceMatchViewModel.MatchState.NotStarted)
+            assertThat(get(1)).isEqualTo(FaceMatchViewModel.MatchState.LoadingCandidates)
+            assertThat(get(2)).isEqualTo(FaceMatchViewModel.MatchState.Matching)
+            assertThat(get(3)).isEqualTo(FaceMatchViewModel.MatchState.Finished(5, 5, 4, 0, 1))
         }
 
         assertThat(viewModel.faceMatchResponse.value?.getContentIfNotHandled()).isEqualTo(
             FaceMatchResponse(
                 listOf(
-                    FaceMatchResult(candidates[0].faceId, 0.9f),
-                    FaceMatchResult(candidates[2].faceId, 0.7f),
-                    FaceMatchResult(candidates[1].faceId, 0.6f),
-                    FaceMatchResult(candidates[4].faceId, 0.55f),
-                    FaceMatchResult(candidates[3].faceId, 0.2f)
+                    FaceMatchResult(candidates[0].faceId, 90f),
+                    FaceMatchResult(candidates[2].faceId, 70f),
+                    FaceMatchResult(candidates[1].faceId, 60f),
+                    FaceMatchResult(candidates[4].faceId, 55f),
+                    FaceMatchResult(candidates[3].faceId, 20f)
                 )
             )
         )
@@ -110,21 +110,21 @@ class FaceMatchViewModelTest {
         // Doing this way so I can compare later
         val candidates = generateSequenceN(1) { PeopleGenerator.getFaceIdentity(2) }.toList()
         coEvery { faceDbManager.loadPeople(any()) } returns candidates.asFlow()
-        coEvery { faceMatcher.getComparisonScore(any(), any()) } returnsMany listOf(0.9f, 0.8f)
+        coEvery { faceMatcher.getComparisonScore(any(), any()) } returnsMany listOf(90f, 80f)
         val matchStateObserver = viewModel.matchState.testObserver()
 
         viewModel.setupMatch(verifyRequest)
 
         assertThat(matchStateObserver.observedValues.size).isEqualTo(4)
         with(matchStateObserver.observedValues) {
-            assertThat(get(0)).isEqualTo(FaceMatchViewModel.MatchState.NOT_STARTED)
-            assertThat(get(1)).isEqualTo(FaceMatchViewModel.MatchState.LOADING_CANDIDATES)
-            assertThat(get(2)).isEqualTo(FaceMatchViewModel.MatchState.MATCHING)
-            assertThat(get(3)).isEqualTo(FaceMatchViewModel.MatchState.FINISHED)
+            assertThat(get(0)).isEqualTo(FaceMatchViewModel.MatchState.NotStarted)
+            assertThat(get(1)).isEqualTo(FaceMatchViewModel.MatchState.LoadingCandidates)
+            assertThat(get(2)).isEqualTo(FaceMatchViewModel.MatchState.Matching)
+            assertThat(get(3)).isEqualTo(FaceMatchViewModel.MatchState.Finished(1, 1, 1, 0, 0))
         }
 
         assertThat(viewModel.faceMatchResponse.value?.getContentIfNotHandled()).isEqualTo(
-            FaceMatchResponse(listOf(FaceMatchResult(candidates[0].faceId, 0.9f)))
+            FaceMatchResponse(listOf(FaceMatchResult(candidates[0].faceId, 90f)))
         )
     }
 
