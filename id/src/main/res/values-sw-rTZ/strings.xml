@@ -129,7 +129,7 @@
     <string name="verify_guid_not_found_offline_message">Mtu hajapatikana, tafadhali hakikisha umeeunganishwa kwenye mtandao na jaribu tena</string>
     <string name="verify_guid_not_found_online_message">Mtu aliyechaguliwa kwa uthibitisho hayuko kwenye kumbukumbu za taarifa</string>
     <string name="verify_guid_not_found_title">Mtu hajapatikana</string>
-    <string name="why_did_you_skip_fingerprinting">Je, kwanini umeruka kuweka alama za vidole?</string>
+    <string name="reasons_for_leaving_fingerprint">Je, kwanini umeruka kuweka alama za vidole?</string>
     <string name="confirm_module_selection_cancel">Ghairi</string>
     <string name="confirm_module_selection_title">Vipengele vilivochaguliwa</string>
     <string name="confirm_module_selection_yes">Hakikisha</string>
