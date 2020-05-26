@@ -67,6 +67,7 @@ class ConnectScannerViewModel(
             .andThen(checkIfBluetoothIsEnabled())
             .andThen(initVero())
             .andThen(connectToVero())
+            .andThen(setupVero())
             .andThen(resetVeroUI())
             .andThen(wakeUpVero())
             .subscribeOn(Schedulers.io())
@@ -97,17 +98,21 @@ class ConnectScannerViewModel(
         veroTask(computeProgress(4), R.string.connect_scanner_bt_connect, "ScannerManager: connectToVero",
             scannerManager.scanner { connect() }) { addBluetoothConnectivityEvent() }
 
+    private fun setupVero() =
+        veroTask(computeProgress(5), R.string.connect_scanner_setup, "ScannerManager: setupVero",
+            scannerManager.scanner { setup() })
+
     private fun resetVeroUI() =
-        veroTask(computeProgress(5), R.string.connect_scanner_setup, "ScannerManager: resetVeroUI",
+        veroTask(computeProgress(6), R.string.connect_scanner_setup, "ScannerManager: resetVeroUI",
             scannerManager.scanner { setUiIdle() })
 
     private fun wakeUpVero() =
-        veroTask(computeProgress(6), R.string.connect_scanner_wake_un20, "ScannerManager: wakeUpVero",
+        veroTask(computeProgress(7), R.string.connect_scanner_wake_un20, "ScannerManager: wakeUpVero",
             scannerManager.scanner { sensorWakeUp() }) { updateBluetoothConnectivityEventWithVeroInfo() }
 
     private fun updateBluetoothConnectivityEventWithVeroInfo() {
         scannerManager.let {
-            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.onScanner { versionInformation() }.firmwareVersion.toString())
+            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.onScanner { versionInformation() }.firmware.toString()) // TODO : Determine appropriate firmware versions for sessions
         }
     }
 
@@ -165,7 +170,7 @@ class ConnectScannerViewModel(
         preferencesManager.lastScannerUsed = scannerManager.lastPairedMacAddress?.let {
             serialNumberConverter.convertMacAddressToSerialNumber(it)
         } ?: ""
-        preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.firmwareVersion.toString()
+        preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.firmware.toString() // TODO : Determine appropriate firmware versions for sessions
         analyticsManager.logScannerProperties(scannerManager.lastPairedMacAddress
             ?: "", scannerManager.lastPairedScannerId ?: "")
         scannerConnected.postEvent(true)
@@ -199,7 +204,7 @@ class ConnectScannerViewModel(
                     ScannerConnectionEvent.ScannerInfo(
                         lastPairedScannerId ?: "",
                         lastPairedMacAddress ?: "",
-                        onScanner { versionInformation() }.firmwareVersion.toString())))
+                        onScanner { versionInformation() }.firmware.toString()))) // TODO : Determine appropriate firmware versions for sessions
         }
     }
 
@@ -222,7 +227,7 @@ class ConnectScannerViewModel(
     }
 
     companion object {
-        const val NUMBER_OF_STEPS = 7
+        const val NUMBER_OF_STEPS = 8
         private fun computeProgress(step: Int) = step * 100 / NUMBER_OF_STEPS
     }
 }
