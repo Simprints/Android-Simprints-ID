@@ -1,34 +1,31 @@
 package com.simprints.id.data.db.project.remote
 
 import com.google.gson.JsonElement
-import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.tools.utils.retrySimNetworkCalls
+import com.simprints.id.network.SimApiClient
+import com.simprints.id.network.SimApiClientFactory
 
 open class ProjectRemoteDataSourceImpl(
-    private val remoteDbManager: RemoteDbManager,
     private val simApiClientFactory: SimApiClientFactory
 ) : ProjectRemoteDataSource {
 
     override suspend fun loadProjectFromRemote(projectId: String): Project =
-        makeNetworkRequest({
+        executeCall("requestProject") {
             it.requestProject(projectId)
-        }, "requestProject")
+        }
 
     override suspend fun loadProjectRemoteConfigSettingsJsonString(projectId: String): JsonElement =
-        makeNetworkRequest({
+        executeCall("requestProjectConfig") {
             it.requestProjectConfig(projectId)
-        }, "requestProjectConfig")
+        }
 
-    override suspend fun getProjectApiClient(): ProjectRemoteInterface {
-        val token = remoteDbManager.getCurrentToken()
-        return simApiClientFactory.build<ProjectRemoteInterface>(token).api
-    }
+    private suspend fun <T> executeCall(nameCall: String, block: suspend (ProjectRemoteInterface) -> T): T =
+        with(getProjectApiClient()) {
+            executeCall(nameCall) {
+                block(it)
+            }
+        }
 
-    private suspend fun <T> makeNetworkRequest(
-        block: suspend (client: ProjectRemoteInterface) -> T,
-        traceName: String
-    ): T =
-        retrySimNetworkCalls(getProjectApiClient(), block, traceName)
+    override suspend fun getProjectApiClient(): SimApiClient<ProjectRemoteInterface> =
+        simApiClientFactory.buildClient(ProjectRemoteInterface::class)
 }
