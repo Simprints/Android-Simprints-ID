@@ -17,6 +17,10 @@ android {
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
     buildTypes {
+        staging {
+            initWith release
+        }
+
         debug {
             testCoverageEnabled true
         }
