@@ -54,7 +54,7 @@ class FaceExitFormActivity : AppCompatActivity() {
 
     private fun setTextInLayout() {
         with(androidResourcesHelper) {
-            whySkipFaceText.text = getString(R.string.reasons_for_leaving_camera)
+            whySkipFaceText.text = getString(R.string.why_did_you_skip_face_capture)
             faceRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
             faceRbDataConcerns.text = getString(R.string.refusal_data_concerns)
             faceRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
@@ -64,7 +64,7 @@ class FaceExitFormActivity : AppCompatActivity() {
             faceRbOther.text = getString(R.string.refusal_other)
             faceExitFormText.hint = getString(R.string.hint_other_reason)
             faceBtSubmitExitForm.text = getString(R.string.button_submit)
-            faceBtGoBack.text = getString(R.string.exit_form_return_to_simprints)
+            faceBtGoBack.text = getString(R.string.exit_form_capture_face)
         }
     }
 

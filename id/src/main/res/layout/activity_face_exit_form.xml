@@ -58,7 +58,7 @@
                 android:layout_weight="1"
                 android:minHeight="70dp"
                 android:onClick="handleGoBackClick"
-                android:text="@string/exit_form_return_to_simprints"
+                android:text="@string/exit_form_capture_face"
                 tools:ignore="ButtonStyle" />
 
             <Button
@@ -145,7 +145,7 @@
             android:id="@+id/whySkipFaceText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/reasons_for_leaving_camera"
+            android:text="@string/why_did_you_skip_face_capture"
             android:textAlignment="center"
             android:textColor="@color/simprints_white"
             android:textSize="25sp"
