@@ -4,7 +4,7 @@ if [ "help" = "$1" ]; then
     echo "Run tests - ./run_all_android_tests universal.apk module1_name:module1_test_apk ...."
     echo "Stop any background tests - ./run_all_android_tests stop"
     exit 1
-fi
+fi 
 
 if [ "stop" = "$1" ]; then 
 	echo "Stopping all gcloud instances...."
