@@ -32,18 +32,17 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
     companion object {
         private const val PROJECT_ID = "projectId"
         private const val USER_ID = "userId"
+        private const val DEVICE_ID = "deviceId"
     }
 
     private val nonceFromServer = "nonce_from_server"
     private val publicKeyFromServer = "public_key_from_server"
     private val validAuthenticationJsonResponse = "{\"nonce\":\"$nonceFromServer\", \"publicKey\":\"$publicKeyFromServer\"}"
     private val expectedAuthenticationData = AuthenticationData(Nonce(nonceFromServer), PublicKeyString(publicKeyFromServer))
-    private val expectedUrl = DEFAULT_BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?key=$API_KEY"
+    private val expectedUrl = DEFAULT_BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?deviceId=$DEVICE_ID&key=$API_KEY"
 
-    @MockK
-    lateinit var mockBaseUrlProvider: BaseUrlProvider
-    @MockK
-    lateinit var mockRemoteDbManager: RemoteDbManager
+    @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
+    @MockK lateinit var mockRemoteDbManager: RemoteDbManager
 
     private val validateUrl: (url: String) -> Unit = {
         assertThat(it).isEqualTo(expectedUrl)
@@ -87,8 +86,9 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
     private suspend fun makeTestRequestForAuthenticationData(): AuthenticationData {
         val factory = mockk<SimApiClientFactory>()
         every { factory.buildUnauthenticatedClient(SecureApiInterface::class) } returns apiClient
-        val authenticationDataManagerSpy = spyk(AuthenticationDataManagerImpl(factory))
+        val authenticationDataManagerSpy = spyk(AuthenticationDataManagerImpl(factory, DEVICE_ID))
 
         return authenticationDataManagerSpy.requestAuthenticationData(PROJECT_ID, USER_ID)
     }
+
 }
