@@ -89,6 +89,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - echo "org.gradle.parallel=false" >> gradle.properties
                     - ./gradlew fingerprintscanner:jacocoTestReportDebug
                 artifacts:
                     - fingerprintscanner/build/reports/**
