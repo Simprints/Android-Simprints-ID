@@ -8,7 +8,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.extentions.concurrentMap
-import com.simprints.face.controllers.core.flow.Action.*
+import com.simprints.face.controllers.core.flow.Action
 import com.simprints.face.controllers.core.flow.MasterFlowManager
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.data.db.person.FaceIdentity
@@ -16,11 +16,11 @@ import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.io.Serializable
+import kotlin.math.min
 
 class FaceMatchViewModel(
     private val masterFlowManager: MasterFlowManager,
@@ -29,8 +29,7 @@ class FaceMatchViewModel(
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
     companion object {
-        const val verifyReturnCount = 1
-        const val identifyReturnCount = 10
+        const val returnCount = 10
         const val veryGoodMatchThreshold = 50.0
         const val goodMatchThreshold = 35.0
         const val fairMatchThreshold = 20.0
@@ -43,29 +42,19 @@ class FaceMatchViewModel(
     val matchState: MutableLiveData<MatchState> = MutableLiveData(MatchState.NotStarted)
     val faceMatchResponse: MutableLiveData<LiveDataEventWithContent<FaceMatchResponse>> =
         MutableLiveData()
-    var returnCount = 1
-    private var candidatesMatched = 0
 
     fun setupMatch(faceRequest: FaceMatchRequest) = viewModelScope.launch {
         probeFaceSamples = faceRequest.probeFaceSamples
         queryForCandidates = faceRequest.queryForCandidates
 
-        when (masterFlowManager.getCurrentAction()) {
-            ENROL -> {
-                matchState.value = MatchState.Error
-                return@launch
-            }
-            IDENTIFY -> {
-                returnCount = identifyReturnCount
-            }
-            VERIFY -> {
-                returnCount = verifyReturnCount
-            }
+        if (masterFlowManager.getCurrentAction() == Action.ENROL) {
+            matchState.value = MatchState.Error
+            return@launch
         }
 
         val candidates = loadCandidates()
         val results = matchCandidates(candidates)
-        val sortedResults = getNSortedResult(results)
+        val sortedResults = getSortedResult(results)
         sendFaceMatchResponse(sortedResults)
     }
 
@@ -75,6 +64,7 @@ class FaceMatchViewModel(
     }
 
     private suspend fun matchCandidates(candidates: Flow<FaceIdentity>): Flow<FaceMatchResult> {
+        matchState.postValue(MatchState.Matching)
         return getConcurrentMatchResultsForCandidates(candidates)
     }
 
@@ -83,34 +73,32 @@ class FaceMatchViewModel(
      */
     private suspend fun getConcurrentMatchResultsForCandidates(candidates: Flow<FaceIdentity>) =
         candidates.concurrentMap(dispatcherProvider.default()) { candidate ->
-            matchState.postValue(MatchState.Matching(++candidatesMatched))
             FaceMatchResult(
                 candidate.faceId,
                 faceMatcher.getHighestComparisonScoreForCandidate(probeFaceSamples, candidate)
             )
         }
 
-    private suspend fun getNSortedResult(results: Flow<FaceMatchResult>): List<FaceMatchResult> =
-        results.toList().sortedByDescending { it.confidence }.take(returnCount)
+    private suspend fun getSortedResult(results: Flow<FaceMatchResult>): List<FaceMatchResult> =
+        results.toList().sortedByDescending { it.confidence }
 
-    private suspend fun sendFaceMatchResponse(results: List<FaceMatchResult>) {
-        val veryGoodMatches = results.count { (_, score) -> veryGoodMatchThreshold <= score }
+    private fun sendFaceMatchResponse(allResults: List<FaceMatchResult>) {
+        val results = allResults.take(returnCount)
+        val veryGoodMatches = results.count { veryGoodMatchThreshold <= it.confidence }
         val goodMatches =
-            results.count { (_, score) -> goodMatchThreshold <= score && score < veryGoodMatchThreshold }
+            results.count { goodMatchThreshold <= it.confidence && it.confidence < veryGoodMatchThreshold }
         val fairMatches =
-            results.count { (_, score) -> fairMatchThreshold <= score && score < goodMatchThreshold }
+            results.count { fairMatchThreshold <= it.confidence && it.confidence < goodMatchThreshold }
 
-        matchState.value =
-            MatchState.Finished(
-                returnCount,
-                veryGoodMatches,
-                goodMatches,
-                fairMatches
-            )
+        matchState.value = MatchState.Finished(
+            allResults.size,
+            min(returnCount, results.size),
+            veryGoodMatches,
+            goodMatches,
+            fairMatches
+        )
         val response = FaceMatchResponse(results)
 
-        // Wait a bit so the user can see the results
-        delay(matchingEndWaitTimeInMillis)
         faceMatchResponse.send(response)
     }
 
@@ -118,13 +106,13 @@ class FaceMatchViewModel(
         object NotStarted : MatchState()
         object Error : MatchState()
         object LoadingCandidates : MatchState()
-        data class Matching(val candidatesMatched: Int) : MatchState()
+        object Matching : MatchState()
         data class Finished(
+            val candidatesMatched: Int,
             val returnSize: Int,
             val veryGoodMatches: Int,
             val goodMatches: Int,
             val fairMatches: Int
-        ) :
-            MatchState()
+        ) : MatchState()
     }
 }

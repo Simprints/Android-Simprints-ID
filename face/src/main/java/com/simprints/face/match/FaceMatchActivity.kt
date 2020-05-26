@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
@@ -62,14 +63,15 @@ class FaceMatchActivity : AppCompatActivity(R.layout.activity_face_match) {
         vm.faceMatchResponse.observe(this, LiveDataEventWithContentObserver {
             val intent = Intent().apply { putExtra(IFaceResponse.BUNDLE_KEY, it) }
             setResult(Activity.RESULT_OK, intent)
-            finish()
+            // wait a bit for the user to see the results
+            Handler().postDelayed({ finish() }, FaceMatchViewModel.matchingEndWaitTimeInMillis)
         })
         vm.matchState.observe(this, Observer { matchState ->
             when (matchState) {
                 NotStarted -> renderNotStarted()
                 Error -> TODO()
                 LoadingCandidates -> renderLoadingCandidates()
-                is Matching -> renderMatching(matchState)
+                is Matching -> renderMatching()
                 is Finished -> renderFinished(matchState)
             }
         })
@@ -93,22 +95,21 @@ class FaceMatchActivity : AppCompatActivity(R.layout.activity_face_match) {
         setIdentificationProgress(25)
     }
 
-    private fun renderMatching(matchState: Matching) {
+    private fun renderMatching() {
         face_match_tv_matchingProgressStatus1.text =
             androidResourcesHelper.getString(R.string.face_match_matching_candidates)
-
-
-        face_match_tv_matchingProgressStatus2.isVisible = true
-        face_match_tv_matchingProgressStatus2.text = androidResourcesHelper.getStringPlural(
-            R.string.face_match_matched_candidates_quantity_key,
-            matchState.candidatesMatched,
-            arrayOf(matchState.candidatesMatched)
-        )
 
         setIdentificationProgress(50)
     }
 
     private fun renderFinished(matchState: Finished) {
+        face_match_tv_matchingProgressStatus1.text = androidResourcesHelper.getStringPlural(
+            R.string.face_match_matched_candidates_quantity_key,
+            matchState.candidatesMatched,
+            arrayOf(matchState.candidatesMatched)
+        )
+
+        face_match_tv_matchingProgressStatus2.isVisible = true
         face_match_tv_matchingProgressStatus2.text = androidResourcesHelper.getStringPlural(
             R.string.face_match_returned_results_quantity_key,
             matchState.returnSize,
