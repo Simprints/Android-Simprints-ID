@@ -26,6 +26,10 @@ android {
             //proguardFiles 'proguard-rules-dynamic-features.pro'
         }
 
+        staging {
+            initWith release
+        }
+
         debug {
             testCoverageEnabled true
         }

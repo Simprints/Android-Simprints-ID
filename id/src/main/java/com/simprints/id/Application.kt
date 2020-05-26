@@ -52,9 +52,9 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
 
     open fun initModules() {
         if (Timber.treeCount() <= 0) {
-            if (isReleaseWithLogfileVariant()) {
+            if (isWithLogFileFlavour()) {
                 Timber.plant(FileLoggingTree())
-                Timber.d("Release with log file set up.")
+                Timber.d("File logging set up.")
             } else if (BuildConfig.DEBUG) {
                 Timber.plant(LineNumberDebugTree())
             }
@@ -84,7 +84,8 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
         }
     }
 
-    private fun isReleaseWithLogfileVariant(): Boolean = BuildConfig.BUILD_TYPE == "releaseWithLogfile"
+    // TODO: move to flavour-specific class
+    private fun isWithLogFileFlavour(): Boolean = BuildConfig.FLAVOR == "withLogFile"
 
     private fun initServiceLocation() {
         startKoin {

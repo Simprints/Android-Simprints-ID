@@ -23,6 +23,10 @@ android {
         release {
             proguardFiles 'proguard-rules-dynamic-features.pro'
         }
+
+        staging {
+            initWith release
+        }
     }
 
     flavorDimensions "mode"
