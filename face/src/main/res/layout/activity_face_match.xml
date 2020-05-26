@@ -28,7 +28,7 @@
         android:indeterminate="false"
         android:max="100"
         android:progress="0"
-        android:progressDrawable="@drawable/matching_progress_bar"
+        android:progressDrawable="@drawable/face_matching_progress_bar"
         app:layout_constraintBottom_toTopOf="@+id/face_match_tv_matchingProgressStatus1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
