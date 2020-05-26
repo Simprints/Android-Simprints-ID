@@ -33,6 +33,8 @@ probe2 x candidate1.face2 = 0.1
 
 The value 0.8 will be the one assigned to candidate1 MatchResult.
 
+The reason behind returning `max` instead of `mean` is because there is a probability that the person can take 2 photos but one of them is from the wrong person. Or that the other photo has no one in there - the user moves the phone too fast. So thinking about that, both cases would drag the `mean` down as (1 + 0) / 2 = 0.5.
+
 # Concurrency
 
 Because the process of matching can be expensive - it needs to match `n` probes against `f` candidate faces - we tried to run it in parallel. That way, we can run multiple matchings at the same time. Also, since the list will be ordered later, we don't need to care about the order that the results are returned as well.
