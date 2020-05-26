@@ -264,7 +264,9 @@ class LoginActivityAndroidTest {
     }
 
     private fun mockAuthenticationResult(result: AuthenticationEvent.Result) {
-        coEvery { mockAuthenticationHelper.authenticateSafely(any(), any(), any()) } returns result
+        coEvery {
+            mockAuthenticationHelper.authenticateSafely(any(), any(), any(), any())
+        } returns result
     }
 
 }

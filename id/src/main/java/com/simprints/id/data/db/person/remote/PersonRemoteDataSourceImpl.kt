@@ -1,7 +1,5 @@
 package com.simprints.id.data.db.person.remote
 
-import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.person.domain.Person
@@ -13,25 +11,25 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.request.Ap
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.WhereLabelKey.*
 import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
-import com.simprints.id.tools.utils.retrySimNetworkCalls
+import com.simprints.id.network.SimApiClient
+import com.simprints.id.network.SimApiClientFactory
 
 open class PersonRemoteDataSourceImpl(
-    private val remoteDbManager: RemoteDbManager,
     private val simApiClientFactory: SimApiClientFactory
 ) : PersonRemoteDataSource {
 
     override suspend fun downloadPerson(patientId: String, projectId: String): Person =
-        makeNetworkRequest({
+        executeCall("downloadPerson") {
             it.requestPerson(patientId, projectId).fromGetApiToDomain()
-        }, "downloadPerson")
+        }
 
     override suspend fun uploadPeople(projectId: String, patientsToUpload: List<Person>) =
-        makeNetworkRequest({
+        executeCall("uploadPatientBatch") {
             it.uploadPeople(
                 projectId,
                 hashMapOf("patients" to patientsToUpload.map(Person::fromDomainToPostApi))
             )
-        }, "uploadPatientBatch")
+        }
 
 
     override suspend fun getDownSyncPeopleCount(
@@ -48,7 +46,7 @@ open class PersonRemoteDataSourceImpl(
         projectId: String,
         peopleOperationsParams: List<PeopleDownSyncOperation>
     ): List<PeopleCount> =
-        makeNetworkRequest({
+        executeCall("countRequest") {
             val response = it.requestPeopleOperations(
                 projectId,
                 buildApiPeopleOperations(peopleOperationsParams)
@@ -62,7 +60,7 @@ open class PersonRemoteDataSourceImpl(
                     countsForSyncScope.delete
                 )
             }
-        }, "countRequest")
+        }
 
     private fun buildApiPeopleOperations(peopleOperationsParams: List<PeopleDownSyncOperation>) =
         ApiPeopleOperations(buildGroups(peopleOperationsParams))
@@ -99,15 +97,13 @@ open class PersonRemoteDataSourceImpl(
             ApiPeopleOperationGroup(lastKnownInfo, whereLabels)
         }
 
-    private suspend fun <T> makeNetworkRequest(
-        block: suspend (client: PeopleRemoteInterface) -> T,
-        traceName: String
-    ): T =
-        retrySimNetworkCalls(getPeopleApiClient(), block, traceName)
+    private suspend fun <T> executeCall(nameCall: String, block: suspend (PeopleRemoteInterface) -> T): T =
+        with(getPeopleApiClient()) {
+            executeCall(nameCall) {
+                block(it)
+            }
+        }
 
-
-    override suspend fun getPeopleApiClient(): PeopleRemoteInterface {
-        val token = remoteDbManager.getCurrentToken()
-        return simApiClientFactory.build<PeopleRemoteInterface>(token).api
-    }
+    override suspend fun getPeopleApiClient(): SimApiClient<PeopleRemoteInterface> =
+        simApiClientFactory.buildClient(PeopleRemoteInterface::class)
 }

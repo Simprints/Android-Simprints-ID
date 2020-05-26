@@ -1,31 +1,14 @@
 package com.simprints.id.network
 
-import com.google.gson.Gson
-import com.simprints.core.tools.json.JsonHelper
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
+import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 
-open class SimApiClient<T>(private val service: Class<T>,
-                           private val url: String,
-                           private val deviceId: String,
-                           private val authToken: String? = null,
-                           private val jsonAdapter: Gson = JsonHelper.gson) {
+interface SimApiClient<T : SimRemoteInterface> {
 
-    val api: T by lazy {
-        retrofit.create(service)
-    }
+    val api: T
 
-    open val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create(jsonAdapter))
-            .baseUrl(url)
-            .client(okHttpClientConfig.build()).build()
-    }
+    // SyncCloudIntegrationException if an integration issue occurs or Throwable otherwise
+    @Throws(SyncCloudIntegrationException::class)
+    suspend fun <V> executeCall(traceName: String?,
+                                networkBlock: suspend (T) -> V): V
 
-    val okHttpClientConfig: OkHttpClient.Builder by lazy {
-        DefaultOkHttpClientBuilder().get(authToken, deviceId)
-    }
 }

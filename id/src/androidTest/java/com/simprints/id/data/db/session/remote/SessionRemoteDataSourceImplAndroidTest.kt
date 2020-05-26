@@ -3,9 +3,6 @@ package com.simprints.id.data.db.session.remote
 import android.net.NetworkInfo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
@@ -21,6 +18,9 @@ import com.simprints.id.data.db.session.domain.models.events.callout.Identificat
 import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
+import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
@@ -56,7 +56,8 @@ class SessionRemoteDataSourceImplAndroidTest {
     private lateinit var testProject: TestProject
 
     private lateinit var sessionRemoteDataSource: SessionRemoteDataSource
-    @MockK var remoteDbManager = mockk<RemoteDbManager>()
+    @MockK
+    var remoteDbManager = mockk<RemoteDbManager>()
 
     @Before
     fun setUp() {
@@ -68,8 +69,7 @@ class SessionRemoteDataSourceImplAndroidTest {
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         sessionRemoteDataSource = SessionRemoteDataSourceImpl(
-            remoteDbManager,
-                SimApiClientFactory(mockBaseUrlProvider, "some_device")
+            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device", remoteDbManager)
         )
     }
 
