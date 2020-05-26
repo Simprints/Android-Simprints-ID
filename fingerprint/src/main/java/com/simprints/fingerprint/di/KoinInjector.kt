@@ -37,6 +37,8 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBu
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.controllers.v2.*
+import com.simprints.fingerprint.scanner.data.FirmwareFileManager
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
@@ -105,7 +107,13 @@ object KoinInjector {
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
         single { ScannerPairingManager(get()) }
-        single<ScannerFactory> { ScannerFactoryImpl(get(), get(), get(), get(), get(), get()) }
+        single { FirmwareFileManager() }
+        single { ScannerInitialSetupHelper(get()) }
+        single { ConnectionHelper(get()) }
+        single { CypressOtaHelper(get(), get()) }
+        single { StmOtaHelper(get(), get()) }
+        single { Un20OtaHelper(get(), get()) }
+        single<ScannerFactory> { ScannerFactoryImpl(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
         single<ScannerManager> { ScannerManagerImpl(get(), get(), get(), get()) }
 
         single<ComponentNfcAdapter> { AndroidNfcAdapter(NfcAdapter.getDefaultAdapter(get())) }
