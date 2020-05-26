@@ -4,12 +4,14 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
+import com.google.firebase.perf.metrics.Trace
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
+import com.simprints.id.tools.extensions.trace
 import timber.log.Timber
 import java.io.IOException
 
@@ -19,6 +21,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
     abstract val tag: String
     var resultSetter: WorkerResultSetter = WorkerResultSetterImpl()
     abstract var crashReportManager: CrashReportManager
+    private var workerTrace: Trace? = null
 
     protected inline fun <reified T> getComponent(block: (component: AppComponent) -> Unit) {
         val context = applicationContext
@@ -27,12 +30,18 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
         } else throw WorkerInjectionFailedException.forWorker<T>()
     }
 
+    protected fun traceWorkerPerformance() {
+        workerTrace = trace("${tag}Trace")
+        workerTrace?.start()
+    }
+
     protected fun retry(t: Throwable? = null, message: String = t?.message ?: ""): Result {
         val finalMessage = "$tag - Retry] $message"
         crashlyticsLog(finalMessage)
         Timber.tag(SYNC_LOG_TAG).d(finalMessage)
 
         logExceptionIfRequired(t)
+        workerTrace?.stop()
         return resultSetter.retry()
     }
 
@@ -45,6 +54,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
         Timber.tag(SYNC_LOG_TAG).d(finalMessage)
 
         logExceptionIfRequired(t)
+        workerTrace?.stop()
         return resultSetter.failure(outputData)
     }
 
@@ -55,6 +65,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
         crashlyticsLog(finalMessage)
         Timber.tag(SYNC_LOG_TAG).d(finalMessage)
 
+        workerTrace?.stop()
         return resultSetter.success(outputData)
     }
 
