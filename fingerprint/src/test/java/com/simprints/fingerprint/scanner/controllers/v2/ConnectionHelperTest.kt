@@ -1,19 +1,21 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
+import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
-import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
+import com.simprints.testtools.common.reactive.advanceTime
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.Ordering
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.reactivex.Completable
+import io.reactivex.schedulers.TestScheduler
 import org.junit.Test
 import java.io.IOException
 
@@ -36,7 +38,8 @@ class ConnectionHelperTest {
         every { disconnect() } returns Completable.complete()
     }
 
-    private val connectionHelper = ConnectionHelper(mockAdapter)
+    private val testScheduler = TestScheduler()
+    private val connectionHelper = ConnectionHelper(mockAdapter, testScheduler)
 
     @Test
     fun connect_successful_connectsScannerAndSocket() {
@@ -46,6 +49,7 @@ class ConnectionHelperTest {
         every { mockSocket.connect() } returns Unit
 
         val testSubscriber = connectionHelper.connectScanner(mockScanner, "mac address").test()
+        testScheduler.advanceTime()
 
         testSubscriber.awaitAndAssertSuccess()
 
@@ -58,6 +62,7 @@ class ConnectionHelperTest {
         every { mockAdapter.isNull() } returns true
 
         val testSubscriber = connectionHelper.connectScanner(mockScanner, "mac address").test()
+        testScheduler.advanceTime()
 
         testSubscriber.awaitTerminalEvent()
         testSubscriber.assertError(BluetoothNotSupportedException::class.java)
@@ -69,6 +74,7 @@ class ConnectionHelperTest {
         every { mockAdapter.isEnabled() } returns false
 
         val testSubscriber = connectionHelper.connectScanner(mockScanner, "mac address").test()
+        testScheduler.advanceTime()
 
         testSubscriber.awaitTerminalEvent()
         testSubscriber.assertError(BluetoothNotEnabledException::class.java)
@@ -81,6 +87,7 @@ class ConnectionHelperTest {
         every { mockDevice.isBonded() } returns false
 
         val testSubscriber = connectionHelper.connectScanner(mockScanner, "mac address").test()
+        testScheduler.advanceTime()
 
         testSubscriber.awaitTerminalEvent()
         testSubscriber.assertError(ScannerNotPairedException::class.java)
@@ -94,6 +101,7 @@ class ConnectionHelperTest {
         every { mockSocket.connect() } throws IOException("Oops")
 
         val testSubscriber = connectionHelper.connectScanner(mockScanner, "mac address").test()
+        testScheduler.advanceTime()
 
         testSubscriber.awaitTerminalEvent()
         testSubscriber.assertError(ScannerDisconnectedException::class.java)
@@ -107,6 +115,7 @@ class ConnectionHelperTest {
         every { mockSocket.connect() } throws IOException("Oops") andThen Unit
 
         val testSubscriber = connectionHelper.connectScanner(mockScanner, "mac address").test()
+        testScheduler.advanceTime()
 
         testSubscriber.awaitAndAssertSuccess()
 
@@ -116,7 +125,8 @@ class ConnectionHelperTest {
 
     @Test
     fun disconnect_disconnectsScanner() {
-        connectionHelper.disconnectScanner(mockScanner).test().awaitAndAssertSuccess()
+        connectionHelper.disconnectScanner(mockScanner)
+            .test().also { testScheduler.advanceTime() }.awaitAndAssertSuccess()
 
         verify { mockScanner.disconnect() }
     }
@@ -129,8 +139,10 @@ class ConnectionHelperTest {
         every { mockSocket.connect() } returns Unit
         every { mockSocket.close() } returns Unit
 
-        connectionHelper.connectScanner(mockScanner, "mac address").test().awaitAndAssertSuccess()
-        connectionHelper.disconnectScanner(mockScanner).test().awaitAndAssertSuccess()
+        connectionHelper.connectScanner(mockScanner, "mac address")
+            .test().also { testScheduler.advanceTime() }.awaitAndAssertSuccess()
+        connectionHelper.disconnectScanner(mockScanner)
+            .test().also { testScheduler.advanceTime() }.awaitAndAssertSuccess()
 
         verify { mockScanner.disconnect() }
         verify { mockSocket.close() }
@@ -144,8 +156,10 @@ class ConnectionHelperTest {
         every { mockSocket.connect() } returns Unit
         every { mockSocket.close() } returns Unit
 
-        connectionHelper.connectScanner(mockScanner, "mac address").test().awaitAndAssertSuccess()
-        connectionHelper.reconnect(mockScanner, "mac address").test().awaitAndAssertSuccess()
+        connectionHelper.connectScanner(mockScanner, "mac address")
+            .test().also { testScheduler.advanceTime() }.awaitAndAssertSuccess()
+        connectionHelper.reconnect(mockScanner, "mac address")
+            .test().also { testScheduler.advanceTime() }.awaitAndAssertSuccess()
 
         verify(Ordering.SEQUENCE) {
             mockScanner.connect(any(), any())

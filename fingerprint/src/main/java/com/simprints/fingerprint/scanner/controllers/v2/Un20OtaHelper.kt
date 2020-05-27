@@ -14,10 +14,14 @@ import com.simprints.fingerprint.tools.doIfNotNull
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Scheduler
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
-                    private val firmwareFileManager: FirmwareFileManager) {
+                    private val firmwareFileManager: FirmwareFileManager,
+                    private val timeScheduler: Scheduler = Schedulers.io()) {
 
     private var newFirmwareVersion: ChipFirmwareVersion? = null
     private var newApiVersion: ChipApiVersion? = null
@@ -31,12 +35,16 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
             .concatWith(scanner.enterMainMode() thenEmitStep Un20OtaStep.TurningOnUn20BeforeTransfer)
             .concatWith(scanner.turnUn20OnAndAwaitStateChangeEvent() thenEmitStep Un20OtaStep.CommencingTransfer)
             .concatWith(scanner.startUn20Ota(firmwareFileManager.getUn20FirmwareBytes()).map { Un20OtaStep.TransferInProgress(it) })
-            .concatWith(emitStep(Un20OtaStep.TurningOffUn20AfterTransfer))
+            .concatWith(emitStep(Un20OtaStep.AwaitingCacheCommit))
+            .concatWith(waitCacheCommitTime() thenEmitStep Un20OtaStep.TurningOffUn20AfterTransfer)
             .concatWith(scanner.turnUn20OffAndAwaitStateChangeEvent() thenEmitStep Un20OtaStep.TurningOnUn20AfterTransfer)
             .concatWith(scanner.turnUn20OnAndAwaitStateChangeEvent() thenEmitStep Un20OtaStep.ValidatingNewFirmwareVersion)
             .concatWith(validateUn20FirmwareVersion(scanner) thenEmitStep Un20OtaStep.ReconnectingAfterValidating)
             .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep Un20OtaStep.UpdatingUnifiedVersionInformation)
             .concatWith(updateUnifiedVersionInformation(scanner))
+
+    private fun waitCacheCommitTime(): Completable =
+        Completable.timer(CACHE_COMMIT_TIME, TimeUnit.MILLISECONDS, timeScheduler)
 
     private fun validateUn20FirmwareVersion(scanner: Scanner): Completable =
         scanner.getUn20AppVersion().flatMapCompletable {
@@ -66,4 +74,8 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
 
     private fun emitStep(step: Un20OtaStep) = Single.just(step)
     private infix fun Completable.thenEmitStep(step: Un20OtaStep) = andThen(emitStep(step))
+
+    companion object {
+        const val CACHE_COMMIT_TIME = 10000L // milliseconds
+    }
 }
