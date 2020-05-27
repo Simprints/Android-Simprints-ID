@@ -65,7 +65,7 @@ class FingerprintExitFormActivity : AppCompatActivity() {
 
     private fun setTextInLayout() {
         with(androidResourcesHelper) {
-            whySkipFingerprintText.text = getString(R.string.reasons_for_leaving_fingerprint)
+            whySkipFingerprintText.text = getString(R.string.why_did_you_skip_fingerprinting)
             fingerprintRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
             fingerprintRbDataConcerns.text = getString(R.string.refusal_data_concerns)
             fingerprintRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
