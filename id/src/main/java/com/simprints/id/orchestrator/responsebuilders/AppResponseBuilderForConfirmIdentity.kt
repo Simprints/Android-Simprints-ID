@@ -22,3 +22,4 @@ class AppResponseBuilderForConfirmIdentity : BaseAppResponseBuilder() {
     private fun getCoreResponseForGuidSelection(results: List<Step.Result?>): GuidSelectionResponse =
         results.filterIsInstance(GuidSelectionResponse::class.java).lastOrNull() ?: throw Throwable("GuidSelectionResponse responses not found")
 }
+

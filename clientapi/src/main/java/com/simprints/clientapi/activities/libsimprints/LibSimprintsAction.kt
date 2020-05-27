@@ -1,13 +1,13 @@
 package com.simprints.clientapi.activities.libsimprints
 
-import  com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.*
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.ConfirmIdentity
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.EnrolLastBiometrics
 import com.simprints.id.domain.Constants.Companion.SIMPRINTS_IDENTIFY_INTENT
 import com.simprints.id.domain.Constants.Companion.SIMPRINTS_REGISTER_INTENT
 import com.simprints.id.domain.Constants.Companion.SIMPRINTS_REGISTER_LAST_BIOMETRICS_INTENT
 import com.simprints.id.domain.Constants.Companion.SIMPRINTS_SELECT_GUID_INTENT
 import com.simprints.id.domain.Constants.Companion.SIMPRINTS_VERIFICATION
 import com.simprints.id.domain.Constants.Companion.SIMPRINTS_VERIFY_INTENT
-import timber.log.Timber
 
 sealed class LibSimprintsAction(open val action: String?) {
 

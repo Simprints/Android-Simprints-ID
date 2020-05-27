@@ -15,8 +15,9 @@ import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
@@ -33,18 +34,14 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     CheckLoginPresenter(view, component),
     CheckLoginFromIntentContract.Presenter {
 
-    @Inject
-    lateinit var remoteConfigFetcher: RemoteConfigFetcher
+    @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
 
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var setupFailed: Boolean = false
 
-    @Inject
-    lateinit var sessionRepository: SessionRepository
-    @Inject
-    lateinit var personLocalDataSource: PersonLocalDataSource
-    @Inject
-    lateinit var simNetworkUtils: SimNetworkUtils
+    @Inject lateinit var sessionRepository: SessionRepository
+    @Inject lateinit var personLocalDataSource: PersonLocalDataSource
+    @Inject lateinit var simNetworkUtils: SimNetworkUtils
     internal lateinit var appRequest: AppRequest
 
     init {
@@ -91,7 +88,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             is AppEnrolLastBiometricsRequest -> addEnrolLastBiometricsCalloutEvent(request, relativeStarTime)
         }
 
-    internal fun addEnrolLastBiometricsCalloutEvent(request: AppEnrolLastBiometricsRequest, relativeStarTime: Long) =
+    private fun addEnrolLastBiometricsCalloutEvent(request: AppEnrolLastBiometricsRequest, relativeStarTime: Long) =
         EnrolmentLastBiometricsCalloutEvent(
             relativeStarTime,
             request.projectId,

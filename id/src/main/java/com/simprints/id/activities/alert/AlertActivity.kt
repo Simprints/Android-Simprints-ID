@@ -70,8 +70,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
     }
 
     override fun setAlertMessageWithStringRes(@StringRes stringRes: Int,  params: Array<Any>) { message.text = androidResourcesHelper.getString(stringRes, params) }
-    override fun getTranslatedString(@StringRes stringRes: Int) =
-        androidResourcesHelper.getString(stringRes)
+    override fun getTranslatedString(@StringRes stringRes: Int) = androidResourcesHelper.getString(stringRes)
 
     override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
         if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {
