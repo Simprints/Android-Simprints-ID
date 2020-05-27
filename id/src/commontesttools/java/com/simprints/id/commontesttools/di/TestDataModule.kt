@@ -1,13 +1,9 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
-import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
@@ -15,9 +11,12 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import com.simprints.testtools.common.di.DependencyRule
 import kotlinx.coroutines.FlowPreview
@@ -49,10 +48,9 @@ class TestDataModule(
         }
 
     override fun provideProjectRemoteDataSource(
-        remoteDbManager: RemoteDbManager,
         simApiClientFactory: SimApiClientFactory
     ): ProjectRemoteDataSource = projectRemoteDataSourceRule.resolveDependency {
-        super.provideProjectRemoteDataSource(remoteDbManager, simApiClientFactory)
+        super.provideProjectRemoteDataSource(simApiClientFactory)
     }
 
     override fun provideProjectRepository(
@@ -87,12 +85,10 @@ class TestDataModule(
     }
 
     override fun providePersonRemoteDataSource(
-        remoteDbManager: RemoteDbManager,
         simApiClientFactory: SimApiClientFactory
     ): PersonRemoteDataSource =
         personRemoteDataSourceRule.resolveDependency {
             super.providePersonRemoteDataSource(
-                remoteDbManager,
                 simApiClientFactory
             )
         }

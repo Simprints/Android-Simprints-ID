@@ -1,16 +1,11 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.images.repository.ImageRepositoryImpl
-import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSourceImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.PersonRepositoryImpl
@@ -25,8 +20,12 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSourceImpl
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
+import com.simprints.id.data.images.repository.ImageRepository
+import com.simprints.id.data.images.repository.ImageRepositoryImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncExecutor
 import dagger.Module
 import dagger.Provides
@@ -39,10 +38,8 @@ open class DataModule {
     @Provides
     @Singleton
     open fun providePersonRemoteDataSource(
-        remoteDbManager: RemoteDbManager,
         simApiClientFactory: SimApiClientFactory
     ): PersonRemoteDataSource = PersonRemoteDataSourceImpl(
-        remoteDbManager,
         simApiClientFactory
     )
 
@@ -61,10 +58,8 @@ open class DataModule {
     @Provides
     @Singleton
     open fun provideProjectRemoteDataSource(
-        remoteDbManager: RemoteDbManager,
         simApiClientFactory: SimApiClientFactory
     ): ProjectRemoteDataSource = ProjectRemoteDataSourceImpl(
-        remoteDbManager,
         simApiClientFactory
     )
 

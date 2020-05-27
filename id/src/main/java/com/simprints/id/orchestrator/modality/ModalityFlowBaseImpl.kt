@@ -4,6 +4,7 @@ import android.content.Intent
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent
+import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
@@ -23,7 +24,8 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
                                     private val faceStepProcessor: FaceStepProcessor,
                                     private val timeHelper: TimeHelper,
                                     private val sessionRepository: SessionRepository,
-                                    private val consentRequired: Boolean) : ModalityFlow {
+                                    private val consentRequired: Boolean,
+                                    private val locationRequired: Boolean) : ModalityFlow {
 
     override val steps: MutableList<Step> = mutableListOf()
 
@@ -32,7 +34,6 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
             steps.add(buildConsentStep(consentType))
         }
     }
-
     private fun buildConsentStep(consentType: ConsentType) =
         coreStepProcessor.buildStepConsent(consentType)
 
@@ -41,6 +42,17 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         steps.addAll(stepsToRestore)
     }
 
+    protected fun addSetupStep() {
+        steps.add(buildSetupStep())
+    }
+
+    private fun buildSetupStep() = coreStepProcessor.buildStepSetup(getPermissions())
+
+    private fun getPermissions() = if (locationRequired) {
+        listOf(SetupPermission.LOCATION)
+    } else {
+        emptyList()
+    }
     fun completeAllStepsIfExitFormHappened(requestCode: Int, resultCode: Int, data: Intent?) =
         tryProcessingResultFromCoreStepProcessor(data)
             ?: tryProcessingResultFromFingerprintStepProcessor(requestCode, resultCode, data)

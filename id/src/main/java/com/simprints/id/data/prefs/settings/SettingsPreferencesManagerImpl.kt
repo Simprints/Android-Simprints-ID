@@ -165,7 +165,7 @@ open class SettingsPreferencesManagerImpl(
         )
 
     /**
-     * Wheter consent screen should show or not
+     * Whether consent screen should show or not
      */
     override var consentRequired: Boolean
         by RemoteConfigPrimitivePreference(
@@ -173,6 +173,14 @@ open class SettingsPreferencesManagerImpl(
             remoteConfigWrapper,
             CONSENT_REQUIRED_KEY,
             CONSENT_REQUIRED_DEFAULT
+        )
+
+    override var locationPermissionRequired: Boolean
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            LOCATION_REQUIRED_KEY,
+            LOCATION_REQUIRED_DEFAULT
         )
 
     /**
@@ -315,6 +323,9 @@ open class SettingsPreferencesManagerImpl(
 
         const val CONSENT_REQUIRED_KEY = "ConsentRequired"
         const val CONSENT_REQUIRED_DEFAULT = true
+
+        const val LOCATION_REQUIRED_KEY = "LocationRequired"
+        const val LOCATION_REQUIRED_DEFAULT = true
 
         const val PEOPLE_DOWN_SYNC_SETTING_KEY = "DownSyncSetting"
         val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = PeopleDownSyncSetting.ON
