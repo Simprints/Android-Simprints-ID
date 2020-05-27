@@ -47,7 +47,9 @@ class SubjectsDownSyncDownloaderWorker(context: Context, params: WorkerParameter
 
     @ExperimentalCoroutinesApi
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+
         try {
+            traceWorkerPerformance()
             getComponent<SubjectsDownSyncDownloaderWorker> { it.inject(this@SubjectsDownSyncDownloaderWorker) }
             val downSyncOperation = extractSubSyncScopeFromInput()
             crashlyticsLog("Start - Params: $downSyncOperation")
