@@ -65,12 +65,12 @@ enum class AlertActivityViewModel(val type: Type,
 
     ENROLMENT_LAST_BIOMETRICS_FAILED(
         type = Type.DataError(
-            title = R.string.enrol_last_biometrics_failed_title,
+            title = R.string.last_biometrics_alert_title,
             hintDrawable = null
         ),
         leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
-        message = R.string.enrol_last_biometrics_failed_message
+        message = R.string.last_biometrics_alert_message
     );
 
     companion object {

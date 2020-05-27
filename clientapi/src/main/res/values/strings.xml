@@ -30,6 +30,5 @@
     <string name="guid_selection_data_sent">Data sent</string>
     <string name="guid_selection_result_sent">Result sent</string>
     <string name="close">Close</string>
-    <string name="invalid_state_for_intent_action_message">invalid_state_for_intent_action_message</string>
     <!-- endregion -->
 </resources>
