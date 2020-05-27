@@ -12,12 +12,12 @@ public class roc_embedded_geographic_origin {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected roc_embedded_geographic_origin(long cPtr, boolean cMemoryOwn) {
+  public roc_embedded_geographic_origin(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(roc_embedded_geographic_origin obj) {
+  public static long getCPtr(roc_embedded_geographic_origin obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
