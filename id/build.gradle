@@ -77,18 +77,7 @@ android {
         }
 
         staging {
-            lintOptions {
-                // TODO : Remove whenever possible
-                // Check in the Translations Editor for crucial translations that may be missing
-                abortOnError true
-                fatal 'StopShip'
-                checkReleaseBuilds true
-            }
-            minifyEnabled true
-            ext.enableCrashlytics = true
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
-            signingConfig signingConfigs.release
+            initWith release
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCSmwYkm2iHlKi-cBjohMH-FS6jQuCqPTE\"")
         }
 
