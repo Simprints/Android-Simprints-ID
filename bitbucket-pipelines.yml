@@ -89,6 +89,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    # Tests lock if gradle runs in parallel
                     - echo "org.gradle.parallel=false" >> gradle.properties
                     - ./gradlew fingerprintscanner:jacocoTestReportDebug
                 artifacts:
@@ -170,11 +171,11 @@ definitions:
 flows:
     -   flow: &main-flow
             -   parallel:
-#                    -   step: *run-clientapi-unit-tests
-#                    -   step: *run-id-unit-tests
-#                    -   step: *run-face-unit-tests
-#                    -   step: *run-fingerprint-unit-tests
-#                    -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *run-clientapi-unit-tests
+                    -   step: *run-id-unit-tests
+                    -   step: *run-face-unit-tests
+                    -   step: *run-fingerprint-unit-tests
+                    -   step: *run-fingerprintscanner-unit-tests
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
