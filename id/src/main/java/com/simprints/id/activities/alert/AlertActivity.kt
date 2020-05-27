@@ -18,9 +18,9 @@ import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
+import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_alert.*
 import javax.inject.Inject
@@ -69,7 +69,9 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         }
     }
 
-    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int) { message.text = androidResourcesHelper.getString(stringRes) }
+    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int,  params: Array<Any>) { message.text = androidResourcesHelper.getString(stringRes, params) }
+    override fun getTranslatedString(@StringRes stringRes: Int) =
+        androidResourcesHelper.getString(stringRes)
 
     override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
         if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {

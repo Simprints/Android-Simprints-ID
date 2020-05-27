@@ -1,8 +1,9 @@
 package com.simprints.id.domain.alert
 
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType
+import kotlin.reflect.jvm.internal.impl.descriptors.Modality
 
-enum class AlertType {
+enum class AlertType(val modalities: List<Modality>? = null) {
     GUID_NOT_FOUND_ONLINE,
     GUID_NOT_FOUND_OFFLINE,
     ENROLMENT_LAST_BIOMETRICS_FAILED,

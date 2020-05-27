@@ -4,16 +4,15 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.EnrolmentHelper
-import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
@@ -30,7 +29,14 @@ class EnrolLastBiometricsActivity : AppCompatActivity() {
     @Inject
     lateinit var timeHelper: TimeHelper
 
+    @Inject
+    lateinit var viewModelFactory: EnrolLastBiometricsViewModelFactory
+
     private lateinit var enrolLastBiometricsRequest: EnrolLastBiometricsRequest
+
+    private val vm: EnrolLastBiometricsViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory).get(EnrolLastBiometricsViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,34 +47,26 @@ class EnrolLastBiometricsActivity : AppCompatActivity() {
         enrolLastBiometricsRequest = intent.extras?.getParcelable(CORE_STEP_BUNDLE)
             ?: throw InvalidAppRequest()
 
+        observeViewState()
+        processRequest()
+    }
+
+    private fun processRequest() {
         lifecycleScope.launchWhenCreated {
-            with(enrolLastBiometricsRequest) {
-                try {
-                    val steps = enrolLastBiometricsRequest.steps
-                    if(steps.firstOrNull { it.request is EnrolLastBiometricsRequest } != null) {
-                        throw Throwable("EnrolLastBiometricsActivity already happened in this session")
-                    }
-
-                    val person = enrolmentHelper.buildPerson(
-                        projectId,
-                        userId,
-                        moduleId,
-                        getCaptureResponse<FingerprintCaptureResponse>(steps),
-                        getCaptureResponse<FaceCaptureResponse>(steps),
-                        timeHelper)
-
-                    enrolmentHelper.enrol(person)
-                    sendOkResult(person.patientId)
-                } catch (t: Throwable) {
-                    Timber.d(t)
-                    AlertActivityHelper.launchAlert(this@EnrolLastBiometricsActivity, AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED)
-                }
-            }
+            vm.getNextStep(enrolLastBiometricsRequest)
         }
     }
 
-    private inline fun <reified T> getCaptureResponse(steps: List<Step>) =
-        steps.firstOrNull { it.getResult() is T }?.getResult() as T?
+    private fun observeViewState() {
+        vm.getViewStateLiveData().observe(this, Observer {
+            if (it is ViewState.Success) {
+                sendOkResult(it.newGuid)
+            } else {
+                AlertActivityHelper.launchAlert(this@EnrolLastBiometricsActivity, AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED)
+            }
+        })
+    }
+
 
     private fun injectDependencies() {
         val component = (application as Application).component
@@ -94,5 +92,11 @@ class EnrolLastBiometricsActivity : AppCompatActivity() {
 
     private fun buildIntentForResponse(coreResponse: CoreResponse) = Intent().apply {
         putExtra(CORE_STEP_BUNDLE, coreResponse)
+    }
+
+
+    sealed class ViewState {
+        class Success(val newGuid: String) : ViewState()
+        object Failed : ViewState()
     }
 }

@@ -3,12 +3,11 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
+import com.simprints.id.activities.enrollast.EnrolLastBiometricsViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
@@ -59,6 +58,8 @@ import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.EnrolmentHelperImpl
 import com.simprints.id.orchestrator.cache.HotCache
@@ -393,7 +394,7 @@ open class AppModule {
 
     @Provides
     open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)
-    
+
     @Provides
     open fun provideCameraHelper(
         context: Context,
@@ -440,5 +441,11 @@ open class AppModule {
         sessionRepository: SessionRepository,
         timeHelper: TimeHelper
     ): EnrolmentHelper = EnrolmentHelperImpl(repository, sessionRepository, timeHelper)
+
+    @Provides
+    open fun provideEnrolLastBiometricsViewModel(
+        enrolmentHelper: EnrolmentHelper,
+        timeHelper: TimeHelper
+    ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper)
 }
 
