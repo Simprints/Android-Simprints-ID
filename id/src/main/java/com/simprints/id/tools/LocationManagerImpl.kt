@@ -1,5 +1,6 @@
 package com.simprints.id.tools
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import com.google.android.gms.location.LocationCallback
@@ -14,6 +15,7 @@ class LocationManagerImpl(val ctx: Context) : LocationManager {
 
     private val locationClient = LocationServices.getFusedLocationProviderClient(ctx)
 
+    @SuppressLint("MissingPermission")
     override suspend fun requestLocation(request: LocationRequest): Flow<List<Location>> = channelFlow {
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
