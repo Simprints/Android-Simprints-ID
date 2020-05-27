@@ -3,7 +3,6 @@ package com.simprints.id
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
 import androidx.multidex.MultiDexApplication
-import com.simprints.core.tools.LineNumberDebugTree
 import com.simprints.id.di.*
 import com.simprints.id.tools.logging.LoggingConfigHelper
 import com.simprints.id.tools.logging.NoLoggingConfigHelper
@@ -49,17 +48,14 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
 
     open fun initApplication() {
         createComponent()
-
-        if (loggingConfigHelper.loggingNeedsSetUp())
-            loggingConfigHelper.setUpLogging()
-
+        setUpLogging()
         handleUndeliverableExceptionInRxJava()
         initKoin()
     }
 
-    fun setupTimber() {
-        if (BuildConfig.DEBUG)
-            Timber.plant(LineNumberDebugTree())
+    fun setUpLogging() {
+        if (loggingConfigHelper.loggingNeedsSetUp())
+            loggingConfigHelper.setUpLogging()
     }
 
     override fun getCameraXConfig(): CameraXConfig = Camera2Config.defaultConfig()
