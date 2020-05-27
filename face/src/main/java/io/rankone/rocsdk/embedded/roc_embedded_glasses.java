@@ -12,12 +12,12 @@ public class roc_embedded_glasses {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected roc_embedded_glasses(long cPtr, boolean cMemoryOwn) {
+  public roc_embedded_glasses(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(roc_embedded_glasses obj) {
+  public static long getCPtr(roc_embedded_glasses obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 

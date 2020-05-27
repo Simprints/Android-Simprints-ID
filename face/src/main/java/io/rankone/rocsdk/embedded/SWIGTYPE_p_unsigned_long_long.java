@@ -8,18 +8,18 @@
 
 package io.rankone.rocsdk.embedded;
 
-public class SWIGTYPE_p_float {
+public class SWIGTYPE_p_unsigned_long_long {
   private transient long swigCPtr;
 
-  public SWIGTYPE_p_float(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  public SWIGTYPE_p_unsigned_long_long(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  public SWIGTYPE_p_float() {
+  public SWIGTYPE_p_unsigned_long_long() {
     swigCPtr = 0;
   }
 
-  public static long getCPtr(SWIGTYPE_p_float obj) {
+  public static long getCPtr(SWIGTYPE_p_unsigned_long_long obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }
