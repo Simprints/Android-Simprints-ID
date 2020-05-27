@@ -18,5 +18,6 @@ enum class CoreResponseType {
     FACE_EXIT_FORM,
     FETCH_GUID,
     GUID_SELECTION,
+    SETUP,
     ENROL_LAST_BIOMETRICS
 }

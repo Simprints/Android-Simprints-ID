@@ -66,6 +66,7 @@ import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.cache.StepEncoderImpl
+import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
@@ -202,8 +203,9 @@ open class AppModule {
     @Provides
     open fun provideSimApiClientFactory(
         ctx: Context,
+        remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider
-    ) = SimApiClientFactory(baseUrlProvider, ctx.deviceId)
+    ): SimApiClientFactory = SimApiClientFactoryImpl(baseUrlProvider, ctx.deviceId, remoteDbManager)
 
     @Provides
     @Singleton
@@ -244,10 +246,8 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideSessionEventsRemoteDbManager(
-        remoteDbManager: RemoteDbManager,
         simApiClientFactory: SimApiClientFactory
     ): SessionRemoteDataSource = SessionRemoteDataSourceImpl(
-        remoteDbManager,
         simApiClientFactory
     )
 
