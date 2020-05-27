@@ -5,7 +5,8 @@ import androidx.camera.core.CameraXConfig
 import androidx.multidex.MultiDexApplication
 import com.simprints.core.tools.LineNumberDebugTree
 import com.simprints.id.di.*
-import com.simprints.id.tools.FileLoggingTree
+import com.simprints.id.tools.logging.LoggingConfigHelper
+import com.simprints.id.tools.logging.NoLoggingConfigHelper
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import org.koin.android.ext.koin.androidContext
@@ -21,6 +22,8 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
 
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
+
+    open var loggingConfigHelper: LoggingConfigHelper = NoLoggingConfigHelper()
 
     open fun createComponent() {
         component = DaggerAppComponent
@@ -46,20 +49,17 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
 
     open fun initApplication() {
         createComponent()
-        setupTimber()
+
+        if (loggingConfigHelper.loggingNeedsSetUp())
+            loggingConfigHelper.setUpLogging()
+
         handleUndeliverableExceptionInRxJava()
         initKoin()
     }
 
-    open fun setupTimber() {
-        if (Timber.treeCount() <= 0) {
-            if (isWithLogFileFlavour()) {
-                Timber.plant(FileLoggingTree())
-                Timber.d("File logging set.")
-            } else if (BuildConfig.DEBUG) {
-                Timber.plant(LineNumberDebugTree())
-            }
-        }
+    fun setupTimber() {
+        if (BuildConfig.DEBUG)
+            Timber.plant(LineNumberDebugTree())
     }
 
     override fun getCameraXConfig(): CameraXConfig = Camera2Config.defaultConfig()
@@ -82,9 +82,6 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
             component.getCrashReportManager().logException(e)
         }
     }
-
-    // TODO: move to flavour-specific class
-    private fun isWithLogFileFlavour(): Boolean = BuildConfig.FLAVOR == "withLogFile"
 
     private fun initKoin() {
         startKoin {
