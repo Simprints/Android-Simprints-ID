@@ -14,11 +14,11 @@ import com.simprints.id.data.db.person.remote.PipeSeparatorWrapperForURLListPara
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.fromDomainToApi
 import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
+import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
 import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.utils.retrySimNetworkCalls
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.produce
@@ -95,17 +95,17 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
         downSyncWorkerProgressReporter.reportCount(count)
     }
 
-    private suspend fun makeDownSyncApiCallAndGetResponse(client: PeopleRemoteInterface): ResponseBody =
-        retrySimNetworkCalls(client, {
+    private suspend fun makeDownSyncApiCallAndGetResponse(client: SimApiClient<PeopleRemoteInterface>): ResponseBody =
+        client.executeCall("downSync") {
             with(downSyncOperation) {
-                client.downSync(
+                it.downSync(
                     projectId, userId, moduleId,
                     lastResult?.lastPatientId,
                     lastResult?.lastPatientUpdatedAt,
                     PipeSeparatorWrapperForURLListParam(*modes.map { it.fromDomainToApi() }.toTypedArray()))
 
             }
-        }, "downSync")
+        }
 
     private fun setupJsonReaderFromResponse(response: ResponseBody): JsonReader =
         JsonReader(InputStreamReader(response.byteStream()) as Reader?)
