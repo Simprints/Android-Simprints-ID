@@ -124,9 +124,20 @@ fun validateCalloutEventApiModel(json: JsonObject) {
             ApiCalloutType.ENROLMENT -> verifyCalloutEnrolmentApiModel(this)
             ApiCalloutType.IDENTIFICATION -> verifyCalloutIdentificationApiModel(this)
             ApiCalloutType.VERIFICATION -> verifyCalloutVerificationApiModel(this)
+            ApiCalloutType.ENROLMENT_LAST_BIOMETRICS -> verifyCalloutLastEnrolmentBiometricsApiModel(this)
         }
     }
     assertThat(json.size()).isEqualTo(3)
+}
+
+fun verifyCalloutLastEnrolmentBiometricsApiModel(json: JsonObject) {
+    assertThat(json.get("type").asString).isEqualTo("ENROLMENT_LAST_BIOMETRICS")
+    assertThat(json.get("projectId").asString)
+    assertThat(json.get("userId").asString)
+    assertThat(json.get("moduleId").asString)
+    assertThat(json.get("metadata").asString)
+    assertThat(json.get("sessionId").asString)
+    assertThat(json.size()).isEqualTo(6)
 }
 
 fun verifyCalloutVerificationApiModel(json: JsonObject) {
