@@ -60,7 +60,7 @@ class AndroidTestConfig<T : Any>(
     }
 
     private fun initModules() = also {
-        app.setupTimber()
+        app.setUpLogging()
         app.handleUndeliverableExceptionInRxJava()
     }
 
