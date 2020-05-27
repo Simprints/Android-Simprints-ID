@@ -84,7 +84,7 @@
     <string name="refusal_person_not_present">Namichi hin argamne</string>
     <string name="refusal_religious_concerns">Dhimmoota Amantaa</string>
     <string name="refusal_too_young">Baay\'ee daa\'ima</string>
-    <string name="reasons_for_leaving_fingerprint">Ashaaraa qubaa fudhuu maaliif addaan kutta?</string>
+    <string name="why_did_you_skip_fingerprinting">Ashaaraa qubaa fudhuu maaliif addaan kutta?</string>
     <string name="button_scan_prints">Ashaaraa qubaa fuudhi</string>
     <string name="button_submit">Ol ergi</string>
     <string name="hint_other_reason">Odeeffannoo dabalataa</string>

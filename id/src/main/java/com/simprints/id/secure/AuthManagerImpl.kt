@@ -15,9 +15,11 @@ class AuthManagerImpl(private val simApiClientFactory: SimApiClientFactory) : Au
 
     override suspend fun requestAuthToken(authRequest: AuthRequest): Token {
         val response = executeCall("requestAuthToken") {
-            it.requestCustomTokens(authRequest.projectId,
+            it.requestCustomTokens(
+                authRequest.projectId,
                 authRequest.userId,
-                authRequest.authRequestBody)
+                authRequest.authRequestBody
+            )
         }
 
         response.body()?.let {
@@ -41,4 +43,5 @@ class AuthManagerImpl(private val simApiClientFactory: SimApiClientFactory) : Au
 
     private fun getSecureApiClient(): SimApiClient<SecureApiInterface> =
         simApiClientFactory.buildUnauthenticatedClient(SecureApiInterface::class)
+
 }

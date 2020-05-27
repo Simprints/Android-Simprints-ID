@@ -18,6 +18,7 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.*
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.extensions.deviceId
 import dagger.Module
 import dagger.Provides
 
@@ -44,9 +45,10 @@ open class LoginModule {
     ): AuthManager = AuthManagerImpl(apiClientFactory)
 
     @Provides
-    open fun provideAuthenticationDataManager(apiClientFactory: SimApiClientFactory
-    ): AuthenticationDataManager =
-        AuthenticationDataManagerImpl(apiClientFactory)
+    open fun provideAuthenticationDataManager(
+        apiClientFactory: SimApiClientFactory,
+        context: Context
+    ): AuthenticationDataManager = AuthenticationDataManagerImpl(apiClientFactory, context.deviceId)
 
     @Provides
     open fun provideAttestationManager(): AttestationManager = AttestationManagerImpl()
@@ -67,7 +69,7 @@ open class LoginModule {
         preferencesManager: PreferencesManager,
         attestationManager: AttestationManager,
         authenticationDataManager: AuthenticationDataManager
-    ) : ProjectAuthenticator = ProjectAuthenticatorImpl(
+    ): ProjectAuthenticator = ProjectAuthenticatorImpl(
         authManager,
         projectSecretManager,
         safetyNetClient,

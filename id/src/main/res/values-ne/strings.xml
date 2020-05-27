@@ -72,7 +72,7 @@
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
     <!-- Screen Text -->
-    <string name="reasons_for_leaving_fingerprint">किन तपाईंले औँठाछाप लगाउने छोड्नुभयो?</string>
+    <string name="why_did_you_skip_fingerprinting">किन तपाईंले औँठाछाप लगाउने छोड्नुभयो?</string>
     <!-- Button Labels -->
     <string name="button_submit">पेश गर्नुहोस्</string>
     <string name="button_scan_prints">औँठाछापहरू स्क्यान गर्नुहोस्</string>
