@@ -4,9 +4,10 @@ private const val CORE_REQUEST_CODE = 300
 
 enum class CoreRequestCode(val value: Int) {
     CONSENT(CORE_REQUEST_CODE + 1),
-    FETCH_GUID_CODE(CORE_REQUEST_CODE + 2),
+    FETCH_GUID_CHECK(CORE_REQUEST_CODE + 2),
     EXIT_FORM(CORE_REQUEST_CODE + 3),
-    GUID_SELECTION_CODE(CORE_REQUEST_CODE + 4);
+    GUID_SELECTION_CODE(CORE_REQUEST_CODE + 4),
+    SETUP(CORE_REQUEST_CODE + 5);
 
     companion object {
         fun isCoreResult(requestCode: Int) =

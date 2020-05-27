@@ -15,6 +15,7 @@ import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
 import com.simprints.id.testtools.typeText
 import org.hamcrest.CoreMatchers.not
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -116,4 +117,9 @@ class CoreExitFormActivityTest {
 
     private fun launchCoreExitFormActivity(): ActivityScenario<CoreExitFormActivity> =
         ActivityScenario.launch(CoreExitFormActivity::class.java)
+
+    @After
+    fun tearDown() {
+        Intents.release()
+    }
 }

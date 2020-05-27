@@ -9,6 +9,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.id.data.exitform.FaceExitFormReason
 import com.simprints.id.data.exitform.FingerprintExitFormReason
+import com.simprints.id.domain.moduleapi.core.response.SetupResponse
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
@@ -29,26 +30,33 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     private val coreStepProcessor = CoreStepProcessorImpl()
 
     @Test
-    fun stepProcessorShouldBuildRightStepForEnrol() {
+    fun stepProcessor_shouldBuildRightStepForEnrol() {
         val step = CoreStepProcessorImpl().buildStepConsent(ConsentType.ENROL)
 
         verifyCoreIntent<AskConsentRequest>(step, CoreRequestCode.CONSENT.value)
     }
 
     @Test
-    fun stepProcessorShouldBuildRightStepForIdentify() {
+    fun stepProcessor_shouldBuildRightStepForIdentify() {
         val step = CoreStepProcessorImpl().buildStepConsent(ConsentType.IDENTIFY)
 
         verifyCoreIntent<AskConsentRequest>(step, CoreRequestCode.CONSENT.value)
     }
 
     @Test
-    fun stepProcessorShouldProcessFetchGUIDResponse() {
+    fun stepProcessor_shouldProcessFetchGUIDResponse() {
         val fetchActivityReturn: Intent =
             Intent().putExtra(CORE_STEP_BUNDLE, FetchGUIDResponse(false))
         val result = coreStepProcessor.processResult(fetchActivityReturn)
 
         assertThat(result).isInstanceOf(FetchGUIDResponse::class.java)
+    }
+
+    @Test
+    fun stepProcessor_shouldBuildRightStepForVerify() {
+        val step = CoreStepProcessorImpl().buildStepConsent(ConsentType.VERIFY)
+
+        verifyCoreIntent<AskConsentRequest>(step, CoreRequestCode.CONSENT.value)
     }
 
     @Test
@@ -64,7 +72,7 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     }
 
     @Test
-    fun stepProcessorShouldProcessGuidSelectionResponse() {
+    fun stepProcessor_shouldProcessGuidSelectionResponse() {
         val guidSelectionReturn: Intent =
             Intent().putExtra(CORE_STEP_BUNDLE, GuidSelectionResponse(true))
         val result = coreStepProcessor.processResult(guidSelectionReturn)
@@ -73,7 +81,7 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     }
 
     @Test
-    fun stepProcessorShouldProcessConsentResult() {
+    fun stepProcessor_shouldProcessConsentResult() {
         val consentData: Intent =
             Intent().putExtra(CORE_STEP_BUNDLE, AskConsentResponse(ConsentResponse.ACCEPTED))
         val result = coreStepProcessor.processResult(consentData)
@@ -82,7 +90,7 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     }
 
     @Test
-    fun stepProcessorShouldProcessCoreExitFormResult() {
+    fun stepProcessor_shouldProcessCoreExitFormResult() {
         val exitFormData = Intent().apply {
             putExtra(CORE_STEP_BUNDLE, CoreExitFormResponse(CoreExitFormReason.OTHER, "optional_text"))
         }
@@ -92,7 +100,7 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     }
 
     @Test
-    fun stepProcessorShouldProcessFingerprintExitFormResult() {
+    fun stepProcessor_shouldProcessFingerprintExitFormResult() {
         val fingerprintExitFormData = Intent().apply {
             putExtra(CORE_STEP_BUNDLE,
                 CoreFingerprintExitFormResponse(FingerprintExitFormReason.OTHER, "fingerprint_optional_text"))
@@ -104,7 +112,7 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     }
 
     @Test
-    fun stepProcessorShouldProcessFaceExitFormResult() {
+    fun stepProcessor_shouldProcessFaceExitFormResult() {
         val faceExitFormData = Intent().apply {
             putExtra(CORE_STEP_BUNDLE, CoreFaceExitFormResponse(FaceExitFormReason.OTHER,
                 "face_optional_text"))
@@ -112,6 +120,17 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
         val result = coreStepProcessor.processResult(faceExitFormData)
 
         assertThat(result).isInstanceOf(CoreFaceExitFormResponse::class.java)
+    }
+
+    @Test
+    fun stepProcessor_shouldProcessResultFromSetup() {
+        val setupData = Intent().apply {
+            putExtra(CORE_STEP_BUNDLE, SetupResponse())
+        }
+
+        val result = coreStepProcessor.processResult(setupData)
+
+        assertThat(result).isInstanceOf(SetupResponse::class.java)
     }
 
     @After

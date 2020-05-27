@@ -3,89 +3,63 @@ package com.simprints.fingerprint.scanner.wrapper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
+import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
-import com.simprints.fingerprint.scanner.domain.ScannerVersionInformation
-import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
+import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
+import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
+import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
+import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
-import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.Single
 import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 import java.io.IOException
-import java.util.*
-import java.util.concurrent.TimeUnit
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
 class ScannerWrapperV2(private val scannerV2: ScannerV2,
                        private val scannerUiHelper: ScannerUiHelper,
                        private val macAddress: String,
-                       private val bluetoothAdapter: ComponentBluetoothAdapter,
+                       private val scannerInitialSetupHelper: ScannerInitialSetupHelper,
+                       private val connectionHelper: ConnectionHelper,
+                       private val cypressOtaHelper: CypressOtaHelper,
+                       private val stmOtaHelper: StmOtaHelper,
+                       private val un20OtaHelper: Un20OtaHelper,
                        private val crashReportManager: FingerprintCrashReportManager) : ScannerWrapper {
 
-    private lateinit var socket: ComponentBluetoothSocket
+    private var scannerVersion: ScannerVersion? = null
 
-    private var unifiedVersionInformation: UnifiedVersionInformation? = null
+    override fun versionInformation(): ScannerVersion =
+        scannerVersion ?: ScannerVersion(
+            ScannerGeneration.VERO_2,
+            ScannerFirmwareVersions.UNKNOWN,
+            ScannerApiVersions.UNKNOWN
+        )
 
-    override fun versionInformation(): ScannerVersionInformation =
-        unifiedVersionInformation?.let {
-            ScannerVersionInformation(2, it.masterFirmwareVersion,
-                (it.un20AppVersion.apiMajorVersion.toLong() shl 48) or
-                    (it.un20AppVersion.apiMinorVersion.toLong() shl 32) or
-                    (it.un20AppVersion.firmwareMajorVersion.toLong() shl 16) or
-                    (it.un20AppVersion.firmwareMinorVersion.toLong()))
-        } ?: ScannerVersionInformation(2, -1, -1)
+    override fun connect(): Completable =
+        connectionHelper.connectScanner(scannerV2, macAddress)
+            .wrapErrorsFromScanner()
 
-    override fun connect(): Completable {
-        if (bluetoothAdapter.isNull()) throw BluetoothNotSupportedException()
-        if (!bluetoothAdapter.isEnabled()) throw BluetoothNotEnabledException()
-
-        val device = bluetoothAdapter.getRemoteDevice(macAddress)
-
-        if (!device.isBonded()) throw ScannerNotPairedException()
-
-        return Single.fromCallable {
-            try {
-                Timber.d("Attempting connect...")
-                socket = device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
-                bluetoothAdapter.cancelDiscovery()
-                socket.connect()
-                socket
-            } catch (e: IOException) {
-                throw ScannerDisconnectedException()
-            }
-        }.retry(CONNECT_MAX_RETRIES)
-            .flatMapCompletable { socket ->
-                Timber.d("Socket connected. Setting up scanner...")
-                scannerV2.connect(socket.getInputStream(), socket.getOutputStream())
-                    .delay(100, TimeUnit.MILLISECONDS) // Speculatively needed
-                    .andThen(scannerV2.getVersionInformation())
-                    .map {
-                        unifiedVersionInformation = it
-                    }
-                    .ignoreElement()
-                    .andThen(scannerV2.enterMainMode())
-                    .delay(100, TimeUnit.MILLISECONDS) // Speculatively needed
-            }.wrapErrorsFromScanner()
-    }
+    override fun setup(): Completable =
+        scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerV2) { scannerVersion = it }
+            .wrapErrorsFromScanner()
 
     override fun disconnect(): Completable =
-        scannerV2.disconnect()
-            .doOnComplete { socket.close() }
+        connectionHelper.disconnectScanner(scannerV2)
             .wrapErrorsFromScanner()
 
     override fun sensorWakeUp(): Completable =
@@ -201,6 +175,18 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
         }
     }
 
+    override fun performCypressOta(): Observable<CypressOtaStep> =
+        cypressOtaHelper.performOtaSteps(scannerV2, macAddress)
+            .wrapErrorsFromScanner()
+
+    override fun performStmOta(): Observable<StmOtaStep> =
+        stmOtaHelper.performOtaSteps(scannerV2, macAddress)
+            .wrapErrorsFromScanner()
+
+    override fun performUn20Ota(): Observable<Un20OtaStep> =
+        un20OtaHelper.performOtaSteps(scannerV2, macAddress)
+            .wrapErrorsFromScanner()
+
     private fun CaptureFingerprintStrategy.deduceCaptureDpi(): Dpi =
         when (this) {
             CaptureFingerprintStrategy.SECUGEN_ISO_500_DPI -> Dpi(500)
@@ -221,6 +207,9 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     private fun <T> Single<T>.wrapErrorsFromScanner() =
         onErrorResumeNext { Single.error(wrapErrorFromScanner(it)) }
 
+    private fun <T> Observable<T>.wrapErrorsFromScanner() =
+        onErrorResumeNext { e: Throwable -> Observable.error(wrapErrorFromScanner(e)) }
+
     private fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
         is IOException -> { // Disconnected or timed-out communications with Scanner
             Timber.d(e, "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException")
@@ -238,8 +227,6 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     }
 
     companion object {
-        private val DEFAULT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
-        private const val CONNECT_MAX_RETRIES = 1L
         private const val NO_FINGER_IMAGE_QUALITY_THRESHOLD = 10 // The image quality at which we decide a fingerprint wasn't detected
     }
 }

@@ -50,7 +50,7 @@ class ProjectAuthenticatorImplTest {
     fun successfulResponse_userShouldSignIn() = runBlockingTest {
         val authenticator = buildProjectAuthenticator()
 
-        authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET)
+        authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
     }
 
     @Test
@@ -60,7 +60,7 @@ class ProjectAuthenticatorImplTest {
         val authenticator = buildProjectAuthenticator()
 
         assertThrows<IOException> {
-            authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET)
+            authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
         }
     }
 
@@ -68,7 +68,7 @@ class ProjectAuthenticatorImplTest {
     fun authenticate_invokeAuthenticationDataManagerCorrectly() = runBlockingTest {
         val authenticator = buildProjectAuthenticator()
 
-        authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET)
+        authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
 
         coVerify(exactly = 1) { authenticationDataManagerMock.requestAuthenticationData(PROJECT_ID, USER_ID) }
     }
@@ -77,7 +77,7 @@ class ProjectAuthenticatorImplTest {
     fun authenticate_invokeSignerManagerCorrectly() = runBlockingTest {
         val authenticator = buildProjectAuthenticator()
 
-        authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET)
+        authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
 
         coVerify(exactly = 1) { signerManager.signIn(PROJECT_ID, USER_ID, any()) }
     }
@@ -86,7 +86,7 @@ class ProjectAuthenticatorImplTest {
     fun authenticate_invokeSecureDataManagerCorrectly() = runBlockingTest {
         val authenticator = buildProjectAuthenticator()
 
-        authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET)
+        authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
 
         coVerify(exactly = 1) { secureDataManager.setLocalDatabaseKey(PROJECT_ID) }
     }
@@ -99,7 +99,7 @@ class ProjectAuthenticatorImplTest {
         val authenticator = buildProjectAuthenticator()
 
         assertThrows<SafetyNetException> {
-            authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET)
+            authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
         }
     }
 
@@ -132,6 +132,7 @@ class ProjectAuthenticatorImplTest {
         const val PROJECT_ID = "project_id"
         const val USER_ID = "user_id"
         const val PROJECT_SECRET = "encrypted_project_secret"
+        const val DEVICE_ID = "device_id"
     }
 
 }
