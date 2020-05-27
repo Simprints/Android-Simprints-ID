@@ -12,11 +12,13 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFi
 import com.simprints.fingerprintscanner.v2.domain.root.models.CypressFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
+import com.simprints.testtools.common.reactive.advanceTime
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.every
 import io.mockk.mockk
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.schedulers.TestScheduler
 import org.junit.Before
 import org.junit.Test
 
@@ -24,7 +26,8 @@ class ScannerInitialSetupHelperTest {
 
     private val scannerMock = mockk<Scanner>()
     private val firmwareFileManagerMock = mockk<FirmwareFileManager>()
-    private val scannerInitialSetupHelper = ScannerInitialSetupHelper(firmwareFileManagerMock)
+    private val testScheduler = TestScheduler()
+    private val scannerInitialSetupHelper = ScannerInitialSetupHelper(firmwareFileManagerMock, testScheduler)
 
     @Before
     fun setup() {
@@ -37,6 +40,7 @@ class ScannerInitialSetupHelperTest {
         every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns null
 
         val testSubscriber = scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock) {}.test()
+        testScheduler.advanceTime()
 
         testSubscriber.awaitAndAssertSuccess()
     }
@@ -49,6 +53,7 @@ class ScannerInitialSetupHelperTest {
         )
 
         val testSubscriber = scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock) {}.test()
+        testScheduler.advanceTime()
 
         testSubscriber.awaitTerminalEvent()
         testSubscriber.assertError { e ->
@@ -64,6 +69,7 @@ class ScannerInitialSetupHelperTest {
         var version: ScannerVersion? = null
 
         val testSubscriber = scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock) { version = it }.test()
+        testScheduler.advanceTime()
 
         testSubscriber.awaitAndAssertSuccess()
 
@@ -76,6 +82,7 @@ class ScannerInitialSetupHelperTest {
         every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns SCANNER_VERSION_LOW.toScannerVersion().firmware
 
         val testSubscriber = scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock) {}.test()
+        testScheduler.advanceTime()
 
         testSubscriber.awaitAndAssertSuccess()
     }
@@ -86,6 +93,7 @@ class ScannerInitialSetupHelperTest {
         every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns SCANNER_VERSION_HIGH.toScannerVersion().firmware
 
         val testSubscriber = scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock) {}.test()
+        testScheduler.advanceTime()
 
         testSubscriber.awaitTerminalEvent()
         testSubscriber.assertError { e ->

@@ -8,19 +8,22 @@ import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import io.reactivex.Completable
+import io.reactivex.Scheduler
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
-class ScannerInitialSetupHelper(private val firmwareFileManager: FirmwareFileManager) {
+class ScannerInitialSetupHelper(private val firmwareFileManager: FirmwareFileManager,
+                                private val timeScheduler: Scheduler = Schedulers.io()) {
 
     fun setupScannerWithOtaCheck(scanner: Scanner, withScannerVersion: (ScannerVersion) -> Unit): Completable =
         Completable.complete()
-            .delay(100, TimeUnit.MILLISECONDS) // Speculatively needed
+            .delay(100, TimeUnit.MILLISECONDS, timeScheduler) // Speculatively needed
             .andThen(scanner.getVersionInformation())
             .map { unifiedVersion -> unifiedVersion.toScannerVersion().also { withScannerVersion(it) } }
             .ifAvailableOtasThenThrow(firmwareFileManager.getAvailableScannerFirmwareVersions())
             .andThen(scanner.enterMainMode())
-            .delay(100, TimeUnit.MILLISECONDS) // Speculatively needed
+            .delay(100, TimeUnit.MILLISECONDS, timeScheduler) // Speculatively needed
 
     private fun Single<ScannerVersion>.ifAvailableOtasThenThrow(availableVersions: ScannerFirmwareVersions?): Completable =
         flatMapCompletable { scannerVersions ->
