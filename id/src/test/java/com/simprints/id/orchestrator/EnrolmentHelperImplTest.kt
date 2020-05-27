@@ -21,16 +21,11 @@ import org.junit.Test
 
 class EnrolmentHelperImplTest {
 
-    lateinit var enrolmentHelper: EnrolmentHelper
+    private lateinit var enrolmentHelper: EnrolmentHelper
 
-    @MockK
-    lateinit var personRepository: PersonRepository
-
-    @MockK
-    lateinit var sessionRepository: SessionRepository
-
-    @MockK
-    lateinit var timeHelper: TimeHelper
+    @MockK lateinit var personRepository: PersonRepository
+    @MockK lateinit var sessionRepository: SessionRepository
+    @MockK lateinit var timeHelper: TimeHelper
 
     @Before
     fun setUp() {

@@ -1,5 +1,5 @@
 package com.simprints.clientapi.activities.commcare
-
+import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
 
 sealed class CommCareAction(open val action: String?) {
 
@@ -25,7 +25,7 @@ sealed class CommCareAction(open val action: String?) {
                 ACTION_REGISTER -> Enrol
                 ACTION_IDENTIFY -> Identify
                 ACTION_VERIFY -> Verify
-                ACTION_CONFIRM_IDENTITY -> CommCareActionFollowUpAction.ConfirmIdentity
+                ACTION_CONFIRM_IDENTITY -> ConfirmIdentity
                 else -> Invalid
             }
     }

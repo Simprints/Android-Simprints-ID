@@ -4,7 +4,6 @@ import android.app.Activity
 import com.simprints.clientapi.domain.requests.*
 import com.simprints.clientapi.extensions.toIntent
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
-import timber.log.Timber
 
 object AppRequestRouter {
 

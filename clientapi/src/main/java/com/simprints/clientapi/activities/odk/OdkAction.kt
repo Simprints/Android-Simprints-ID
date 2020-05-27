@@ -1,8 +1,7 @@
 package com.simprints.clientapi.activities.odk
 
-import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.*
-import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction
-import com.simprints.id.domain.Constants
+import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.ConfirmIdentity
+import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.EnrolLastBiometrics
 
 sealed class OdkAction(open val action: String?) {
 

@@ -86,17 +86,10 @@ enum class AlertActivityViewModel(val type: Type,
             }
     }
 
-    @StringRes
-    val title: Int = type.title
-
-    @ColorRes
-    val backgroundColor: Int = type.backgroundColor
-
-    @DrawableRes
-    val mainDrawable: Int = type.mainDrawable
-
-    @DrawableRes
-    val hintDrawable: Int? = type.hintDrawable
+    @StringRes val title: Int = type.title
+    @ColorRes val backgroundColor: Int = type.backgroundColor
+    @DrawableRes val mainDrawable: Int = type.mainDrawable
+    @DrawableRes val hintDrawable: Int? = type.hintDrawable
 
     @Keep
     sealed class Type(@StringRes val title: Int,
