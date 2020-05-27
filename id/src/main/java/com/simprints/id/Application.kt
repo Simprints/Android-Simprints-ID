@@ -46,21 +46,20 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
 
     open fun initApplication() {
         createComponent()
-        this.initModules()
-        initServiceLocation()
+        setupTimber()
+        handleUndeliverableExceptionInRxJava()
+        initKoin()
     }
 
-    open fun initModules() {
+    open fun setupTimber() {
         if (Timber.treeCount() <= 0) {
             if (isWithLogFileFlavour()) {
                 Timber.plant(FileLoggingTree())
-                Timber.d("File logging set up.")
+                Timber.d("File logging set.")
             } else if (BuildConfig.DEBUG) {
                 Timber.plant(LineNumberDebugTree())
             }
         }
-
-        handleUndeliverableExceptionInRxJava()
     }
 
     override fun getCameraXConfig(): CameraXConfig = Camera2Config.defaultConfig()
@@ -87,7 +86,7 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
     // TODO: move to flavour-specific class
     private fun isWithLogFileFlavour(): Boolean = BuildConfig.FLAVOR == "withLogFile"
 
-    private fun initServiceLocation() {
+    private fun initKoin() {
         startKoin {
             androidLogger()
             androidContext(this@Application)
