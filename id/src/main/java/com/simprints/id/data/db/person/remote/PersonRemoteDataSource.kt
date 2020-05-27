@@ -3,6 +3,7 @@ package com.simprints.id.data.db.person.remote
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.network.SimApiClient
 
 interface PersonRemoteDataSource {
 
@@ -10,5 +11,5 @@ interface PersonRemoteDataSource {
     suspend fun uploadPeople(projectId: String, patientsToUpload: List<Person>)
 
     suspend fun getDownSyncPeopleCount(projectId: String, peopleOperationsParams: List<PeopleDownSyncOperation>): List<PeopleCount>
-    suspend fun getPeopleApiClient(): PeopleRemoteInterface
+    suspend fun getPeopleApiClient(): SimApiClient<PeopleRemoteInterface>
 }
