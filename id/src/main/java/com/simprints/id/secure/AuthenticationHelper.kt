@@ -7,7 +7,8 @@ interface AuthenticationHelper {
     suspend fun authenticateSafely(
         userId: String,
         projectId: String,
-        projectSecret: String
+        projectSecret: String,
+        deviceId: String
     ): AuthenticationEvent.Result
 
 }

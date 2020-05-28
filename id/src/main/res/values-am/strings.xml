@@ -83,7 +83,7 @@
     <string name="refusal_too_young">ጨቅላ</string>
     <string name="refusal_app_not_working">አፕልኬሽኑ አይሰራም</string>
     <string name="refusal_other">ተጨማሪ</string>
-    <string name="reasons_for_leaving_fingerprint">የጣት አሻራውን ለምንድን ነው የሚዘሉት?</string>
+    <string name="why_did_you_skip_fingerprinting">የጣት አሻራውን ለምንድን ነው የሚዘሉት?</string>
     <string name="button_scan_prints">የጣት አሻራውን እስካን ያድርጉ</string>
     <string name="button_submit">ይላኩ</string>
     <string name="hint_other_reason">ተጨማሪ ኢንፎርሜሽን</string>

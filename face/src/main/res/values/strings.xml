@@ -35,6 +35,6 @@
     <string name="capture_title_too_close">Too close</string>
     <string name="capture_title_face_too_far">Too far</string>
     <string name="matching_x_records">Matching against %s records</string>
-    <string name="why_did_you_skip_face_capture">Reasons for leaving camera flow</string>
+    <string name="why_did_you_skip_face_capture">Why did you skip face capture?</string>
     <string name="exit_form_return_to_face_capture">Capture face</string>
 </resources>

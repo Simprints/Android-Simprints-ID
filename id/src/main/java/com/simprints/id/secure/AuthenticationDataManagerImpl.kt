@@ -10,12 +10,14 @@ import com.simprints.id.secure.models.remote.toDomainAuthData
 import retrofit2.HttpException
 import retrofit2.Response
 
-class AuthenticationDataManagerImpl(private val simApiClientFactory: SimApiClientFactory) : AuthenticationDataManager {
-
+class AuthenticationDataManagerImpl(
+    private val simApiClientFactory: SimApiClientFactory,
+    private val deviceId: String
+): AuthenticationDataManager {
 
     override suspend fun requestAuthenticationData(projectId: String, userId: String): AuthenticationData {
         val response = executeCall("requestAuthData") {
-            it.requestAuthenticationData(projectId, userId)
+            it.requestAuthenticationData(projectId, userId, deviceId)
         }
 
         response.body()?.let {
@@ -39,4 +41,5 @@ class AuthenticationDataManagerImpl(private val simApiClientFactory: SimApiClien
 
     private fun getSecureApiClient(): SimApiClient<SecureApiInterface> =
         simApiClientFactory.buildUnauthenticatedClient(SecureApiInterface::class)
+
 }

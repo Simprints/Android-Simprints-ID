@@ -23,10 +23,14 @@ class ProjectAuthenticatorImpl(
     private val authenticationDataManager: AuthenticationDataManager
 ) : ProjectAuthenticator {
 
-    override suspend fun authenticate(nonceScope: NonceScope, projectSecret: String) {
+    override suspend fun authenticate(
+        nonceScope: NonceScope,
+        projectSecret: String,
+        deviceId: String
+    ) {
         createLocalDbKeyForProject(nonceScope.projectId)
 
-        prepareAuthRequestParameters(nonceScope, projectSecret)
+        prepareAuthRequestParameters(nonceScope, projectSecret, deviceId)
             .makeAuthRequest()
             .signIn(nonceScope.projectId, nonceScope.userId)
 
@@ -35,15 +39,24 @@ class ProjectAuthenticatorImpl(
             .fetchProjectLongConsentTexts()
     }
 
-    private suspend fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): AuthRequest =
-        buildAuthRequestParameters(nonceScope, projectSecret)
+    private suspend fun prepareAuthRequestParameters(
+        nonceScope: NonceScope,
+        projectSecret: String,
+        deviceId: String
+    ): AuthRequest = buildAuthRequestParameters(nonceScope, projectSecret, deviceId)
 
-    private suspend fun buildAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): AuthRequest {
+    private suspend fun buildAuthRequestParameters(
+        nonceScope: NonceScope,
+        projectSecret: String,
+        deviceId: String
+    ): AuthRequest {
         val authenticationData = getAuthenticationData(nonceScope.projectId, nonceScope.userId)
         return buildAuthRequest(
             getEncryptedProjectSecret(projectSecret, authenticationData),
             getGoogleAttestation(safetyNetClient, authenticationData),
-            nonceScope)
+            nonceScope,
+            deviceId
+        )
     }
 
     private suspend fun getAuthenticationData(projectId: String, userId: String) =
@@ -56,10 +69,16 @@ class ProjectAuthenticatorImpl(
     private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationData: AuthenticationData): AttestToken =
         attestationManager.requestAttestation(safetyNetClient, authenticationData.nonce)
 
-    private fun buildAuthRequest(encryptedProjectSecret: String,
-                                 googleAttestation: AttestToken,
-                                 nonceScope: NonceScope): AuthRequest =
-        AuthRequest(nonceScope.projectId, nonceScope.userId, AuthRequestBody(encryptedProjectSecret, googleAttestation.value))
+    private fun buildAuthRequest(
+        encryptedProjectSecret: String,
+        googleAttestation: AttestToken,
+        nonceScope: NonceScope,
+        deviceId: String
+    ): AuthRequest = AuthRequest(
+        nonceScope.projectId,
+        nonceScope.userId,
+        AuthRequestBody(encryptedProjectSecret, googleAttestation.value, deviceId)
+    )
 
     private suspend fun AuthRequest.makeAuthRequest(): Token =
         authManager.requestAuthToken(this)
