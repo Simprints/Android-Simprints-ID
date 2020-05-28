@@ -4,8 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.face.PeopleGenerator
-import com.simprints.face.controllers.core.flow.Action
-import com.simprints.face.controllers.core.flow.MasterFlowManager
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
@@ -15,7 +13,6 @@ import com.simprints.id.tools.utils.generateSequenceN
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import kotlinx.coroutines.CoroutineDispatcher
@@ -46,24 +43,13 @@ class FaceMatchViewModelTest {
     private val verifyRequest = FaceMatchRequest(listOf(verifyProbe), mockQuery)
     private val identifyRequest = FaceMatchRequest(listOf(identifyProbe), mockQuery)
 
-    private val masterFlowManager: MasterFlowManager = mockk()
     private val faceDbManager: FaceDbManager = mockk()
     private val faceMatcher: FaceMatcher = spyk()
     private val viewModel: FaceMatchViewModel =
-        FaceMatchViewModel(masterFlowManager, faceDbManager, faceMatcher, testDispatcherProvider)
-
-    @Test
-    fun `Route correctly to an error if it's not identify or verify`() {
-        every { masterFlowManager.getCurrentAction() } returns Action.ENROL
-
-        viewModel.setupMatch(identifyRequest)
-
-        assertThat(viewModel.matchState.value).isEqualTo(FaceMatchViewModel.MatchState.Error)
-    }
+        FaceMatchViewModel(faceDbManager, faceMatcher, testDispatcherProvider)
 
     @Test
     fun `Send events with correct values for identification`() = testCoroutineRule.runBlockingTest {
-        every { masterFlowManager.getCurrentAction() } returns Action.IDENTIFY
         // Doing this way so I can compare later
         val candidates = generateSequenceN(5) { PeopleGenerator.getFaceIdentity(2) }.toList()
         coEvery { faceDbManager.loadPeople(any()) } returns candidates.asFlow()
@@ -106,7 +92,6 @@ class FaceMatchViewModelTest {
 
     @Test
     fun `Send events with correct values for verification`() = testCoroutineRule.runBlockingTest {
-        every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
         // Doing this way so I can compare later
         val candidates = generateSequenceN(1) { PeopleGenerator.getFaceIdentity(2) }.toList()
         coEvery { faceDbManager.loadPeople(any()) } returns candidates.asFlow()

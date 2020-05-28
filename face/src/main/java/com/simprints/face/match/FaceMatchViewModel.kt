@@ -8,8 +8,6 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.extentions.concurrentMap
-import com.simprints.face.controllers.core.flow.Action
-import com.simprints.face.controllers.core.flow.MasterFlowManager
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.data.db.person.FaceIdentity
 import com.simprints.face.data.db.person.FaceSample
@@ -23,7 +21,6 @@ import java.io.Serializable
 import kotlin.math.min
 
 class FaceMatchViewModel(
-    private val masterFlowManager: MasterFlowManager,
     private val faceDbManager: FaceDbManager,
     private val faceMatcher: FaceMatcher,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
@@ -41,11 +38,6 @@ class FaceMatchViewModel(
         MutableLiveData()
 
     fun setupMatch(faceRequest: FaceMatchRequest) = viewModelScope.launch {
-        if (masterFlowManager.getCurrentAction() == Action.ENROL) {
-            matchState.value = MatchState.Error
-            return@launch
-        }
-
         val candidates = loadCandidates(faceRequest.queryForCandidates)
         val results = matchCandidates(faceRequest.probeFaceSamples, candidates)
         val sortedResults = getSortedResult(results)
