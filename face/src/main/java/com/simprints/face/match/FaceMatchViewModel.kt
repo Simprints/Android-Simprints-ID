@@ -36,42 +36,42 @@ class FaceMatchViewModel(
         const val matchingEndWaitTimeInMillis = 1000L
     }
 
-    private lateinit var probeFaceSamples: List<FaceSample>
-    private lateinit var queryForCandidates: Serializable
-
     val matchState: MutableLiveData<MatchState> = MutableLiveData(MatchState.NotStarted)
     val faceMatchResponse: MutableLiveData<LiveDataEventWithContent<FaceMatchResponse>> =
         MutableLiveData()
 
     fun setupMatch(faceRequest: FaceMatchRequest) = viewModelScope.launch {
-        probeFaceSamples = faceRequest.probeFaceSamples
-        queryForCandidates = faceRequest.queryForCandidates
-
         if (masterFlowManager.getCurrentAction() == Action.ENROL) {
             matchState.value = MatchState.Error
             return@launch
         }
 
-        val candidates = loadCandidates()
-        val results = matchCandidates(candidates)
+        val candidates = loadCandidates(faceRequest.queryForCandidates)
+        val results = matchCandidates(faceRequest.probeFaceSamples, candidates)
         val sortedResults = getSortedResult(results)
         sendFaceMatchResponse(sortedResults)
     }
 
-    private suspend fun loadCandidates(): Flow<FaceIdentity> {
+    private suspend fun loadCandidates(queryForCandidates: Serializable): Flow<FaceIdentity> {
         matchState.value = MatchState.LoadingCandidates
         return faceDbManager.loadPeople(queryForCandidates)
     }
 
-    private suspend fun matchCandidates(candidates: Flow<FaceIdentity>): Flow<FaceMatchResult> {
+    private suspend fun matchCandidates(
+        probeFaceSamples: List<FaceSample>,
+        candidates: Flow<FaceIdentity>
+    ): Flow<FaceMatchResult> {
         matchState.postValue(MatchState.Matching)
-        return getConcurrentMatchResultsForCandidates(candidates)
+        return getConcurrentMatchResultsForCandidates(probeFaceSamples, candidates)
     }
 
     /**
      * Run in a concurrent map, making the processing much faster
      */
-    private suspend fun getConcurrentMatchResultsForCandidates(candidates: Flow<FaceIdentity>) =
+    private suspend fun getConcurrentMatchResultsForCandidates(
+        probeFaceSamples: List<FaceSample>,
+        candidates: Flow<FaceIdentity>
+    ) =
         candidates.concurrentMap(dispatcherProvider.default()) { candidate ->
             FaceMatchResult(
                 candidate.faceId,
