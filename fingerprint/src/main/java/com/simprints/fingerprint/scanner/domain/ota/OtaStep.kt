@@ -26,8 +26,8 @@ sealed class StmOtaStep(totalProgress: Float,
     object ReconnectingAfterTransfer : StmOtaStep(0.70f)
     object EnteringMainMode : StmOtaStep(0.78f)
     object ValidatingNewFirmwareVersion : StmOtaStep(0.80f)
-    object ReconnectingAfterValidating : StmOtaStep(0.85f)
-    object UpdatingUnifiedVersionInformation : StmOtaStep(0.95f)
+    object ReconnectingAfterValidating : StmOtaStep(0.85f, OtaRecoveryStrategy.UserActionRequired.SoftReset)
+    object UpdatingUnifiedVersionInformation : StmOtaStep(0.95f, OtaRecoveryStrategy.UserActionRequired.SoftReset)
 }
 
 sealed class Un20OtaStep(totalProgress: Float,

@@ -53,6 +53,7 @@ class ConnectScannerViewModel(
     val launchAlert = MutableLiveData<LiveDataEventWithContent<FingerprintAlert>>()
     val scannerConnected = MutableLiveData<LiveDataEventWithContent<Boolean>>()
     val finish = MutableLiveData<LiveDataEvent>()
+    val finishAfterError = MutableLiveData<LiveDataEvent>()
 
     val showScannerErrorDialogWithScannerId = MutableLiveData<LiveDataEventWithContent<String>>()
 

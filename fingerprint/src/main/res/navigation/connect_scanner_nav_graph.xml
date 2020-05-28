@@ -96,6 +96,9 @@
         <action
             android:id="@+id/action_otaFragment_to_otaRecoveryFragment"
             app:destination="@id/otaRecoveryFragment" />
+        <action
+            android:id="@+id/action_otaFragment_to_otaFailedFragment"
+            app:destination="@id/otaFailedFragment" />
     </fragment>
     <fragment
         android:id="@+id/otaRecoveryFragment"
@@ -108,7 +111,15 @@
         <action
             android:id="@+id/action_otaRecoveryFragment_to_otaFragment"
             app:destination="@id/otaFragment" />
+        <action
+            android:id="@+id/action_otaRecoveryFragment_to_otaFailedFragment"
+            app:destination="@id/otaFailedFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/otaFailedFragment"
+        android:name="com.simprints.fingerprint.activities.connect.issues.otafailed.OtaFailedFragment"
+        android:label="fragment_ota_failed"
+        tools:layout="@layout/fragment_ota_failed" />
     <fragment
         android:id="@+id/serialEntryPairFragment"
         android:name="com.simprints.fingerprint.activities.connect.issues.serialentrypair.SerialEntryPairFragment"

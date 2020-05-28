@@ -11,4 +11,5 @@ sealed class ConnectScannerIssue {
     object ScannerOff : ConnectScannerIssue()
     class Ota(val otaFragmentRequest: OtaFragmentRequest) : ConnectScannerIssue()
     class OtaRecovery(val otaRecoveryFragmentRequest: OtaRecoveryFragmentRequest) : ConnectScannerIssue()
+    object OtaFailed : ConnectScannerIssue()
 }

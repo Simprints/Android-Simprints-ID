@@ -23,7 +23,8 @@ class OtaViewModel(
 
     val progress = MutableLiveData(0f)
     val otaComplete = MutableLiveData<LiveDataEvent>()
-    val otaFailedNeedingUserAction = MutableLiveData<LiveDataEventWithContent<OtaRecoveryFragmentRequest>>()
+    val otaRecovery = MutableLiveData<LiveDataEventWithContent<OtaRecoveryFragmentRequest>>()
+    val otaFailed = MutableLiveData<LiveDataEvent>()
 
     private var currentStep: OtaStep? = null
     private var remainingOtas = mutableListOf<AvailableOta>()
@@ -55,25 +56,19 @@ class OtaViewModel(
     private fun handleScannerError(e: Throwable, currentRetryAttempt: Int) {
         Timber.e(e)
         if (currentRetryAttempt >= MAX_RETRY_ATTEMPTS) {
-            handleOtaFailedFinalTime()
+            otaFailed.postEvent()
         } else {
             when (val strategy = currentStep?.recoveryStrategy) {
                 is OtaRecoveryStrategy.UserActionRequired ->
-                    otaFailedNeedingUserAction.postEvent(OtaRecoveryFragmentRequest(strategy, remainingOtas, currentRetryAttempt))
-                OtaRecoveryStrategy.NoUserActionRequired.Un20OnlyReset ->
-                    resetUn20()
-                null -> handleOtaFailedFinalTime()
+                    otaRecovery.postEvent(OtaRecoveryFragmentRequest(strategy, remainingOtas, currentRetryAttempt))
+                OtaRecoveryStrategy.NoUserActionRequired.Un20OnlyReset -> resetUn20()
+                null -> otaFailed.postEvent()
             }
         }
-
     }
 
     private fun resetUn20() {
         TODO("Not yet implemented")
-    }
-
-    private fun handleOtaFailedFinalTime() {
-        TODO()
     }
 
     companion object {

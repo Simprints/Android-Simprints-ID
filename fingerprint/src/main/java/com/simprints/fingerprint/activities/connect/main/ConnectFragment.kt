@@ -56,7 +56,7 @@ abstract class ConnectFragment(@LayoutRes private val layout: Int) : Fingerprint
                 ConnectScannerIssue.SerialEntryPair -> actionConnectScannerMainFragmentToSerialEntryPairFragment()
                 ConnectScannerIssue.ScannerOff -> actionConnectScannerMainFragmentToScannerOffFragment()
                 is ConnectScannerIssue.Ota -> actionConnectScannerMainFragmentToOtaFragment(issue.otaFragmentRequest)
-                is ConnectScannerIssue.OtaRecovery -> null
+                is ConnectScannerIssue.OtaRecovery, ConnectScannerIssue.OtaFailed -> null
             }
             action?.let { findNavController().navigate(it) }
         }
