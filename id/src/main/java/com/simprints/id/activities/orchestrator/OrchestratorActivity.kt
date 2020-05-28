@@ -40,8 +40,8 @@ class OrchestratorActivity : AppCompatActivity() {
         it?.let {
             with(Intent().setClassName(packageName, it.activityName)) {
                 putExtra(it.bundleKey, it.request.fromDomainToModuleApi())
-                this@OrchestratorActivity.removeAnimationsToNextActivity()
                 startActivityForResult(this, it.requestCode)
+                this@OrchestratorActivity.removeAnimationsToNextActivity()
             }
         }
     }

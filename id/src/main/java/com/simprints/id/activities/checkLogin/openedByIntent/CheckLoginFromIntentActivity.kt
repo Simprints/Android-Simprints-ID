@@ -102,8 +102,8 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
             putExtra(AppRequest.BUNDLE_KEY, appRequest)
             addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
         }
-        this.removeAnimationsToNextActivity()
         startActivity(intent)
+        this.removeAnimationsToNextActivity()
         finish()
     }
 

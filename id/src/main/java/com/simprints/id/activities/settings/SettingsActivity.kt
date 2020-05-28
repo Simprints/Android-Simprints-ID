@@ -78,8 +78,8 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     }
 
     fun openCheckLoginFromMainLauncherActivity() {
-        removeAnimationsToNextActivity()
         startActivity(Intent(this, CheckLoginFromMainLauncherActivity::class.java))
+        removeAnimationsToNextActivity()
     }
     
 }

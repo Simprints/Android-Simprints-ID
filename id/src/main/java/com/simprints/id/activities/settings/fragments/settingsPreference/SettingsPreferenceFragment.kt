@@ -149,9 +149,9 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
 
     override fun clearActivityStackAndRelaunchApp() {
         activity.runOnUiThreadIfStillRunning {
-            activity.removeAnimationsToNextActivity()
             activity.finishAffinity()
             (activity as SettingsActivity).openCheckLoginFromMainLauncherActivity()
+            activity.removeAnimationsToNextActivity()
         }
     }
 
