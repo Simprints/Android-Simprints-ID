@@ -16,7 +16,7 @@ import com.simprints.face.detection.rankone.RankOneFaceDetector
 import com.simprints.face.exitform.ExitFormViewModel
 import com.simprints.face.match.FaceMatchViewModel
 import com.simprints.face.match.FaceMatcher
-import com.simprints.face.match.mock.MockFaceMatcher
+import com.simprints.face.match.rankone.RankOneFaceMatcher
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.id.Application
 import com.simprints.uicomponents.imageTools.LibYuvJni
@@ -66,7 +66,7 @@ object KoinInjector {
         factory<FaceDetector> { RankOneFaceDetector() }
         factory { FrameProcessor(get()) }
         factory { LibYuvJni() }
-        factory<FaceMatcher> { MockFaceMatcher() }
+        factory<FaceMatcher> { RankOneFaceMatcher() }
     }
 
     private fun Module.defineBuildersForViewModels() {
