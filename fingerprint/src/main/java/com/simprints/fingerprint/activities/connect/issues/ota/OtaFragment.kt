@@ -37,12 +37,13 @@ class OtaFragment : FingerprintFragment() {
         initStartUpdateButton()
         listenForProgress()
         listenForCompleteEvent()
+        listenForRecoveryEvent()
         listenForFailedEvent()
     }
 
     private fun setTextInLayout() {
         with(resourceHelper) {
-            // TODO
+
         }
     }
 
@@ -62,9 +63,15 @@ class OtaFragment : FingerprintFragment() {
         }
     }
 
-    private fun listenForFailedEvent() {
-        viewModel.otaFailedNeedingUserAction.fragmentObserveEventWith {
+    private fun listenForRecoveryEvent() {
+        viewModel.otaRecovery.fragmentObserveEventWith {
             findNavController().navigate(OtaFragmentDirections.actionOtaFragmentToOtaRecoveryFragment(it))
+        }
+    }
+
+    private fun listenForFailedEvent() {
+        viewModel.otaFailed.fragmentObserveEventWith {
+            findNavController()
         }
     }
 

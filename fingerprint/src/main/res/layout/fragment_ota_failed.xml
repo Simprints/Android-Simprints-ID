@@ -5,55 +5,56 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/simprints_blue"
-    tools:context=".activities.connect.issues.otarecovery.OtaRecoveryFragment">
+    tools:context=".activities.connect.issues.otafailed.OtaFailedFragment">
 
     <Button
-        android:id="@+id/tryAgainButton"
+        android:id="@+id/continueButton"
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="0dp"
         android:layout_height="54dp"
         android:background="@drawable/button_rounded_corners_orange"
         android:fontFamily="@font/muli"
         android:padding="8sp"
-        android:text="@string/try_again_label"
+        android:text="Continue"
         android:textColor="@color/simprints_white"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/otaRecoveryEndGuideline"
-        app:layout_constraintStart_toStartOf="@+id/otaRecoveryStartGuideline"
-        app:layout_constraintTop_toBottomOf="@+id/otaRecoveryImageGuideline"
+        app:layout_constraintEnd_toStartOf="@+id/otaFailedEndGuideline"
+        app:layout_constraintStart_toStartOf="@+id/otaFailedStartGuideline"
+        app:layout_constraintTop_toBottomOf="@+id/otaFailedImageGuideline"
         app:layout_constraintVertical_bias="0.55" />
 
     <TextView
-        android:id="@+id/otaRecoveryInstructionsTextView"
+        android:id="@+id/otaFailedInstructionsTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:gravity="center"
+        android:text="Please contact your supervisor"
         android:textColor="@color/simprints_white"
         android:textSize="22sp"
         app:layout_constraintBottom_toTopOf="@id/continueButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/otaRecoveryImageGuideline"
+        app:layout_constraintTop_toTopOf="@id/otaFailedImageGuideline"
         app:layout_constraintVertical_weight="0.25" />
 
     <ImageView
-        android:id="@+id/otaRecoveryImageView"
+        android:id="@+id/otaFailedImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="0dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/turn_on_scanner"
-        app:layout_constraintBottom_toTopOf="@+id/otaRecoveryImageGuideline"
+        android:src="@drawable/error_icon"
+        app:layout_constraintBottom_toTopOf="@+id/otaFailedImageGuideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/otaRecoveryTitleTextView"
+        app:layout_constraintTop_toBottomOf="@+id/otaFailedTitleTextView"
         app:layout_constraintVertical_weight="0.65"
         tools:ignore="ContentDescription" />
 
     <ProgressBar
-        android:id="@+id/otaRecoveryProgressBar"
+        android:id="@+id/otaFailedProgressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -65,7 +66,7 @@
         app:layout_constraintTop_toTopOf="@id/continueButton" />
 
     <TextView
-        android:id="@+id/otaRecoveryTitleTextView"
+        android:id="@+id/otaFailedTitleTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
@@ -74,28 +75,28 @@
         android:textColor="@color/simprints_white"
         android:textSize="26sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/otaRecoveryImageView"
+        app:layout_constraintBottom_toTopOf="@id/otaFailedImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_weight="0.4" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/otaRecoveryEndGuideline"
+        android:id="@+id/otaFailedEndGuideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.80" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/otaRecoveryImageGuideline"
+        android:id="@+id/otaFailedImageGuideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.65" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/otaRecoveryStartGuideline"
+        android:id="@+id/otaFailedStartGuideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
