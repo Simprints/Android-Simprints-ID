@@ -5,8 +5,6 @@ import com.simprints.face.capture.livefeedback.LiveFeedbackFragmentViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
 import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelperImpl
-import com.simprints.face.controllers.core.flow.MasterFlowManager
-import com.simprints.face.controllers.core.flow.MasterFlowManagerImpl
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.controllers.core.image.FaceImageManagerImpl
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
@@ -33,8 +31,7 @@ import org.koin.dsl.module
 object KoinInjector {
     private var koinModule: Module? = null
 
-    private fun Scope.appComponent() =
-        (androidApplication() as Application).component
+    private fun Scope.appComponent() = (androidApplication() as Application).component
 
     fun acquireFaceKoinModules() {
         if (koinModule == null) {
@@ -62,7 +59,6 @@ object KoinInjector {
         factory<FaceAndroidResourcesHelper> { FaceAndroidResourcesHelperImpl(get()) }
         factory<FacePreferencesManager> { FacePreferencesManagerImpl(get()) }
         factory<FaceImageManager> { FaceImageManagerImpl(get(), get()) }
-        factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
         factory<FaceDbManager> { FaceDbManagerImpl(get()) }
     }
 
@@ -76,9 +72,16 @@ object KoinInjector {
     private fun Module.defineBuildersForViewModels() {
         viewModel { FaceOrchestratorViewModel() }
         viewModel { FaceCaptureViewModel(get<FacePreferencesManager>().maxRetries, get()) }
-        viewModel { FaceMatchViewModel(get(), get(), get()) }
+        viewModel { FaceMatchViewModel(get(), get()) }
 
-        viewModel { (mainVM: FaceCaptureViewModel) -> LiveFeedbackFragmentViewModel(mainVM, get(), get(), get<FacePreferencesManager>().qualityThreshold) }
+        viewModel { (mainVM: FaceCaptureViewModel) ->
+            LiveFeedbackFragmentViewModel(
+                mainVM,
+                get(),
+                get(),
+                get<FacePreferencesManager>().qualityThreshold
+            )
+        }
         viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM) }
     }
 }
