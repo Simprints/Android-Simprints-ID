@@ -9,6 +9,7 @@ import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.PersonRepositoryImpl
+import com.simprints.id.data.db.person.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.local.PersonLocalDataSourceImpl
@@ -102,6 +103,11 @@ open class DataModule {
     open fun provideFingerprintRecordLocalDataSource(
         personLocalDataSource: PersonLocalDataSource
     ): FingerprintIdentityLocalDataSource = personLocalDataSource
+
+    @Provides
+    open fun provideFaceIdentityLocalDataSource(
+        personLocalDataSource: PersonLocalDataSource
+    ): FaceIdentityLocalDataSource = personLocalDataSource
 
     @Provides
     open fun provideImageRepository(
