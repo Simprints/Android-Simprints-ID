@@ -2,9 +2,11 @@ package com.simprints.fingerprint.scanner.domain.ota
 
 import com.simprints.fingerprint.scanner.tools.mapProgress
 
-sealed class OtaStep(val totalProgress: Float)
+sealed class OtaStep(val totalProgress: Float, val recoveryStrategy: OtaRecoveryStrategy)
 
-sealed class CypressOtaStep(totalProgress: Float) : OtaStep(totalProgress) {
+sealed class CypressOtaStep(totalProgress: Float,
+                            recoveryStrategy: OtaRecoveryStrategy = OtaRecoveryStrategy.UserActionRequired.SoftReset)
+    : OtaStep(totalProgress, recoveryStrategy) {
     object EnteringOtaMode : CypressOtaStep(0.00f)
     object CommencingTransfer : CypressOtaStep(0.05f)
     data class TransferInProgress(val otaProgress: Float) : CypressOtaStep(otaProgress.mapProgress(0.05f, 0.85f))
@@ -13,7 +15,9 @@ sealed class CypressOtaStep(totalProgress: Float) : OtaStep(totalProgress) {
     object UpdatingUnifiedVersionInformation : CypressOtaStep(0.95f)
 }
 
-sealed class StmOtaStep(totalProgress: Float) : OtaStep(totalProgress) {
+sealed class StmOtaStep(totalProgress: Float,
+                        recoveryStrategy: OtaRecoveryStrategy = OtaRecoveryStrategy.UserActionRequired.HardReset)
+    : OtaStep(totalProgress, recoveryStrategy) {
     object EnteringOtaModeFirstTime : StmOtaStep(0.00f)
     object ReconnectingAfterEnteringOtaMode : StmOtaStep(0.05f)
     object EnteringOtaModeSecondTime : StmOtaStep(0.08f)
@@ -26,7 +30,9 @@ sealed class StmOtaStep(totalProgress: Float) : OtaStep(totalProgress) {
     object UpdatingUnifiedVersionInformation : StmOtaStep(0.95f)
 }
 
-sealed class Un20OtaStep(totalProgress: Float) : OtaStep(totalProgress) {
+sealed class Un20OtaStep(totalProgress: Float,
+                         recoveryStrategy: OtaRecoveryStrategy = OtaRecoveryStrategy.NoUserActionRequired.Un20OnlyReset)
+    : OtaStep(totalProgress, recoveryStrategy) {
     object EnteringMainMode : Un20OtaStep(0.00f)
     object TurningOnUn20BeforeTransfer : Un20OtaStep(0.05f)
     object CommencingTransfer : Un20OtaStep(0.15f)

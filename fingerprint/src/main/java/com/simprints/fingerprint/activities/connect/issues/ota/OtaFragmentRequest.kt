@@ -5,4 +5,5 @@ import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class OtaFragmentRequest(val availableOtas: List<AvailableOta>): Parcelable
+data class OtaFragmentRequest(val availableOtas: List<AvailableOta>,
+                              val currentRetryAttempt: Int = 0) : Parcelable

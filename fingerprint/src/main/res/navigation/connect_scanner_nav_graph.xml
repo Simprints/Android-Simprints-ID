@@ -93,6 +93,21 @@
         <action
             android:id="@+id/action_otaFragment_to_connectScannerMainFragment"
             app:destination="@id/connectScannerMainFragment" />
+        <action
+            android:id="@+id/action_otaFragment_to_otaRecoveryFragment"
+            app:destination="@id/otaRecoveryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/otaRecoveryFragment"
+        android:name="com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragment"
+        android:label="fragment_ota_recovery"
+        tools:layout="@layout/fragment_ota_recovery">
+        <argument
+            android:name="otaRecoveryFragmentRequest"
+            app:argType="com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragmentRequest" />
+        <action
+            android:id="@+id/action_otaRecoveryFragment_to_otaFragment"
+            app:destination="@id/otaFragment" />
     </fragment>
     <fragment
         android:id="@+id/serialEntryPairFragment"

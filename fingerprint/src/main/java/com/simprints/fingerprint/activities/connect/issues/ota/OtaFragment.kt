@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.activities.connect.issues.ota
 
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,14 +10,17 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import kotlinx.android.synthetic.main.fragment_ota.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
+import kotlin.concurrent.schedule
 
 class OtaFragment : FingerprintFragment() {
 
     private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
+    private val timeHelper: FingerprintTimeHelper by inject()
 
     private val viewModel: OtaViewModel by viewModel()
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
@@ -35,6 +37,7 @@ class OtaFragment : FingerprintFragment() {
         initStartUpdateButton()
         listenForProgress()
         listenForCompleteEvent()
+        listenForFailedEvent()
     }
 
     private fun setTextInLayout() {
@@ -49,7 +52,7 @@ class OtaFragment : FingerprintFragment() {
             otaStatusTextView.visibility = View.VISIBLE
             startUpdateButton.visibility = View.INVISIBLE
             startUpdateButton.isEnabled = false
-            viewModel.startOta(args.otaFragmentRequest.availableOtas)
+            viewModel.startOta(args.otaFragmentRequest.availableOtas, args.otaFragmentRequest.currentRetryAttempt)
         }
     }
 
@@ -59,16 +62,22 @@ class OtaFragment : FingerprintFragment() {
         }
     }
 
+    private fun listenForFailedEvent() {
+        viewModel.otaFailedNeedingUserAction.fragmentObserveEventWith {
+            findNavController().navigate(OtaFragmentDirections.actionOtaFragmentToOtaRecoveryFragment(it))
+        }
+    }
+
     private fun listenForCompleteEvent() {
         viewModel.otaComplete.fragmentObserveEventWith {
             otaStatusTextView.text = "Updated ✓"
-            Handler().postDelayed({ retryConnectAndFinishFragment() }, FINISHED_TIME_DELAY_MS)
+            timeHelper.newTimer().schedule(FINISHED_TIME_DELAY_MS) { retryConnectAndFinishFragment() }
         }
     }
 
     private fun retryConnectAndFinishFragment() {
         connectScannerViewModel.retryConnect()
-        findNavController().navigate(R.id.action_otaFragment_to_connectScannerMainFragment)
+        findNavController().navigate(OtaFragmentDirections.actionOtaFragmentToConnectScannerMainFragment())
     }
 
     companion object {
