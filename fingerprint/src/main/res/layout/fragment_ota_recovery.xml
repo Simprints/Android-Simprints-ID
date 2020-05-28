@@ -32,7 +32,7 @@
         android:gravity="center"
         android:textColor="@color/simprints_white"
         android:textSize="22sp"
-        app:layout_constraintBottom_toTopOf="@id/continueButton"
+        app:layout_constraintBottom_toTopOf="@id/tryAgainButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/otaRecoveryImageGuideline"
@@ -59,10 +59,10 @@
         android:layout_height="wrap_content"
         android:progressTint="@color/simprints_white"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@id/continueButton"
-        app:layout_constraintEnd_toEndOf="@id/continueButton"
-        app:layout_constraintStart_toStartOf="@id/continueButton"
-        app:layout_constraintTop_toTopOf="@id/continueButton" />
+        app:layout_constraintBottom_toBottomOf="@id/tryAgainButton"
+        app:layout_constraintEnd_toEndOf="@id/tryAgainButton"
+        app:layout_constraintStart_toStartOf="@id/tryAgainButton"
+        app:layout_constraintTop_toTopOf="@id/tryAgainButton" />
 
     <TextView
         android:id="@+id/otaRecoveryTitleTextView"
@@ -70,7 +70,7 @@
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="Scanner Update Failed"
+        android:text="@string/ota_recovery_title"
         android:textColor="@color/simprints_white"
         android:textSize="26sp"
         android:textStyle="bold"
