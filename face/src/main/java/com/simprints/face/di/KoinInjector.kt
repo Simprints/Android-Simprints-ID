@@ -9,10 +9,15 @@ import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.controllers.core.image.FaceImageManagerImpl
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManagerImpl
+import com.simprints.face.controllers.core.repository.FaceDbManager
+import com.simprints.face.controllers.core.repository.FaceDbManagerImpl
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.detection.mock.MockFaceDetector
-import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.face.exitform.ExitFormViewModel
+import com.simprints.face.match.FaceMatchViewModel
+import com.simprints.face.match.FaceMatcher
+import com.simprints.face.match.mock.MockFaceMatcher
+import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.id.Application
 import com.simprints.uicomponents.imageTools.LibYuvJni
 import org.koin.android.ext.koin.androidApplication
@@ -26,8 +31,7 @@ import org.koin.dsl.module
 object KoinInjector {
     private var koinModule: Module? = null
 
-    private fun Scope.appComponent() =
-        (androidApplication() as Application).component
+    private fun Scope.appComponent() = (androidApplication() as Application).component
 
     fun acquireFaceKoinModules() {
         if (koinModule == null) {
@@ -55,18 +59,29 @@ object KoinInjector {
         factory<FaceAndroidResourcesHelper> { FaceAndroidResourcesHelperImpl(get()) }
         factory<FacePreferencesManager> { FacePreferencesManagerImpl(get()) }
         factory<FaceImageManager> { FaceImageManagerImpl(get(), get()) }
+        factory<FaceDbManager> { FaceDbManagerImpl(get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
         factory<FaceDetector> { MockFaceDetector() }
         factory { FrameProcessor(get()) }
         factory { LibYuvJni() }
+        factory<FaceMatcher> { MockFaceMatcher() }
     }
 
     private fun Module.defineBuildersForViewModels() {
         viewModel { FaceOrchestratorViewModel() }
         viewModel { FaceCaptureViewModel(get<FacePreferencesManager>().maxRetries, get()) }
-        viewModel { (mainVM: FaceCaptureViewModel) -> LiveFeedbackFragmentViewModel(mainVM, get(), get(), get<FacePreferencesManager>().qualityThreshold) }
+        viewModel { FaceMatchViewModel(get(), get()) }
+
+        viewModel { (mainVM: FaceCaptureViewModel) ->
+            LiveFeedbackFragmentViewModel(
+                mainVM,
+                get(),
+                get(),
+                get<FacePreferencesManager>().qualityThreshold
+            )
+        }
         viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM) }
     }
 }

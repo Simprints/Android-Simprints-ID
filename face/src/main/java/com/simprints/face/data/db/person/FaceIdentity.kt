@@ -4,4 +4,4 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class FaceSample(val faceId: String, val template: ByteArray) : Parcelable
+data class FaceIdentity(val faceId: String, val faces: List<FaceSample>) : Parcelable
