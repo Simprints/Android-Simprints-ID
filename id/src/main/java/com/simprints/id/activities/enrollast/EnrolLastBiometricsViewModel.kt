@@ -14,6 +14,7 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
 import com.simprints.id.tools.TimeHelper
+import timber.log.Timber
 
 class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
                                    val timeHelper: TimeHelper) : ViewModel() {
@@ -34,7 +35,7 @@ class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
                     Success(person.patientId)
                 }
             } catch (t: Throwable) {
-                timber.log.Timber.d(t)
+                Timber.e(t)
                 Failed
             }
         }

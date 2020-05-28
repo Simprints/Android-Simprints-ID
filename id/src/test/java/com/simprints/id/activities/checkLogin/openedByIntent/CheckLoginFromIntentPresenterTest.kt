@@ -2,10 +2,16 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_METADATA
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
+import com.simprints.id.orchestrator.SOME_GUID
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.extensions.just
@@ -75,6 +81,23 @@ class CheckLoginFromIntentPresenterTest {
         checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest as AppEnrolRequest)
 
         verify(exactly = 1) { checkLoginFromIntentPresenter.buildEnrolmentCalloutEvent(any(), any()) }
+    }
+
+    @Test
+    fun givenCheckLoginFromIntentPresenter_buildRequestIsCalledForLastEnrolment_buildsEnrolLastBiomentricsCallout() {
+        val checkLoginFromIntentPresenter = spyk(CheckLoginFromIntentPresenter(viewMock, "device_id", mockk(relaxed = true)))
+
+        checkLoginFromIntentPresenter.appRequest = mockk<AppEnrolLastBiometricsRequest>().apply {
+            every { this@apply.projectId } returns DEFAULT_PROJECT_ID
+            every { this@apply.userId } returns DEFAULT_USER_ID
+            every { this@apply.moduleId } returns DEFAULT_MODULE_ID
+            every { this@apply.metadata } returns DEFAULT_METADATA
+            every { this@apply.identificationSessionId } returns SOME_GUID
+        }
+
+        checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest )
+
+        verify(exactly = 1) { checkLoginFromIntentPresenter.addEnrolLastBiometricsCalloutEvent(any(), any()) }
     }
 
     @Test
