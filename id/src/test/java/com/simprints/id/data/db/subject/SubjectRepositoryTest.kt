@@ -25,6 +25,7 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.json.SimJsonHelper
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
@@ -36,6 +37,7 @@ import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
 import java.io.InputStream
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SubjectRepositoryTest {
 
@@ -102,7 +104,44 @@ class SubjectRepositoryTest {
         runBlocking {
             val subject = SubjectsGeneratorUtils.getRandomSubject()
             coEvery { localDataSource.load(any()) } returns flowOf()
-            coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildCreationEventFromSubject(subject)
+            coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildCreationEventStreamFromSubject(subject)
+
+            val fetch = subjectRepository.loadFromRemoteIfNeeded(subject.projectId, subject.subjectId)
+
+            with(fetch.subject) {
+                assertThat(this?.subjectId).isEqualTo(subject.subjectId)
+                assertThat(this?.attendantId).isEqualTo(subject.attendantId)
+                assertThat(this?.moduleId).isEqualTo(subject.moduleId)
+                assertThat(this?.projectId).isEqualTo(subject.projectId)
+            }
+            assertThat(fetch.subjectSource).isEqualTo(SubjectFetchResult.SubjectSource.REMOTE)
+
+            fetch.subject?.let {
+                coVerify { localDataSource.insertOrUpdate(listOf(it)) }
+            }
+        }
+    }
+
+    @Test
+    fun givenADeletedSubjectInRemote_shouldNotBeLoaded() {
+        runBlocking {
+            val subject = SubjectsGeneratorUtils.getRandomSubject()
+            coEvery { localDataSource.load(any()) } returns flowOf()
+            coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildEventsStreamForSubjectWithLastEventAsDeletion(subject)
+
+            val fetch = subjectRepository.loadFromRemoteIfNeeded(subject.projectId, subject.subjectId)
+
+            assertThat(fetch.subject).isNull()
+            assertThat(fetch.subjectSource).isEqualTo(SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE)
+        }
+    }
+    
+    @Test
+    fun givenAMoveEventForSubjectInRemote_shouldBeLoaded() {
+        runBlocking {
+            val subject = SubjectsGeneratorUtils.getRandomSubject()
+            coEvery { localDataSource.load(any()) } returns flowOf()
+            coEvery { eventRemoteDataSource.getStreaming(any()) } returns buildEventsStreamForSubjectWithLastEventAsMove(subject)
 
             val fetch = subjectRepository.loadFromRemoteIfNeeded(subject.projectId, subject.subjectId)
 
@@ -132,7 +171,7 @@ class SubjectRepositoryTest {
         assertThat(counts.created).isEqualTo(REMOTE_SUBJECTS_FOR_SUBSYNC)
     }
 
-    private fun buildCreationEventFromSubject(subject: Subject): InputStream {
+    private fun buildCreationEventStreamFromSubject(subject: Subject): InputStream {
         val event = with(subject) {
             Event(
                 randomUUID(),
@@ -148,6 +187,65 @@ class SubjectRepositoryTest {
         return responseString.toResponseBody().byteStream()
     }
 
+    private fun buildEventsStreamForSubjectWithLastEventAsDeletion(subject: Subject): InputStream {
+        val creationEvent = with(subject) {
+            Event(
+                randomUUID(),
+                listOf(projectId),
+                listOf(subjectId),
+                listOf(attendantId),
+                listOf(moduleId),
+                listOf(),
+                buildCreationPayload(this)
+            ).fromDomainToApi()
+        }
+
+        val deletionEvent = with(subject) {
+            Event(
+                randomUUID(),
+                listOf(projectId),
+                listOf(subjectId),
+                listOf(attendantId),
+                listOf(moduleId),
+                listOf(),
+                buildDeletionPayload(this)
+            ).fromDomainToApi()
+        }
+
+        val responseString = SimJsonHelper.gson.toJson(listOf(creationEvent, deletionEvent))
+        return responseString.toResponseBody().byteStream()
+    }
+
+    private fun buildEventsStreamForSubjectWithLastEventAsMove(subject: Subject): InputStream {
+
+        val creationEvent = with(subject) {
+            Event(
+                randomUUID(),
+                listOf(projectId),
+                listOf(subjectId),
+                listOf(attendantId),
+                listOf(moduleId),
+                listOf(),
+                buildCreationPayload(this)
+            ).fromDomainToApi()
+        }
+
+        val moveEvent = with(subject) {
+            Event(
+                randomUUID(),
+                listOf(projectId),
+                listOf(subjectId),
+                listOf(attendantId),
+                listOf(moduleId),
+                listOf(),
+                buildMovePayload(this)
+            ).fromDomainToApi()
+        }
+
+        val responseString = SimJsonHelper.gson.toJson(listOf(creationEvent, moveEvent))
+        return responseString.toResponseBody().byteStream()
+    }
+
     private fun buildCreationPayload(subject: Subject) = with(subject) {
         EnrolmentRecordCreationPayload(
             subjectId,
@@ -157,6 +255,20 @@ class SubjectRepositoryTest {
             buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples)
         )
     }
+
+    private fun buildDeletionPayload(subject: Subject) = with(subject) {
+        EnrolmentRecordDeletionPayload(
+            subjectId,
+            projectId,
+            moduleId,
+            attendantId
+        )
+    }
+
+    private fun buildMovePayload(subject: Subject) = EnrolmentRecordMovePayload(
+        buildCreationPayload(subject),
+        buildDeletionPayload(subject)
+    )
 
     private fun buildBiometricReferences(fingerprintSamples: List<FingerprintSample>, faceSamples: List<FaceSample>): List<BiometricReference> {
         val fingerprintReference = FingerprintReference(fingerprintSamples.map {
