@@ -8,9 +8,6 @@ data class EnrolmentRecordMovePayload(
 ) : EventPayload(EventPayloadType.ENROLMENT_RECORD_MOVE)
 
 fun ApiEnrolmentRecordMovePayload.fromApiToDomainAndNullForCreationIfBiometricRefsAreNull() =
-    if (enrolmentRecordCreation.biometricReferences != null) {
-        EnrolmentRecordMovePayload(enrolmentRecordCreation.fromApiToDomainOrNullIfNoBiometricReferences(),
+    EnrolmentRecordMovePayload(enrolmentRecordCreation.fromApiToDomainOrNullIfNoBiometricReferences(),
         enrolmentRecordDeletion.fromApiToDomain())
-    } else {
-        EnrolmentRecordMovePayload(null, enrolmentRecordDeletion.fromApiToDomain())
-    }
+
