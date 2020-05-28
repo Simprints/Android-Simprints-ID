@@ -8,6 +8,7 @@ import com.simprints.id.data.db.common.models.SubjectsCount
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.Subject.Companion.buildSubjectFromCreationPayload
 import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
+import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordMovePayload
 import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.*
 import com.simprints.id.data.db.subject.domain.subjectevents.fromApiToDomainOrNullIfNoBiometricReferences
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
@@ -73,16 +74,29 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
         val eventQuery = buildEventQueryForSubjectFetch(projectId, subjectId)
         val inputStream = eventRemoteDataSource.getStreaming(eventQuery)
         val reader = setupJsonReaderFromResponseStream(inputStream)
-        return if (reader.hasNext()) {
-            val apiEvent: ApiEvent = SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java)
-            val event = apiEvent.fromApiToDomainOrNullIfNoBiometricReferences()
-            event?.let {
-                val subject = buildSubjectFromCreationPayload(event.payload as EnrolmentRecordCreationPayload)
-                SubjectFetchResult(subject, REMOTE)
-            } ?: SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
-        } else {
-            SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
+
+        val apiEventsForSubject = ArrayList<ApiEvent>()
+        while(reader.hasNext()) {
+            apiEventsForSubject.add(SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java))
         }
+        val latestEvent = apiEventsForSubject.last().fromApiToDomainOrNullIfNoBiometricReferences()
+
+        return latestEvent?.let { event ->
+            when(event.payload.type) {
+                ENROLMENT_RECORD_CREATION -> {
+                    val subject = buildSubjectFromCreationPayload(event.payload as EnrolmentRecordCreationPayload)
+                    SubjectFetchResult(subject, REMOTE)
+                }
+                ENROLMENT_RECORD_DELETION -> {
+                    SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
+                }
+                ENROLMENT_RECORD_MOVE -> {
+                    (event.payload as EnrolmentRecordMovePayload).enrolmentRecordCreation?.let {
+                        SubjectFetchResult(buildSubjectFromCreationPayload(it), REMOTE)
+                    } ?: SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
+                }
+            }
+        } ?: SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
     }
 
     private fun setupJsonReaderFromResponseStream(responseStream: InputStream): JsonReader =
