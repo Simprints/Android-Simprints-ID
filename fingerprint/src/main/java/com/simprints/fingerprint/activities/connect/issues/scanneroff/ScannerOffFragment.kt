@@ -92,7 +92,7 @@ class ScannerOffFragment : FingerprintFragment() {
                 ConnectScannerIssue.SerialEntryPair -> actionScannerOffFragmentToSerialEntryPairFragment()
                 ConnectScannerIssue.BluetoothOff -> actionScannerOffFragmentToBluetoothOffFragment()
                 is ConnectScannerIssue.Ota -> actionScannerOffFragmentToOtaFragment(issue.otaFragmentRequest)
-                ConnectScannerIssue.ScannerOff -> null
+                ConnectScannerIssue.ScannerOff, is ConnectScannerIssue.OtaRecovery -> null
             }
             navAction?.let { findNavController().navigate(it) }
         }

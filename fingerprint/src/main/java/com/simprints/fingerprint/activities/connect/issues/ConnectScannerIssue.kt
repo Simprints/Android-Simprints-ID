@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.activities.connect.issues
 
 import com.simprints.fingerprint.activities.connect.issues.ota.OtaFragmentRequest
+import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragmentRequest
 
 sealed class ConnectScannerIssue {
     object BluetoothOff : ConnectScannerIssue()
@@ -9,4 +10,5 @@ sealed class ConnectScannerIssue {
     object SerialEntryPair : ConnectScannerIssue()
     object ScannerOff : ConnectScannerIssue()
     class Ota(val otaFragmentRequest: OtaFragmentRequest) : ConnectScannerIssue()
+    class OtaRecovery(val otaRecoveryFragmentRequest: OtaRecoveryFragmentRequest) : ConnectScannerIssue()
 }

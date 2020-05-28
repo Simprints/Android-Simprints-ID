@@ -10,6 +10,7 @@ import com.simprints.fingerprint.activities.collect.domain.FingerOrderDeterminer
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.nfcpair.NfcPairViewModel
 import com.simprints.fingerprint.activities.connect.issues.ota.OtaViewModel
+import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryViewModel
 import com.simprints.fingerprint.activities.connect.issues.serialentrypair.SerialEntryPairViewModel
 import com.simprints.fingerprint.activities.matching.MatchingViewModel
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorViewModel
@@ -142,5 +143,6 @@ object KoinInjector {
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
         viewModel { OtaViewModel(get()) }
+        viewModel { OtaRecoveryViewModel(get()) }
     }
 }
