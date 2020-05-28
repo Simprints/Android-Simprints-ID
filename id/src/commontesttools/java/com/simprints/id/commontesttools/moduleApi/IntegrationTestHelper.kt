@@ -1,9 +1,6 @@
 package com.simprints.id.commontesttools.moduleApi
 
-import com.simprints.moduleapi.app.requests.IAppEnrolRequest
-import com.simprints.moduleapi.app.requests.IAppIdentifyRequest
-import com.simprints.moduleapi.app.requests.IAppConfirmIdentityRequest
-import com.simprints.moduleapi.app.requests.IAppVerifyRequest
+import com.simprints.moduleapi.app.requests.*
 import com.simprints.moduleapi.app.responses.*
 import kotlinx.android.parcel.Parcelize
 
@@ -85,6 +82,15 @@ internal data class AppConfirmaConfirmIdentityRequestModuleApi(
     override val sessionId: String,
     override val selectedGuid: String
 ) : IAppConfirmIdentityRequest
+
+@Parcelize
+internal data class AppEnrolLastBiometricsRequestApi(
+    override val projectId: String,
+    override val userId: String,
+    override val moduleId: String,
+    override val metadata: String,
+    override val sessionId: String
+) : IAppEnrolLastBiometricsRequest
 
 fun Pair<String, String>.key() = first
 fun Pair<String, String>.value() = second

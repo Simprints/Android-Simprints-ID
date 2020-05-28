@@ -88,7 +88,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             is AppEnrolLastBiometricsRequest -> addEnrolLastBiometricsCalloutEvent(request, relativeStarTime)
         }
 
-    private fun addEnrolLastBiometricsCalloutEvent(request: AppEnrolLastBiometricsRequest, relativeStarTime: Long) =
+    internal fun addEnrolLastBiometricsCalloutEvent(request: AppEnrolLastBiometricsRequest, relativeStarTime: Long) =
         EnrolmentLastBiometricsCalloutEvent(
             relativeStarTime,
             request.projectId,

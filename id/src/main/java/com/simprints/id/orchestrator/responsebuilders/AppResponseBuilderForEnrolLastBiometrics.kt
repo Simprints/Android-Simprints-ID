@@ -18,12 +18,11 @@ class AppResponseBuilderForEnrolLastBiometrics : BaseAppResponseBuilder() {
 
         val results = steps.map { it.getResult() }
         val responseForEnrolLastBiometrics = getCoreResponseForEnrolLastBiometrics(results)
-        return responseForEnrolLastBiometrics.newSubjectId?.let {
+        return responseForEnrolLastBiometrics?.newSubjectId?.let {
             AppEnrolResponse(it)
         } ?: AppErrorResponse(ENROLMENT_LAST_BIOMETRICS_FAILED)
     }
 
-    private fun getCoreResponseForEnrolLastBiometrics(results: List<Step.Result?>): EnrolLastBiometricsResponse =
+    private fun getCoreResponseForEnrolLastBiometrics(results: List<Step.Result?>): EnrolLastBiometricsResponse? =
         results.filterIsInstance(EnrolLastBiometricsResponse::class.java).lastOrNull()
-            ?: throw Throwable("CoreEnrolLastBiometricsResponse responses not found")
 }
