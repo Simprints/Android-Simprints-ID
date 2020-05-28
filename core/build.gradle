@@ -33,7 +33,7 @@ android {
 
         staging {
             initWith release
-            buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"") // TODO: confirm with Etienne
+            buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
         }
 
         debug {
