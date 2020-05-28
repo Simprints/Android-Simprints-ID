@@ -43,7 +43,9 @@ class OtaFragment : FingerprintFragment() {
 
     private fun setTextInLayout() {
         with(resourceHelper) {
-
+            otaTitleTextView.text = getString(R.string.ota_title)
+            otaInstructionsTextView.text = getString(R.string.ota_instructions)
+            startUpdateButton.text = getString(R.string.start_update)
         }
     }
 
@@ -51,6 +53,10 @@ class OtaFragment : FingerprintFragment() {
         startUpdateButton.setOnClickListener {
             otaProgressBar.visibility = View.VISIBLE
             otaStatusTextView.visibility = View.VISIBLE
+            otaStatusTextView.text = when (val retry = args.otaFragmentRequest.currentRetryAttempt) {
+                0 -> resourceHelper.getString(R.string.updating)
+                else -> resourceHelper.getString(R.string.updating_attempt, arrayOf("${retry + 1}", "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}"))
+            }
             startUpdateButton.visibility = View.INVISIBLE
             startUpdateButton.isEnabled = false
             viewModel.startOta(args.otaFragmentRequest.availableOtas, args.otaFragmentRequest.currentRetryAttempt)
@@ -71,14 +77,16 @@ class OtaFragment : FingerprintFragment() {
 
     private fun listenForFailedEvent() {
         viewModel.otaFailed.fragmentObserveEventWith {
-            findNavController()
+            findNavController().navigate(OtaFragmentDirections.actionOtaFragmentToOtaFailedFragment())
         }
     }
 
     private fun listenForCompleteEvent() {
         viewModel.otaComplete.fragmentObserveEventWith {
-            otaStatusTextView.text = "Updated ✓"
-            timeHelper.newTimer().schedule(FINISHED_TIME_DELAY_MS) { retryConnectAndFinishFragment() }
+            otaStatusTextView.text = resourceHelper.getString(R.string.update_complete)
+            timeHelper.newTimer().schedule(FINISHED_TIME_DELAY_MS) {
+                requireActivity().runOnUiThread { retryConnectAndFinishFragment() }
+            }
         }
     }
 

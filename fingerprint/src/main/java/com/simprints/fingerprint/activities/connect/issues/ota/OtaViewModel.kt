@@ -31,7 +31,7 @@ class OtaViewModel(
 
     @SuppressLint("CheckResult")
     fun startOta(availableOtas: List<AvailableOta>, currentRetryAttempt: Int) {
-        remainingOtas.addAll(remainingOtas)
+        remainingOtas.addAll(availableOtas)
         scannerManager.scanner { disconnect() }
             .andThen(scannerManager.scanner { connect() })
             .andThen(Observable.concat(availableOtas.map {

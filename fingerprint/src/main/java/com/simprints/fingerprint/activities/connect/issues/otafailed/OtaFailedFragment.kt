@@ -32,7 +32,9 @@ class OtaFailedFragment : FingerprintFragment() {
 
     private fun setTextInLayout() {
         with(resourceHelper) {
-
+            otaFailedTitleTextView.text = getString(R.string.ota_failed_title)
+            otaFailedInstructionsTextView.text = getString(R.string.ota_failed_instructions)
+            continueButton.text = getString(R.string.continue_button)
         }
     }
 }
