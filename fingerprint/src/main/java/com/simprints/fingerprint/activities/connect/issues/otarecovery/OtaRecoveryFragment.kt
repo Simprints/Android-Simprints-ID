@@ -41,8 +41,9 @@ class OtaRecoveryFragment : FingerprintFragment() {
             otaRecoveryTitleTextView.text = getString(R.string.ota_recovery_title)
             tryAgainButton.text = getString(R.string.try_again_label)
             otaRecoveryInstructionsTextView.text = getString(when (args.otaRecoveryFragmentRequest.recoveryStrategy) {
-                OtaRecoveryStrategy.UserActionRequired.HardReset -> R.string.ota_recovery_hard_reset
-                OtaRecoveryStrategy.UserActionRequired.SoftReset -> R.string.ota_recovery_soft_reset
+                OtaRecoveryStrategy.HARD_RESET -> R.string.ota_recovery_hard_reset
+                OtaRecoveryStrategy.SOFT_RESET,
+                OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY -> R.string.ota_recovery_soft_reset
             })
         }
     }

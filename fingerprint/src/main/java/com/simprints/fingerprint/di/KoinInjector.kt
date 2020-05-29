@@ -142,7 +142,7 @@ object KoinInjector {
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
-        viewModel { OtaViewModel(get()) }
+        viewModel { OtaViewModel(get(), get()) }
         viewModel { OtaRecoveryViewModel(get()) }
     }
 }
