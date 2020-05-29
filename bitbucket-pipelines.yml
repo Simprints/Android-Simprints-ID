@@ -139,7 +139,7 @@ definitions:
                     - ./gradlew face:assembleStandardDebugAndroidTest
                     - mv face/build/outputs/apk/androidTest/standard/debug/face-standard-debug-androidTest.apk face-standard-debug-androidTest.apk
                     # Build Universal APK
-                    - ./gradlew bundleDebug --stacktrace
+                    - ./gradlew bundleStandardDebug --stacktrace
                     - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
                     - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/standardDebug/id-standard-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=ci/debug_keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
                     - mv universal.apks universal.zip
