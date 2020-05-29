@@ -2,11 +2,7 @@ package com.simprints.id.di
 
 import android.content.Context
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
-import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSourceImpl
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
-import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
+import com.simprints.id.data.consent.longconsent.*
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -14,6 +10,7 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSourceImpl
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.db.subject.*
+import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
@@ -81,16 +78,26 @@ open class DataModule {
         eventRemoteDataSource: EventRemoteDataSource,
         subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
         preferencesManager: PreferencesManager,
-        subjectsSyncCache: SubjectsSyncCache): SubjectRepositoryUpSyncHelper =
-        SubjectRepositoryUpSyncHelperImpl(loginInfoManager, subjectLocalDataSource, eventRemoteDataSource,
-            subjectsUpSyncScopeRepository, preferencesManager.modalities)
+        subjectsSyncCache: SubjectsSyncCache
+    ): SubjectRepositoryUpSyncHelper =
+        SubjectRepositoryUpSyncHelperImpl(
+            loginInfoManager, subjectLocalDataSource, eventRemoteDataSource,
+            subjectsUpSyncScopeRepository, preferencesManager.modalities
+        )
 
     @Provides
-    open fun providePersonRepositoryDownSyncHelper(subjectLocalDataSource: SubjectLocalDataSource,
-                                                   eventRemoteDataSource: EventRemoteDataSource,
-                                                   downSyncScopeRepository: SubjectsDownSyncScopeRepository,
-                                                   timeHelper: TimeHelper): SubjectRepositoryDownSyncHelper =
-        SubjectRepositoryDownSyncHelperImpl(subjectLocalDataSource, eventRemoteDataSource, downSyncScopeRepository, timeHelper)
+    open fun providePersonRepositoryDownSyncHelper(
+        subjectLocalDataSource: SubjectLocalDataSource,
+        eventRemoteDataSource: EventRemoteDataSource,
+        downSyncScopeRepository: SubjectsDownSyncScopeRepository,
+        timeHelper: TimeHelper
+    ): SubjectRepositoryDownSyncHelper =
+        SubjectRepositoryDownSyncHelperImpl(
+            subjectLocalDataSource,
+            eventRemoteDataSource,
+            downSyncScopeRepository,
+            timeHelper
+        )
 
     @Provides
     open fun providePersonRepository(
@@ -146,11 +153,20 @@ open class DataModule {
         LongConsentLocalDataSourceImpl(context.filesDir.absolutePath, loginInfoManager)
 
     @Provides
+    open fun provideLongConsentRemoteDataSource(
+        loginInfoManager: LoginInfoManager
+    ): LongConsentRemoteDataSource =
+        LongConsentRemoteDataSourceImpl(loginInfoManager)
+
+    @Provides
     open fun provideLongConsentRepository(
         longConsentLocalDataSource: LongConsentLocalDataSource,
-        loginInfoManager: LoginInfoManager,
+        longConsentRemoteDataSource: LongConsentRemoteDataSource,
         crashReportManager: CrashReportManager
-    ): LongConsentRepository = LongConsentRepositoryImpl(longConsentLocalDataSource,
-        loginInfoManager, crashReportManager)
+    ): LongConsentRepository = LongConsentRepositoryImpl(
+        longConsentLocalDataSource,
+        longConsentRemoteDataSource,
+        crashReportManager
+    )
 
 }

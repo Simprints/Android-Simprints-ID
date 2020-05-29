@@ -2,12 +2,13 @@ package com.simprints.id.data.consent.longconsent
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.activities.longConsent.PrivacyNoticeViewState.ConsentAvailable
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,39 +23,29 @@ class LongConsentRepositoryImplTest {
     }
 
     @MockK lateinit var longConsentLocalDataSourceMock: LongConsentLocalDataSource
-    @MockK lateinit var loginInfoManagerMock: LoginInfoManager
+    @MockK lateinit var longConsentRemoteDataSourceMock: LongConsentRemoteDataSource
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this)
-
-        every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns PROJECT_ID_TEST
+        MockKAnnotations.init(this, relaxed = true)
     }
 
     @Test
-    fun setLanguage_shouldSetLanguageAndUpdateTextIfPresentInLocal() {
-        every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns LONG_CONSENT_TEXT
-        val longConsentRepository = LongConsentRepositoryImpl(longConsentLocalDataSourceMock, loginInfoManagerMock, mockk())
+    fun download_consentInLocal_shouldReturnTheLocalCopy() {
+        runBlocking {
+            every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns LONG_CONSENT_TEXT
+            val longConsentRepository = LongConsentRepositoryImpl(longConsentLocalDataSourceMock, longConsentRemoteDataSourceMock, mockk())
 
-        longConsentRepository.setLanguage(DEFAULT_LANGUAGE)
+            val states = longConsentRepository.downloadLongConsent(arrayOf(DEFAULT_LANGUAGE))
 
-        assertThat(longConsentRepository.language).isEqualTo(DEFAULT_LANGUAGE)
-        assertThat(longConsentRepository.longConsentTextLiveData.value).isEqualTo(LONG_CONSENT_TEXT)
-    }
-
-    @Test
-    fun setLanguageAndLongConsentNotPresentInLocal_shouldSetEmptyString() {
-        val longConsentRepository = LongConsentRepositoryImpl(longConsentLocalDataSourceMock, loginInfoManagerMock, mockk())
-
-        longConsentRepository.setLanguage(DEFAULT_LANGUAGE)
-
-        assertThat(longConsentRepository.language).isEqualTo(DEFAULT_LANGUAGE)
-        assertThat(longConsentRepository.longConsentTextLiveData.value).isEmpty()
+            assertThat(states.poll()).isEqualTo(mapOf(DEFAULT_LANGUAGE to ConsentAvailable(DEFAULT_LANGUAGE, LONG_CONSENT_TEXT)))
+            verify(exactly = 1) { longConsentLocalDataSourceMock.getLongConsentText(DEFAULT_LANGUAGE) }
+        }
     }
 
     @Test
     fun deleteLongConsents_shouldDeleteLongConsentsFromRepository() {
-        val longConsentRepository = LongConsentRepositoryImpl(longConsentLocalDataSourceMock, loginInfoManagerMock, mockk())
+        val longConsentRepository = LongConsentRepositoryImpl(longConsentLocalDataSourceMock, longConsentRemoteDataSourceMock, mockk())
 
         longConsentRepository.deleteLongConsents()
 

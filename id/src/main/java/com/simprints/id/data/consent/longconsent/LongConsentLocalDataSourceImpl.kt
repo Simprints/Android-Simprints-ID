@@ -1,7 +1,6 @@
 package com.simprints.id.data.consent.longconsent
 
 import androidx.annotation.VisibleForTesting
-import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl.Companion.DEFAULT_LANGUAGE
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import java.io.BufferedReader
 import java.io.File
@@ -25,19 +24,14 @@ class LongConsentLocalDataSourceImpl(absolutePath: String,
     }
 
     override fun isLongConsentPresentInLocal(language: String): Boolean {
-        val fileName = if (language.isEmpty()) {
-            "${DEFAULT_LANGUAGE}.${FILE_TYPE}"
-        } else {
-            "$language.${FILE_TYPE}"
-        }
-
+        val fileName = "$language.${FILE_TYPE}"
         return File(filePathForProject, fileName).exists()
     }
 
-    override fun createFileForLanguage(language: String)  =
+    override fun createFileForLanguage(language: String) =
         File(filePathForProject, "$language.$FILE_TYPE")
 
-    private fun createBaseFilePath(absolutePath: String) = File (absolutePath +
+    private fun createBaseFilePath(absolutePath: String) = File(absolutePath +
         File.separator +
         FILE_PATH)
 
@@ -55,7 +49,7 @@ class LongConsentLocalDataSourceImpl(absolutePath: String,
 
     override fun deleteLongConsents() {
         getAllLongConsentFiles()?.forEach { baseFile ->
-            if(baseFile.isDirectory) {
+            if (baseFile.isDirectory) {
                 deleteFilesInDirectory(baseFile)
             }
             baseFile.delete()

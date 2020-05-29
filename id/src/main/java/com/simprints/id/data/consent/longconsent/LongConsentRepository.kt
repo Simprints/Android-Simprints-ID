@@ -1,20 +1,13 @@
 package com.simprints.id.data.consent.longconsent
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.channels.ReceiveChannel
+
 
 interface LongConsentRepository {
 
-    val downloadProgressLiveData: LiveData<Int>
+    suspend fun fetchLongConsent(language: String): String?
 
-    val isDownloadSuccessfulLiveData: LiveData<Boolean>
-
-    val longConsentTextLiveData: LiveData<String>
-
-    suspend fun downloadLongConsentForLanguages(languages: Array<String>)
-
-    suspend fun downloadLongConsentWithProgress()
+    suspend fun downloadLongConsent(languages: Array<String>): ReceiveChannel<Map<String, LongConsentFetchResult>>
 
     fun deleteLongConsents()
-
-    fun setLanguage(language: String)
 }

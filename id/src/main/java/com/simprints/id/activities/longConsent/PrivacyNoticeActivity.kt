@@ -20,23 +20,6 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
 
     private lateinit var viewModel: PrivacyNoticeViewModel
 
-    private val observerForLongConsentText: Observer<String> = Observer {
-        if(it.isNullOrEmpty()) {
-            setNoPrivacyNoticeFound()
-        } else {
-            setLongConsentText(it)
-        }
-    }
-
-    private val observerForDownloadProgress: Observer<Int> = Observer {
-        setDownloadProgress(it)
-    }
-
-    private val observerForDownloadSuccess: Observer<Boolean> = Observer {
-        if(!it) {
-            showDownloadErrorToast()
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +30,6 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
         setContentView(R.layout.activity_privacy_notice)
 
         initActionBar()
-        viewModel.start()
 
         initInUi()
         observeUi()
@@ -66,7 +48,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     private fun initInUi() {
         longConsent_downloadButton.text = getString(R.string.long_consent_download_button_text)
         longConsent_downloadButton.setOnClickListener {
-            if(deviceManager.isConnected()) {
+            if (deviceManager.isConnected()) {
                 viewModel.downloadLongConsent()
             } else {
                 showUserOfflineToast()
@@ -80,11 +62,30 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     }
 
     private fun observeUi() {
-        with(viewModel) {
-            longConsentTextLiveData.observe(this@PrivacyNoticeActivity, observerForLongConsentText)
-            downloadProgressLiveData.observe(this@PrivacyNoticeActivity, observerForDownloadProgress)
-            isDownloadSuccessfulLiveData.observe(this@PrivacyNoticeActivity, observerForDownloadSuccess)
+        viewModel.privateNoticeViewStateLiveData.observe(this@PrivacyNoticeActivity, Observer {
+            when (it) {
+                is PrivacyNoticeViewState.ConsentAvailable -> handleSucceedDownload(it)
+                is PrivacyNoticeViewState.ConsentNotAvailable -> handleFailedDownload()
+                is PrivacyNoticeViewState.DownloadInProgress -> handleProgressDownload(it)
+            }
+        })
+    }
+
+    private fun handleSucceedDownload(consentAvailableState: PrivacyNoticeViewState.ConsentAvailable) {
+        val consent = consentAvailableState.consent
+        if (consent.isEmpty()) {
+            setNoPrivacyNoticeFound()
+        } else {
+            setLongConsentText(consent)
         }
+    }
+
+    private fun handleFailedDownload() {
+        showDownloadErrorToast()
+    }
+
+    private fun handleProgressDownload(downloadInProgressState: PrivacyNoticeViewState.DownloadInProgress) {
+        setDownloadProgress(downloadInProgressState.progress)
     }
 
     private fun setLongConsentText(text: String) {
@@ -111,7 +112,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     }
 
     private fun hideProgressBarIfNecessary(progress: Int) {
-        if(progress == PROGRESS_COMPLETE) {
+        if (progress == PROGRESS_COMPLETE) {
             longConsent_downloadProgressBar.visibility = View.INVISIBLE
         } else {
             longConsent_downloadProgressBar.visibility = View.VISIBLE

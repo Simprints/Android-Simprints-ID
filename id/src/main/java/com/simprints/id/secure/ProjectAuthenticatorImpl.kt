@@ -2,13 +2,16 @@ package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.secure.models.*
-import com.simprints.core.tools.utils.LanguageHelper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ProjectAuthenticatorImpl(
     private val authManager: AuthManager,
@@ -64,10 +67,15 @@ class ProjectAuthenticatorImpl(
         authenticationDataManager.requestAuthenticationData(projectId, userId)
 
     private fun getEncryptedProjectSecret(projectSecret: String, authenticationData: AuthenticationData): String =
-        projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret,
-            authenticationData.publicKeyString)
+        projectSecretManager.encryptAndStoreAndReturnProjectSecret(
+            projectSecret,
+            authenticationData.publicKeyString
+        )
 
-    private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationData: AuthenticationData): AttestToken =
+    private fun getGoogleAttestation(
+        safetyNetClient: SafetyNetClient,
+        authenticationData: AuthenticationData
+    ): AttestToken =
         attestationManager.requestAttestation(safetyNetClient, authenticationData.nonce)
 
     private fun buildAuthRequest(
@@ -108,6 +116,9 @@ class ProjectAuthenticatorImpl(
     }
 
     private suspend fun Array<String>.fetchProjectLongConsentTexts() {
-        longConsentRepository.downloadLongConsentForLanguages(this)
+        CoroutineScope(Dispatchers.IO).launch {
+            longConsentRepository.deleteLongConsents()
+            longConsentRepository.downloadLongConsent(this@fetchProjectLongConsentTexts)
+        }
     }
 }
