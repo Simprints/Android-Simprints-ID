@@ -4,6 +4,7 @@ import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrat
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
@@ -14,6 +15,8 @@ import io.reactivex.Observable
 import io.reactivex.Single
 
 interface ScannerWrapper {
+
+    val generation: ScannerGeneration
 
     fun connect(): Completable
     fun disconnect(): Completable

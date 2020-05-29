@@ -43,6 +43,8 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                        private val un20OtaHelper: Un20OtaHelper,
                        private val crashReportManager: FingerprintCrashReportManager) : ScannerWrapper {
 
+    override val generation: ScannerGeneration = ScannerGeneration.VERO_2
+
     private var scannerVersion: ScannerVersion? = null
 
     override fun versionInformation(): ScannerVersion =
