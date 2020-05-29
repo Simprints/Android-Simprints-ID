@@ -131,7 +131,7 @@ class LiveFeedbackFragmentViewModel(
      * get any good images, at least one good image will be saved
      */
     private fun updateFallbackCaptureIfValid(faceDetection: FaceDetection) {
-        if (faceDetection.hasValidStatus()) fallbackCapture = faceDetection
+        if (faceDetection.hasValidStatus()) fallbackCapture = faceDetection.apply { isFallback = true }
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED, FINISHED_FAILED }
