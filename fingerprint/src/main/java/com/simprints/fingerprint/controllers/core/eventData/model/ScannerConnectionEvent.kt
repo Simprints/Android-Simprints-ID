@@ -12,8 +12,8 @@ class ScannerConnectionEvent(startTime: Long,
     class ScannerInfo(val scannerId: String, val macAddress: String, var hardwareVersion: String)
 }
 
-fun ScannerConnectionEvent.fromDomainToCore() =
-    ScannerConnectionEventCore(starTime, scannerInfo.fromDomainToCore())
+fun ScannerConnectionEvent.fromDomainToCore(): ScannerConnectionEventCore =
+    TODO()
 
-fun ScannerConnectionEvent.ScannerInfo.fromDomainToCore() =
-    ScannerInfoCore(scannerId, macAddress, hardwareVersion)
+fun ScannerConnectionEvent.ScannerInfo.fromDomainToCore(): ScannerInfoCore =
+    TODO()
