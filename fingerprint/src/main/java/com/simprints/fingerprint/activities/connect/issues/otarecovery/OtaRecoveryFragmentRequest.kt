@@ -6,6 +6,6 @@ import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class OtaRecoveryFragmentRequest(val recoveryStrategy: OtaRecoveryStrategy.UserActionRequired,
+data class OtaRecoveryFragmentRequest(val recoveryStrategy: OtaRecoveryStrategy,
                                       val remainingOtas: List<AvailableOta>,
                                       val currentRetryAttempt: Int) : Parcelable

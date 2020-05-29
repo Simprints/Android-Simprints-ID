@@ -74,13 +74,15 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:gravity="center"
         android:textColor="@color/simprints_white"
         android:textSize="22sp"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@id/startUpdateButton"
-        app:layout_constraintEnd_toEndOf="@id/otaEndGuideline"
-        app:layout_constraintStart_toStartOf="@id/otaStartGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/startUpdateButton" />
 
     <TextView

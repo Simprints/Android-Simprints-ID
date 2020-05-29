@@ -30,6 +30,8 @@
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:gravity="center"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:text="@string/ota_failed_instructions"
         android:textColor="@color/simprints_white"
         android:textSize="22sp"
