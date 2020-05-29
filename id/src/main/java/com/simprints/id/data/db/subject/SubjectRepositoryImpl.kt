@@ -139,7 +139,7 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
         with(peopleDownSyncOperation) {
             EventQuery(
                 projectId = projectId,
-                userId = userId,
+                userId = attendantId,
                 moduleIds = moduleId?.let { listOf(it) },
                 lastEventId = lastResult?.lastEventId,
                 modes = modes,

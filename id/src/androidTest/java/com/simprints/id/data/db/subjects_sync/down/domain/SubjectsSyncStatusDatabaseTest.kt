@@ -128,7 +128,7 @@ class SubjectsSyncStatusDatabaseTest {
             DbSubjectsDownSyncOperationKey(
                 projectId,
                 modes,
-                userId,
+                attendantId,
                 moduleId)
         }
 

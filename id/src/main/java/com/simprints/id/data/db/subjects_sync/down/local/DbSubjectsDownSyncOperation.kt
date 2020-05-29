@@ -85,6 +85,6 @@ fun DbSubjectsDownSyncOperation.fromDbToDomain() =
 
 fun DbSubjectsDownSyncOperation.isSameOperation(compareTo: SubjectsDownSyncOperation) =
     projectId == compareTo.projectId &&
-    userId == compareTo.userId &&
+    userId == compareTo.attendantId &&
     moduleId == compareTo.moduleId &&
     modes.toTypedArray() contentEquals compareTo.modes.toTypedArray()

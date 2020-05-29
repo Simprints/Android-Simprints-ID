@@ -9,7 +9,7 @@ class SubjectsDownSyncOperationFactoryImpl : SubjectsDownSyncOperationFactory {
                                            syncOperationResult: SubjectsDownSyncOperationResult?) =
         SubjectsDownSyncOperation(
             projectId = projectId,
-            userId = null,
+            attendantId = null,
             moduleId = null,
             modes = modes,
             lastResult = syncOperationResult
@@ -21,7 +21,7 @@ class SubjectsDownSyncOperationFactoryImpl : SubjectsDownSyncOperationFactory {
                                         syncOperationResult: SubjectsDownSyncOperationResult?) =
         SubjectsDownSyncOperation(
             projectId = projectId,
-            userId = userId,
+            attendantId = userId,
             moduleId = null,
             modes = modes,
             lastResult = syncOperationResult
@@ -33,7 +33,7 @@ class SubjectsDownSyncOperationFactoryImpl : SubjectsDownSyncOperationFactory {
                                           syncOperationResult: SubjectsDownSyncOperationResult?) =
         SubjectsDownSyncOperation(
             projectId = projectId,
-            userId = null,
+            attendantId = null,
             moduleId = moduleId,
             modes = modes,
             lastResult = syncOperationResult

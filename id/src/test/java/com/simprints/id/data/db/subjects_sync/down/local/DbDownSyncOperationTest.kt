@@ -31,7 +31,7 @@ class DbSubjectsDownSyncOperationTest {
 
         with(dbOp.fromDbToDomain()) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
-            assertThat(userId).isEqualTo(DEFAULT_USER_ID)
+            assertThat(attendantId).isEqualTo(DEFAULT_USER_ID)
             assertThat(moduleId).isEqualTo(DEFAULT_MODULE_ID)
             assertThat(modes).isEqualTo(DEFAULT_MODES)
             assertThat(lastResult?.lastEventId).isEqualTo(LAST_EVENT_ID)
