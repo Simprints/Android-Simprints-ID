@@ -8,10 +8,11 @@
 
 package io.rankone.rocsdk.embedded;
 
-public final class roc_pose {
+public final class roc_pose_options {
   public final static int ROC_POSE_FRONTAL = rocJNI.ROC_POSE_FRONTAL_get();
   public final static int ROC_POSE_LEFT_PROFILE = rocJNI.ROC_POSE_LEFT_PROFILE_get();
   public final static int ROC_POSE_RIGHT_PROFILE = rocJNI.ROC_POSE_RIGHT_PROFILE_get();
   public final static int ROC_POSE_NUM_POSES = rocJNI.ROC_POSE_NUM_POSES_get();
+  public final static int ROC_POSE_PERIOCULAR = rocJNI.ROC_POSE_PERIOCULAR_get();
 }
 

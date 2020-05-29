@@ -8,16 +8,16 @@
 
 package io.rankone.rocsdk.embedded;
 
-public class roc_embedded_gender {
+public class roc_uuid {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  public roc_embedded_gender(long cPtr, boolean cMemoryOwn) {
+  public roc_uuid(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  public static long getCPtr(roc_embedded_gender obj) {
+  public static long getCPtr(roc_uuid obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -30,30 +30,23 @@ public class roc_embedded_gender {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        rocJNI.delete_roc_embedded_gender(swigCPtr);
+        rocJNI.delete_roc_uuid(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
-  public void setFemale(float value) {
-    rocJNI.roc_embedded_gender_female_set(swigCPtr, this, value);
+  public void setData(SWIGTYPE_p_unsigned_char value) {
+    rocJNI.roc_uuid_data_set(swigCPtr, this, SWIGTYPE_p_unsigned_char.getCPtr(value));
   }
 
-  public float getFemale() {
-    return rocJNI.roc_embedded_gender_female_get(swigCPtr, this);
+  public SWIGTYPE_p_unsigned_char getData() {
+    long cPtr = rocJNI.roc_uuid_data_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_unsigned_char(cPtr, false);
   }
 
-  public void setMale(float value) {
-    rocJNI.roc_embedded_gender_male_set(swigCPtr, this, value);
-  }
-
-  public float getMale() {
-    return rocJNI.roc_embedded_gender_male_get(swigCPtr, this);
-  }
-
-  public roc_embedded_gender() {
-    this(rocJNI.new_roc_embedded_gender(), true);
+  public roc_uuid() {
+    this(rocJNI.new_roc_uuid(), true);
   }
 
 }

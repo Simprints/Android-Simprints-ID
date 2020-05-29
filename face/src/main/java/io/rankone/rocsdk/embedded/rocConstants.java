@@ -14,10 +14,10 @@ public interface rocConstants {
   public final static int ROC_VERSION_PATCH = rocJNI.ROC_VERSION_PATCH_get();
   public final static String ROC_VERSION_STRING = rocJNI.ROC_VERSION_STRING_get();
   public final static String ROC_COPYRIGHT = rocJNI.ROC_COPYRIGHT_get();
-  public final static long ROC_NO_TIMESTAMP = rocJNI.ROC_NO_TIMESTAMP_get();
-  public final static long ROC_UNKNOWN_PERSON = rocJNI.ROC_UNKNOWN_PERSON_get();
+  public final static java.math.BigInteger ROC_NO_TIMESTAMP = rocJNI.ROC_NO_TIMESTAMP_get();
   public final static long ROC_FR_FV_SIZE = rocJNI.ROC_FR_FV_SIZE_get();
   public final static long ROC_FR_FAST_FV_SIZE = rocJNI.ROC_FR_FAST_FV_SIZE_get();
+  public final static long ROC_FR_PERIOCULAR_FV_SIZE = rocJNI.ROC_FR_PERIOCULAR_FV_SIZE_get();
   public final static long ROC_TATTOO_FV_SIZE = rocJNI.ROC_TATTOO_FV_SIZE_get();
   public final static float ROC_MAX_SIMILARITY = rocJNI.ROC_MAX_SIMILARITY_get();
   public final static float ROC_MIN_SIMILARITY = rocJNI.ROC_MIN_SIMILARITY_get();

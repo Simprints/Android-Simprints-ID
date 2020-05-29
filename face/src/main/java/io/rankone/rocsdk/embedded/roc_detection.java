@@ -12,12 +12,12 @@ public class roc_detection {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected roc_detection(long cPtr, boolean cMemoryOwn) {
+  public roc_detection(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(roc_detection obj) {
+  public static long getCPtr(roc_detection obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -84,11 +84,11 @@ public class roc_detection {
     return rocJNI.roc_detection_confidence_get(swigCPtr, this);
   }
 
-  public void setPose(int value) {
+  public void setPose(long value) {
     rocJNI.roc_detection_pose_set(swigCPtr, this, value);
   }
 
-  public int getPose() {
+  public long getPose() {
     return rocJNI.roc_detection_pose_get(swigCPtr, this);
   }
 
