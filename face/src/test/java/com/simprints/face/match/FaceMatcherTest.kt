@@ -1,7 +1,7 @@
 package com.simprints.face.match
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.face.PeopleGenerator
+import com.simprints.face.FixtureGenerator
 import com.simprints.face.match.mock.MockFaceMatcher
 import com.simprints.id.tools.utils.generateSequenceN
 import io.mockk.coEvery
@@ -11,8 +11,8 @@ import org.junit.Test
 
 class FaceMatcherTest {
     private val faceMatcher = spyk(MockFaceMatcher())
-    private val candidate1 = PeopleGenerator.getFaceIdentity(2)
-    private val probes = generateSequenceN(2) { PeopleGenerator.getFaceSample() }.toList()
+    private val candidate1 = FixtureGenerator.getFaceIdentity(2)
+    private val probes = generateSequenceN(2) { FixtureGenerator.getFaceSample() }.toList()
 
     @Test
     fun `Get highest score for a candidate`() = runBlockingTest {

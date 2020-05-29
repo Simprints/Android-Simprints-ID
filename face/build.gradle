@@ -120,4 +120,5 @@ dependencies {
     // Mockk
     testImplementation deps.testing.mockk.core
     testImplementation deps.testing.truth
+    testImplementation deps.testing.robolectric.core
 }
