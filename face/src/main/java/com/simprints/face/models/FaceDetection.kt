@@ -11,7 +11,8 @@ data class FaceDetection(
     val face: Face?,
     val status: Status,
     var securedImageRef: SecuredImageRef? = null,
-    val detectionTime: Long = System.currentTimeMillis()
+    val detectionTime: Long = System.currentTimeMillis(),
+    var isFallback: Boolean = false
 ) {
     enum class Status {
         VALID,
