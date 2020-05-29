@@ -53,7 +53,7 @@ class EnrolLastBiometricsActivity : AppCompatActivity() {
 
     private fun processRequest() {
         lifecycleScope.launchWhenCreated {
-            vm.getNextStep(enrolLastBiometricsRequest)
+            vm.processEnrolLastBiometricsRequest(enrolLastBiometricsRequest)
         }
     }
 
