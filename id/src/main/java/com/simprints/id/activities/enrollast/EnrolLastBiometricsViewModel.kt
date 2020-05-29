@@ -22,10 +22,10 @@ class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
     fun getViewStateLiveData(): LiveData<ViewState> = viewStateLiveData
     private val viewStateLiveData = MutableLiveData<ViewState>()
 
-    suspend fun getNextStep(enrolLastBiometricsRequest: EnrolLastBiometricsRequest) {
+    suspend fun processEnrolLastBiometricsRequest(enrolLastBiometricsRequest: EnrolLastBiometricsRequest) {
         with(enrolLastBiometricsRequest) {
             viewStateLiveData.value = try {
-                val steps = enrolLastBiometricsRequest.steps
+                val steps = enrolLastBiometricsRequest.previousSteps
                 val previousLastEnrolmentResult = steps.firstOrNull { it.request is EnrolLastBiometricsRequest }?.getResult()
                 if (previousLastEnrolmentResult is EnrolLastBiometricsResponse) {
                     previousLastEnrolmentResult.newSubjectId?.let { Success(it) } ?: Failed

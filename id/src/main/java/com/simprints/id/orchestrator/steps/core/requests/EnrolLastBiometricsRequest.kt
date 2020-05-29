@@ -7,5 +7,5 @@ import kotlinx.android.parcel.Parcelize
 data class EnrolLastBiometricsRequest(val projectId: String,
                                       val userId: String,
                                       val moduleId: String,
-                                      val steps: List<Step>,
+                                      val previousSteps: List<Step>,
                                       val sessionId: String?) : CoreRequest

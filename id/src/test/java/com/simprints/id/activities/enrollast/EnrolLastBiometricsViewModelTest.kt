@@ -53,8 +53,8 @@ class EnrolLastBiometricsViewModelTest {
     fun getNextStep_enrolFails_shouldProduceFailedState() {
         runBlocking {
             val request = mockk<EnrolLastBiometricsRequest>()
-            every { request.steps } throws Throwable("No steps from previous run")
-            viewModel.getNextStep(request)
+            every { request.previousSteps } throws Throwable("No steps from previous run")
+            viewModel.processEnrolLastBiometricsRequest(request)
             Truth.assertThat(viewModel.getViewStateLiveData().value).isEqualTo(Failed)
         }
     }
@@ -62,7 +62,7 @@ class EnrolLastBiometricsViewModelTest {
     @Test
     fun getNextStep_enrolAlreadyHappened_shouldProduceSuccessState() {
         runBlocking {
-            viewModel.getNextStep(appRequestWithPastEnrolLastBiometricSteps)
+            viewModel.processEnrolLastBiometricsRequest(appRequestWithPastEnrolLastBiometricSteps)
 
             with(viewModel.getViewStateLiveData()) {
                 Truth.assertThat(this.value).isInstanceOf(Success::class.java)
@@ -77,7 +77,7 @@ class EnrolLastBiometricsViewModelTest {
             val newEnrolment = PeopleGeneratorUtils.getRandomPerson()
             every { enrolHelper.buildPerson(any(), any(), any(), any(), any(), any()) } returns newEnrolment
 
-            viewModel.getNextStep(appRequestWithoutPastEnrolLastBiometricSteps)
+            viewModel.processEnrolLastBiometricsRequest(appRequestWithoutPastEnrolLastBiometricSteps)
 
             with(viewModel.getViewStateLiveData()) {
                 Truth.assertThat(this.value).isInstanceOf(Success::class.java)
