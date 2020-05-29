@@ -40,7 +40,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew core:jacocoTestReportStandardDebug
+                    - ./gradlew core:jacocoTestReportDebug
                     - ./gradlew id:jacocoTestReportStandardDebug
                 artifacts:
                     - id/build/reports/**
@@ -91,7 +91,7 @@ definitions:
                     - bash ./ci/pipeline/setup
                     # Tests lock if gradle runs in parallel
                     - echo "org.gradle.parallel=false" >> gradle.properties
-                    - ./gradlew fingerprintscanner:jacocoTestReportStandardDebug
+                    - ./gradlew fingerprintscanner:jacocoTestReportDebug
                 artifacts:
                     - fingerprintscanner/build/reports/**
 
