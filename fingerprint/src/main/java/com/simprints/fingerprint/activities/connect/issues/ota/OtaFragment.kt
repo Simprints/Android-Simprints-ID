@@ -34,11 +34,17 @@ class OtaFragment : FingerprintFragment() {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
 
-        initStartUpdateButton()
         listenForProgress()
         listenForCompleteEvent()
         listenForRecoveryEvent()
         listenForFailedEvent()
+
+        // If the user is coming for a retry, no need to wait for the button press
+        if (args.otaFragmentRequest.currentRetryAttempt == 0) {
+            initStartUpdateButton()
+        } else {
+            adjustUiAndStartUpdate()
+        }
     }
 
     private fun setTextInLayout() {
@@ -51,16 +57,20 @@ class OtaFragment : FingerprintFragment() {
 
     private fun initStartUpdateButton() {
         startUpdateButton.setOnClickListener {
-            otaProgressBar.visibility = View.VISIBLE
-            otaStatusTextView.visibility = View.VISIBLE
-            otaStatusTextView.text = when (val retry = args.otaFragmentRequest.currentRetryAttempt) {
-                0 -> resourceHelper.getString(R.string.updating)
-                else -> resourceHelper.getString(R.string.updating_attempt, arrayOf("${retry + 1}", "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}"))
-            }
-            startUpdateButton.visibility = View.INVISIBLE
-            startUpdateButton.isEnabled = false
-            viewModel.startOta(args.otaFragmentRequest.availableOtas, args.otaFragmentRequest.currentRetryAttempt)
+            adjustUiAndStartUpdate()
         }
+    }
+
+    private fun adjustUiAndStartUpdate() {
+        otaProgressBar.visibility = View.VISIBLE
+        otaStatusTextView.visibility = View.VISIBLE
+        otaStatusTextView.text = when (val retry = args.otaFragmentRequest.currentRetryAttempt) {
+            0 -> resourceHelper.getString(R.string.updating)
+            else -> resourceHelper.getString(R.string.updating_attempt, arrayOf("${retry + 1}", "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}"))
+        }
+        startUpdateButton.visibility = View.INVISIBLE
+        startUpdateButton.isEnabled = false
+        viewModel.startOta(args.otaFragmentRequest.availableOtas, args.otaFragmentRequest.currentRetryAttempt)
     }
 
     private fun listenForProgress() {
