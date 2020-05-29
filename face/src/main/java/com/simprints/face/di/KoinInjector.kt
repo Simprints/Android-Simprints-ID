@@ -12,11 +12,11 @@ import com.simprints.face.controllers.core.preferencesManager.FacePreferencesMan
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.controllers.core.repository.FaceDbManagerImpl
 import com.simprints.face.detection.FaceDetector
-import com.simprints.face.detection.mock.MockFaceDetector
+import com.simprints.face.detection.rankone.RankOneFaceDetector
 import com.simprints.face.exitform.ExitFormViewModel
 import com.simprints.face.match.FaceMatchViewModel
 import com.simprints.face.match.FaceMatcher
-import com.simprints.face.match.mock.MockFaceMatcher
+import com.simprints.face.match.rankone.RankOneFaceMatcher
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.id.Application
 import com.simprints.uicomponents.imageTools.LibYuvJni
@@ -63,10 +63,10 @@ object KoinInjector {
     }
 
     private fun Module.defineBuildersForDomainClasses() {
-        factory<FaceDetector> { MockFaceDetector() }
+        factory<FaceDetector> { RankOneFaceDetector() }
         factory { FrameProcessor(get()) }
         factory { LibYuvJni() }
-        factory<FaceMatcher> { MockFaceMatcher() }
+        factory<FaceMatcher> { RankOneFaceMatcher() }
     }
 
     private fun Module.defineBuildersForViewModels() {

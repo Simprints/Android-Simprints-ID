@@ -11,11 +11,14 @@ package io.rankone.rocsdk.embedded;
 public final class roc_algorithm_options {
   public final static int ROC_FRONTAL = rocJNI.ROC_FRONTAL_get();
   public final static int ROC_FULL = rocJNI.ROC_FULL_get();
+  public final static int ROC_PERIOCULAR = rocJNI.ROC_PERIOCULAR_get();
   public final static int ROC_MANUAL = rocJNI.ROC_MANUAL_get();
   public final static int ROC_ROLL = rocJNI.ROC_ROLL_get();
   public final static int ROC_FR = rocJNI.ROC_FR_get();
   public final static int ROC_FR_FAST = rocJNI.ROC_FR_FAST_get();
+  public final static int ROC_FR_PERIOCULAR = rocJNI.ROC_FR_PERIOCULAR_get();
   public final static int ROC_TATTOO = rocJNI.ROC_TATTOO_get();
+  public final static int ROC_PAD_LOGO = rocJNI.ROC_PAD_LOGO_get();
   public final static int ROC_PITCHYAW = rocJNI.ROC_PITCHYAW_get();
   public final static int ROC_DEMOGRAPHICS = rocJNI.ROC_DEMOGRAPHICS_get();
   public final static int ROC_LANDMARKS = rocJNI.ROC_LANDMARKS_get();
