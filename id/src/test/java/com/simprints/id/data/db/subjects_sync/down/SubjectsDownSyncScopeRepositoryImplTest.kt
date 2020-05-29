@@ -236,7 +236,7 @@ class SubjectsDownSyncScopeRepositoryImplTest {
     private fun SubjectsDownSyncOperation.assertProjectSyncOpIsRefreshed() {
         assertThat(lastResult).isEqualTo(lastDownSyncResult)
         assertThat(projectId).isEqualTo(projectSyncOp.projectId)
-        assertThat(userId).isNull()
+        assertThat(attendantId).isNull()
         assertThat(moduleId).isNull()
         assertThat(modes).isEqualTo(projectSyncOp.modes)
     }
@@ -244,7 +244,7 @@ class SubjectsDownSyncScopeRepositoryImplTest {
     private fun SubjectsDownSyncOperation.assertUserSyncOpIsRefreshed() {
         assertThat(lastResult).isEqualTo(lastDownSyncResult)
         assertThat(projectId).isEqualTo(userSyncOp.projectId)
-        assertThat(userId).isEqualTo(userSyncOp.userId)
+        assertThat(attendantId).isEqualTo(userSyncOp.attendantId)
         assertThat(moduleId).isNull()
         assertThat(modes).isEqualTo(userSyncOp.modes)
     }
@@ -253,7 +253,7 @@ class SubjectsDownSyncScopeRepositoryImplTest {
         assertThat(lastResult).isEqualTo(lastDownSyncResult)
         assertThat(projectId).isEqualTo(moduleSyncOp.projectId)
         assertThat(moduleId).isEqualTo(moduleSyncOp.moduleId)
-        assertThat(userId).isNull()
+        assertThat(attendantId).isNull()
         assertThat(modes).isEqualTo(moduleSyncOp.modes)
     }
 }

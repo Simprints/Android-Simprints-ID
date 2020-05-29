@@ -2,7 +2,6 @@ package com.simprints.id.data.db.subject
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.google.gson.JsonArray
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
@@ -81,7 +80,7 @@ class SubjectRepositoryDownSyncHelperImplTest {
 
 
     @Test
-    fun downloadPatientsForGlobalSync_shouldSuccess() {
+    fun downloadSubjectsForGlobalSync_shouldSuccess() {
         runBlocking {
             val nEventsToDownload = 407
             val nEventsToDelete = 0
@@ -92,7 +91,7 @@ class SubjectRepositoryDownSyncHelperImplTest {
     }
 
     @Test
-    fun downloadPatientsForUserSync_shouldSuccess() {
+    fun downloadEventsForUserSync_shouldSuccess() {
         runBlocking {
             val nEventsToDownload = 513
             val nEventsToDelete = 0
@@ -103,7 +102,7 @@ class SubjectRepositoryDownSyncHelperImplTest {
     }
 
     @Test
-    fun downloadPatientsForModuleSync_shouldSuccess() {
+    fun downloadEventsForModuleSync_shouldSuccess() {
         runBlocking {
             val nEventsToDownload = 513
             val nEventsToDelete = 0
@@ -114,7 +113,7 @@ class SubjectRepositoryDownSyncHelperImplTest {
     }
 
     @Test
-    fun deletePatientsForGlobalSync_shouldSuccess() {
+    fun deleteEventsForGlobalSync_shouldSuccess() {
         runBlocking {
             val nEventsToDownload = 0
             val nEventsToDelete = 300
@@ -125,7 +124,7 @@ class SubjectRepositoryDownSyncHelperImplTest {
     }
 
     @Test
-    fun deletePatientsForUserSync_shouldSuccess() {
+    fun deleteEventsForUserSync_shouldSuccess() {
         runBlocking {
             val nEventsToDownload = 0
             val nEventsToDelete = 212
@@ -136,7 +135,7 @@ class SubjectRepositoryDownSyncHelperImplTest {
     }
 
     @Test
-    fun deletePatientsForModuleSync_shouldSuccess() {
+    fun deleteEventsForModuleSync_shouldSuccess() {
         runBlocking {
             val nEventsToDownload = 0
             val nEventsToDelete = 123
@@ -180,7 +179,7 @@ class SubjectRepositoryDownSyncHelperImplTest {
     }
 
     @Test
-    fun downloadPatients_patientSerializationFails_shouldTriggerOnError() {
+    fun downloadEvents_eventSerializationFails_shouldTriggerOnError() {
         runBlocking {
             val nEventsToDownload = 499
             val projectDownSyncOp = builder.buildProjectSyncOperation(DefaultTestConstants.DEFAULT_PROJECT_ID, modes, null)
@@ -249,9 +248,8 @@ class SubjectRepositoryDownSyncHelperImplTest {
             mockEventRemoteDataSource(nEventsToDownload, nEventsToDelete, nEventsToUpdate)
             mockDownSyncScopeRepository()
 
-            val numberOfBatchesToUpdate = calculateCorrectNumberOfBatches(nEventsToUpdate)
-            val numberOfBatchesToSave = calculateCorrectNumberOfBatches(nEventsToDownload) + numberOfBatchesToUpdate
-            val numberOfBatchesToDelete = calculateCorrectNumberOfBatches(nEventsToDelete) + numberOfBatchesToUpdate
+            val numberOfBatchesToSave = calculateCorrectNumberOfBatchesToSave(nEventsToDownload, nEventsToUpdate, syncOp)
+            val numberOfBatchesToDelete = calculateCorrectNumberOfBatchesToDelete(nEventsToDelete, nEventsToUpdate)
 
             val downSyncHelper =
                 SubjectRepositoryDownSyncHelperImpl(subjectLocalDataSource, eventRemoteDataSource,
@@ -341,6 +339,30 @@ class SubjectRepositoryDownSyncHelperImplTest {
     private fun mockDownSyncScopeRepository() {
         coEvery { subjectsDownSyncScopeRepository.insertOrUpdate(any())  } returns Unit
     }
+
+    private fun calculateCorrectNumberOfBatchesToSave(nEventsToDownload: Int,
+                                                      nEventsToUpdate: Int,
+                                                      syncOp: SubjectsDownSyncOperation) =
+        when {
+            /*
+            The generator generates move events where it is a deletion for current attendantId and current moduleId to a
+            creation for new attendantId and new moduleId. We would be ignoring the events for new attendantId and new moduleId
+            for USER and MODULE sync.
+             */
+            syncOp.moduleId != null -> {
+                calculateCorrectNumberOfBatches(nEventsToDownload)
+            }
+            syncOp.attendantId != null -> {
+                calculateCorrectNumberOfBatches(nEventsToDownload)
+            }
+            else -> {
+                calculateCorrectNumberOfBatches(nEventsToDownload) + calculateCorrectNumberOfBatches(nEventsToUpdate)
+            }
+        }
+
+    private fun calculateCorrectNumberOfBatchesToDelete(nEventsToDelete: Int,
+                                                        nEventsToUpdate: Int) =
+        calculateCorrectNumberOfBatches(nEventsToDelete) + calculateCorrectNumberOfBatches(nEventsToUpdate)
 
     private fun calculateCorrectNumberOfBatches(nEvents: Int) =
         ceil(nEvents.toDouble() / BATCH_SIZE_FOR_DOWNLOADING.toDouble()).toInt()

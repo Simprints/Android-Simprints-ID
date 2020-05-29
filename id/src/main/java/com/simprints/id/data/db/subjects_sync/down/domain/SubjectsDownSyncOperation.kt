@@ -5,15 +5,15 @@ import com.simprints.id.data.db.subjects_sync.down.local.DbSubjectsDownSyncOpera
 import com.simprints.id.domain.modality.Modes
 
 data class SubjectsDownSyncOperation(val projectId: String,
-                                     val userId: String?,
+                                     val attendantId: String?,
                                      val moduleId: String?,
                                      val modes: List<Modes>,
                                      val lastResult: SubjectsDownSyncOperationResult?)
 
 fun SubjectsDownSyncOperation.fromDomainToDb(): DbSubjectsDownSyncOperation =
     DbSubjectsDownSyncOperation(
-        DbSubjectsDownSyncOperationKey(projectId, modes, userId, moduleId),
-        projectId, userId, moduleId, modes,
+        DbSubjectsDownSyncOperationKey(projectId, modes, attendantId, moduleId),
+        projectId, attendantId, moduleId, modes,
         lastResult?.state,
         lastResult?.lastEventId,
         lastResult?.lastSyncTime)
