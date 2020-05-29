@@ -27,6 +27,8 @@ import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 
 class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
 
+    override val generation: ScannerGeneration = ScannerGeneration.VERO_1
+
     override fun versionInformation(): ScannerVersion =
         ScannerVersion(
             ScannerGeneration.VERO_1,

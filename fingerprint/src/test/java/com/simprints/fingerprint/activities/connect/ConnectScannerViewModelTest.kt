@@ -73,6 +73,7 @@ class ConnectScannerViewModelTest : KoinTest {
         every { sensorWakeUp() } returns Completable.complete()
         every { setUiIdle() } returns Completable.complete()
         every { versionInformation() } returns mockk(relaxed = true)
+        every { generation } returns ScannerGeneration.VERO_2
     }
 
     @Test

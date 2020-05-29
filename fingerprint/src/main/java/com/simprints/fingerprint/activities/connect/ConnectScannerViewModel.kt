@@ -214,7 +214,8 @@ class ConnectScannerViewModel(
                     ScannerConnectionEvent.ScannerInfo(
                         lastPairedScannerId ?: "",
                         lastPairedMacAddress ?: "",
-                        onScanner { versionInformation() }.firmware.toString()))) // TODO : Determine appropriate firmware versions for sessions
+                        ScannerConnectionEvent.ScannerGeneration.get(onScanner { generation }),
+                        null)))
         }
     }
 
