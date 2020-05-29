@@ -31,15 +31,15 @@ android {
             buildConfigField("String", "BASE_URL_PREFIX", "\"prod\"")
         }
 
-        staging {
-            initWith release
-            buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
-        }
-
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             buildConfigField("String", "BASE_URL_PREFIX", "\"dev\"")
+        }
+
+        staging {
+            initWith release
+            buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
         }
     }
 }
