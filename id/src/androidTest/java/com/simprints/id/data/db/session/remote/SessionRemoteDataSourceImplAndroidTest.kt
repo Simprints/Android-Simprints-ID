@@ -11,6 +11,7 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.db.session.SessionRepositoryImpl
 import com.simprints.id.data.db.session.domain.models.events.*
+import com.simprints.id.data.db.session.domain.models.events.ScannerConnectionEvent.ScannerGeneration
 import com.simprints.id.data.db.session.domain.models.events.callback.*
 import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
 import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
@@ -113,6 +114,8 @@ class SessionRemoteDataSourceImplAndroidTest {
                 addPersonCreationEvent()
                 addRefusalEvent()
                 addScannerConnectionEvent()
+                addVero2InfoSnapshotEvents()
+                addScannerFirmwareUpdateEvent()
                 addSuspiciousIntentEvent()
                 addCallbackEvent()
                 addCalloutEvent()
@@ -249,7 +252,21 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     private fun SessionEvents.addScannerConnectionEvent() {
-        addEvent(ScannerConnectionEvent(0, ScannerConnectionEvent.ScannerInfo("scanner_id", "macAddress", "hardware")))
+        addEvent(ScannerConnectionEvent(0,
+            ScannerConnectionEvent.ScannerInfo("scanner_id", "macAddress",
+                ScannerGeneration.VERO_2,"hardware")))
+    }
+
+    private fun SessionEvents.addVero2InfoSnapshotEvents() {
+        addEvent(Vero2InfoSnapshotEvent(0,
+            Vero2InfoSnapshotEvent.Vero2Version(Int.MAX_VALUE.toLong() + 1, "1.23",
+                "api", "stmApp", "stmApi", "un20App", "un20Api"),
+            Vero2InfoSnapshotEvent.BatteryInfo(70, 15, 1, 37)))
+    }
+
+    private fun SessionEvents.addScannerFirmwareUpdateEvent() {
+        addEvent(ScannerFirmwareUpdateEvent(0, 0, "stm",
+            "targetApp", "failureReason"))
     }
 
     private fun SessionEvents.addSuspiciousIntentEvent() {
