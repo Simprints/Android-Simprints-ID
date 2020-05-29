@@ -18,6 +18,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
+import com.simprints.fingerprint.controllers.core.eventData.model.Vero2InfoSnapshotEvent
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
@@ -180,7 +181,7 @@ class ConnectScannerViewModel(
         preferencesManager.lastScannerUsed = scannerManager.lastPairedMacAddress?.let {
             serialNumberConverter.convertMacAddressToSerialNumber(it)
         } ?: ""
-        preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.firmware.toString() // TODO : Determine appropriate firmware versions for sessions
+        preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.computeMasterVersion().toString() // TODO : Determine appropriate firmware versions for sessions
         analyticsManager.logScannerProperties(scannerManager.lastPairedMacAddress
             ?: "", scannerManager.lastPairedScannerId ?: "")
         scannerConnected.postEvent(true)
@@ -207,15 +208,29 @@ class ConnectScannerViewModel(
     }
 
     private fun addBluetoothConnectivityEvent() {
-        scannerManager.apply {
+        with(scannerManager) {
             sessionEventsManager.addEventInBackground(
                 ScannerConnectionEvent(
                     timeHelper.now(),
                     ScannerConnectionEvent.ScannerInfo(
                         lastPairedScannerId ?: "",
                         lastPairedMacAddress ?: "",
-                        ScannerConnectionEvent.ScannerGeneration.get(onScanner { generation }),
+                        ScannerConnectionEvent.ScannerGeneration.get(onScanner { versionInformation().generation }),
                         null)))
+        }
+    }
+
+    private fun addInfoSnapshotEventIfNecessary() {
+        with(scannerManager) {
+            if (onScanner { versionInformation().generation } == ScannerGeneration.VERO_2) {
+                sessionEventsManager.addEventInBackground(
+                    Vero2InfoSnapshotEvent(
+                        timeHelper.now(),
+                        Vero2InfoSnapshotEvent.Vero2Version.get(onScanner { versionInformation() }),
+                        Vero2InfoSnapshotEvent.BatteryInfo.get(onScanner { batteryInformation() })
+                    )
+                )
+            }
         }
     }
 
