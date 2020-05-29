@@ -47,6 +47,7 @@ import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
+import com.simprints.fingerprint.tools.BatteryLevelChecker
 import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
@@ -107,11 +108,13 @@ object KoinInjector {
         factory { SerialNumberConverter() }
         factory { ScannerGenerationDeterminer() }
 
+        factory { BatteryLevelChecker(androidContext()) }
+        factory { FirmwareFileManager(androidContext()) }
+
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
         single { ScannerPairingManager(get()) }
-        single { FirmwareFileManager(androidContext()) }
-        single { ScannerInitialSetupHelper(get()) }
+        single { ScannerInitialSetupHelper(get(), get(), get()) }
         single { ConnectionHelper(get()) }
         single { CypressOtaHelper(get(), get()) }
         single { StmOtaHelper(get(), get()) }

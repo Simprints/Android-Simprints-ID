@@ -1,6 +1,8 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
+import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
+import com.simprints.fingerprint.scanner.domain.BatteryInfo as BatteryInfoDomain
 import com.simprints.id.data.db.session.domain.models.events.Vero2InfoSnapshotEvent as Vero2InfoSnapshotEventCore
 import com.simprints.id.data.db.session.domain.models.events.Vero2InfoSnapshotEvent.BatteryInfo as BatteryInfoCore
 import com.simprints.id.data.db.session.domain.models.events.Vero2InfoSnapshotEvent.Vero2Version as Vero2VersionCore
@@ -19,7 +21,22 @@ class Vero2InfoSnapshotEvent(startTime: Long,
         val stmApi: String,
         val un20App: String,
         val un20Api: String
-    )
+    ) {
+        companion object {
+            fun get(scannerVersion: ScannerVersion) =
+                with(scannerVersion) {
+                    Vero2Version(
+                        master = computeMasterVersion(),
+                        cypressApp = firmware.cypress.toString(),
+                        cypressApi = api.cypress.toString(),
+                        stmApp = firmware.stm.toString(),
+                        stmApi = api.stm.toString(),
+                        un20App = firmware.un20.toString(),
+                        un20Api = api.un20.toString()
+                    )
+                }
+        }
+    }
 
     @Keep
     class BatteryInfo(
@@ -27,7 +44,14 @@ class Vero2InfoSnapshotEvent(startTime: Long,
         val voltage: Int,
         val current: Int,
         val temperature: Int
-    )
+    ) {
+        companion object {
+            fun get(batteryInfo: BatteryInfoDomain) =
+                with(batteryInfo) {
+                    BatteryInfo(charge, voltage, current, temperature)
+                }
+        }
+    }
 }
 
 fun Vero2InfoSnapshotEvent.fromDomainToCore(): Vero2InfoSnapshotEventCore =

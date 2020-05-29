@@ -2,10 +2,7 @@ package com.simprints.fingerprint.scanner.wrapper
 
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
-import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
-import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
+import com.simprints.fingerprint.scanner.domain.*
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
@@ -27,8 +24,6 @@ import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 
 class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
 
-    override val generation: ScannerGeneration = ScannerGeneration.VERO_1
-
     override fun versionInformation(): ScannerVersion =
         ScannerVersion(
             ScannerGeneration.VERO_1,
@@ -39,6 +34,8 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
             ),
             ScannerApiVersions.UNKNOWN
         )
+
+    override fun batteryInformation(): BatteryInfo = BatteryInfo.UNKNOWN
 
     override fun connect(): Completable = Completable.create { result ->
         scannerV1.connect(ScannerCallbackWrapper({

@@ -4,10 +4,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.controllers.v2.*
-import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
-import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
+import com.simprints.fingerprint.scanner.domain.*
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
@@ -23,7 +20,6 @@ import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
-import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -31,6 +27,7 @@ import io.reactivex.Single
 import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 import java.io.IOException
+import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
 class ScannerWrapperV2(private val scannerV2: ScannerV2,
@@ -43,9 +40,8 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                        private val un20OtaHelper: Un20OtaHelper,
                        private val crashReportManager: FingerprintCrashReportManager) : ScannerWrapper {
 
-    override val generation: ScannerGeneration = ScannerGeneration.VERO_2
-
     private var scannerVersion: ScannerVersion? = null
+    private var batteryInfo: BatteryInfo? = null
 
     override fun versionInformation(): ScannerVersion =
         scannerVersion ?: ScannerVersion(
@@ -54,12 +50,15 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             ScannerApiVersions.UNKNOWN
         )
 
+    override fun batteryInformation(): BatteryInfo = batteryInfo ?: BatteryInfo.UNKNOWN
+
     override fun connect(): Completable =
         connectionHelper.connectScanner(scannerV2, macAddress)
             .wrapErrorsFromScanner()
 
     override fun setup(): Completable =
-        scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerV2) { scannerVersion = it }
+        scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerV2, macAddress,
+            { scannerVersion = it }, { batteryInfo = it })
             .wrapErrorsFromScanner()
 
     override fun disconnect(): Completable =
