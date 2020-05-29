@@ -89,6 +89,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    # Tests lock if gradle runs in parallel
+                    - echo "org.gradle.parallel=false" >> gradle.properties
                     - ./gradlew fingerprintscanner:jacocoTestReportDebug
                 artifacts:
                     - fingerprintscanner/build/reports/**
@@ -120,7 +122,6 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - echo "org.gradle.daemon=true" >> gradle.properties
                     # Build ID Android Test APK
                     - cat ci/debug_gradle_signing >> id/build.gradle
                     - ./gradlew id:assembleDebugAndroidTest
