@@ -13,14 +13,17 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration.*
+import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.versions.*
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
+import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
 import com.simprints.fingerprint.testtools.assertEventReceived
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
+import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothDevice
 import com.simprints.testtools.common.livedata.testObserver
@@ -247,6 +250,20 @@ class ConnectScannerViewModelTest : KoinTest {
         scannerConnectedObserver.assertEventReceivedWithContent(false)
         launchAlertObserver.assertEventReceivedWithContent(FingerprintAlert.UNEXPECTED_ERROR)
         verify { crashReportManager.logExceptionOrSafeException(eq(error)) }
+    }
+
+    @Test
+    fun start_scannerConnectThrowsOtaAvailableException_sendsOtaAvailableScannerIssue() {
+        val e = OtaAvailableException(listOf(AvailableOta.CYPRESS, AvailableOta.UN20))
+        setupBluetooth(numberOfPairedScanners = 1)
+        every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2, e)
+
+        viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
+
+        viewModel.connectScannerIssue.assertEventReceivedWithContentAssertions {
+            assertThat(it).isInstanceOf(ConnectScannerIssue.Ota::class.java)
+            assertThat((it as ConnectScannerIssue.Ota).otaFragmentRequest.availableOtas).containsExactlyElementsIn(e.availableOtas).inOrder()
+        }
     }
 
     @Test

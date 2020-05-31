@@ -6,8 +6,12 @@ import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragmentRequest
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.data.FirmwareFileManager
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.*
@@ -22,6 +26,9 @@ import kotlin.concurrent.schedule
 
 class OtaViewModel(
     private val scannerManager: ScannerManager,
+    private val firmwareFileManager: FirmwareFileManager,
+    private val sessionEventsManager: FingerprintSessionEventsManager,
+    private val crashReportManager: FingerprintCrashReportManager,
     private val timeHelper: FingerprintTimeHelper
 ) : ViewModel() {
 
@@ -36,11 +43,9 @@ class OtaViewModel(
     @SuppressLint("CheckResult")
     fun startOta(availableOtas: List<AvailableOta>, currentRetryAttempt: Int) {
         remainingOtas.addAll(availableOtas)
-        scannerManager.scanner { disconnect() }
-            .andThen(scannerManager.scanner { connect() })
-            .andThen(Observable.concat(availableOtas.map {
+        Observable.concat(availableOtas.map {
                 it.toScannerObservable().doOnComplete { remainingOtas.remove(it) }
-            })).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
+            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
                 onNext = { otaStep ->
                     currentStep = otaStep
                     progress.postValue(otaStep.totalProgress.mapToTotalProgress(remainingOtas.size, availableOtas.size))
@@ -53,14 +58,19 @@ class OtaViewModel(
             )
     }
 
-    private fun AvailableOta.toScannerObservable(): Observable<out OtaStep> = when (this) {
-        AvailableOta.CYPRESS -> scannerManager.scannerObservable { performCypressOta() }
-        AvailableOta.STM -> scannerManager.scannerObservable { performStmOta() }
-        AvailableOta.UN20 -> scannerManager.scannerObservable { performUn20Ota() }
+    private fun AvailableOta.toScannerObservable(): Observable<out OtaStep> = Observable.defer {
+        val otaStartedTime = timeHelper.now()
+        when (this) {
+            AvailableOta.CYPRESS -> scannerManager.scannerObservable { performCypressOta() }
+            AvailableOta.STM -> scannerManager.scannerObservable { performStmOta() }
+            AvailableOta.UN20 -> scannerManager.scannerObservable { performUn20Ota() }
+        }.doOnComplete { saveOtaEventInSession(this, otaStartedTime) }
+            .doOnError { saveOtaEventInSession(this, otaStartedTime, it) }
     }
 
     private fun handleScannerError(e: Throwable, currentRetryAttempt: Int) {
         Timber.e(e)
+        crashReportManager.logExceptionOrSafeException(e)
         if (currentRetryAttempt >= MAX_RETRY_ATTEMPTS) {
             otaFailed.postEvent()
         } else {
@@ -74,6 +84,30 @@ class OtaViewModel(
                 null -> otaFailed.postEvent()
             }
         }
+    }
+
+    private fun saveOtaEventInSession(availableOta: AvailableOta, startTime: Long, e: Throwable? = null) {
+        val chipName = when (availableOta) {
+            AvailableOta.CYPRESS -> "cypress"
+            AvailableOta.STM -> "stm"
+            AvailableOta.UN20 -> "un20"
+        }
+
+        val targetVersion = when (availableOta) {
+            AvailableOta.CYPRESS -> firmwareFileManager.getAvailableScannerFirmwareVersions()?.cypress?.toString()
+            AvailableOta.STM -> firmwareFileManager.getAvailableScannerFirmwareVersions()?.stm?.toString()
+            AvailableOta.UN20 -> firmwareFileManager.getAvailableScannerFirmwareVersions()?.un20?.toString()
+        } ?: "unknown"
+
+        val failureReason = e?.let { "${it::class.java.simpleName} : ${it.message}" }
+
+        sessionEventsManager.addEventInBackground(ScannerFirmwareUpdateEvent(
+            startTime,
+            timeHelper.now(),
+            chipName,
+            targetVersion,
+            failureReason
+        ))
     }
 
     private fun Float.mapToTotalProgress(nRemainingOtas: Int, nTotalOtas: Int): Float {
