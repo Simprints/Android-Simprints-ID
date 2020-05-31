@@ -105,7 +105,7 @@ class ConnectScannerViewModel(
 
     private fun setupVero() =
         veroTask(computeProgress(5), R.string.connect_scanner_setup, "ScannerManager: setupVero",
-            scannerManager.scanner { setup() })
+            scannerManager.scanner { setup() }) { addInfoSnapshotEventIfNecessary() }
 
     private fun resetVeroUI() =
         veroTask(computeProgress(6), R.string.connect_scanner_setup, "ScannerManager: resetVeroUI",
@@ -117,7 +117,7 @@ class ConnectScannerViewModel(
 
     private fun updateBluetoothConnectivityEventWithVeroInfo() {
         scannerManager.let {
-            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.onScanner { versionInformation() }.firmware.toString()) // TODO : Determine appropriate firmware versions for sessions
+            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.onScanner { versionInformation() }.computeMasterVersion().toString())
         }
     }
 
@@ -181,7 +181,7 @@ class ConnectScannerViewModel(
         preferencesManager.lastScannerUsed = scannerManager.lastPairedMacAddress?.let {
             serialNumberConverter.convertMacAddressToSerialNumber(it)
         } ?: ""
-        preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.computeMasterVersion().toString() // TODO : Determine appropriate firmware versions for sessions
+        preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.computeMasterVersion().toString()
         analyticsManager.logScannerProperties(scannerManager.lastPairedMacAddress
             ?: "", scannerManager.lastPairedScannerId ?: "")
         scannerConnected.postEvent(true)
