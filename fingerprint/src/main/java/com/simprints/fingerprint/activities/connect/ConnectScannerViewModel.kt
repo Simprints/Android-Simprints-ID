@@ -113,11 +113,13 @@ class ConnectScannerViewModel(
 
     private fun wakeUpVero() =
         veroTask(computeProgress(7), R.string.connect_scanner_wake_un20, "ScannerManager: wakeUpVero",
-            scannerManager.scanner { sensorWakeUp() }) { updateBluetoothConnectivityEventWithVeroInfo() }
+            scannerManager.scanner { sensorWakeUp() }) { updateBluetoothConnectivityEventWithVeroInfoIfNecessary() }
 
-    private fun updateBluetoothConnectivityEventWithVeroInfo() {
+    private fun updateBluetoothConnectivityEventWithVeroInfoIfNecessary() {
         scannerManager.let {
-            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.onScanner { versionInformation() }.computeMasterVersion().toString())
+            if (scannerManager.onScanner { versionInformation() }.generation == ScannerGeneration.VERO_1) {
+                sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.onScanner { versionInformation() }.computeMasterVersion().toString())
+            }
         }
     }
 
