@@ -151,6 +151,6 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
         projectId = projectId,
         subjectId = subjectId,
         modes = listOf(Modes.FINGERPRINT),
-        types = listOf(ENROLMENT_RECORD_CREATION)
+        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE)
     )
 }
