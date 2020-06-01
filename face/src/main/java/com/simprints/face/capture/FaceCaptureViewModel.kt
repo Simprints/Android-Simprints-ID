@@ -18,7 +18,10 @@ import com.simprints.face.models.FaceDetection
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageManager: FaceImageManager) : ViewModel() {
+class FaceCaptureViewModel(
+    private val maxRetries: Int,
+    private val faceImageManager: FaceImageManager
+) : ViewModel() {
 //    private val analyticsManager: AnalyticsManager
 
     val faceDetections = MutableLiveData<List<FaceDetection>>()
@@ -65,13 +68,13 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
         when (backButtonContext) {
             CAPTURE -> startExitForm()
             CONFIRMATION -> flowFinished()
-            RETRY -> handleRetry()
+            RETRY -> handleRetry(true)
         }
     }
 
-    fun handleRetry() {
+    fun handleRetry(isBackButton: Boolean) {
         if (canRetry) {
-            startExitForm()
+            if (isBackButton) startExitForm() else retryFlow()
         } else {
             finishFlowWithFailedRetries()
         }
@@ -98,12 +101,18 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
 
     private fun saveFaceDetections() {
         // TODO: send the correct captureEventId once we can get it
-        faceDetections.value?.forEachIndexed { index, faceDetection -> saveImage(faceDetection, index.toString()) }
+        faceDetections.value?.forEachIndexed { index, faceDetection ->
+            saveImage(
+                faceDetection,
+                index.toString()
+            )
+        }
     }
 
     private fun saveImage(faceDetection: FaceDetection, captureEventId: String) {
         runBlocking {
-            faceDetection.securedImageRef = faceImageManager.save(faceDetection.frame.toByteArray(), captureEventId)
+            faceDetection.securedImageRef =
+                faceImageManager.save(faceDetection.frame.toByteArray(), captureEventId)
         }
     }
 
