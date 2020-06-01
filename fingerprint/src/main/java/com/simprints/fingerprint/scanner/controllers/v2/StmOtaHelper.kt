@@ -28,7 +28,7 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
      */
     fun performOtaSteps(scanner: Scanner, macAddress: String): Observable<StmOtaStep> =
         Observable.just<StmOtaStep>(StmOtaStep.EnteringOtaModeFirstTime)
-            .concatWith(scanner.enterStmOtaMode() thenEmitStep StmOtaStep.ReconnectingAfterEnteringOtaMode)
+            .concatWith(scanner.enterStmOtaMode().onErrorComplete() thenEmitStep StmOtaStep.ReconnectingAfterEnteringOtaMode)
             .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep StmOtaStep.EnteringOtaModeSecondTime)
             .concatWith(scanner.enterStmOtaMode() thenEmitStep StmOtaStep.CommencingTransfer)
             .concatWith(scanner.startStmOta(firmwareFileManager.getStmFirmwareBytes()).map { StmOtaStep.TransferInProgress(it) })
