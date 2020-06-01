@@ -8,13 +8,14 @@ import java.io.File
 
 class FirmwareFileManager(private val context: Context) {
 
-    fun getAvailableScannerFirmwareVersions(): ScannerFirmwareVersions? = ScannerFirmwareVersions( // TODO : temporary for testing
-        cypress = ChipFirmwareVersion(1, 2),
-        stm = ChipFirmwareVersion.UNKNOWN,
-        un20 = ChipFirmwareVersion.UNKNOWN
-    )
+    fun getAvailableScannerFirmwareVersions(): ScannerFirmwareVersions? = null
+//        ScannerFirmwareVersions( // TODO : temporary for testing
+//            cypress = ChipFirmwareVersion(1, 2),
+//            stm = ChipFirmwareVersion.UNKNOWN,
+//            un20 = ChipFirmwareVersion.UNKNOWN
+//        )
 
-    fun getCypressFirmwareBytes(): ByteArray { // TODO : temporary for tetsing
+    fun getCypressFirmwareBytes(): ByteArray { // TODO : temporary for testing
         val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "cypress_firmware_app_1-2_api_1-1.bin")
         return file.readBytes()
     }
