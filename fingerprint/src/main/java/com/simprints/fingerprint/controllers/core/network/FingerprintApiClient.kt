@@ -6,8 +6,6 @@ interface FingerprintApiClient<T : SimRemoteInterface> {
 
     val api: T
 
-    /**
-     * @throws SyncCloudIntegrationException
-     */
+    /** @throws SyncCloudIntegrationException */
     suspend fun <V> executeCall(traceName: String?, networkBlock: suspend (T) -> V): V
 }

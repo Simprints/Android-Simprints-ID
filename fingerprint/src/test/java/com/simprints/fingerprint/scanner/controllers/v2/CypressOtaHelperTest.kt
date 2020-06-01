@@ -42,7 +42,7 @@ class CypressOtaHelperTest {
         every { scannerMock.getCypressFirmwareVersion() } returns Single.just(NEW_CYPRESS_VERSION)
 
         every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns NEW_SCANNER_VERSION.toScannerFirmwareVersions()
-        every { firmwareFileManagerMock.getCypressFirmwareBytes() } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
+        every { firmwareFileManagerMock.loadCypressFirmwareBytes() } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
     }
 
     @Test

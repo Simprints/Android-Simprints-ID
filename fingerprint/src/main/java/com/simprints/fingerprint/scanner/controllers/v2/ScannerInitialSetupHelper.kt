@@ -54,8 +54,7 @@ class ScannerInitialSetupHelper(private val firmwareFileManager: FirmwareFileMan
 
     private fun ifAvailableOtasPrepareScannerThenThrow(scanner: Scanner, macAddress: String, batteryInfo: BatteryInfo): Completable {
         val availableVersions = firmwareFileManager.getAvailableScannerFirmwareVersions()
-        val availableOtas = availableVersions?.let { determineAvailableOtas(scannerVersion.firmware, it) }
-            ?: emptyList()
+        val availableOtas = determineAvailableOtas(scannerVersion.firmware, availableVersions)
         return if (availableOtas.isEmpty() || batteryInfo.isLowBattery() || batteryLevelChecker.isLowBattery()) {
             Completable.complete()
         } else {

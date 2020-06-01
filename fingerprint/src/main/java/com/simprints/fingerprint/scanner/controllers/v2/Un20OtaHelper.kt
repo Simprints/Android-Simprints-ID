@@ -34,7 +34,7 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
         Observable.just<Un20OtaStep>(Un20OtaStep.EnteringMainMode)
             .concatWith(scanner.enterMainMode() thenEmitStep Un20OtaStep.TurningOnUn20BeforeTransfer)
             .concatWith(scanner.turnUn20OnAndAwaitStateChangeEvent() thenEmitStep Un20OtaStep.CommencingTransfer)
-            .concatWith(scanner.startUn20Ota(firmwareFileManager.getUn20FirmwareBytes()).map { Un20OtaStep.TransferInProgress(it) })
+            .concatWith(scanner.startUn20Ota(firmwareFileManager.loadUn20FirmwareBytes()).map { Un20OtaStep.TransferInProgress(it) })
             .concatWith(emitStep(Un20OtaStep.AwaitingCacheCommit))
             .concatWith(waitCacheCommitTime() thenEmitStep Un20OtaStep.TurningOffUn20AfterTransfer)
             .concatWith(scanner.turnUn20OffAndAwaitStateChangeEvent() thenEmitStep Un20OtaStep.TurningOnUn20AfterTransfer)
@@ -48,7 +48,7 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
 
     private fun validateUn20FirmwareVersion(scanner: Scanner): Completable =
         scanner.getUn20AppVersion().flatMapCompletable {
-            val expectedFirmwareVersion = firmwareFileManager.getAvailableScannerFirmwareVersions()?.un20
+            val expectedFirmwareVersion = firmwareFileManager.getAvailableScannerFirmwareVersions().un20
             val actualFirmwareVersion = it.toChipFirmwareVersion()
             if (expectedFirmwareVersion != actualFirmwareVersion) {
                 Completable.error(OtaFailedException("UN20 OTA did not increment firmware version. Expected $expectedFirmwareVersion, but was $actualFirmwareVersion"))

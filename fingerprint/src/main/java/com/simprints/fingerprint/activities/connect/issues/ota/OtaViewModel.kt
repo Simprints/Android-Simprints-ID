@@ -94,10 +94,10 @@ class OtaViewModel(
         }
 
         val targetVersion = when (availableOta) {
-            AvailableOta.CYPRESS -> firmwareFileManager.getAvailableScannerFirmwareVersions()?.cypress?.toString()
-            AvailableOta.STM -> firmwareFileManager.getAvailableScannerFirmwareVersions()?.stm?.toString()
-            AvailableOta.UN20 -> firmwareFileManager.getAvailableScannerFirmwareVersions()?.un20?.toString()
-        } ?: "unknown"
+            AvailableOta.CYPRESS -> firmwareFileManager.getAvailableScannerFirmwareVersions().cypress.toString()
+            AvailableOta.STM -> firmwareFileManager.getAvailableScannerFirmwareVersions().stm.toString()
+            AvailableOta.UN20 -> firmwareFileManager.getAvailableScannerFirmwareVersions().un20.toString()
+        }
 
         val failureReason = e?.let { "${it::class.java.simpleName} : ${it.message}" }
 

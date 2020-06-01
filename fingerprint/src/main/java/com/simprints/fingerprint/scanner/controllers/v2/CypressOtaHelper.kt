@@ -29,7 +29,7 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
     fun performOtaSteps(scanner: Scanner, macAddress: String): Observable<CypressOtaStep> =
         Observable.just<CypressOtaStep>(CypressOtaStep.EnteringOtaMode)
             .concatWith(scanner.enterCypressOtaMode() thenEmitStep CypressOtaStep.CommencingTransfer)
-            .concatWith(scanner.startCypressOta(firmwareFileManager.getCypressFirmwareBytes()).map { CypressOtaStep.TransferInProgress(it) })
+            .concatWith(scanner.startCypressOta(firmwareFileManager.loadCypressFirmwareBytes()).map { CypressOtaStep.TransferInProgress(it) })
             .concatWith(emitStep(CypressOtaStep.ReconnectingAfterTransfer))
             .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep CypressOtaStep.ValidatingNewFirmwareVersion)
             .concatWith(validateCypressFirmwareVersion(scanner) thenEmitStep CypressOtaStep.UpdatingUnifiedVersionInformation)
@@ -37,7 +37,7 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
 
     private fun validateCypressFirmwareVersion(scanner: Scanner): Completable =
         scanner.getCypressFirmwareVersion().flatMapCompletable {
-            val expectedFirmwareVersion = firmwareFileManager.getAvailableScannerFirmwareVersions()?.cypress
+            val expectedFirmwareVersion = firmwareFileManager.getAvailableScannerFirmwareVersions().cypress
             val actualFirmwareVersion = it.toChipFirmwareVersion()
             if (expectedFirmwareVersion != actualFirmwareVersion) {
                 Completable.error(OtaFailedException("Cypress OTA did not increment firmware version. Expected $expectedFirmwareVersion, but was $actualFirmwareVersion"))
