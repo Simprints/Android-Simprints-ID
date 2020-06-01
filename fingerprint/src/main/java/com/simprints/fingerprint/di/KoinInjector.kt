@@ -41,6 +41,8 @@ import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.data.FirmwareFileManager
+import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactory
+import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactoryImpl
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
@@ -102,6 +104,7 @@ object KoinInjector {
         factory<FingerprintAndroidResourcesHelper> { FingerprintAndroidResourcesHelperImpl(get()) }
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
         factory<FingerprintImageManager> { FingerprintImageManagerImpl(get(), get()) }
+        factory<FingerprintApiClientFactory> { FingerprintApiClientFactoryImpl(get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
