@@ -109,6 +109,7 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
         factory { orchestratorComponent.getFlowManager() }
         factory { component.getPersonRepository() }
         factory { component.getImageRepository() }
+        factory { component.getSimClientFactory() }
     }
 
     override fun onTerminate() {
