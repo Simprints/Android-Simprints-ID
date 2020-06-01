@@ -2,15 +2,19 @@ package com.simprints.fingerprint.controllers.core.network
 
 import com.simprints.fingerprint.scanner.data.FirmwareFileManager
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
+import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
+import timber.log.Timber
 
 class FirmwareFileDownloader(private val fingerprintApiClientFactory: FingerprintApiClientFactory,
                              private val fingerprintFileDownloader: FingerprintFileDownloader,
                              private val firmwareFileManager: FirmwareFileManager) {
 
     suspend fun download() {
-        val downloadableFirmwares = getDownloadableFirmwares()
-
         val savedVersions = firmwareFileManager.getAvailableScannerFirmwareVersions()
+        Timber.d("Saved firmware versions: $savedVersions")
+
+        val downloadableFirmwares = getDownloadableFirmwares(savedVersions)
+        Timber.d("Firmwares available for download: $downloadableFirmwares")
 
         val cypressToDownload = downloadableFirmwares.getFirmwareToDownloadOrNull(Chip.CYPRESS, savedVersions.cypress)
         val stmToDownload = downloadableFirmwares.getFirmwareToDownloadOrNull(Chip.STM, savedVersions.stm)
@@ -21,12 +25,17 @@ class FirmwareFileDownloader(private val fingerprintApiClientFactory: Fingerprin
         un20ToDownload?.downloadAndSave()
     }
 
-    private suspend fun getDownloadableFirmwares(): List<DownloadableFirmwareVersion> {
-        val fingerprintApiClient = fingerprintApiClientFactory.buildClient(FirmwareRemoteInterface::class)
-        return fingerprintApiClient.executeCall("downloadFirmware") { api ->
-            api.getAvailableDownloadableVersions().map { it.toDomain() }
+    private suspend fun getDownloadableFirmwares(savedVersion: ScannerFirmwareVersions): List<DownloadableFirmwareVersion> =
+        fingerprintApiClientFactory.buildClient(FirmwareRemoteInterface::class).executeCall("downloadFirmware") { api ->
+            api.getAvailableDownloadableVersions(
+                aboveCypressVersion = savedVersion.cypress.toStringForApi(),
+                aboveStmVersion = savedVersion.stm.toStringForApi(),
+                aboveUn20Version = savedVersion.un20.toStringForApi()
+            ).values.map { it.toDomain() }
         }
-    }
+
+    private fun ChipFirmwareVersion.toStringForApi() =
+        if (this == ChipFirmwareVersion.UNKNOWN) "0.0" else this.toString()
 
     private fun List<DownloadableFirmwareVersion>.getFirmwareToDownloadOrNull(chip: Chip, savedVersion: ChipFirmwareVersion?): DownloadableFirmwareVersion? {
         val downloadableVersion = this.find { it.chip == chip } ?: return null

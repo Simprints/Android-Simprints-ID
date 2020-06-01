@@ -43,6 +43,8 @@ import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.data.FirmwareFileManager
 import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactory
 import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactoryImpl
+import com.simprints.fingerprint.controllers.core.network.FingerprintFileDownloader
+import com.simprints.fingerprint.controllers.core.network.FirmwareFileDownloader
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
@@ -113,6 +115,8 @@ object KoinInjector {
 
         factory { BatteryLevelChecker(androidContext()) }
         factory { FirmwareFileManager(androidContext()) }
+        factory { FingerprintFileDownloader() }
+        factory { FirmwareFileDownloader(get(), get(), get()) }
 
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
