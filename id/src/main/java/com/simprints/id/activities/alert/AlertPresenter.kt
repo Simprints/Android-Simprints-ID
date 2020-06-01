@@ -69,9 +69,9 @@ class AlertPresenter(val view: AlertContract.View,
         return if (alertViewModel == ENROLMENT_LAST_BIOMETRICS_FAILED) {
             with(preferencesManager.modalities) {
                 when {
-                    isFingerprintAndFace() -> { listOf(view.getTranslatedString(R.string.last_biometrics_alert_message_all_param)) }
-                    isFace() -> { listOf(view.getTranslatedString(R.string.last_biometrics_alert_message_face_param)) }
-                    isFingerprint() -> { listOf(view.getTranslatedString(R.string.last_biometrics_alert_message_fingerprint_param)) }
+                    isFingerprintAndFace() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_all_param)) }
+                    isFace() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_face_param)) }
+                    isFingerprint() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_fingerprint_param)) }
                     else -> {
                         emptyList<String>()
                     }

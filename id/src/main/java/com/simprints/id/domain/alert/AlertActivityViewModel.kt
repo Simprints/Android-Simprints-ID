@@ -70,7 +70,7 @@ enum class AlertActivityViewModel(val type: Type,
         ),
         leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
-        message = R.string.last_biometrics_alert_message
+        message = R.string.enrol_last_biometrics_alert_message
     );
 
     companion object {

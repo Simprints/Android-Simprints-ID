@@ -103,10 +103,10 @@
     <string name="verify_guid_not_found_offline_message">Person not found, please make sure you are connected to the internet and try again</string>
     <string name="unforeseen_error_message">Please try again and if Simprints does not work contact your system administrator</string>
     <string name="safetynet_down_alert_message">1. Please try again after 5–10 minutes \n 2. Tap close</string>
-    <string name="last_biometrics_alert_message">1. Failed to save %1$s record \n 2. Tap close</string>
-    <string name="last_biometrics_alert_message_face_param">Face</string>
-    <string name="last_biometrics_alert_message_fingerprint_param">Fingerprint</string>
-    <string name="last_biometrics_alert_message_all_param">Face/Fingerprint</string>
+    <string name="enrol_last_biometrics_alert_message">1. Failed to save %1$s record \n 2. Tap close</string>
+    <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
+    <string name="enrol_last_biometrics_alert_message_fingerprint_param">Fingerprint</string>
+    <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
 
     <!-- Button Labels For Error Messages -->
     <string name="close">CLOSE</string>
@@ -280,6 +280,7 @@
     <string name="confirm_module_selection_yes">Confirm</string>
     <string name="confirm_module_selection_cancel">Cancel</string>
     <string name="dashboard_sync_card_try_again_button">Try again</string>
+    <string name="enrol_last_biometrics_success">Successful enrolment</string>
     <!-- endregion -->
 
 </resources>
