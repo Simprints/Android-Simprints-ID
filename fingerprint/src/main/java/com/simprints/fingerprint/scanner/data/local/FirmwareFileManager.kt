@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.scanner.data
+package com.simprints.fingerprint.scanner.data.local
 
 import android.content.Context
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion

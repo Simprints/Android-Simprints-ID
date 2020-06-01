@@ -8,7 +8,7 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.data.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.local.FirmwareFileManager
 import com.simprints.fingerprint.scanner.domain.ota.*
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions

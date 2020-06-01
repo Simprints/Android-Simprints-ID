@@ -4,7 +4,7 @@ import com.simprints.fingerprint.scanner.adapters.v2.toChipApiVersion
 import com.simprints.fingerprint.scanner.adapters.v2.toChipFirmwareVersion
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.adapters.v2.toUnifiedVersionInformation
-import com.simprints.fingerprint.scanner.data.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.local.FirmwareFileManager
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ChipApiVersion
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion

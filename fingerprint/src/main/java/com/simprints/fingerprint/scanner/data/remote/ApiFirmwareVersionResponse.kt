@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.controllers.core.network
+package com.simprints.fingerprint.scanner.data.remote
 
 import androidx.annotation.Keep
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
@@ -13,7 +13,7 @@ data class ApiFirmwareVersionResponse(
 /** @throws IllegalArgumentException */
 fun ApiFirmwareVersionResponse.toDomain() =
     DownloadableFirmwareVersion(
-        Chip.values().find { it.chipName == chipType }
+        DownloadableFirmwareVersion.Chip.values().find { it.chipName == chipType }
             ?: throw IllegalArgumentException("Unexpected chipType in ApiFirmwareVersionResponse: $chipType"),
         ChipFirmwareVersion.fromString(version),
         versionURL
