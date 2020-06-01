@@ -9,6 +9,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 
 class OtaRecoveryViewModel(private val scannerManager: ScannerManager) : ViewModel() {
 
@@ -23,7 +24,10 @@ class OtaRecoveryViewModel(private val scannerManager: ScannerManager) : ViewMod
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = { isConnectionSuccess.postEvent(true) },
-                onError = { isConnectionSuccess.postEvent(false) }
+                onError = {
+                    Timber.e(it)
+                    isConnectionSuccess.postEvent(false)
+                }
             )
     }
 
