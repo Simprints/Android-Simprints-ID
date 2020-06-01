@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.controllers.core.network
 
+import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.network.SimRemoteInterface
 
 interface FingerprintApiClient<T : SimRemoteInterface> {
