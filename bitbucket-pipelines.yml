@@ -114,7 +114,7 @@ definitions:
         ######################################################################
         -   step: &build-and-sign-universal-apk
                 name: "Build universal & test APKs"
-                max-time: 20
+                max-time: 30
                 caches:
                     - gradle
                     - gradlewrapper
