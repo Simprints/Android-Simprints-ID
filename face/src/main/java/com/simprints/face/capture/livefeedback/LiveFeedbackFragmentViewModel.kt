@@ -29,7 +29,7 @@ class LiveFeedbackFragmentViewModel(
         FloatRange(0.25f, 0.5f)
     )
 
-    var fallbackCapture: FaceDetection? = null
+    lateinit var fallbackCapture: FaceDetection
     val captures = mutableListOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
@@ -70,18 +70,17 @@ class LiveFeedbackFragmentViewModel(
         frameChannel.offer(frame)
     }
 
+    /**
+     * If any of the user captures are good, use them. If not, use the fallback capture
+     */
     private fun finishCapture() {
         val sortedQualifyingCaptures = captures
             .filter { it.hasValidStatus() && it.isAboveQualityThreshold(qualityThreshold) }
             .sortedByDescending { it.face?.quality }
+            .ifEmpty { listOf(fallbackCapture) }
 
+        capturingState.value = CapturingState.FINISHED
         mainVM.captureFinished(sortedQualifyingCaptures)
-
-        if (sortedQualifyingCaptures.isEmpty()) {
-            capturingState.value = CapturingState.FINISHED_FAILED
-        } else {
-            capturingState.value = CapturingState.FINISHED
-        }
     }
 
     private fun getFaceDetectionFromPotentialFace(
@@ -131,7 +130,8 @@ class LiveFeedbackFragmentViewModel(
      * get any good images, at least one good image will be saved
      */
     private fun updateFallbackCaptureIfValid(faceDetection: FaceDetection) {
-        if (faceDetection.hasValidStatus()) fallbackCapture = faceDetection.apply { isFallback = true }
+        if (faceDetection.hasValidStatus()) fallbackCapture =
+            faceDetection.apply { isFallback = true }
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED, FINISHED_FAILED }
