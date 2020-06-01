@@ -24,9 +24,10 @@ class FaceCaptureViewModel(
 ) : ViewModel() {
 //    private val analyticsManager: AnalyticsManager
 
-    val faceDetections = MutableLiveData<List<FaceDetection>>()
+    var faceDetections = listOf<FaceDetection>()
 
     val retryFlowEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val recaptureEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val exitFormEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
     val finishFlowEvent: MutableLiveData<LiveDataEventWithContent<FaceCaptureResponse>> =
@@ -53,15 +54,15 @@ class FaceCaptureViewModel(
         saveFaceDetections()
         // TODO: add analytics for FlowFinished(SUCCESS) and EndSession
 
-        val results = faceDetections.value?.mapIndexed { index, detection ->
+        val results = faceDetections.mapIndexed { index, detection ->
             FaceCaptureResult(index, detection.toFaceSample())
-        } ?: listOf()
+        }
 
         finishFlowEvent.send(FaceCaptureResponse(results))
     }
 
-    fun captureFinished(faceDetections: List<FaceDetection>) {
-        this.faceDetections.value = faceDetections
+    fun captureFinished(newFaceDetections: List<FaceDetection>) {
+        faceDetections = newFaceDetections
     }
 
     fun handleBackButton(backButtonContext: BackButtonContext) {
@@ -80,12 +81,19 @@ class FaceCaptureViewModel(
         }
     }
 
+    fun recapture() {
+        // TODO: add analytics for FlowFinished(RECAPTURE)
+        faceDetections = listOf()
+        recaptureEvent.send()
+    }
+
     private fun startExitForm() {
         exitFormEvent.send()
     }
 
     private fun retryFlow() {
         // TODO: add analytics for FlowFinished(RETRY)
+        faceDetections = listOf()
         retryFlowEvent.send()
     }
 
@@ -101,7 +109,7 @@ class FaceCaptureViewModel(
 
     private fun saveFaceDetections() {
         // TODO: send the correct captureEventId once we can get it
-        faceDetections.value?.forEachIndexed { index, faceDetection ->
+        faceDetections.forEachIndexed { index, faceDetection ->
             saveImage(
                 faceDetection,
                 index.toString()

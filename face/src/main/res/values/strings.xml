@@ -22,6 +22,7 @@
     <string name="title_capturing">Live Capture</string>
     <string name="title_preparation">Preparation</string>
 
+    <string name="btn_recapture">Recapture</string>
     <string name="btn_finish">Tap to continue</string>
     <string name="btn_capture_again">Capture again</string>
     <string name="captured_unsuccessful">Couldn\'t capture the face due to technical issue.</string>

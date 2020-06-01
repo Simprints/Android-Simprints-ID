@@ -26,8 +26,9 @@ class FaceCaptureActivity : AppCompatActivity() {
         setContentView(R.layout.activity_face_capture)
         bindViewModel()
 
-        val faceRequest: FaceCaptureRequest = this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
-            ?: throw InvalidFaceRequestException("No IFaceRequest found for FaceCaptureActivity")
+        val faceRequest: FaceCaptureRequest =
+            this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
+                ?: throw InvalidFaceRequestException("No IFaceRequest found for FaceCaptureActivity")
 
         vm.setupCapture(faceRequest)
     }
@@ -41,6 +42,10 @@ class FaceCaptureActivity : AppCompatActivity() {
 
         vm.retryFlowEvent.observe(this, LiveDataEventObserver {
             findNavController(R.id.capture_host_fragment).navigate(R.id.action_retryFragment_to_liveFeedbackFragment)
+        })
+
+        vm.recaptureEvent.observe(this, LiveDataEventObserver {
+            findNavController(R.id.capture_host_fragment).navigate(R.id.action_confirmationFragment_to_liveFeedbackFragment)
         })
 
         vm.exitFormEvent.observe(this, LiveDataEventObserver {
