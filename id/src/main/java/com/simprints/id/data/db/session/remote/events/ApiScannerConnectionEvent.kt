@@ -14,7 +14,7 @@ class ApiScannerConnectionEvent(val relativeStartTime: Long,
                          var hardwareVersion: String?) {
         constructor(scannerInfo: ScannerConnectionEvent.ScannerInfo) :
             this(scannerInfo.scannerId, scannerInfo.macAddress,
-                scannerInfo.generation?.toApiScannerGeneration(), scannerInfo.hardwareVersion)
+                scannerInfo.generation.toApiScannerGeneration(), scannerInfo.hardwareVersion)
     }
 
     constructor(scannerConnectionEvent: ScannerConnectionEvent) :
