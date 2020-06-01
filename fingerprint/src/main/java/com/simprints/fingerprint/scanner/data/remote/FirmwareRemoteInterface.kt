@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.scanner.data.remote
 
-import com.simprints.fingerprint.scanner.data.remote.ApiFirmwareVersionResponse
 import com.simprints.fingerprint.controllers.core.network.FingerprintRemoteInterface
 import retrofit2.http.GET
 import retrofit2.http.Query
