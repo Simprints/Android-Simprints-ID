@@ -40,11 +40,12 @@ import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.controllers.v2.*
-import com.simprints.fingerprint.scanner.data.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.local.FirmwareFileManager
 import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactory
 import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactoryImpl
 import com.simprints.fingerprint.controllers.core.network.FingerprintFileDownloader
-import com.simprints.fingerprint.controllers.core.network.FirmwareFileDownloader
+import com.simprints.fingerprint.scanner.data.FirmwareFileUpdater
+import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
@@ -116,7 +117,8 @@ object KoinInjector {
         factory { BatteryLevelChecker(androidContext()) }
         factory { FirmwareFileManager(androidContext()) }
         factory { FingerprintFileDownloader() }
-        factory { FirmwareFileDownloader(get(), get(), get()) }
+        factory { FirmwareFileUpdater(get(), get(), get()) }
+        factory { FirmwareFileUpdateScheduler(androidContext()) }
 
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
@@ -146,7 +148,7 @@ object KoinInjector {
             RefusalPresenter(view, get(), get(), get())
         }
 
-        viewModel { OrchestratorViewModel(get(), get()) }
+        viewModel { OrchestratorViewModel(get(), get(), get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { CollectFingerprintsViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }

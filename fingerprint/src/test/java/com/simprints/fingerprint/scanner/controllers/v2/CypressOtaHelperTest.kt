@@ -3,7 +3,7 @@ package com.simprints.fingerprint.scanner.controllers.v2
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
-import com.simprints.fingerprint.scanner.data.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.local.FirmwareFileManager
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion

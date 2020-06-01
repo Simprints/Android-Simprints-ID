@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
-import com.simprints.fingerprint.scanner.data.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.local.FirmwareFileManager
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions

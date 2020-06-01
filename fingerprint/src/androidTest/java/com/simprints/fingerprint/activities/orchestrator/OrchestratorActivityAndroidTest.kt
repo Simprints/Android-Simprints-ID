@@ -21,6 +21,7 @@ import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -38,8 +39,9 @@ import org.koin.test.mock.declareModule
 class OrchestratorActivityAndroidTest : KoinTest {
 
     private val orchestratorMock = mockk<Orchestrator>(relaxed = true)
+    private val firmwareFileUpdateSchedulerMock = mockk<FirmwareFileUpdateScheduler>(relaxed = true)
     private val scannerManagerMock = spyk<ScannerManager>(ScannerManagerImpl(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)))
-    private val orchestratorViewModel = spyk(OrchestratorViewModel(orchestratorMock, scannerManagerMock))
+    private val orchestratorViewModel = spyk(OrchestratorViewModel(orchestratorMock, scannerManagerMock, firmwareFileUpdateSchedulerMock))
 
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
 
