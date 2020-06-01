@@ -3,6 +3,7 @@ package com.simprints.fingerprint.scanner.data
 import android.content.Context
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
+import timber.log.Timber
 import java.io.File
 
 class FirmwareFileManager(private val context: Context) {
@@ -22,7 +23,7 @@ class FirmwareFileManager(private val context: Context) {
 
     private fun loadFirmwareBytes(chipDirName: String): ByteArray {
         val version = getFirmwareVersionsInDir(chipDirName).max()
-            ?: throw IllegalStateException("No available firmware file")
+            ?: throw IllegalStateException("No available firmware file in $FIRMWARE_DIR/$chipDirName/")
         return getFile(chipDirName, version).readBytes()
     }
 
@@ -36,6 +37,7 @@ class FirmwareFileManager(private val context: Context) {
         saveFirmwareBytes(UN20_DIR, version, bytes)
 
     private fun saveFirmwareBytes(chipDirName: String, version: ChipFirmwareVersion, bytes: ByteArray) {
+        Timber.d("Saving firmware file of ${bytes.size} bytes at $FIRMWARE_DIR/${version.toString().replace(".", "-")}.$BIN_FILE_EXTENSION")
         val existingVersions = getFirmwareVersionsInDir(chipDirName)
         getFile(chipDirName, version).writeBytes(bytes)
         existingVersions.filter { it != version }.forEach { getFile(chipDirName, it).delete() }
@@ -54,7 +56,7 @@ class FirmwareFileManager(private val context: Context) {
         } ?: emptyList()
 
     private fun getDir(chipDirName: String): File =
-        File(context.filesDir, "$FIRMWARE_DIR/$chipDirName")
+        File(context.filesDir, "$FIRMWARE_DIR/$chipDirName").also { it.mkdirs() }
 
     private fun getFile(chipDirName: String, version: ChipFirmwareVersion): File =
         File(getDir(chipDirName), "${version.toString().replace(".", "-")}.$BIN_FILE_EXTENSION")

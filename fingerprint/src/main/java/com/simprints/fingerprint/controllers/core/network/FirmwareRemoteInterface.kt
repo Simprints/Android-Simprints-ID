@@ -8,7 +8,9 @@ interface FirmwareRemoteInterface : FingerprintRemoteInterface {
 
     @GET("firmware/versions")
     suspend fun getAvailableDownloadableVersions(
-        @Query("from") versionsGreaterThan: String? = null, // Defaults to latest versions only
+        @Query("from-cypress") aboveCypressVersion: String,
+        @Query("from-stm") aboveStmVersion: String,
+        @Query("from-un20") aboveUn20Version: String,
         @Query("fields") desiredFields: String? = null // Defaults to all fields
-    ): List<ApiFirmwareVersionResponse>
+    ): Map<String, ApiFirmwareVersionResponse>
 }
