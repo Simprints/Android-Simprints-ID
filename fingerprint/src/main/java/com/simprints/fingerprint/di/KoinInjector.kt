@@ -28,6 +28,9 @@ import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManagerImpl
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManagerImpl
+import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactory
+import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactoryImpl
+import com.simprints.fingerprint.controllers.core.network.FingerprintFileDownloader
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManagerImpl
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
@@ -40,11 +43,8 @@ import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.controllers.v2.*
-import com.simprints.fingerprint.scanner.data.local.FirmwareFileManager
-import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactory
-import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactoryImpl
-import com.simprints.fingerprint.controllers.core.network.FingerprintFileDownloader
 import com.simprints.fingerprint.scanner.data.FirmwareFileUpdater
+import com.simprints.fingerprint.scanner.data.local.FirmwareFileManager
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
