@@ -31,7 +31,7 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
             .concatWith(scanner.enterStmOtaMode() thenEmitStep StmOtaStep.ReconnectingAfterEnteringOtaMode)
             .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep StmOtaStep.EnteringOtaModeSecondTime)
             .concatWith(scanner.enterStmOtaMode() thenEmitStep StmOtaStep.CommencingTransfer)
-            .concatWith(scanner.startStmOta(firmwareFileManager.getStmFirmwareBytes()).map { StmOtaStep.TransferInProgress(it) })
+            .concatWith(scanner.startStmOta(firmwareFileManager.loadStmFirmwareBytes()).map { StmOtaStep.TransferInProgress(it) })
             .concatWith(emitStep(StmOtaStep.ReconnectingAfterTransfer))
             .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep StmOtaStep.EnteringMainMode)
             .concatWith(scanner.enterMainMode() thenEmitStep StmOtaStep.ValidatingNewFirmwareVersion)
@@ -41,7 +41,7 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
 
     private fun validateStmFirmwareVersion(scanner: Scanner): Completable =
         scanner.getStmFirmwareVersion().flatMapCompletable {
-            val expectedFirmwareVersion = firmwareFileManager.getAvailableScannerFirmwareVersions()?.stm
+            val expectedFirmwareVersion = firmwareFileManager.getAvailableScannerFirmwareVersions().stm
             val actualFirmwareVersion = it.toChipFirmwareVersion()
             if (expectedFirmwareVersion != actualFirmwareVersion) {
                 Completable.error(OtaFailedException("STM OTA did not increment firmware version. Expected $expectedFirmwareVersion, but was $actualFirmwareVersion"))

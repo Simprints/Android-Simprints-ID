@@ -6,6 +6,7 @@ import com.simprints.fingerprint.scanner.data.FirmwareFileManager
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
+import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprint.tools.BatteryLevelChecker
@@ -50,7 +51,7 @@ class ScannerInitialSetupHelperTest {
     @Test
     fun ifNoAvailableVersions_completesNormally() {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
-        every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns null
+        every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns ScannerFirmwareVersions.UNKNOWN
         every { batteryLevelChecker.isLowBattery() } returns false
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
@@ -82,7 +83,7 @@ class ScannerInitialSetupHelperTest {
     @Test
     fun setupScannerWithOtaCheck_savesVersionAndBatteryInfo() {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
-        every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns null
+        every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns ScannerFirmwareVersions.UNKNOWN
         every { batteryLevelChecker.isLowBattery() } returns false
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
