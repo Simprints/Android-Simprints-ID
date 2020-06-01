@@ -15,9 +15,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import com.simprints.uicomponents.models.PreviewFrame
 import com.simprints.uicomponents.models.Size
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -154,6 +152,8 @@ class LiveFeedbackFragmentViewModelTest {
             )
         } returns previewFrameMock
         coEvery { faceDetector.analyze(previewFrameMock) } returns validFace
+        val mainCapturedDetections: CapturingSlot<List<FaceDetection>> = slot()
+        every { mainVM.captureFinished(capture(mainCapturedDetections)) } just Runs
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
@@ -187,14 +187,87 @@ class LiveFeedbackFragmentViewModelTest {
 
             assertThat(it[1].isFallback).isEqualTo(false)
         }
+
+        with(mainCapturedDetections.captured) {
+            assertThat(size).isEqualTo(2)
+            assertThat(get(0).face).isEqualTo(validFace)
+            assertThat(get(0).isFallback).isEqualTo(false)
+            assertThat(get(1).face).isEqualTo(validFace)
+            assertThat(get(1).isFallback).isEqualTo(false)
+        }
     }
+
+    @Test
+    fun `save at least one valid captures without fallback image`() =
+        testCoroutineRule.runBlockingTest {
+            val previewFrameMock: PreviewFrame = mockk()
+            val validFace: Face = getFace()
+            val noFace = null
+            every {
+                frameProcessor.previewFrameFrom(
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns previewFrameMock
+            coEvery { faceDetector.analyze(previewFrameMock) } returnsMany listOf(
+                validFace,
+                validFace,
+                noFace
+            )
+            val mainCapturedDetections: CapturingSlot<List<FaceDetection>> = slot()
+            every { mainVM.captureFinished(capture(mainCapturedDetections)) } just Runs
+
+            val currentDetectionObserver = viewModel.currentDetection.testObserver()
+            val capturingStateObserver = viewModel.capturingState.testObserver()
+
+            viewModel.process(frame, rectF, size)
+            viewModel.startCapture()
+            viewModel.process(frame, rectF, size)
+            viewModel.process(frame, rectF, size)
+
+            currentDetectionObserver.observedValues.let {
+                assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.VALID)
+                assertThat(it[1]?.status).isEqualTo(FaceDetection.Status.VALID_CAPTURING)
+                assertThat(it[2]?.status).isEqualTo(FaceDetection.Status.NOFACE)
+            }
+
+            capturingStateObserver.observedValues.let {
+                assertThat(it[0]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED)
+                assertThat(it[1]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.CAPTURING)
+                assertThat(it[2]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.FINISHED)
+            }
+
+            assertThat(viewModel.fallbackCapture).isNotNull()
+
+            assertThat(viewModel.captures.size).isEqualTo(2)
+            viewModel.captures.let {
+                with(it[0]) {
+                    assertThat(status).isEqualTo(FaceDetection.Status.VALID_CAPTURING)
+                    assertThat(face).isEqualTo(validFace)
+                    assertThat(isFallback).isEqualTo(false)
+                }
+
+                with(it[1]) {
+                    assertThat(status).isEqualTo(FaceDetection.Status.NOFACE)
+                    assertThat(isFallback).isEqualTo(false)
+                }
+            }
+
+            with(mainCapturedDetections.captured) {
+                assertThat(size).isEqualTo(1)
+                assertThat(get(0).face).isEqualTo(validFace)
+                assertThat(get(0).isFallback).isEqualTo(false)
+            }
+        }
 
     /**
      * This tests a case where the button turns green (a valid capture), the user clicked the button
      * but then moved the phone very fast and didn't capture anything
      */
     @Test
-    fun `finish with error if all captures are invalid`() = testCoroutineRule.runBlockingTest {
+    fun `use fallback image if all captures are invalid`() = testCoroutineRule.runBlockingTest {
         val previewFrameMock: PreviewFrame = mockk()
         val validFace: Face = getFace()
         val noFace = null
@@ -206,7 +279,13 @@ class LiveFeedbackFragmentViewModelTest {
                 any()
             )
         } returns previewFrameMock
-        coEvery { faceDetector.analyze(previewFrameMock) } returnsMany listOf(validFace, noFace, noFace)
+        coEvery { faceDetector.analyze(previewFrameMock) } returnsMany listOf(
+            validFace,
+            noFace,
+            noFace
+        )
+        val mainCapturedDetections: CapturingSlot<List<FaceDetection>> = slot()
+        every { mainVM.captureFinished(capture(mainCapturedDetections)) } just Runs
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
@@ -226,15 +305,18 @@ class LiveFeedbackFragmentViewModelTest {
         capturingStateObserver.observedValues.let {
             assertThat(it[0]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED)
             assertThat(it[1]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.CAPTURING)
-            assertThat(it[2]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.FINISHED_FAILED)
+            assertThat(it[2]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.FINISHED)
         }
 
         assertThat(viewModel.captures.size).isEqualTo(2)
-        viewModel.captures.let {
-            with(it[0]) {
-                assertThat(status).isEqualTo(FaceDetection.Status.NOFACE)
-                assertThat(face).isEqualTo(noFace)
-            }
+        with(viewModel.captures[0]) {
+            assertThat(status).isEqualTo(FaceDetection.Status.NOFACE)
+            assertThat(face).isEqualTo(noFace)
+        }
+
+        with(mainCapturedDetections.captured[0]) {
+            assertThat(face).isEqualTo(validFace)
+            assertThat(isFallback).isEqualTo(true)
         }
     }
 
