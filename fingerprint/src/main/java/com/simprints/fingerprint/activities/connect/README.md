@@ -48,6 +48,7 @@ The user is provided with a "link" in case we are trying to connect to the wrong
 
 Upon successful connection, always directly finishes the activity.
 If the user presses the "SPXX is not my scanner" link, this leads to the appropriate pairing fragment, which can be either `NfcOffFragment`, `NfcPairFragment`, or the `SerialEntryFragment`.
+Can also go to the other error fragments if an issue arises during connection, such as OTA.
 
 ### NfcPairFragment
 This fragment is launched if the user confirms the wrong scanner is paired, if there are no scanners paired, or if there are multiple scanners paired.
@@ -72,3 +73,26 @@ Can additionally be triggered by the `NfcPairFragment` if the user had difficult
 The user can enter a serial number as a stand-in for the NFC chip in the `NfcPairFragment`, and the consequent pairing, listening for bond state action, retry, and timeout behaviour is identical.
 
 Upon successful pairing, restarts connecting and returns to the `ConnectScannerMainFragment`.
+
+### OtaFragment
+If an `OtaAvailableException` is thrown during setup, the `OtaFragment` is shown.
+This fragment executes the OTA procedure, which updates the firmware of the various chips on the scanner.
+The progress bar tracks the state of the OTA steps. If multiple chips are being updated, they share a portion of the progress bar.
+The scanner is assumed to be connected and in Root mode upon entry to this fragment.
+
+If the update is successful for all chips, we return to the `ConnectScannerMainFragment`, where the scanner reconnects and the flow proceeds normally.
+
+If the update for any of the chips fails, then we go to the `OtaRecoveryFragment` if we still are retrying, otherwise we go to the `OtaFailedFragment` if the final attempt failed.
+
+### OtaRecoveryFragment
+This fragment is entered from the `OtaFragment` if OTA fails and user action is required to reset the scanner.
+Depending on the current step that failed during OTA, a message for either a soft (simple turning off then on) or hard (long press of power button for 5+ seconds) reset is shown.
+The button attempts a reconnect to the scanner.
+
+If the reconnect succeeds, we go back to the `OtaFragment` to re-attempt the remaining OTA updates needed as well as incrementing the retry attempt counter.
+
+If the reconnect fails for whatever reason, we assume the scanner is in an irrecoverable state and take the user to the `OtaFailedFragment`. 
+
+### OtaFailedFragment
+This fragment only displays a message to the user to contact their supervisor as the scanner may be in an irrecoverable state after a failed OTA update attempt.
+Pressing Continue will exit the entire fingerprint flow with the `Activity.CANCELLED` result.
