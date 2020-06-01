@@ -43,5 +43,5 @@ fun Event.toApiEvent(): ApiEvent =
         CALLBACK_CONFIRMATION -> ApiCallbackEvent(this as ConfirmationCallbackEvent)
         CALLBACK_ERROR -> ApiCallbackEvent(this as ErrorCallbackEvent)
         VERO_2_INFO_SNAPSHOT -> ApiVero2InfoSnapshotEvent(this as Vero2InfoSnapshotEvent)
-        SCANNER_FIRMWARE_UPDATE -> TODO()
+        SCANNER_FIRMWARE_UPDATE -> ApiScannerFirmwareUpdateEvent(this as ScannerFirmwareUpdateEvent)
     }

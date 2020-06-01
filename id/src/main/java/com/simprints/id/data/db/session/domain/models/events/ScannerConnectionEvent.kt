@@ -9,7 +9,7 @@ class ScannerConnectionEvent(startTime: Long,
     @Keep
     class ScannerInfo(val scannerId: String,
                       val macAddress: String,
-                      val generation: ScannerGeneration?,
+                      val generation: ScannerGeneration,
                       var hardwareVersion: String?)
 
     enum class ScannerGeneration {
