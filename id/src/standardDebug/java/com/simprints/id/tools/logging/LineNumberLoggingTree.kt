@@ -1,9 +1,11 @@
-package com.simprints.core.tools
+package com.simprints.id.tools.logging
 
 import timber.log.Timber
 
-class LineNumberDebugTree : Timber.DebugTree() {
+class LineNumberLoggingTree : Timber.DebugTree() {
+
     override fun createStackElementTag(element: StackTraceElement): String? {
         return "(${element.fileName}:${element.lineNumber})"
     }
+
 }
