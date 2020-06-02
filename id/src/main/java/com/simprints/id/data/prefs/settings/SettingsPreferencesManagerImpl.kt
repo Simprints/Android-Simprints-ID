@@ -1,7 +1,6 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
-import com.simprints.core.network.NetworkConstants
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -17,6 +16,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
+import com.simprints.id.network.NetworkConstants
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
