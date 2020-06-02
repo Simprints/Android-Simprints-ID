@@ -16,6 +16,6 @@ fun ApiDownloadableFirmwareVersion.toDomain() =
     DownloadableFirmwareVersion(
         DownloadableFirmwareVersion.Chip.values().find { it.chipName == chipType }
             ?: throw IllegalArgumentException("Unexpected chipType in ApiFirmwareVersionResponse: $chipType"),
-        ChipFirmwareVersion.fromString(version),
+        ChipFirmwareVersion.parse(version),
         versionURL
     )

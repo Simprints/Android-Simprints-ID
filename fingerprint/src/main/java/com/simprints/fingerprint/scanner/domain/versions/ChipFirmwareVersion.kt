@@ -12,7 +12,7 @@ data class ChipFirmwareVersion(val major: Int, val minor: Int) : Comparable<Chip
         val UNKNOWN = ChipFirmwareVersion(-1, -1)
 
         /** @throws IllegalArgumentException */
-        fun fromString(s: String) =
+        fun parse(s: String) =
             try {
                 s.split(".").let { ChipFirmwareVersion(it[0].toInt(), it[1].toInt()) }
             } catch (e: Exception) {

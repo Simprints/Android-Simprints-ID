@@ -45,12 +45,13 @@ class FirmwareLocalDataSource(private val context: Context) {
 
     private fun getFirmwareVersionsInDir(chipDirName: String): List<ChipFirmwareVersion> =
         getDir(chipDirName).listFiles { _, name ->
-            FILE_NAME_REGEX.containsMatchIn(name)
+            FIRMWARE_FILE_NAME_REGEX.containsMatchIn(name)
         }?.mapNotNull {
             try {
                 val majorMinor = it.name.split('.')[0].split('-')
                 ChipFirmwareVersion(majorMinor[0].toInt(), majorMinor[1].toInt())
             } catch (e: Exception) {
+                Timber.e(e, "Error encountered when parsing firmware file name")
                 null
             }
         } ?: emptyList()
@@ -62,7 +63,7 @@ class FirmwareLocalDataSource(private val context: Context) {
         File(getDir(chipDirName), "${version.toString().replace(".", "-")}.$BIN_FILE_EXTENSION")
 
     companion object {
-        val FILE_NAME_REGEX = """^[0-9]+-[0-9]+\.bin$""".toRegex() // e.g. "12-345.bin"
+        val FIRMWARE_FILE_NAME_REGEX = """^[0-9]+-[0-9]+\.bin$""".toRegex() // e.g. "12-345.bin"
 
         const val FIRMWARE_DIR = "firmware"
 
