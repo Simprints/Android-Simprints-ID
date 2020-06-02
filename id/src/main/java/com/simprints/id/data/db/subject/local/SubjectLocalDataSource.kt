@@ -8,7 +8,7 @@ interface SubjectLocalDataSource : FingerprintIdentityLocalDataSource {
 
     class Query(val projectId: String? = null,
                 val subjectId: String? = null,
-                val userId: String? = null,
+                val attendantId: String? = null,
                 val moduleId: String? = null,
                 val toSync: Boolean? = null) : Serializable
 

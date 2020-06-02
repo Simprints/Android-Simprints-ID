@@ -14,9 +14,10 @@ import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.testtools.common.syntax.assertThrows
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
+import io.mockk.mockk
 import io.realm.Realm
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -30,21 +31,19 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
     private lateinit var realm: Realm
     private lateinit var subjectLocalDataSource: SubjectLocalDataSource
 
-    private val loginInfoManagerMock = mock<LoginInfoManager>().apply {
-        whenever(this) { getSignedInProjectIdOrEmpty() }
-            .thenReturn(DEFAULT_PROJECT_ID)
-    }
-    private val secureLocalDbKeyProviderMock = mock<SecureLocalDbKeyProvider>().apply {
-        whenever(this) { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
-            .thenReturn(LocalDbKey(newDatabaseName, newDatabaseKey))
-    }
+    private val loginInfoManagerMock = mockk<LoginInfoManager>()
+    private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>()
 
     @Before
     fun setup() {
         realm = Realm.getInstance(config)
+        every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        every { secureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(newDatabaseName, newDatabaseKey)
+
         subjectLocalDataSource = SubjectLocalDataSourceImpl(testContext, secureLocalDbKeyProviderMock, loginInfoManagerMock)
     }
 
+    @FlowPreview
     @Test
     fun changeLocalDbKey_shouldNotAllowedToUseFirstRealm() {
         saveFakePerson(realm, getFakePerson())
@@ -53,10 +52,8 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
 
         val differentNewDatabaseName = "different_${Date().time}newDatabase"
         val differentDatabaseKey: ByteArray = "different_newKey".toByteArray().copyOf(KEY_LENGTH)
-        val differentSecureLocalDbKeyProviderMock = mock<SecureLocalDbKeyProvider>().apply {
-            whenever(this) { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
-                .thenReturn(LocalDbKey(differentNewDatabaseName, differentDatabaseKey))
-        }
+        val differentSecureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>()
+        every { differentSecureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(differentNewDatabaseName, differentDatabaseKey)
         val differentLocalDataSource = SubjectLocalDataSourceImpl(testContext, differentSecureLocalDbKeyProviderMock, loginInfoManagerMock)
 
         val count = runBlocking { differentLocalDataSource.count() }
@@ -84,7 +81,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = subjectLocalDataSource.count(SubjectLocalDataSource.Query(userId = fakePerson.attendantId))
+        val count = subjectLocalDataSource.count(SubjectLocalDataSource.Query(attendantId = fakePerson.attendantId))
         assertThat(count).isEqualTo(1)
     }
 
@@ -163,7 +160,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
     fun givenInvalidSerializableQuery_aThrowableIsThrown() {
         runBlocking {
             assertThrows<InvalidQueryToLoadRecordsException> {
-                (subjectLocalDataSource as FingerprintIdentityLocalDataSource).loadFingerprintIdentities(mock())
+                (subjectLocalDataSource as FingerprintIdentityLocalDataSource).loadFingerprintIdentities(mockk())
             }
         }
     }
@@ -184,7 +181,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = subjectLocalDataSource.load(SubjectLocalDataSource.Query(userId = fakePerson.attendantId)).toList()
+        val people = subjectLocalDataSource.load(SubjectLocalDataSource.Query(attendantId = fakePerson.attendantId)).toList()
         listOf(fakePerson).zip(people).forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
     }
 
