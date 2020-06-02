@@ -15,6 +15,14 @@ fun TestObserver<LiveDataEvent>.assertEventReceived() {
     assertThat(this.observedValues.count()).isEqualTo(1)
 }
 
+fun MutableLiveData<LiveDataEvent>.assertEventNeverReceived() {
+    assertThat(this.value).isNull()
+}
+
+fun <T> MutableLiveData<LiveDataEventWithContent<T>>.assertEventWithContentNeverReceived() {
+    assertThat(this.value).isNull()
+}
+
 fun MutableLiveData<LiveDataEvent>.assertEventReceived() {
     assertThat(this.value).isNotNull()
 }

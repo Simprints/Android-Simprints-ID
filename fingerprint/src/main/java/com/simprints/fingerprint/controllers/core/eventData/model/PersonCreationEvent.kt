@@ -8,4 +8,4 @@ class PersonCreationEvent(starTime: Long,
                           val fingerprintCaptureIds: List<String>) : Event(EventType.PERSON_CREATION, starTime)
 
 fun PersonCreationEvent.fromDomainToCore() =
-    CorePersonCreationEvent(starTime, fingerprintCaptureIds)
+    CorePersonCreationEvent(startTime, fingerprintCaptureIds)
