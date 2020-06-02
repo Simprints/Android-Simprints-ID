@@ -57,7 +57,7 @@ class OrchestratorActivityAndroidTest : KoinTest {
     }
 
     @Test
-    fun orchestratorActivityCallsNextActivity_returnsWithResult_handlesActivityResult() {
+    fun orchestratorActivityCallsNextActivityAndSchedulesFirmwareUpdate_returnsWithResult_handlesActivityResult() {
         every { orchestratorMock.isFinished() } returns false
         every { orchestratorMock.getNextTask() } returns FingerprintTask.ConnectScanner("connect") {
             launchTaskRequest()
@@ -68,6 +68,8 @@ class OrchestratorActivityAndroidTest : KoinTest {
                 Intent().putExtra(ConnectScannerTaskResult.BUNDLE_KEY, ConnectScannerTaskResult())))
 
         scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
+
+        verify { firmwareFileUpdateSchedulerMock.schedule() }
 
         every { orchestratorMock.isFinished() } returns true
         every { orchestratorMock.getFinalResult() } returns
