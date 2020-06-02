@@ -1,21 +1,19 @@
 package com.simprints.id.data.db.subject.remote
 
-import com.simprints.core.network.SimApiClientFactory
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
 import com.simprints.id.data.db.subject.domain.subjectevents.Events
 import com.simprints.id.data.db.subject.remote.models.subjectcounts.fromApiToDomain
 import com.simprints.id.data.db.subject.remote.models.subjectevents.fromDomainToApi
-import com.simprints.id.tools.utils.retrySimNetworkCalls
+import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
+import com.simprints.id.network.SimApiClient
+import com.simprints.id.network.SimApiClientFactory
 import java.io.InputStream
 
-class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
-                                private val simApiClientFactory: SimApiClientFactory) : EventRemoteDataSource {
+class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFactory) : EventRemoteDataSource {
 
     override suspend fun count(query: EventQuery): List<EventCount> = with(query.fromDomainToApi()) {
-        makeNetworkRequest({ peopleRemoteInterface ->
-            peopleRemoteInterface.countEvents(
+        executeCall("EventCount") { subjectsRemoteInterface ->
+            subjectsRemoteInterface.countEvents(
                 projectId = projectId,
                 moduleIds = moduleIds,
                 attendantId = userId,
@@ -24,12 +22,12 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                 lastEventId = lastEventId,
                 eventType = types.map { it.apiName }
             ).map { it.fromApiToDomain() }
-        }, "EventCount")
+        }
     }
 
     override suspend fun getStreaming(query: EventQuery): InputStream = with(query.fromDomainToApi()) {
-        makeNetworkRequest({ peopleRemoteInterface ->
-            peopleRemoteInterface.downloadEvents(
+        executeCall("EventDownload") { subjectsRemoteInterface ->
+            subjectsRemoteInterface.downloadEvents(
                 projectId = projectId,
                 moduleIds = moduleIds,
                 attendantId = userId,
@@ -38,24 +36,23 @@ class EventRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager,
                 lastEventId = lastEventId,
                 eventType = types.map { it.apiName }
             )
-        }, "EventDownload")
+        }
     }.byteStream()
 
     override suspend fun post(projectId: String, events: Events) {
-        makeNetworkRequest({
+        executeCall("EventUpload") {
             it.uploadEvents(projectId, events.fromDomainToApi())
-        }, "EventUpload")
+        }
     }
 
-    private suspend fun <T> makeNetworkRequest(
-            block: suspend (client: EventRemoteInterface) -> T,
-            traceName: String
-    ): T =
-        retrySimNetworkCalls(getSubjectsApiClient(), block, traceName)
+    private suspend fun <T> executeCall(nameCall: String, block: suspend (EventRemoteInterface) -> T): T =
+        with(getSubjectsApiClient()) {
+            executeCall(nameCall) {
+                block(it)
+            }
+        }
 
 
-    internal suspend fun getSubjectsApiClient(): EventRemoteInterface {
-        val token = remoteDbManager.getCurrentToken()
-        return simApiClientFactory.build<EventRemoteInterface>(token).api
-    }
+    suspend fun getSubjectsApiClient(): SimApiClient<EventRemoteInterface> =
+        simApiClientFactory.buildClient(EventRemoteInterface::class)
 }

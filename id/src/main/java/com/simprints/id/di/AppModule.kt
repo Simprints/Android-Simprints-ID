@@ -4,8 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
-import com.simprints.core.network.BaseUrlProvider
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
@@ -200,7 +198,7 @@ open class AppModule {
     open fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
-        baseUrlProvider: BaseUrlProvider
+        baseUrlProvider: BaseUrlProvider,
         gson: Gson
     ): SimApiClientFactory = SimApiClientFactoryImpl(baseUrlProvider, ctx.deviceId, remoteDbManager, gson)
 
