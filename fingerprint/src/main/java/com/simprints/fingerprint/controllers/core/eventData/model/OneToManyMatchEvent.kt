@@ -27,7 +27,7 @@ fun SubjectLocalDataSource.Query.asCoreMatchPool(count: Int) =
 
 fun SubjectLocalDataSource.Query.parseQueryAsCoreMatchPoolType(): CoreMatchPoolType =
     when {
-        this.userId != null -> CoreMatchPoolType.USER
+        this.attendantId != null -> CoreMatchPoolType.USER
         this.moduleId != null -> CoreMatchPoolType.MODULE
         else -> CoreMatchPoolType.PROJECT
     }

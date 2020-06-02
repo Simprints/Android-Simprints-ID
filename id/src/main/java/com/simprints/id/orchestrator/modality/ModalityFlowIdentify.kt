@@ -84,7 +84,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
         with(appRequest) {
             when (matchGroup) {
                 GROUP.GLOBAL -> Query(projectId)
-                GROUP.USER -> Query(projectId, userId = userId)
+                GROUP.USER -> Query(projectId, attendantId = userId)
                 GROUP.MODULE -> Query(projectId, moduleId = moduleId)
             }
         }

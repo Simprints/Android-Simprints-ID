@@ -33,7 +33,7 @@ class SubjectLocalDataSourceImpl(private val appContext: Context,
     companion object {
         const val SYNC_ID_FIELD = "syncGroupId"
         const val PROJECT_ID_FIELD = "projectId"
-        const val USER_ID_FIELD = "userId"
+        const val USER_ID_FIELD = "attendantId"
         const val SUBJECT_ID_FIELD = "subjectId"
         const val MODULE_ID_FIELD = "moduleId"
         const val TO_SYNC_FIELD = "toSync"
@@ -116,7 +116,7 @@ class SubjectLocalDataSourceImpl(private val appContext: Context,
                 query?.let { query ->
                     query.projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
                     query.subjectId?.let { this.equalTo(SUBJECT_ID_FIELD, it) }
-                    query.userId?.let { this.equalTo(USER_ID_FIELD, it) }
+                    query.attendantId?.let { this.equalTo(USER_ID_FIELD, it) }
                     query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
                     query.toSync?.let { this.equalTo(TO_SYNC_FIELD, it) }
                 }
