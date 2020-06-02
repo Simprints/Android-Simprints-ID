@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
-import com.simprints.fingerprint.scanner.data.local.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
@@ -16,7 +16,7 @@ import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
-class ScannerInitialSetupHelper(private val firmwareFileManager: FirmwareFileManager,
+class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLocalDataSource,
                                 private val connectionHelper: ConnectionHelper,
                                 private val batteryLevelChecker: BatteryLevelChecker,
                                 private val timeScheduler: Scheduler = Schedulers.io()) {
@@ -53,7 +53,7 @@ class ScannerInitialSetupHelper(private val firmwareFileManager: FirmwareFileMan
         }
 
     private fun ifAvailableOtasPrepareScannerThenThrow(scanner: Scanner, macAddress: String, batteryInfo: BatteryInfo): Completable {
-        val availableVersions = firmwareFileManager.getAvailableScannerFirmwareVersions()
+        val availableVersions = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
         val availableOtas = determineAvailableOtas(scannerVersion.firmware, availableVersions)
         return if (availableOtas.isEmpty() || batteryInfo.isLowBattery() || batteryLevelChecker.isLowBattery()) {
             Completable.complete()

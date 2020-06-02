@@ -2,7 +2,7 @@ package com.simprints.fingerprint.scanner.controllers.v2
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
-import com.simprints.fingerprint.scanner.data.local.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
@@ -29,7 +29,7 @@ import org.junit.Test
 class ScannerInitialSetupHelperTest {
 
     private val scannerMock = mockk<Scanner>()
-    private val firmwareFileManagerMock = mockk<FirmwareFileManager>()
+    private val firmwareFileManagerMock = mockk<FirmwareLocalDataSource>()
     private val connectionHelperMock = mockk<ConnectionHelper>()
     private val batteryLevelChecker = mockk<BatteryLevelChecker>()
     private val testScheduler = TestScheduler()

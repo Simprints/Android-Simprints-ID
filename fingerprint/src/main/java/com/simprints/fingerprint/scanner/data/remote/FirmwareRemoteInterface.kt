@@ -13,5 +13,5 @@ interface FirmwareRemoteInterface : FingerprintRemoteInterface {
         @Query("from-stm") aboveStmVersion: String,
         @Query("from-un20") aboveUn20Version: String,
         @Query("fields") desiredFields: String? = null // Defaults to all fields
-    ): Map<String, ApiFirmwareVersionResponse>
+    ): Map<String, ApiDownloadableFirmwareVersion>
 }

@@ -4,7 +4,7 @@ import com.simprints.fingerprint.scanner.adapters.v2.toChipApiVersion
 import com.simprints.fingerprint.scanner.adapters.v2.toChipFirmwareVersion
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.adapters.v2.toUnifiedVersionInformation
-import com.simprints.fingerprint.scanner.data.local.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ChipApiVersion
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
@@ -20,7 +20,7 @@ import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class StmOtaHelper(private val connectionHelper: ConnectionHelper,
-                   private val firmwareFileManager: FirmwareFileManager,
+                   private val firmwareLocalDataSource: FirmwareLocalDataSource,
                    private val timeScheduler: Scheduler = Schedulers.io()) {
 
     private var newFirmwareVersion: ChipFirmwareVersion? = null
@@ -35,7 +35,7 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
             .concatWith(scanner.enterStmOtaMode().onErrorComplete() thenEmitStep StmOtaStep.ReconnectingAfterEnteringOtaMode)
             .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep StmOtaStep.EnteringOtaModeSecondTime)
             .concatWith(scanner.enterStmOtaMode().addSmallDelay() thenEmitStep StmOtaStep.CommencingTransfer)
-            .concatWith(scanner.startStmOta(firmwareFileManager.loadStmFirmwareBytes()).map { StmOtaStep.TransferInProgress(it) })
+            .concatWith(scanner.startStmOta(firmwareLocalDataSource.loadStmFirmwareBytes()).map { StmOtaStep.TransferInProgress(it) })
             .concatWith(emitStep(StmOtaStep.ReconnectingAfterTransfer))
             .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep StmOtaStep.EnteringMainMode)
             .concatWith(scanner.enterMainMode().addSmallDelay() thenEmitStep StmOtaStep.ValidatingNewFirmwareVersion)
@@ -47,7 +47,7 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
 
     private fun validateStmFirmwareVersion(scanner: Scanner): Completable =
         scanner.getStmFirmwareVersion().flatMapCompletable {
-            val expectedFirmwareVersion = firmwareFileManager.getAvailableScannerFirmwareVersions().stm
+            val expectedFirmwareVersion = firmwareLocalDataSource.getAvailableScannerFirmwareVersions().stm
             val actualFirmwareVersion = it.toChipFirmwareVersion()
             if (expectedFirmwareVersion != actualFirmwareVersion) {
                 Completable.error(OtaFailedException("STM OTA did not increment firmware version. Expected $expectedFirmwareVersion, but was $actualFirmwareVersion"))

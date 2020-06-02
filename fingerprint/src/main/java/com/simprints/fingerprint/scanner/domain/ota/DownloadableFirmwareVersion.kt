@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.scanner.data.remote
+package com.simprints.fingerprint.scanner.domain.ota
 
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 
