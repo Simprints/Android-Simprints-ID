@@ -3,9 +3,8 @@ package com.simprints.id.data.db.subject.remote
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.reflect.TypeToken
-import com.simprints.core.network.BaseUrlProvider
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.*
 import com.simprints.id.data.db.subject.domain.subjectevents.Events
@@ -15,13 +14,12 @@ import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolment
 import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
 import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
 import com.simprints.id.domain.modality.Modes
+import com.simprints.id.network.*
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.testtools.unit.mockserver.mockSuccessfulResponse
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.spyk
+import io.mockk.*
+import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -44,27 +42,31 @@ class EventRemoteDataSourceImplTest {
     }
 
     private val mockServer = MockWebServer()
-    private val mockBaseUrlProvider: BaseUrlProvider = mockk()
+    @RelaxedMockK lateinit var mockBaseUrlProvider: BaseUrlProvider
+    @RelaxedMockK lateinit var remoteDbManager: RemoteDbManager
     private val gson = SimJsonHelper.gson
 
-    private val eventRemoteDataSourceSpy = spyk(EventRemoteDataSourceImpl(mockk(), mockk()))
-    private lateinit var eventRemoteInterface: EventRemoteInterface
+    private val eventRemoteDataSourceSpy = spyk(EventRemoteDataSourceImpl(mockk()))
+    private lateinit var eventRemoteInterface: SimApiClient<EventRemoteInterface>
 
     @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
+        MockKAnnotations.init(this)
         UnitTestConfig(this).setupFirebase()
         mockServer.start()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns mockServer.url("/").toString()
+        coEvery { remoteDbManager.getCurrentToken() } returns "token"
     }
 
     @Test
     fun successfulResponse_onWrite() {
         runBlocking {
             val expectedRequestUrlFormat = "/projects/project_id/events"
-            eventRemoteInterface = SimApiClientFactory(
-                mockBaseUrlProvider, DEVICE_ID, gson
-            ).build<EventRemoteInterface>().api
+            eventRemoteInterface = SimApiClientFactoryImpl(
+                mockBaseUrlProvider, DEVICE_ID, remoteDbManager, gson
+            ).buildClient(EventRemoteInterface::class)
+
             coEvery { eventRemoteDataSourceSpy.getSubjectsApiClient() } returns eventRemoteInterface
             mockServer.enqueue(mockSuccessfulResponse())
 
@@ -86,9 +88,9 @@ class EventRemoteDataSourceImplTest {
                 EventCount(ENROLMENT_RECORD_MOVE, 42)
             )
             val expectedRequestUrlFormat = "projects/project_id/events/count?l_moduleId=module1&l_moduleId=module2&l_attendantId=user_id&l_subjectId=subject_id&l_mode=FINGERPRINT&l_mode=FACE&lastEventId=last_event_id&type=EnrolmentRecordMove&type=EnrolmentRecordDeletion&type=EnrolmentRecordCreation"
-            eventRemoteInterface = SimApiClientFactory(
-                mockBaseUrlProvider, DEVICE_ID, gson
-            ).build<EventRemoteInterface>().api
+            eventRemoteInterface = SimApiClientFactoryImpl(
+                mockBaseUrlProvider, DEVICE_ID, remoteDbManager, gson
+            ).buildClient(EventRemoteInterface::class)
 
             coEvery { eventRemoteDataSourceSpy.getSubjectsApiClient() } returns eventRemoteInterface
             mockServer.enqueue(buildSuccessfulResponseForCount())
@@ -108,9 +110,9 @@ class EventRemoteDataSourceImplTest {
     fun successfulResponse_get_shouldFormCorrectUrlAndInstances() {
         runBlocking {
             val expectedUrlFormat = "/projects/project_id/events?l_moduleId=module1&l_moduleId=module2&l_attendantId=user_id&l_subjectId=subject_id&l_mode=FINGERPRINT&l_mode=FACE&lastEventId=last_event_id&type=EnrolmentRecordMove&type=EnrolmentRecordDeletion&type=EnrolmentRecordCreation"
-            eventRemoteInterface = SimApiClientFactory(
-                mockBaseUrlProvider, "deviceId", gson
-            ).build<EventRemoteInterface>().api
+            eventRemoteInterface = SimApiClientFactoryImpl(
+                mockBaseUrlProvider, "deviceId", remoteDbManager, gson
+            ).buildClient(EventRemoteInterface::class)
             coEvery { eventRemoteDataSourceSpy.getSubjectsApiClient() } returns eventRemoteInterface
             mockServer.enqueue(buildSuccessfulResponseForGetEvents())
 
@@ -160,6 +162,6 @@ class EventRemoteDataSourceImplTest {
 
     private fun parseApiEventsFromResponse(responseString: String): List<ApiEvent> {
         val listType = object : TypeToken<ArrayList<ApiEvent?>?>() {}.type
-        return SimJsonHelper.gson.fromJson<List<ApiEvent>>(responseString, listType)
+        return SimJsonHelper.gson.fromJson(responseString, listType)
     }
 }
