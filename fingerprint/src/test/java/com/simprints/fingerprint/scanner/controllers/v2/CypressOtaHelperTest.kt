@@ -12,6 +12,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.models.CypressFirmwareVer
 import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
+import com.simprints.testtools.common.reactive.advanceTime
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.CapturingSlot
 import io.mockk.every
@@ -20,6 +21,7 @@ import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.schedulers.TestScheduler
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
@@ -29,7 +31,8 @@ class CypressOtaHelperTest {
     private val scannerMock = mockk<Scanner>()
     private val connectionHelperMock = mockk<ConnectionHelper>()
     private val firmwareFileManagerMock = mockk<FirmwareFileManager>()
-    private val cypressOtaHelper = CypressOtaHelper(connectionHelperMock, firmwareFileManagerMock)
+    private val testScheduler = TestScheduler()
+    private val cypressOtaHelper = CypressOtaHelper(connectionHelperMock, firmwareFileManagerMock, testScheduler)
 
     @Before
     fun setup() {
@@ -52,6 +55,7 @@ class CypressOtaHelperTest {
             listOf(CypressOtaStep.ReconnectingAfterTransfer, CypressOtaStep.ValidatingNewFirmwareVersion, CypressOtaStep.UpdatingUnifiedVersionInformation)
 
         val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        testScheduler.advanceTime()
 
         testObserver.awaitAndAssertSuccess()
 
@@ -77,6 +81,7 @@ class CypressOtaHelperTest {
             Observable.fromIterable(progressValues).concatWith(Observable.error(error))
 
         val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
 
@@ -97,6 +102,7 @@ class CypressOtaHelperTest {
         every { connectionHelperMock.reconnect(any(), any()) } returns Completable.error(error)
 
         val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
 
@@ -116,6 +122,7 @@ class CypressOtaHelperTest {
         every { scannerMock.getCypressFirmwareVersion() } returns Single.just(OLD_CYPRESS_VERSION)
 
         val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
 

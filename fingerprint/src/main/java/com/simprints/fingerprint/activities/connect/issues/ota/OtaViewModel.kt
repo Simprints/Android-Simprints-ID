@@ -47,6 +47,7 @@ class OtaViewModel(
                 it.toScannerObservable().doOnComplete { remainingOtas.remove(it) }
             }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
                 onNext = { otaStep ->
+                    Timber.d(otaStep.toString())
                     currentStep = otaStep
                     progress.postValue(otaStep.totalProgress.mapToTotalProgress(remainingOtas.size, availableOtas.size))
                 },

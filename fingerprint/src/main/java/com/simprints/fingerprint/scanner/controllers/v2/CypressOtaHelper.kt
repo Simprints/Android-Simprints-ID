@@ -14,10 +14,14 @@ import com.simprints.fingerprint.tools.doIfNotNull
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Scheduler
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
-                       private val firmwareFileManager: FirmwareFileManager) {
+                       private val firmwareFileManager: FirmwareFileManager,
+                       private val timeScheduler: Scheduler = Schedulers.io()) {
 
     private var newFirmwareVersion: ChipFirmwareVersion? = null
     private var newApiVersion: ChipApiVersion? = null
@@ -31,9 +35,11 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
             .concatWith(scanner.enterCypressOtaMode() thenEmitStep CypressOtaStep.CommencingTransfer)
             .concatWith(scanner.startCypressOta(firmwareFileManager.loadCypressFirmwareBytes()).map { CypressOtaStep.TransferInProgress(it) })
             .concatWith(emitStep(CypressOtaStep.ReconnectingAfterTransfer))
-            .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep CypressOtaStep.ValidatingNewFirmwareVersion)
+            .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep CypressOtaStep.ValidatingNewFirmwareVersion)
             .concatWith(validateCypressFirmwareVersion(scanner) thenEmitStep CypressOtaStep.UpdatingUnifiedVersionInformation)
             .concatWith(updateUnifiedVersionInformation(scanner))
+
+    private fun Completable.addSmallDelay() = delay(1, TimeUnit.SECONDS, timeScheduler)
 
     private fun validateCypressFirmwareVersion(scanner: Scanner): Completable =
         scanner.getCypressFirmwareVersion().flatMapCompletable {
