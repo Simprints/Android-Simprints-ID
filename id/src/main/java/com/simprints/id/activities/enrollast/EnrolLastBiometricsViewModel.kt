@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState.Failed
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState.Success
-import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.EnrolmentHelper
@@ -30,9 +30,9 @@ class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
                 if (previousLastEnrolmentResult is EnrolLastBiometricsResponse) {
                     previousLastEnrolmentResult.newSubjectId?.let { Success(it) } ?: Failed
                 } else {
-                    val person = buildPerson(steps)
-                    enrolmentHelper.enrol(person)
-                    Success(person.patientId)
+                    val subject = buildPerson(steps)
+                    enrolmentHelper.enrol(subject)
+                    Success(subject.subjectId)
                 }
             } catch (t: Throwable) {
                 Timber.e(t)
@@ -41,8 +41,8 @@ class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
         }
     }
 
-    private fun EnrolLastBiometricsRequest.buildPerson(steps: List<Step>): Person {
-        return enrolmentHelper.buildPerson(
+    private fun EnrolLastBiometricsRequest.buildPerson(steps: List<Step>): Subject {
+        return enrolmentHelper.buildSubject(
             projectId,
             userId,
             moduleId,
