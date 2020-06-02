@@ -39,6 +39,8 @@ fun DbEvent.toDomainEvent(): Event? =
             EventType.COMPLETION_CHECK -> JsonHelper.gson.fromJson(it, CompletionCheckEvent::class.java)
             EventType.CALLBACK_CONFIRMATION -> JsonHelper.gson.fromJson(it, ConfirmationCallbackEvent::class.java)
             EventType.CALLOUT_LAST_BIOMETRICS -> JsonHelper.gson.fromJson(it, EnrolmentLastBiometricsCalloutEvent::class.java)
+            EventType.VERO_2_INFO_SNAPSHOT -> JsonHelper.gson.fromJson(it, Vero2InfoSnapshotEvent::class.java)
+            EventType.SCANNER_FIRMWARE_UPDATE -> JsonHelper.gson.fromJson(it, ScannerFirmwareUpdateEvent::class.java)
             null -> null
         }
     }
