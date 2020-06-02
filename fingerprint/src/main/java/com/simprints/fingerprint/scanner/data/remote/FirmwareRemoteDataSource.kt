@@ -16,8 +16,8 @@ class FirmwareRemoteDataSource(private val fingerprintApiClientFactory: Fingerpr
                     aboveCypressVersion = savedVersion.cypress.toStringForApi(),
                     aboveStmVersion = savedVersion.stm.toStringForApi(),
                     aboveUn20Version = savedVersion.un20.toStringForApi()
-                ).values.map { it.toDomain() }
-            }
+                )
+            }.values.map { it.toDomain() }
 
     private fun ChipFirmwareVersion.toStringForApi() =
         if (this == ChipFirmwareVersion.UNKNOWN) "0.0" else this.toString()
