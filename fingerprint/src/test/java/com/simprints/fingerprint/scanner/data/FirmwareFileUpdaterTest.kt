@@ -49,6 +49,19 @@ class FirmwareFileUpdaterTest {
         }
     }
 
+    @Test
+    fun download_noVersionsAvailable_downloadsNoFiles() = runBlockingTest {
+        every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns SCANNER_VERSIONS_LOW
+        coEvery { fingerprintApiClientMock.executeCall<List<DownloadableFirmwareVersion>>(any(), any()) } returns emptyList()
+
+        firmwareFileUpdater.download()
+
+        coVerify(exactly = 0) { fingerprintFileDownloaderMock.download(any()) }
+        coVerify(exactly = 0) { firmwareFileManagerMock.saveCypressFirmwareBytes(any(), any()) }
+        coVerify(exactly = 0) { firmwareFileManagerMock.saveStmFirmwareBytes(any(), any()) }
+        coVerify(exactly = 0) { firmwareFileManagerMock.saveUn20FirmwareBytes(any(), any()) }
+    }
+
     companion object {
         private const val CYPRESS_NAME = "cypress"
         private val CYPRESS_VERSION_LOW = ChipFirmwareVersion(1, 0)
