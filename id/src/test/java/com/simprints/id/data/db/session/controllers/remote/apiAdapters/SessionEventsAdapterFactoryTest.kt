@@ -10,10 +10,7 @@ import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPool
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPoolType
 import com.simprints.id.data.db.session.domain.models.events.callback.*
-import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
+import com.simprints.id.data.db.session.domain.models.events.callout.*
 import com.simprints.id.data.db.session.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.session.domain.models.session.Device
 import com.simprints.id.data.db.session.domain.models.session.Location
@@ -111,6 +108,19 @@ class SessionEventsAdapterFactoryTest {
         val calloutEvent = IdentificationCalloutEvent(
             10,
             "projectId", "userId", "moduleId", "metadata"
+        )
+
+        val apiEvent = ApiCalloutEvent(calloutEvent)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
+
+        validateCalloutEventApiModel(json)
+    }
+
+    @Test
+    fun validate_calloutEventForEnrolLastBiometricsModel() {
+        val calloutEvent = EnrolmentLastBiometricsCalloutEvent(
+            10,
+            "projectId", "userId", "moduleId", "metadata", "sessionId"
         )
 
         val apiEvent = ApiCalloutEvent(calloutEvent)
@@ -249,7 +259,7 @@ class SessionEventsAdapterFactoryTest {
     }
 
     @Test
-    fun validate_enrollmentEventApiModel() {
+    fun validate_enrolmentEventApiModel() {
         val event = EnrolmentEvent(
             10,
             UUID.randomUUID().toString()

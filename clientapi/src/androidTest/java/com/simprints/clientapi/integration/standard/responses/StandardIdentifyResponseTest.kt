@@ -28,7 +28,7 @@ class StandardIdentifyResponseTest: BaseStandardClientApiTest() {
         mockAppModuleResponse(appIdentifyResponse, APP_IDENTIFY_ACTION)
 
         val scenario =
-            ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_IDENTIFY_ACTION })
+            ActivityScenario.launch<LibSimprintsActivity>(standardBaseFlowIntentRequest.apply { action = STANDARD_IDENTIFY_ACTION })
 
         assertStandardIdentifyResponse(scenario, appIdentifyResponse)
     }

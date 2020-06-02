@@ -13,9 +13,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.integration.AppIdentifyRequest
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
-import com.simprints.moduleapi.app.requests.IAppRequest
-import com.simprints.clientapi.integration.key
 import com.simprints.clientapi.integration.value
+import com.simprints.moduleapi.app.requests.IAppRequest
 import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.Test
@@ -33,7 +32,7 @@ class StandardIdentifyRequestTest : BaseStandardClientApiTest() {
 
     @Test
     fun callingAppSendsAnIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_IDENTIFY_ACTION })
+        ActivityScenario.launch<LibSimprintsActivity>(standardBaseFlowIntentRequest.apply { action = STANDARD_IDENTIFY_ACTION })
 
         val expectedAppRequest = AppIdentifyRequest(
             projectIdField.value(),
@@ -47,13 +46,13 @@ class StandardIdentifyRequestTest : BaseStandardClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestSuspicious(standardBaseIntentRequest).apply { action = STANDARD_IDENTIFY_ACTION })
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestSuspicious(standardBaseFlowIntentRequest).apply { action = STANDARD_IDENTIFY_ACTION })
         intended(hasAction(APP_IDENTIFY_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestInvalid(standardBaseIntentRequest).apply { action = STANDARD_IDENTIFY_ACTION })
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestInvalid(standardBaseFlowIntentRequest).apply { action = STANDARD_IDENTIFY_ACTION })
         intended(CoreMatchers.not(hasAction(APP_IDENTIFY_ACTION)), times(2))
     }
 }
