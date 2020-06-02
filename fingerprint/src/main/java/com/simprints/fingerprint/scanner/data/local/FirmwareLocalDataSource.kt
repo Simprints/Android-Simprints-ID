@@ -6,7 +6,7 @@ import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import timber.log.Timber
 import java.io.File
 
-class FirmwareFileManager(private val context: Context) {
+class FirmwareLocalDataSource(private val context: Context) {
 
     fun getAvailableScannerFirmwareVersions(): ScannerFirmwareVersions =
         ScannerFirmwareVersions(

@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.fingerprint.di.KoinInjector
-import com.simprints.fingerprint.scanner.data.FirmwareFileUpdater
+import com.simprints.fingerprint.scanner.data.FirmwareRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.KoinComponent
@@ -19,9 +19,9 @@ class FirmwareFileUpdateWorker(context: Context, params: WorkerParameters)
             Timber.d("FirmwareFileUpdateWorker started")
             KoinInjector.acquireFingerprintKoinModules()
 
-            val firmwareFileUpdater: FirmwareFileUpdater by inject()
+            val firmwareRepository: FirmwareRepository by inject()
 
-            firmwareFileUpdater.download()
+            firmwareRepository.updateStoredFirmwareFilesWithLatest()
 
             Timber.d("FirmwareFileUpdateWorker succeeded")
             Result.success()

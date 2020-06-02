@@ -43,8 +43,9 @@ import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.controllers.v2.*
-import com.simprints.fingerprint.scanner.data.FirmwareFileUpdater
-import com.simprints.fingerprint.scanner.data.local.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.FirmwareRepository
+import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
+import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
@@ -113,11 +114,12 @@ object KoinInjector {
     private fun Module.defineBuildersForDomainClasses() {
         factory { SerialNumberConverter() }
         factory { ScannerGenerationDeterminer() }
+        factory { FingerprintFileDownloader() }
 
         factory { BatteryLevelChecker(androidContext()) }
-        factory { FirmwareFileManager(androidContext()) }
-        factory { FingerprintFileDownloader() }
-        factory { FirmwareFileUpdater(get(), get(), get()) }
+        factory { FirmwareLocalDataSource(androidContext()) }
+        factory { FirmwareRemoteDataSource(get(), get()) }
+        factory { FirmwareRepository(get(), get()) }
         factory { FirmwareFileUpdateScheduler(androidContext()) }
 
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }

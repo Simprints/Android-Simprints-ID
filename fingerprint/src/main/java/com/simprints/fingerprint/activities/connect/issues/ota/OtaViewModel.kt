@@ -11,7 +11,7 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.data.local.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.*
@@ -25,11 +25,11 @@ import timber.log.Timber
 import kotlin.concurrent.schedule
 
 class OtaViewModel(
-        private val scannerManager: ScannerManager,
-        private val firmwareFileManager: FirmwareFileManager,
-        private val sessionEventsManager: FingerprintSessionEventsManager,
-        private val crashReportManager: FingerprintCrashReportManager,
-        private val timeHelper: FingerprintTimeHelper
+    private val scannerManager: ScannerManager,
+    private val firmwareLocalDataSource: FirmwareLocalDataSource,
+    private val sessionEventsManager: FingerprintSessionEventsManager,
+    private val crashReportManager: FingerprintCrashReportManager,
+    private val timeHelper: FingerprintTimeHelper
 ) : ViewModel() {
 
     val progress = MutableLiveData(0f)
@@ -95,9 +95,9 @@ class OtaViewModel(
         }
 
         val targetVersion = when (availableOta) {
-            AvailableOta.CYPRESS -> firmwareFileManager.getAvailableScannerFirmwareVersions().cypress.toString()
-            AvailableOta.STM -> firmwareFileManager.getAvailableScannerFirmwareVersions().stm.toString()
-            AvailableOta.UN20 -> firmwareFileManager.getAvailableScannerFirmwareVersions().un20.toString()
+            AvailableOta.CYPRESS -> firmwareLocalDataSource.getAvailableScannerFirmwareVersions().cypress.toString()
+            AvailableOta.STM -> firmwareLocalDataSource.getAvailableScannerFirmwareVersions().stm.toString()
+            AvailableOta.UN20 -> firmwareLocalDataSource.getAvailableScannerFirmwareVersions().un20.toString()
         }
 
         val failureReason = e?.let { "${it::class.java.simpleName} : ${it.message}" }
