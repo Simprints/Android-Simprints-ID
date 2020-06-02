@@ -32,16 +32,18 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
      */
     fun performOtaSteps(scanner: Scanner, macAddress: String): Observable<Un20OtaStep> =
         Observable.just<Un20OtaStep>(Un20OtaStep.EnteringMainMode)
-            .concatWith(scanner.enterMainMode() thenEmitStep Un20OtaStep.TurningOnUn20BeforeTransfer)
+            .concatWith(scanner.enterMainMode().addSmallDelay() thenEmitStep Un20OtaStep.TurningOnUn20BeforeTransfer)
             .concatWith(scanner.turnUn20OnAndAwaitStateChangeEvent() thenEmitStep Un20OtaStep.CommencingTransfer)
             .concatWith(scanner.startUn20Ota(firmwareFileManager.loadUn20FirmwareBytes()).map { Un20OtaStep.TransferInProgress(it) })
             .concatWith(emitStep(Un20OtaStep.AwaitingCacheCommit))
             .concatWith(waitCacheCommitTime() thenEmitStep Un20OtaStep.TurningOffUn20AfterTransfer)
-            .concatWith(scanner.turnUn20OffAndAwaitStateChangeEvent() thenEmitStep Un20OtaStep.TurningOnUn20AfterTransfer)
+            .concatWith(scanner.turnUn20OffAndAwaitStateChangeEvent().addSmallDelay() thenEmitStep Un20OtaStep.TurningOnUn20AfterTransfer)
             .concatWith(scanner.turnUn20OnAndAwaitStateChangeEvent() thenEmitStep Un20OtaStep.ValidatingNewFirmwareVersion)
             .concatWith(validateUn20FirmwareVersion(scanner) thenEmitStep Un20OtaStep.ReconnectingAfterValidating)
-            .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep Un20OtaStep.UpdatingUnifiedVersionInformation)
+            .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep Un20OtaStep.UpdatingUnifiedVersionInformation)
             .concatWith(updateUnifiedVersionInformation(scanner))
+
+    private fun Completable.addSmallDelay() = delay(1, TimeUnit.SECONDS, timeScheduler)
 
     private fun waitCacheCommitTime(): Completable =
         Completable.timer(CACHE_COMMIT_TIME, TimeUnit.MILLISECONDS, timeScheduler)
