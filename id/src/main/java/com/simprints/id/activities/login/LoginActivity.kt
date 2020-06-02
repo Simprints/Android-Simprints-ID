@@ -24,9 +24,10 @@ import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.core.network.BaseUrlProvider
+import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.SimProgressDialog
+import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_login.*
 import timber.log.Timber
@@ -190,7 +191,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         else if (!areSuppliedProjectIdAndProjectIdFromIntentEqual)
             handleProjectIdMismatch()
         else
-            viewModel.signIn(userId, projectId, projectSecret)
+            viewModel.signIn(userId, projectId, projectSecret, deviceId)
     }
 
     private fun handleMissingCredentials() {

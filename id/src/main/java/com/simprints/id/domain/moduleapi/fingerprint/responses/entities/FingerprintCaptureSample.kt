@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.fingerprint.responses.entities
 
 import android.os.Parcelable
-import com.simprints.core.images.model.SecuredImageRef
+import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.id.domain.moduleapi.images.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.images.fromModuleApiToDomain
 import com.simprints.id.data.db.subject.domain.FingerIdentifier

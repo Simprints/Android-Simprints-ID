@@ -1,0 +1,4 @@
+GCLOUD_PROJECT=simprints-android-ci
+echo ${GCLOUD_API_KEYFILE} | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
+gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+gcloud config set project ${GCLOUD_PROJECT}

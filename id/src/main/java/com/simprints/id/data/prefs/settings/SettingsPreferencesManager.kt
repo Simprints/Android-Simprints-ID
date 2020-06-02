@@ -29,6 +29,7 @@ interface SettingsPreferencesManager {
 
     var logoExists: Boolean
     var consentRequired: Boolean
+    var locationPermissionRequired: Boolean
 
     var modalities: List<Modality>
     var subjectsDownSyncSetting: SubjectsDownSyncSetting

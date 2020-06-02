@@ -1,10 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.core.images.repository.ImageRepository
-import com.simprints.core.images.repository.ImageRepositoryImpl
-import com.simprints.core.network.BaseUrlProvider
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSourceImpl
@@ -25,6 +21,8 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSourceImpl
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
+import com.simprints.id.data.images.repository.ImageRepository
+import com.simprints.id.data.images.repository.ImageRepositoryImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
@@ -42,9 +40,8 @@ open class DataModule {
     @Provides
     @Singleton
     open fun provideEventRemoteDataSource(
-        remoteDbManager: RemoteDbManager,
         simApiClientFactory: SimApiClientFactory
-    ): EventRemoteDataSource = EventRemoteDataSourceImpl(remoteDbManager, simApiClientFactory)
+    ): EventRemoteDataSource = EventRemoteDataSourceImpl(simApiClientFactory)
 
     @Provides
     @FlowPreview
@@ -61,10 +58,8 @@ open class DataModule {
     @Provides
     @Singleton
     open fun provideProjectRemoteDataSource(
-        remoteDbManager: RemoteDbManager,
         simApiClientFactory: SimApiClientFactory
     ): ProjectRemoteDataSource = ProjectRemoteDataSourceImpl(
-        remoteDbManager,
         simApiClientFactory
     )
 

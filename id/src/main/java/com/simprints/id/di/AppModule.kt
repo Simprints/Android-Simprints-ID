@@ -60,6 +60,9 @@ import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactory
+import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
@@ -196,9 +199,10 @@ open class AppModule {
     @Provides
     open fun provideSimApiClientFactory(
         ctx: Context,
-        baseUrlProvider: BaseUrlProvider,
+        remoteDbManager: RemoteDbManager,
+        baseUrlProvider: BaseUrlProvider
         gson: Gson
-    ) = SimApiClientFactory(baseUrlProvider, ctx.deviceId, gson)
+    ): SimApiClientFactory = SimApiClientFactoryImpl(baseUrlProvider, ctx.deviceId, remoteDbManager, gson)
 
     @Provides
     @Singleton
@@ -239,10 +243,8 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideSessionEventsRemoteDbManager(
-        remoteDbManager: RemoteDbManager,
         simApiClientFactory: SimApiClientFactory
     ): SessionRemoteDataSource = SessionRemoteDataSourceImpl(
-        remoteDbManager,
         simApiClientFactory
     )
 

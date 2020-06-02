@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
+import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -68,6 +69,7 @@ class ConnectScannerViewModelTest : KoinTest {
     private fun mockScannerWrapper(connectFailException: Throwable? = null) = mockk<ScannerWrapper> {
         every { disconnect() } returns Completable.complete()
         every { connect() } returns if (connectFailException == null) Completable.complete() else Completable.error(connectFailException)
+        every { setup() } returns Completable.complete()
         every { sensorWakeUp() } returns Completable.complete()
         every { setUiIdle() } returns Completable.complete()
         every { versionInformation() } returns mockk(relaxed = true)
@@ -80,7 +82,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
 
-        viewModel.start()
+        viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.BLUETOOTH_OFF)
     }
@@ -92,7 +94,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         val launchAlertObserver = viewModel.launchAlert.testObserver()
 
-        viewModel.start()
+        viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         launchAlertObserver.assertEventReceivedWithContent(FingerprintAlert.BLUETOOTH_NOT_SUPPORTED)
     }
@@ -105,7 +107,7 @@ class ConnectScannerViewModelTest : KoinTest {
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
         val scannerProgressObserver = viewModel.progress.testObserver()
 
-        viewModel.start()
+        viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         scannerConnectedObserver.assertEventReceivedWithContent(true)
         assertThat(scannerProgressObserver.observedValues.size).isEqualTo(ConnectScannerViewModel.NUMBER_OF_STEPS + 2) // 2 at the start
@@ -122,7 +124,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
 
-        viewModel.start()
+        viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NFC_PAIR)
     }
@@ -135,7 +137,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
 
-        viewModel.start()
+        viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NFC_OFF)
     }
@@ -148,7 +150,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
 
-        viewModel.start()
+        viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.SERIAL_ENTRY_PAIR)
     }
@@ -161,7 +163,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
 
-        viewModel.start()
+        viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.SERIAL_ENTRY_PAIR)
     }
@@ -174,7 +176,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
 
-        viewModel.start()
+        viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.SERIAL_ENTRY_PAIR)
     }
@@ -187,7 +189,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
 
-        viewModel.start()
+        viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NFC_PAIR)
     }
@@ -199,7 +201,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
 
-        viewModel.start()
+        viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         scannerConnectedObserver.assertEventReceivedWithContent(false)
     }
@@ -213,7 +215,7 @@ class ConnectScannerViewModelTest : KoinTest {
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
         val launchAlertObserver = viewModel.launchAlert.testObserver()
 
-        viewModel.start()
+        viewModel.start(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         scannerConnectedObserver.assertEventReceivedWithContent(false)
         launchAlertObserver.assertEventReceivedWithContent(FingerprintAlert.UNEXPECTED_ERROR)

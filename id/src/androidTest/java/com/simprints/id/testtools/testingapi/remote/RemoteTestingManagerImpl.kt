@@ -16,9 +16,8 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
     }
 
     private val remoteTestingApi = TestingApiClient(
-        RemoteTestingApi::class.java,
-        RemoteTestingApi.baseUrl)
-        .api
+        RemoteTestingApi::class,
+        RemoteTestingApi.baseUrl).api
 
     override fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters): TestProject =
         remoteTestingApi.createProject(testProjectCreationParameters)
