@@ -17,11 +17,11 @@ import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LO
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.domain.moduleapi.core.requests.FetchGUIDRequest
-import com.simprints.id.domain.moduleapi.core.response.CoreResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import com.simprints.id.domain.moduleapi.core.response.FetchGUIDResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.orchestrator.steps.core.requests.FetchGUIDRequest
+import com.simprints.id.orchestrator.steps.core.response.CoreResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
+import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
 import javax.inject.Inject
 
 class FetchGuidActivity : AppCompatActivity() {

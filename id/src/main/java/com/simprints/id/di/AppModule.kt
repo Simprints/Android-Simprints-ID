@@ -8,6 +8,7 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
+import com.simprints.id.activities.enrollast.EnrolLastBiometricsViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
@@ -26,10 +27,6 @@ import com.simprints.id.data.consent.shortconsent.ConsentRepository
 import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
@@ -42,6 +39,10 @@ import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.session.local.SessionRealmConfigBuilderImpl
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSourceImpl
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -61,6 +62,12 @@ import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientFactoryImpl
+import com.simprints.id.orchestrator.EnrolmentHelper
+import com.simprints.id.orchestrator.EnrolmentHelperImpl
+import com.simprints.id.orchestrator.cache.HotCache
+import com.simprints.id.orchestrator.cache.HotCacheImpl
+import com.simprints.id.orchestrator.cache.StepEncoder
+import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
@@ -69,8 +76,8 @@ import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.tools.*
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
@@ -389,7 +396,7 @@ open class AppModule {
 
     @Provides
     open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)
-    
+
     @Provides
     open fun provideCameraHelper(
         context: Context,
@@ -420,5 +427,27 @@ open class AppModule {
         longConsentRepository: LongConsentRepository,
         preferencesManager: PreferencesManager
     ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager)
+
+    @Provides
+    fun provideHotCache(
+        @Named("EncryptedSharedPreferences") sharedPrefs: SharedPreferences,
+        stepEncoder: StepEncoder
+    ): HotCache = HotCacheImpl(sharedPrefs, stepEncoder)
+
+    @Provides
+    fun provideStepEncoder(): StepEncoder = StepEncoderImpl()
+
+    @Provides
+    fun provideEnrolmentHelper(
+        repository: SubjectRepository,
+        sessionRepository: SessionRepository,
+        timeHelper: TimeHelper
+    ): EnrolmentHelper = EnrolmentHelperImpl(repository, sessionRepository, timeHelper)
+
+    @Provides
+    open fun provideEnrolLastBiometricsViewModel(
+        enrolmentHelper: EnrolmentHelper,
+        timeHelper: TimeHelper
+    ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper)
 }
 

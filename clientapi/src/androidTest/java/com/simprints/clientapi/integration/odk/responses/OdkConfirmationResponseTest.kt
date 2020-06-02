@@ -16,7 +16,7 @@ class OdkConfirmationResponseTest : BaseOdkClientApiTest() {
     @Test
     fun appModuleSendsAConfirmationAppResponse_shouldReturnAOdkConfirmationResponse() {
         val appIdentificationOutcomeResponse = AppConfirmationResponse(true)
-        mockAppModuleResponse(appIdentificationOutcomeResponse, ODK_CONFIRM_IDENTITY_ACTION)
+        mockAppModuleResponse(appIdentificationOutcomeResponse, APP_CONFIRM_ACTION)
 
         val scenario =
             ActivityScenario.launch<OdkActivity>(odkConfirmIntentRequest.apply { action = ODK_CONFIRM_IDENTITY_ACTION })

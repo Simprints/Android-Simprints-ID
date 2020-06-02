@@ -31,7 +31,7 @@ class ErrorPresenterTest {
             val clientApiSessionEventsManagerMock = mockk<ClientApiSessionEventsManager>(relaxed = true)
 
             ErrorPresenter(view, clientApiSessionEventsManagerMock).apply {
-                start(ClientApiAlert.INVALID_CLIENT_REQUEST)
+                start(ClientApiAlert.INVALID_PROJECT_ID)
             }
 
             verify(exactly = 1) { view.setErrorMessageText(any()) }

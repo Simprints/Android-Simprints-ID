@@ -2,14 +2,18 @@ package com.simprints.clientapi.activities.commcare
 
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
+import com.simprints.clientapi.activities.commcare.CommCareAction.*
+import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.*
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
+import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
@@ -19,7 +23,7 @@ import kotlinx.coroutines.launch
 
 class CommCarePresenter(
     private val view: CommCareContract.View,
-    private val action: String?,
+    private val action: CommCareAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     private val sharedPreferencesManager: SharedPreferencesManager,
     deviceManager: DeviceManager,
@@ -31,36 +35,28 @@ class CommCarePresenter(
     crashReportManager
 ), CommCareContract.Presenter {
 
-    companion object {
-        private const val PACKAGE_NAME = "com.simprints.commcare"
-        const val ACTION_REGISTER = "$PACKAGE_NAME.REGISTER"
-        const val ACTION_IDENTIFY = "$PACKAGE_NAME.IDENTIFY"
-        const val ACTION_VERIFY = "$PACKAGE_NAME.VERIFY"
-        const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
-    }
-
     override suspend fun start() {
-        if (action != ACTION_CONFIRM_IDENTITY) {
+        if (action !is CommCareActionFollowUpAction) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
 
         runIfDeviceIsNotRooted {
             when (action) {
-                ACTION_REGISTER -> processEnrollRequest()
-                ACTION_IDENTIFY -> processIdentifyRequest()
-                ACTION_VERIFY -> processVerifyRequest()
-                ACTION_CONFIRM_IDENTITY -> checkAndProcessSessionId()
-                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
-            }
+                Enrol -> processEnrolRequest()
+                Identify -> processIdentifyRequest()
+                Verify -> processVerifyRequest()
+                ConfirmIdentity -> checkAndProcessSessionId()
+                Invalid -> throw InvalidIntentActionException()
+            }.safeSealedWhens
         }
     }
 
-    override fun handleEnrollResponse(enroll: EnrollResponse) {
+    override fun handleEnrolResponse(enrol: EnrolResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(enroll.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
+            view.returnRegistration(enrol.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
 

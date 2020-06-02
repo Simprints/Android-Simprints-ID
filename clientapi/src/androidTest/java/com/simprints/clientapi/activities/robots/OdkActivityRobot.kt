@@ -26,7 +26,7 @@ class OdkActivityAssertions(private val rule: ActivityTestRule<OdkActivity>) {
     }
 
     fun enrolExtractorIsOdkEnrolExtractor() {
-        assertThat(rule.activity.enrollExtractor).isInstanceOf(OdkEnrolExtractor::class.java)
+        assertThat(rule.activity.enrolExtractor).isInstanceOf(OdkEnrolExtractor::class.java)
     }
 
     fun identifyExtractorIsOdkIdentifyExtractor() {

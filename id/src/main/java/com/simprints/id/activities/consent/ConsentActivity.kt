@@ -17,11 +17,12 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.ConsentEvent
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
-import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
-import com.simprints.id.domain.moduleapi.core.response.ConsentResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
+import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
+import com.simprints.id.orchestrator.steps.core.response.AskConsentResponse
+import com.simprints.id.orchestrator.steps.core.response.ConsentResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
+import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode

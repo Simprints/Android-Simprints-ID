@@ -32,7 +32,7 @@ class CommCareVerifyRequestTest : BaseCommCareClientApiTest() {
 
     @Test
     fun callingAppSendsAVerifyRequest_shouldLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply {
+        ActivityScenario.launch<CommCareActivity>(commCareBaseFlowIntentRequest.apply {
             action = COMMCARE_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
@@ -50,7 +50,7 @@ class CommCareVerifyRequestTest : BaseCommCareClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(makeIntentRequestSuspicious(commCareBaseIntentRequest).apply {
+        ActivityScenario.launch<CommCareActivity>(makeIntentRequestSuspicious(commCareBaseFlowIntentRequest).apply {
             action = COMMCARE_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
@@ -60,7 +60,7 @@ class CommCareVerifyRequestTest : BaseCommCareClientApiTest() {
 
     @Test
     fun callingAppSendsAnInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(makeIntentRequestInvalid(commCareBaseIntentRequest).apply {
+        ActivityScenario.launch<CommCareActivity>(makeIntentRequestInvalid(commCareBaseFlowIntentRequest).apply {
             action = COMMCARE_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })

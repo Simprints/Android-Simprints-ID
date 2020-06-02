@@ -3,10 +3,7 @@ package com.simprints.id.data.db.session.local
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.callback.*
-import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
+import com.simprints.id.data.db.session.domain.models.events.callout.*
 import com.simprints.id.data.db.session.local.models.DbEvent
 
 fun DbEvent.toDomainEvent(): Event? =
@@ -41,6 +38,7 @@ fun DbEvent.toDomainEvent(): Event? =
             EventType.INTENT_PARSING -> JsonHelper.gson.fromJson(it, IntentParsingEvent::class.java)
             EventType.COMPLETION_CHECK -> JsonHelper.gson.fromJson(it, CompletionCheckEvent::class.java)
             EventType.CALLBACK_CONFIRMATION -> JsonHelper.gson.fromJson(it, ConfirmationCallbackEvent::class.java)
+            EventType.CALLOUT_LAST_BIOMETRICS -> JsonHelper.gson.fromJson(it, EnrolmentLastBiometricsCalloutEvent::class.java)
             EventType.VERO_2_INFO_SNAPSHOT -> JsonHelper.gson.fromJson(it, Vero2InfoSnapshotEvent::class.java)
             EventType.SCANNER_FIRMWARE_UPDATE -> JsonHelper.gson.fromJson(it, ScannerFirmwareUpdateEvent::class.java)
             null -> null

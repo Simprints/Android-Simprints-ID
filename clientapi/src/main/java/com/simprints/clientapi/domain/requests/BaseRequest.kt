@@ -1,14 +1,14 @@
 package com.simprints.clientapi.domain.requests
 
-import com.simprints.clientapi.domain.ClientBase
 import com.simprints.moduleapi.app.requests.IAppRequest
 
 
-interface BaseRequest : ClientBase {
+interface BaseRequest {
 
+    val projectId: String
     val userId: String
-    val moduleId: String
-    val metadata: String
+
+    val unknownExtras: Map<String, Any?>
 
     fun convertToAppRequest(): IAppRequest
 
