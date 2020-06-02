@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/connectScannerMainFragment"
-        android:name="com.simprints.fingerprint.activities.connect.ConnectScannerMainFragment"
+        android:name="com.simprints.fingerprint.activities.connect.main.ConnectScannerMainFragment"
         android:label="ConnectScannerMainFragment" >
         <action
             android:id="@+id/action_connectScannerMainFragment_to_bluetoothOffFragment"

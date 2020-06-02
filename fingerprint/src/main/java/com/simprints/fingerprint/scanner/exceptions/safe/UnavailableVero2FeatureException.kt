@@ -6,5 +6,6 @@ class UnavailableVero2FeatureException(val feature: UnavailableVero2Feature)
     : FingerprintSimprintsException("UnavailableVero2FeatureException for feature ${feature.name}")
 
 enum class UnavailableVero2Feature {
-    IMAGE_ACQUISITION
+    IMAGE_ACQUISITION,
+    OTA
 }

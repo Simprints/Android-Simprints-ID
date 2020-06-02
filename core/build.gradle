@@ -7,12 +7,11 @@ androidExtensions {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion config.min_sdk
-        targetSdkVersion 28
-        multiDexEnabled true
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -53,9 +52,9 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':libsimprints')
 
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation deps.androidx.appcompat
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation deps.kotlin.stdlib
     implementation deps.kotlin.coroutines_core
     implementation deps.kotlin.coroutines_play_services
     implementation deps.testing.espresso.idling

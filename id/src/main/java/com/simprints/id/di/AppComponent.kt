@@ -1,6 +1,5 @@
 package com.simprints.id.di
 
-import com.simprints.core.images.repository.ImageRepository
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
@@ -30,15 +29,18 @@ import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAbou
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
+import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.guidselection.GuidSelectionWorker
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncWorker
@@ -129,6 +131,7 @@ interface AppComponent {
     fun inject(subjectsEndSyncReporterWorker: SubjectsEndSyncReporterWorker)
     fun inject(subjectsStartSyncWorker: SubjectsStartSyncReporterWorker)
     fun inject(qrCaptureActivity: QrCaptureActivity)
+    fun inject(setupActivity: SetupActivity)
 
     fun getSessionEventsManager(): SessionRepository
     fun getCrashReportManager(): CoreCrashReportManager
@@ -141,5 +144,5 @@ interface AppComponent {
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getAndroidResourcesHelper(): AndroidResourcesHelper
     fun getImageRepository(): ImageRepository
-
+    fun getSimClientFactory(): SimApiClientFactory
 }

@@ -1,9 +1,6 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
-import com.simprints.core.images.repository.ImageRepository
-import com.simprints.core.network.BaseUrlProvider
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
@@ -18,6 +15,7 @@ import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
@@ -57,10 +55,9 @@ class TestDataModule(
         }
 
     override fun provideProjectRemoteDataSource(
-        remoteDbManager: RemoteDbManager,
         simApiClientFactory: SimApiClientFactory
     ): ProjectRemoteDataSource = projectRemoteDataSourceRule.resolveDependency {
-        super.provideProjectRemoteDataSource(remoteDbManager, simApiClientFactory)
+        super.provideProjectRemoteDataSource(simApiClientFactory)
     }
 
     override fun provideProjectRepository(

@@ -9,6 +9,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequestType
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.core.requests.ConsentType
+import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreFaceExitFormResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreFingerprintExitFormResponse
@@ -27,11 +28,13 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
                                     private val faceStepProcessor: FaceStepProcessor,
                                     private val timeHelper: TimeHelper,
                                     private val sessionRepository: SessionRepository,
-                                    private val consentRequired: Boolean) : ModalityFlow {
+                                    private val consentRequired: Boolean,
+                                    private val locationRequired: Boolean) : ModalityFlow {
 
     override val steps: MutableList<Step> = mutableListOf()
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
+        addSetupStep()
         when (appRequest.type) {
             AppRequestType.ENROL -> addConsentStepIfRequired(ConsentType.ENROL)
             AppRequestType.IDENTIFY -> addConsentStepIfRequired(ConsentType.IDENTIFY)
@@ -40,6 +43,10 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
                 addConsentStepIfRequired(ConsentType.VERIFY)
             }
         }
+    }
+
+    private fun addSetupStep() {
+        steps.add(buildSetupStep())
     }
 
     private fun addConsentStepIfRequired(consentType: ConsentType) {
@@ -57,6 +64,14 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     override fun restoreState(stepsToRestore: List<Step>) {
         steps.clear()
         steps.addAll(stepsToRestore)
+    }
+
+    private fun buildSetupStep() = coreStepProcessor.buildStepSetup(getPermissions())
+
+    private fun getPermissions() = if (locationRequired) {
+        listOf(SetupPermission.LOCATION)
+    } else {
+        emptyList()
     }
 
     private fun buildConsentStep(consentType: ConsentType) =

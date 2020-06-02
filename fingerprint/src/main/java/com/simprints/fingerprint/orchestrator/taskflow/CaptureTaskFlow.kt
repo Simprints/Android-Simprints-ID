@@ -20,7 +20,7 @@ class CaptureTaskFlow(captureRequest: FingerprintCaptureRequest) : FingerprintTa
     }
 
     private fun createConnectScannerTaskRequest() =
-        ConnectScannerTaskRequest()
+        ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
     private fun FingerprintCaptureRequest.createCollectFingerprintsTaskRequest() =
         CollectFingerprintsTaskRequest(fingerprintsToCapture)
