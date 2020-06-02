@@ -14,7 +14,7 @@ class OneToOneMatchEvent(starTime: Long,
 
 fun OneToOneMatchEvent.fromDomainToCore() =
     CoreOneToOneMatchEvent(
-        starTime,
+        startTime,
         endTime,
         (query as SubjectLocalDataSource.Query).extractVerifyId(),
         result?.fromDomainToCore()

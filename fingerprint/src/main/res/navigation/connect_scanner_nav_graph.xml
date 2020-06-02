@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/connect_scanner_nav_graph"
@@ -9,7 +8,7 @@
     <fragment
         android:id="@+id/connectScannerMainFragment"
         android:name="com.simprints.fingerprint.activities.connect.main.ConnectScannerMainFragment"
-        android:label="ConnectScannerMainFragment" >
+        android:label="ConnectScannerMainFragment">
         <action
             android:id="@+id/action_connectScannerMainFragment_to_bluetoothOffFragment"
             app:destination="@id/bluetoothOffFragment" />
@@ -25,12 +24,15 @@
         <action
             android:id="@+id/action_connectScannerMainFragment_to_serialEntryPairFragment"
             app:destination="@id/serialEntryPairFragment" />
+        <action
+            android:id="@+id/action_connectScannerMainFragment_to_otaFragment"
+            app:destination="@id/otaFragment" />
     </fragment>
     <fragment
         android:id="@+id/bluetoothOffFragment"
         android:name="com.simprints.fingerprint.activities.connect.issues.bluetoothoff.BluetoothOffFragment"
         android:label="fragment_bluetooth_off"
-        tools:layout="@layout/fragment_bluetooth_off" >
+        tools:layout="@layout/fragment_bluetooth_off">
         <action
             android:id="@+id/action_bluetoothOffFragment_to_connectScannerMainFragment"
             app:destination="@id/connectScannerMainFragment" />
@@ -39,7 +41,7 @@
         android:id="@+id/nfcOffFragment"
         android:name="com.simprints.fingerprint.activities.connect.issues.nfcoff.NfcOffFragment"
         android:label="fragment_nfc_off"
-        tools:layout="@layout/fragment_nfc_off" >
+        tools:layout="@layout/fragment_nfc_off">
         <action
             android:id="@+id/action_nfcOffFragment_to_serialEntryPairFragment"
             app:destination="@id/serialEntryPairFragment" />
@@ -51,7 +53,7 @@
         android:id="@+id/nfcPairFragment"
         android:name="com.simprints.fingerprint.activities.connect.issues.nfcpair.NfcPairFragment"
         android:label="fragment_nfc_pair"
-        tools:layout="@layout/fragment_nfc_pair" >
+        tools:layout="@layout/fragment_nfc_pair">
         <action
             android:id="@+id/action_nfcPairFragment_to_connectScannerMainFragment"
             app:destination="@id/connectScannerMainFragment" />
@@ -63,7 +65,7 @@
         android:id="@+id/scannerOffFragment"
         android:name="com.simprints.fingerprint.activities.connect.issues.scanneroff.ScannerOffFragment"
         android:label="fragment_scanner_off"
-        tools:layout="@layout/fragment_scanner_off" >
+        tools:layout="@layout/fragment_scanner_off">
         <action
             android:id="@+id/action_scannerOffFragment_to_nfcPairFragment"
             app:destination="@id/nfcPairFragment" />
@@ -73,12 +75,56 @@
         <action
             android:id="@+id/action_scannerOffFragment_to_nfcOffFragment"
             app:destination="@id/nfcOffFragment" />
+        <action
+            android:id="@+id/action_scannerOffFragment_to_bluetoothOffFragment"
+            app:destination="@id/bluetoothOffFragment" />
+        <action
+            android:id="@+id/action_scannerOffFragment_to_otaFragment"
+            app:destination="@id/otaFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/otaFragment"
+        android:name="com.simprints.fingerprint.activities.connect.issues.ota.OtaFragment"
+        android:label="fragment_ota"
+        tools:layout="@layout/fragment_ota">
+        <argument
+            android:name="otaFragmentRequest"
+            app:argType="com.simprints.fingerprint.activities.connect.issues.ota.OtaFragmentRequest" />
+        <action
+            android:id="@+id/action_otaFragment_to_connectScannerMainFragment"
+            app:destination="@id/connectScannerMainFragment" />
+        <action
+            android:id="@+id/action_otaFragment_to_otaRecoveryFragment"
+            app:destination="@id/otaRecoveryFragment" />
+        <action
+            android:id="@+id/action_otaFragment_to_otaFailedFragment"
+            app:destination="@id/otaFailedFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/otaRecoveryFragment"
+        android:name="com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragment"
+        android:label="fragment_ota_recovery"
+        tools:layout="@layout/fragment_ota_recovery">
+        <argument
+            android:name="otaRecoveryFragmentRequest"
+            app:argType="com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragmentRequest" />
+        <action
+            android:id="@+id/action_otaRecoveryFragment_to_otaFragment"
+            app:destination="@id/otaFragment" />
+        <action
+            android:id="@+id/action_otaRecoveryFragment_to_otaFailedFragment"
+            app:destination="@id/otaFailedFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/otaFailedFragment"
+        android:name="com.simprints.fingerprint.activities.connect.issues.otafailed.OtaFailedFragment"
+        android:label="fragment_ota_failed"
+        tools:layout="@layout/fragment_ota_failed" />
     <fragment
         android:id="@+id/serialEntryPairFragment"
         android:name="com.simprints.fingerprint.activities.connect.issues.serialentrypair.SerialEntryPairFragment"
         android:label="fragment_serial_entry_pair"
-        tools:layout="@layout/fragment_serial_entry_pair" >
+        tools:layout="@layout/fragment_serial_entry_pair">
         <action
             android:id="@+id/action_serialEntryPairFragment_to_connectScannerMainFragment"
             app:destination="@id/connectScannerMainFragment" />
