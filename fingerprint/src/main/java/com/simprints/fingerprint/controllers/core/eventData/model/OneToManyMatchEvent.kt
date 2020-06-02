@@ -16,7 +16,7 @@ class OneToManyMatchEvent(starTime: Long,
 
 fun OneToManyMatchEvent.fromDomainToCore() =
     CoreOneToManyMatchEvent(
-        starTime,
+        startTime,
         endTime,
         (query as PersonLocalDataSource.Query).asCoreMatchPool(count),
         result?.map { it.fromDomainToCore() }

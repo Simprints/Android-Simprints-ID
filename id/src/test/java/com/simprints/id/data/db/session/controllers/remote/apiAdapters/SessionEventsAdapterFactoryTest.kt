@@ -404,6 +404,42 @@ class SessionEventsAdapterFactoryTest {
     }
 
     @Test
+    fun validate_scannerConnectionEventApiModel() {
+        val scannerConnectionEvent = ScannerConnectionEvent(0,
+            ScannerConnectionEvent.ScannerInfo("scannerId", "macAddress",
+            ScannerConnectionEvent.ScannerGeneration.VERO_2, "2"))
+
+        val apiScannerConnectionEvent = ApiScannerConnectionEvent(scannerConnectionEvent)
+        val json = gsonWithAdapters.toJsonTree(apiScannerConnectionEvent).asJsonObject
+
+        validateScannerConnectionEventApiModel(json)
+    }
+
+    @Test
+    fun validate_vero2InfoSnapshotEvent() {
+        val vero2InfoSnapshotEvent = Vero2InfoSnapshotEvent(0,
+            Vero2InfoSnapshotEvent.Vero2Version(Int.MAX_VALUE.toLong() + 1, "1.23",
+        "api", "stmApp", "stmApi", "un20App", "un20Api"),
+            Vero2InfoSnapshotEvent.BatteryInfo(70, 15, 1, 37))
+
+        val apiVero2InfoSnapshotEvent = ApiVero2InfoSnapshotEvent(vero2InfoSnapshotEvent)
+        val json = gsonWithAdapters.toJsonTree(apiVero2InfoSnapshotEvent).asJsonObject
+
+        validateVero2InfoSnapshotEventApiModel(json)
+    }
+
+    @Test
+    fun validate_ScannerFirmwareUpdateEvent() {
+        val scannerFirmwareUpdateEvent = ScannerFirmwareUpdateEvent(0, 0, "stm",
+            "targetApp", "failureReason")
+
+        val apiScannerFirmwareUpdateEvent = ApiScannerFirmwareUpdateEvent(scannerFirmwareUpdateEvent)
+        val json = gsonWithAdapters.toJsonTree(apiScannerFirmwareUpdateEvent).asJsonObject
+
+        validateScannerFirmwareUpdateEventApiModel(json)
+    }
+
+    @Test
     fun validate_invalidEventApiModel() {
         val invalidIntentEvent =
             InvalidIntentEvent(0, "some_action", mapOf("projectId" to "someProject"))

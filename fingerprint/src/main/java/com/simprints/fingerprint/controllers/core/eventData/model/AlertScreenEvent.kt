@@ -10,7 +10,7 @@ class AlertScreenEvent(starTime: Long,
                        val alertType: FingerprintAlert) : Event(EventType.ALERT_SCREEN, starTime)
 
 fun AlertScreenEvent.fromDomainToCore() =
-    CoreAlertScreenEvent(starTime, alertType.fromFingerprintAlertToAlertTypeEvent())
+    CoreAlertScreenEvent(startTime, alertType.fromFingerprintAlertToAlertTypeEvent())
 
 fun FingerprintAlert.fromFingerprintAlertToAlertTypeEvent(): CoreAlertScreenEventType =
     when (this) {
