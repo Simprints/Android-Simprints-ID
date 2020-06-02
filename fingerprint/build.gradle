@@ -125,6 +125,8 @@ dependencies {
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
     implementation deps.androidx.ui.viewpager2
+    implementation deps.androidx.navigation.fragment
+    implementation deps.androidx.navigation.ui
     implementation deps.arch_components.work
 
     // RxJava

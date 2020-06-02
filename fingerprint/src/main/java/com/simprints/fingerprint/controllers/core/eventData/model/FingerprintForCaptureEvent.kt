@@ -51,7 +51,7 @@ class FingerprintCaptureEvent(
 }
 
 fun FingerprintCaptureEvent.fromDomainToCore() = FingerprintCaptureEventCore(
-    starTime,
+    startTime,
     endTime,
     finger.fromDomainToCore(),
     qualityThreshold,

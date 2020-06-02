@@ -13,7 +13,7 @@ data class ScannerVersion(val generation: ScannerGeneration,
     fun computeMasterVersion(): Long =
         when (generation) {
             ScannerGeneration.VERO_1 -> {
-                TODO("Compute master version for Vero 1")
+                firmware.stm.major.toLong()
             }
             ScannerGeneration.VERO_2 -> {
                 if (listOf(api.cypress, api.stm, api.un20).any { it == ChipApiVersion.UNKNOWN } ||
