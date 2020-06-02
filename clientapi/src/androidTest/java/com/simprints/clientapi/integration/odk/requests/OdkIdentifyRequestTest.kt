@@ -13,9 +13,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.integration.AppIdentifyRequest
 import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
-import com.simprints.moduleapi.app.requests.IAppRequest
-import com.simprints.clientapi.integration.key
 import com.simprints.clientapi.integration.value
+import com.simprints.moduleapi.app.requests.IAppRequest
 import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +33,7 @@ class OdkIdentifyRequestTest : BaseOdkClientApiTest() {
 
     @Test
     fun callingAppSendsAnIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = ODK_IDENTIFY_ACTION })
+        ActivityScenario.launch<OdkActivity>(odkBaseFlowIntentRequest.apply { action = ODK_IDENTIFY_ACTION })
 
         val expectedAppRequest = AppIdentifyRequest(
             projectIdField.value(),
@@ -48,13 +47,13 @@ class OdkIdentifyRequestTest : BaseOdkClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<OdkActivity>(makeIntentRequestSuspicious(odkBaseIntentRequest).apply { action = ODK_IDENTIFY_ACTION })
+        ActivityScenario.launch<OdkActivity>(makeIntentRequestSuspicious(odkBaseFlowIntentRequest).apply { action = ODK_IDENTIFY_ACTION })
         intended(hasAction(APP_IDENTIFY_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<OdkActivity>(makeIntentRequestInvalid(odkBaseIntentRequest).apply { action = ODK_IDENTIFY_ACTION })
+        ActivityScenario.launch<OdkActivity>(makeIntentRequestInvalid(odkBaseFlowIntentRequest).apply { action = ODK_IDENTIFY_ACTION })
         intended(CoreMatchers.not(hasAction(APP_IDENTIFY_ACTION)), times(2))
     }
 }

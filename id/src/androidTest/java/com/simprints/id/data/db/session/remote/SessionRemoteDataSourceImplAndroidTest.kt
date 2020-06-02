@@ -13,10 +13,7 @@ import com.simprints.id.data.db.session.SessionRepositoryImpl
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.ScannerConnectionEvent.ScannerGeneration
 import com.simprints.id.data.db.session.domain.models.events.callback.*
-import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
+import com.simprints.id.data.db.session.domain.models.events.callout.*
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.network.BaseUrlProvider
@@ -298,5 +295,6 @@ class SessionRemoteDataSourceImplAndroidTest {
         addEvent(ConfirmationCalloutEvent(10, "projectId", RANDOM_GUID, RANDOM_GUID))
         addEvent(IdentificationCalloutEvent(0, "project_id", "user_id", "module_id", "metadata"))
         addEvent(VerificationCalloutEvent(2, "project_id", "user_id", "module_id", RANDOM_GUID, "metadata"))
+        addEvent(EnrolmentLastBiometricsCalloutEvent(2, "project_id", "user_id", "module_id", "metadata", RANDOM_GUID))
     }
 }

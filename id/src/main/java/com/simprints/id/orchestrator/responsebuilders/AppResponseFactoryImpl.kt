@@ -1,10 +1,10 @@
 package com.simprints.id.orchestrator.responsebuilders
 
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
@@ -27,8 +27,8 @@ class AppResponseFactoryImpl(
             is AppEnrolRequest -> AppResponseBuilderForEnrol(enrolmentHelper, timeHelper)
             is AppIdentifyRequest -> AppResponseBuilderForIdentify()
             is AppVerifyRequest -> AppResponseBuilderForVerify()
-            else -> null
-        }?.buildAppResponse(modalities, appRequest, steps, sessionId)
-            ?: throw Throwable("Wrong modalities")
+            is AppConfirmIdentityRequest -> AppResponseBuilderForConfirmIdentity()
+            is AppEnrolLastBiometricsRequest -> AppResponseBuilderForEnrolLastBiometrics()
+        }.buildAppResponse(modalities, appRequest, steps, sessionId)
 }
 

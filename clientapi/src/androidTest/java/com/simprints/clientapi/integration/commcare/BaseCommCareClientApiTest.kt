@@ -3,17 +3,22 @@ package com.simprints.clientapi.integration.commcare
 import android.content.Intent
 import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.integration.BaseClientApiTest
+import com.simprints.clientapi.integration.key
+import com.simprints.clientapi.integration.value
 
 open class BaseCommCareClientApiTest : BaseClientApiTest() {
 
     private val commCareActivityName = CommCareActivity::class.qualifiedName!!
 
-    internal val commCareConfirmIntentRequest = baseConfirmIntentRequest.apply {
+    internal val commCareConfirmIntentRequest = baseIntentRequest.apply {
         setClassName(packageName, commCareActivityName)
+        putExtra(sessionIdField.key(), sessionIdField.value())
+        putExtra(selectedGuidField.key(), selectedGuidField.value())
     }
 
-    internal val commCareBaseIntentRequest = baseIntentRequest.apply {
+    internal val commCareBaseFlowIntentRequest = baseIntentRequest.apply {
         setClassName(packageName, commCareActivityName)
+        putExtra(moduleIdField.key(), moduleIdField.value())
     }
 
     fun makeIntentRequestInvalid(baseIntent: Intent, invalidParam: Pair<String, String> = projectIdField) =

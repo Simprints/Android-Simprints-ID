@@ -7,6 +7,7 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
+import com.simprints.id.activities.enrollast.EnrolLastBiometricsViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
@@ -59,6 +60,12 @@ import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
+import com.simprints.id.orchestrator.EnrolmentHelper
+import com.simprints.id.orchestrator.EnrolmentHelperImpl
+import com.simprints.id.orchestrator.cache.HotCache
+import com.simprints.id.orchestrator.cache.HotCacheImpl
+import com.simprints.id.orchestrator.cache.StepEncoder
+import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
@@ -387,7 +394,7 @@ open class AppModule {
 
     @Provides
     open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)
-    
+
     @Provides
     open fun provideCameraHelper(
         context: Context,
@@ -418,5 +425,27 @@ open class AppModule {
         longConsentRepository: LongConsentRepository,
         preferencesManager: PreferencesManager
     ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager)
+
+    @Provides
+    fun provideHotCache(
+        @Named("EncryptedSharedPreferences") sharedPrefs: SharedPreferences,
+        stepEncoder: StepEncoder
+    ): HotCache = HotCacheImpl(sharedPrefs, stepEncoder)
+
+    @Provides
+    fun provideStepEncoder(): StepEncoder = StepEncoderImpl()
+
+    @Provides
+    fun provideEnrolmentHelper(
+        repository: PersonRepository,
+        sessionRepository: SessionRepository,
+        timeHelper: TimeHelper
+    ): EnrolmentHelper = EnrolmentHelperImpl(repository, sessionRepository, timeHelper)
+
+    @Provides
+    open fun provideEnrolLastBiometricsViewModel(
+        enrolmentHelper: EnrolmentHelper,
+        timeHelper: TimeHelper
+    ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper)
 }
 

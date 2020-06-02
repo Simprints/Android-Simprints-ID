@@ -15,7 +15,6 @@ import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.integration.AppIdentifyRequest
 import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
-import com.simprints.clientapi.integration.key
 import com.simprints.clientapi.integration.value
 import org.hamcrest.CoreMatchers
 import org.junit.Before
@@ -35,7 +34,7 @@ class CommCareIdentifyRequestTest : BaseCommCareClientApiTest() {
     @Test
     @MediumTest
     fun callingAppSendsAnIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = COMMCARE_IDENTIFY_ACTION })
+        ActivityScenario.launch<CommCareActivity>(commCareBaseFlowIntentRequest.apply { action = COMMCARE_IDENTIFY_ACTION })
 
         val expectedAppRequest = AppIdentifyRequest(
             projectIdField.value(),
@@ -49,13 +48,13 @@ class CommCareIdentifyRequestTest : BaseCommCareClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(makeIntentRequestSuspicious(commCareBaseIntentRequest).apply { action = COMMCARE_IDENTIFY_ACTION })
+        ActivityScenario.launch<CommCareActivity>(makeIntentRequestSuspicious(commCareBaseFlowIntentRequest).apply { action = COMMCARE_IDENTIFY_ACTION })
         intended(hasAction(APP_IDENTIFY_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(makeIntentRequestInvalid(commCareBaseIntentRequest).apply { action = COMMCARE_IDENTIFY_ACTION })
+        ActivityScenario.launch<CommCareActivity>(makeIntentRequestInvalid(commCareBaseFlowIntentRequest).apply { action = COMMCARE_IDENTIFY_ACTION })
         intended(CoreMatchers.not(hasAction(APP_IDENTIFY_ACTION)), times(2))
     }
 }

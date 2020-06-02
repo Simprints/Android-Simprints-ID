@@ -20,7 +20,7 @@ class OdkErrorResponseTest : BaseOdkClientApiTest() {
         mockAppModuleResponse(appErrorResponse, APP_ENROL_ACTION)
 
         val scenario =
-            ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = ODK_ENROL_ACTION })
+            ActivityScenario.launch<OdkActivity>(odkBaseFlowIntentRequest.apply { action = ODK_ENROL_ACTION })
 
         assertOdkErrorResponse(scenario, RETURN_FOR_FLOW_COMPLETED)
     }
@@ -31,7 +31,7 @@ class OdkErrorResponseTest : BaseOdkClientApiTest() {
         mockAppModuleResponse(appErrorResponse, APP_ENROL_ACTION)
 
         val scenario =
-            ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = ODK_ENROL_ACTION })
+            ActivityScenario.launch<OdkActivity>(odkBaseFlowIntentRequest.apply { action = ODK_ENROL_ACTION })
 
         assertOdkErrorResponse(scenario, RETURN_FOR_FLOW_NOT_COMPLETED)
     }
