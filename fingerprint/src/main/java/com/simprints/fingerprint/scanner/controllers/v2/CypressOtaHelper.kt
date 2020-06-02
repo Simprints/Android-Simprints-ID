@@ -32,7 +32,7 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
      */
     fun performOtaSteps(scanner: Scanner, macAddress: String): Observable<CypressOtaStep> =
         Observable.just<CypressOtaStep>(CypressOtaStep.EnteringOtaMode)
-            .concatWith(scanner.enterCypressOtaMode() thenEmitStep CypressOtaStep.CommencingTransfer)
+            .concatWith(scanner.enterCypressOtaMode().addSmallDelay() thenEmitStep CypressOtaStep.CommencingTransfer)
             .concatWith(scanner.startCypressOta(firmwareFileManager.loadCypressFirmwareBytes()).map { CypressOtaStep.TransferInProgress(it) })
             .concatWith(emitStep(CypressOtaStep.ReconnectingAfterTransfer))
             .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep CypressOtaStep.ValidatingNewFirmwareVersion)
