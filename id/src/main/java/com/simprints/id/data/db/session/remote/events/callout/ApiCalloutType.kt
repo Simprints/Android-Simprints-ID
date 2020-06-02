@@ -6,6 +6,7 @@ import io.realm.internal.Keep
 enum class ApiCalloutType {
     CONFIRMATION,
     ENROLMENT,
+    ENROLMENT_LAST_BIOMETRICS,
     IDENTIFICATION,
     VERIFICATION
 }

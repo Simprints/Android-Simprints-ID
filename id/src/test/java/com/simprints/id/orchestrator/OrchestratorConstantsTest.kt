@@ -3,15 +3,13 @@ package com.simprints.id.orchestrator
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
 import com.simprints.moduleapi.face.responses.IFaceMatchResponse
 import com.simprints.moduleapi.face.responses.IFaceMatchResult
 import com.simprints.moduleapi.face.responses.IFaceResponseType
 import com.simprints.moduleapi.face.responses.entities.IFaceCaptureResult
 import kotlinx.android.parcel.Parcelize
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 
 internal const val SOME_GUID = "some_guid"
 internal const val SOME_METADATA = "some_metadata"

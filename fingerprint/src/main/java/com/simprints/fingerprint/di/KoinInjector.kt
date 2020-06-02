@@ -28,6 +28,9 @@ import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManagerImpl
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManagerImpl
+import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactory
+import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactoryImpl
+import com.simprints.fingerprint.controllers.core.network.FingerprintFileDownloader
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManagerImpl
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
@@ -40,7 +43,10 @@ import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.controllers.v2.*
-import com.simprints.fingerprint.scanner.data.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.FirmwareRepository
+import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
+import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource
+import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
@@ -102,14 +108,19 @@ object KoinInjector {
         factory<FingerprintAndroidResourcesHelper> { FingerprintAndroidResourcesHelperImpl(get()) }
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
         factory<FingerprintImageManager> { FingerprintImageManagerImpl(get(), get()) }
+        factory<FingerprintApiClientFactory> { FingerprintApiClientFactoryImpl(get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
         factory { SerialNumberConverter() }
         factory { ScannerGenerationDeterminer() }
+        factory { FingerprintFileDownloader() }
 
         factory { BatteryLevelChecker(androidContext()) }
-        factory { FirmwareFileManager(androidContext()) }
+        factory { FirmwareLocalDataSource(androidContext()) }
+        factory { FirmwareRemoteDataSource(get(), get()) }
+        factory { FirmwareRepository(get(), get()) }
+        factory { FirmwareFileUpdateScheduler(androidContext()) }
 
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
@@ -139,7 +150,7 @@ object KoinInjector {
             RefusalPresenter(view, get(), get(), get())
         }
 
-        viewModel { OrchestratorViewModel(get(), get()) }
+        viewModel { OrchestratorViewModel(get(), get(), get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { CollectFingerprintsViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }

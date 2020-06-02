@@ -8,22 +8,20 @@ import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.AuthorizationEvent
 import com.simprints.id.data.db.session.domain.models.events.ConnectivitySnapshotEvent
 import com.simprints.id.data.db.session.domain.models.events.Event
-import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
+import com.simprints.id.data.db.session.domain.models.events.callout.*
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
-import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.ignoreException
 import com.simprints.id.tools.utils.SimNetworkUtils
 import timber.log.Timber
@@ -86,8 +84,25 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             is AppEnrolRequest -> buildEnrolmentCalloutEvent(request, relativeStarTime)
             is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStarTime)
             is AppIdentifyRequest -> buildIdentificationCalloutEvent(request, relativeStarTime)
-            else -> throw InvalidAppRequest()
+            is AppConfirmIdentityRequest -> addConfirmationCalloutEvent(request, relativeStarTime)
+            is AppEnrolLastBiometricsRequest -> addEnrolLastBiometricsCalloutEvent(request, relativeStarTime)
         }
+
+    internal fun addEnrolLastBiometricsCalloutEvent(request: AppEnrolLastBiometricsRequest, relativeStarTime: Long) =
+        EnrolmentLastBiometricsCalloutEvent(
+            relativeStarTime,
+            request.projectId,
+            request.userId,
+            request.moduleId,
+            request.metadata,
+            request.identificationSessionId)
+
+    internal fun addConfirmationCalloutEvent(request: AppConfirmIdentityRequest, relativeStarTime: Long) =
+        ConfirmationCalloutEvent(
+            relativeStarTime,
+            request.projectId,
+            request.selectedGuid,
+            request.sessionId)
 
     internal fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStarTime: Long) =
         with(request) {
@@ -136,14 +151,19 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun extractSessionParametersOrThrow() =
         with(appRequest) {
-            analyticsManager.logCallout(this)
-            analyticsManager.logUserProperties(userId, projectId, moduleId, deviceId)
+            if (this is AppRequestFlow) {
+                analyticsManager.logCallout(this)
+                analyticsManager.logUserProperties(userId, projectId, moduleId, deviceId)
+            }
         }
 
     override fun handleNotSignedInUser() {
-        sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(AuthorizationEvent.Result.NOT_AUTHORIZED))
 
-        if (!loginAlreadyTried.get()) {
+        // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
+        // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
+        if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest && appRequest !is AppEnrolLastBiometricsRequest) {
+            sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(AuthorizationEvent.Result.NOT_AUTHORIZED))
+
             loginAlreadyTried.set(true)
             view.openLoginActivity(appRequest)
         } else {

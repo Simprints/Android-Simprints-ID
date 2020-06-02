@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.data.consent.shortconsent.ConsentRepository
 import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
+import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 
 class ConsentViewModelFactory(private val consentTextManager: ConsentRepository,
                               private val sessionRepository: SessionRepository) : ViewModelProvider.Factory {

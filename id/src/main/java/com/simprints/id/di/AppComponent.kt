@@ -12,6 +12,7 @@ import com.simprints.id.activities.consent.ConsentActivity
 import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.debug.DebugActivity
+import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fetchguid.FetchGuidActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
@@ -131,6 +132,7 @@ interface AppComponent {
     fun inject(subjectsEndSyncReporterWorker: SubjectsEndSyncReporterWorker)
     fun inject(subjectsStartSyncWorker: SubjectsStartSyncReporterWorker)
     fun inject(qrCaptureActivity: QrCaptureActivity)
+    fun inject(enrolLastBiometricsActivity: EnrolLastBiometricsActivity)
     fun inject(setupActivity: SetupActivity)
 
     fun getSessionEventsManager(): SessionRepository

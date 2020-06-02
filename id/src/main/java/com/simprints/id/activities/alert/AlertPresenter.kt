@@ -1,5 +1,6 @@
 package com.simprints.id.activities.alert
 
+import com.simprints.id.R
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -9,8 +10,12 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertActivityViewModel.ButtonAction
+import com.simprints.id.domain.alert.AlertActivityViewModel.ENROLMENT_LAST_BIOMETRICS_FAILED
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.alert.fromAlertToAlertTypeEvent
+import com.simprints.id.domain.modality.Modality
+import com.simprints.id.domain.modality.Modality.FACE
+import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.tools.TimeHelper
 import javax.inject.Inject
@@ -57,8 +62,29 @@ class AlertPresenter(val view: AlertContract.View,
         view.setAlertTitleWithStringRes(alertViewModel.title)
         view.setAlertImageWithDrawableId(alertViewModel.mainDrawable)
         view.setAlertHintImageWithDrawableId(alertViewModel.hintDrawable)
-        view.setAlertMessageWithStringRes(alertViewModel.message)
+        view.setAlertMessageWithStringRes(alertViewModel.message, getParamsForMessageString().toTypedArray())
     }
+
+    private fun getParamsForMessageString(): List<Any> {
+        return if (alertViewModel == ENROLMENT_LAST_BIOMETRICS_FAILED) {
+            with(preferencesManager.modalities) {
+                when {
+                    isFingerprintAndFace() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_all_param)) }
+                    isFace() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_face_param)) }
+                    isFingerprint() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_fingerprint_param)) }
+                    else -> {
+                        emptyList<String>()
+                    }
+                }
+            }
+        } else {
+            emptyList<String>()
+        }
+    }
+
+    private fun List<Modality>.isFingerprintAndFace() = containsAll(listOf(FACE, FINGER))
+    private fun List<Modality>.isFingerprint() = contains(FINGER) && this.size == 1
+    private fun List<Modality>.isFace() = contains(FACE) && this.size == 1
 
     override fun handleButtonClick(buttonAction: ButtonAction) {
         when (buttonAction) {
@@ -75,6 +101,7 @@ class AlertPresenter(val view: AlertContract.View,
             AlertType.GUID_NOT_FOUND_ONLINE,
             AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN,
             AlertType.DIFFERENT_USER_ID_SIGNED_IN,
+            AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED,
             AlertType.SAFETYNET_ERROR -> {
                 view.closeActivityAfterCloseButton()
             }

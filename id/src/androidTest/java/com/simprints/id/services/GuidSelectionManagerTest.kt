@@ -58,7 +58,7 @@ package com.simprints.id.services
 //            "some_guid_confirmed")
 //
 //        guidSelectionManager
-//            .handleIdentityConfirmationRequest(request)
+//            .handleConfirmIdentityRequest(request)
 //            .test()
 //            .awaitAndAssertSuccess()
 //

@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator.responsebuilders
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
 import com.simprints.id.orchestrator.steps.Step
 import kotlinx.coroutines.ExperimentalCoroutinesApi

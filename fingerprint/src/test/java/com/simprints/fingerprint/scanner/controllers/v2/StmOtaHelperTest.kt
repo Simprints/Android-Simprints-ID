@@ -3,7 +3,7 @@ package com.simprints.fingerprint.scanner.controllers.v2
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
-import com.simprints.fingerprint.scanner.data.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
@@ -12,6 +12,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.models.CypressFirmwareVer
 import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
+import com.simprints.testtools.common.reactive.advanceTime
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.CapturingSlot
 import io.mockk.every
@@ -20,6 +21,7 @@ import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.schedulers.TestScheduler
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
@@ -28,8 +30,9 @@ class StmOtaHelperTest {
 
     private val scannerMock = mockk<Scanner>()
     private val connectionHelperMock = mockk<ConnectionHelper>()
-    private val firmwareFileManagerMock = mockk<FirmwareFileManager>()
-    private val stmOtaHelper = StmOtaHelper(connectionHelperMock, firmwareFileManagerMock)
+    private val firmwareFileManagerMock = mockk<FirmwareLocalDataSource>()
+    private val testScheduler = TestScheduler()
+    private val stmOtaHelper = StmOtaHelper(connectionHelperMock, firmwareFileManagerMock, testScheduler)
 
     @Before
     fun setup() {
@@ -43,7 +46,7 @@ class StmOtaHelperTest {
         every { scannerMock.getStmFirmwareVersion() } returns Single.just(NEW_STM_VERSION)
 
         every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns NEW_SCANNER_VERSION.toScannerFirmwareVersions()
-        every { firmwareFileManagerMock.getStmFirmwareBytes() } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
+        every { firmwareFileManagerMock.loadStmFirmwareBytes() } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
     }
 
     @Test
@@ -55,6 +58,7 @@ class StmOtaHelperTest {
                 StmOtaStep.ReconnectingAfterValidating, StmOtaStep.UpdatingUnifiedVersionInformation)
 
         val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        testScheduler.advanceTime()
 
         testObserver.awaitAndAssertSuccess()
 
@@ -81,6 +85,7 @@ class StmOtaHelperTest {
             Observable.fromIterable(progressValues).concatWith(Observable.error(error))
 
         val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
 
@@ -103,6 +108,7 @@ class StmOtaHelperTest {
             listOf(Completable.complete(), Completable.error(error))
 
         val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
 
@@ -123,6 +129,7 @@ class StmOtaHelperTest {
         every { scannerMock.getStmFirmwareVersion() } returns Single.just(OLD_STM_VERSION)
 
         val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
 

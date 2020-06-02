@@ -16,6 +16,7 @@ interface IAppResponse : Parcelable, IResponse {
 
 enum class IAppResponseType {
     ENROL,
+    ENROL_LAST_BIOMETRICS,
     VERIFY,
     REFUSAL,
     IDENTIFY,

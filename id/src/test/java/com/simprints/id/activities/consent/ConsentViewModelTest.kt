@@ -4,8 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.consent.shortconsent.ConsentRepository
-import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
-import com.simprints.id.domain.moduleapi.core.requests.ConsentType
+import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
+import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.livedata.testObserver

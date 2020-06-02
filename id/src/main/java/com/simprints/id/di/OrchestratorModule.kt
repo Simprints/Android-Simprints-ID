@@ -1,6 +1,5 @@
 package com.simprints.id.di
 
-import android.content.SharedPreferences
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
@@ -16,13 +15,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.orchestrator.*
 import com.simprints.id.orchestrator.cache.HotCache
-import com.simprints.id.orchestrator.cache.HotCacheImpl
-import com.simprints.id.orchestrator.cache.StepEncoder
-import com.simprints.id.orchestrator.cache.StepEncoderImpl
-import com.simprints.id.orchestrator.modality.ModalityFlow
-import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
-import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
-import com.simprints.id.orchestrator.modality.ModalityFlowVerifyImpl
+import com.simprints.id.orchestrator.modality.*
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
@@ -60,7 +53,27 @@ class OrchestratorModule {
     @Provides
     fun provideCoreStepProcessor(): CoreStepProcessor = CoreStepProcessorImpl()
 
-    // ModalFlow [Enrol, Identify, Verify]
+    // ModalFlow [ConfirmIdentity, Enrol, Identify, Verify, EnrolLastBiometrics]
+    @Provides
+    @Named("ModalityConfirmationFlow")
+    fun provideModalityFlowConfirmIdentity(
+        coreStepProcessor: CoreStepProcessor
+    ): ModalityFlow =
+        ModalityFlowConfirmIdentity(
+            coreStepProcessor
+        )
+
+    @Provides
+    @Named("ModalityEnrolLastBiometricsFlow")
+    fun provideModalityEnrolLastBiometricsFlow(
+        coreStepProcessor: CoreStepProcessor,
+        hotCache: HotCache
+    ): ModalityFlow =
+        ModalityFlowEnrolLastBiometrics(
+            coreStepProcessor,
+            hotCache
+        )
+
     @Provides
     @Named("ModalityFlowEnrol")
     fun provideModalityFlow(
@@ -121,9 +134,11 @@ class OrchestratorModule {
     fun provideModalityFlowFactory(
         @Named("ModalityFlowEnrol") enrolFlow: ModalityFlow,
         @Named("ModalityFlowVerify") verifyFlow: ModalityFlow,
-        @Named("ModalityFlowIdentify") identifyFlow: ModalityFlow
+        @Named("ModalityFlowIdentify") identifyFlow: ModalityFlow,
+        @Named("ModalityConfirmationFlow") confirmationIdentityFlow: ModalityFlow,
+        @Named("ModalityEnrolLastBiometricsFlow") enrolLastBiometricsFlow: ModalityFlow
     ): ModalityFlowFactory =
-        ModalityFlowFactoryImpl(enrolFlow, verifyFlow, identifyFlow)
+        ModalityFlowFactoryImpl(enrolFlow, verifyFlow, identifyFlow, confirmationIdentityFlow, enrolLastBiometricsFlow)
 
     @Provides
     fun provideOrchestratorManager(orchestratorManagerImpl: OrchestratorManagerImpl): OrchestratorManager {
@@ -170,26 +185,10 @@ class OrchestratorModule {
     }
 
     @Provides
-    fun provideHotCache(
-        @Named("EncryptedSharedPreferences") sharedPrefs: SharedPreferences,
-        stepEncoder: StepEncoder
-    ): HotCache = HotCacheImpl(sharedPrefs, stepEncoder)
-
-    @Provides
-    fun provideStepEncoder(): StepEncoder = StepEncoderImpl()
-
-    @Provides
     open fun provideAppResponseBuilderFactory(
         enrolmentHelper: EnrolmentHelper,
         timeHelper: TimeHelper
     ): AppResponseFactory = AppResponseFactoryImpl(enrolmentHelper, timeHelper)
-
-    @Provides
-    fun provideEnrolmentHelper(
-            repository: SubjectRepository,
-            sessionRepository: SessionRepository,
-            timeHelper: TimeHelper
-    ): EnrolmentHelper = EnrolmentHelperImpl(repository, sessionRepository, timeHelper)
 
     @Provides
     fun provideFlowManager(

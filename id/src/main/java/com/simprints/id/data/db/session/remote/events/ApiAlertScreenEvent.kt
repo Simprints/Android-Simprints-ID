@@ -26,7 +26,10 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
         MULTIPLE_PAIRED_SCANNERS,
         NOT_PAIRED,
         BLUETOOTH_NOT_ENABLED,
+        @Deprecated("That can never been triggered, so to be removed soon")
         INVALID_INTENT_ACTION,
+        ENROLMENT_LAST_BIOMETRICS_FAILED,
+        INVALID_STATE_FOR_INTENT_ACTION,
         INVALID_METADATA,
         INVALID_MODULE_ID,
         INVALID_PROJECT_ID,
@@ -59,6 +62,8 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
                     AlertScreenEvent.AlertScreenEventType.INVALID_USER_ID -> INVALID_USER_ID
                     AlertScreenEvent.AlertScreenEventType.INVALID_VERIFY_ID -> INVALID_VERIFY_ID
                     AlertScreenEvent.AlertScreenEventType.SAFETYNET_ERROR -> SAFETYNET_ERROR
+                    AlertScreenEvent.AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
+                    AlertScreenEvent.AlertScreenEventType.INVALID_STATE_FOR_INTENT_ACTION -> INVALID_STATE_FOR_INTENT_ACTION
                 }
         }
     }

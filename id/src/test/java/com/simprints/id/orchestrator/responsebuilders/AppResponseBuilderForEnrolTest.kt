@@ -1,10 +1,9 @@
 package com.simprints.id.orchestrator.responsebuilders
 
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
@@ -59,20 +58,6 @@ class AppResponseBuilderForEnrolTest {
             )
 
             assertThat(response, instanceOf(AppEnrolResponse::class.java))
-        }
-    }
-
-    @Test
-    fun withInvalidSteps_shouldThrowException() {
-        runBlockingTest {
-            val modalities = emptyList<Modality>()
-            val steps = mockSteps(modalities)
-
-            assertThrows<Throwable> {
-                responseBuilder.buildAppResponse(
-                    modalities, mockRequest(), steps, "sessionId"
-                )
-            }
         }
     }
 
