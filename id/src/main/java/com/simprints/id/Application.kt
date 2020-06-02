@@ -3,9 +3,9 @@ package com.simprints.id
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
 import androidx.multidex.MultiDexApplication
-import com.simprints.core.tools.LineNumberDebugTree
 import com.simprints.id.di.*
-import com.simprints.id.tools.FileLoggingTree
+import com.simprints.id.tools.logging.LoggingConfigHelper
+import com.simprints.id.tools.logging.NoLoggingConfigHelper
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import org.koin.android.ext.koin.androidContext
@@ -21,6 +21,8 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
 
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
+
+    open var loggingConfigHelper: LoggingConfigHelper = NoLoggingConfigHelper()
 
     open fun createComponent() {
         component = DaggerAppComponent
@@ -46,21 +48,14 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
 
     open fun initApplication() {
         createComponent()
-        this.initModules()
-        initServiceLocation()
+        setUpLogging()
+        handleUndeliverableExceptionInRxJava()
+        initKoin()
     }
 
-    open fun initModules() {
-        if (Timber.treeCount() <= 0) {
-            if (isReleaseWithLogfileVariant()) {
-                Timber.plant(FileLoggingTree())
-                Timber.d("Release with log file set up.")
-            } else if (BuildConfig.DEBUG) {
-                Timber.plant(LineNumberDebugTree())
-            }
-        }
-
-        handleUndeliverableExceptionInRxJava()
+    fun setUpLogging() {
+        if (loggingConfigHelper.loggingNeedsSetUp())
+            loggingConfigHelper.setUpLogging()
     }
 
     override fun getCameraXConfig(): CameraXConfig = Camera2Config.defaultConfig()
@@ -84,9 +79,7 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
         }
     }
 
-    private fun isReleaseWithLogfileVariant(): Boolean = BuildConfig.BUILD_TYPE == "releaseWithLogfile"
-
-    private fun initServiceLocation() {
+    private fun initKoin() {
         startKoin {
             androidLogger()
             androidContext(this@Application)
