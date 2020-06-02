@@ -308,14 +308,52 @@ fun validateRefusalEventApiModel(json: JsonObject) {
 }
 
 fun validateScannerConnectionEventApiModel(json: JsonObject) {
-    assertThat(json.get("type").asString).isEqualTo("SCANNER_NOT_WORKING")
+    assertThat(json.get("type").asString).isEqualTo("SCANNER_CONNECTION")
     assertThat(json.get("relativeStartTime").asLong)
     with(json.get("scannerInfo").asJsonObject) {
-        assertThat(get("lastScannerId").asString).isNotEmpty()
+        assertThat(get("scannerId").asString).isNotEmpty()
         assertThat(get("macAddress").asString).isNotEmpty()
         assertThat(get("hardwareVersion").asString).isNotEmpty()
+        assertThat(get("generation").asString).isEqualTo("VERO_2")
     }
     assertThat(json.size()).isEqualTo(3)
+}
+
+
+fun validateVero2InfoSnapshotEventApiModel(json: JsonObject) {
+    assertThat(json.get("type").asString).isEqualTo("VERO_2_INFO_SNAPSHOT")
+    assertThat(json.get("relativeStartTime").asLong)
+
+    with(json.get("version").asJsonObject) {
+        assertThat(get("master").asString).isNotEmpty()
+        assertThat(get("cypressApp").asString).isNotEmpty()
+        assertThat(get("cypressApi").asString).isNotEmpty()
+        assertThat(get("stmApp").asString).isNotEmpty()
+        assertThat(get("stmApi").asString).isNotEmpty()
+        assertThat(get("un20App").asString).isNotEmpty()
+        assertThat(get("un20Api").asString).isNotEmpty()
+    }
+
+    with(json.get("battery").asJsonObject) {
+        assertThat(get("charge").asInt)
+        assertThat(get("voltage").asInt)
+        assertThat(get("current").asInt)
+        assertThat(get("temperature").asInt)
+    }
+
+    assertThat(json.size()).isEqualTo(4)
+}
+
+fun validateScannerFirmwareUpdateEventApiModel(json: JsonObject) {
+    with(json) {
+        assertThat(get("type").asString).isEqualTo("SCANNER_FIRMWARE_UPDATE")
+        assertThat(get("relativeStartTime").asLong)
+        assertThat(get("relativeEndTime").asLong)
+        assertThat(get("chip").asString).isNotEmpty()
+        assertThat(get("targetAppVersion").asString).isNotEmpty()
+        assertThat(get("failureReason").asString).isNotEmpty()
+    }
+    assertThat(json.size()).isEqualTo(6)
 }
 
 fun validateEvent(json: JsonObject) {
@@ -351,6 +389,8 @@ fun validateEvent(json: JsonObject) {
         EventType.INTENT_PARSING,
         EventType.COMPLETION_CHECK,
         EventType.CALLOUT_IDENTIFICATION -> validateCalloutEventApiModel(json)
+        EventType.VERO_2_INFO_SNAPSHOT -> validateVero2InfoSnapshotEventApiModel(json)
+        EventType.SCANNER_FIRMWARE_UPDATE -> validateScannerFirmwareUpdateEventApiModel(json)
     }
 }
 

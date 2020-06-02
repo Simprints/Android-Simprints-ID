@@ -9,8 +9,8 @@ import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ChipApiVersion
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
+import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.tools.doIfNotNull
-import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -28,7 +28,7 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
      */
     fun performOtaSteps(scanner: Scanner, macAddress: String): Observable<StmOtaStep> =
         Observable.just<StmOtaStep>(StmOtaStep.EnteringOtaModeFirstTime)
-            .concatWith(scanner.enterStmOtaMode() thenEmitStep StmOtaStep.ReconnectingAfterEnteringOtaMode)
+            .concatWith(scanner.enterStmOtaMode().onErrorComplete() thenEmitStep StmOtaStep.ReconnectingAfterEnteringOtaMode)
             .concatWith(connectionHelper.reconnect(scanner, macAddress) thenEmitStep StmOtaStep.EnteringOtaModeSecondTime)
             .concatWith(scanner.enterStmOtaMode() thenEmitStep StmOtaStep.CommencingTransfer)
             .concatWith(scanner.startStmOta(firmwareFileManager.getStmFirmwareBytes()).map { StmOtaStep.TransferInProgress(it) })

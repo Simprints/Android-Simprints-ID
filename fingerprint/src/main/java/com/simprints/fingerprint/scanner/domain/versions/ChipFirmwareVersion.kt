@@ -6,6 +6,8 @@ data class ChipFirmwareVersion(val major: Int, val minor: Int) {
 
     operator fun compareTo(other: ChipFirmwareVersion) = this.combined() - other.combined()
 
+    override fun toString() = "$major.$minor"
+
     companion object {
         val UNKNOWN = ChipFirmwareVersion(-1, -1)
     }

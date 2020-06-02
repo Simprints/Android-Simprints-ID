@@ -36,7 +36,7 @@ enum class RefusalAnswer {
 }
 
 fun RefusalEvent.fromDomainToCore() =
-    CoreRefusalEvent(starTime, endTime, reason.fromDomainToCore(), otherText)
+    CoreRefusalEvent(startTime, endTime, reason.fromDomainToCore(), otherText)
 
 fun RefusalAnswer.fromDomainToCore(): CoreRefusalAnswer =
     when (this) {

@@ -60,7 +60,7 @@ class ScannerOffFragment : FingerprintFragment() {
         }
         connectScannerViewModel.connectScannerIssue.fragmentObserveEventWith {
             connectScannerViewModel.stopConnectingAndResetState()
-            goToAppropriatePairingScreen(it)
+            goToAppropriateIssueFragment(it)
         }
     }
 
@@ -84,14 +84,18 @@ class ScannerOffFragment : FingerprintFragment() {
         Handler().postDelayed({ connectScannerViewModel.finishConnectActivity() }, FINISHED_TIME_DELAY_MS)
     }
 
-    private fun goToAppropriatePairingScreen(issue: ConnectScannerIssue) {
-        val navAction = when (issue) {
-            ConnectScannerIssue.NFC_OFF -> R.id.action_scannerOffFragment_to_nfcOffFragment
-            ConnectScannerIssue.NFC_PAIR -> R.id.action_scannerOffFragment_to_nfcPairFragment
-            ConnectScannerIssue.SERIAL_ENTRY_PAIR -> R.id.action_scannerOffFragment_to_serialEntryPairFragment
-            else -> null
+    private fun goToAppropriateIssueFragment(issue: ConnectScannerIssue) {
+        with(ScannerOffFragmentDirections) {
+            val navAction = when (issue) {
+                ConnectScannerIssue.NfcOff -> actionScannerOffFragmentToNfcOffFragment()
+                ConnectScannerIssue.NfcPair -> actionScannerOffFragmentToNfcPairFragment()
+                ConnectScannerIssue.SerialEntryPair -> actionScannerOffFragmentToSerialEntryPairFragment()
+                ConnectScannerIssue.BluetoothOff -> actionScannerOffFragmentToBluetoothOffFragment()
+                is ConnectScannerIssue.Ota -> actionScannerOffFragmentToOtaFragment(issue.otaFragmentRequest)
+                ConnectScannerIssue.ScannerOff, is ConnectScannerIssue.OtaRecovery, ConnectScannerIssue.OtaFailed -> null
+            }
+            navAction?.let { findNavController().navigate(it) }
         }
-        navAction?.let { findNavController().navigate(it) }
     }
 
     companion object {
