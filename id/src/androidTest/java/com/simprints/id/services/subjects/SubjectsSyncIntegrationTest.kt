@@ -8,8 +8,6 @@ import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.network.BaseUrlProvider
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -24,6 +22,7 @@ import com.simprints.id.commontesttools.SubjectsGeneratorUtils.getRandomPeople
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.commontesttools.di.TestSyncModule
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
 import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.ENROLMENT_RECORD_CREATION
@@ -36,6 +35,9 @@ import com.simprints.id.data.db.subject.remote.models.subjectevents.fromDomainTo
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactory
+import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState.*
@@ -82,6 +84,7 @@ class SubjectsSyncIntegrationTest {
     @MockK lateinit var loginInfoManagerMock: LoginInfoManager
     @MockK lateinit var secureLocalDbKeyProviderMock: SecureLocalDbKeyProvider
     @MockK lateinit var legacyLocalDbKeyProviderMock: LegacyLocalDbKeyProvider
+    @MockK lateinit var remoteDbManager: RemoteDbManager
 
     private val appModule by lazy {
         TestAppModule(
@@ -110,16 +113,21 @@ class SubjectsSyncIntegrationTest {
 
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns mockServer.url("/").toString()
-        val remotePeopleApi = SimApiClientFactory(
-            mockBaseUrlProvider,
-            "deviceId"
-        ).build<EventRemoteInterface>().api
+        coEvery { remoteDbManager.getCurrentToken() } returns "token"
 
-        every { downSyncScopeRepositorySpy.getDownSyncScope() } returns projectSyncScope
-        every { secureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } returns DEFAULT_LOCAL_DB_KEY
-        every { legacyLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } returns DEFAULT_LOCAL_DB_KEY
-        every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
-        every { loginInfoManagerMock.getSignedInUserIdOrEmpty() } returns DEFAULT_USER_ID
+        runBlocking {
+            val remotePeopleApi = SimApiClientFactoryImpl(
+                mockBaseUrlProvider,
+                "deviceId",
+                remoteDbManager
+            ).buildClient(EventRemoteInterface::class)
+
+            every { downSyncScopeRepositorySpy.getDownSyncScope() } returns projectSyncScope
+            every { secureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } returns DEFAULT_LOCAL_DB_KEY
+            every { legacyLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } returns DEFAULT_LOCAL_DB_KEY
+            every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+            every { loginInfoManagerMock.getSignedInUserIdOrEmpty() } returns DEFAULT_USER_ID
+        }
 
     }
 

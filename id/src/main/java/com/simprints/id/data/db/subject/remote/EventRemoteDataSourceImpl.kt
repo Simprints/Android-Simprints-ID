@@ -52,7 +52,6 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
             }
         }
 
-
     suspend fun getSubjectsApiClient(): SimApiClient<EventRemoteInterface> =
         simApiClientFactory.buildClient(EventRemoteInterface::class)
 }
