@@ -8,7 +8,7 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.data.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.ota.*
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
@@ -36,7 +36,7 @@ class OtaViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    private val firmwareFileManager: FirmwareFileManager = mockk()
+    private val firmwareLocalDataSource: FirmwareLocalDataSource = mockk()
     private val sessionEventsManagerMock: FingerprintSessionEventsManager = mockk(relaxed = true)
     private val crashReportManagerMock: FingerprintCrashReportManager = mockk(relaxed = true)
     private val mockTimer = MockTimer()
@@ -48,11 +48,11 @@ class OtaViewModelTest {
         it.scanner = scannerMock
     }
 
-    private val otaViewModel = OtaViewModel(scannerManager, firmwareFileManager, sessionEventsManagerMock, crashReportManagerMock, timeHelperMock)
+    private val otaViewModel = OtaViewModel(scannerManager, firmwareLocalDataSource, sessionEventsManagerMock, crashReportManagerMock, timeHelperMock)
 
     @Before
     fun setup() {
-        every { firmwareFileManager.getAvailableScannerFirmwareVersions() } returns
+        every { firmwareLocalDataSource.getAvailableScannerFirmwareVersions() } returns
             ScannerFirmwareVersions(cypress = NEW_CYPRESS_VERSION, stm = NEW_STM_VERSION, un20 = NEW_UN20_VERSION)
         every { scannerMock.performCypressOta() } returns Observable.fromIterable(CYPRESS_OTA_STEPS)
         every { scannerMock.performStmOta() } returns Observable.fromIterable(STM_OTA_STEPS)
