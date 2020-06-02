@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.id.tools.logging
 
 import android.os.Environment
 import android.util.Log
@@ -11,9 +11,7 @@ import java.util.*
 class FileLoggingTree : Timber.DebugTree() {
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-
         try {
-
             val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             val direct = File("$path/SimprintsLogs")
 
@@ -29,7 +27,6 @@ class FileLoggingTree : Timber.DebugTree() {
             file.createNewFile()
 
             if (file.exists()) {
-
                 val fileOutputStream = FileOutputStream(file, true)
 
                 fileOutputStream.write("<p><strong>&nbsp&nbsp$logTimeStamp :&nbsp&nbsp</strong>&nbsp&nbsp$message</p>".toByteArray())
@@ -41,7 +38,7 @@ class FileLoggingTree : Timber.DebugTree() {
     }
 
     companion object {
-
         private val TAG = FileLoggingTree::class.java.simpleName
     }
+
 }
