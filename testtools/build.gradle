@@ -23,7 +23,7 @@ android {
         release {
             minifyEnabled false
         }
-        releaseWithLogfile {
+        staging {
             initWith release
         }
     }
