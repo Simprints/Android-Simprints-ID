@@ -3,6 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
+apply from: "${rootDir}${File.separator}ci${File.separator}signing_config.gradle"
+
 androidExtensions {
     experimental = true
 }

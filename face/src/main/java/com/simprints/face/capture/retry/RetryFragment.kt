@@ -26,7 +26,7 @@ class RetryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
-        retry_btn.setOnClickListener { mainVM.handleRetry() }
+        retry_btn.setOnClickListener { mainVM.handleRetry(false) }
     }
 
     private fun setTextInLayout() {

@@ -10,6 +10,7 @@ clone:
 definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
+
     steps:
 
         ######################################################################
@@ -18,6 +19,7 @@ definitions:
         ######################################################################
         -   step: &run-clientapi-unit-tests
                 name: "Run Clientapi unit tests"
+                max-time: 15
                 caches:
                     - gradle
                     - gradlewrapper
@@ -32,6 +34,7 @@ definitions:
         ######################################################################
         -   step: &run-id-unit-tests
                 name: "Run Id & Core unit tests"
+                max-time: 15
                 caches:
                     - gradle
                     - gradlewrapper
@@ -48,6 +51,7 @@ definitions:
         ######################################################################
         -   step: &run-face-unit-tests
                 name: "Run Face unit tests"
+                max-time: 15
                 caches:
                     - gradle
                     - gradlewrapper
@@ -63,6 +67,7 @@ definitions:
         ######################################################################
         -   step: &run-fingerprint-unit-tests
                 name: "Run Fingerprint unit tests"
+                max-time: 15
                 caches:
                     - gradle
                     - gradlewrapper
@@ -78,6 +83,7 @@ definitions:
         ######################################################################
         -   step: &run-fingerprintscanner-unit-tests
                 name: "Run Fingerprint Scanner unit tests"
+                max-time: 15
                 caches:
                     - gradle
                     - gradlewrapper
@@ -92,6 +98,7 @@ definitions:
         # them to sonarcloud.io, and check that they pass the quality gateway.
         ######################################################################
         -   step: &upload-sonar-scan-and-check-quality-gate
+                max-time: 15
                 name: "Upload scan and check quality gateway"
                 caches:
                     - gradle
@@ -107,32 +114,28 @@ definitions:
         ######################################################################
         -   step: &build-and-sign-universal-apk
                 name: "Build universal & test APKs"
+                max-time: 30
                 caches:
                     - gradle
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - echo "org.gradle.daemon=true" >> gradle.properties
                     # Build ID Android Test APK
-                    - cat ci/debug_gradle_signing >> id/build.gradle
                     - ./gradlew id:assembleDebugAndroidTest
                     - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk
                     # Build Client API Android Test APK
-                    - cat ci/debug_gradle_signing >> clientapi/build.gradle
                     - ./gradlew clientapi:assembleDebugAndroidTest
                     - mv clientapi/build/outputs/apk/androidTest/debug/clientapi-debug-androidTest.apk clientapi-debug-androidTest.apk
                     # Build Fingerprint Android Test APK
-                    - cat ci/debug_gradle_signing >> fingerprint/build.gradle
                     - ./gradlew fingerprint:assembleDebugAndroidTest
                     - mv fingerprint/build/outputs/apk/androidTest/debug/fingerprint-debug-androidTest.apk fingerprint-debug-androidTest.apk
                     # Build Face Android Test APK
-                    - cat ci/debug_gradle_signing >> face/build.gradle
                     - ./gradlew face:assembleDebugAndroidTest
                     - mv face/build/outputs/apk/androidTest/debug/face-debug-androidTest.apk face-debug-androidTest.apk
                     # Build Universal APK
                     - ./gradlew bundleDebug --stacktrace
                     - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
-                    - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/debug/id-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=ci/debug_keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
+                    - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/debug/id-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=debug.keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
                     - mv universal.apks universal.zip
                     - unzip universal.zip
                 artifacts:
@@ -143,44 +146,18 @@ definitions:
                     - face-debug-androidTest.apk
 
         ######################################################################
-        # Run ID Android tests on Firebase test lab.
+        # Run All Android tests on Firebase test lab.
         ######################################################################
-        -   step: &run-id-android-tests-on-gcloud-image
-                name: "Run Id android tests"
+        -   step: &run-all-android-tests
+                name: "Run android tests"
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk id-debug-androidTest.apk
-
-        ######################################################################
-        # Run Client API Android tests on Firebase test lab.
-        ######################################################################
-        -   step: &run-clientapi-android-tests-on-gcloud-image
-                name: "Run ClientApi android tests"
-                image: google/cloud-sdk:slim
-                script:
-                    - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk clientapi-debug-androidTest.apk
-
-        ######################################################################
-        # Run Fingerprint Android tests on Firebase test lab.
-        ######################################################################
-        -   step: &run-fingerprint-android-tests
-                name: "Run Fingerprint android tests"
-                image: google/cloud-sdk:slim
-                script:
-                    - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk fingerprint-debug-androidTest.apk
-
-        ######################################################################
-        # Run Face Android tests on Firebase test lab.
-        ######################################################################
-        -   step: &run-face-android-tests
-                name: "Run Face android tests"
-                image: google/cloud-sdk:slim
-                script:
-                    - bash ./ci/pipeline/setup_gcloud
-                    - bash ./ci/pipeline/run_firebase_test_lab universal.apk face-debug-androidTest.apk
+                    - mv ./*.apk ./ci/pipeline/
+                    - cd ./ci/pipeline/
+                    - ./run_all_android_tests.sh universal.apk id:id-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
+                artifacts:
+                    - ci/pipeline/test-reports/**
 
 ######################################################################
 # Define the different pipelines flows as anchors.
@@ -196,10 +173,7 @@ flows:
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
-                    -   step: *run-clientapi-android-tests-on-gcloud-image
-                    -   step: *run-id-android-tests-on-gcloud-image
-                    -   step: *run-face-android-tests
-                    -   step: *run-fingerprint-android-tests
+                    -   step: *run-all-android-tests
 
 ######################################################################
 # Define the triggers that launch the pipeline.
@@ -209,8 +183,5 @@ pipelines:
         master: *main-flow
         develop: *main-flow
         ci/*: *main-flow
-    pull-requests:
-        master: *main-flow
-        develop: *main-flow
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere

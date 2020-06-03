@@ -12,12 +12,12 @@ public class roc_embedded_gender {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected roc_embedded_gender(long cPtr, boolean cMemoryOwn) {
+  public roc_embedded_gender(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(roc_embedded_gender obj) {
+  public static long getCPtr(roc_embedded_gender obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
