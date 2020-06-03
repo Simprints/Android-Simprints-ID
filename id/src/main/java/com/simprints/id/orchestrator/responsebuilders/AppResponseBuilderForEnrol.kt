@@ -1,8 +1,5 @@
 package com.simprints.id.orchestrator.responsebuilders
 
-import com.simprints.id.data.db.person.domain.FaceSample
-import com.simprints.id.data.db.person.domain.FingerprintSample
-import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
@@ -13,7 +10,6 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptur
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.tools.TimeHelper
-import java.util.*
 
 class AppResponseBuilderForEnrol(
     private val enrolmentHelper: EnrolmentHelper,
@@ -33,7 +29,7 @@ class AppResponseBuilderForEnrol(
         val faceResponse = getFaceCaptureResponse(results)
         val fingerprintResponse = getFingerprintCaptureResponse(results)
 
-        val person = enrolmentHelper.buildPerson(
+        val subject = enrolmentHelper.buildSubject(
             request.projectId,
             request.userId,
             request.moduleId,
@@ -41,8 +37,8 @@ class AppResponseBuilderForEnrol(
             faceResponse,
             timeHelper)
 
-        enrolmentHelper.enrol(person)
-        return AppEnrolResponse(person.patientId)
+        enrolmentHelper.enrol(subject)
+        return AppEnrolResponse(subject.subjectId)
     }
 
     private fun getFaceCaptureResponse(results: List<Step.Result?>): FaceCaptureResponse? =

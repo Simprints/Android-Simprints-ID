@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.person.local.PersonLocalDataSource.Query
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
@@ -86,7 +86,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
         with(appRequest) {
             when (matchGroup) {
                 GROUP.GLOBAL -> Query(projectId)
-                GROUP.USER -> Query(projectId, userId = userId)
+                GROUP.USER -> Query(projectId, attendantId = userId)
                 GROUP.MODULE -> Query(projectId, moduleId = moduleId)
             }
         }

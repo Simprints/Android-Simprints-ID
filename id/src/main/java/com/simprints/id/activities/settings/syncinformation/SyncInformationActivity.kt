@@ -16,11 +16,11 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.EXTRA
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting.ON
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.ON
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_sync_information.*
 import javax.inject.Inject
@@ -30,7 +30,7 @@ class SyncInformationActivity : AppCompatActivity() {
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var viewModelFactory: SyncInformationViewModelFactory
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var peopleSyncManager: PeopleSyncManager
+    @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
     private val moduleCountAdapterForUnselected by lazy { ModuleCountAdapter() }
@@ -249,7 +249,7 @@ class SyncInformationActivity : AppCompatActivity() {
     }
 
     private fun observeForSyncState() {
-        peopleSyncManager.getLastSyncState().observe(this, Observer { syncState ->
+        subjectsSyncManager.getLastSyncState().observe(this, Observer { syncState ->
             if (syncState.isRunning() && !isProgressOverlayVisible()) {
                 showProgressOverlay()
             } else if (!syncState.isRunning() && isProgressOverlayVisible()) {
@@ -271,15 +271,15 @@ class SyncInformationActivity : AppCompatActivity() {
     }
 
     private fun isDownSyncAllowed() = with(preferencesManager) {
-        peopleDownSyncSetting == ON || peopleDownSyncSetting == EXTRA
+        subjectsDownSyncSetting == ON || subjectsDownSyncSetting == EXTRA
     }
 
-    private fun PeopleSyncState.isRunning(): Boolean {
+    private fun SubjectsSyncState.isRunning(): Boolean {
         val downSyncStates = downSyncWorkersInfo
         val upSyncStates = upSyncWorkersInfo
         val allSyncStates = downSyncStates + upSyncStates
         return allSyncStates.any {
-            it.state is PeopleSyncWorkerState.Running || it.state is PeopleSyncWorkerState.Enqueued
+            it.state is SubjectsSyncWorkerState.Running || it.state is SubjectsSyncWorkerState.Enqueued
         }
     }
 

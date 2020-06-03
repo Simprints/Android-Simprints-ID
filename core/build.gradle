@@ -58,6 +58,7 @@ dependencies {
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter
     implementation deps.retrofit.convertergson
+    implementation deps.gson.extras
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
     implementation deps.androidx.security

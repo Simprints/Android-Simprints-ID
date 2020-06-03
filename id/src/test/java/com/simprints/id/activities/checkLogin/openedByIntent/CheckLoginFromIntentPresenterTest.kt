@@ -48,7 +48,7 @@ class CheckLoginFromIntentPresenterTest {
                 coEvery { viewMock.parseRequest() } returns mockk(relaxed = true)
                 remoteConfigFetcher = mockk()
                 analyticsManager = mockk()
-                personLocalDataSource = mockk()
+                subjectLocalDataSource = mockk()
                 preferencesManager = mockk()
 
                 analyticsManager = mockk()
@@ -161,8 +161,8 @@ class CheckLoginFromIntentPresenterTest {
                 analyticsManager = mockk()
                 preferencesManager = mockk()
 
-                personLocalDataSource = mockk()
-                coEvery { personLocalDataSource.count() } returns 0
+                subjectLocalDataSource = mockk()
+                coEvery { subjectLocalDataSource.count() } returns 0
 
 
                 crashReportManager = mockk()

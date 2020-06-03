@@ -8,7 +8,7 @@ import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewSta
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.SOME_GUID
 import com.simprints.id.orchestrator.steps.Step
@@ -74,14 +74,14 @@ class EnrolLastBiometricsViewModelTest {
     @Test
     fun getNextStep_enrolNeverHappened_shouldProduceSuccessState() {
         runBlocking {
-            val newEnrolment = PeopleGeneratorUtils.getRandomPerson()
-            every { enrolHelper.buildPerson(any(), any(), any(), any(), any(), any()) } returns newEnrolment
+            val newEnrolment = SubjectsGeneratorUtils.getRandomSubject()
+            every { enrolHelper.buildSubject(any(), any(), any(), any(), any(), any()) } returns newEnrolment
 
             viewModel.processEnrolLastBiometricsRequest(appRequestWithoutPastEnrolLastBiometricSteps)
 
             with(viewModel.getViewStateLiveData()) {
                 Truth.assertThat(this.value).isInstanceOf(Success::class.java)
-                Truth.assertThat((this.value as Success).newGuid).isEqualTo(newEnrolment.patientId)
+                Truth.assertThat((this.value as Success).newGuid).isEqualTo(newEnrolment.subjectId)
             }
         }
     }
