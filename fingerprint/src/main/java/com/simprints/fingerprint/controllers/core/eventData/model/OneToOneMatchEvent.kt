@@ -2,7 +2,7 @@ package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import java.io.Serializable
 import com.simprints.id.data.db.session.domain.models.events.OneToOneMatchEvent as CoreOneToOneMatchEvent
 
@@ -16,10 +16,10 @@ fun OneToOneMatchEvent.fromDomainToCore() =
     CoreOneToOneMatchEvent(
         startTime,
         endTime,
-        (query as PersonLocalDataSource.Query).extractVerifyId(),
+        (query as SubjectLocalDataSource.Query).extractVerifyId(),
         result?.fromDomainToCore()
     )
 
-fun PersonLocalDataSource.Query.extractVerifyId() =
-    personId
+fun SubjectLocalDataSource.Query.extractVerifyId() =
+    subjectId
         ?: throw FingerprintUnexpectedException("null personId in candidate query when saving OneToOneMatchEvent")

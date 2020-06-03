@@ -7,7 +7,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
-import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
+import com.simprints.id.services.scheduledSync.subjects.common.SimCoroutineWorker
 import timber.log.Timber
 import javax.inject.Inject
 

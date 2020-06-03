@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.sessionEvents.*
-import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPool
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPoolType

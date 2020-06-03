@@ -8,12 +8,15 @@ import java.util.*
 @Keep
 class JsonHelper {
     companion object {
-        val gson: Gson by lazy {
+        val defaultBuilder by lazy {
+            GsonBuilder().apply {
+                registerDateAdapter(this)
+                registerFingerIdentifierAdapter(this)
+            }
+        }
 
-            val builder = GsonBuilder()
-            registerDateAdapter(builder)
-            registerFingerIdentifierAdapter(builder)
-            builder.create()
+        val gson: Gson by lazy {
+            defaultBuilder.create()
         }
 
         private fun registerFingerIdentifierAdapter(builder: GsonBuilder) {

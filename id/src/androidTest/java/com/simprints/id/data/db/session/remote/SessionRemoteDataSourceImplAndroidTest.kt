@@ -5,10 +5,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.session.SessionRepositoryImpl
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.ScannerConnectionEvent.ScannerGeneration
@@ -190,7 +190,7 @@ class SessionRemoteDataSourceImplAndroidTest {
         FingerprintCaptureEvent.Result.values().forEach { result ->
             FingerIdentifier.values().forEach { fingerIdentifier ->
                 val fakeTemplate = EncodingUtils.byteArrayToBase64(
-                    PeopleGeneratorUtils.getRandomFingerprintSample().template
+                    SubjectsGeneratorUtils.getRandomFingerprintSample().template
                 )
 
                 val fingerprint = FingerprintCaptureEvent.Fingerprint(

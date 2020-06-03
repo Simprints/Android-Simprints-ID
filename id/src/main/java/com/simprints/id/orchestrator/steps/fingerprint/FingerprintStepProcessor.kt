@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.steps.fingerprint
 
 import android.content.Intent
-import com.simprints.id.data.db.person.local.PersonLocalDataSource.Query
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.orchestrator.steps.Step
 /**
