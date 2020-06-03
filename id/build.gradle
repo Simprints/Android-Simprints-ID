@@ -24,8 +24,8 @@ android {
         minSdkVersion config.min_sdk
         targetSdkVersion 29
         vectorDrawables.useSupportLibrary = true
-        versionName "2020.2.0"
-        versionCode 222
+        versionName "2020.2.1-rc0"
+        versionCode 223
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
