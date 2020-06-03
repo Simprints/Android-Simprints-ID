@@ -3,7 +3,7 @@ package com.simprints.face.orchestrator
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.collect.Range
 import com.google.common.truth.Truth.assertThat
-import com.simprints.face.PeopleGenerator.generateFaceMatchResults
+import com.simprints.face.FixtureGenerator.generateFaceMatchResults
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
