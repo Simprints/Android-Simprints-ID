@@ -1,6 +1,7 @@
 package com.simprints.face.capture
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -10,7 +11,7 @@ import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.whenNonNull
 import com.simprints.core.tools.whenNull
 import com.simprints.face.R
-import com.simprints.face.data.moduleapi.face.requests.FaceRequest
+import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
@@ -25,8 +26,9 @@ class FaceCaptureActivity : AppCompatActivity() {
         setContentView(R.layout.activity_face_capture)
         bindViewModel()
 
-        val faceRequest: FaceRequest = this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
-            ?: throw InvalidFaceRequestException("No IFaceRequest found for FaceOrchestratorActivity")
+        val faceRequest: FaceCaptureRequest =
+            this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
+                ?: throw InvalidFaceRequestException("No IFaceRequest found for FaceCaptureActivity")
 
         vm.setupCapture(faceRequest)
     }
@@ -40,6 +42,10 @@ class FaceCaptureActivity : AppCompatActivity() {
 
         vm.retryFlowEvent.observe(this, LiveDataEventObserver {
             findNavController(R.id.capture_host_fragment).navigate(R.id.action_retryFragment_to_liveFeedbackFragment)
+        })
+
+        vm.recaptureEvent.observe(this, LiveDataEventObserver {
+            findNavController(R.id.capture_host_fragment).navigate(R.id.action_confirmationFragment_to_liveFeedbackFragment)
         })
 
         vm.exitFormEvent.observe(this, LiveDataEventObserver {
@@ -73,4 +79,12 @@ class FaceCaptureActivity : AppCompatActivity() {
             }
         }
     }
+
+    companion object {
+        fun getStartingIntent(context: Context, faceCaptureRequest: FaceCaptureRequest): Intent =
+            Intent(context, FaceCaptureActivity::class.java).apply {
+                putExtra(IFaceRequest.BUNDLE_KEY, faceCaptureRequest)
+            }
+    }
+
 }

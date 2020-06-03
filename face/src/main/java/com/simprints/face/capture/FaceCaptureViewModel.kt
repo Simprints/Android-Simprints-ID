@@ -11,7 +11,6 @@ import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.*
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
-import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
@@ -19,12 +18,16 @@ import com.simprints.face.models.FaceDetection
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageManager: FaceImageManager) : ViewModel() {
+class FaceCaptureViewModel(
+    private val maxRetries: Int,
+    private val faceImageManager: FaceImageManager
+) : ViewModel() {
 //    private val analyticsManager: AnalyticsManager
 
-    val faceDetections = MutableLiveData<List<FaceDetection>>()
+    var faceDetections = listOf<FaceDetection>()
 
     val retryFlowEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val recaptureEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val exitFormEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
     val finishFlowEvent: MutableLiveData<LiveDataEventWithContent<FaceCaptureResponse>> =
@@ -43,43 +46,45 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
         viewModelScope.launch { startNewAnalyticsSession() }
     }
 
-    fun setupCapture(faceRequest: FaceRequest) {
-        when (faceRequest) {
-            is FaceCaptureRequest -> {
-                samplesToCapture = faceRequest.nFaceSamplesToCapture
-            }
-        }
+    fun setupCapture(faceRequest: FaceCaptureRequest) {
+        samplesToCapture = faceRequest.nFaceSamplesToCapture
     }
 
     fun flowFinished() {
         saveFaceDetections()
         // TODO: add analytics for FlowFinished(SUCCESS) and EndSession
 
-        val results = faceDetections.value?.mapIndexed { index, detection ->
+        val results = faceDetections.mapIndexed { index, detection ->
             FaceCaptureResult(index, detection.toFaceSample())
-        } ?: listOf()
+        }
 
         finishFlowEvent.send(FaceCaptureResponse(results))
     }
 
-    fun captureFinished(faceDetections: List<FaceDetection>) {
-        this.faceDetections.value = faceDetections
+    fun captureFinished(newFaceDetections: List<FaceDetection>) {
+        faceDetections = newFaceDetections
     }
 
     fun handleBackButton(backButtonContext: BackButtonContext) {
         when (backButtonContext) {
             CAPTURE -> startExitForm()
             CONFIRMATION -> flowFinished()
-            RETRY -> handleRetry()
+            RETRY -> handleRetry(true)
         }
     }
 
-    fun handleRetry() {
+    fun handleRetry(isBackButton: Boolean) {
         if (canRetry) {
-            startExitForm()
+            if (isBackButton) startExitForm() else retryFlow()
         } else {
             finishFlowWithFailedRetries()
         }
+    }
+
+    fun recapture() {
+        // TODO: add analytics for FlowFinished(RECAPTURE)
+        faceDetections = listOf()
+        recaptureEvent.send()
     }
 
     private fun startExitForm() {
@@ -88,6 +93,7 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
 
     private fun retryFlow() {
         // TODO: add analytics for FlowFinished(RETRY)
+        faceDetections = listOf()
         retryFlowEvent.send()
     }
 
@@ -103,12 +109,18 @@ class FaceCaptureViewModel(private val maxRetries: Int, private val faceImageMan
 
     private fun saveFaceDetections() {
         // TODO: send the correct captureEventId once we can get it
-        faceDetections.value?.forEachIndexed { index, faceDetection -> saveImage(faceDetection, index.toString()) }
+        faceDetections.forEachIndexed { index, faceDetection ->
+            saveImage(
+                faceDetection,
+                index.toString()
+            )
+        }
     }
 
     private fun saveImage(faceDetection: FaceDetection, captureEventId: String) {
         runBlocking {
-            faceDetection.securedImageRef = faceImageManager.save(faceDetection.frame.toByteArray(), captureEventId)
+            faceDetection.securedImageRef =
+                faceImageManager.save(faceDetection.frame.toByteArray(), captureEventId)
         }
     }
 

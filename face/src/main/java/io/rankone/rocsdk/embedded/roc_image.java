@@ -12,12 +12,12 @@ public class roc_image {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected roc_image(long cPtr, boolean cMemoryOwn) {
+  public roc_image(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(roc_image obj) {
+  public static long getCPtr(roc_image obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -75,6 +75,23 @@ public class roc_image {
 
   public int getColor_space() {
     return rocJNI.roc_image_color_space_get(swigCPtr, this);
+  }
+
+  public void setMedia_id(roc_hash value) {
+    rocJNI.roc_image_media_id_set(swigCPtr, this, roc_hash.getCPtr(value), value);
+  }
+
+  public roc_hash getMedia_id() {
+    long cPtr = rocJNI.roc_image_media_id_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new roc_hash(cPtr, false);
+  }
+
+  public void setTimestamp(java.math.BigInteger value) {
+    rocJNI.roc_image_timestamp_set(swigCPtr, this, value);
+  }
+
+  public java.math.BigInteger getTimestamp() {
+    return rocJNI.roc_image_timestamp_get(swigCPtr, this);
   }
 
   public roc_image() {

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
     xmlns:tools="http://schemas.android.com/tools"
@@ -13,11 +14,14 @@
     <application
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
+        <activity android:name=".orchestrator.FaceOrchestratorActivity" />
+
         <activity
-            android:name="com.simprints.face.capture.FaceCaptureActivity"
+            android:name=".capture.FaceCaptureActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
-        <activity android:name="com.simprints.face.orchestrator.FaceOrchestratorActivity" />
+
+        <activity android:name=".match.FaceMatchActivity" />
     </application>
 
 </manifest>
-

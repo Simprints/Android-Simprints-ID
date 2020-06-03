@@ -9,4 +9,5 @@
     <color name="transparent">#00000000</color>
     <color name="translucent">#80000000</color>
     <color name="white">#ffffff</color>
+    <color name="simprints_blue">#00B3D1</color>
 </resources>
