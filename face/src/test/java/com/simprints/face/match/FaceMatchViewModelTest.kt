@@ -3,7 +3,7 @@ package com.simprints.face.match
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.face.PeopleGenerator
+import com.simprints.face.FixtureGenerator
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
@@ -51,7 +51,7 @@ class FaceMatchViewModelTest {
     @Test
     fun `Send events with correct values for identification`() = testCoroutineRule.runBlockingTest {
         // Doing this way so I can compare later
-        val candidates = generateSequenceN(5) { PeopleGenerator.getFaceIdentity(2) }.toList()
+        val candidates = generateSequenceN(5) { FixtureGenerator.getFaceIdentity(2) }.toList()
         coEvery { faceDbManager.loadPeople(any()) } returns candidates.asFlow()
         coEvery { faceMatcher.getComparisonScore(any(), any()) } returnsMany listOf(
             90f, // person 1
@@ -93,7 +93,7 @@ class FaceMatchViewModelTest {
     @Test
     fun `Send events with correct values for verification`() = testCoroutineRule.runBlockingTest {
         // Doing this way so I can compare later
-        val candidates = generateSequenceN(1) { PeopleGenerator.getFaceIdentity(2) }.toList()
+        val candidates = generateSequenceN(1) { FixtureGenerator.getFaceIdentity(2) }.toList()
         coEvery { faceDbManager.loadPeople(any()) } returns candidates.asFlow()
         coEvery { faceMatcher.getComparisonScore(any(), any()) } returnsMany listOf(90f, 80f)
         val matchStateObserver = viewModel.matchState.testObserver()

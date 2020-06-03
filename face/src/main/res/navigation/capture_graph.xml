@@ -36,7 +36,13 @@
         android:id="@+id/confirmationFragment"
         android:name="com.simprints.face.capture.confirmation.ConfirmationFragment"
         android:label="ConfirmationFragment"
-        tools:layout="@layout/fragment_confirmation" />
+        tools:layout="@layout/fragment_confirmation" >
+        <action
+            android:id="@+id/action_confirmationFragment_to_liveFeedbackFragment"
+            app:destination="@id/liveFeedbackFragment"
+            app:popUpTo="@+id/capture_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
     <fragment
         android:id="@+id/retryFragment"
         android:name="com.simprints.face.capture.retry.RetryFragment"
