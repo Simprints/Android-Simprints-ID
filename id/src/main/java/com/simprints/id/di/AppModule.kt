@@ -63,6 +63,8 @@ import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
+import com.simprints.id.secure.securitystate.SecurityStateProcessor
+import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
@@ -418,5 +420,9 @@ open class AppModule {
         longConsentRepository: LongConsentRepository,
         preferencesManager: PreferencesManager
     ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager)
+
+    @Provides
+    open fun provideSecurityStateProcessor(): SecurityStateProcessor = SecurityStateProcessorImpl()
+
 }
 
