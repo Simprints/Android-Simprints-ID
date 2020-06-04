@@ -10,7 +10,7 @@ interface SessionRepository {
     suspend fun getCurrentSession(): SessionEvents
     suspend fun updateCurrentSession(updateBlock: (SessionEvents) -> Unit)
     suspend fun updateSession(sessionId: String, updateBlock: (SessionEvents) -> Unit)
-
+    suspend fun deleteAllFromLocal()
     fun addEventToCurrentSessionInBackground(event: Event)
 
     suspend fun signOut()
