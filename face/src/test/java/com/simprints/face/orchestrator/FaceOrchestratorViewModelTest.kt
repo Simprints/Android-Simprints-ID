@@ -12,6 +12,7 @@ import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResu
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
+import com.simprints.face.error.ErrorType
 import com.simprints.moduleapi.face.requests.IFaceCaptureRequest
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
 import com.simprints.moduleapi.face.responses.IFaceMatchResponse
@@ -68,13 +69,13 @@ class FaceOrchestratorViewModelTest {
     @Test
     fun `route user to invalid license flow if needed`() {
         viewModel.invalidLicense()
-        assertThat(viewModel.invalidLicenseEvent.value).isNotNull()
+        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LICENSE_INVALID)
     }
 
     @Test
     fun `route user to missing license flow if needed`() {
         viewModel.missingLicense()
-        assertThat(viewModel.missingLicenseEvent.value).isNotNull()
+        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LICENSE_INVALID)
     }
 
     private fun generateCaptureRequest(captures: Int) = mockk<IFaceCaptureRequest> {
