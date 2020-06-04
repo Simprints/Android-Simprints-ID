@@ -112,14 +112,22 @@ open class AppModule {
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
         peopleSyncManager: PeopleSyncManager,
-        syncManager: SyncManager
+        syncManager: SyncManager,
+        longConsentRepository: LongConsentRepository,
+        sessionRepository: SessionRepository,
+        baseUrlProvider: BaseUrlProvider,
+        remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
         projectRepository,
         remoteDbManager,
         loginInfoManager,
         preferencesManager,
         peopleSyncManager,
-        syncManager
+        syncManager,
+        longConsentRepository,
+        sessionRepository,
+        baseUrlProvider,
+        remoteConfigWrapper
     )
 
     @Provides
