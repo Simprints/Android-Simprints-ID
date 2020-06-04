@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
-import com.simprints.id.network.SimRemoteInterface
 import com.simprints.id.BuildConfig
+import com.simprints.id.network.SimRemoteInterface
 import com.simprints.id.secure.models.AuthRequestBody
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.ApiToken
@@ -29,5 +29,11 @@ interface SecureApiInterface : SimRemoteInterface {
         @Body credentials: AuthRequestBody,
         @Query("key") key: String = API_KEY
     ): Response<ApiToken>
+
+    @GET("projects/{projectId}/devices/{deviceId}")
+    suspend fun requestSecurityState(
+        @Path("projectId") projectId: String,
+        @Path("deviceId") deviceId: String
+    ): Any // TODO: replace Any with SecurityState once PAS-900 gets merged in
 
 }
