@@ -19,12 +19,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var signerManager: SignerManager
-    @Inject lateinit var syncManager: SyncManager
-    @Inject lateinit var sessionEventManager: SessionRepository
     @Inject lateinit var recentEventsManager: RecentEventsPreferencesManager
-    @Inject lateinit var baseUrlProvider: BaseUrlProvider
-    @Inject lateinit var longConsentRepository: LongConsentRepository
-    @Inject lateinit var remoteConfigWrapper: RemoteConfigWrapper
 
     init {
         component.inject(this)
@@ -90,12 +85,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
 
     override suspend fun logout() {
         signerManager.signOut()
-        syncManager.cancelBackgroundSyncs()
-        longConsentRepository.deleteLongConsents()
-        sessionEventManager.signOut()
-        baseUrlProvider.resetApiBaseUrl()
-        remoteConfigWrapper.clearRemoteConfig()
-        
         view.finishSettings()
     }
+
 }
