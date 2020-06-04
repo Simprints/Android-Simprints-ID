@@ -3,12 +3,14 @@ package com.simprints.id.secure.securitystate
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.images.repository.ImageRepository
+import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.models.SecurityState
 
 class SecurityStateProcessorImpl(
     private val imageRepository: ImageRepository,
     private val personRepository: PersonRepository,
-    private val sessionRepository: SessionRepository
+    private val sessionRepository: SessionRepository,
+    private val signerManager: SignerManager
 ) : SecurityStateProcessor {
 
     override suspend fun processSecurityState(securityState: SecurityState) {
@@ -27,8 +29,8 @@ class SecurityStateProcessorImpl(
         sessionRepository.deleteAllFromLocal()
     }
 
-    private fun signOut() {
-        TODO("not implemented yet")
+    private suspend fun signOut() {
+        signerManager.signOut()
     }
 
     private fun SecurityState.Status.isCompromisedOrProjectEnded(): Boolean {

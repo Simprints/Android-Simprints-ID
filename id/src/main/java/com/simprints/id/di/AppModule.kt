@@ -434,11 +434,13 @@ open class AppModule {
     open fun provideSecurityStateProcessor(
         imageRepository: ImageRepository,
         personRepository: PersonRepository,
-        sessionRepository: SessionRepository
+        sessionRepository: SessionRepository,
+        signerManager: SignerManager
     ): SecurityStateProcessor = SecurityStateProcessorImpl(
         imageRepository,
         personRepository,
-        sessionRepository
+        sessionRepository,
+        signerManager
     )
 
 }
