@@ -79,6 +79,8 @@ import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
+import com.simprints.id.tools.performance.PerformanceMonitoringHelper
+import com.simprints.id.tools.performance.PerformanceMonitoringHelperImpl
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
@@ -124,6 +126,7 @@ open class AppModule {
 
     @Provides
     @Singleton
+    @Suppress("MissingPermission")
     fun provideFirebaseAnalytics(app: Application): FirebaseAnalytics =
         FirebaseAnalytics.getInstance(app).apply {
             setMinimumSessionDuration(0)
@@ -199,8 +202,14 @@ open class AppModule {
     open fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
-        baseUrlProvider: BaseUrlProvider
-    ): SimApiClientFactory = SimApiClientFactoryImpl(baseUrlProvider, ctx.deviceId, remoteDbManager)
+        baseUrlProvider: BaseUrlProvider,
+        performanceMonitoringHelper: PerformanceMonitoringHelper
+    ): SimApiClientFactory = SimApiClientFactoryImpl(
+        baseUrlProvider,
+        ctx.deviceId,
+        remoteDbManager,
+        performanceMonitoringHelper
+    )
 
     @Provides
     @Singleton
@@ -431,6 +440,11 @@ open class AppModule {
         loginInfoManager,
         context.deviceId
     )
+
+    @Provides
+    open fun providePerformanceMonitoringHelper(): PerformanceMonitoringHelper {
+        return PerformanceMonitoringHelperImpl()
+    }
 
 }
 

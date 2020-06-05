@@ -132,7 +132,8 @@ class PeopleDownSyncDownloaderTaskImplTest {
             val client = SimApiClientFactoryImpl(
                 mockBaseUrlProvider,
                 "deviceId",
-                remoteDbManagerSpy
+                remoteDbManagerSpy,
+                mockk()
             ).buildClient(PeopleRemoteInterface::class)
 
             coEvery { personRemoteDataSourceMock.getPeopleApiClient() } returns client
@@ -317,7 +318,8 @@ class PeopleDownSyncDownloaderTaskImplTest {
         val remotePeopleApi = SimApiClientFactoryImpl(
             mockBaseUrlProvider,
             "deviceId",
-            remoteDbManagerSpy
+            remoteDbManagerSpy,
+            mockk()
         ).buildClient(PeopleRemoteInterface::class).api
 
         return mockk {
