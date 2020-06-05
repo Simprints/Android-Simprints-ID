@@ -3,12 +3,14 @@ package com.simprints.id.network
 import com.google.gson.Gson
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.tools.performance.PerformanceMonitoringHelper
 import kotlin.reflect.KClass
 
 class SimApiClientFactoryImpl(
     val baseUrlProvider: BaseUrlProvider,
     val deviceId: String,
     private val remoteDbManager: RemoteDbManager,
+    private val performanceMonitoringHelper: PerformanceMonitoringHelper,
     private val jsonAdapter: Gson = JsonHelper.gson
 ): SimApiClientFactory {
 
@@ -20,6 +22,7 @@ class SimApiClientFactoryImpl(
             remoteInterface,
             baseUrlProvider.getApiBaseUrl(),
             deviceId,
+            performanceMonitoringHelper,
             remoteDbManager.getCurrentToken(),
             jsonAdapter
         )
@@ -30,6 +33,7 @@ class SimApiClientFactoryImpl(
             remoteInterface,
             baseUrlProvider.getApiBaseUrl(),
             deviceId,
+            performanceMonitoringHelper,
             null,
             jsonAdapter
         )

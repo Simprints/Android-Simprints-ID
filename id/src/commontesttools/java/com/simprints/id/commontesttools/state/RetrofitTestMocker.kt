@@ -11,7 +11,12 @@ suspend fun replaceSecureApiClientWithFailingClientProvider() = createFailingApi
 suspend inline fun <reified T : SimRemoteInterface> createFailingApiClient(): T {
     val mockBaseUrlProvider: BaseUrlProvider = mockk()
     every { mockBaseUrlProvider.getApiBaseUrl() } returns NetworkConstants.DEFAULT_BASE_URL
-    val apiClient = SimApiClientFactoryImpl(mockBaseUrlProvider, "deviceId", mockk(relaxed = true)).buildClient(T::class) as SimApiClientImpl<T>
+    val apiClient = SimApiClientFactoryImpl(
+        mockBaseUrlProvider,
+        "deviceId",
+        mockk(relaxed = true),
+        mockk()
+    ).buildClient(T::class) as SimApiClientImpl<T>
 
     return createMockBehaviorService(
         apiClient.retrofit,
