@@ -67,8 +67,8 @@ import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourc
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourceImpl
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepositoryImpl
-import com.simprints.id.services.GuidSelectionManager
-import com.simprints.id.services.GuidSelectionManagerImpl
+import com.simprints.id.services.guidselection.GuidSelectionManager
+import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
