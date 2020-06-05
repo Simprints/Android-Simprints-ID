@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 open class SessionLocalDataSourceImpl(private val appContext: Context,
                                       private val secureDataManager: SecureLocalDbKeyProvider,
@@ -73,6 +74,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
 
                     val dbSession = DbSession(session)
                     reamInTrans.insert(dbSession)
+                    Timber.d("Session created ${dbSession.id}")
                 }
             }
         }
@@ -113,6 +115,9 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
     }
 
     override suspend fun updateCurrentSession(updateBlock: (SessionEvents) -> Unit) {
+        if(count(SessionQuery(openSession = true)) > 1) {
+            Timber.d("More than 1 session open!")
+        }
         updateFirstSession(SessionQuery(openSession = true), updateBlock)
     }
 
