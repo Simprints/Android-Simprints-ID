@@ -33,9 +33,11 @@ class SecureApiServiceMock(
         buildSuccessResponseWith(getApiToken())
     ).requestCustomTokens(projectId, userId, credentials)
 
-    override suspend fun requestSecurityState(projectId: String, deviceId: String): Any {
-        // TODO: replace with mock SecurityState in the response body
-        return delegate.returning(buildSuccessResponseWith(""))
+    override suspend fun requestSecurityState(projectId: String, deviceId: String): Response<Any> {
+        // TODO: replace empty string with mock SecurityState in the response body
+        return delegate.returning(
+            buildSuccessResponseWith("")
+        ).requestSecurityState(projectId, deviceId)
     }
 
     private fun getApiAuthenticationData() = ApiAuthenticationData(
