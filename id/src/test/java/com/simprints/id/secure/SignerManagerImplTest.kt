@@ -10,6 +10,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -18,14 +19,15 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 
-class SignerManagerTest {
+class SignerManagerImplTest {
 
-    @MockK lateinit var projectRepository: ProjectRepository
-    @MockK lateinit var remoteDbManager: RemoteDbManager
-    @MockK lateinit var loginInfoManager: LoginInfoManager
-    @MockK lateinit var preferencesManager: PreferencesManager
-    @MockK lateinit var syncManager: SyncManager
-    @MockK lateinit var peopleSyncManager: PeopleSyncManager
+    @MockK lateinit var mockProjectRepository: ProjectRepository
+    @MockK lateinit var mockRemoteDbManager: RemoteDbManager
+    @MockK lateinit var mockLoginInfoManager: LoginInfoManager
+    @MockK lateinit var mockPreferencesManager: PreferencesManager
+    @MockK lateinit var mockSyncManager: SyncManager
+    @MockK lateinit var mockPeopleSyncManager: PeopleSyncManager
+    @MockK lateinit var mockSecurityStateScheduler: SecurityStateScheduler
 
     private lateinit var signerManager: SignerManagerImpl
 
@@ -36,26 +38,25 @@ class SignerManagerTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
         signerManager = SignerManagerImpl(
-            projectRepository,
-            remoteDbManager,
-            loginInfoManager,
-            preferencesManager,
-            peopleSyncManager,
-            syncManager
+            mockProjectRepository,
+            mockRemoteDbManager,
+            mockLoginInfoManager,
+            mockPreferencesManager,
+            mockPeopleSyncManager,
+            mockSyncManager,
+            mockSecurityStateScheduler
         )
-
-        mockkStatic("com.simprints.id.tools.extensions.PerformanceMonitoring_extKt")
     }
 
     @Test
     @ExperimentalCoroutinesApi
     fun signIn_shouldSignInToRemoteDb() = runBlockingTest {
         mockRemoteSignedIn()
-        mockFetchingProjectInto()
+        mockFetchingProjectInfo()
 
         signIn()
 
-        coVerify { remoteDbManager.signIn(token.value) }
+        coVerify { mockRemoteDbManager.signIn(token.value) }
     }
 
     @Test
@@ -71,11 +72,11 @@ class SignerManagerTest {
     fun signIn_shouldStoreCredentialsLocally() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
-        mockFetchingProjectInto()
+        mockFetchingProjectInfo()
 
         signIn()
 
-        verify { loginInfoManager.storeCredentials(DEFAULT_PROJECT_ID, DEFAULT_USER_ID) }
+        verify { mockLoginInfoManager.storeCredentials(DEFAULT_PROJECT_ID, DEFAULT_USER_ID) }
     }
 
     @Test
@@ -92,11 +93,11 @@ class SignerManagerTest {
     fun signIn_shouldFetchProjectInfo() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
-        mockFetchingProjectInto()
+        mockFetchingProjectInfo()
 
         signIn()
 
-        coVerify { projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID) }
+        coVerify { mockProjectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID) }
     }
 
     @Test
@@ -104,7 +105,7 @@ class SignerManagerTest {
     fun loadAndRefreshCacheFails_signInShouldFail() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
-        mockFetchingProjectInto(true)
+        mockFetchingProjectInfo(true)
 
         assertThrows<Throwable> { signIn() }
     }
@@ -114,7 +115,7 @@ class SignerManagerTest {
     fun signIn_shouldSucceed() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
-        mockFetchingProjectInto()
+        mockFetchingProjectInfo()
         mockResumePeopleSync()
 
         signIn()
@@ -122,8 +123,21 @@ class SignerManagerTest {
 
     @Test
     @ExperimentalCoroutinesApi
+    fun signIn_shouldScheduleSecurityStateCheck() = runBlockingTest {
+        mockRemoteSignedIn()
+        mockStoreCredentialsLocally()
+        mockFetchingProjectInfo()
+        mockResumePeopleSync()
+
+        signIn()
+
+        verify { mockSecurityStateScheduler.scheduleSecurityStateCheck() }
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
     fun signOut_shouldRemoveAnyState() = runBlockingTest {
-        every { loginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
+        every { mockLoginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         signerManager.signOut()
 
@@ -137,7 +151,7 @@ class SignerManagerTest {
     private suspend fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, token)
 
     private fun mockStoreCredentialsLocally(error: Boolean = false) =
-        every { loginInfoManager.storeCredentials(DEFAULT_PROJECT_ID, DEFAULT_USER_ID) }.apply {
+        every { mockLoginInfoManager.storeCredentials(DEFAULT_PROJECT_ID, DEFAULT_USER_ID) }.apply {
             if (!error) {
                 this.returns(Unit)
             } else {
@@ -146,7 +160,7 @@ class SignerManagerTest {
         }
 
     private fun mockRemoteSignedIn(error: Boolean = false) =
-        coEvery { remoteDbManager.signIn(token.value) }.apply {
+        coEvery { mockRemoteDbManager.signIn(token.value) }.apply {
             if(error) {
                 this.throws(Throwable("Failed to store credentials"))
             } else {
@@ -154,8 +168,8 @@ class SignerManagerTest {
             }
         }
 
-    private fun mockFetchingProjectInto(error: Boolean = false) =
-        coEvery { projectRepository.loadFromRemoteAndRefreshCache(any()) }.apply {
+    private fun mockFetchingProjectInfo(error: Boolean = false) =
+        coEvery { mockProjectRepository.loadFromRemoteAndRefreshCache(any()) }.apply {
             if (!error) {
                 this.returns(
                     Project(
@@ -172,7 +186,7 @@ class SignerManagerTest {
         }
 
     private fun mockResumePeopleSync(error: Boolean = false) =
-        coEvery { syncManager.scheduleBackgroundSyncs() }.apply {
+        coEvery { mockSyncManager.scheduleBackgroundSyncs() }.apply {
             if (!error) {
                 this.returns(Unit)
             } else {
@@ -180,9 +194,9 @@ class SignerManagerTest {
             }
         }
 
-    private fun verifyUpSyncGotPaused() = verify { syncManager.cancelBackgroundSyncs() }
-    private fun verifyStoredCredentialsGotCleaned() = verify { loginInfoManager.cleanCredentials() }
-    private fun verifyRemoteManagerGotSignedOut() = verify { remoteDbManager.signOut() }
-    private fun verifyLastSyncInfoGotDeleted() = coVerify { peopleSyncManager.deleteSyncInfo() }
-    private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() = verify { preferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
+    private fun verifyUpSyncGotPaused() = verify { mockSyncManager.cancelBackgroundSyncs() }
+    private fun verifyStoredCredentialsGotCleaned() = verify { mockLoginInfoManager.cleanCredentials() }
+    private fun verifyRemoteManagerGotSignedOut() = verify { mockRemoteDbManager.signOut() }
+    private fun verifyLastSyncInfoGotDeleted() = coVerify { mockPeopleSyncManager.deleteSyncInfo() }
+    private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() = verify { mockPreferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
 }

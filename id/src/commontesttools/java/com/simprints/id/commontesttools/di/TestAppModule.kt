@@ -33,6 +33,7 @@ import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
@@ -102,7 +103,8 @@ class TestAppModule(
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
         peopleSyncManager: PeopleSyncManager,
-        syncManager: SyncManager
+        syncManager: SyncManager,
+        securityStateScheduler: SecurityStateScheduler
     ): SignerManager = dbManagerRule.resolveDependency {
         super.provideSignerManager(
             projectRepository,
@@ -110,7 +112,8 @@ class TestAppModule(
             loginInfoManager,
             preferencesManager,
             peopleSyncManager,
-            syncManager
+            syncManager,
+            securityStateScheduler
         )
     }
 
