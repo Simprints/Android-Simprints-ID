@@ -65,6 +65,8 @@ import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourceImpl
+import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
+import com.simprints.id.secure.securitystate.repository.SecurityStateRepositoryImpl
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
@@ -440,6 +442,11 @@ open class AppModule {
         loginInfoManager,
         context.deviceId
     )
+
+    @Provides
+    open fun provideSecurityStateRepository(
+        remoteDataSource: SecurityStateRemoteDataSource
+    ): SecurityStateRepository = SecurityStateRepositoryImpl(remoteDataSource)
 
     @Provides
     open fun providePerformanceMonitoringHelper(): PerformanceMonitoringHelper {
