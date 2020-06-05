@@ -53,6 +53,7 @@ import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncM
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.UpSessionEventsWorker
+import com.simprints.id.services.securitystate.SecurityStateWorker
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import dagger.BindsInstance
@@ -133,6 +134,7 @@ interface AppComponent {
     fun inject(peopleStartSyncWorker: PeopleStartSyncReporterWorker)
     fun inject(qrCaptureActivity: QrCaptureActivity)
     fun inject(setupActivity: SetupActivity)
+    fun inject(securityStateWorker: SecurityStateWorker)
 
     fun getSessionEventsManager(): SessionRepository
     fun getCrashReportManager(): CoreCrashReportManager
