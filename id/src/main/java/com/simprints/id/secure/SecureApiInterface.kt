@@ -34,6 +34,6 @@ interface SecureApiInterface : SimRemoteInterface {
     suspend fun requestSecurityState(
         @Path("projectId") projectId: String,
         @Path("deviceId") deviceId: String
-    ): Any // TODO: replace Any with SecurityState once PAS-900 gets merged in
+    ): Response<Any> // TODO: replace Any with SecurityState once PAS-900 gets merged in
 
 }
