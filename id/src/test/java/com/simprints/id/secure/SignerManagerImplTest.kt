@@ -148,6 +148,16 @@ class SignerManagerImplTest {
         verifyAllSharedPreferencesExceptRealmKeysGotCleared()
     }
 
+    @Test
+    @ExperimentalCoroutinesApi
+    fun signOut_shouldCancelPeriodicSecurityStateCheck() = runBlockingTest {
+        every { mockLoginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
+
+        signerManager.signOut()
+
+        verify { mockSecurityStateScheduler.cancelSecurityStateCheck() }
+    }
+
     private suspend fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, token)
 
     private fun mockStoreCredentialsLocally(error: Boolean = false) =
