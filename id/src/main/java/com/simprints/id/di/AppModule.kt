@@ -74,6 +74,8 @@ import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.services.securitystate.SecurityStateScheduler
+import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.tools.*
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
@@ -447,6 +449,11 @@ open class AppModule {
     open fun provideSecurityStateRepository(
         remoteDataSource: SecurityStateRemoteDataSource
     ): SecurityStateRepository = SecurityStateRepositoryImpl(remoteDataSource)
+
+    @Provides
+    open fun provideSecurityStateScheduler(
+        context: Context
+    ): SecurityStateScheduler = SecurityStateSchedulerImpl(context)
 
     @Provides
     open fun providePerformanceMonitoringHelper(): PerformanceMonitoringHelper {
