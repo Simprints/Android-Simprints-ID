@@ -8,8 +8,8 @@ sealed class CommCareAction(open val action: String?) {
     }
 
     object Enrol : CommCareAction(ACTION_REGISTER)
-    object Verify : CommCareAction(ACTION_IDENTIFY)
-    object Identify : CommCareAction(ACTION_VERIFY)
+    object Verify : CommCareAction(ACTION_VERIFY)
+    object Identify : CommCareAction(ACTION_IDENTIFY)
 
     object Invalid : CommCareAction(null)
 

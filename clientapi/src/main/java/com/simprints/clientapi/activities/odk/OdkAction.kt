@@ -11,8 +11,8 @@ sealed class OdkAction(open val action: String?) {
     }
 
     object Enrol : OdkAction(ACTION_ENROL)
-    object Verify : OdkAction(ACTION_IDENTIFY)
-    object Identify : OdkAction(ACTION_VERIFY)
+    object Verify : OdkAction(ACTION_VERIFY)
+    object Identify : OdkAction(ACTION_IDENTIFY)
 
     object Invalid : OdkAction(null)
 
