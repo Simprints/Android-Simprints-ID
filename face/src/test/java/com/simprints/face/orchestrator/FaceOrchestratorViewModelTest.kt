@@ -15,6 +15,8 @@ import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.error.ErrorType
 import com.simprints.moduleapi.face.requests.IFaceCaptureRequest
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
+import com.simprints.moduleapi.face.responses.IFaceErrorReason
+import com.simprints.moduleapi.face.responses.IFaceErrorResponse
 import com.simprints.moduleapi.face.responses.IFaceMatchResponse
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.every
@@ -70,12 +72,22 @@ class FaceOrchestratorViewModelTest {
     fun `route user to invalid license flow if needed`() {
         viewModel.invalidLicense()
         assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LICENSE_INVALID)
+        viewModel.finishWithError(ErrorType.LICENSE_INVALID)
+        viewModel.flowFinished.value?.peekContent()?.let { response ->
+            assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
+            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.LICENSE_INVALID)
+        }
     }
 
     @Test
     fun `route user to missing license flow if needed`() {
         viewModel.missingLicense()
-        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LICENSE_INVALID)
+        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LICENSE_MISSING)
+        viewModel.finishWithError(ErrorType.LICENSE_MISSING)
+        viewModel.flowFinished.value?.peekContent()?.let { response ->
+            assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
+            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.LICENSE_MISSING)
+        }
     }
 
     private fun generateCaptureRequest(captures: Int) = mockk<IFaceCaptureRequest> {
