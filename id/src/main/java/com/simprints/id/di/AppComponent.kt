@@ -64,7 +64,7 @@ import javax.inject.Singleton
     modules = [
         AppModule::class,
         DataModule::class,
-        LoginModule::class,
+        SecurityModule::class,
         PreferencesModule::class,
         SerializerModule::class,
         SyncModule::class,
@@ -82,7 +82,7 @@ interface AppComponent {
         fun appModule(appModule: AppModule): Builder
         fun dataModule(dataModule: DataModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
-        fun loginModule(loginModule: LoginModule): Builder
+        fun loginModule(securityModule: SecurityModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun syncModule(syncModule: SyncModule): Builder
         fun dashboardActivityModule(dashboardActivityModule: DashboardActivityModule): Builder

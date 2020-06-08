@@ -41,7 +41,6 @@ import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.session.local.SessionRealmConfigBuilderImpl
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSourceImpl
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -64,12 +63,6 @@ import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
-import com.simprints.id.secure.securitystate.SecurityStateProcessor
-import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
-import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
-import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourceImpl
-import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
-import com.simprints.id.secure.securitystate.repository.SecurityStateRepositoryImpl
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
@@ -78,7 +71,6 @@ import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerI
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
-import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.tools.*
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
@@ -112,34 +104,6 @@ open class AppModule {
     @Singleton
     open fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager =
         LoginInfoManagerImpl(improvedSharedPreferences)
-
-    @Provides
-    @Singleton
-    open fun provideSignerManager(
-        projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager,
-        peopleSyncManager: PeopleSyncManager,
-        syncManager: SyncManager,
-        securityStateScheduler: SecurityStateScheduler,
-        longConsentRepository: LongConsentRepository,
-        sessionRepository: SessionRepository,
-        baseUrlProvider: BaseUrlProvider,
-        remoteConfigWrapper: RemoteConfigWrapper
-    ): SignerManager = SignerManagerImpl(
-        projectRepository,
-        remoteDbManager,
-        loginInfoManager,
-        preferencesManager,
-        peopleSyncManager,
-        syncManager,
-        securityStateScheduler,
-        longConsentRepository,
-        sessionRepository,
-        baseUrlProvider,
-        remoteConfigWrapper
-    )
 
     @Provides
     @Singleton
@@ -320,15 +284,14 @@ open class AppModule {
         crashReportManager: CrashReportManager,
         timeHelper: TimeHelper,
         sessionRepository: SessionRepository
-    ): GuidSelectionManager =
-        GuidSelectionManagerImpl(
-            context.deviceId,
-            loginInfoManager,
-            analyticsManager,
-            crashReportManager,
-            timeHelper,
-            sessionRepository
-        )
+    ): GuidSelectionManager = GuidSelectionManagerImpl(
+        context.deviceId,
+        loginInfoManager,
+        analyticsManager,
+        crashReportManager,
+        timeHelper,
+        sessionRepository
+    )
 
     @Provides
     @Singleton
@@ -415,7 +378,7 @@ open class AppModule {
 
     @Provides
     open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)
-    
+
     @Provides
     open fun provideCameraHelper(
         context: Context,
@@ -448,43 +411,8 @@ open class AppModule {
     ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager)
 
     @Provides
-    open fun provideSecurityStateRemoteDataSource(
-        simApiClientFactory: SimApiClientFactory,
-        loginInfoManager: LoginInfoManager,
-        context: Context
-    ): SecurityStateRemoteDataSource = SecurityStateRemoteDataSourceImpl(
-        simApiClientFactory,
-        loginInfoManager,
-        context.deviceId
-    )
-
-    @Provides
-    open fun provideSecurityStateRepository(
-        remoteDataSource: SecurityStateRemoteDataSource
-    ): SecurityStateRepository = SecurityStateRepositoryImpl(remoteDataSource)
-
-    @Provides
-    open fun provideSecurityStateScheduler(
-        context: Context
-    ): SecurityStateScheduler = SecurityStateSchedulerImpl(context)
-
-    @Provides
-    open fun providePerformanceMonitoringHelper(): PerformanceMonitoringHelper {
-        return PerformanceMonitoringHelperImpl()
-    }
-
-    @Provides
-    open fun provideSecurityStateProcessor(
-        imageRepository: ImageRepository,
-        personRepository: PersonRepository,
-        sessionRepository: SessionRepository,
-        signerManager: SignerManager
-    ): SecurityStateProcessor = SecurityStateProcessorImpl(
-        imageRepository,
-        personRepository,
-        sessionRepository,
-        signerManager
-    )
+    open fun providePerformanceMonitoringHelper(): PerformanceMonitoringHelper =
+        PerformanceMonitoringHelperImpl()
 
 }
 
