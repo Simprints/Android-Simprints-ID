@@ -41,6 +41,7 @@ import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.session.local.SessionRealmConfigBuilderImpl
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSourceImpl
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -63,6 +64,8 @@ import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
+import com.simprints.id.secure.securitystate.SecurityStateProcessor
+import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourceImpl
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
@@ -119,7 +122,11 @@ open class AppModule {
         preferencesManager: PreferencesManager,
         peopleSyncManager: PeopleSyncManager,
         syncManager: SyncManager,
-        securityStateScheduler: SecurityStateScheduler
+        securityStateScheduler: SecurityStateScheduler,
+        longConsentRepository: LongConsentRepository,
+        sessionRepository: SessionRepository,
+        baseUrlProvider: BaseUrlProvider,
+        remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
         projectRepository,
         remoteDbManager,
@@ -127,7 +134,11 @@ open class AppModule {
         preferencesManager,
         peopleSyncManager,
         syncManager,
-        securityStateScheduler
+        securityStateScheduler,
+        longConsentRepository,
+        sessionRepository,
+        baseUrlProvider,
+        remoteConfigWrapper
     )
 
     @Provides
@@ -461,6 +472,19 @@ open class AppModule {
     open fun providePerformanceMonitoringHelper(): PerformanceMonitoringHelper {
         return PerformanceMonitoringHelperImpl()
     }
+
+    @Provides
+    open fun provideSecurityStateProcessor(
+        imageRepository: ImageRepository,
+        personRepository: PersonRepository,
+        sessionRepository: SessionRepository,
+        signerManager: SignerManager
+    ): SecurityStateProcessor = SecurityStateProcessorImpl(
+        imageRepository,
+        personRepository,
+        sessionRepository,
+        signerManager
+    )
 
 }
 

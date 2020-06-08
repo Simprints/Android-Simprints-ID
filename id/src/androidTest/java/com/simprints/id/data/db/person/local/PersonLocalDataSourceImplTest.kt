@@ -18,6 +18,7 @@ import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
 import io.mockk.mockk
 import io.realm.Realm
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -39,12 +40,14 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
     }
 
     @Before
+    @FlowPreview
     fun setup() {
         realm = Realm.getInstance(config)
         personLocalDataSource = PersonLocalDataSourceImpl(testContext, secureLocalDbKeyProviderMock, loginInfoManagerMock)
     }
 
     @Test
+    @FlowPreview
     fun changeLocalDbKey_shouldNotAllowedToUseFirstRealm() {
         saveFakePerson(realm, getFakePerson())
         val countNewRealm = runBlocking { personLocalDataSource.count() }
@@ -169,16 +172,6 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         }
     }
 
-    private fun verifyIdentity(person: DbPerson, fingerprintIdentity: FingerprintIdentity) {
-        assertThat(fingerprintIdentity.fingerprints.count()).isEqualTo(person.fingerprintSamples.count())
-        assertThat(fingerprintIdentity.patientId).isEqualTo(person.patientId)
-    }
-
-    private fun verifyIdentity(person: DbPerson, faceIdentity: FaceIdentity) {
-        assertThat(faceIdentity.faces.count()).isEqualTo(person.faceSamples.count())
-        assertThat(faceIdentity.personId).isEqualTo(person.patientId)
-    }
-
     @Test
     fun givenInvalidSerializableQuery_aThrowableIsThrown() {
         runBlocking {
@@ -232,4 +225,40 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         val people = personLocalDataSource.load(PersonLocalDataSource.Query(toSync = false)).toList()
         assertThat(people.size).isEqualTo(0)
     }
+
+    @Test
+    fun shouldDeletePerson() = runBlocking {
+        val person1 = getFakePerson()
+        val person2 = getFakePerson()
+        saveFakePerson(realm, person1)
+        saveFakePerson(realm, person2)
+
+        personLocalDataSource.delete(
+            listOf(PersonLocalDataSource.Query(personId = person1.patientId))
+        )
+
+        val peopleCount = personLocalDataSource.count()
+        assertThat(peopleCount).isEqualTo(1)
+    }
+
+    @Test
+    fun shouldDeleteAllPeople() = runBlocking {
+        saveFakePeople(realm, getRandomPeople(5))
+
+        personLocalDataSource.deleteAll()
+
+        val peopleCount = personLocalDataSource.count()
+        assertThat(peopleCount).isEqualTo(0)
+    }
+
+    private fun verifyIdentity(person: DbPerson, fingerprintIdentity: FingerprintIdentity) {
+        assertThat(fingerprintIdentity.fingerprints.count()).isEqualTo(person.fingerprintSamples.count())
+        assertThat(fingerprintIdentity.patientId).isEqualTo(person.patientId)
+    }
+
+    private fun verifyIdentity(person: DbPerson, faceIdentity: FaceIdentity) {
+        assertThat(faceIdentity.faces.count()).isEqualTo(person.faceSamples.count())
+        assertThat(faceIdentity.personId).isEqualTo(person.patientId)
+    }
+
 }

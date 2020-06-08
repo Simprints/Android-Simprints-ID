@@ -2,11 +2,15 @@ package com.simprints.id.secure
 
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.RemoteConfigWrapper
+import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
@@ -28,6 +32,10 @@ class SignerManagerImplTest {
     @MockK lateinit var mockSyncManager: SyncManager
     @MockK lateinit var mockPeopleSyncManager: PeopleSyncManager
     @MockK lateinit var mockSecurityStateScheduler: SecurityStateScheduler
+    @MockK lateinit var mockLongConsentRepository: LongConsentRepository
+    @MockK lateinit var mockSessionRepository: SessionRepository
+    @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
+    @MockK lateinit var mockRemoteConfigWrapper: RemoteConfigWrapper
 
     private lateinit var signerManager: SignerManagerImpl
 
@@ -44,7 +52,11 @@ class SignerManagerImplTest {
             mockPreferencesManager,
             mockPeopleSyncManager,
             mockSyncManager,
-            mockSecurityStateScheduler
+            mockSecurityStateScheduler,
+            mockLongConsentRepository,
+            mockSessionRepository,
+            mockBaseUrlProvider,
+            mockRemoteConfigWrapper
         )
     }
 
@@ -158,6 +170,46 @@ class SignerManagerImplTest {
         verify { mockSecurityStateScheduler.cancelSecurityStateCheck() }
     }
 
+    @Test
+    @ExperimentalCoroutinesApi
+    fun signOut_backgroundSyncWorkersAreCancelled() = runBlockingTest {
+        signerManager.signOut()
+
+        coVerify { mockSyncManager.cancelBackgroundSyncs() }
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun signOut_longConsentsAreDeleted() = runBlockingTest {
+        signerManager.signOut()
+
+        verify(exactly = 1) { mockLongConsentRepository.deleteLongConsents() }
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun signOut_sessionRepositorySignsOut() = runBlockingTest {
+        signerManager.signOut()
+
+        coVerify(exactly = 1) { mockSessionRepository.signOut() }
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun signOut_apiBaseUrlIsReset() = runBlockingTest {
+        signerManager.signOut()
+
+        verify { mockBaseUrlProvider.resetApiBaseUrl() }
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun signOut_clearRemoteConfig() = runBlockingTest {
+        signerManager.signOut()
+
+        coVerify { mockRemoteConfigWrapper.clearRemoteConfig() }
+    }
+
     private suspend fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, token)
 
     private fun mockStoreCredentialsLocally(error: Boolean = false) =
@@ -171,7 +223,7 @@ class SignerManagerImplTest {
 
     private fun mockRemoteSignedIn(error: Boolean = false) =
         coEvery { mockRemoteDbManager.signIn(token.value) }.apply {
-            if(error) {
+            if (error) {
                 this.throws(Throwable("Failed to store credentials"))
             } else {
                 this.returns(Unit)
