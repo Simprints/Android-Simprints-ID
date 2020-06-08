@@ -69,6 +69,21 @@
     <string name="enter_scanner_number_detail">এই নাম্বারটি স্ক্যানার-এর একদম নিচে পাবেন</string>
     <string name="serial_entry_pair_failed">স্ক্যানার চালুু আছে কিনা নিশ্চিত করুন এবং আবার চেষ্টা করুন</string>
     <string name="serial_entry_pair_toast_invalid">সিরিয়াল নাম্বার টির ৬টি সংখ্যা লিখুন</string>
+    <!-- OtaFragment -->
+    <string name="ota_title">স্ক্যানার আপডেট করা প্রয়োজন</string>
+    <string name="ota_instructions">স্ক্যানার চালু রাখুন, তা আপডেট হচ্ছে</string>
+    <string name="updating">আপডেট হচ্ছে</string>
+    <string name="updating_attempt">আপডেট চেষ্টা %1$s of %2$s…</string>
+    <string name="update_complete">আপডেট হয়ে গেছে</string>
+    <string name="start_update">আপডেট শুরু করুন</string>
+    <!-- OtaRecoveryFragment -->
+    <string name="ota_recovery_title">স্ক্যানার আপডেট হয়নি</string>
+    <string name="ota_recovery_soft_reset">স্ক্যানার বন্ধ করে আবার চালু করুন</string>
+    <string name="ota_recovery_hard_reset">পাওয়ার বাটন ৫ সেকেন্ড চেপে ধরে রাখুন</string>
+    <!-- OtaFailedFragment -->
+    <string name="ota_failed_title">স্ক্যানার আপডেট হয়নি</string>
+    <string name="ota_failed_instructions">সাহায্যের জন্য সুপারভাইসর এর সাথে যোগাযোগ করুন</string>
+    <string name="continue_button">সামনে আগান</string>
 
 
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
