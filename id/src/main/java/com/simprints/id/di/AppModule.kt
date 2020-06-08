@@ -41,6 +41,7 @@ import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.session.local.SessionRealmConfigBuilderImpl
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSourceImpl
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -63,6 +64,8 @@ import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
+import com.simprints.id.secure.securitystate.SecurityStateProcessor
+import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
@@ -110,14 +113,22 @@ open class AppModule {
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
         peopleSyncManager: PeopleSyncManager,
-        syncManager: SyncManager
+        syncManager: SyncManager,
+        longConsentRepository: LongConsentRepository,
+        sessionRepository: SessionRepository,
+        baseUrlProvider: BaseUrlProvider,
+        remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
         projectRepository,
         remoteDbManager,
         loginInfoManager,
         preferencesManager,
         peopleSyncManager,
-        syncManager
+        syncManager,
+        longConsentRepository,
+        sessionRepository,
+        baseUrlProvider,
+        remoteConfigWrapper
     )
 
     @Provides
@@ -418,5 +429,19 @@ open class AppModule {
         longConsentRepository: LongConsentRepository,
         preferencesManager: PreferencesManager
     ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager)
+
+    @Provides
+    open fun provideSecurityStateProcessor(
+        imageRepository: ImageRepository,
+        personRepository: PersonRepository,
+        sessionRepository: SessionRepository,
+        signerManager: SignerManager
+    ): SecurityStateProcessor = SecurityStateProcessorImpl(
+        imageRepository,
+        personRepository,
+        sessionRepository,
+        signerManager
+    )
+
 }
 
