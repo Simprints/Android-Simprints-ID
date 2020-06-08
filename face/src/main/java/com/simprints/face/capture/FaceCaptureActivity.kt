@@ -10,13 +10,14 @@ import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.whenNonNull
 import com.simprints.core.tools.whenNull
 import com.simprints.face.R
+import com.simprints.face.base.BaseSplitActivity
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class FaceCaptureActivity : AppCompatActivity() {
+class FaceCaptureActivity : BaseSplitActivity() {
 
     private val vm: FaceCaptureViewModel by viewModel()
 

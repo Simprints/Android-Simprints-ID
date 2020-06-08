@@ -31,8 +31,9 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
                              timeHelper: TimeHelper,
                              sessionRepository: SessionRepository,
                              consentRequired: Boolean,
-                             locationRequired: Boolean) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired) {
+                             locationRequired: Boolean,
+                             modalities: List<Modality>) :
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired, modalities) {
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppVerifyRequest)

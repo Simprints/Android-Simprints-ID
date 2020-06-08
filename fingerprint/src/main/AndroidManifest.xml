@@ -5,9 +5,11 @@
     package="com.simprints.fingerprint">
 
     <dist:module
-        dist:instant="false"
-        dist:onDemand="false">
+        dist:title="@string/module_feature_finger">
         <dist:fusing dist:include="true" />
+        <dist:delivery>
+            <dist:on-demand />
+        </dist:delivery>
     </dist:module>
 
     <uses-permission android:name="android.permission.VIBRATE" />
