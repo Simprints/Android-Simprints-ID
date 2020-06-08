@@ -8,10 +8,8 @@ import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
-import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
@@ -20,7 +18,6 @@ import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
@@ -31,11 +28,7 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.secure.SignerManager
-import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
@@ -62,7 +55,6 @@ class TestAppModule(
     private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
     private val sessionEventsRemoteDbManagerRule: DependencyRule = RealRule,
     private val simNetworkUtilsRule: DependencyRule = RealRule,
-    private val signerManagerRule: DependencyRule = RealRule,
     private val longConsentManagerRule: DependencyRule = RealRule,
     private val secureApiInterfaceRule: DependencyRule = RealRule,
     private val syncStatusDatabaseRule: DependencyRule = RealRule,
@@ -98,34 +90,6 @@ class TestAppModule(
 
     override fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager =
         remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager(loginInfoManager) }
-
-    override fun provideSignerManager(
-        projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager,
-        peopleSyncManager: PeopleSyncManager,
-        syncManager: SyncManager,
-        securityStateScheduler: SecurityStateScheduler,
-        longConsentRepository: LongConsentRepository,
-        sessionRepository: SessionRepository,
-        baseUrlProvider: BaseUrlProvider,
-        remoteConfigWrapper: RemoteConfigWrapper
-    ): SignerManager = signerManagerRule.resolveDependency {
-        super.provideSignerManager(
-            projectRepository,
-            remoteDbManager,
-            loginInfoManager,
-            preferencesManager,
-            peopleSyncManager,
-            syncManager,
-            securityStateScheduler,
-            longConsentRepository,
-            sessionRepository,
-            baseUrlProvider,
-            remoteConfigWrapper
-        )
-    }
 
     override fun provideSecureLocalDbKeyProvider(
         builder: EncryptedSharedPreferencesBuilder,
