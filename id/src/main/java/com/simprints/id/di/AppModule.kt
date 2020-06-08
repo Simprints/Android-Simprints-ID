@@ -78,8 +78,6 @@ import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
-import com.simprints.id.tools.performance.PerformanceMonitoringHelper
-import com.simprints.id.tools.performance.PerformanceMonitoringHelperImpl
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
@@ -183,13 +181,11 @@ open class AppModule {
     open fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
-        baseUrlProvider: BaseUrlProvider,
-        performanceMonitoringHelper: PerformanceMonitoringHelper
+        baseUrlProvider: BaseUrlProvider
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
-        remoteDbManager,
-        performanceMonitoringHelper
+        remoteDbManager
     )
 
     @Provides
@@ -284,14 +280,15 @@ open class AppModule {
         crashReportManager: CrashReportManager,
         timeHelper: TimeHelper,
         sessionRepository: SessionRepository
-    ): GuidSelectionManager = GuidSelectionManagerImpl(
-        context.deviceId,
-        loginInfoManager,
-        analyticsManager,
-        crashReportManager,
-        timeHelper,
-        sessionRepository
-    )
+    ): GuidSelectionManager =
+        GuidSelectionManagerImpl(
+            context.deviceId,
+            loginInfoManager,
+            analyticsManager,
+            crashReportManager,
+            timeHelper,
+            sessionRepository
+        )
 
     @Provides
     @Singleton
@@ -409,10 +406,6 @@ open class AppModule {
         longConsentRepository: LongConsentRepository,
         preferencesManager: PreferencesManager
     ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager)
-
-    @Provides
-    open fun providePerformanceMonitoringHelper(): PerformanceMonitoringHelper =
-        PerformanceMonitoringHelperImpl()
 
 }
 

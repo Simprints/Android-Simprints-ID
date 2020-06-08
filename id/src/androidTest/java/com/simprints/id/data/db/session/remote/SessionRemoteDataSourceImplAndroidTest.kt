@@ -69,12 +69,7 @@ class SessionRemoteDataSourceImplAndroidTest {
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         sessionRemoteDataSource = SessionRemoteDataSourceImpl(
-            SimApiClientFactoryImpl(
-                mockBaseUrlProvider,
-                "some_device",
-                remoteDbManager,
-                mockk(relaxed = true)
-            )
+            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device", remoteDbManager)
         )
     }
 

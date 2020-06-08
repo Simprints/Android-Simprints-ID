@@ -1,28 +1,28 @@
 package com.simprints.id.secure.securitystate.remote
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import com.google.firebase.FirebaseApp
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientImpl
 import com.simprints.id.secure.SecureApiInterface
-import com.simprints.id.tools.performance.PerformanceMonitoringHelper
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import retrofit2.HttpException
 
+@RunWith(AndroidJUnit4::class)
 class SecurityStateRemoteDataSourceImplTest {
 
     @MockK lateinit var mockLoginInfoManager: LoginInfoManager
-    @MockK lateinit var mockPerformanceMonitoringHelper: PerformanceMonitoringHelper
 
     private lateinit var remoteDataSource: SecurityStateRemoteDataSourceImpl
 
@@ -32,14 +32,16 @@ class SecurityStateRemoteDataSourceImplTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
+        FirebaseApp.initializeApp(InstrumentationRegistry.getInstrumentation().targetContext)
+        mockkStatic("com.simprints.id.tools.extensions.PerformanceMonitoring_extKt")
+
         val mockFactory = mockk<SimApiClientFactory>()
         coEvery {
             mockFactory.buildClient(SecureApiInterface::class)
         } returns SimApiClientImpl(
             SecureApiInterface::class,
             mockWebServer.url("/").toString(),
-            DEVICE_ID,
-            mockPerformanceMonitoringHelper
+            DEVICE_ID
         )
 
         every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
