@@ -283,4 +283,7 @@
     <string name="enrol_last_biometrics_success">Successful enrolment</string>
     <!-- endregion -->
 
+    <string name="module_feature_finger">fingerprint</string>
+    <string name="module_feature_face">face</string>
+
 </resources>

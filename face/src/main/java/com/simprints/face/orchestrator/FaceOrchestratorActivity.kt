@@ -9,6 +9,7 @@ import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.extentions.showToast
 import com.simprints.core.tools.whenNonNull
 import com.simprints.core.tools.whenNull
+import com.simprints.face.base.BaseSplitActivity
 import com.simprints.face.capture.FaceCaptureActivity
 import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException
@@ -17,7 +18,7 @@ import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class FaceOrchestratorActivity : AppCompatActivity() {
+class FaceOrchestratorActivity : BaseSplitActivity() {
     private val viewModel: FaceOrchestratorViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -5,12 +5,19 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.LocationRequest
+import com.google.android.play.core.splitinstall.SplitInstallManager
+import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
+import com.google.android.play.core.splitinstall.SplitInstallRequest
+import com.google.android.play.core.splitinstall.SplitInstallStateUpdatedListener
+import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import com.simprints.id.Application
+import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.Location
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
 import com.simprints.id.domain.moduleapi.core.response.SetupResponse
@@ -28,21 +35,83 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-class SetupActivity: AppCompatActivity() {
+class SetupActivity: BaseSplitActivity() {
 
     private lateinit var setupRequest: SetupRequest
+    private lateinit var splitInstallManager: SplitInstallManager
 
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionRepository: SessionRepository
+
+    private val listener = SplitInstallStateUpdatedListener { state ->
+        Timber.d("Setup -- $state")
+        when (state.status()) {
+            SplitInstallSessionStatus.DOWNLOADING -> {
+                Timber.d("Setup -- Modality downloading: ${state.bytesDownloaded()}/${state.totalBytesToDownload()}")
+            }
+            SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION -> {
+                /*
+                  This may occur when attempting to download a sufficiently large module.
+
+                  In order to see this, the application has to be uploaded to the Play Store.
+                  Then features can be requested until the confirmation path is triggered.
+                 */
+                splitInstallManager.startConfirmationDialogForResult(state, this, 909)
+            }
+            SplitInstallSessionStatus.INSTALLED -> {
+                Timber.d("Setup -- Modality Installed")
+                askPermissionsOrPerformSpecificActions()
+            }
+
+            SplitInstallSessionStatus.INSTALLING -> { Timber.d("Modality Installing")  }
+            SplitInstallSessionStatus.FAILED -> {
+                Timber.d("Setup -- Modality Install Failed")
+            }
+            SplitInstallSessionStatus.CANCELED -> {
+                Timber.d("Setup -- Modality Install Cancelled")
+            }
+            SplitInstallSessionStatus.CANCELING -> {
+                TODO()
+            }
+            SplitInstallSessionStatus.DOWNLOADED -> {
+                Timber.d("Setup -- Modality Downloaded")
+            }
+            SplitInstallSessionStatus.PENDING -> {
+
+            }
+            SplitInstallSessionStatus.UNKNOWN -> {
+
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         injectDependencies()
         super.onCreate(savedInstanceState)
 
         setupRequest = intent.extras?.getParcelable(CoreResponse.CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
+        splitInstallManager = SplitInstallManagerFactory.create(this)
 
-        askPermissionsOrPerformSpecificActions()
+        downloadAndInstallRequiredModules()
+    }
+
+    private fun downloadAndInstallRequiredModules() {
+        val modalitiesToDownload = setupRequest.modalitiesRequired.map {
+            when (it) {
+                Modality.FINGER -> getString(R.string.module_feature_finger)
+                Modality.FACE -> getString(R.string.module_feature_face)
+            }
+        }.filterNot { splitInstallManager.installedModules.contains(it) }
+
+        val splitInstallRequestBuilder = SplitInstallRequest.newBuilder()
+
+        if (modalitiesToDownload.isNotEmpty()) {
+            modalitiesToDownload.forEach { splitInstallRequestBuilder.addModule(it) }
+            splitInstallManager.startInstall(splitInstallRequestBuilder.build())
+        } else {
+            askPermissionsOrPerformSpecificActions()
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -110,6 +179,19 @@ class SetupActivity: AppCompatActivity() {
 
     private fun buildIntentForResponse() = Intent().apply {
         putExtra(CoreResponse.CORE_STEP_BUNDLE, SetupResponse())
+    }
+
+    override fun onResume() {
+        // Listener can be registered even without directly triggering a download.
+        Timber.d("Setup -- Registering listener")
+        splitInstallManager.registerListener(listener)
+        super.onResume()
+    }
+
+    override fun onPause() {
+        // Make sure to dispose of the listener once it's no longer needed.
+        splitInstallManager.unregisterListener(listener)
+        super.onPause()
     }
 
     companion object {
