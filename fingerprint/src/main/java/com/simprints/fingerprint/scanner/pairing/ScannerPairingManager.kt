@@ -3,7 +3,6 @@ package com.simprints.fingerprint.scanner.pairing
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.core.text.isDigitsOnly
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 import java.util.regex.Pattern
@@ -12,11 +11,11 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
 
     /**
      * Turns user entered text into a valid serial number, e.g. "003456" -> "SP003456"
-     * and "9" -> "SP000009"
      * @throws NumberFormatException if the text does not contain an appropriate number
      */
     fun interpretEnteredTextAsSerialNumber(text: String): String {
-        if (!text.isDigitsOnly()) throw NumberFormatException("Non-digits found in serial number: $text")
+        if (text.length != 6) throw NumberFormatException("Incorrect number of digits entered for serial number: $text")
+        if (!IS_DIGITS_ONLY_REGEX.matches(text)) throw NumberFormatException("Non-digits found in serial number: $text")
         val number = text.toInt()
         if (number < 0 || number > 999999) throw NumberFormatException("Number out of range for serial number")
         return SERIAL_PREFIX + number.toString(10).padStart(6, '0')
@@ -73,5 +72,7 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
         private const val MAC_ADDRESS_PREFIX = "F0:AC:D7:C"
         private val SCANNER_ADDRESS_REGEX = Pattern.compile("$MAC_ADDRESS_PREFIX\\p{XDigit}:\\p{XDigit}{2}:\\p{XDigit}{2}")
         private const val SERIAL_PREFIX = "SP"
+
+        private val IS_DIGITS_ONLY_REGEX = Regex("""^[0-9]+$""")
     }
 }

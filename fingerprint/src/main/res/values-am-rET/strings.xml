@@ -100,4 +100,16 @@
     <string name="not_my_scanner">%1$s የእኔ እስካነር አይደለም።</string>
     <string name="serial_entry_ok">እሽ</string>
     <string name="serial_entry_pair_failed">እባክዎ ስካነር ቁጥር %1$s መብራቱን አረጋግጠው እንደገና ይሞክሩ</string>
+    <string name="ota_title">ስካነሩ አፕዴት አድርግ</string>
+    <string name="ota_instructions">ስካነሩ አፕዴት እስኪጨርስ እንደበራ ይቆይ</string>
+    <string name="updating">አፕዴት በማድረግ ላይ...</string>
+    <string name="updating_attempt">አፕዴት ሙከራ %1$s of %2$s…</string>
+    <string name="update_complete">" ✓ አፕዴት ተጠናቋል"</string>
+    <string name="start_update">አፕዴት አስጀምር</string>
+    <string name="ota_recovery_title">ስካነር አፕዴት አልተሳካም</string>
+    <string name="ota_recovery_soft_reset">ስካነሩን አጥፍተህ እንደገና አብራ</string>
+    <string name="ota_recovery_hard_reset">ማስነሻና ማጥፊያውን ለ 5 ሴኮንድ መጫን</string>
+    <string name="ota_failed_title">ስካነር አፕዴት አልተሳካም</string>
+    <string name="ota_failed_instructions">" ለእርዳታ ሱፐርቫይዘሩን አሳዉቅ"</string>
+    <string name="continue_button">ቀጥል</string>
 </resources>
