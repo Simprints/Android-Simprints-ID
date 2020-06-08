@@ -130,8 +130,7 @@ class PeopleSyncIntegrationTest {
             val remotePeopleApi = SimApiClientFactoryImpl(
                 mockBaseUrlProvider,
                 "deviceId",
-                mockRemoteDbManager,
-                mockk()
+                mockRemoteDbManager
             ).buildClient(PeopleRemoteInterface::class)
             
             coEvery { personRemoteDataSourceSpy.getPeopleApiClient() } returns remotePeopleApi
