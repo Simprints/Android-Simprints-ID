@@ -28,11 +28,13 @@ import kotlinx.coroutines.withContext
 import java.io.Serializable
 
 @FlowPreview
-class PersonLocalDataSourceImpl(private val appContext: Context,
-                                val secureDataManager: SecureLocalDbKeyProvider,
-                                val loginInfoManager: LoginInfoManager) : PersonLocalDataSource {
+class PersonLocalDataSourceImpl(
+    private val appContext: Context,
+    val secureDataManager: SecureLocalDbKeyProvider,
+    val loginInfoManager: LoginInfoManager
+) : PersonLocalDataSource {
+
     companion object {
-        const val SYNC_ID_FIELD = "syncGroupId"
         const val PROJECT_ID_FIELD = "projectId"
         const val USER_ID_FIELD = "userId"
         const val PATIENT_ID_FIELD = "patientId"
@@ -73,7 +75,7 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
             Realm.getInstance(config).use {
                 it.buildRealmQueryForPerson(query)
                     .await()
-                    ?.map { it.fromDbToDomain() }
+                    ?.map { dbPerson ->  dbPerson.fromDbToDomain() }
                     ?.asFlow()
                     ?: flowOf()
             }
@@ -109,6 +111,10 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
                 }
             }
         }
+    }
+
+    override suspend fun deleteAll() {
+        delete(listOf(PersonLocalDataSource.Query()))
     }
 
     override suspend fun count(query: PersonLocalDataSource.Query): Int =

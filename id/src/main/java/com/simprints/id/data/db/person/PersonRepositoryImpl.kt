@@ -23,7 +23,6 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     override suspend fun countToDownSync(peopleDownSyncScope: PeopleDownSyncScope): List<PeopleCount> =
         personRemoteDataSource.getDownSyncPeopleCount(peopleDownSyncScope.projectId, downSyncScopeRepository.getDownSyncOperations(peopleDownSyncScope))
 
-
     override suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult =
         try {
             val person = personLocalDataSource.load(PersonLocalDataSource.Query(personId = patientId)).first()

@@ -8,6 +8,7 @@ import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
@@ -19,6 +20,7 @@ import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
@@ -60,6 +62,7 @@ class TestAppModule(
     private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
     private val sessionEventsRemoteDbManagerRule: DependencyRule = RealRule,
     private val simNetworkUtilsRule: DependencyRule = RealRule,
+    private val signerManagerRule: DependencyRule = RealRule,
     private val longConsentManagerRule: DependencyRule = RealRule,
     private val secureApiInterfaceRule: DependencyRule = RealRule,
     private val syncStatusDatabaseRule: DependencyRule = RealRule,
@@ -84,12 +87,11 @@ class TestAppModule(
 
     override fun provideLoginInfoManager(
         improvedSharedPreferences: ImprovedSharedPreferences
-    ): LoginInfoManager =
-        loginInfoManagerRule.resolveDependency {
-            super.provideLoginInfoManager(
-                improvedSharedPreferences
-            )
-        }
+    ): LoginInfoManager = loginInfoManagerRule.resolveDependency {
+        super.provideLoginInfoManager(
+            improvedSharedPreferences
+        )
+    }
 
     override fun provideRandomGenerator(): RandomGenerator =
         randomGeneratorRule.resolveDependency { super.provideRandomGenerator() }
@@ -104,8 +106,12 @@ class TestAppModule(
         preferencesManager: PreferencesManager,
         peopleSyncManager: PeopleSyncManager,
         syncManager: SyncManager,
-        securityStateScheduler: SecurityStateScheduler
-    ): SignerManager = dbManagerRule.resolveDependency {
+        securityStateScheduler: SecurityStateScheduler,
+        longConsentRepository: LongConsentRepository,
+        sessionRepository: SessionRepository,
+        baseUrlProvider: BaseUrlProvider,
+        remoteConfigWrapper: RemoteConfigWrapper
+    ): SignerManager = signerManagerRule.resolveDependency {
         super.provideSignerManager(
             projectRepository,
             remoteDbManager,
@@ -113,7 +119,11 @@ class TestAppModule(
             preferencesManager,
             peopleSyncManager,
             syncManager,
-            securityStateScheduler
+            securityStateScheduler,
+            longConsentRepository,
+            sessionRepository,
+            baseUrlProvider,
+            remoteConfigWrapper
         )
     }
 
