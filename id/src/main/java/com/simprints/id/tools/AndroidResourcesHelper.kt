@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.ColorRes
 import androidx.annotation.PluralsRes
 import com.simprints.id.Application
+import java.util.*
 
 interface AndroidResourcesHelper {
 
@@ -19,7 +20,7 @@ interface AndroidResourcesHelper {
     fun getQuantityString(@PluralsRes resId: Int, quantity: Int): String
     fun getColorStateList(color: Int): ColorStateList?
 
-    fun getLocaleConfiguration(): Configuration
+    fun getLocale(): Locale
 
     companion object {
         fun build(app: Application): AndroidResourcesHelper =

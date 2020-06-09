@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.PluralsRes
 import androidx.core.content.ContextCompat
 import com.simprints.core.tools.LanguageHelper
+import java.util.*
 
 class AndroidResourcesHelperImpl(val ctx: Context, val language: String) : AndroidResourcesHelper {
 
@@ -107,6 +108,6 @@ class AndroidResourcesHelperImpl(val ctx: Context, val language: String) : Andro
 
     override fun getColour(colourId: Int): Int = ContextCompat.getColor(languageContext, colourId)
 
-    override fun getLocaleConfiguration(): Configuration =
-        LanguageHelper.configurationWithSpecificLocale(language)
+    override fun getLocale(): Locale =
+        LanguageHelper.localeFor(language)
 }

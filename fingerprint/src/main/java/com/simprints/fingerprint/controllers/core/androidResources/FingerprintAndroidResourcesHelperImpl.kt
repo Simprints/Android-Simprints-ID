@@ -1,17 +1,20 @@
 package com.simprints.fingerprint.controllers.core.androidResources
 
 import android.content.Context
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
-import androidx.core.content.ContextCompat
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.tools.AndroidResourcesHelper
-import com.simprints.id.tools.AndroidResourcesHelperImpl
+import java.util.*
 
 class FingerprintAndroidResourcesHelperImpl(private val context: Context, private val coreAndroidResourcesHelper: AndroidResourcesHelper) : FingerprintAndroidResourcesHelper {
 
-    private val languageContext by lazy {
-        context.createConfigurationContext(coreAndroidResourcesHelper.getLocaleConfiguration())
+    private val languageContext =
+        context.createConfigurationContext(buildConfiguration(coreAndroidResourcesHelper.getLocale()))
+
+    private fun buildConfiguration(locale: Locale) = Configuration().apply {
+        Locale.setDefault(locale)
+        setLocale(locale)
     }
 
     private enum class QUANTITY constructor(private val title: String) {
@@ -28,13 +31,13 @@ class FingerprintAndroidResourcesHelperImpl(private val context: Context, privat
     }
 
     override fun getString(res: Int): String {
-        return coreAndroidResourcesHelper.getString(res)
+        return languageContext.getString(res)
     }
-    override fun getStringArray(res: Int): Array<String> = coreAndroidResourcesHelper.getStringArray(res)
-    override fun getString(resId: Int, params: Array<Any>): String = coreAndroidResourcesHelper.getString(resId, params)
-    override fun getDrawable(res: Int): Drawable? = coreAndroidResourcesHelper.getDrawable(res)
+    override fun getStringArray(res: Int): Array<String> = languageContext.resources.getStringArray(res)
+    override fun getString(resId: Int, params: Array<Any>): String = languageContext.getString(resId, params)
+    override fun getDrawable(res: Int): Drawable? = languageContext.getDrawable(res)
     override fun getStringPlural(stringQuantityKey: Int, quantity: Int, params: Array<Any>): String =
-        coreAndroidResourcesHelper.getStringPlural(stringQuantityKey, quantity, params)
+        getStringPlural(languageContext, stringQuantityKey, quantity, params)
 
     companion object {
 
