@@ -1,4 +1,4 @@
-package com.simprints.id.services
+package com.simprints.id.services.guidselection
 
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager

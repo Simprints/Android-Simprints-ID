@@ -6,7 +6,7 @@ import com.simprints.id.Application
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.di.TestLoginModule
+import com.simprints.id.commontesttools.di.TestSecurityModule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
 import com.simprints.id.secure.AuthenticationHelper
@@ -34,7 +34,7 @@ class LoginActivityAndroidTest {
     }
 
     private val loginModule by lazy {
-        TestLoginModule(
+        TestSecurityModule(
             loginViewModelFactoryRule = DependencyRule.ReplaceRule {
                 LoginViewModelFactory(mockAuthenticationHelper)
             },

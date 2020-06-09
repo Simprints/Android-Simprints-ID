@@ -11,6 +11,7 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.securitystate.SecurityStateScheduler
 
 open class SignerManagerImpl(
     private var projectRepository: ProjectRepository,
@@ -19,6 +20,7 @@ open class SignerManagerImpl(
     private val preferencesManager: PreferencesManager,
     private val peopleSyncManager: PeopleSyncManager,
     private val syncManager: SyncManager,
+    private val securityStateScheduler: SecurityStateScheduler,
     private val longConsentRepository: LongConsentRepository,
     private val sessionRepository: SessionRepository,
     private val baseUrlProvider: BaseUrlProvider,
@@ -27,17 +29,16 @@ open class SignerManagerImpl(
 
     override suspend fun signIn(projectId: String, userId: String, token: Token) {
         remote.signIn(token.value)
-        storeCredentials(userId, projectId)
+        loginInfoManager.storeCredentials(projectId, userId)
         projectRepository.loadFromRemoteAndRefreshCache(projectId)
             ?: throw Exception("project not found")
+        securityStateScheduler.scheduleSecurityStateCheck()
     }
-
-    private fun storeCredentials(userId: String, projectId: String) =
-        loginInfoManager.storeCredentials(projectId, userId)
 
     override suspend fun signOut() {
         //TODO: move peopleUpSyncMaster to SyncScheduler and call .pause in CheckLoginPresenter.checkSignedInOrThrow
         //If you user clears the data (then doesn't call signout), workers still stay scheduled.
+        securityStateScheduler.cancelSecurityStateCheck()
         loginInfoManager.cleanCredentials()
         remote.signOut()
         syncManager.cancelBackgroundSyncs()
