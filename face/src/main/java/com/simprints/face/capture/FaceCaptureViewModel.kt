@@ -8,6 +8,9 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.*
+import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
+import com.simprints.face.controllers.core.crashreport.FaceCrashReportTag.FACE_CAPTURE
+import com.simprints.face.controllers.core.crashreport.FaceCrashReportTrigger.UI
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
@@ -20,10 +23,9 @@ import kotlinx.coroutines.runBlocking
 
 class FaceCaptureViewModel(
     private val maxRetries: Int,
-    private val faceImageManager: FaceImageManager
+    private val faceImageManager: FaceImageManager,
+    private val crashReportManager: FaceCrashReportManager
 ) : ViewModel() {
-//    private val analyticsManager: AnalyticsManager
-
     var faceDetections = listOf<FaceDetection>()
 
     val retryFlowEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
@@ -83,6 +85,11 @@ class FaceCaptureViewModel(
 
     fun recapture() {
         // TODO: add analytics for FlowFinished(RECAPTURE)
+        crashReportManager.logMessageForCrashReport(
+            FACE_CAPTURE,
+            UI,
+            message = "Starting face recapture flow"
+        )
         faceDetections = listOf()
         recaptureEvent.send()
     }
@@ -105,9 +112,19 @@ class FaceCaptureViewModel(
 
     private fun startNewAnalyticsSession() {
         // TODO: add analytics for StartSession
+        crashReportManager.logMessageForCrashReport(
+            FACE_CAPTURE,
+            UI,
+            message = "Starting face capture flow"
+        )
     }
 
     private fun saveFaceDetections() {
+        crashReportManager.logMessageForCrashReport(
+            FACE_CAPTURE,
+            UI,
+            message = "Saving captures to disk"
+        )
         // TODO: send the correct captureEventId once we can get it
         faceDetections.forEachIndexed { index, faceDetection ->
             saveImage(

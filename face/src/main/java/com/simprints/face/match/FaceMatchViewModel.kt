@@ -9,6 +9,9 @@ import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.extentions.concurrentMap
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
+import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
+import com.simprints.face.controllers.core.crashreport.FaceCrashReportTag
+import com.simprints.face.controllers.core.crashreport.FaceCrashReportTrigger
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.data.db.person.FaceIdentity
 import com.simprints.face.data.db.person.FaceSample
@@ -25,6 +28,7 @@ class FaceMatchViewModel(
     private val faceDbManager: FaceDbManager,
     private val faceMatcher: FaceMatcher,
     private val preferencesManager: FacePreferencesManager,
+    private val crashReportManager: FaceCrashReportManager,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
     companion object {
@@ -47,6 +51,11 @@ class FaceMatchViewModel(
     }
 
     private suspend fun loadCandidates(queryForCandidates: Serializable): Flow<FaceIdentity> {
+        crashReportManager.logMessageForCrashReport(
+            FaceCrashReportTag.FACE_MATCHING,
+            FaceCrashReportTrigger.UI,
+            message = "Loading candidates"
+        )
         matchState.value = MatchState.LoadingCandidates
         return faceDbManager.loadPeople(queryForCandidates)
     }
@@ -55,6 +64,11 @@ class FaceMatchViewModel(
         probeFaceSamples: List<FaceSample>,
         candidates: Flow<FaceIdentity>
     ): Flow<FaceMatchResult> {
+        crashReportManager.logMessageForCrashReport(
+            FaceCrashReportTag.FACE_MATCHING,
+            FaceCrashReportTrigger.UI,
+            message = "Matching probe against candidates"
+        )
         matchState.postValue(MatchState.Matching)
         return getConcurrentMatchResultsForCandidates(probeFaceSamples, candidates)
     }
