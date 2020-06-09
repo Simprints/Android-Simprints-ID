@@ -53,6 +53,7 @@ import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncM
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.UpSessionEventsWorker
+import com.simprints.id.services.securitystate.SecurityStateWorker
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import dagger.BindsInstance
@@ -63,7 +64,7 @@ import javax.inject.Singleton
     modules = [
         AppModule::class,
         DataModule::class,
-        LoginModule::class,
+        SecurityModule::class,
         PreferencesModule::class,
         SerializerModule::class,
         SyncModule::class,
@@ -81,7 +82,7 @@ interface AppComponent {
         fun appModule(appModule: AppModule): Builder
         fun dataModule(dataModule: DataModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
-        fun loginModule(loginModule: LoginModule): Builder
+        fun loginModule(securityModule: SecurityModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun syncModule(syncModule: SyncModule): Builder
         fun dashboardActivityModule(dashboardActivityModule: DashboardActivityModule): Builder
@@ -133,6 +134,7 @@ interface AppComponent {
     fun inject(peopleStartSyncWorker: PeopleStartSyncReporterWorker)
     fun inject(qrCaptureActivity: QrCaptureActivity)
     fun inject(setupActivity: SetupActivity)
+    fun inject(securityStateWorker: SecurityStateWorker)
 
     fun getSessionEventsManager(): SessionRepository
     fun getCrashReportManager(): CoreCrashReportManager

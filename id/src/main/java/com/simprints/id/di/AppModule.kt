@@ -41,7 +41,6 @@ import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.session.local.SessionRealmConfigBuilderImpl
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSourceImpl
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -64,15 +63,14 @@ import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
-import com.simprints.id.secure.securitystate.SecurityStateProcessor
-import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
-import com.simprints.id.services.GuidSelectionManager
-import com.simprints.id.services.GuidSelectionManagerImpl
+import com.simprints.id.services.guidselection.GuidSelectionManager
+import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.tools.*
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
@@ -107,32 +105,7 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSignerManager(
-        projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager,
-        peopleSyncManager: PeopleSyncManager,
-        syncManager: SyncManager,
-        longConsentRepository: LongConsentRepository,
-        sessionRepository: SessionRepository,
-        baseUrlProvider: BaseUrlProvider,
-        remoteConfigWrapper: RemoteConfigWrapper
-    ): SignerManager = SignerManagerImpl(
-        projectRepository,
-        remoteDbManager,
-        loginInfoManager,
-        preferencesManager,
-        peopleSyncManager,
-        syncManager,
-        longConsentRepository,
-        sessionRepository,
-        baseUrlProvider,
-        remoteConfigWrapper
-    )
-
-    @Provides
-    @Singleton
+    @Suppress("MissingPermission")
     fun provideFirebaseAnalytics(app: Application): FirebaseAnalytics =
         FirebaseAnalytics.getInstance(app).apply {
             setMinimumSessionDuration(0)
@@ -209,7 +182,11 @@ open class AppModule {
         ctx: Context,
         remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider
-    ): SimApiClientFactory = SimApiClientFactoryImpl(baseUrlProvider, ctx.deviceId, remoteDbManager)
+    ): SimApiClientFactory = SimApiClientFactoryImpl(
+        baseUrlProvider,
+        ctx.deviceId,
+        remoteDbManager
+    )
 
     @Provides
     @Singleton
@@ -398,7 +375,7 @@ open class AppModule {
 
     @Provides
     open fun provideLocationManager(ctx: Context): LocationManager = LocationManagerImpl(ctx)
-    
+
     @Provides
     open fun provideCameraHelper(
         context: Context,
@@ -429,19 +406,6 @@ open class AppModule {
         longConsentRepository: LongConsentRepository,
         preferencesManager: PreferencesManager
     ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager)
-
-    @Provides
-    open fun provideSecurityStateProcessor(
-        imageRepository: ImageRepository,
-        personRepository: PersonRepository,
-        sessionRepository: SessionRepository,
-        signerManager: SignerManager
-    ): SecurityStateProcessor = SecurityStateProcessorImpl(
-        imageRepository,
-        personRepository,
-        sessionRepository,
-        signerManager
-    )
 
 }
 

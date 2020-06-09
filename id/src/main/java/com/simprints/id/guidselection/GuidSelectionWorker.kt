@@ -8,7 +8,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
-import com.simprints.id.services.GuidSelectionManager
+import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import timber.log.Timber
 import javax.inject.Inject

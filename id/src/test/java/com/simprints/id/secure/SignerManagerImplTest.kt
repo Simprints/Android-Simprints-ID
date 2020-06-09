@@ -14,6 +14,7 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -22,7 +23,7 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 
-class SignerManagerTest {
+class SignerManagerImplTest {
 
     @MockK lateinit var mockProjectRepository: ProjectRepository
     @MockK lateinit var mockRemoteDbManager: RemoteDbManager
@@ -30,6 +31,7 @@ class SignerManagerTest {
     @MockK lateinit var mockPreferencesManager: PreferencesManager
     @MockK lateinit var mockSyncManager: SyncManager
     @MockK lateinit var mockPeopleSyncManager: PeopleSyncManager
+    @MockK lateinit var mockSecurityStateScheduler: SecurityStateScheduler
     @MockK lateinit var mockLongConsentRepository: LongConsentRepository
     @MockK lateinit var mockSessionRepository: SessionRepository
     @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
@@ -50,20 +52,19 @@ class SignerManagerTest {
             mockPreferencesManager,
             mockPeopleSyncManager,
             mockSyncManager,
+            mockSecurityStateScheduler,
             mockLongConsentRepository,
             mockSessionRepository,
             mockBaseUrlProvider,
             mockRemoteConfigWrapper
         )
-
-        mockkStatic("com.simprints.id.tools.extensions.PerformanceMonitoring_extKt")
     }
 
     @Test
     @ExperimentalCoroutinesApi
     fun signIn_shouldSignInToRemoteDb() = runBlockingTest {
         mockRemoteSignedIn()
-        mockFetchingProjectInto()
+        mockFetchingProjectInfo()
 
         signIn()
 
@@ -83,7 +84,7 @@ class SignerManagerTest {
     fun signIn_shouldStoreCredentialsLocally() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
-        mockFetchingProjectInto()
+        mockFetchingProjectInfo()
 
         signIn()
 
@@ -104,7 +105,7 @@ class SignerManagerTest {
     fun signIn_shouldFetchProjectInfo() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
-        mockFetchingProjectInto()
+        mockFetchingProjectInfo()
 
         signIn()
 
@@ -116,7 +117,7 @@ class SignerManagerTest {
     fun loadAndRefreshCacheFails_signInShouldFail() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
-        mockFetchingProjectInto(true)
+        mockFetchingProjectInfo(true)
 
         assertThrows<Throwable> { signIn() }
     }
@@ -126,10 +127,23 @@ class SignerManagerTest {
     fun signIn_shouldSucceed() = runBlockingTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
-        mockFetchingProjectInto()
+        mockFetchingProjectInfo()
         mockResumePeopleSync()
 
         signIn()
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun signIn_shouldScheduleSecurityStateCheck() = runBlockingTest {
+        mockRemoteSignedIn()
+        mockStoreCredentialsLocally()
+        mockFetchingProjectInfo()
+        mockResumePeopleSync()
+
+        signIn()
+
+        verify { mockSecurityStateScheduler.scheduleSecurityStateCheck() }
     }
 
     @Test
@@ -144,6 +158,16 @@ class SignerManagerTest {
         verifyRemoteManagerGotSignedOut()
         verifyLastSyncInfoGotDeleted()
         verifyAllSharedPreferencesExceptRealmKeysGotCleared()
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun signOut_shouldCancelPeriodicSecurityStateCheck() = runBlockingTest {
+        every { mockLoginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
+
+        signerManager.signOut()
+
+        verify { mockSecurityStateScheduler.cancelSecurityStateCheck() }
     }
 
     @Test
@@ -206,7 +230,7 @@ class SignerManagerTest {
             }
         }
 
-    private fun mockFetchingProjectInto(error: Boolean = false) =
+    private fun mockFetchingProjectInfo(error: Boolean = false) =
         coEvery { mockProjectRepository.loadFromRemoteAndRefreshCache(any()) }.apply {
             if (!error) {
                 this.returns(
