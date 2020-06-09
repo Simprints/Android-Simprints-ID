@@ -8,6 +8,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.extentions.concurrentMap
+import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.data.db.person.FaceIdentity
 import com.simprints.face.data.db.person.FaceSample
@@ -23,6 +24,7 @@ import kotlin.math.min
 class FaceMatchViewModel(
     private val faceDbManager: FaceDbManager,
     private val faceMatcher: FaceMatcher,
+    private val preferencesManager: FacePreferencesManager,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
     companion object {
@@ -63,19 +65,20 @@ class FaceMatchViewModel(
     private suspend fun getConcurrentMatchResultsForCandidates(
         probeFaceSamples: List<FaceSample>,
         candidates: Flow<FaceIdentity>
-    ) =
-        candidates.concurrentMap(dispatcherProvider.default()) { candidate ->
-            FaceMatchResult(
-                candidate.faceId,
-                faceMatcher.getHighestComparisonScoreForCandidate(probeFaceSamples, candidate)
-            )
-        }
+    ) = candidates.concurrentMap(dispatcherProvider.default()) { candidate ->
+        FaceMatchResult(
+            candidate.faceId,
+            faceMatcher.getHighestComparisonScoreForCandidate(probeFaceSamples, candidate)
+        )
+    }
 
     private suspend fun getSortedResult(results: Flow<FaceMatchResult>): List<FaceMatchResult> =
         results.toList().sortedByDescending { it.confidence }
 
     private fun sendFaceMatchResponse(allResults: List<FaceMatchResult>) {
-        val results = allResults.take(returnCount)
+        val results = allResults
+            .take(returnCount)
+            .filter { it.confidence >= preferencesManager.faceMatchThreshold }
         val veryGoodMatches = results.count { veryGoodMatchThreshold <= it.confidence }
         val goodMatches =
             results.count { goodMatchThreshold <= it.confidence && it.confidence < veryGoodMatchThreshold }
