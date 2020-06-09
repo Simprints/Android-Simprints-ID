@@ -2,12 +2,14 @@ package com.simprints.id.tools
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import androidx.annotation.PluralsRes
 import androidx.core.content.ContextCompat
+import com.simprints.core.tools.LanguageHelper
 
-class AndroidResourcesHelperImpl(val context: Context) : AndroidResourcesHelper {
+class AndroidResourcesHelperImpl(val ctx: Context, val language: String) : AndroidResourcesHelper {
 
     /**
      * The abstract concept of quantity found in most languages. Note that this will not be correct
@@ -80,24 +82,31 @@ class AndroidResourcesHelperImpl(val context: Context) : AndroidResourcesHelper 
         }
     }
 
+    private val languageContext by lazy {
+            LanguageHelper.contextWithSpecificLanguage(ctx, language)
+    }
+
     override fun getStringPlural(stringQuantityKey: Int, quantity: Int, params: Array<Any>): String =
-        getStringPlural(context, stringQuantityKey, quantity, params)
+        getStringPlural(languageContext, stringQuantityKey, quantity, params)
 
     override fun getQuantityString(
         @PluralsRes resId: Int,
         quantity: Int,
         params: Array<Any>
-    ): String = context.resources.getQuantityString(resId, quantity, params)
+    ): String = languageContext.resources.getQuantityString(resId, quantity, params)
 
     override fun getQuantityString(@PluralsRes resId: Int, quantity: Int): String {
-        return context.resources.getQuantityString(resId, quantity)
+        return languageContext.resources.getQuantityString(resId, quantity)
     }
 
-    override fun getString(res: Int): String = context.getString(res)
-    override fun getString(resId: Int, params: Array<Any>): String = context.getString(resId, *params)
-    override fun getStringArray(res: Int): Array<String> = context.resources.getStringArray(res)
-    override fun getDrawable(res: Int): Drawable? = ContextCompat.getDrawable(context, res)
-    override fun getColorStateList(color: Int): ColorStateList? = ContextCompat.getColorStateList(context, color)
+    override fun getString(res: Int): String = languageContext.getString(res)
+    override fun getString(resId: Int, params: Array<Any>): String = languageContext.getString(resId, *params)
+    override fun getStringArray(res: Int): Array<String> = languageContext.resources.getStringArray(res)
+    override fun getDrawable(res: Int): Drawable? = ContextCompat.getDrawable(languageContext, res)
+    override fun getColorStateList(color: Int): ColorStateList? = ContextCompat.getColorStateList(languageContext, color)
 
-    override fun getColour(colourId: Int): Int = ContextCompat.getColor(context, colourId)
+    override fun getColour(colourId: Int): Int = ContextCompat.getColor(languageContext, colourId)
+
+    override fun getLocaleConfiguration(): Configuration =
+        LanguageHelper.configurationWithSpecificLocale(language)
 }

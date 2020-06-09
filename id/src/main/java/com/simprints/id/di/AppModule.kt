@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
@@ -218,9 +217,7 @@ open class AppModule {
         ctx: Context,
         preferencesManager: PreferencesManager
     ): AndroidResourcesHelper {
-        val contextWithSpecificLanguage =
-            LanguageHelper.contextWithSpecificLanguage(ctx, preferencesManager.language)
-        return AndroidResourcesHelperImpl(contextWithSpecificLanguage)
+        return AndroidResourcesHelperImpl(ctx, preferencesManager.language)
     }
 
     @Provides
