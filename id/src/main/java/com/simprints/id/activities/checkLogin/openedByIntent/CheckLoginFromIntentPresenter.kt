@@ -72,7 +72,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         ignoreException {
             sessionRepository.updateCurrentSession { currentSession ->
                 with(currentSession) {
-                    addEvent(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
+                    if (appRequest !is AppRequest.AppRequestFollowUp) {
+                        addEvent(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
+                    }
                     addEvent(buildRequestEvent(timeHelper.now(), appRequest))
                 }
             }
@@ -197,7 +199,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
          *  doesn't have the userId in the intent. We don't want to switch the
          *  user otherwise will be set to "" and the following requests would fail.
          *  */
-        if(appRequest.userId.isNotEmpty()) {
+        if (appRequest.userId.isNotEmpty()) {
             loginInfoManager.signedInUserId = appRequest.userId
         }
 
