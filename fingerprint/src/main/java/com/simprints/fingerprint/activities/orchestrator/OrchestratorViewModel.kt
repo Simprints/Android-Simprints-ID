@@ -24,7 +24,7 @@ class OrchestratorViewModel(private val orchestrator: Orchestrator,
     val finishedResult = MutableLiveData<ActivityResult>()
 
     fun start(fingerprintRequest: FingerprintRequest) {
-        firmwareFileUpdateScheduler.schedule()
+        firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
         orchestrator.start(fingerprintRequest)
         executeNextTaskOrFinish()
     }
