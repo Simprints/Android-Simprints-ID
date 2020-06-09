@@ -2,6 +2,7 @@ package com.simprints.id.secure.securitystate.repository
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
+import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -27,12 +28,12 @@ class SecurityStateRepositoryImplTest {
 
     @Test
     fun shouldGetSecurityStateFromRemote() = runBlocking {
-        // TODO: replace empty string with SecurityState
-        coEvery { mockRemoteDataSource.getSecurityState() } returns ""
+        val expected = SecurityState(DEVICE_ID, SecurityState.Status.PROJECT_ENDED)
+        coEvery { mockRemoteDataSource.getSecurityState() } returns expected
 
         val securityState = repository.getSecurityState()
 
-        assertThat(securityState).isEqualTo("")
+        assertThat(securityState).isEqualTo(expected)
     }
 
     @Test(expected = SimprintsInternalServerException::class)
@@ -53,6 +54,10 @@ class SecurityStateRepositoryImplTest {
         runBlocking {
             repository.getSecurityState()
         }
+    }
+
+    private companion object {
+        const val DEVICE_ID = "mock-device-id"
     }
 
 }
