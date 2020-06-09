@@ -29,7 +29,6 @@ import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.SessionRepositoryImpl
@@ -60,17 +59,12 @@ import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientFactoryImpl
-import com.simprints.id.secure.BaseUrlProviderImpl
-import com.simprints.id.secure.SignerManager
-import com.simprints.id.secure.SignerManagerImpl
+import com.simprints.id.network.BaseUrlProviderImpl
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
-import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.tools.*
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
@@ -172,9 +166,9 @@ open class AppModule {
         projectLocalDataSource: ProjectLocalDataSource,
         loginInfoManager: LoginInfoManager
     ): BaseUrlProvider = BaseUrlProviderImpl(
-        settingsPreferencesManager,
-        projectLocalDataSource,
-        loginInfoManager
+            settingsPreferencesManager,
+            projectLocalDataSource,
+            loginInfoManager
     )
 
     @Provides
