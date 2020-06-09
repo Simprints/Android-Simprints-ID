@@ -13,7 +13,11 @@ import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
+import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.tools.extensions.showToast
@@ -31,6 +35,8 @@ class SerialEntryPairFragment : FingerprintFragment() {
     private val scannerPairingManager: ScannerPairingManager by inject()
     private val serialNumberConverter: SerialNumberConverter by inject()
     private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
+    private val timeHelper: FingerprintTimeHelper by inject()
+    private val sessionManager: FingerprintSessionEventsManager by inject()
 
     private val bluetoothPairStateChangeReceiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
         onPairSuccess = ::checkIfNowBondedToSingleScannerThenProceed,
@@ -49,6 +55,8 @@ class SerialEntryPairFragment : FingerprintFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
+
+        sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.SerialEntryPair))
 
         serialEntryOkButton.setOnClickListener { parseTextAndCommencePair() }
         setupDoneButtonForEditText()

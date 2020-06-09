@@ -8,8 +8,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
+import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.issues.ota.OtaFragmentRequest
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
 import kotlinx.android.synthetic.main.fragment_ota_recovery.*
 import org.koin.android.ext.android.inject
@@ -18,6 +22,8 @@ import org.koin.android.viewmodel.ext.android.viewModel
 class OtaRecoveryFragment : FingerprintFragment() {
 
     private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
+    private val timeHelper: FingerprintTimeHelper by inject()
+    private val sessionManager: FingerprintSessionEventsManager by inject()
 
     private val viewModel: OtaRecoveryViewModel by viewModel()
 
@@ -29,6 +35,8 @@ class OtaRecoveryFragment : FingerprintFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
+
+        sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.OtaRecovery(args.otaRecoveryFragmentRequest)))
 
         setupTryAgainButton()
         viewModel.isConnectionSuccess.fragmentObserveEventWith { connectionSuccessful ->
