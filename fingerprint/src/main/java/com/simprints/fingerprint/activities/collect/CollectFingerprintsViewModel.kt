@@ -312,10 +312,12 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleMissingFingerButtonPressed() {
-        updateFingerState { toSkipped() }
-        lastCaptureStartedAt = timeHelper.now()
-        addCaptureEventInSession()
-        resolveFingerTerminalConditionTriggered()
+        if (!state().isShowingSplashScreen) {
+            updateFingerState { toSkipped() }
+            lastCaptureStartedAt = timeHelper.now()
+            addCaptureEventInSession()
+            resolveFingerTerminalConditionTriggered()
+        }
     }
 
     private fun isScanningEndStateAchieved(): Boolean = with(state()) {
