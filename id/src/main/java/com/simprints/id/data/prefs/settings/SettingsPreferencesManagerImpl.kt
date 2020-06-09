@@ -1,7 +1,6 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
-import com.simprints.id.network.NetworkConstants
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -17,6 +16,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
+import com.simprints.id.network.NetworkConstants
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
@@ -258,6 +258,22 @@ open class SettingsPreferencesManagerImpl(
             FACE_QUALITY_THRESHOLD_DEFAULT
         )
 
+    override var faceNbOfFramesCaptured: Int
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            FACE_NB_OF_FRAMES_CAPTURED,
+            FACE_NB_OF_FRAMES_CAPTURED_DEFAULT
+        )
+
+    override var faceMatchThreshold: Float
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            FACE_MATCH_THRESHOLD,
+            FACE_MATCH_THRESHOLD_DEFAULT
+        )
+
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()
     }
@@ -351,6 +367,10 @@ open class SettingsPreferencesManagerImpl(
         const val FACE_MAX_RETRIES_DEFAULT = 2
         const val FACE_QUALITY_THRESHOLD = "FaceQualityThreshold"
         const val FACE_QUALITY_THRESHOLD_DEFAULT = -1f
+        const val FACE_NB_OF_FRAMES_CAPTURED = "FaceNbOfFramesCaptured"
+        const val FACE_NB_OF_FRAMES_CAPTURED_DEFAULT = 2
+        const val FACE_MATCH_THRESHOLD = "FaceMatchThreshold"
+        const val FACE_MATCH_THRESHOLD_DEFAULT = 0f
     }
 
 }
