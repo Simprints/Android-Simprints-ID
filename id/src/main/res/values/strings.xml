@@ -284,7 +284,9 @@
     <!-- endregion -->
 
     <!--SetupActivity-->
-    <string name="modality_downloading">Downloading…</string>
+    <string name="modality_starting_download">Starting download…</string>
+    <string name="modality_downloading">Downloading… %1$s</string>
+    <string name="modality_installing">Installing…</string>
 
     <string name="module_feature_finger">fingerprint</string>
     <string name="module_feature_face">face</string>

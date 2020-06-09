@@ -16,6 +16,7 @@ import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.BaseSplitActivity
+import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.Location
@@ -55,23 +56,23 @@ class SetupActivity: BaseSplitActivity() {
         Timber.d("Setup -- $state")
         when (state.status()) {
             SplitInstallSessionStatus.DOWNLOADING -> {
-                setDownloadProgressInUi(state.bytesDownloaded(), state.totalBytesToDownload())
+                updateUi(DOWNLOADING, state.bytesDownloaded(), state.totalBytesToDownload())
             }
             SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION -> {
                 splitInstallManager.startConfirmationDialogForResult(state, this, MODALITIES_DOWNLOAD_REQUEST_CODE)
             }
             SplitInstallSessionStatus.INSTALLED -> {
-                setUiForModalitiesInstalled()
+                updateUi(MODALITIES_INSTALLED)
                 askPermissionsOrPerformSpecificActions()
             }
             SplitInstallSessionStatus.INSTALLING -> {
-                setUiForModalitiesInstallingOrPending()
+                updateUi(MODALITIES_INSTALLING)
             }
             SplitInstallSessionStatus.FAILED -> {
 
             }
             SplitInstallSessionStatus.PENDING -> {
-                setUiForModalitiesInstallingOrPending()
+                updateUi(STARTING_DOWNLOAD)
             }
         }
     }
@@ -80,7 +81,6 @@ class SetupActivity: BaseSplitActivity() {
         injectDependencies()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setup)
-        modalityDownloadText.text = androidResourcesHelper.getString(R.string.modality_downloading)
 
         setupRequest = intent.extras?.getParcelable(CoreResponse.CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
         splitInstallManager = SplitInstallManagerFactory.create(this)
@@ -173,22 +173,22 @@ class SetupActivity: BaseSplitActivity() {
         putExtra(CoreResponse.CORE_STEP_BUNDLE, SetupResponse())
     }
 
-    private fun setDownloadProgressInUi(bytesDownloaded: Long, totalBytesToDownload: Long) {
-        val downloadProgress = calculatePercentage(bytesDownloaded, totalBytesToDownload)
-        with(modalityDownloadProgressBar) {
-            isVisible = true
-            isIndeterminate = false
-            progress = downloadProgress
+    private fun updateUi(viewState: ViewState,
+                         bytesDownloaded: Long = 1L,
+                         totalBytesToDownload: Long = 1L) {
+        when (viewState) {
+            STARTING_DOWNLOAD -> updateUiForDownloadStarting()
+            DOWNLOADING -> updateUiForDownloadProgress(bytesDownloaded, totalBytesToDownload)
+            MODALITIES_INSTALLING -> updateUiForModalitiesInstalling()
+            MODALITIES_INSTALLED -> updateUiForModalitiesInstalled()
         }
-        modalityDownloadText.isVisible = true
-        setupLogo.isVisible = false
     }
 
-    private fun calculatePercentage(progressValue: Long, totalValue: Long) =
-        min((100 * (progressValue.toFloat() / totalValue.toFloat())).toInt(), 100)
-
-    private fun setUiForModalitiesInstallingOrPending() {
-        modalityDownloadText.isVisible = true
+    private fun updateUiForDownloadStarting() {
+        with(modalityDownloadText){
+            text = androidResourcesHelper.getString(R.string.modality_starting_download)
+            isVisible = true
+        }
         with(modalityDownloadProgressBar) {
             isIndeterminate = true
             isVisible = true
@@ -196,7 +196,36 @@ class SetupActivity: BaseSplitActivity() {
         setupLogo.isVisible = false
     }
 
-    private fun setUiForModalitiesInstalled() {
+    private fun updateUiForDownloadProgress(bytesDownloaded: Long, totalBytesToDownload: Long) {
+        val downloadProgress = calculatePercentage(bytesDownloaded, totalBytesToDownload)
+        with(modalityDownloadProgressBar) {
+            isVisible = true
+            isIndeterminate = false
+            progress = downloadProgress
+        }
+        with(modalityDownloadText) {
+            isVisible = true
+            text = androidResourcesHelper.getString(R.string.modality_downloading).format("$downloadProgress%")
+        }
+        setupLogo.isVisible = false
+    }
+
+    private fun calculatePercentage(progressValue: Long, totalValue: Long) =
+        min((100 * (progressValue.toFloat() / totalValue.toFloat())).toInt(), 100)
+
+    private fun updateUiForModalitiesInstalling() {
+        with(modalityDownloadText){
+            text = androidResourcesHelper.getString(R.string.modality_installing)
+            isVisible = true
+        }
+        with(modalityDownloadProgressBar) {
+            isIndeterminate = true
+            isVisible = true
+        }
+        setupLogo.isVisible = false
+    }
+
+    private fun updateUiForModalitiesInstalled() {
         modalityDownloadText.isVisible = false
         modalityDownloadProgressBar.isVisible = false
         setupLogo.isVisible = true
@@ -215,5 +244,12 @@ class SetupActivity: BaseSplitActivity() {
     companion object {
         const val PERMISSIONS_REQUEST_CODE = 99
         const val MODALITIES_DOWNLOAD_REQUEST_CODE = 199
+    }
+
+    enum class ViewState {
+        STARTING_DOWNLOAD,
+        DOWNLOADING,
+        MODALITIES_INSTALLING,
+        MODALITIES_INSTALLED
     }
 }

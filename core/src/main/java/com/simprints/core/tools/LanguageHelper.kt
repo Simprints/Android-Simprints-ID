@@ -18,7 +18,7 @@ object LanguageHelper {
      * Languages are usually two  or three characters, except if they also contain a region.
      * If they contain a region they follow the format [language]-r[REGION] e.g. fa-rAF
      */
-    private fun localeFor(languageString: String): Locale {
+    fun localeFor(languageString: String): Locale {
         val localeParts = languageString.split("-r")
         val language = localeParts[0]
         return if (localeParts.size > 1) {
