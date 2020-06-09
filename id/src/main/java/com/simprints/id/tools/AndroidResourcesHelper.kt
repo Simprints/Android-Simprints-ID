@@ -1,6 +1,7 @@
 package com.simprints.id.tools
 
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import androidx.annotation.ColorRes
 import androidx.annotation.PluralsRes
@@ -17,6 +18,8 @@ interface AndroidResourcesHelper {
     fun getQuantityString(@PluralsRes resId: Int, quantity: Int, params: Array<Any>): String
     fun getQuantityString(@PluralsRes resId: Int, quantity: Int): String
     fun getColorStateList(color: Int): ColorStateList?
+
+    fun getLocaleConfiguration(): Configuration
 
     companion object {
         fun build(app: Application): AndroidResourcesHelper =

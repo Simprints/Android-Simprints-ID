@@ -22,7 +22,7 @@ import org.robolectric.annotation.Config
 class ConsentTextRepositoryImplTest {
 
     val context = ApplicationProvider.getApplicationContext() as TestApplication
-    private val androidResourcesHelper = AndroidResourcesHelperImpl(context)
+    private val androidResourcesHelper = AndroidResourcesHelperImpl(context, preferencesManager.language)
 
     companion object {
         private const val GENERAL_CONSENT_ENROL_FINGER_TEXT = "I'd like to use your fingerprints to enrol you in program_name and identify you in the future. Simprints, a UK-based nonprofit, will have access to your fingerprint information and current location. If you accept, you may withdraw your permission at any time and ask for your data to be erased. May I use your fingerprints? Please say \"I accept\", \"I decline\", or \"I have questions.\""

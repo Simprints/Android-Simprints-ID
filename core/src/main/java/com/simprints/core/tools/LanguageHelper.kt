@@ -6,7 +6,7 @@ import java.util.*
 
 object LanguageHelper {
 
-    private fun configurationWithSpecificLocale(languageString: String): Configuration =
+    fun configurationWithSpecificLocale(languageString: String): Configuration =
         Configuration().apply {
             val locale = localeFor(languageString)
             Locale.setDefault(locale)

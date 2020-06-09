@@ -1,14 +1,12 @@
 package com.simprints.fingerprint.activities.base
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.fingerprint.activities.BaseSplitActivity
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.tools.extensions.logActivityCreated

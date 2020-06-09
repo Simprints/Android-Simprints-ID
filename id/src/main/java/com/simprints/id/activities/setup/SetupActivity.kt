@@ -1,10 +1,12 @@
 package com.simprints.id.activities.setup
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.core.view.isVisible
 import com.google.android.gms.location.LocationRequest
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
@@ -24,9 +26,11 @@ import com.simprints.id.domain.moduleapi.core.response.SetupResponse
 import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
+import kotlinx.android.synthetic.main.activity_setup.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -34,6 +38,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.math.min
 
 class SetupActivity: BaseSplitActivity() {
 
@@ -43,45 +48,30 @@ class SetupActivity: BaseSplitActivity() {
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionRepository: SessionRepository
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
+    @SuppressLint("SwitchIntDef")
     private val listener = SplitInstallStateUpdatedListener { state ->
         Timber.d("Setup -- $state")
         when (state.status()) {
             SplitInstallSessionStatus.DOWNLOADING -> {
-                Timber.d("Setup -- Modality downloading: ${state.bytesDownloaded()}/${state.totalBytesToDownload()}")
+                setDownloadProgressInUi(state.bytesDownloaded(), state.totalBytesToDownload())
             }
             SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION -> {
-                /*
-                  This may occur when attempting to download a sufficiently large module.
-
-                  In order to see this, the application has to be uploaded to the Play Store.
-                  Then features can be requested until the confirmation path is triggered.
-                 */
-                splitInstallManager.startConfirmationDialogForResult(state, this, 909)
+                splitInstallManager.startConfirmationDialogForResult(state, this, MODALITIES_DOWNLOAD_REQUEST_CODE)
             }
             SplitInstallSessionStatus.INSTALLED -> {
-                Timber.d("Setup -- Modality Installed")
+                setUiForModalitiesInstalled()
                 askPermissionsOrPerformSpecificActions()
             }
-
-            SplitInstallSessionStatus.INSTALLING -> { Timber.d("Modality Installing")  }
+            SplitInstallSessionStatus.INSTALLING -> {
+                setUiForModalitiesInstallingOrPending()
+            }
             SplitInstallSessionStatus.FAILED -> {
-                Timber.d("Setup -- Modality Install Failed")
-            }
-            SplitInstallSessionStatus.CANCELED -> {
-                Timber.d("Setup -- Modality Install Cancelled")
-            }
-            SplitInstallSessionStatus.CANCELING -> {
-                TODO()
-            }
-            SplitInstallSessionStatus.DOWNLOADED -> {
-                Timber.d("Setup -- Modality Downloaded")
+
             }
             SplitInstallSessionStatus.PENDING -> {
-
-            }
-            SplitInstallSessionStatus.UNKNOWN -> {
-
+                setUiForModalitiesInstallingOrPending()
             }
         }
     }
@@ -89,6 +79,8 @@ class SetupActivity: BaseSplitActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         injectDependencies()
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_setup)
+        modalityDownloadText.text = androidResourcesHelper.getString(R.string.modality_downloading)
 
         setupRequest = intent.extras?.getParcelable(CoreResponse.CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
         splitInstallManager = SplitInstallManagerFactory.create(this)
@@ -181,20 +173,47 @@ class SetupActivity: BaseSplitActivity() {
         putExtra(CoreResponse.CORE_STEP_BUNDLE, SetupResponse())
     }
 
+    private fun setDownloadProgressInUi(bytesDownloaded: Long, totalBytesToDownload: Long) {
+        val downloadProgress = calculatePercentage(bytesDownloaded, totalBytesToDownload)
+        with(modalityDownloadProgressBar) {
+            isVisible = true
+            isIndeterminate = false
+            progress = downloadProgress
+        }
+        modalityDownloadText.isVisible = true
+        setupLogo.isVisible = false
+    }
+
+    private fun calculatePercentage(progressValue: Long, totalValue: Long) =
+        min((100 * (progressValue.toFloat() / totalValue.toFloat())).toInt(), 100)
+
+    private fun setUiForModalitiesInstallingOrPending() {
+        modalityDownloadText.isVisible = true
+        with(modalityDownloadProgressBar) {
+            isIndeterminate = true
+            isVisible = true
+        }
+        setupLogo.isVisible = false
+    }
+
+    private fun setUiForModalitiesInstalled() {
+        modalityDownloadText.isVisible = false
+        modalityDownloadProgressBar.isVisible = false
+        setupLogo.isVisible = true
+    }
+
     override fun onResume() {
-        // Listener can be registered even without directly triggering a download.
-        Timber.d("Setup -- Registering listener")
         splitInstallManager.registerListener(listener)
         super.onResume()
     }
 
     override fun onPause() {
-        // Make sure to dispose of the listener once it's no longer needed.
         splitInstallManager.unregisterListener(listener)
         super.onPause()
     }
 
     companion object {
         const val PERMISSIONS_REQUEST_CODE = 99
+        const val MODALITIES_DOWNLOAD_REQUEST_CODE = 199
     }
 }

@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities
+package com.simprints.fingerprint.activities.base
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
