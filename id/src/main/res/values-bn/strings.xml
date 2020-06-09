@@ -197,5 +197,9 @@
     <string name="progress_sync_overlay">সিঙ্ক করা হচ্ছে</string>
     <string name="different_projectId_message">একটি কনফিগারেশন সমস্যা ঘটেছে (ভিন্ন প্রজেক্ট আই ডি), সাইন আউট করুন এবং আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
     <string name="fetch_guid_checking_person_in_database">ব্যক্তির তথ্য ডাটাবেসে আছে কি না খুঁজে দেখা হচ্ছে</string>
+    <string name="enrol_last_biometrics_alert_message">১। %1$s রেকর্ড সেভ করা যায়নি \n ২। বন্ধ করুন</string>
+    <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
+    <string name="enrol_last_biometrics_alert_message_fingerprint_param">আঙ্গুলের ছাপ</string>
+    <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
 
 </resources>
