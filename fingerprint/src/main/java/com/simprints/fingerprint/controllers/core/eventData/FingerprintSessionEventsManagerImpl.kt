@@ -49,6 +49,7 @@ class FingerprintSessionEventsManagerImpl(private val sessionRepository: Session
             PERSON_CREATION -> (event as PersonCreationEvent).fromDomainToCore()
             SCANNER_CONNECTION -> (event as ScannerConnectionEvent).fromDomainToCore()
             ALERT_SCREEN -> (event as AlertScreenEvent).fromDomainToCore()
+            ALERT_SCREEN_WITH_SCANNER_ISSUE -> (event as AlertScreenEventWithScannerIssue).fromDomainToCore()
             VERO_2_INFO_SNAPSHOT -> (event as Vero2InfoSnapshotEvent).fromDomainToCore()
             SCANNER_FIRMWARE_UPDATE -> (event as ScannerFirmwareUpdateEvent).fromDomainToCore()
         }

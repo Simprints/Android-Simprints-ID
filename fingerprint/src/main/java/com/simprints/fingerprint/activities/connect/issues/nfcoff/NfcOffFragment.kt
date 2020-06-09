@@ -10,7 +10,11 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
+import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import kotlinx.android.synthetic.main.fragment_nfc_off.*
 import org.koin.android.ext.android.inject
@@ -21,6 +25,8 @@ class NfcOffFragment : FingerprintFragment() {
 
     private val nfcManager: NfcManager by inject()
     private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
+    private val sessionManager: FingerprintSessionEventsManager by inject()
+    private val timeHelper: FingerprintTimeHelper by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_nfc_off, container, false)
@@ -28,6 +34,8 @@ class NfcOffFragment : FingerprintFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
+
+        sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.NfcOff))
 
         if (!nfcManager.doesDeviceHaveNfcCapability()) {
             continueToSerialEntryPair()
