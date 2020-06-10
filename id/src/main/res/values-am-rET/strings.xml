@@ -153,4 +153,6 @@
     <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">የጣት አሻራ</string>
     <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
+    <string name="enrol_last_biometrics_success">የተግባቦት ስህተት አጋጥሟል(የተሳሳተ ሲምፕሪንስ ኢንተንት) እባክዎ ለሲስተም አድሚኒስትሬተር ያሳውቁ</string>
+
 </resources>
