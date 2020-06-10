@@ -2,10 +2,12 @@ package com.simprints.id.activities.orchestrator
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
+import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -73,7 +75,8 @@ class OrchestratorActivity : AppCompatActivity() {
     }
 
     private fun scheduleAndStartSyncIfNecessary() {
-        if(preferencesManager.peopleDownSyncSetting == PeopleDownSyncSetting.EXTRA) {
+        Log.d("TEST_ALAN", "Orchestrator called")
+        if (preferencesManager.peopleDownSyncSetting == PeopleDownSyncSetting.EXTRA) {
             peopleSyncManager.sync()
         }
         syncManager.scheduleBackgroundSyncs()
@@ -84,7 +87,7 @@ class OrchestratorActivity : AppCompatActivity() {
         vm.saveState()
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         vm.restoreState()
         newActivity = false
@@ -92,6 +95,14 @@ class OrchestratorActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        if (preferencesManager.securityStatus.isCompromisedOrProjectEnded()) {
+            Log.d("TEST_ALAN", "Finishing orchestrator")
+            val intent = Intent(this, RequestLoginActivity::class.java)
+            startActivity(intent)
+            // TODO: check
+        }
+
         vm.ongoingStep.observe(this, observerForNextStep)
         vm.appResponse.observe(this, observerForFinalResponse)
 
