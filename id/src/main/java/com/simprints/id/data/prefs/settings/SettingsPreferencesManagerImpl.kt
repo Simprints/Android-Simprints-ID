@@ -1,7 +1,6 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
-import com.simprints.id.network.NetworkConstants
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -17,6 +16,8 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
+import com.simprints.id.network.NetworkConstants
+import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
@@ -31,7 +32,8 @@ open class SettingsPreferencesManagerImpl(
     peopleDownSyncSettingSerializer: Serializer<PeopleDownSyncSetting>,
     captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
     saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
-    scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
+    scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
+    securityStatusSerializer: Serializer<SecurityState.Status>
 ) : SettingsPreferencesManager {
 
     /**
@@ -242,6 +244,13 @@ open class SettingsPreferencesManagerImpl(
     override var apiBaseUrl: String
         by PrimitivePreference(prefs, API_BASE_URL_KEY, NetworkConstants.DEFAULT_BASE_URL)
 
+    override var securityStatus: SecurityState.Status by ComplexPreference(
+        prefs,
+        SECURITY_STATUS_KEY,
+        SECURITY_STATUS_DEFAULT,
+        securityStatusSerializer
+    )
+
     override var faceMaxRetries: Int
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -351,6 +360,9 @@ open class SettingsPreferencesManagerImpl(
         const val FACE_MAX_RETRIES_DEFAULT = 2
         const val FACE_QUALITY_THRESHOLD = "FaceQualityThreshold"
         const val FACE_QUALITY_THRESHOLD_DEFAULT = -1f
+
+        const val SECURITY_STATUS_KEY = "SecurityStatus"
+        val SECURITY_STATUS_DEFAULT = SecurityState.Status.RUNNING
     }
 
 }

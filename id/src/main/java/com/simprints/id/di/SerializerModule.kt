@@ -8,6 +8,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.ScannerGenerationsSerializer
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
+import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
 import com.simprints.id.tools.serializers.*
 import dagger.Module
@@ -36,4 +37,5 @@ class SerializerModule {
     @Provides @Singleton @Named("CaptureFingerprintStrategySerializer") fun provideCaptureFingerprintStrategySerializer(): Serializer<CaptureFingerprintStrategy> = EnumSerializer(CaptureFingerprintStrategy::class.java)
     @Provides @Singleton @Named("SaveFingerprintImagesStrategySerializer") fun provideSaveFingerprintImagesStrategySerializer(): Serializer<SaveFingerprintImagesStrategy> = EnumSerializer(SaveFingerprintImagesStrategy::class.java)
     @Provides @Singleton @Named("ScannerGenerationsSerializer") fun provideScannerGenerationsSerializer(): Serializer<List<ScannerGeneration>> = ScannerGenerationsSerializer()
+    @Provides @Singleton @Named("SecurityStatusSerializer") fun provideSecurityStatusSerializer(): Serializer<SecurityState.Status> = EnumSerializer(SecurityState.Status::class.java)
 }

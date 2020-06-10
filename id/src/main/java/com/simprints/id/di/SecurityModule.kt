@@ -17,6 +17,7 @@ import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
@@ -161,8 +162,12 @@ open class SecurityModule {
 
     @Provides
     open fun provideSecurityStateRepository(
-        remoteDataSource: SecurityStateRemoteDataSource
-    ): SecurityStateRepository = SecurityStateRepositoryImpl(remoteDataSource)
+        remoteDataSource: SecurityStateRemoteDataSource,
+        settingsPreferencesManager: SettingsPreferencesManager
+    ): SecurityStateRepository = SecurityStateRepositoryImpl(
+        remoteDataSource,
+        settingsPreferencesManager
+    )
 
     @Provides
     open fun provideSecurityStateScheduler(
@@ -173,12 +178,10 @@ open class SecurityModule {
     open fun provideSecurityStateProcessor(
         imageRepository: ImageRepository,
         personRepository: PersonRepository,
-        sessionRepository: SessionRepository,
         signerManager: SignerManager
     ): SecurityStateProcessor = SecurityStateProcessorImpl(
         imageRepository,
         personRepository,
-        sessionRepository,
         signerManager
     )
 
