@@ -143,5 +143,6 @@
     <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">Alama ya kidole</string>
     <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
+    <string name="enrol_last_biometrics_success">Kosa la kiufundi limetokea (intenti ya Simprints sio sahihi), tafadhali wasiliana na msimamizi wako wa programu</string>
 
 </resources>
