@@ -228,6 +228,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         try {
             block()
         } catch (t: Throwable) {
+            Timber.d(t)
             throw SessionDataSourceException(t)
         }
 
@@ -235,7 +236,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         try {
             block()
         } catch (t: Throwable) {
-            t.printStackTrace()
+            Timber.d(t)
             throw if (t is SessionDataSourceException) {
                 t
             } else {
