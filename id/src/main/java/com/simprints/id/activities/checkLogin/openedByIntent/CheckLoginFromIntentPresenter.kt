@@ -81,33 +81,33 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    internal fun buildRequestEvent(relativeStarTime: Long, request: AppRequest): Event =
+    internal fun buildRequestEvent(relativeStartTime: Long, request: AppRequest): Event =
         when (request) {
-            is AppEnrolRequest -> buildEnrolmentCalloutEvent(request, relativeStarTime)
-            is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStarTime)
-            is AppIdentifyRequest -> buildIdentificationCalloutEvent(request, relativeStarTime)
+            is AppEnrolRequest -> buildEnrolmentCalloutEvent(request, relativeStartTime)
+            is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStartTime)
+            is AppIdentifyRequest -> buildIdentificationCalloutEvent(request, relativeStartTime)
             else -> throw InvalidAppRequest()
         }
 
-    internal fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStarTime: Long) =
+    internal fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStartTime: Long) =
         with(request) {
             IdentificationCalloutEvent(
-                relativeStarTime,
+                relativeStartTime,
                 projectId, userId, moduleId, metadata)
         }
 
-    internal fun buildVerificationCalloutEvent(request: AppVerifyRequest, relativeStarTime: Long) =
+    internal fun buildVerificationCalloutEvent(request: AppVerifyRequest, relativeStartTime: Long) =
         with(request) {
             VerificationCalloutEvent(
-                relativeStarTime,
+                relativeStartTime,
                 projectId, userId, moduleId, verifyGuid, metadata)
         }
 
 
-    internal fun buildEnrolmentCalloutEvent(request: AppEnrolRequest, relativeStarTime: Long) =
+    internal fun buildEnrolmentCalloutEvent(request: AppEnrolRequest, relativeStartTime: Long) =
         with(request) {
             EnrolmentCalloutEvent(
-                relativeStarTime,
+                relativeStartTime,
                 projectId, userId, moduleId, metadata)
         }
 
