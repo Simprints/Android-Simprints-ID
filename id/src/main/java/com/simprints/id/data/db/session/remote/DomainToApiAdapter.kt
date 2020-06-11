@@ -1,13 +1,11 @@
 package com.simprints.id.data.db.session.remote
 
 import androidx.annotation.Keep
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.EventType.*
 import com.simprints.id.data.db.session.domain.models.events.callback.*
 import com.simprints.id.data.db.session.domain.models.events.callout.*
 import com.simprints.id.data.db.session.remote.events.*
-import timber.log.Timber
 
 @Keep
 fun Event.toApiEvent(): ApiEvent =
@@ -24,11 +22,7 @@ fun Event.toApiEvent(): ApiEvent =
         ONE_TO_ONE_MATCH -> ApiOneToOneMatchEvent(this as OneToOneMatchEvent)
         PERSON_CREATION ->  ApiPersonCreationEvent(this as PersonCreationEvent)
         ONE_TO_MANY_MATCH -> ApiOneToManyMatchEvent(this as OneToManyMatchEvent)
-        SCANNER_CONNECTION -> {
-            Timber.d("Test: ${this as ScannerConnectionEvent}")
-            Timber.d("Test: ${JsonHelper.toJson(this)}")
-            ApiScannerConnectionEvent(this as ScannerConnectionEvent)
-        }
+        SCANNER_CONNECTION -> ApiScannerConnectionEvent(this as ScannerConnectionEvent)
         FINGERPRINT_CAPTURE -> ApiFingerprintCaptureEvent(this as FingerprintCaptureEvent)
         CONNECTIVITY_SNAPSHOT -> ApiConnectivitySnapshotEvent(this as ConnectivitySnapshotEvent)
         INVALID_INTENT -> ApiInvalidIntentEvent(this as InvalidIntentEvent)
