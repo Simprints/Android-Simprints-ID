@@ -3,8 +3,10 @@ package com.simprints.id.data.db.session.domain.models.events
 import androidx.annotation.Keep
 
 @Keep
-class AlertScreenEvent(starTime: Long,
-                       val alertType: AlertScreenEventType) : Event(EventType.ALERT_SCREEN, starTime) {
+class AlertScreenEvent(
+    startTime: Long,
+    val alertType: AlertScreenEventType
+) : Event(EventType.ALERT_SCREEN, startTime) {
 
     enum class AlertScreenEventType {
         DIFFERENT_PROJECT_ID,
