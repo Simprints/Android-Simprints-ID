@@ -94,7 +94,7 @@
     <string name="verify_guid_not_found_title">Person not found</string>
     <string name="error_occurred_title">Error occurred</string>
     <string name="alert_try_again">Try again</string>
-    <string name="last_biometrics_alert_title">Unable to save</string>
+    <string name="enrol_last_biometrics_alert_title">Unable to save</string>
 
     <!-- Error Message Text -->
     <string name="different_projectId_message">A configuration error has occurred (different Project Id), please sign out from the home screen or contact your system administrator</string>
