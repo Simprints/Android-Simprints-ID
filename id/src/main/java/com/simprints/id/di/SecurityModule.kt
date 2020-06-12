@@ -163,13 +163,10 @@ open class SecurityModule {
     )
 
     @Provides
+    @Singleton
     open fun provideSecurityStateRepository(
-        remoteDataSource: SecurityStateRemoteDataSource,
-        localDataSource: SecurityStatusLocalDataSource
-    ): SecurityStateRepository = SecurityStateRepositoryImpl(
-        remoteDataSource,
-        localDataSource
-    )
+        remoteDataSource: SecurityStateRemoteDataSource
+    ): SecurityStateRepository = SecurityStateRepositoryImpl(remoteDataSource)
 
     @Provides
     open fun provideSecurityStatusLocalDataSource(

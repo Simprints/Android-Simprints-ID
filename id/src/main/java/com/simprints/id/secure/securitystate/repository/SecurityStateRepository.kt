@@ -1,11 +1,12 @@
 package com.simprints.id.secure.securitystate.repository
 
 import com.simprints.id.secure.models.SecurityState
+import kotlinx.coroutines.channels.Channel
 
 interface SecurityStateRepository {
 
-    suspend fun getSecurityStateFromRemote(): SecurityState
+    val securityStatusChannel: Channel<SecurityState.Status>
 
-    fun getSecurityStatusFromLocal(): SecurityState.Status
+    suspend fun getSecurityStateFromRemote(): SecurityState
 
 }

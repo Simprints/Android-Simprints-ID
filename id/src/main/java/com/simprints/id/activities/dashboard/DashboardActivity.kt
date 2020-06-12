@@ -25,6 +25,7 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.tools.AndroidResourcesHelper
@@ -49,6 +50,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     @Inject lateinit var viewModelFactory: DashboardViewModelFactory
     @Inject lateinit var peopleSyncManager: PeopleSyncManager
     @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
+    @Inject lateinit var securityStateRepository: SecurityStateRepository
 
     private lateinit var viewModel: DashboardViewModel
 
@@ -188,20 +190,26 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
         super.onResume()
         loadDailyActivity()
         lifecycleScope.launch {
-            stopTickerToCheckIfSyncIsRequired()
-            syncAgainTicker = ticker(
-                delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
-                initialDelayMillis = 0
-            ).also {
-                for (event in it) {
-                    Timber.tag(SYNC_LOG_TAG).d("Launch sync if required")
-                    viewModel.syncIfRequired()
+            val securityStatus = securityStateRepository.securityStatusChannel.receive()
+
+            if (securityStatus.isCompromisedOrProjectEnded()) {
+                finishAndRemoveTask() // TODO: confirm
+            } else {
+                stopTickerToCheckIfSyncIsRequired()
+                syncAgainTicker = ticker(
+                    delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
+                    initialDelayMillis = 0
+                ).also {
+                    for (event in it) {
+                        Timber.tag(SYNC_LOG_TAG).d("Launch sync if required")
+                        viewModel.syncIfRequired()
+                    }
+                }
+
+                lifecycleScope.launch {
+                    syncCardDisplayer.startTickerToUpdateLastSyncText()
                 }
             }
-        }
-
-        lifecycleScope.launch {
-            syncCardDisplayer.startTickerToUpdateLastSyncText()
         }
     }
 
