@@ -6,10 +6,10 @@ import com.simprints.id.data.db.session.domain.models.events.RefusalEvent as Cor
 import com.simprints.id.data.db.session.domain.models.events.RefusalEvent.Answer as CoreRefusalAnswer
 
 @Keep
-class RefusalEvent(starTime: Long,
+class RefusalEvent(startTime: Long,
                    endTime: Long,
                    val reason: RefusalAnswer,
-                   val otherText: String) : Event(EventType.REFUSAL, starTime, endTime)
+                   val otherText: String) : Event(EventType.REFUSAL, startTime, endTime)
 
 @Keep
 enum class RefusalAnswer {
@@ -36,7 +36,7 @@ enum class RefusalAnswer {
 }
 
 fun RefusalEvent.fromDomainToCore() =
-    CoreRefusalEvent(starTime, endTime, reason.fromDomainToCore(), otherText)
+    CoreRefusalEvent(startTime, endTime, reason.fromDomainToCore(), otherText)
 
 fun RefusalAnswer.fromDomainToCore(): CoreRefusalAnswer =
     when (this) {
