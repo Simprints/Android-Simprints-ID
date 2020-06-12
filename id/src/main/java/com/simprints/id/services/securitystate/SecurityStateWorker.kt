@@ -1,7 +1,6 @@
 package com.simprints.id.services.securitystate
 
 import android.content.Context
-import android.util.Log
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -29,7 +28,6 @@ class SecurityStateWorker(
 
         try {
             val securityState = repository.getSecurityState()
-            Log.d("TEST_ALAN", "Security state: ${securityState.status}")
             securityStateProcessor.processSecurityState(securityState)
             success()
         } catch (t: Throwable) {

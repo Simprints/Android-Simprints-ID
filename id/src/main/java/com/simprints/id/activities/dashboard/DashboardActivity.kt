@@ -3,7 +3,6 @@ package com.simprints.id.activities.dashboard
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.Menu
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -66,16 +65,11 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
         component.inject(this)
         title = androidResourcesHelper.getString(R.string.dashboard_label)
 
-        if (settingsPreferencesManager.securityStatus.isCompromisedOrProjectEnded()) {
-            Log.d("TEST_ALAN", "onCreate")
-            startRequestLoginActivityAndFinish()
-        } else {
-            setupActionBar()
-            setupViewModel()
-            setupCards()
-            observeCardData()
-            loadDailyActivity()
-        }
+        setupActionBar()
+        setupViewModel()
+        setupCards()
+        observeCardData()
+        loadDailyActivity()
     }
 
     private fun setupActionBar() {
@@ -192,28 +186,22 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     @ObsoleteCoroutinesApi
     override fun onResume() {
         super.onResume()
-
-        if (settingsPreferencesManager.securityStatus.isCompromisedOrProjectEnded()) {
-            Log.d("TEST_ALAN", "onResume")
-            startRequestLoginActivityAndFinish()
-        } else {
-            loadDailyActivity()
-            lifecycleScope.launch {
-                stopTickerToCheckIfSyncIsRequired()
-                syncAgainTicker = ticker(
-                    delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
-                    initialDelayMillis = 0
-                ).also {
-                    for (event in it) {
-                        Timber.tag(SYNC_LOG_TAG).d("Launch sync if required")
-                        viewModel.syncIfRequired()
-                    }
+        loadDailyActivity()
+        lifecycleScope.launch {
+            stopTickerToCheckIfSyncIsRequired()
+            syncAgainTicker = ticker(
+                delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
+                initialDelayMillis = 0
+            ).also {
+                for (event in it) {
+                    Timber.tag(SYNC_LOG_TAG).d("Launch sync if required")
+                    viewModel.syncIfRequired()
                 }
             }
+        }
 
-            lifecycleScope.launch {
-                syncCardDisplayer.startTickerToUpdateLastSyncText()
-            }
+        lifecycleScope.launch {
+            syncCardDisplayer.startTickerToUpdateLastSyncText()
         }
     }
 
