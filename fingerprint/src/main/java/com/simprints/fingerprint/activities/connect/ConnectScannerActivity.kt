@@ -8,6 +8,7 @@ import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAler
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.base.FingerprintActivity
+import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.BackButtonBehaviour.*
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
@@ -72,6 +73,11 @@ class ConnectScannerActivity : FingerprintActivity() {
     }
 
     override fun onBackPressed() {
-        goToRefusalActivity()
+        when (viewModel.backButtonBehaviour.value) {
+            DISABLED -> { /* Do nothing */
+            }
+            EXIT_FORM, null -> goToRefusalActivity()
+            EXIT_WITH_ERROR -> finishWithError()
+        }
     }
 }
