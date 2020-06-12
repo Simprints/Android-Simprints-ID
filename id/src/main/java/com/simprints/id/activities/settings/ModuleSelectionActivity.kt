@@ -5,12 +5,13 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.settings_toolbar.*
 import javax.inject.Inject
 
-class ModuleSelectionActivity : AppCompatActivity() {
+class ModuleSelectionActivity : BaseSplitActivity() {
 
     private lateinit var moduleSelectionFragment: ModuleSelectionFragment
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper

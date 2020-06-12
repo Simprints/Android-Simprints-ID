@@ -20,8 +20,6 @@ interface AndroidResourcesHelper {
     fun getQuantityString(@PluralsRes resId: Int, quantity: Int): String
     fun getColorStateList(color: Int): ColorStateList?
 
-    fun getLocale(): Locale
-
     companion object {
         fun build(app: Application): AndroidResourcesHelper =
             app.component.getAndroidResourcesHelper()

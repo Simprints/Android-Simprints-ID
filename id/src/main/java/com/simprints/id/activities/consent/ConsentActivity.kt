@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
@@ -36,7 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ConsentActivity : AppCompatActivity() {
+class ConsentActivity : BaseSplitActivity() {
 
     private lateinit var viewModel: ConsentViewModel
     private lateinit var generalConsentTab: TabHost.TabSpec

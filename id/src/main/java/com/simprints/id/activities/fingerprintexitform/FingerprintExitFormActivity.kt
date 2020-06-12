@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult.Action
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult.Answer
@@ -26,7 +27,7 @@ import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 import javax.inject.Inject
 
-class FingerprintExitFormActivity : AppCompatActivity() {
+class FingerprintExitFormActivity : BaseSplitActivity() {
 
     private lateinit var viewModel: FingerprintExitFormViewModel
 

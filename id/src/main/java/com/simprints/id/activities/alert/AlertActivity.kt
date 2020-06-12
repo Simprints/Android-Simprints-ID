@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.alert.request.AlertActRequest
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.di.AppComponent
@@ -25,7 +26,7 @@ import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_alert.*
 import javax.inject.Inject
 
-class AlertActivity : AppCompatActivity(), AlertContract.View {
+class AlertActivity : BaseSplitActivity(), AlertContract.View {
 
     override lateinit var viewPresenter: AlertContract.Presenter
     private lateinit var alertTypeType: AlertType

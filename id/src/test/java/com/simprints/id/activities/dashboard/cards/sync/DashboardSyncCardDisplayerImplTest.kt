@@ -43,7 +43,7 @@ class DashboardSyncCardDisplayerImplTest {
     fun setUp() {
         ctx = ApplicationProvider.getApplicationContext()
         syncCardRootLayout = LinearLayout(ctx)
-        androidResHelper = AndroidResourcesHelperImpl(ctx, preferencesManager.language)
+        androidResHelper = AndroidResourcesHelperImpl(ctx)
         syncCardDisplayer = DashboardSyncCardDisplayerImpl(androidResHelper, TimeHelperImpl())
         syncCardDisplayer.initRoot(syncCardRootLayout)
     }

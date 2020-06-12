@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.CLOSE
@@ -24,7 +25,7 @@ import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.
 import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
 import javax.inject.Inject
 
-class FetchGuidActivity : AppCompatActivity() {
+class FetchGuidActivity : BaseSplitActivity() {
 
     private lateinit var fetchGuidRequest: FetchGUIDRequest
     private lateinit var viewModel: FetchGuidViewModel

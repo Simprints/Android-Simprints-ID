@@ -105,7 +105,7 @@ object KoinInjector {
         factory<FingerprintCrashReportManager> { FingerprintCrashReportManagerImpl(get()) }
         factory<FingerprintTimeHelper> { FingerprintTimeHelperImpl(get()) }
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
-        factory<FingerprintAndroidResourcesHelper> { FingerprintAndroidResourcesHelperImpl(get(), get()) }
+        factory<FingerprintAndroidResourcesHelper> { FingerprintAndroidResourcesHelperImpl(get()) }
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
         factory<FingerprintImageManager> { FingerprintImageManagerImpl(get(), get()) }
         factory<FingerprintApiClientFactory> { FingerprintApiClientFactoryImpl(get()) }

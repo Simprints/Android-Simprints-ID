@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult.Action.GO_BACK
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult.Action.SUBMIT
@@ -26,7 +27,7 @@ import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 import javax.inject.Inject
 
-class CoreExitFormActivity : AppCompatActivity() {
+class CoreExitFormActivity : BaseSplitActivity() {
 
     private lateinit var viewModel: CoreExitFormViewModel
 

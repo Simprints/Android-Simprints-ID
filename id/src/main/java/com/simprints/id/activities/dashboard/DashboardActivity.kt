@@ -13,6 +13,7 @@ import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.dashboard.cards.daily_activity.displayer.DashboardDailyActivityCardDisplayer
 import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
@@ -38,7 +39,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
+class DashboardActivity : BaseSplitActivity() {
 
     private var syncAgainTicker: ReceiveChannel<Unit>? = null
 
@@ -63,6 +64,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
         super.onCreate(savedInstanceState)
         val component = (application as Application).component
         component.inject(this)
+        setContentView(R.layout.activity_dashboard)
         title = androidResourcesHelper.getString(R.string.dashboard_label)
 
         setupActionBar()

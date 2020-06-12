@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import com.simprints.core.tools.LanguageHelper
 import java.util.*
 
-class AndroidResourcesHelperImpl(val ctx: Context, val language: String) : AndroidResourcesHelper {
+class AndroidResourcesHelperImpl(ctx: Context) : AndroidResourcesHelper {
 
     /**
      * The abstract concept of quantity found in most languages. Note that this will not be correct
@@ -83,9 +83,7 @@ class AndroidResourcesHelperImpl(val ctx: Context, val language: String) : Andro
         }
     }
 
-    private val languageContext by lazy {
-            LanguageHelper.contextWithSpecificLanguage(ctx, language)
-    }
+    private val languageContext = LanguageHelper.getLanguageConfigurationContext(ctx)
 
     override fun getStringPlural(stringQuantityKey: Int, quantity: Int, params: Array<Any>): String =
         getStringPlural(languageContext, stringQuantityKey, quantity, params)
@@ -107,7 +105,4 @@ class AndroidResourcesHelperImpl(val ctx: Context, val language: String) : Andro
     override fun getColorStateList(color: Int): ColorStateList? = ContextCompat.getColorStateList(languageContext, color)
 
     override fun getColour(colourId: Int): Int = ContextCompat.getColor(languageContext, colourId)
-
-    override fun getLocale(): Locale =
-        LanguageHelper.localeFor(language)
 }

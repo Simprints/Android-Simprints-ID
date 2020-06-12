@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.work.WorkManager
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.data.db.subjects_sync.down.local.SubjectsDownSyncOperationLocalDataSource
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
@@ -20,7 +21,7 @@ import kotlinx.android.synthetic.main.activity_debug.*
 import javax.inject.Inject
 
 
-class DebugActivity : AppCompatActivity() {
+class DebugActivity : BaseSplitActivity() {
 
     @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
     @Inject lateinit var subjectsDownSyncOperationLocalDataSource: SubjectsDownSyncOperationLocalDataSource

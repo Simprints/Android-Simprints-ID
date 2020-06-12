@@ -9,6 +9,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.guidselection.GuidSelectionWorker
@@ -19,7 +20,7 @@ import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
 
-class GuidSelectionActivity : AppCompatActivity() {
+class GuidSelectionActivity : BaseSplitActivity() {
 
     @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var timeHelper: TimeHelper

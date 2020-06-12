@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -23,7 +24,7 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.Companion.BUNDLE_KEY as APP_REQUEST_BUNDLE_KEY
 
-class OrchestratorActivity : AppCompatActivity() {
+class OrchestratorActivity : BaseSplitActivity() {
 
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var orchestratorViewModelFactory: OrchestratorViewModelFactory
