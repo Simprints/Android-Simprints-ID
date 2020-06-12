@@ -33,6 +33,7 @@ class OtaFailedFragment : FingerprintFragment() {
 
         sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.OtaFailed))
 
+        connectScannerViewModel.setBackButtonToExitWithError()
         continueButton.setOnClickListener {
             connectScannerViewModel.finishAfterError.postEvent()
         }
