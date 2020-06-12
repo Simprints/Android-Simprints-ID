@@ -4,13 +4,14 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.packageVersionName
 import kotlinx.android.synthetic.main.activity_front.*
 import javax.inject.Inject
 
-open class RequestLoginActivity : AppCompatActivity() {
+open class RequestLoginActivity : BaseSplitActivity() {
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper

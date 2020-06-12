@@ -5,6 +5,7 @@ import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
 import androidx.multidex.MultiDexApplication
 import com.google.android.play.core.splitcompat.SplitCompat
+import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.di.*
 import com.simprints.id.tools.logging.LoggingConfigHelper
 import com.simprints.id.tools.logging.NoLoggingConfigHelper
@@ -26,8 +27,10 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
 
     open var loggingConfigHelper: LoggingConfigHelper = NoLoggingConfigHelper()
 
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
+    override fun attachBaseContext(base: Context) {
+        LanguageHelper.init(base)
+        val ctx = LanguageHelper.getLanguageConfigurationContext(base)
+        super.attachBaseContext(ctx)
         SplitCompat.install(this)
     }
 

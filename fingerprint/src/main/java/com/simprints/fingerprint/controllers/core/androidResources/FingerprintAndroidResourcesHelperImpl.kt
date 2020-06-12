@@ -1,21 +1,13 @@
 package com.simprints.fingerprint.controllers.core.androidResources
 
 import android.content.Context
-import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
-import com.simprints.id.tools.AndroidResourcesHelper
-import java.util.*
+import com.simprints.core.tools.LanguageHelper
 
-class FingerprintAndroidResourcesHelperImpl(private val context: Context, private val coreAndroidResourcesHelper: AndroidResourcesHelper) : FingerprintAndroidResourcesHelper {
+class FingerprintAndroidResourcesHelperImpl(context: Context) : FingerprintAndroidResourcesHelper {
 
-    private val languageContext =
-        context.createConfigurationContext(buildConfiguration(coreAndroidResourcesHelper.getLocale()))
-
-    private fun buildConfiguration(locale: Locale) = Configuration().apply {
-        Locale.setDefault(locale)
-        setLocale(locale)
-    }
+    private val languageContext = LanguageHelper.getLanguageConfigurationContext(context)
 
     private enum class QUANTITY constructor(private val title: String) {
         ZERO("zero"),

@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.LoginActivity
@@ -29,7 +30,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
-open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromIntentContract.View {
+open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromIntentContract.View {
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var preferencesManager: PreferencesManager

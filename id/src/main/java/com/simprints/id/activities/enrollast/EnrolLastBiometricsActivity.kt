@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -23,7 +24,7 @@ import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
 
-class EnrolLastBiometricsActivity : AppCompatActivity() {
+class EnrolLastBiometricsActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var enrolmentHelper: EnrolmentHelper

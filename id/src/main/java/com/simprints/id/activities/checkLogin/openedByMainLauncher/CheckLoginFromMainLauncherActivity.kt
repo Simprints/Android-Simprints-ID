@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.dashboard.DashboardActivity
@@ -17,7 +18,7 @@ import org.jetbrains.anko.startActivity
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using the Home button
-open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginFromMainLauncherContract.View {
+open class CheckLoginFromMainLauncherActivity : BaseSplitActivity(), CheckLoginFromMainLauncherContract.View {
 
     override lateinit var viewPresenter: CheckLoginFromMainLauncherContract.Presenter
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper

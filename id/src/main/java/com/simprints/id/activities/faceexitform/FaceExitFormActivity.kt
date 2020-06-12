@@ -8,6 +8,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Action
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Answer
@@ -24,7 +25,7 @@ import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 import javax.inject.Inject
 
-class FaceExitFormActivity : AppCompatActivity() {
+class FaceExitFormActivity : BaseSplitActivity() {
 
     private var faceExitFormReason = OTHER
 

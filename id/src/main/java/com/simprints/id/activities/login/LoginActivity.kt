@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.request.LoginActivityRequest
@@ -33,7 +34,7 @@ import kotlinx.android.synthetic.main.activity_login.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class LoginActivity : AppCompatActivity(R.layout.activity_login) {
+class LoginActivity : BaseSplitActivity() {
 
     @Inject lateinit var viewModelFactory: LoginViewModelFactory
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
@@ -52,6 +53,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
+        setContentView(R.layout.activity_login)
 
         baseUrlProvider.resetApiBaseUrl()
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)

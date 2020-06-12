@@ -213,17 +213,12 @@ open class AppModule {
     fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
 
     @Provides
-    fun provideAndroidResourcesHelper(
-        ctx: Context,
-        preferencesManager: PreferencesManager
-    ): AndroidResourcesHelper {
-        return AndroidResourcesHelperImpl(ctx, preferencesManager.language)
-    }
+    fun provideAndroidResourcesHelper(ctx: Context): AndroidResourcesHelper =
+        AndroidResourcesHelperImpl(ctx)
 
     @Provides
     open fun provideSessionRealmConfigBuilder(): SessionRealmConfigBuilder =
         SessionRealmConfigBuilderImpl()
-
 
     @Provides
     @Singleton
