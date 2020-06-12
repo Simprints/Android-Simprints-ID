@@ -40,7 +40,7 @@ class FirmwareFileUpdateScheduler(val context: Context, val preferencesManager: 
 
     companion object {
         const val WORK_NAME = "firmware-file-update-work"
-        const val REPEAT_INTERVAL = 15L
-        val REPEAT_INTERVAL_UNITS = TimeUnit.MINUTES
+        const val REPEAT_INTERVAL = 1L
+        val REPEAT_INTERVAL_UNITS = TimeUnit.DAYS
     }
 }
