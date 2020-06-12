@@ -37,7 +37,7 @@ class SecurityStateRepositoryImplTest {
         val expected = SecurityState(DEVICE_ID, SecurityState.Status.PROJECT_ENDED)
         coEvery { mockRemoteDataSource.getSecurityState() } returns expected
 
-        val securityState = repository.getSecurityState()
+        val securityState = repository.getSecurityStateFromRemote()
 
         assertThat(securityState).isEqualTo(expected)
     }
@@ -49,7 +49,7 @@ class SecurityStateRepositoryImplTest {
         } throws SimprintsInternalServerException()
 
         runBlocking {
-            repository.getSecurityState()
+            repository.getSecurityStateFromRemote()
         }
     }
 
@@ -58,7 +58,7 @@ class SecurityStateRepositoryImplTest {
         coEvery { mockRemoteDataSource.getSecurityState() } throws HttpException(mockk())
 
         runBlocking {
-            repository.getSecurityState()
+            repository.getSecurityStateFromRemote()
         }
     }
 
@@ -68,7 +68,7 @@ class SecurityStateRepositoryImplTest {
         coEvery { mockRemoteDataSource.getSecurityState() } returns securityState
 
         runBlocking {
-            repository.getSecurityState()
+            repository.getSecurityStateFromRemote()
         }
 
         verify { mockSettingsPreferencesManager.securityStatus = securityState.status }

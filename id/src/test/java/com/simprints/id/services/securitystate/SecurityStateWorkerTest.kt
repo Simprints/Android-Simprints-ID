@@ -74,11 +74,11 @@ class SecurityStateWorkerTest {
 
     private fun mockSuccess() {
         val securityState = SecurityState(DEVICE_ID, SecurityState.Status.RUNNING)
-        coEvery { worker.repository.getSecurityState() } returns securityState
+        coEvery { worker.repository.getSecurityStateFromRemote() } returns securityState
     }
 
     private fun mockException() {
-        coEvery { worker.repository.getSecurityState() } throws Throwable()
+        coEvery { worker.repository.getSecurityStateFromRemote() } throws Throwable()
     }
 
     private companion object {
