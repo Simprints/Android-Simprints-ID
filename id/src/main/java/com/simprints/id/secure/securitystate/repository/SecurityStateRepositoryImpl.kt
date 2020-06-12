@@ -1,21 +1,27 @@
 package com.simprints.id.secure.securitystate.repository
 
 import com.simprints.id.secure.models.SecurityState
-import com.simprints.id.secure.securitystate.local.SecurityStatusLocalDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 
 class SecurityStateRepositoryImpl(
-    private val remoteDataSource: SecurityStateRemoteDataSource,
-    private val localDataSource: SecurityStatusLocalDataSource
+    private val remoteDataSource: SecurityStateRemoteDataSource
 ) : SecurityStateRepository {
 
+    override val securityStatusChannel: Channel<SecurityState.Status> = Channel(Channel.CONFLATED)
+
+    @ExperimentalCoroutinesApi
     override suspend fun getSecurityStateFromRemote(): SecurityState {
         return remoteDataSource.getSecurityState().also {
-            localDataSource.updateSecurityStatus(it.status)
+            securityStatusChannel.update(it.status)
         }
     }
 
-    override fun getSecurityStatusFromLocal(): SecurityState.Status
-        = localDataSource.getSecurityStatus()
+    @ExperimentalCoroutinesApi
+    private suspend fun Channel<SecurityState.Status>.update(status: SecurityState.Status) {
+        if (!isClosedForSend)
+            send(status)
+    }
 
 }

@@ -16,7 +16,7 @@ class SecurityStateRemoteDataSourceImpl(
 ) : SecurityStateRemoteDataSource {
 
     override suspend fun getSecurityState(): SecurityState {
-        return SecurityState(deviceId, SecurityState.Status.COMPROMISED)
+        return SecurityState(deviceId, SecurityState.Status.RUNNING)
         /*val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
 
         val response = getClient().executeCall("requestSecurityState") {
