@@ -13,7 +13,7 @@ class ScannerConnectionEvent(startTime: Long,
 }
 
 fun ScannerConnectionEvent.fromDomainToCore() =
-    ScannerConnectionEventCore(starTime, scannerInfo.fromDomainToCore())
+    ScannerConnectionEventCore(startTime, scannerInfo.fromDomainToCore())
 
 fun ScannerConnectionEvent.ScannerInfo.fromDomainToCore() =
     ScannerInfoCore(scannerId, macAddress, hardwareVersion)

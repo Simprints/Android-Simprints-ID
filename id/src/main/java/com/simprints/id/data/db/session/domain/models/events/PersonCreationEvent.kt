@@ -8,8 +8,10 @@ import com.simprints.id.tools.TimeHelper
 
 // At the end of the sequence of capture, we build a Person object used either for enrolment or verification/identification
 @Keep
-class PersonCreationEvent(starTime: Long,
-                          val fingerprintCaptureIds: List<String>) : Event(EventType.PERSON_CREATION, starTime) {
+class PersonCreationEvent(
+    startTime: Long,
+    val fingerprintCaptureIds: List<String>
+) : Event(EventType.PERSON_CREATION, startTime) {
 
     companion object {
         fun build(timeHelper: TimeHelper,
