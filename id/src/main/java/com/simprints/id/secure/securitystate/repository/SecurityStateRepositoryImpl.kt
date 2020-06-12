@@ -1,18 +1,21 @@
 package com.simprints.id.secure.securitystate.repository
 
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.secure.models.SecurityState
+import com.simprints.id.secure.securitystate.local.SecurityStatusLocalDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
 
 class SecurityStateRepositoryImpl(
     private val remoteDataSource: SecurityStateRemoteDataSource,
-    private val settingsPreferencesManager: SettingsPreferencesManager
+    private val localDataSource: SecurityStatusLocalDataSource
 ) : SecurityStateRepository {
 
-    override suspend fun getSecurityState(): SecurityState {
+    override suspend fun getSecurityStateFromRemote(): SecurityState {
         return remoteDataSource.getSecurityState().also {
-            settingsPreferencesManager.securityStatus = it.status
+            localDataSource.updateSecurityStatus(it.status)
         }
     }
+
+    override fun getSecurityStatusFromLocal(): SecurityState.Status
+        = localDataSource.getSecurityStatus()
 
 }

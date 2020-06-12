@@ -24,6 +24,8 @@ import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.*
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
+import com.simprints.id.secure.securitystate.local.SecurityStatusLocalDataSource
+import com.simprints.id.secure.securitystate.local.SecurityStatusLocalDataSourceImpl
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourceImpl
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
@@ -163,11 +165,16 @@ open class SecurityModule {
     @Provides
     open fun provideSecurityStateRepository(
         remoteDataSource: SecurityStateRemoteDataSource,
-        settingsPreferencesManager: SettingsPreferencesManager
+        localDataSource: SecurityStatusLocalDataSource
     ): SecurityStateRepository = SecurityStateRepositoryImpl(
         remoteDataSource,
-        settingsPreferencesManager
+        localDataSource
     )
+
+    @Provides
+    open fun provideSecurityStatusLocalDataSource(
+        settingsPreferencesManager: SettingsPreferencesManager
+    ): SecurityStatusLocalDataSource = SecurityStatusLocalDataSourceImpl(settingsPreferencesManager)
 
     @Provides
     open fun provideSecurityStateScheduler(

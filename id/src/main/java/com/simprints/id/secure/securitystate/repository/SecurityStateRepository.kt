@@ -4,6 +4,8 @@ import com.simprints.id.secure.models.SecurityState
 
 interface SecurityStateRepository {
 
-    suspend fun getSecurityState(): SecurityState
+    suspend fun getSecurityStateFromRemote(): SecurityState
+
+    fun getSecurityStatusFromLocal(): SecurityState.Status
 
 }
