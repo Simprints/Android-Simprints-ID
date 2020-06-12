@@ -76,6 +76,7 @@ class OtaFragment : FingerprintFragment() {
         }
         startUpdateButton.visibility = View.INVISIBLE
         startUpdateButton.isEnabled = false
+        connectScannerViewModel.disableBackButton()
         viewModel.startOta(args.otaFragmentRequest.availableOtas, args.otaFragmentRequest.currentRetryAttempt)
     }
 
