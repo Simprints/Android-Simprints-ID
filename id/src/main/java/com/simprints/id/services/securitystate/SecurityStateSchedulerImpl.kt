@@ -25,7 +25,7 @@ class SecurityStateSchedulerImpl(context: Context) : SecurityStateScheduler {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        return PeriodicWorkRequestBuilder<SecurityStateWorker>(REPEAT_INTERVAL, TimeUnit.MINUTES)
+        return PeriodicWorkRequestBuilder<SecurityStateWorker>(REPEAT_INTERVAL, TimeUnit.MILLISECONDS)
             .setConstraints(constraints)
             .setBackoffCriteria(
                 BackoffPolicy.EXPONENTIAL,
@@ -36,7 +36,8 @@ class SecurityStateSchedulerImpl(context: Context) : SecurityStateScheduler {
 
     private companion object {
         const val WORK_NAME = "security-status-check-work"
-        const val REPEAT_INTERVAL = 30L
+        const val REPEAT_INTERVAL = PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS
+        // TODO: replace repeat interval with 30 MINUTES after testing
     }
 
 }

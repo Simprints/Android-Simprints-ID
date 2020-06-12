@@ -16,7 +16,8 @@ class SecurityStateRemoteDataSourceImpl(
 ) : SecurityStateRemoteDataSource {
 
     override suspend fun getSecurityState(): SecurityState {
-        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        return SecurityState(deviceId, SecurityState.Status.COMPROMISED)
+        /*val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
 
         val response = getClient().executeCall("requestSecurityState") {
             it.requestSecurityState(projectId, deviceId)
@@ -24,7 +25,7 @@ class SecurityStateRemoteDataSourceImpl(
 
         response.body()?.let {
             return it
-        } ?: handleErrorResponse(response)
+        } ?: handleErrorResponse(response)*/
     }
 
     private suspend fun getClient(): SimApiClient<SecureApiInterface> {

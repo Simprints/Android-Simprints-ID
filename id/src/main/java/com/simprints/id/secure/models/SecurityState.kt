@@ -5,7 +5,10 @@ data class SecurityState(val deviceId: String, val status: Status) {
     enum class Status {
         RUNNING,
         COMPROMISED,
-        PROJECT_ENDED
+        PROJECT_ENDED;
+
+        fun isCompromisedOrProjectEnded(): Boolean = this == COMPROMISED || this == PROJECT_ENDED
+
     }
 
 }

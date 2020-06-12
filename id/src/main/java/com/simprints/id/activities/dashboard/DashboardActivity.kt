@@ -225,12 +225,13 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
         }
 
         if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
-            startCheckLoginActivityAndFinish()
+            startRequestLoginActivityAndFinish()
         }
     }
 
-    private fun startCheckLoginActivityAndFinish() {
+    private fun startRequestLoginActivityAndFinish() {
         startActivity(Intent(this, RequestLoginActivity::class.java))
         finish()
     }
+
 }
