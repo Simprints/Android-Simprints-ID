@@ -7,19 +7,20 @@ import java.io.Serializable
 import com.simprints.id.data.db.session.domain.models.events.OneToOneMatchEvent as CoreOneToOneMatchEvent
 
 @Keep
-class OneToOneMatchEvent(starTime: Long,
-                         endTime: Long,
-                         val query: Serializable,
-                         val result: MatchEntry?) : Event(EventType.ONE_TO_ONE_MATCH, starTime, endTime)
+class OneToOneMatchEvent(
+    startTime: Long,
+    endTime: Long,
+    val query: Serializable,
+    val result: MatchEntry?
+) : Event(EventType.ONE_TO_ONE_MATCH, startTime, endTime)
 
 fun OneToOneMatchEvent.fromDomainToCore() =
     CoreOneToOneMatchEvent(
-        starTime,
+        startTime,
         endTime,
         (query as PersonLocalDataSource.Query).extractVerifyId(),
         result?.fromDomainToCore()
     )
 
-fun PersonLocalDataSource.Query.extractVerifyId() =
-    personId
+fun PersonLocalDataSource.Query.extractVerifyId() = personId
         ?: throw FingerprintUnexpectedException("null personId in candidate query when saving OneToOneMatchEvent")
