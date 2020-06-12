@@ -3,10 +3,12 @@ package com.simprints.id.data.db.session.domain.models.events
 import androidx.annotation.Keep
 
 @Keep
-class AuthenticationEvent(starTime: Long,
-                          endTime: Long,
-                          val userInfo: UserInfo,
-                          val result: Result) : Event(EventType.AUTHENTICATION, starTime, endTime) {
+class AuthenticationEvent(
+    startTime: Long,
+    endTime: Long,
+    val userInfo: UserInfo,
+    val result: Result
+) : Event(EventType.AUTHENTICATION, startTime, endTime) {
 
     @Keep
     class UserInfo(val projectId: String, val userId: String)

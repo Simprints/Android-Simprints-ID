@@ -6,11 +6,11 @@ import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent as
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
 
 @Keep
-class AlertScreenEvent(starTime: Long,
-                       val alertType: FingerprintAlert) : Event(EventType.ALERT_SCREEN, starTime)
+class AlertScreenEvent(startTime: Long,
+                       val alertType: FingerprintAlert) : Event(EventType.ALERT_SCREEN, startTime)
 
 fun AlertScreenEvent.fromDomainToCore() =
-    CoreAlertScreenEvent(starTime, alertType.fromFingerprintAlertToAlertTypeEvent())
+    CoreAlertScreenEvent(startTime, alertType.fromFingerprintAlertToAlertTypeEvent())
 
 fun FingerprintAlert.fromFingerprintAlertToAlertTypeEvent(): CoreAlertScreenEventType =
     when (this) {
