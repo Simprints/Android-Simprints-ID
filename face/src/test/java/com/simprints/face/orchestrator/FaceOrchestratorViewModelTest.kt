@@ -75,7 +75,7 @@ class FaceOrchestratorViewModelTest {
         viewModel.finishWithError(ErrorType.LICENSE_INVALID)
         viewModel.flowFinished.value?.peekContent()?.let { response ->
             assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
-            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.LICENSE_INVALID)
+            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.UNEXPECTED_ERROR)
         }
     }
 
@@ -86,7 +86,7 @@ class FaceOrchestratorViewModelTest {
         viewModel.finishWithError(ErrorType.LICENSE_MISSING)
         viewModel.flowFinished.value?.peekContent()?.let { response ->
             assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
-            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.LICENSE_MISSING)
+            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.UNEXPECTED_ERROR)
         }
     }
 
