@@ -18,11 +18,12 @@ enum class FaceErrorReason {
     LICENSE_MISSING,
     LICENSE_INVALID;
 
+    // TODO: map to new errors
     fun fromDomainToFaceErrorReason(): IFaceErrorReason =
         when (this) {
             UNEXPECTED_ERROR -> IFaceErrorReason.UNEXPECTED_ERROR
-            LICENSE_MISSING -> IFaceErrorReason.LICENSE_MISSING
-            LICENSE_INVALID -> IFaceErrorReason.LICENSE_INVALID
+            LICENSE_MISSING -> IFaceErrorReason.UNEXPECTED_ERROR
+            LICENSE_INVALID -> IFaceErrorReason.UNEXPECTED_ERROR
         }
 
     companion object {
