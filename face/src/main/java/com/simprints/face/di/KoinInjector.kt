@@ -72,7 +72,7 @@ object KoinInjector {
     private fun Module.defineBuildersForViewModels() {
         viewModel { FaceOrchestratorViewModel() }
         viewModel { FaceCaptureViewModel(get<FacePreferencesManager>().maxRetries, get()) }
-        viewModel { FaceMatchViewModel(get(), get()) }
+        viewModel { FaceMatchViewModel(get(), get(), get()) }
 
         viewModel { (mainVM: FaceCaptureViewModel) ->
             LiveFeedbackFragmentViewModel(

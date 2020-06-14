@@ -47,8 +47,11 @@ class OrchestratorModule {
         FingerprintRequestFactoryImpl()
 
     @Provides
-    fun provideFaceStepProcessor(faceRequestFactory: FaceRequestFactory): FaceStepProcessor =
-        FaceStepProcessorImpl(faceRequestFactory)
+    fun provideFaceStepProcessor(
+        faceRequestFactory: FaceRequestFactory,
+        preferenceManager: PreferencesManager
+    ): FaceStepProcessor =
+        FaceStepProcessorImpl(faceRequestFactory, preferenceManager)
 
     @Provides
     fun provideFingerprintStepProcessor(
@@ -112,8 +115,14 @@ class OrchestratorModule {
         sessionRepository: SessionRepository
     ): ModalityFlow =
         ModalityFlowIdentifyImpl(
-            fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, prefs.matchGroup, timeHelper, sessionRepository, prefs.consentRequired, prefs.locationPermissionRequired
+            fingerprintStepProcessor,
+            faceStepProcessor,
+            coreStepProcessor,
+            prefs.matchGroup,
+            timeHelper,
+            sessionRepository,
+            prefs.consentRequired,
+            prefs.locationPermissionRequired
         )
 
     // Orchestration
