@@ -9,6 +9,7 @@ enum class CrashReportTag {
     FACE_CAPTURE,
     MATCHING,
     FACE_MATCHING,
+    FACE_LICENSE,
     SETTINGS,
     LONG_CONSENT,
     ALERT,
