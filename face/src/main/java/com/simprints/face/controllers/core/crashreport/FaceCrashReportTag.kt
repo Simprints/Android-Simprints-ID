@@ -13,8 +13,8 @@ enum class FaceCrashReportTag {
 
 fun FaceCrashReportTag.fromDomainToCore() =
     when (this) {
-        FaceCrashReportTag.FACE_LICENSE -> FACE_CAPTURE
-        FaceCrashReportTag.FACE_CAPTURE -> FINGER_CAPTURE
+        FaceCrashReportTag.FACE_LICENSE -> FACE_LICENSE
+        FaceCrashReportTag.FACE_CAPTURE -> FACE_CAPTURE
         FaceCrashReportTag.FACE_MATCHING -> FACE_MATCHING
         FaceCrashReportTag.ALERT -> ALERT
         FaceCrashReportTag.REFUSAL -> REFUSAL
