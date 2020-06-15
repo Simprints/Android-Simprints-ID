@@ -9,10 +9,10 @@ class SecurityStateRepositoryImpl(
     private val remoteDataSource: SecurityStateRemoteDataSource
 ) : SecurityStateRepository {
 
-    override val securityStatusChannel: Channel<SecurityState.Status> = Channel(Channel.CONFLATED)
+    override var securityStatusChannel: Channel<SecurityState.Status> = Channel(Channel.CONFLATED)
 
     @ExperimentalCoroutinesApi
-    override suspend fun getSecurityStateFromRemote(): SecurityState {
+    override suspend fun getSecurityState(): SecurityState {
         return remoteDataSource.getSecurityState().also {
             securityStatusChannel.update(it.status)
         }
