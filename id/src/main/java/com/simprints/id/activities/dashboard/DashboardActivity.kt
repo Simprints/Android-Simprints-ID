@@ -194,7 +194,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
             val securityStatus = securityStateRepository.securityStatusChannel.receive()
 
             if (securityStatus.isCompromisedOrProjectEnded())
-                finish()
+                startRequestLoginActivityAndFinish()
         }
 
         lifecycleScope.launch {

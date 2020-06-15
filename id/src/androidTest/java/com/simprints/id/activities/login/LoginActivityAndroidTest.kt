@@ -33,7 +33,7 @@ class LoginActivityAndroidTest {
         TestAppModule(app, crashReportManagerRule = DependencyRule.MockkRule)
     }
 
-    private val loginModule by lazy {
+    private val securityModule by lazy {
         TestSecurityModule(
             loginViewModelFactoryRule = DependencyRule.ReplaceRule {
                 LoginViewModelFactory(mockAuthenticationHelper)
@@ -48,7 +48,7 @@ class LoginActivityAndroidTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        AndroidTestConfig(this, appModule = appModule, loginModule = loginModule)
+        AndroidTestConfig(this, appModule = appModule, securityModule = securityModule)
             .initAndInjectComponent()
         Intents.init()
     }

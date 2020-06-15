@@ -18,6 +18,8 @@ import com.simprints.id.di.SecurityModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.*
+import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
+import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
@@ -31,7 +33,8 @@ class TestSecurityModule(
     private val projectAuthenticatorRule: DependencyRule = RealRule,
     private val authenticationHelperRule: DependencyRule = RealRule,
     private val safetyNetClientRule: DependencyRule = RealRule,
-    private val signerManagerRule: DependencyRule = RealRule
+    private val signerManagerRule: DependencyRule = RealRule,
+    private val securityStateRepositoryRule: DependencyRule = RealRule
 ) : SecurityModule() {
 
     override fun provideSignerManager(
@@ -134,6 +137,12 @@ class TestSecurityModule(
         return safetyNetClientRule.resolveDependency {
             super.provideSafetyNetClient(context)
         }
+    }
+
+    override fun provideSecurityStateRepository(
+        remoteDataSource: SecurityStateRemoteDataSource
+    ): SecurityStateRepository = securityStateRepositoryRule.resolveDependency {
+        super.provideSecurityStateRepository(remoteDataSource)
     }
 
 }
