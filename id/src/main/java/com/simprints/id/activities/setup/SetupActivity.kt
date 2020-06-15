@@ -1,18 +1,17 @@
 package com.simprints.id.activities.setup
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.view.isVisible
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationRequest
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
-import com.google.android.play.core.splitinstall.SplitInstallRequest
-import com.google.android.play.core.splitinstall.SplitInstallStateUpdatedListener
-import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
+import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.BaseSplitActivity
@@ -34,6 +33,7 @@ import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import kotlinx.android.synthetic.main.activity_setup.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
@@ -41,69 +41,48 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.min
 
+@ExperimentalCoroutinesApi
 class SetupActivity: BaseSplitActivity() {
 
     private lateinit var setupRequest: SetupRequest
     private lateinit var splitInstallManager: SplitInstallManager
+    private val viewModel: SetupViewModel by lazy {
+        ViewModelProvider(this).get(SetupViewModel::class.java)
+    }
 
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
-    @SuppressLint("SwitchIntDef")
-    private val listener = SplitInstallStateUpdatedListener { state ->
-        Timber.d("Setup -- $state")
-        when (state.status()) {
-            SplitInstallSessionStatus.DOWNLOADING -> {
-                updateUi(DOWNLOADING, state.bytesDownloaded(), state.totalBytesToDownload())
-            }
-            SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION -> {
-                splitInstallManager.startConfirmationDialogForResult(state, this, MODALITIES_DOWNLOAD_REQUEST_CODE)
-            }
-            SplitInstallSessionStatus.INSTALLED -> {
-                updateUi(MODALITIES_INSTALLED)
-                askPermissionsOrPerformSpecificActions()
-            }
-            SplitInstallSessionStatus.INSTALLING -> {
-                updateUi(MODALITIES_INSTALLING)
-            }
-            SplitInstallSessionStatus.FAILED -> {
-
-            }
-            SplitInstallSessionStatus.PENDING -> {
-                updateUi(STARTING_DOWNLOAD)
-            }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         injectDependencies()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setup)
-
         setupRequest = intent.extras?.getParcelable(CoreResponse.CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
         splitInstallManager = SplitInstallManagerFactory.create(this)
 
-        downloadAndInstallRequiredModules()
+        viewModel.start(splitInstallManager, getRequiredModules())
+        observeViewState()
     }
 
-    private fun downloadAndInstallRequiredModules() {
-        val modalitiesToDownload = setupRequest.modalitiesRequired.map {
-            when (it) {
-                Modality.FINGER -> getString(R.string.module_feature_finger)
-                Modality.FACE -> getString(R.string.module_feature_face)
-            }
-        }.filterNot { splitInstallManager.installedModules.contains(it) }
-
-        val splitInstallRequestBuilder = SplitInstallRequest.newBuilder()
-
-        if (modalitiesToDownload.isNotEmpty()) {
-            modalitiesToDownload.forEach { splitInstallRequestBuilder.addModule(it) }
-            splitInstallManager.startInstall(splitInstallRequestBuilder.build())
-        } else {
-            askPermissionsOrPerformSpecificActions()
+    private fun getRequiredModules() = setupRequest.modalitiesRequired.map {
+        when (it) {
+            Modality.FINGER -> getString(R.string.module_feature_finger)
+            Modality.FACE -> getString(R.string.module_feature_face)
         }
+    }
+
+    private fun observeViewState() {
+        viewModel.getViewStateLiveData().observe(this, Observer {
+            when(it) {
+                StartingDownload -> updateUiForDownloadStarting()
+                is RequiresUserConfirmationToDownload -> requestUserConfirmationDoDownloadModalities(it.state)
+                is Downloading -> updateUiForDownloadProgress(it.bytesDownloaded, it.totalBytesToDownload)
+                ModalitiesInstalling -> updateUiForModalitiesInstalling()
+                ModalitiesInstalled -> updateUiForModalitiesInstalledAndAskPermissions()
+            }
+        })
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -173,17 +152,6 @@ class SetupActivity: BaseSplitActivity() {
         putExtra(CoreResponse.CORE_STEP_BUNDLE, SetupResponse())
     }
 
-    private fun updateUi(viewState: ViewState,
-                         bytesDownloaded: Long = 1L,
-                         totalBytesToDownload: Long = 1L) {
-        when (viewState) {
-            STARTING_DOWNLOAD -> updateUiForDownloadStarting()
-            DOWNLOADING -> updateUiForDownloadProgress(bytesDownloaded, totalBytesToDownload)
-            MODALITIES_INSTALLING -> updateUiForModalitiesInstalling()
-            MODALITIES_INSTALLED -> updateUiForModalitiesInstalled()
-        }
-    }
-
     private fun updateUiForDownloadStarting() {
         with(modalityDownloadText){
             text = androidResourcesHelper.getString(R.string.modality_starting_download)
@@ -194,6 +162,10 @@ class SetupActivity: BaseSplitActivity() {
             isVisible = true
         }
         setupLogo.isVisible = false
+    }
+
+    private fun requestUserConfirmationDoDownloadModalities(state: SplitInstallSessionState) {
+        splitInstallManager.startConfirmationDialogForResult(state, this, MODALITIES_DOWNLOAD_REQUEST_CODE)
     }
 
     private fun updateUiForDownloadProgress(bytesDownloaded: Long, totalBytesToDownload: Long) {
@@ -225,31 +197,23 @@ class SetupActivity: BaseSplitActivity() {
         setupLogo.isVisible = false
     }
 
-    private fun updateUiForModalitiesInstalled() {
+    private fun updateUiForModalitiesInstalledAndAskPermissions() {
         modalityDownloadText.isVisible = false
         modalityDownloadProgressBar.isVisible = false
         setupLogo.isVisible = true
+        askPermissionsOrPerformSpecificActions()
     }
 
-    override fun onResume() {
-        splitInstallManager.registerListener(listener)
-        super.onResume()
-    }
-
-    override fun onPause() {
-        splitInstallManager.unregisterListener(listener)
-        super.onPause()
+    sealed class ViewState {
+        object StartingDownload : ViewState()
+        class RequiresUserConfirmationToDownload(val state: SplitInstallSessionState): ViewState()
+        class Downloading(val bytesDownloaded: Long, val totalBytesToDownload: Long): ViewState()
+        object ModalitiesInstalling : ViewState()
+        object ModalitiesInstalled : ViewState()
     }
 
     companion object {
         const val PERMISSIONS_REQUEST_CODE = 99
         const val MODALITIES_DOWNLOAD_REQUEST_CODE = 199
-    }
-
-    enum class ViewState {
-        STARTING_DOWNLOAD,
-        DOWNLOADING,
-        MODALITIES_INSTALLING,
-        MODALITIES_INSTALLED
     }
 }
