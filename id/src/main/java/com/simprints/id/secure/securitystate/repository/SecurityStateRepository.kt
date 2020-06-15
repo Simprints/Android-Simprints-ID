@@ -7,6 +7,6 @@ interface SecurityStateRepository {
 
     val securityStatusChannel: Channel<SecurityState.Status>
 
-    suspend fun getSecurityStateFromRemote(): SecurityState
+    suspend fun getSecurityState(): SecurityState
 
 }
