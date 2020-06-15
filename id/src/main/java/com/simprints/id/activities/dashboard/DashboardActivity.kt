@@ -193,7 +193,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
             val securityStatus = securityStateRepository.securityStatusChannel.receive()
 
             if (securityStatus.isCompromisedOrProjectEnded()) {
-                finishAndRemoveTask() // TODO: confirm
+                finish() // TODO: confirm
             } else {
                 stopTickerToCheckIfSyncIsRequired()
                 syncAgainTicker = ticker(
