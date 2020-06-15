@@ -16,6 +16,7 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
 
+@ExperimentalCoroutinesApi
 class SecurityStateRepositoryImplTest {
 
     @MockK lateinit var mockRemoteDataSource: SecurityStateRemoteDataSource
@@ -33,7 +34,6 @@ class SecurityStateRepositoryImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun shouldGetSecurityStateFromRemote() = runBlocking {
         val expected = SecurityState(DEVICE_ID, SecurityState.Status.PROJECT_ENDED)
         coEvery { mockRemoteDataSource.getSecurityState() } returns expected
@@ -44,7 +44,6 @@ class SecurityStateRepositoryImplTest {
     }
 
     @Test(expected = SimprintsInternalServerException::class)
-    @ExperimentalCoroutinesApi
     fun remoteDataSourceThrowsInternalServerException_repositoryShouldThrow() {
         coEvery {
             mockRemoteDataSource.getSecurityState()
@@ -56,7 +55,6 @@ class SecurityStateRepositoryImplTest {
     }
 
     @Test(expected = HttpException::class)
-    @ExperimentalCoroutinesApi
     fun remoteDataSourceThrowsHttpException_repositoryShouldThrow() {
         coEvery { mockRemoteDataSource.getSecurityState() } throws HttpException(mockk())
 
@@ -66,7 +64,6 @@ class SecurityStateRepositoryImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun shouldSendSecurityStatusThroughChannel() = runBlocking {
         val securityState = SecurityState(DEVICE_ID, SecurityState.Status.PROJECT_ENDED)
         coEvery { mockRemoteDataSource.getSecurityState() } returns securityState
