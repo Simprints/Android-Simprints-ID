@@ -189,26 +189,28 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     override fun onResume() {
         super.onResume()
         loadDailyActivity()
+
         lifecycleScope.launch {
             val securityStatus = securityStateRepository.securityStatusChannel.receive()
 
-            if (securityStatus.isCompromisedOrProjectEnded()) {
-                finish() // TODO: confirm
-            } else {
-                stopTickerToCheckIfSyncIsRequired()
-                syncAgainTicker = ticker(
-                    delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
-                    initialDelayMillis = 0
-                ).also {
-                    for (event in it) {
-                        Timber.tag(SYNC_LOG_TAG).d("Launch sync if required")
-                        viewModel.syncIfRequired()
-                    }
-                }
+            if (securityStatus.isCompromisedOrProjectEnded())
+                finish()
+        }
 
-                lifecycleScope.launch {
-                    syncCardDisplayer.startTickerToUpdateLastSyncText()
+        lifecycleScope.launch {
+            stopTickerToCheckIfSyncIsRequired()
+            syncAgainTicker = ticker(
+                delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
+                initialDelayMillis = 0
+            ).also {
+                for (event in it) {
+                    Timber.tag(SYNC_LOG_TAG).d("Launch sync if required")
+                    viewModel.syncIfRequired()
                 }
+            }
+
+            lifecycleScope.launch {
+                syncCardDisplayer.startTickerToUpdateLastSyncText()
             }
         }
     }
