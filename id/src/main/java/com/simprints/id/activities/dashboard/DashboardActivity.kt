@@ -17,7 +17,6 @@ import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.dashboard.cards.daily_activity.displayer.DashboardDailyActivityCardDisplayer
 import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncConnecting
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
@@ -148,7 +147,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     }
 
     private fun observeForSyncCardState() {
-        viewModel.syncCardStateLiveData.observe(this, Observer<DashboardSyncCardState> {
+        viewModel.syncCardStateLiveData.observe(this, Observer {
             syncCardDisplayer.displayState(it)
         })
 
