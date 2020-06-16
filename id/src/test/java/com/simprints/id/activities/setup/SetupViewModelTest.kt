@@ -5,6 +5,7 @@ import com.google.android.play.core.ktx.requestProgressFlow
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
+import com.google.android.play.core.splitinstall.testing.FakeSplitInstallManager
 import com.google.common.truth.Truth.assertThat
 import com.simprints.testtools.common.syntax.verifyExactly
 import io.mockk.*
@@ -49,19 +50,5 @@ class SetupViewModelTest {
         viewModel.start(splitInstallManagerMock, modalityList)
 
         assertThat(viewModel.getViewStateLiveData().value).isEqualTo(SetupActivity.ViewState.ModalitiesInstalled)
-    }
-
-    @Test
-    fun modalityDownloadPending_shouldUpdateCorrectViewState() {
-        runBlocking {
-            val mockSessionState: SplitInstallSessionState = mockk()
-            every { mockSessionState.status() } returns SplitInstallSessionStatus.PENDING
-            coEvery { splitInstallManagerMock.requestProgressFlow() } returns flowOf(mockSessionState)
-
-            val viewModel = SetupViewModel()
-            viewModel.monitorDownloadProgress(splitInstallManagerMock)
-
-            assertThat(viewModel.getViewStateLiveData().value).isEqualTo(SetupActivity.ViewState.StartingDownload)
-        }
     }
 }
