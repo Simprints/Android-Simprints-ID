@@ -37,7 +37,7 @@ class SetupViewModel : ViewModel() {
     }
 
     @SuppressLint("SwitchIntDef")
-    private fun monitorDownloadProgress(splitInstallManager: SplitInstallManager) {
+    internal fun monitorDownloadProgress(splitInstallManager: SplitInstallManager) {
         viewModelScope.launch {
             splitInstallManager.requestProgressFlow()
                 .collect { state ->

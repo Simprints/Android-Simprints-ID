@@ -24,11 +24,10 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
                             sessionRepository: SessionRepository,
                             consentRequired: Boolean,
                             locationRequired: Boolean,
-                            modalities: List<Modality>) :
+                            private val modalities: List<Modality>) :
     ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceEnrolProcessor, timeHelper, sessionRepository, consentRequired, locationRequired, modalities) {
 
-    override fun startFlow(appRequest: AppRequest,
-                           modalities: List<Modality>) {
+    override fun startFlow(appRequest: AppRequest) {
 
         require(appRequest is AppEnrolRequest)
         addSetupStep()

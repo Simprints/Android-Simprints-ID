@@ -17,7 +17,7 @@ class ModalityFlowFactoryImpl(private val enrolFlow: ModalityFlow,
     override fun createModalityFlow(appRequest: AppRequest,
                                     modalities: List<Modality>): ModalityFlow =
         buildFlow(appRequest).also {
-            it.startFlow(appRequest, modalities)
+            it.startFlow(appRequest)
         }
 
     private fun buildFlow(appRequest: AppRequest): ModalityFlow =

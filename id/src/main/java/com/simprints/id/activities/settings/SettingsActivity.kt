@@ -1,12 +1,9 @@
 package com.simprints.id.activities.settings
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.preference.PreferenceFragment
-import com.google.android.play.core.splitcompat.SplitCompat
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -38,11 +35,6 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         fragmentManager.beginTransaction()
             .replace(R.id.prefContent, SettingsPreferenceFragment())
             .commit()
-    }
-
-    override fun attachBaseContext(newBase: Context) {
-        val ctx = LanguageHelper.getLanguageConfigurationContext(newBase)
-        super.attachBaseContext(ctx)
     }
 
     private fun setupActionBar() {
