@@ -8,6 +8,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.secure.models.*
+import com.simprints.id.tools.LanguageHelper
 
 class ProjectAuthenticatorImpl(
     private val authManager: AuthManager,
@@ -35,7 +36,7 @@ class ProjectAuthenticatorImpl(
             .signIn(nonceScope.projectId, nonceScope.userId)
 
         fetchProjectRemoteConfigSettings(nonceScope.projectId)
-            .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
+            .storeProjectRemoteConfigSettingsUpdateLanguageAndReturnProjectLanguages()
             .fetchProjectLongConsentTexts()
     }
 
@@ -94,9 +95,15 @@ class ProjectAuthenticatorImpl(
     private suspend fun fetchProjectRemoteConfigSettings(projectId: String): JsonElement =
         projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(projectId)
 
-    private fun JsonElement.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(): Array<String> {
+    private fun JsonElement.storeProjectRemoteConfigSettingsUpdateLanguageAndReturnProjectLanguages(): Array<String> {
         val jsonString = this.toString()
         remoteConfigWrapper.projectSettingsJsonString = jsonString
+
+        /*We need to override the language in the helper as the language context is initialised in Application
+         in attachBaseContext() which is  called before initialising dagger component.
+         Thus we cannot use preferences manager to get the language.*/
+        LanguageHelper.language = preferencesManager.language
+
         return preferencesManager.projectLanguages
     }
 
