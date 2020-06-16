@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
+import com.simprints.face.controllers.core.crashreport.FaceCrashReportTag.FACE_LICENSE
+import com.simprints.face.controllers.core.crashreport.FaceCrashReportTrigger.UI
 import com.simprints.face.data.moduleapi.face.DomainToFaceResponse
 import com.simprints.face.data.moduleapi.face.FaceToDomainRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
@@ -15,7 +18,8 @@ import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import timber.log.Timber
 
-class FaceOrchestratorViewModel : ViewModel() {
+class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportManager) :
+    ViewModel() {
     lateinit var faceRequest: FaceRequest
 
     val startCapture: MutableLiveData<LiveDataEventWithContent<FaceCaptureRequest>> =
@@ -54,14 +58,22 @@ class FaceOrchestratorViewModel : ViewModel() {
     }
 
     fun missingLicense() {
-        // TODO: log on Crashlytics that the license is inexistent
-        Timber.d("RankOne license is missing")
+        Timber.d("License is missing")
+        crashReportManager.logMessageForCrashReport(
+            FACE_LICENSE,
+            UI,
+            message = "License is missing"
+        )
         missingLicenseEvent.send()
     }
 
     fun invalidLicense() {
-        // TODO: log on Crashlytics that the license is invalid
-        Timber.d("RankOne license is invalid")
+        Timber.d("License is invalid")
+        crashReportManager.logMessageForCrashReport(
+            FACE_LICENSE,
+            UI,
+            message = "License is invalid"
+        )
         invalidLicenseEvent.send()
     }
 

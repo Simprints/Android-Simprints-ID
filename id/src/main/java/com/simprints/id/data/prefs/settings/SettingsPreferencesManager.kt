@@ -44,6 +44,8 @@ interface SettingsPreferencesManager {
 
     var faceMaxRetries: Int
     var faceQualityThreshold: Float
+    var faceNbOfFramesCaptured: Int
+    var faceMatchThreshold: Float
 
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
