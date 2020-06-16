@@ -7,7 +7,6 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintIm
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
@@ -40,7 +39,6 @@ interface SettingsPreferencesManager {
     var saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
     var scannerGenerations: List<ScannerGeneration>
     var apiBaseUrl: String
-    var securityStatus: SecurityState.Status
 
     var faceMaxRetries: Int
     var faceQualityThreshold: Float
