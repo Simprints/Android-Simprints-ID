@@ -17,7 +17,6 @@ import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.network.NetworkConstants
-import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
@@ -32,8 +31,7 @@ open class SettingsPreferencesManagerImpl(
     peopleDownSyncSettingSerializer: Serializer<PeopleDownSyncSetting>,
     captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
     saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
-    scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
-    securityStatusSerializer: Serializer<SecurityState.Status>
+    scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
 ) : SettingsPreferencesManager {
 
     /**
@@ -244,13 +242,6 @@ open class SettingsPreferencesManagerImpl(
     override var apiBaseUrl: String
         by PrimitivePreference(prefs, API_BASE_URL_KEY, NetworkConstants.DEFAULT_BASE_URL)
 
-    override var securityStatus: SecurityState.Status by ComplexPreference(
-        prefs,
-        SECURITY_STATUS_KEY,
-        SECURITY_STATUS_DEFAULT,
-        securityStatusSerializer
-    )
-
     override var faceMaxRetries: Int
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -376,9 +367,6 @@ open class SettingsPreferencesManagerImpl(
         const val FACE_MAX_RETRIES_DEFAULT = 2
         const val FACE_QUALITY_THRESHOLD = "FaceQualityThreshold"
         const val FACE_QUALITY_THRESHOLD_DEFAULT = -1f
-
-        const val SECURITY_STATUS_KEY = "SecurityStatus"
-        val SECURITY_STATUS_DEFAULT = SecurityState.Status.RUNNING
 
         const val FACE_NB_OF_FRAMES_CAPTURED = "FaceNbOfFramesCaptured"
         const val FACE_NB_OF_FRAMES_CAPTURED_DEFAULT = 2
