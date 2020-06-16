@@ -3,11 +3,8 @@ package com.simprints.face.controllers.core.androidResources
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
-import com.simprints.core.tools.LanguageHelper
 
-class FaceAndroidResourcesHelperImpl(context: Context) : FaceAndroidResourcesHelper {
-
-    private val languageContext = LanguageHelper.getLanguageConfigurationContext(context)
+class FaceAndroidResourcesHelperImpl(val context: Context) : FaceAndroidResourcesHelper {
 
     private enum class QUANTITY constructor(private val title: String) {
         ZERO("zero"),
@@ -23,13 +20,13 @@ class FaceAndroidResourcesHelperImpl(context: Context) : FaceAndroidResourcesHel
     }
 
     override fun getString(res: Int): String {
-        return languageContext.getString(res)
+        return context.getString(res)
     }
-    override fun getStringArray(res: Int): Array<String> = languageContext.resources.getStringArray(res)
-    override fun getString(resId: Int, params: Array<Any>): String = languageContext.getString(resId, params)
-    override fun getDrawable(res: Int): Drawable? = languageContext.getDrawable(res)
+    override fun getStringArray(res: Int): Array<String> = context.resources.getStringArray(res)
+    override fun getString(resId: Int, params: Array<Any>): String = context.getString(resId, params)
+    override fun getDrawable(res: Int): Drawable? = context.getDrawable(res)
     override fun getStringPlural(stringQuantityKey: Int, quantity: Int, params: Array<Any>): String =
-        getStringPlural(languageContext, stringQuantityKey, quantity, params)
+        getStringPlural(context, stringQuantityKey, quantity, params)
 
     companion object {
 

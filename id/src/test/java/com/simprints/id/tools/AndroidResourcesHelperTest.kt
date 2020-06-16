@@ -3,7 +3,6 @@ package com.simprints.id.tools
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.testtools.TestApplication

@@ -1,11 +1,9 @@
 package com.simprints.id.activities.settings
 
-import android.content.Context
 import android.os.Bundle
 import android.preference.PreferenceActivity
 import android.view.MenuItem
 import androidx.preference.PreferenceFragment
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
@@ -34,11 +32,6 @@ class SettingsAboutActivity : AppCompatPreferenceActivity() {
         fragmentManager.beginTransaction()
             .replace(R.id.prefContent, SettingsAboutFragment())
             .commit()
-    }
-
-    override fun attachBaseContext(newBase: Context) {
-        val ctx = LanguageHelper.getLanguageConfigurationContext(newBase)
-        super.attachBaseContext(ctx)
     }
 
     override fun onIsMultiPane() = isXLargeTablet()
