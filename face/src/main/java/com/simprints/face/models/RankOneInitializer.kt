@@ -17,7 +17,6 @@ object RankOneInitializer {
         try {
             System.loadLibrary("_roc_embedded")
         } catch (t: Throwable) {
-            // TODO: log the exception on Crashlytics
             return false
         }
         roc.roc_preinitialize_android(activity)

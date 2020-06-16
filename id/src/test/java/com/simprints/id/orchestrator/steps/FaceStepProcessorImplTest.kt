@@ -50,9 +50,10 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
             every { this@with.logoExists } returns true
             every { this@with.organizationName } returns "some_org"
             every { this@with.programName } returns "some_name"
+            every { this@with.faceNbOfFramesCaptured } returns 2
         }
 
-        faceStepProcess = FaceStepProcessorImpl(faceRequestFactory)
+        faceStepProcess = FaceStepProcessorImpl(faceRequestFactory, preferencesManagerMock)
 
 
         mockFromModuleApiToDomainExt()
