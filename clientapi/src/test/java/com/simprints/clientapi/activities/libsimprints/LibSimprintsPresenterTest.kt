@@ -1,23 +1,24 @@
 package com.simprints.clientapi.activities.libsimprints
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.*
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.ConfirmIdentity
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.EnrolLastBiometrics
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.STANDARD
-import com.simprints.clientapi.domain.responses.EnrollResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
-import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
-import com.simprints.clientapi.requestFactories.EnrollRequestFactory
-import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
-import com.simprints.clientapi.requestFactories.VerifyRequestFactory
-import com.simprints.libsimprints.Constants
+import com.simprints.clientapi.exceptions.InvalidIntentActionException
+import com.simprints.clientapi.requestFactories.*
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
 import com.simprints.testtools.unit.BaseUnitTestConfig
+import io.kotlintest.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
@@ -31,31 +32,36 @@ class LibSimprintsPresenterTest {
         const val RETURN_FOR_FLOW_COMPLETED_CHECK = true
     }
 
-    @MockK lateinit var view: LibSimprintsActivity
-    @MockK lateinit var clientApiSessionEventsManager: ClientApiSessionEventsManager
+    @MockK
+    lateinit var view: LibSimprintsActivity
+    @MockK
+    lateinit var clientApiSessionEventsManager: ClientApiSessionEventsManager
 
     @Before
     fun setup() {
         BaseUnitTestConfig().rescheduleRxMainThread().coroutinesMainThread()
-        MockKAnnotations.init(this)
+        MockKAnnotations.init(this, relaxed = true)
+        coEvery { clientApiSessionEventsManager.isCurrentSessionAnIdentification() } returns true
+        coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns RequestFactory.MOCK_SESSION_ID
+        coEvery { clientApiSessionEventsManager.createSession(any()) } returns "session_id"
     }
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
-        val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
-        every { view.enrollExtractor } returns enrollmentExtractor
+        val enrolmentExtractor = EnrolRequestFactory.getMockExtractor()
+        every { view.enrolExtractor } returns enrolmentExtractor
 
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_REGISTER_INTENT,
-            mockSessionManagerToCreateSession(),
+            Enrol,
+            clientApiSessionEventsManager,
             mockk(),
             mockk()
         ).apply {
             runBlocking { start() }
         }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest(STANDARD)) }
+        verify(exactly = 1) { view.sendSimprintsRequest(EnrolRequestFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test
@@ -65,8 +71,8 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_IDENTIFY_INTENT,
-            mockSessionManagerToCreateSession(),
+            Identify,
+            clientApiSessionEventsManager,
             mockk(),
             mockk()
         ).apply {
@@ -83,8 +89,8 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_VERIFY_INTENT,
-            mockSessionManagerToCreateSession(),
+            Verify,
+            clientApiSessionEventsManager,
             mockk(),
             mockk()
         ).apply { runBlocking { start() } }
@@ -99,25 +105,46 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_SELECT_GUID_INTENT,
-            mockSessionManagerToCreateSession(),
+            ConfirmIdentity,
+            clientApiSessionEventsManager,
             mockk(),
             mockk()
         ).apply { runBlocking { start() } }
 
-        verify(exactly = 1) { view.sendSimprintsConfirmation(ConfirmIdentityFactory.getValidSimprintsRequest(STANDARD)) }
+        verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(STANDARD)) }
+    }
+
+    @Test
+    fun startPresenterForEnrolLastBiometrics_ShouldRequestEnrolLastBiometrics() {
+        val enrolLastBiometricsExtractor = EnrolLastBiometricsFactory.getMockExtractor()
+        every { view.enrolLastBiometricsExtractor } returns enrolLastBiometricsExtractor
+
+        LibSimprintsPresenter(
+            view,
+            EnrolLastBiometrics,
+            clientApiSessionEventsManager,
+            mockk(),
+            mockk()
+        ).apply { runBlocking { start() } }
+
+        verify(exactly = 1) { view.sendSimprintsRequest(EnrolLastBiometricsFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
         LibSimprintsPresenter(
             view,
-            "Garbage",
-            mockSessionManagerToCreateSession(),
+            Invalid,
+            clientApiSessionEventsManager,
             mockk(),
             mockk()
-        ).apply { runBlocking { start() } }
-        verify(exactly = 1) { view.handleClientRequestError(any()) }
+        ).apply {
+            runBlocking {
+                shouldThrow<InvalidIntentActionException> {
+                    start()
+                }
+            }
+        }
     }
 
     @Test
@@ -128,11 +155,11 @@ class LibSimprintsPresenterTest {
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns sessionId
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_REGISTER_INTENT,
+            Enrol,
             clientApiSessionEventsManager,
             mockk(),
             mockk()
-        ).handleEnrollResponse(EnrollResponse(registerId))
+        ).handleEnrolResponse(EnrolResponse(registerId))
 
         verify(exactly = 1) {
             view.returnRegistration(
@@ -154,7 +181,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_IDENTIFY_INTENT,
+            Identify,
             clientApiSessionEventsManager,
             mockk(),
             mockk()
@@ -188,7 +215,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            Constants.SIMPRINTS_VERIFY_INTENT,
+            Verify,
             clientApiSessionEventsManager,
             mockk(),
             mockk()
@@ -221,7 +248,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(
             view,
-            "",
+            Invalid,
             clientApiSessionEventsManager,
             mockk(),
             mockk()
@@ -237,9 +264,5 @@ class LibSimprintsPresenterTest {
         coVerify(exactly = 1) {
             clientApiSessionEventsManager.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
-    }
-
-    private fun mockSessionManagerToCreateSession() = mockk<ClientApiSessionEventsManager>().apply {
-        coEvery { this@apply.createSession(any()) } returns "session_id"
     }
 }

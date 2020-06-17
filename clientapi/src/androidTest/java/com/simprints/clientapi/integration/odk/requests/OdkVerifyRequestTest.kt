@@ -11,10 +11,10 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.integration.AppVerifyRequest
-import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
-import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.clientapi.integration.key
+import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
 import com.simprints.clientapi.integration.value
+import com.simprints.moduleapi.app.requests.IAppRequest
 import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.Test
@@ -32,7 +32,7 @@ class OdkVerifyRequestTest : BaseOdkClientApiTest() {
 
     @Test
     fun callingAppSendsAVerifyRequest_shouldLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply {
+        ActivityScenario.launch<OdkActivity>(odkBaseFlowIntentRequest.apply {
             action = ODK_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
@@ -50,7 +50,7 @@ class OdkVerifyRequestTest : BaseOdkClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<OdkActivity>(makeIntentRequestSuspicious(odkBaseIntentRequest).apply {
+        ActivityScenario.launch<OdkActivity>(makeIntentRequestSuspicious(odkBaseFlowIntentRequest).apply {
             action = ODK_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
@@ -60,7 +60,7 @@ class OdkVerifyRequestTest : BaseOdkClientApiTest() {
 
     @Test
     fun callingAppSendsAnInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<OdkActivity>(makeIntentRequestInvalid(odkBaseIntentRequest).apply {
+        ActivityScenario.launch<OdkActivity>(makeIntentRequestInvalid(odkBaseFlowIntentRequest).apply {
             action = ODK_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })

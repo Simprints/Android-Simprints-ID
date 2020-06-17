@@ -51,6 +51,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private lateinit var fingerViewPagerManager: FingerViewPagerManager
     private lateinit var timeoutBar: ScanningTimeoutBar
     private var confirmDialog: AlertDialog? = null
+    private var hasSplashScreenBeenTriggered: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -198,8 +199,13 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     private fun CollectFingerprintsState.listenForSplashScreen() {
         if (isShowingSplashScreen && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-            startActivity(Intent(this@CollectFingerprintsActivity, SplashScreenActivity::class.java))
-            overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
+            if (!hasSplashScreenBeenTriggered) {
+                startActivity(Intent(this@CollectFingerprintsActivity, SplashScreenActivity::class.java))
+                overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
+                hasSplashScreenBeenTriggered = true
+            }
+        } else {
+            hasSplashScreenBeenTriggered = false
         }
     }
 

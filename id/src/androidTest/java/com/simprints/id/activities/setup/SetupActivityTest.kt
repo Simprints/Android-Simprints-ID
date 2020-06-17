@@ -11,7 +11,7 @@ import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
-import com.simprints.id.domain.moduleapi.core.response.CoreResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.LocationManager
 import com.simprints.testtools.common.di.DependencyRule
@@ -19,7 +19,6 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule

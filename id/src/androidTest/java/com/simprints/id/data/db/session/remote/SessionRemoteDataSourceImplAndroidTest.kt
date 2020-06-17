@@ -5,17 +5,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.session.SessionRepositoryImpl
 import com.simprints.id.data.db.session.domain.models.events.*
+import com.simprints.id.data.db.session.domain.models.events.ScannerConnectionEvent.ScannerGeneration
 import com.simprints.id.data.db.session.domain.models.events.callback.*
-import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
+import com.simprints.id.data.db.session.domain.models.events.callout.*
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.network.BaseUrlProvider
@@ -113,6 +111,8 @@ class SessionRemoteDataSourceImplAndroidTest {
                 addPersonCreationEvent()
                 addRefusalEvent()
                 addScannerConnectionEvent()
+                addVero2InfoSnapshotEvents()
+                addScannerFirmwareUpdateEvent()
                 addSuspiciousIntentEvent()
                 addCallbackEvent()
                 addCalloutEvent()
@@ -190,7 +190,7 @@ class SessionRemoteDataSourceImplAndroidTest {
         FingerprintCaptureEvent.Result.values().forEach { result ->
             FingerIdentifier.values().forEach { fingerIdentifier ->
                 val fakeTemplate = EncodingUtils.byteArrayToBase64(
-                    PeopleGeneratorUtils.getRandomFingerprintSample().template
+                    SubjectsGeneratorUtils.getRandomFingerprintSample().template
                 )
 
                 val fingerprint = FingerprintCaptureEvent.Fingerprint(
@@ -249,7 +249,21 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     private fun SessionEvents.addScannerConnectionEvent() {
-        addEvent(ScannerConnectionEvent(0, ScannerConnectionEvent.ScannerInfo("scanner_id", "macAddress", "hardware")))
+        addEvent(ScannerConnectionEvent(0,
+            ScannerConnectionEvent.ScannerInfo("scanner_id", "macAddress",
+                ScannerGeneration.VERO_2,"hardware")))
+    }
+
+    private fun SessionEvents.addVero2InfoSnapshotEvents() {
+        addEvent(Vero2InfoSnapshotEvent(0,
+            Vero2InfoSnapshotEvent.Vero2Version(Int.MAX_VALUE.toLong() + 1, "1.23",
+                "api", "stmApp", "stmApi", "un20App", "un20Api"),
+            Vero2InfoSnapshotEvent.BatteryInfo(70, 15, 1, 37)))
+    }
+
+    private fun SessionEvents.addScannerFirmwareUpdateEvent() {
+        addEvent(ScannerFirmwareUpdateEvent(0, 0, "stm",
+            "targetApp", "failureReason"))
     }
 
     private fun SessionEvents.addSuspiciousIntentEvent() {
@@ -281,5 +295,6 @@ class SessionRemoteDataSourceImplAndroidTest {
         addEvent(ConfirmationCalloutEvent(10, "projectId", RANDOM_GUID, RANDOM_GUID))
         addEvent(IdentificationCalloutEvent(0, "project_id", "user_id", "module_id", "metadata"))
         addEvent(VerificationCalloutEvent(2, "project_id", "user_id", "module_id", RANDOM_GUID, "metadata"))
+        addEvent(EnrolmentLastBiometricsCalloutEvent(2, "project_id", "user_id", "module_id", "metadata", RANDOM_GUID))
     }
 }

@@ -9,7 +9,7 @@ import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
+import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
@@ -31,7 +31,7 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
@@ -97,19 +97,19 @@ class TestAppModule(
         remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager(loginInfoManager) }
 
     override fun provideSignerManager(
-        projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager,
-        peopleSyncManager: PeopleSyncManager,
-        syncManager: SyncManager
+            projectRepository: ProjectRepository,
+            remoteDbManager: RemoteDbManager,
+            loginInfoManager: LoginInfoManager,
+            preferencesManager: PreferencesManager,
+            subjectsSyncManager: SubjectsSyncManager,
+            syncManager: SyncManager
     ): SignerManager = dbManagerRule.resolveDependency {
         super.provideSignerManager(
             projectRepository,
             remoteDbManager,
             loginInfoManager,
             preferencesManager,
-            peopleSyncManager,
+            subjectsSyncManager,
             syncManager
         )
     }
@@ -197,7 +197,7 @@ class TestAppModule(
             super.provideLocationManager(ctx)
         }
 
-    override fun provideSyncStatusDatabase(ctx: Context): PeopleSyncStatusDatabase =
+    override fun provideSyncStatusDatabase(ctx: Context): SubjectsSyncStatusDatabase =
         syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase(ctx) }
 
     // Android keystore is not available in unit tests - so it returns a mock that builds the standard shared prefs.

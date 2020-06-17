@@ -19,9 +19,10 @@ interface AlertContract {
         fun setAlertTitleWithStringRes(@StringRes stringRes: Int)
         fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int)
         fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?)
+        fun getTranslatedString(@StringRes stringRes: Int): String
         fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction)
         fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction)
-        fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
+        fun setAlertMessageWithStringRes(@StringRes stringRes: Int, params: Array<Any> = emptyArray())
         fun closeActivityAfterCloseButton()
         fun startExitForm(exitFormActivityClass: String?)
         fun finishWithTryAgain()

@@ -12,6 +12,7 @@ import com.simprints.id.activities.consent.ConsentActivity
 import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.debug.DebugActivity
+import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fetchguid.FetchGuidActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
@@ -32,9 +33,8 @@ import com.simprints.id.activities.settings.syncinformation.SyncInformationActiv
 import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
-import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.person.local.FaceIdentityLocalDataSource
-import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
@@ -45,13 +45,13 @@ import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncWorker
-import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
-import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleEndSyncReporterWorker
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleStartSyncReporterWorker
-import com.simprints.id.services.scheduledSync.people.master.workers.PeopleSyncMasterWorker
-import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncCountWorker
-import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker
+import com.simprints.id.services.scheduledSync.subjects.down.workers.SubjectsDownSyncCountWorker
+import com.simprints.id.services.scheduledSync.subjects.down.workers.SubjectsDownSyncDownloaderWorker
+import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsEndSyncReporterWorker
+import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsStartSyncReporterWorker
+import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsSyncMasterWorker
+import com.simprints.id.services.scheduledSync.subjects.up.workers.SubjectsUpSyncCountWorker
+import com.simprints.id.services.scheduledSync.subjects.up.workers.SubjectsUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.UpSessionEventsWorker
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
@@ -122,22 +122,23 @@ interface AppComponent {
     fun inject(fetchGuidActivity: FetchGuidActivity)
     fun inject(guidSelectionActivity: GuidSelectionActivity)
     fun inject(debugActivity: DebugActivity)
-    fun inject(peopleDownSyncCountWorker: PeopleDownSyncCountWorker)
-    fun inject(peopleDownSyncDownloaderWorker: PeopleDownSyncDownloaderWorker)
-    fun inject(peopleSyncMasterWorker: PeopleSyncMasterWorker)
-    fun inject(peopleUpSyncUploaderWorker: PeopleUpSyncUploaderWorker)
-    fun inject(peopleUpSyncCountWorker: PeopleUpSyncCountWorker)
+    fun inject(subjectsDownSyncCountWorker: SubjectsDownSyncCountWorker)
+    fun inject(subjectsDownSyncDownloaderWorker: SubjectsDownSyncDownloaderWorker)
+    fun inject(subjectsSyncMasterWorker: SubjectsSyncMasterWorker)
+    fun inject(subjectsUpSyncUploaderWorker: SubjectsUpSyncUploaderWorker)
+    fun inject(subjectsUpSyncCountWorker: SubjectsUpSyncCountWorker)
     fun inject(imageUpSyncWorker: ImageUpSyncWorker)
     fun inject(syncInformationActivity: SyncInformationActivity)
-    fun inject(peopleEndSyncReporterWorker: PeopleEndSyncReporterWorker)
-    fun inject(peopleStartSyncWorker: PeopleStartSyncReporterWorker)
+    fun inject(subjectsEndSyncReporterWorker: SubjectsEndSyncReporterWorker)
+    fun inject(subjectsStartSyncWorker: SubjectsStartSyncReporterWorker)
     fun inject(qrCaptureActivity: QrCaptureActivity)
+    fun inject(enrolLastBiometricsActivity: EnrolLastBiometricsActivity)
     fun inject(setupActivity: SetupActivity)
 
     fun getSessionEventsManager(): SessionRepository
     fun getCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
-    fun getPersonRepository(): PersonRepository
+    fun getPersonRepository(): SubjectRepository
     fun getFingerprintRecordLocalDataSource(): FingerprintIdentityLocalDataSource
     fun getFaceIdentityLocalDataSource(): FaceIdentityLocalDataSource
     fun getPreferencesManager(): PreferencesManager
