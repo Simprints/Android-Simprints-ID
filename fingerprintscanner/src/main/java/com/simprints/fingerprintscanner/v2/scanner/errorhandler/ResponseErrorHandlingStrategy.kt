@@ -11,7 +11,7 @@ data class ResponseErrorHandlingStrategy(
     companion object {
         val DEFAULT = ResponseErrorHandlingStrategy(
             retryTimes = null,
-            generalTimeOutMs = 3000,
+            generalTimeOutMs = 5000,
             setUn20ResponseTimeOut = 5000,
             un20StateChangeEventTimeOut = 5000,
             captureFingerprintResponseTimeOut = 5000,

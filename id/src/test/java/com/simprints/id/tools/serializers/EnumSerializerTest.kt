@@ -1,6 +1,6 @@
 package com.simprints.id.tools.serializers
 
-import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import org.junit.Assert
 import org.junit.Test
 
@@ -11,10 +11,13 @@ class EnumSerializerTest {
 
     @Test
     fun testSerializeThenDeserializeGivesOriginalEnumValue() {
-        for (originalEnumValue in enumClass.enumConstants) {
-            val serializedEnumValue = enumSerializer.serialize(originalEnumValue)
-            val deserializedEnumValue = enumSerializer.deserialize(serializedEnumValue)
-            Assert.assertEquals(originalEnumValue, deserializedEnumValue)
+        enumClass.enumConstants?.let {
+            for (originalEnumValue in it) {
+                val serializedEnumValue = enumSerializer.serialize(originalEnumValue)
+                val deserializedEnumValue = enumSerializer.deserialize(serializedEnumValue)
+                Assert.assertEquals(originalEnumValue, deserializedEnumValue)
+            }
         }
+
     }
 }

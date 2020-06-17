@@ -29,7 +29,8 @@ class AuthenticationHelperImpl(
     override suspend fun authenticateSafely(
         userId: String,
         projectId: String,
-        projectSecret: String
+        projectSecret: String,
+        deviceId: String
     ): AuthenticationEvent.Result {
         val result = try {
             logMessageForCrashReportWithNetworkTrigger("Making authentication request")
@@ -37,7 +38,7 @@ class AuthenticationHelperImpl(
 
             loginStartTime = timeHelper.now()
             val nonceScope = NonceScope(projectId, userId)
-            projectAuthenticator.authenticate(nonceScope, projectSecret)
+            projectAuthenticator.authenticate(nonceScope, projectSecret, deviceId)
 
             logMessageForCrashReportWithNetworkTrigger("Sign in success")
             AUTHENTICATED

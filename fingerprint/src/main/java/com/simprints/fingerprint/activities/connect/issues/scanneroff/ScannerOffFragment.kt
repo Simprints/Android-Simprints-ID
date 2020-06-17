@@ -12,6 +12,9 @@ import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import kotlinx.android.synthetic.main.fragment_scanner_off.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -20,6 +23,8 @@ class ScannerOffFragment : FingerprintFragment() {
 
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
     private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
+    private val timeHelper: FingerprintTimeHelper by inject()
+    private val sessionManager: FingerprintSessionEventsManager by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_scanner_off, container, false)
@@ -27,6 +32,8 @@ class ScannerOffFragment : FingerprintFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
+
+        sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.ScannerOff))
 
         initTryAgainButton()
         initCouldNotConnectTextView()
@@ -60,7 +67,7 @@ class ScannerOffFragment : FingerprintFragment() {
         }
         connectScannerViewModel.connectScannerIssue.fragmentObserveEventWith {
             connectScannerViewModel.stopConnectingAndResetState()
-            goToAppropriatePairingScreen(it)
+            goToAppropriateIssueFragment(it)
         }
     }
 
@@ -84,14 +91,18 @@ class ScannerOffFragment : FingerprintFragment() {
         Handler().postDelayed({ connectScannerViewModel.finishConnectActivity() }, FINISHED_TIME_DELAY_MS)
     }
 
-    private fun goToAppropriatePairingScreen(issue: ConnectScannerIssue) {
-        val navAction = when (issue) {
-            ConnectScannerIssue.NFC_OFF -> R.id.action_scannerOffFragment_to_nfcOffFragment
-            ConnectScannerIssue.NFC_PAIR -> R.id.action_scannerOffFragment_to_nfcPairFragment
-            ConnectScannerIssue.SERIAL_ENTRY_PAIR -> R.id.action_scannerOffFragment_to_serialEntryPairFragment
-            else -> null
+    private fun goToAppropriateIssueFragment(issue: ConnectScannerIssue) {
+        with(ScannerOffFragmentDirections) {
+            val navAction = when (issue) {
+                ConnectScannerIssue.NfcOff -> actionScannerOffFragmentToNfcOffFragment()
+                ConnectScannerIssue.NfcPair -> actionScannerOffFragmentToNfcPairFragment()
+                ConnectScannerIssue.SerialEntryPair -> actionScannerOffFragmentToSerialEntryPairFragment()
+                ConnectScannerIssue.BluetoothOff -> actionScannerOffFragmentToBluetoothOffFragment()
+                is ConnectScannerIssue.Ota -> actionScannerOffFragmentToOtaFragment(issue.otaFragmentRequest)
+                ConnectScannerIssue.ScannerOff, is ConnectScannerIssue.OtaRecovery, ConnectScannerIssue.OtaFailed -> null
+            }
+            navAction?.let { findNavController().navigate(it) }
         }
-        navAction?.let { findNavController().navigate(it) }
     }
 
     companion object {

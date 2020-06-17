@@ -13,8 +13,14 @@ import retrofit2.mock.Calls
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class SecureApiServiceMock(private val delegate: BehaviorDelegate<SecureApiInterface>) : SecureApiInterface {
 
-    override suspend fun requestAuthenticationData(projectId: String, userId: String, key: String): Response<ApiAuthenticationData> =
-        delegate.returning(buildSuccessResponseWith(getApiAuthenticationData())).requestAuthenticationData(projectId, userId, key)
+    override suspend fun requestAuthenticationData(
+        projectId: String,
+        userId: String,
+        deviceId: String,
+        key: String
+    ): Response<ApiAuthenticationData> = delegate.returning(
+        buildSuccessResponseWith(getApiAuthenticationData())
+    ).requestAuthenticationData(projectId, userId, deviceId, key)
 
     override suspend fun requestCustomTokens(projectId: String, userId: String, credentials: AuthRequestBody, key: String): Response<ApiToken> =
         delegate.returning(buildSuccessResponseWith(getApiToken())).requestCustomTokens(projectId, userId, credentials)

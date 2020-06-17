@@ -6,7 +6,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.integration.AppConfirmationResponse
-import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -17,7 +16,7 @@ class CommCareConfirmationResponseTest : BaseCommCareClientApiTest() {
     @Test
     fun appModuleSendsAConfirmationAppResponse_shouldReturnACommCareConfirmationResponse() {
         val appIdentificationOutcomeResponse = AppConfirmationResponse(true)
-        mockAppModuleResponse(appIdentificationOutcomeResponse, COMMCARE_CONFIRM_IDENTITY_ACTION)
+        mockAppModuleResponse(appIdentificationOutcomeResponse, APP_CONFIRM_ACTION)
 
         val scenario =
             ActivityScenario.launch<CommCareActivity>(commCareConfirmIntentRequest.apply { action = COMMCARE_CONFIRM_IDENTITY_ACTION })
@@ -29,7 +28,7 @@ class CommCareConfirmationResponseTest : BaseCommCareClientApiTest() {
         with(scenario.result) {
             Truth.assertThat(resultCode).isEqualTo(Activity.RESULT_OK)
             resultData.extras?.getBundle(COMMCARE_BUNDLE_KEY)?.let {
-                Truth.assertThat(it.getString(BIOMETRICS_COMPLETE_KEY)).isEqualTo(BaseClientApiTest.RETURN_FOR_FLOW_COMPLETED.toString())
+                Truth.assertThat(it.getString(BIOMETRICS_COMPLETE_KEY)).isEqualTo(RETURN_FOR_FLOW_COMPLETED.toString())
             } ?: throw Exception("No bundle found")
         }
     }

@@ -20,7 +20,7 @@ class CommCareExitResponseTest : BaseCommCareClientApiTest() {
         mockAppModuleResponse(appExitResponse, APP_ENROL_ACTION)
 
         val scenario =
-            ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
+            ActivityScenario.launch<CommCareActivity>(commCareBaseFlowIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
 
         assertCommCareExitResponse(scenario, appExitResponse)
     }

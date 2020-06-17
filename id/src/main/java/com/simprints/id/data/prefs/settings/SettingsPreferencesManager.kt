@@ -1,13 +1,13 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
-import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
 
@@ -29,9 +29,10 @@ interface SettingsPreferencesManager {
 
     var logoExists: Boolean
     var consentRequired: Boolean
+    var locationPermissionRequired: Boolean
 
     var modalities: List<Modality>
-    var peopleDownSyncSetting: PeopleDownSyncSetting
+    var subjectsDownSyncSetting: SubjectsDownSyncSetting
 
     var fingerImagesExist: Boolean
     var captureFingerprintStrategy: CaptureFingerprintStrategy

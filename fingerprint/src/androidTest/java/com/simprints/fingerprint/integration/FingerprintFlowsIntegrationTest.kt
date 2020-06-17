@@ -21,11 +21,13 @@ import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.SimulationMode
 import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothAdapter
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintCaptureResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintMatchResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponseType
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.whenThis
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -46,7 +48,8 @@ class FingerprintFlowsIntegrationTest : KoinTest {
     private val dbManagerMock: FingerprintDbManager = mockk(relaxed = true)
     private val masterFlowManager: MasterFlowManager = mockk(relaxed = true)
 
-    @get:Rule var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
+    @get:Rule
+    var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
 
@@ -59,7 +62,19 @@ class FingerprintFlowsIntegrationTest : KoinTest {
         val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager(simulationMode))
         declareModule {
             single<ScannerFactory> {
-                spyk(ScannerFactoryImpl(simulatedBluetoothAdapter, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))).apply {
+                spyk(ScannerFactoryImpl(
+                    bluetoothAdapter = simulatedBluetoothAdapter,
+                    preferencesManager = mockk(relaxed = true),
+                    crashReportManager = mockk(relaxed = true),
+                    scannerUiHelper = mockk(relaxed = true),
+                    serialNumberConverter = mockk(relaxed = true),
+                    scannerGenerationDeterminer = mockk(relaxed = true),
+                    scannerInitialSetupHelper = mockk(relaxed = true),
+                    connectionHelper = mockk(relaxed = true),
+                    cypressOtaHelper = mockk(relaxed = true),
+                    stmOtaHelper = mockk(relaxed = true),
+                    un20OtaHelper = mockk(relaxed = true)
+                )).apply {
                     every { create(any()) } answers {
                         val macAddress = args[0] as String
                         when (simulationMode) {
@@ -83,9 +98,9 @@ class FingerprintFlowsIntegrationTest : KoinTest {
 
     private fun setupDbManagerMock() {
         with(dbManagerMock) {
-            every { loadPeople(any()) } answers {
-                val query = args[0] as PersonLocalDataSource.Query
-                val numberOfPeopleToLoad = if (query.personId == null) NUMBER_OF_PEOPLE_IN_DB else 1
+            whenThis { loadPeople(anyNotNull()) } then {
+                val query = it.arguments[0] as SubjectLocalDataSource.Query
+                val numberOfPeopleToLoad = if (query.subjectId == null) NUMBER_OF_PEOPLE_IN_DB else 1
                 Single.just(
                     FingerprintGenerator.generateRandomFingerprintRecords(numberOfPeopleToLoad)
                 )
@@ -137,7 +152,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
     private fun assertIdentifyFlowFinishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintMatchRequestIntent(
             FingerprintGenerator.generateRandomFingerprints(2),
-            PersonLocalDataSource.Query(projectId = DEFAULT_PROJECT_ID)
+            SubjectLocalDataSource.Query(projectId = DEFAULT_PROJECT_ID)
         ))
 
         with(scenario.result) {
@@ -152,7 +167,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
     private fun assertVerifyFlowFinishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintMatchRequestIntent(
             FingerprintGenerator.generateRandomFingerprints(2),
-            PersonLocalDataSource.Query(personId = UUID.randomUUID().toString())
+            SubjectLocalDataSource.Query(subjectId = UUID.randomUUID().toString())
         ))
 
         with(scenario.result) {

@@ -20,7 +20,7 @@ class OdkEnrolResponseTest : BaseOdkClientApiTest() {
         mockAppModuleResponse(appEnrolResponse, APP_ENROL_ACTION)
 
         val scenario =
-            ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = ODK_ENROL_ACTION })
+            ActivityScenario.launch<OdkActivity>(odkBaseFlowIntentRequest.apply { action = ODK_ENROL_ACTION })
 
         assertOdkEnrolResponse(scenario, appEnrolResponse)
     }

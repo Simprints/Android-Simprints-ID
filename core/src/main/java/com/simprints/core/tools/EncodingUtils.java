@@ -5,6 +5,7 @@ import android.util.Base64;
 
 import androidx.annotation.NonNull;
 
+// For some reason, mocking this class in Kotlin fails (required by Fingerprint module)
 public class EncodingUtils {
 
     public static @NonNull

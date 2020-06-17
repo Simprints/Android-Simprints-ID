@@ -1,7 +1,7 @@
 package com.simprints.id.activities.settings.fragments.settingsAbout
 
 import android.preference.Preference
-import com.simprints.core.network.BaseUrlProvider
+import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.prefs.PreferencesManager

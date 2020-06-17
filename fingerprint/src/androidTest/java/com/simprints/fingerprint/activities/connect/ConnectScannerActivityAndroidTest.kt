@@ -95,6 +95,9 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
     @Test
     fun pressBack_launchesRefusalActivity() {
+        val backButtonBehaviourLiveData = MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
+        every { viewModelMock.backButtonBehaviour } returns backButtonBehaviourLiveData
+
         Intents.init()
 
         scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
@@ -112,7 +115,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
 
     companion object {
-        private fun connectScannerTaskRequest() = ConnectScannerTaskRequest()
+        private fun connectScannerTaskRequest() = ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         private fun ConnectScannerTaskRequest.toIntent() = Intent().also {
             it.setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, ConnectScannerActivity::class.qualifiedName!!)
