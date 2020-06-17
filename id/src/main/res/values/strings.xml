@@ -2,6 +2,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Dynamic module names -->
+    <string name="title_face" translatable="false">Face</string>
+    <string name="title_fingerprint" translatable="false">Fingerprint</string>
 
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- App Name -->
@@ -44,12 +46,12 @@
     <string name="consent_parental_confirmation">May I %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
 
     <string name="biometrics_general_fingerprint">use your fingerprints</string>
-    <string name="biometric_general_face">take your photographs</string>
+    <string name="biometric_general_face">take photographs of your face</string>
     <string name="biometrics_access_fingerprint">fingerprint information</string>
     <string name="biometrics_access_face">photographs</string>
     <string name="biometrics_access_fingerprint_face">fingerprint information, photographs</string>
     <string name="biometrics_parental_fingerprint">use your child\'s fingerprints</string>
-    <string name="biometrics_parental_face">take your child\'s photographs</string>
+    <string name="biometrics_parental_face">take photographs of your child\'s face</string>
 
     <string name="biometric_concat_modalities">and</string>
     <!-- Loading Messages-->
@@ -94,6 +96,8 @@
     <string name="verify_guid_not_found_title">Person not found</string>
     <string name="error_occurred_title">Error occurred</string>
     <string name="alert_try_again">Try again</string>
+    <string name="enrol_last_biometrics_alert_title">Unable to save</string>
+
     <!-- Error Message Text -->
     <string name="different_projectId_message">A configuration error has occurred (different Project Id), please sign out from the home screen or contact your system administrator</string>
     <string name="different_userId_message">A configuration error has occurred (different User Id), please sign out from the home screen or contact your system administrator</string>
@@ -101,6 +105,11 @@
     <string name="verify_guid_not_found_offline_message">Person not found, please make sure you are connected to the internet and try again</string>
     <string name="unforeseen_error_message">Please try again and if Simprints does not work contact your system administrator</string>
     <string name="safetynet_down_alert_message">1. Please try again after 5–10 minutes \n 2. Tap close</string>
+    <string name="enrol_last_biometrics_alert_message">1. Failed to save %1$s record \n 2. Tap close</string>
+    <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
+    <string name="enrol_last_biometrics_alert_message_fingerprint_param">Fingerprint</string>
+    <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
+
     <!-- Button Labels For Error Messages -->
     <string name="close">CLOSE</string>
     <string name="try_again_label">Try Again</string>
@@ -260,8 +269,9 @@
     <string name="refusal_too_young">Too young</string>
     <string name="refusal_other">Other</string>
     <string name="exit_form_return_to_simprints">Return to Simprints</string>
-    <string name="why_did_you_skip_biometrics">Why did you skip Biometrics?</string>
-    <string name="why_did_you_skip_face">Why did you skip face capture?</string>
+    <string name="exit_form_capture_face">Capture face</string>
+    <string name="why_did_you_skip_biometrics">Why did you skip biometrics?</string>
+    <string name="why_did_you_skip_face_capture">Why did you skip face capture?</string>
     <string name="fetch_guid_checking_person_in_database">Checking person in database</string>
     <!-- region Module selection -->
     <string name="hint_search_modules">Search modules</string>
@@ -272,6 +282,7 @@
     <string name="confirm_module_selection_yes">Confirm</string>
     <string name="confirm_module_selection_cancel">Cancel</string>
     <string name="dashboard_sync_card_try_again_button">Try again</string>
+    <string name="enrol_last_biometrics_success">Successful enrolment</string>
     <!-- endregion -->
 
 </resources>

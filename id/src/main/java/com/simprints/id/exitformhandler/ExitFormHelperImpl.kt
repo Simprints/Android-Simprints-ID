@@ -8,10 +8,10 @@ import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResul
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreFaceExitFormResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreFingerprintExitFormResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
 import com.simprints.id.exitformhandler.ExitFormResult.ExitFormType.*
 

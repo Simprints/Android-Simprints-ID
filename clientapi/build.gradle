@@ -1,6 +1,6 @@
 apply plugin: 'com.android.dynamic-feature'
 apply plugin: 'kotlin-android'
-apply plugin: "kotlin-kapt"
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 sonarqube {
@@ -14,14 +14,13 @@ androidExtensions {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion config.min_sdk
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
@@ -32,11 +31,28 @@ android {
             // in Dynamic Features, aapt doesn't pull them out from the Manifest as it does with the base model
             //proguardFiles 'proguard-rules-dynamic-features.pro'
         }
-        releaseWithLogfile {
+
+        debug {
+            testCoverageEnabled true
+        }
+
+        staging {
             initWith release
         }
         debug {
             testCoverageEnabled true
+        }
+    }
+
+    flavorDimensions "mode"
+
+    productFlavors {
+        standard {
+            dimension "mode"
+        }
+
+        withLogFile {
+            dimension "mode"
         }
     }
 
@@ -61,7 +77,7 @@ dependencies {
     // So the tests that have references to the base module fail with java.lang.NoClassDefFoundError exceptions.
     // The following line includes the base module classes.jar into the final one.
     // To run unit tests from CL: ./gradlew fingerprint:test
-    testRuntimeOnly (files("${projectDir}/../id/build/intermediates/app_classes/debug/classes.jar"))
+    testRuntimeOnly fileTree(include: ['**/*.jar'], dir: '../id/build/intermediates/app_classes/')
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':id')
@@ -106,6 +122,7 @@ dependencies {
     testImplementation deps.testing.androidx.core
     testImplementation deps.testing.androidx.ext_junit
     testImplementation deps.testing.mockk.core
+    testImplementation deps.testing.kotlin
 
     testImplementation deps.testing.espresso.intents
     testImplementation deps.koin.core_ext

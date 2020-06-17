@@ -1,158 +1,235 @@
 package com.simprints.fingerprint.activities.collect
 
-import android.app.ProgressDialog
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import androidx.core.content.ContextCompat
-import androidx.viewpager.widget.ViewPager
+import androidx.lifecycle.Lifecycle
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
+import com.simprints.fingerprint.activities.collect.confirmfingerprints.ConfirmFingerprintsDialog
+import com.simprints.fingerprint.activities.collect.fingerviewpager.FingerViewPagerManager
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
+import com.simprints.fingerprint.activities.collect.resources.buttonBackgroundColour
+import com.simprints.fingerprint.activities.collect.resources.buttonTextColour
+import com.simprints.fingerprint.activities.collect.resources.buttonTextId
+import com.simprints.fingerprint.activities.collect.resources.nameTextId
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
+import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
+import com.simprints.fingerprint.activities.collect.state.FingerCollectionState.*
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningOnlyTimeoutBar
 import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningWithImageTransferTimeoutBar
+import com.simprints.fingerprint.activities.collect.tryagainsplash.SplashScreenActivity
+import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
+import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.flow.Action
+import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
+import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
+import com.simprints.fingerprint.tools.extensions.setResultAndFinish
+import com.simprints.fingerprint.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
+import org.koin.android.viewmodel.ext.android.viewModel
 
-class CollectFingerprintsActivity :
-    FingerprintActivity(),
-    CollectFingerprintsContract.View {
+class CollectFingerprintsActivity : FingerprintActivity() {
 
-    val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
+    private val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
+    private val masterFlowManager: MasterFlowManager by inject()
 
-    private lateinit var fingerprintRequest: CollectFingerprintsTaskRequest
-    override lateinit var viewPresenter: CollectFingerprintsContract.Presenter
+    private val vm: CollectFingerprintsViewModel by viewModel()
 
-    override lateinit var viewPager: ViewPagerCustom
-    override lateinit var indicatorLayout: LinearLayout
-    override lateinit var pageAdapter: FingerPageAdapter
-    override lateinit var scanButton: Button
-    override lateinit var progressBar: ProgressBar
-    override lateinit var timeoutBar: ScanningTimeoutBar
-    override lateinit var un20WakeupDialog: ProgressDialog
-
-    private var rightToLeft: Boolean = false
+    private lateinit var fingerViewPagerManager: FingerViewPagerManager
+    private lateinit var timeoutBar: ScanningTimeoutBar
+    private var confirmDialog: AlertDialog? = null
+    private var hasSplashScreenBeenTriggered: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_collect_fingerprints)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        fingerprintRequest = this.intent.extras?.getParcelable(CollectFingerprintsTaskRequest.BUNDLE_KEY)
+        val fingerprintRequest = this.intent.extras?.getParcelable<CollectFingerprintsTaskRequest>(CollectFingerprintsTaskRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForCollectFingerprintsActivityException()
 
-        configureRightToLeft()
+        vm.start(fingerprintRequest.fingerprintsToCapture)
 
-        viewPresenter = get { parametersOf(this, this, fingerprintRequest) }
-        initBar()
-        initViewFields()
-        viewPresenter.start()
+        initUiComponents()
+        observeStateChanges()
     }
 
-    private fun configureRightToLeft() {
-        rightToLeft = resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
+    private fun initUiComponents() {
+        initToolbar()
+        initViewPagerManager()
+        initTimeoutBar()
+        initScanButton()
+        initMissingFingerButton()
     }
 
-    private fun initBar() {
+    private fun initToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.show()
-        supportActionBar?.title = viewPresenter.getTitle()
+        supportActionBar?.title = when (masterFlowManager.getCurrentAction()) {
+            Action.ENROL -> androidResourcesHelper.getString(R.string.register_title)
+            Action.IDENTIFY -> androidResourcesHelper.getString(R.string.identify_title)
+            Action.VERIFY -> androidResourcesHelper.getString(R.string.verify_title)
+        }
     }
 
-    private fun initViewFields() {
-        viewPager = view_pager
-        indicatorLayout = indicator_layout
-        scanButton = scan_button
-        progressBar = pb_timeout
-        setListenerToMissingFinger()
+    private fun initViewPagerManager() {
+        fingerViewPagerManager = FingerViewPagerManager(
+            vm.state().fingerStates.map { it.id }.toMutableList(),
+            this,
+            view_pager,
+            indicator_layout,
+            onFingerSelected = { position -> vm.updateSelectedFinger(position) },
+            isAbleToSelectNewFinger = { !vm.state().currentFingerState().isCommunicating() }
+        )
+    }
 
+    private fun initMissingFingerButton() {
         with(androidResourcesHelper) {
-            scanButton.text = getString(R.string.scan)
             missingFingerText.text = getString(R.string.missing_finger)
             missingFingerText.paintFlags = missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         }
+        missingFingerText.setOnClickListener {
+            vm.logUiMessageForCrashReport("Missing finger text clicked")
+            vm.handleMissingFingerButtonPressed()
+        }
+    }
+
+    private fun initScanButton() {
+        scan_button.setOnClickListener {
+            vm.logUiMessageForCrashReport("Scan button clicked")
+            vm.handleScanButtonPressed()
+        }
+    }
+
+    private fun initTimeoutBar() {
+        timeoutBar = if (vm.isImageTransferRequired()) {
+            ScanningWithImageTransferTimeoutBar(pb_timeout, CollectFingerprintsViewModel.scanningTimeoutMs, CollectFingerprintsViewModel.imageTransferTimeoutMs)
+        } else {
+            ScanningOnlyTimeoutBar(pb_timeout, CollectFingerprintsViewModel.scanningTimeoutMs)
+        }
+    }
+
+    private fun observeStateChanges() {
+        vm.state.activityObserveWith {
+            it.updateViewPagerManager()
+            it.updateScanButton()
+            it.updateProgressBar()
+            it.listenForConfirmDialog()
+            it.listenForSplashScreen()
+        }
+
+        vm.vibrate.activityObserveEventWith { Vibrate.vibrate(this) }
+        vm.noFingersScannedToast.activityObserveEventWith { showToast(androidResourcesHelper.getString(R.string.no_fingers_scanned)) }
+        vm.launchAlert.activityObserveEventWith { launchAlert(this, it) }
+        vm.launchReconnect.activityObserveEventWith { launchConnectScannerActivityForReconnect() }
+        vm.finishWithFingerprints.activityObserveEventWith { setResultAndFinishSuccess(it) }
+    }
+
+    private fun CollectFingerprintsState.updateViewPagerManager() {
+        fingerViewPagerManager.setCurrentPageAndFingerStates(fingerStates, currentFingerIndex)
+    }
+
+    private fun CollectFingerprintsState.updateScanButton() {
+        with(currentFingerState()) {
+            scan_button.text = androidResourcesHelper.getString(buttonTextId(isAskingRescan))
+            scan_button.setTextColor(resources.getColor(buttonTextColour(), null))
+            scan_button.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
+        }
+    }
+
+    private fun CollectFingerprintsState.updateProgressBar() {
+        with(timeoutBar) {
+            when (val fingerState = currentFingerState()) {
+                is NotCollected,
+                is Skipped -> {
+                    handleCancelled()
+                    progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bar)
+                }
+                is Scanning -> startTimeoutBar()
+                is TransferringImage -> handleScanningFinished()
+                is NotDetected -> {
+                    handleCancelled()
+                    progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
+                }
+                is Collected -> if (fingerState.scanResult.isGoodScan()) {
+                    handleCancelled()
+                    progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_good)
+                } else {
+                    handleCancelled()
+                    progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
+                }
+            }
+        }
+    }
+
+    private fun CollectFingerprintsState.listenForConfirmDialog() {
+        confirmDialog = if (isShowingConfirmDialog && confirmDialog == null) {
+            val mapOfScannedFingers = fingerStates.associate { fingerState ->
+                androidResourcesHelper.getString(fingerState.id.nameTextId()) to
+                    (fingerState is Collected && fingerState.scanResult.isGoodScan())
+            }
+            ConfirmFingerprintsDialog(this@CollectFingerprintsActivity, androidResourcesHelper, mapOfScannedFingers,
+                callbackConfirm = {
+                    vm.logUiMessageForCrashReport("Confirm fingerprints clicked")
+                    vm.handleConfirmFingerprintsAndContinue()
+                },
+                callbackRestart = {
+                    vm.logUiMessageForCrashReport("Restart clicked")
+                    vm.handleRestart()
+                })
+                .create().also { it.show() }
+        } else {
+            confirmDialog?.let { if (it.isShowing) it.dismiss() }
+            null
+        }
+    }
+
+    private fun CollectFingerprintsState.listenForSplashScreen() {
+        if (isShowingSplashScreen && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            if (!hasSplashScreenBeenTriggered) {
+                startActivity(Intent(this@CollectFingerprintsActivity, SplashScreenActivity::class.java))
+                overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
+                hasSplashScreenBeenTriggered = true
+            }
+        } else {
+            hasSplashScreenBeenTriggered = false
+        }
+    }
+
+    private fun launchConnectScannerActivityForReconnect() {
+        val intent = Intent(this, ConnectScannerActivity::class.java).apply {
+            putExtra(ConnectScannerTaskRequest.BUNDLE_KEY, ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.RECONNECT))
+        }
+        startActivityForResult(intent, RequestCode.CONNECT.value)
+    }
+
+    private fun setResultAndFinishSuccess(fingerprints: List<Fingerprint>) {
+        setResultAndFinish(ResultCode.OK, Intent().apply {
+            putExtra(CollectFingerprintsTaskResult.BUNDLE_KEY, CollectFingerprintsTaskResult(fingerprints))
+        })
     }
 
     override fun onResume() {
         super.onResume()
-        viewPresenter.handleOnResume()
+        vm.handleOnResume()
     }
 
-    override fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean) {
-        view_pager.adapter = pageAdapter
-        view_pager.offscreenPageLimit = 1
-        view_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
-            override fun onPageScrollStateChanged(state: Int) {}
-            override fun onPageSelected(position: Int) {
-                onPageSelected(position)
-            }
-        })
-        view_pager.setOnTouchListener { _, _ -> onTouch() }
-        view_pager.currentItem = viewPresenter.currentActiveFingerNo
-
-        reverseViewPagerIfNeeded()
-    }
-
-    private fun reverseViewPagerIfNeeded() {
-        // If the layout is from right to left, we need to reverse the scrolling direction
-        if (rightToLeft) view_pager.rotationY = 180f
-    }
-
-    private fun setListenerToMissingFinger() {
-        missingFingerText.setOnClickListener { viewPresenter.handleMissingFingerClick() }
-    }
-
-    override fun refreshScanButtonAndTimeoutBar() {
-        val activeStatus = viewPresenter.currentFinger().status
-        scan_button.text = androidResourcesHelper.getString(activeStatus.buttonTextId)
-        scan_button.setTextColor(activeStatus.buttonTextColor)
-        scan_button.setBackgroundColor(ContextCompat.getColor(this, activeStatus.buttonBgColorRes))
-
-        timeoutBar.setProgressBar(activeStatus)
-    }
-
-    override fun refreshFingerFragment() {
-        pageAdapter.getFragment(viewPresenter.currentActiveFingerNo)?.let {
-            reverseFingerFragmentIfNeeded(it)
-            it.updateTextAccordingToStatus()
-        }
-    }
-
-    private fun reverseFingerFragmentIfNeeded(it: FingerFragment) {
-        // If the layout direction is RTL, then the view pager will have been rotated,
-        // but the image and text need to be rotated back
-        if (rightToLeft) {
-            it.view?.rotationY = 180f
-        }
-    }
-
-    override fun setResultAndFinishSuccess(fingerprintsActResult: CollectFingerprintsTaskResult) {
-        setResultAndFinish(ResultCode.OK, Intent().apply {
-            putExtra(CollectFingerprintsTaskResult.BUNDLE_KEY, fingerprintsActResult)
-        })
-    }
-
-
-    override fun startRefusalActivity() = launchRefusalActivity()
-
-    override fun onBackPressed() {
-        viewPresenter.handleOnBackPressed()
+    override fun onPause() {
+        super.onPause()
+        vm.handleOnPause()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -163,33 +240,15 @@ class CollectFingerprintsActivity :
                 ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
                 ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
                 ResultCode.OK -> {
-                    viewPresenter.handleTryAgainFromDifferentActivity()
                 }
             }
         }
     }
 
-    private fun setResultAndFinish(resultCode: ResultCode, data: Intent?) {
-        setResult(resultCode.value, data)
-        finish()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewPresenter.handleOnPause()
-    }
-
-    override fun doLaunchAlert(fingerprintAlert: FingerprintAlert) {
-        launchAlert(this, fingerprintAlert)
-    }
-
-    override fun showSplashScreen() {
-        startActivity(Intent(this, SplashScreenActivity::class.java))
-        overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
-    }
-
-    override fun onDestroy() {
-        viewPresenter.disconnectScannerIfNeeded()
-        super.onDestroy()
+    override fun onBackPressed() {
+        vm.handleOnBackPressed()
+        if (!vm.state().currentFingerState().isCommunicating()) {
+            launchRefusalActivity()
+        }
     }
 }

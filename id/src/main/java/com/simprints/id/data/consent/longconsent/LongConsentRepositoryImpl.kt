@@ -22,7 +22,7 @@ class LongConsentRepositoryImpl(private val longConsentLocalDataSource: LongCons
     }
 
     //TODO Explore how to centralised these constants based on BuildConfig in a gradle file
-    private val bucketUrl = if(BuildConfig.DEBUG) "gs://simprints-dev-firebase-storage" else "gs://simprints-152315-firebase-storage"
+    private val bucketUrl = BuildConfig.LONG_CONSENT_BUCKET
 
     private val firebaseStorage by lazy { FirebaseStorage.getInstance(bucketUrl) }
     internal var language = DEFAULT_LANGUAGE

@@ -17,16 +17,15 @@ androidExtensions {
 }
 
 android {
+    compileSdkVersion 29
+    buildToolsVersion '29.0.3'
 
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
     defaultConfig {
         minSdkVersion config.min_sdk
-        targetSdkVersion 28
-        multiDexEnabled true
+        targetSdkVersion 29
         vectorDrawables.useSupportLibrary = true
-        versionName "2020.2.0"
-        versionCode 222
+        versionName "2020.2.1"
+        versionCode 239
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -74,10 +73,10 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
             signingConfig signingConfigs.release
+            buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
+            buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-152315-firebase-storage\"")
         }
-        releaseWithLogfile {
-            initWith release
-        }
+
         debug {
             minifyEnabled false
             ext.enableCrashlytics = false
@@ -86,15 +85,26 @@ android {
             versionNameSuffix "-dev"
             manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
             signingConfig signingConfigs.debug
+            buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
+            buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-dev-firebase-storage\"")
+        }
+
+        staging {
+            initWith release
+            buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCSmwYkm2iHlKi-cBjohMH-FS6jQuCqPTE\"")
+            buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-firebase-staging.appspot.com\"")
         }
     }
 
-    applicationVariants.all { variant ->
-        if (variant.buildType.name == "release" ||
-            variant.buildType.name == "releaseWithLogfile") {
-            buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
-        } else if (variant.buildType.name == "debug") {
-            buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
+    flavorDimensions "mode"
+
+    productFlavors {
+        standard {
+            dimension "mode"
+        }
+
+        withLogFile {
+            dimension "mode"
         }
     }
 
@@ -205,6 +215,7 @@ dependencies {
     api deps.firebase.mlkit_barcode
     api deps.firebase.crashlytics
     api deps.gson.core
+    api deps.gson.extras
     api deps.timber.core
     api deps.androidx.core
     api deps.androidx.multidex

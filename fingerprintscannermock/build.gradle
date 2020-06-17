@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         minSdkVersion config.min_sdk
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName project.version
 
@@ -24,7 +24,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        releaseWithLogfile {
+        staging {
             initWith release
         }
     }

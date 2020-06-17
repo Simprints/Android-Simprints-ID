@@ -4,14 +4,12 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.simprints.core.network.BaseUrlProvider
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
+import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
@@ -29,10 +27,13 @@ import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.ConnectivityHelper
@@ -64,6 +65,7 @@ class TestAppModule(
     private val deviceManagerRule: DependencyRule = RealRule,
     private val recentEventsPreferencesManagerRule: DependencyRule = RealRule,
     private val remoteProjectInfoProviderRule: DependencyRule = RealRule,
+    private val locationManagerRule: DependencyRule = RealRule,
     private val baseUrlProviderRule: DependencyRule = RealRule,
     private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule {
         setupFakeEncryptedSharedPreferences(
@@ -95,19 +97,19 @@ class TestAppModule(
         remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager(loginInfoManager) }
 
     override fun provideSignerManager(
-        projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager,
-        peopleSyncManager: PeopleSyncManager,
-        syncManager: SyncManager
+            projectRepository: ProjectRepository,
+            remoteDbManager: RemoteDbManager,
+            loginInfoManager: LoginInfoManager,
+            preferencesManager: PreferencesManager,
+            subjectsSyncManager: SubjectsSyncManager,
+            syncManager: SyncManager
     ): SignerManager = dbManagerRule.resolveDependency {
         super.provideSignerManager(
             projectRepository,
             remoteDbManager,
             loginInfoManager,
             preferencesManager,
-            peopleSyncManager,
+            subjectsSyncManager,
             syncManager
         )
     }
@@ -179,12 +181,10 @@ class TestAppModule(
         }
 
     override fun provideSessionEventsRemoteDbManager(
-        remoteDbManager: RemoteDbManager,
         simApiClientFactory: SimApiClientFactory
     ): SessionRemoteDataSource =
         sessionEventsRemoteDbManagerRule.resolveDependency {
             super.provideSessionEventsRemoteDbManager(
-                remoteDbManager,
                 simApiClientFactory
             )
         }
@@ -192,8 +192,12 @@ class TestAppModule(
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
 
+    override fun provideLocationManager(ctx: Context): LocationManager =
+        locationManagerRule.resolveDependency {
+            super.provideLocationManager(ctx)
+        }
 
-    override fun provideSyncStatusDatabase(ctx: Context): PeopleSyncStatusDatabase =
+    override fun provideSyncStatusDatabase(ctx: Context): SubjectsSyncStatusDatabase =
         syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase(ctx) }
 
     // Android keystore is not available in unit tests - so it returns a mock that builds the standard shared prefs.

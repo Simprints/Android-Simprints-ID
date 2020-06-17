@@ -18,7 +18,7 @@ object DomainToModuleApiAppResponse {
             IDENTIFY -> fromDomainToModuleApiAppIdentifyResponse(response as AppIdentifyResponse)
             REFUSAL -> fromDomainToModuleApiAppRefusalFormResponse(response as AppRefusalFormResponse)
             VERIFY -> fromDomainToModuleApiAppVerifyResponse(response as AppVerifyResponse)
-            CONFIRMATION -> fromDomainToModuleApiAppIdentityConfirmationResponse(response as AppConfirmationResponse)
+            CONFIRMATION -> fromDomainToModuleApiAppConfirmIdentityResponse(response as AppConfirmationResponse)
             ERROR -> fromDomainToModuleApiAppErrorResponse(response as AppErrorResponse)
         }
 
@@ -33,6 +33,7 @@ object DomainToModuleApiAppResponse {
             UNEXPECTED_ERROR -> IAppErrorReason.UNEXPECTED_ERROR
             BLUETOOTH_NOT_SUPPORTED -> IAppErrorReason.BLUETOOTH_NOT_SUPPORTED
             LOGIN_NOT_COMPLETE -> IAppErrorReason.LOGIN_NOT_COMPLETE
+            ENROLMENT_LAST_BIOMETRICS_FAILED -> IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED
         }
 
     private fun fromDomainToModuleApiAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)
@@ -51,7 +52,7 @@ object DomainToModuleApiAppResponse {
     private fun fromDomainToModuleApiAppMatchResult(result: MatchResult): IAppMatchResult =
         IAppMatchResultImpl(result.guidFound, result.confidence, fromDomainToAppIAppResponseTier(result.tier))
 
-    private fun fromDomainToModuleApiAppIdentityConfirmationResponse(response: AppConfirmationResponse) =
+    private fun fromDomainToModuleApiAppConfirmIdentityResponse(response: AppConfirmationResponse) =
         IAppConfirmationResponseImpl(response.identificationOutcome)
 
     private fun fromDomainToAppIAppResponseTier(tier: Tier): IAppResponseTier =

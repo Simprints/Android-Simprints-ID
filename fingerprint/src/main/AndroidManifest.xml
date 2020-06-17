@@ -39,9 +39,10 @@
             android:name=".activities.connect.ConnectScannerActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent"/>
         <activity
-            android:name=".activities.collect.SplashScreenActivity"
+            android:name=".activities.collect.tryagainsplash.SplashScreenActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
         <activity

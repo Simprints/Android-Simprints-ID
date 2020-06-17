@@ -1,12 +1,15 @@
 package com.simprints.clientapi.di
 
 import android.content.Context
+import com.simprints.clientapi.activities.commcare.CommCareAction
 import com.simprints.clientapi.activities.commcare.CommCareContract
 import com.simprints.clientapi.activities.commcare.CommCarePresenter
 import com.simprints.clientapi.activities.errors.ErrorContract
 import com.simprints.clientapi.activities.errors.ErrorPresenter
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsContract
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsPresenter
+import com.simprints.clientapi.activities.odk.OdkAction
 import com.simprints.clientapi.activities.odk.OdkContract
 import com.simprints.clientapi.activities.odk.OdkPresenter
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
@@ -65,13 +68,13 @@ object KoinInjector {
         factory<ErrorContract.Presenter> { (view: ErrorContract.View) ->
             ErrorPresenter(view, get())
         }
-        factory<LibSimprintsContract.Presenter> { (view: LibSimprintsContract.View, action: String?) ->
+        factory<LibSimprintsContract.Presenter> { (view: LibSimprintsContract.View, action: LibSimprintsAction) ->
             LibSimprintsPresenter(view, action, get(), get(), get())
         }
-        factory<OdkContract.Presenter> { (view: OdkContract.View, action: String?) ->
+        factory<OdkContract.Presenter> { (view: OdkContract.View, action: OdkAction) ->
             OdkPresenter(view, action, get(), get(), get())
         }
-        factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: String?) ->
+        factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: CommCareAction) ->
             CommCarePresenter(view, action, get(), get(), get(), get())
         }
     }

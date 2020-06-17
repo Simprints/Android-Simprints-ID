@@ -27,16 +27,16 @@ fun Activity.hasPermission(permission: String): Boolean {
     return checkSelfPermission(permission) == PERMISSION_GRANTED
 }
 
-fun Activity.requestPermissionsIfRequired(permissions: Array<String>, permissionsRequestCode: Int): Boolean {
+fun Activity.requestPermissionsIfRequired(permissions: List<String>, permissionsRequestCode: Int): Boolean {
     val permissionsToAsk = getNotGrantedPermissions(permissions)
 
     return if (permissionsToAsk.isNotEmpty()) {
-        requestPermissions(this, permissionsToAsk, permissionsRequestCode)
+        requestPermissions(this, permissionsToAsk.toTypedArray(), permissionsRequestCode)
         true
     } else {
         false
     }
 }
 
-fun Activity.getNotGrantedPermissions(permissions: Array<String>) =
-    permissions.filterNot { hasPermission(it) }.toTypedArray()
+fun Activity.getNotGrantedPermissions(permissions: List<String>) =
+    permissions.filterNot { hasPermission(it) }

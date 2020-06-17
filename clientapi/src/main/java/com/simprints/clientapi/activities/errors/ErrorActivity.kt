@@ -8,6 +8,7 @@ import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.simprints.clientapi.R
+import com.simprints.clientapi.activities.commcare.CommCareAction
 import com.simprints.clientapi.activities.errors.request.AlertActRequest
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.id.tools.AndroidResourcesHelper
@@ -32,7 +33,7 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
 
         clientApiAlertType = intent
             .extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.clientApiAlert
-            ?: ClientApiAlert.INVALID_CLIENT_REQUEST
+            ?: throw Throwable("No AlertActRequest found")
 
         textView_close_button.setOnClickListener { presenter.handleCloseOrBackClick() }
 

@@ -5,8 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequestType
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
+import com.simprints.id.orchestrator.FlowProvider.FlowType.*
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
@@ -24,21 +27,18 @@ open class OrchestratorManagerImpl(
     override val appResponse = MutableLiveData<AppResponse?>()
 
     internal lateinit var modalities: List<Modality>
-    internal lateinit var appRequest: AppRequest
     internal var sessionId: String = ""
 
     private lateinit var modalitiesFlow: ModalityFlow
-    private lateinit var flow: AppRequestType
 
     override suspend fun initialise(modalities: List<Modality>,
                                     appRequest: AppRequest,
                                     sessionId: String) {
         this.sessionId = sessionId
-        this.appRequest = appRequest
+        hotCache.appRequest = appRequest
         this.modalities = modalities
         modalitiesFlow = flowModalityFactory.createModalityFlow(appRequest, modalities)
         resetInternalState()
-        flow = appRequest.type
 
         proceedToNextStepOrAppResponse()
     }
@@ -55,17 +55,24 @@ open class OrchestratorManagerImpl(
     }
 
     override fun clearState() {
-        hotCache.clear()
+        hotCache.clearSteps()
     }
 
     override fun saveState() {
-        hotCache.clear()
+        hotCache.clearSteps()
         modalitiesFlow.steps.forEach {
             hotCache.save(it)
         }
     }
 
-    override fun getCurrentFlow() = flow
+    override fun getCurrentFlow() =
+        when (hotCache.appRequest) {
+            is AppEnrolRequest -> ENROL
+            is AppIdentifyRequest -> IDENTIFY
+            is AppVerifyRequest -> VERIFY
+            is AppEnrolLastBiometricsRequest ->throw IllegalStateException("Not running one of the main flows")
+            is AppConfirmIdentityRequest -> throw IllegalStateException("Not running one of the main flows")
+        }
 
     private suspend fun proceedToNextStepOrAppResponse() {
         with(modalitiesFlow) {
@@ -91,7 +98,7 @@ open class OrchestratorManagerImpl(
     private suspend fun buildAppResponseAndUpdateDailyActivity() {
         val steps = modalitiesFlow.steps
         val appResponseToReturn = appResponseFactory.buildAppResponse(
-            modalities, appRequest, steps, sessionId
+            modalities, hotCache.appRequest, steps, sessionId
         )
         ongoingStep.value = null
         appResponse.value = appResponseToReturn

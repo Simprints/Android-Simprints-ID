@@ -5,15 +5,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.sessionEvents.*
-import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPool
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPoolType
 import com.simprints.id.data.db.session.domain.models.events.callback.*
-import com.simprints.id.data.db.session.domain.models.events.callout.ConfirmationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
+import com.simprints.id.data.db.session.domain.models.events.callout.*
 import com.simprints.id.data.db.session.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.session.domain.models.session.Device
 import com.simprints.id.data.db.session.domain.models.session.Location
@@ -111,6 +108,19 @@ class SessionEventsAdapterFactoryTest {
         val calloutEvent = IdentificationCalloutEvent(
             10,
             "projectId", "userId", "moduleId", "metadata"
+        )
+
+        val apiEvent = ApiCalloutEvent(calloutEvent)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
+
+        validateCalloutEventApiModel(json)
+    }
+
+    @Test
+    fun validate_calloutEventForEnrolLastBiometricsModel() {
+        val calloutEvent = EnrolmentLastBiometricsCalloutEvent(
+            10,
+            "projectId", "userId", "moduleId", "metadata", "sessionId"
         )
 
         val apiEvent = ApiCalloutEvent(calloutEvent)
@@ -249,7 +259,7 @@ class SessionEventsAdapterFactoryTest {
     }
 
     @Test
-    fun validate_enrollmentEventApiModel() {
+    fun validate_enrolmentEventApiModel() {
         val event = EnrolmentEvent(
             10,
             UUID.randomUUID().toString()
@@ -391,6 +401,42 @@ class SessionEventsAdapterFactoryTest {
         val apiSuspiciousIntentEvent = ApiSuspiciousIntentEvent(suspiciousIntentEvent)
         val json = gsonWithAdapters.toJsonTree(apiSuspiciousIntentEvent).asJsonObject
         validateSuspiciousIntentEventApiModel(json)
+    }
+
+    @Test
+    fun validate_scannerConnectionEventApiModel() {
+        val scannerConnectionEvent = ScannerConnectionEvent(0,
+            ScannerConnectionEvent.ScannerInfo("scannerId", "macAddress",
+            ScannerConnectionEvent.ScannerGeneration.VERO_2, "2"))
+
+        val apiScannerConnectionEvent = ApiScannerConnectionEvent(scannerConnectionEvent)
+        val json = gsonWithAdapters.toJsonTree(apiScannerConnectionEvent).asJsonObject
+
+        validateScannerConnectionEventApiModel(json)
+    }
+
+    @Test
+    fun validate_vero2InfoSnapshotEvent() {
+        val vero2InfoSnapshotEvent = Vero2InfoSnapshotEvent(0,
+            Vero2InfoSnapshotEvent.Vero2Version(Int.MAX_VALUE.toLong() + 1, "1.23",
+        "api", "stmApp", "stmApi", "un20App", "un20Api"),
+            Vero2InfoSnapshotEvent.BatteryInfo(70, 15, 1, 37))
+
+        val apiVero2InfoSnapshotEvent = ApiVero2InfoSnapshotEvent(vero2InfoSnapshotEvent)
+        val json = gsonWithAdapters.toJsonTree(apiVero2InfoSnapshotEvent).asJsonObject
+
+        validateVero2InfoSnapshotEventApiModel(json)
+    }
+
+    @Test
+    fun validate_ScannerFirmwareUpdateEvent() {
+        val scannerFirmwareUpdateEvent = ScannerFirmwareUpdateEvent(0, 0, "stm",
+            "targetApp", "failureReason")
+
+        val apiScannerFirmwareUpdateEvent = ApiScannerFirmwareUpdateEvent(scannerFirmwareUpdateEvent)
+        val json = gsonWithAdapters.toJsonTree(apiScannerFirmwareUpdateEvent).asJsonObject
+
+        validateScannerFirmwareUpdateEventApiModel(json)
     }
 
     @Test
