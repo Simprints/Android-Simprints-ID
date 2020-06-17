@@ -2,6 +2,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Dynamic module names -->
+    <string name="title_face" translatable="false">Face</string>
+    <string name="title_fingerprint" translatable="false">Fingerprint</string>
 
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- App Name -->
