@@ -137,7 +137,7 @@ definitions:
                     # Build Universal APK
                     - ./gradlew bundleStandardDebug --stacktrace
                     - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
-                    - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/standardDebug/id-standard-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=debug_keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
+                    - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/standardDebug/id-standard-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=debug.keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
                     - mv universal.apks universal.zip
                     - unzip universal.zip
                 artifacts:
