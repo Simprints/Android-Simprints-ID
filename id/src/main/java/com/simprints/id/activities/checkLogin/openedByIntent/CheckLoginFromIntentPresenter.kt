@@ -83,11 +83,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     internal fun buildRequestEvent(relativeStartTime: Long, request: AppRequest): Event =
         when (request) {
-            is AppEnrolRequest -> buildEnrolmentCalloutEvent(request, relativeStarTime)
-            is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStarTime)
-            is AppIdentifyRequest -> buildIdentificationCalloutEvent(request, relativeStarTime)
-            is AppConfirmIdentityRequest -> addConfirmationCalloutEvent(request, relativeStarTime)
-            is AppEnrolLastBiometricsRequest -> addEnrolLastBiometricsCalloutEvent(request, relativeStarTime)
+            is AppEnrolRequest -> buildEnrolmentCalloutEvent(request, relativeStartTime)
+            is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStartTime)
+            is AppIdentifyRequest -> buildIdentificationCalloutEvent(request, relativeStartTime)
+            is AppConfirmIdentityRequest -> addConfirmationCalloutEvent(request, relativeStartTime)
+            is AppEnrolLastBiometricsRequest -> addEnrolLastBiometricsCalloutEvent(request, relativeStartTime)
         }
 
     internal fun addEnrolLastBiometricsCalloutEvent(request: AppEnrolLastBiometricsRequest, relativeStarTime: Long) =
@@ -99,14 +99,14 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             request.metadata,
             request.identificationSessionId)
 
-    internal fun addConfirmationCalloutEvent(request: AppConfirmIdentityRequest, relativeStarTime: Long) =
+    internal fun addConfirmationCalloutEvent(request: AppConfirmIdentityRequest, relativeStartTime: Long) =
         ConfirmationCalloutEvent(
-            relativeStarTime,
+            relativeStartTime,
             request.projectId,
             request.selectedGuid,
             request.sessionId)
 
-    internal fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStarTime: Long) =
+    internal fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStartTime: Long) =
         with(request) {
             IdentificationCalloutEvent(
                 relativeStartTime,

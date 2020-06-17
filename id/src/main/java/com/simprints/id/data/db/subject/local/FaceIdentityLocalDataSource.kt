@@ -1,6 +1,6 @@
-package com.simprints.id.data.db.person.local
+package com.simprints.id.data.db.subject.local
 
-import com.simprints.id.data.db.person.domain.FaceIdentity
+import com.simprints.id.data.db.subject.domain.FaceIdentity
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import kotlinx.coroutines.flow.Flow
 import java.io.Serializable

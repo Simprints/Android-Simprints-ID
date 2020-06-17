@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.person.domain
+package com.simprints.id.data.db.subject.domain
 
 import android.os.Parcelable
 import com.simprints.id.data.db.subject.domain.FaceSample

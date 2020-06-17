@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.steps.face
 
 import android.content.Intent
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
