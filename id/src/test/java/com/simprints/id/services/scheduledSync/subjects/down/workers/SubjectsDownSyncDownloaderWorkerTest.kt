@@ -51,7 +51,7 @@ class SubjectsDownSyncDownloaderWorkerTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).setupWorkManager()
+        UnitTestConfig(this).setupWorkManager().setupFirebase()
         app.component = mockk(relaxed = true)
         val correctInputData = SimJsonHelper.gson.toJson(projectSyncOp)
         subjectsDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
