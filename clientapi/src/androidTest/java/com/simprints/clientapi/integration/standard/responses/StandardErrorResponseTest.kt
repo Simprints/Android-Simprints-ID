@@ -20,7 +20,7 @@ class StandardErrorResponseTest : BaseStandardClientApiTest() {
         mockAppModuleResponse(appErrorResponse, APP_ENROL_ACTION)
 
         val scenario =
-            ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_ENROL_ACTION })
+            ActivityScenario.launch<LibSimprintsActivity>(standardBaseFlowIntentRequest.apply { action = STANDARD_ENROL_ACTION })
 
         assertStandardErrorResponse(scenario, RETURN_FOR_FLOW_COMPLETED)
     }
@@ -31,7 +31,7 @@ class StandardErrorResponseTest : BaseStandardClientApiTest() {
         mockAppModuleResponse(appErrorResponse, APP_ENROL_ACTION)
 
         val scenario =
-            ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_ENROL_ACTION })
+            ActivityScenario.launch<LibSimprintsActivity>(standardBaseFlowIntentRequest.apply { action = STANDARD_ENROL_ACTION })
 
         assertStandardErrorResponse(scenario, RETURN_FOR_FLOW_NOT_COMPLETED)
     }

@@ -2,8 +2,8 @@ package com.simprints.id.data.consent.shortconsent
 
 import com.simprints.id.R
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
-import com.simprints.id.domain.moduleapi.core.requests.ConsentType
+import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
+import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.tools.AndroidResourcesHelper
 
 data class ParentalConsentDataGenerator(val parentalConsentExists: Boolean,

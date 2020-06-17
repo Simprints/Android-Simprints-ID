@@ -48,6 +48,8 @@ class SessionRepositoryImplTest {
         ShadowLog.stream = System.out
         MockKAnnotations.init(this, relaxed = true)
 
+        coEvery { sessionLocalDataSourceMock.count(any()) } returns 0
+
         sessionsRepository = SessionRepositoryImpl(
             DEVICE_ID,
             APP_VERSION_NAME,

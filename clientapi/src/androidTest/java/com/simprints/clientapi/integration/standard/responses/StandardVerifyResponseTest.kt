@@ -29,7 +29,7 @@ class StandardVerifyResponseTest : BaseStandardClientApiTest() {
         mockAppModuleResponse(appVerifyResponse, APP_VERIFICATION_ACTION)
 
         val scenario =
-            ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply {
+            ActivityScenario.launch<LibSimprintsActivity>(standardBaseFlowIntentRequest.apply {
                 action = STANDARD_VERIFY_ACTION
                 putExtra(verifyGuidField.key(), verifyGuidField.value())
             })

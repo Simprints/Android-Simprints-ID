@@ -11,5 +11,4 @@
     android:paddingEnd="@dimen/padding_large"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true"
-    tools:text="@sample/sample_modules.json/data/name" />
+    android:focusable="true" />

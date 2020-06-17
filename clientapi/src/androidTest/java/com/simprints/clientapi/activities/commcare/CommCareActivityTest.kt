@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
+import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.robots.commCare
 import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.clientapi.integration.BaseClientApiTest
@@ -13,7 +14,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.test.mock.declare
 import org.koin.test.mock.declareModule
 
 @RunWith(AndroidJUnit4::class)
@@ -41,7 +41,7 @@ class CommCareActivityTest : BaseClientApiTest() {
     }
 
     private fun buildIntent(): Intent {
-        return Intent(CommCarePresenter.ACTION_CONFIRM_IDENTITY)
+        return Intent(ConfirmIdentity.action)
             .putExtra(SIMPRINTS_PROJECT_ID, "projectId")
             .putExtra(SIMPRINTS_SESSION_ID, "sessionId")
             .putExtra(SIMPRINTS_SELECTED_GUID, "selectedGuid")

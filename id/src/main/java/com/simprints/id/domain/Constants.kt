@@ -14,6 +14,7 @@ class Constants {
         const val SIMPRINTS_UPDATE_INTENT = "com.simprints.id.UPDATE"
         const val SIMPRINTS_VERIFY_INTENT = "com.simprints.id.VERIFY"
         const val SIMPRINTS_SELECT_GUID_INTENT = "com.simprints.id.CONFIRM_IDENTITY"
+        const val SIMPRINTS_REGISTER_LAST_BIOMETRICS_INTENT = "com.simprints.id.REGISTER_LAST_BIOMETRICS"
 
         // Mandatory extras
         const val SIMPRINTS_PROJECT_ID = "projectId"
