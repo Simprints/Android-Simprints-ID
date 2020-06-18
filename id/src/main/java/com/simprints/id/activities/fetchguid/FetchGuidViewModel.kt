@@ -3,69 +3,69 @@ package com.simprints.id.activities.fetchguid
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.data.db.PersonFetchResult.PersonSource
-import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.SubjectFetchResult
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.CandidateReadEvent
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import kotlinx.coroutines.launch
 
-class FetchGuidViewModel(private val personRepository: PersonRepository,
+class FetchGuidViewModel(private val subjectRepository: SubjectRepository,
                          private val deviceManager: DeviceManager,
                          private val sessionRepository: SessionRepository,
                          private val timeHelper: TimeHelper) : ViewModel() {
 
-    var personFetch = MutableLiveData<PersonSource>()
+    var subjectFetch = MutableLiveData<SubjectSource>()
 
     fun fetchGuid(projectId: String, verifyGuid: String) {
         viewModelScope.launch {
-            val personFetchStartTime = timeHelper.now()
-            val personFetchResult = getPersonFetchResult(projectId, verifyGuid)
-            personFetch.postValue(personFetchResult.personSource)
-            addPersonFetchEventToSession(personFetchResult, personFetchStartTime, verifyGuid)
+            val subjectFetchStartTime = timeHelper.now()
+            val subjectFetchResult = getSubjectFetchResult(projectId, verifyGuid)
+            subjectFetch.postValue(subjectFetchResult.subjectSource)
+            addSubjectFetchEventToSession(subjectFetchResult, subjectFetchStartTime, verifyGuid)
         }
     }
 
-    private suspend fun getPersonFetchResult(projectId: String, verifyGuid: String) = try {
-        personRepository.loadFromRemoteIfNeeded(projectId, verifyGuid)
+    private suspend fun getSubjectFetchResult(projectId: String, verifyGuid: String) = try {
+        subjectRepository.loadFromRemoteIfNeeded(projectId, verifyGuid)
     } catch (t: Throwable) {
-        getPersonFetchResultForError()
+        getSubjectFetchResultForError()
     }
 
-    private fun getPersonFetchResultForError() =
+    private fun getSubjectFetchResultForError() =
         if (deviceManager.isConnected()) {
-            PersonFetchResult(null, PersonSource.NOT_FOUND_IN_LOCAL_AND_REMOTE)
+            SubjectFetchResult(null, SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE)
         } else {
-            PersonFetchResult(null, PersonSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR)
+            SubjectFetchResult(null, SubjectSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR)
         }
 
-    private fun addPersonFetchEventToSession(personFetchResult: PersonFetchResult,
-                                             personFetchStartTime: Long,
-                                             verifyGuid: String) {
-        sessionRepository.addEventToCurrentSessionInBackground(getCandidateReadEvent(personFetchResult,
-            personFetchStartTime, verifyGuid))
+    private fun addSubjectFetchEventToSession(subjectFetchResult: SubjectFetchResult,
+                                              subjectFetchStartTime: Long,
+                                              verifyGuid: String) {
+        sessionRepository.addEventToCurrentSessionInBackground(getCandidateReadEvent(subjectFetchResult,
+            subjectFetchStartTime, verifyGuid))
     }
 
-    private fun getCandidateReadEvent(personFetchResult: PersonFetchResult,
-                                      personFetchStartTime: Long,
+    private fun getCandidateReadEvent(subjectFetchResult: SubjectFetchResult,
+                                      subjectFetchStartTime: Long,
                                       verifyGuid: String) =
-        CandidateReadEvent(personFetchStartTime,
+        CandidateReadEvent(subjectFetchStartTime,
             timeHelper.now(),
             verifyGuid,
-            getLocalResultForFetchEvent(personFetchResult.personSource),
-            getRemoteResultForFetchEvent(personFetchResult.personSource))
+            getLocalResultForFetchEvent(subjectFetchResult.subjectSource),
+            getRemoteResultForFetchEvent(subjectFetchResult.subjectSource))
 
-    private fun getLocalResultForFetchEvent(personSource: PersonSource) =
-        if (personSource == PersonSource.LOCAL) {
+    private fun getLocalResultForFetchEvent(subjectSource: SubjectSource) =
+        if (subjectSource == SubjectSource.LOCAL) {
             CandidateReadEvent.LocalResult.FOUND
         } else {
             CandidateReadEvent.LocalResult.NOT_FOUND
         }
 
-    private fun getRemoteResultForFetchEvent(personSource: PersonSource) =
-        if (personSource == PersonSource.REMOTE) {
+    private fun getRemoteResultForFetchEvent(subjectSource: SubjectSource) =
+        if (subjectSource == SubjectSource.REMOTE) {
             CandidateReadEvent.RemoteResult.FOUND
         } else {
             CandidateReadEvent.RemoteResult.NOT_FOUND

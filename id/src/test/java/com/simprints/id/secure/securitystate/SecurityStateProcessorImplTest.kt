@@ -1,6 +1,6 @@
 package com.simprints.id.secure.securitystate
 
-import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.models.SecurityState
@@ -15,7 +15,7 @@ import org.junit.Test
 class SecurityStateProcessorImplTest {
 
     @MockK lateinit var mockImageRepository: ImageRepository
-    @MockK lateinit var mockPersonRepository: PersonRepository
+    @MockK lateinit var mockSubjectRepository: SubjectRepository
     @MockK lateinit var mockSignerManager: SignerManager
 
     private lateinit var securityStateProcessor: SecurityStateProcessorImpl
@@ -26,7 +26,7 @@ class SecurityStateProcessorImplTest {
 
         securityStateProcessor = SecurityStateProcessorImpl(
             mockImageRepository,
-            mockPersonRepository,
+            mockSubjectRepository,
             mockSignerManager
         )
     }
@@ -41,7 +41,7 @@ class SecurityStateProcessorImplTest {
         }
 
         verify(exactly = 0) { mockImageRepository.deleteStoredImages() }
-        coVerify(exactly = 0) { mockPersonRepository.deleteAll() }
+        coVerify(exactly = 0) { mockSubjectRepository.deleteAll() }
         coVerify(exactly = 0) { mockSignerManager.signOut() }
     }
 
@@ -55,7 +55,7 @@ class SecurityStateProcessorImplTest {
         }
 
         verify(exactly = 1) { mockImageRepository.deleteStoredImages() }
-        coVerify(exactly = 1) { mockPersonRepository.deleteAll() }
+        coVerify(exactly = 1) { mockSubjectRepository.deleteAll() }
         coVerify(exactly = 1) { mockSignerManager.signOut() }
     }
 
@@ -69,7 +69,7 @@ class SecurityStateProcessorImplTest {
         }
 
         verify(exactly = 1) { mockImageRepository.deleteStoredImages() }
-        coVerify(exactly = 1) { mockPersonRepository.deleteAll() }
+        coVerify(exactly = 1) { mockSubjectRepository.deleteAll() }
         coVerify(exactly = 1) { mockSignerManager.signOut() }
     }
 

@@ -1,7 +1,7 @@
 package com.simprints.id.data.consent.shortconsent
 
 import androidx.lifecycle.LiveData
-import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
+import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 
 interface ConsentRepository {
 

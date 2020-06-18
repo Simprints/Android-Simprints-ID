@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.view.WindowManager
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.base.FingerprintActivity
+import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.BackButtonBehaviour.*
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
@@ -31,6 +34,7 @@ class ConnectScannerActivity : FingerprintActivity() {
 
         viewModel.launchAlert.activityObserveEventWith { launchAlert(this, it) }
         viewModel.finish.activityObserveEventWith { vibrateAndContinueToNextActivity() }
+        viewModel.finishAfterError.activityObserveEventWith { finishWithError() }
         viewModel.start(connectScannerRequest.connectMode)
     }
 
@@ -53,6 +57,12 @@ class ConnectScannerActivity : FingerprintActivity() {
         })
     }
 
+    private fun finishWithError() {
+        setResultAndFinish(ResultCode.ALERT, Intent().apply {
+            putExtra(AlertTaskResult.BUNDLE_KEY, AlertTaskResult(FingerprintAlert.UNEXPECTED_ERROR, AlertTaskResult.CloseButtonAction.CLOSE))
+        })
+    }
+
     private fun goToRefusalActivity() {
         startActivityForResult(Intent(this, RefusalActivity::class.java), RequestCode.REFUSAL.value)
     }
@@ -63,6 +73,11 @@ class ConnectScannerActivity : FingerprintActivity() {
     }
 
     override fun onBackPressed() {
-        goToRefusalActivity()
+        when (viewModel.backButtonBehaviour.value) {
+            DISABLED -> { /* Do nothing */
+            }
+            EXIT_FORM, null -> goToRefusalActivity()
+            EXIT_WITH_ERROR -> finishWithError()
+        }
     }
 }

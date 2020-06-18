@@ -21,7 +21,7 @@ class StandardExitResponseTest: BaseStandardClientApiTest() {
         mockAppModuleResponse(appExitResponse, APP_ENROL_ACTION)
 
         val scenario =
-            ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_ENROL_ACTION })
+            ActivityScenario.launch<LibSimprintsActivity>(standardBaseFlowIntentRequest.apply { action = STANDARD_ENROL_ACTION })
 
         assertStandardExitResponse(scenario, appExitResponse)
     }

@@ -1,25 +1,25 @@
 package com.simprints.clientapi.activities.commcare
 
-import com.simprints.clientapi.activities.commcare.CommCarePresenter.Companion.ACTION_CONFIRM_IDENTITY
-import com.simprints.clientapi.activities.commcare.CommCarePresenter.Companion.ACTION_IDENTIFY
-import com.simprints.clientapi.activities.commcare.CommCarePresenter.Companion.ACTION_REGISTER
-import com.simprints.clientapi.activities.commcare.CommCarePresenter.Companion.ACTION_VERIFY
+import com.simprints.clientapi.activities.commcare.CommCareAction.*
+import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.domain.responses.EnrollResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier
+import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
-import com.simprints.clientapi.requestFactories.EnrollRequestFactory
+import com.simprints.clientapi.requestFactories.EnrolRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.libsimprints.Constants
 import com.simprints.testtools.unit.BaseUnitTestConfig
+import io.kotlintest.shouldThrow
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -42,12 +42,12 @@ class CommCarePresenterTest {
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
-        val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
-        every { view.enrollExtractor } returns enrollmentExtractor
+        val enrolmentExtractor = EnrolRequestFactory.getMockExtractor()
+        every { view.enrolExtractor } returns enrolmentExtractor
 
         CommCarePresenter(
             view,
-            ACTION_REGISTER,
+            Enrol,
             mockSessionManagerToCreateSession(),
             mockSharedPrefs(),
             mockk(),
@@ -56,7 +56,7 @@ class CommCarePresenterTest {
             runBlocking { start() }
         }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
+        verify(exactly = 1) { view.sendSimprintsRequest(EnrolRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
     }
 
     @Test
@@ -67,7 +67,7 @@ class CommCarePresenterTest {
 
             CommCarePresenter(
                 view,
-                ACTION_IDENTIFY,
+                Identify,
                 mockSessionManagerToCreateSession(),
                 mockSharedPrefs(),
                 mockk(relaxed = true),
@@ -87,7 +87,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            ACTION_VERIFY,
+            Verify,
             mockSessionManagerToCreateSession(),
             mockSharedPrefs(),
             mockk(),
@@ -105,27 +105,32 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            ACTION_CONFIRM_IDENTITY,
+            ConfirmIdentity,
             mockSessionManagerToCreateSession(),
             mockSharedPrefs(),
             mockk(),
             mockk()
         ).apply { runBlocking { start() } }
 
-        verify(exactly = 1) { view.sendSimprintsConfirmation(ConfirmIdentityFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
+        verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
         CommCarePresenter(
             view,
-            "Garbage",
+            Invalid,
             mockSessionManagerToCreateSession(),
             mockSharedPrefs(),
             mockk(),
             mockk()
-        ).apply { runBlocking { start() } }
-        verify(exactly = 1) { view.handleClientRequestError(any()) }
+        ).apply {
+            runBlocking {
+                shouldThrow<InvalidIntentActionException> {
+                    start()
+                }
+            }
+        }
     }
 
     @Test
@@ -138,12 +143,12 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            Constants.SIMPRINTS_REGISTER_INTENT,
+            Enrol,
             sessionEventsManagerMock,
             mockSharedPrefs(),
             mockk(),
             mockk()
-        ).handleEnrollResponse(EnrollResponse(registerId))
+        ).handleEnrolResponse(EnrolResponse(registerId))
 
         verify(exactly = 1) { view.returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
         coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
@@ -158,7 +163,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            Constants.SIMPRINTS_IDENTIFY_INTENT,
+            Identify,
             mockk(),
             mockSharedPrefs(),
             mockk(),
@@ -184,7 +189,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            Constants.SIMPRINTS_VERIFY_INTENT,
+            Verify,
             sessionEventsManagerMock,
             mockSharedPrefs(),
             mockk(),
@@ -210,7 +215,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(
             view,
-            "",
+            Invalid,
             sessionEventsManagerMock,
             mockSharedPrefs(),
             mockk(),
