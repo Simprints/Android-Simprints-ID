@@ -5,13 +5,9 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.commcare.CommCareActivity
-import com.simprints.clientapi.integration.AppMatchResult
-import com.simprints.clientapi.integration.AppVerifyResponse
-import com.simprints.clientapi.integration.BaseClientApiTest
+import com.simprints.clientapi.integration.*
 import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import com.simprints.moduleapi.app.responses.IAppResponseTier
-import com.simprints.clientapi.integration.key
-import com.simprints.clientapi.integration.value
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
@@ -27,7 +23,7 @@ class CommCareVerifyResponseTest : BaseCommCareClientApiTest() {
         mockAppModuleResponse(appVerifyResponse, APP_VERIFICATION_ACTION)
 
         val scenario =
-            ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply {
+            ActivityScenario.launch<CommCareActivity>(commCareBaseFlowIntentRequest.apply {
                 action = COMMCARE_VERIFY_ACTION
                 putExtra(verifyGuidField.key(), verifyGuidField.value())
             })

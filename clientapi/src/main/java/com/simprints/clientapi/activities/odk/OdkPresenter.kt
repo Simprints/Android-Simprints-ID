@@ -2,20 +2,23 @@ package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.activities.errors.ClientApiAlert
+import com.simprints.clientapi.activities.odk.OdkAction.*
+import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.*
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
+import com.simprints.core.tools.extentions.safeSealedWhens
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class OdkPresenter(
     private val view: OdkContract.View,
-    private val action: String?,
+    private val action: OdkAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     deviceManager: DeviceManager,
     crashReportManager: ClientApiCrashReportManager
@@ -26,28 +29,21 @@ class OdkPresenter(
     crashReportManager
 ), OdkContract.Presenter {
 
-    companion object {
-        private const val PACKAGE_NAME = "com.simprints.simodkadapter"
-        const val ACTION_REGISTER = "$PACKAGE_NAME.REGISTER"
-        const val ACTION_IDENTIFY = "$PACKAGE_NAME.IDENTIFY"
-        const val ACTION_VERIFY = "$PACKAGE_NAME.VERIFY"
-        const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
-    }
-
     override suspend fun start() {
-        if (action != ACTION_CONFIRM_IDENTITY) {
+        if (action !is OdkActionFollowUpAction) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.ODK)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
 
         runIfDeviceIsNotRooted {
             when (action) {
-                ACTION_REGISTER -> processEnrollRequest()
-                ACTION_IDENTIFY -> processIdentifyRequest()
-                ACTION_VERIFY -> processVerifyRequest()
-                ACTION_CONFIRM_IDENTITY -> processConfirmIdentityRequest()
-                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
-            }
+                Enrol -> processEnrolRequest()
+                Identify -> processIdentifyRequest()
+                Verify -> processVerifyRequest()
+                ConfirmIdentity -> processConfirmIdentityRequest()
+                EnrolLastBiometrics -> processEnrolLastBiometrics()
+                Invalid -> throw InvalidIntentActionException()
+            }.safeSealedWhens
         }
     }
 
@@ -59,11 +55,11 @@ class OdkPresenter(
         }
     }
 
-    override fun handleEnrollResponse(enroll: EnrollResponse) {
+    override fun handleEnrolResponse(enrol: EnrolResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(enroll.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
+            view.returnRegistration(enrol.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
         }
     }
 

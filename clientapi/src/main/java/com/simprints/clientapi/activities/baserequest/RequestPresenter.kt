@@ -2,17 +2,13 @@ package com.simprints.clientapi.activities.baserequest
 
 import com.simprints.clientapi.activities.errors.ClientApiAlert.*
 import com.simprints.clientapi.clientrequests.builders.*
-import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidator
-import com.simprints.clientapi.clientrequests.validators.EnrollValidator
-import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
-import com.simprints.clientapi.clientrequests.validators.VerifyValidator
+import com.simprints.clientapi.clientrequests.validators.*
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.domain.ClientBase
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.tools.DeviceManager
+import timber.log.Timber
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 private val eventsManager: ClientApiSessionEventsManager,
@@ -20,8 +16,8 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 protected val crashReportManager: ClientApiCrashReportManager)
     : RequestContract.Presenter {
 
-    override suspend fun processEnrollRequest() = validateAndSendRequest(
-        EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))
+    override suspend fun processEnrolRequest() = validateAndSendRequest(
+        EnrolBuilder(view.enrolExtractor, EnrolValidator(view.enrolExtractor))
     )
 
     override suspend fun processIdentifyRequest() = validateAndSendRequest(
@@ -39,17 +35,19 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         )
     )
 
+    override suspend fun processEnrolLastBiometrics() = validateAndSendRequest(
+        EnrolLastBiometricsBuilder(
+            view.enrolLastBiometricsExtractor,
+            EnrolLastBiometricsValidator(view.enrolLastBiometricsExtractor, eventsManager.getCurrentSessionId(), eventsManager.isCurrentSessionAnIdentification())
+        )
+    )
+
     override suspend fun validateAndSendRequest(builder: ClientRequestBuilder) = try {
         val request = builder.build()
         addSuspiciousEventIfRequired(request)
-
-        when (request) {
-            is BaseRequest -> view.sendSimprintsRequest(request)
-            is BaseConfirmation -> view.sendSimprintsConfirmation(request)
-            else -> throw InvalidClientRequestException()
-        }
+        view.sendSimprintsRequest(request)
     } catch (exception: InvalidRequestException) {
-        exception.printStackTrace()
+        Timber.d(exception)
         logInvalidSessionInBackground()
         handleInvalidRequest(exception)
     }
@@ -70,7 +68,6 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
 
     private fun handleInvalidRequest(exception: InvalidRequestException) {
         when (exception) {
-            is InvalidClientRequestException -> INVALID_CLIENT_REQUEST
             is InvalidMetadataException -> INVALID_METADATA
             is InvalidModuleIdException -> INVALID_MODULE_ID
             is InvalidProjectIdException -> INVALID_PROJECT_ID
@@ -78,19 +75,20 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
             is InvalidSessionIdException -> INVALID_SESSION_ID
             is InvalidUserIdException -> INVALID_USER_ID
             is InvalidVerifyIdException -> INVALID_VERIFY_ID
+            is InvalidStateForIntentAction -> INVALID_STATE_FOR_INTENT_ACTION
         }.also {
             view.handleClientRequestError(it)
         }
     }
 
-    private suspend fun addSuspiciousEventIfRequired(request: ClientBase) {
+    private suspend fun addSuspiciousEventIfRequired(request: BaseRequest) {
         if (request.unknownExtras.isNotEmpty()) {
             eventsManager.addSuspiciousIntentEvent(request.unknownExtras)
         }
     }
 
     private suspend fun logInvalidSessionInBackground() {
-        eventsManager.addInvalidIntentEvent(view.action ?: "", view.extras ?: emptyMap())
+        eventsManager.addInvalidIntentEvent(view.intentAction ?: "", view.extras ?: emptyMap())
     }
 
 }

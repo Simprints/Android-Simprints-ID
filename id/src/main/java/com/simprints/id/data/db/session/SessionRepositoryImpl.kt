@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 // Class to manage the current activeSession
 open class SessionRepositoryImpl(
@@ -75,10 +76,17 @@ open class SessionRepositoryImpl(
     }
 
     private suspend fun loadSessionsToUpload() =
-        sessionLocalDataSource.load(SessionQuery(projectId = projectId))
+        sessionLocalDataSource.load(SessionQuery(projectId = projectId)).also {
+            val open = sessionLocalDataSource.count(SessionQuery(projectId = projectId, openSession = true))
+            val close = sessionLocalDataSource.count(SessionQuery(projectId = projectId, openSession = false))
+            val total = sessionLocalDataSource.count(SessionQuery(projectId = projectId))
+            Timber.d("Preparing sessions for $projectId: total $total (open $open, close $close)")
+        }
 
     private fun Flow<SessionEvents>.filterClosedSessions() =
-        filter { it.isClosed() }
+        filter {
+            it.isClosed()
+        }
 
     private suspend fun Flow<SessionEvents>.createBatches() =
         this.bufferedChunks(SESSION_BATCH_SIZE)
@@ -86,6 +94,7 @@ open class SessionRepositoryImpl(
     private suspend fun Flow<List<SessionEvents>>.updateRelativeUploadTimeAndUploadSessions(): Flow<List<SessionEvents>> {
         this.collect {
             val sessionsWithUpdatedRelativeUploadTime = it.updateRelativeUploadTime()
+            Timber.d("Uploading ${sessionsWithUpdatedRelativeUploadTime.size} sessions")
             sessionRemoteDataSource.uploadSessions(projectId, sessionsWithUpdatedRelativeUploadTime)
         }
         return this

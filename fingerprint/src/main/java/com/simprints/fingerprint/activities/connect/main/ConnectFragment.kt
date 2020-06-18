@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.navigation.fragment.findNavController
-import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.confirmscannererror.ConfirmScannerErrorBuilder
@@ -49,14 +48,18 @@ abstract class ConnectFragment(@LayoutRes private val layout: Int) : Fingerprint
     }
 
     private fun navigateToScannerIssueFragment(issue: ConnectScannerIssue) {
-        val action = when (issue) {
-            ConnectScannerIssue.BLUETOOTH_OFF -> R.id.action_connectScannerMainFragment_to_bluetoothOffFragment
-            ConnectScannerIssue.NFC_OFF -> R.id.action_connectScannerMainFragment_to_nfcOffFragment
-            ConnectScannerIssue.NFC_PAIR -> R.id.action_connectScannerMainFragment_to_nfcPairFragment
-            ConnectScannerIssue.SERIAL_ENTRY_PAIR -> R.id.action_connectScannerMainFragment_to_serialEntryPairFragment
-            ConnectScannerIssue.SCANNER_OFF -> R.id.action_connectScannerMainFragment_to_scannerOffFragment
+        with(ConnectScannerMainFragmentDirections) {
+            val action = when (issue) {
+                ConnectScannerIssue.BluetoothOff -> actionConnectScannerMainFragmentToBluetoothOffFragment()
+                ConnectScannerIssue.NfcOff -> actionConnectScannerMainFragmentToNfcOffFragment()
+                ConnectScannerIssue.NfcPair -> actionConnectScannerMainFragmentToNfcPairFragment()
+                ConnectScannerIssue.SerialEntryPair -> actionConnectScannerMainFragmentToSerialEntryPairFragment()
+                ConnectScannerIssue.ScannerOff -> actionConnectScannerMainFragmentToScannerOffFragment()
+                is ConnectScannerIssue.Ota -> actionConnectScannerMainFragmentToOtaFragment(issue.otaFragmentRequest)
+                is ConnectScannerIssue.OtaRecovery, ConnectScannerIssue.OtaFailed -> null
+            }
+            action?.let { findNavController().navigate(it) }
         }
-        findNavController().navigate(action)
     }
 
     protected fun showDialogForScannerErrorConfirmation(scannerId: String) {

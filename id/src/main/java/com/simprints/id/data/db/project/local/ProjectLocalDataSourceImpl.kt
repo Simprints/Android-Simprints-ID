@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.project.local
 
 import android.content.Context
-import com.simprints.id.data.db.common.realm.PeopleRealmConfig
+import com.simprints.id.data.db.common.realm.SubjectsRealmConfig
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.project.local.models.fromDbToDomain
@@ -44,7 +44,7 @@ class ProjectLocalDataSourceImpl(
         }
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): RealmConfiguration =
-        PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        SubjectsRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
 
     override suspend fun load(projectId: String): Project? =
         withContext(Dispatchers.Main) {

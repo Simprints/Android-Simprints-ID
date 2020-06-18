@@ -2,7 +2,11 @@ apply plugin: 'com.android.dynamic-feature'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
-apply from: "${rootDir}${File.separator}ci${File.separator}signing_config.gradle"
+sonarqube {
+    properties {
+        property "sonar.sources", "src/main/java"
+    }
+}
 
 androidExtensions {
     experimental = true
@@ -19,11 +23,24 @@ android {
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
     buildTypes {
-        releaseWithLogfile {
+        staging {
             initWith release
         }
+
         debug {
             testCoverageEnabled true
+        }
+    }
+
+    flavorDimensions "mode"
+
+    productFlavors {
+        standard {
+            dimension "mode"
+        }
+
+        withLogFile {
+            dimension "mode"
         }
     }
 
@@ -67,7 +84,7 @@ dependencies {
     // So the tests that have references to the base module fail with java.lang.NoClassDefFoundError exceptions.
     // The following line includes the base module classes.jar into the final one.
     // To run unit tests from CL: ./gradlew fingerprint:test
-    testRuntimeOnly (files("${projectDir}/../id/build/intermediates/app_classes/debug/classes.jar"))
+    testRuntimeOnly fileTree(include: ['**/*.jar'], dir: '../id/build/intermediates/app_classes/')
     
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':id')

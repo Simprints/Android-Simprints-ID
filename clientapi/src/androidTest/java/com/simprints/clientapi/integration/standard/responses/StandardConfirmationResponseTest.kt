@@ -17,7 +17,7 @@ class StandardConfirmationResponseTest : BaseStandardClientApiTest() {
     @Test
     fun appModuleSendsAStandardConfirmationAppResponse_shouldReturnAStandardConfirmationResponse() {
         val appIdentificationOutcomeResponse = AppConfirmationResponse(true)
-        mockAppModuleResponse(appIdentificationOutcomeResponse, STANDARD_CONFIRM_IDENTITY_ACTION)
+        mockAppModuleResponse(appIdentificationOutcomeResponse, APP_CONFIRM_ACTION)
 
         val scenario =
             ActivityScenario.launch<LibSimprintsActivity>(standardConfirmIntentRequest.apply { action = STANDARD_CONFIRM_IDENTITY_ACTION })

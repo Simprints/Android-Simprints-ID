@@ -28,22 +28,18 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "BASE_URL_PREFIX", "\"prod\"")
         }
-        releaseWithLogfile {
-            initWith release
-        }
+
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            buildConfigField("String", "BASE_URL_PREFIX", "\"dev\"")
         }
-    }
 
-    libraryVariants.all { variant ->
-        if (variant.buildType.name == "release" ||
-            variant.buildType.name == "releaseWithLogfile") {
-            buildConfigField("String", "END_POINT", "\"prod\"")
-        } else if (variant.buildType.name == "debug") {
-            buildConfigField("String", "END_POINT", "\"dev\"")
+        staging {
+            initWith release
+            buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
         }
     }
 }
@@ -62,6 +58,7 @@ dependencies {
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter
     implementation deps.retrofit.convertergson
+    implementation deps.gson.extras
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
     implementation deps.androidx.security

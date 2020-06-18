@@ -10,7 +10,7 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 
 open class SignerManagerImpl(
@@ -18,7 +18,7 @@ open class SignerManagerImpl(
     private val remote: RemoteDbManager,
     private val loginInfoManager: LoginInfoManager,
     private val preferencesManager: PreferencesManager,
-    private val peopleSyncManager: PeopleSyncManager,
+    private val subjectsSyncManager: SubjectsSyncManager,
     private val syncManager: SyncManager,
     private val securityStateScheduler: SecurityStateScheduler,
     private val longConsentRepository: LongConsentRepository,
@@ -42,7 +42,7 @@ open class SignerManagerImpl(
         loginInfoManager.cleanCredentials()
         remote.signOut()
         syncManager.cancelBackgroundSyncs()
-        peopleSyncManager.deleteSyncInfo()
+        subjectsSyncManager.deleteSyncInfo()
         preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
         longConsentRepository.deleteLongConsents()
         sessionRepository.signOut()

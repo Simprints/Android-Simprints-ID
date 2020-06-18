@@ -23,7 +23,7 @@ class ErrorPresenter(val view: ErrorContract.View,
 
     private fun getErrorMessage(clientApiAlert: ClientApiAlert): String =
         when (clientApiAlert) {
-            ClientApiAlert.INVALID_CLIENT_REQUEST -> R.string.invalid_intentAction_message
+            ClientApiAlert.INVALID_STATE_FOR_INTENT_ACTION -> R.string.invalid_intentAction_message
             ClientApiAlert.INVALID_METADATA -> R.string.invalid_metadata_message
             ClientApiAlert.INVALID_MODULE_ID -> R.string.invalid_moduleId_message
             ClientApiAlert.INVALID_PROJECT_ID -> R.string.invalid_projectId_message

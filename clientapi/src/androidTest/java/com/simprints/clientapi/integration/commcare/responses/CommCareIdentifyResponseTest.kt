@@ -7,7 +7,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.integration.AppIdentifyResponse
 import com.simprints.clientapi.integration.AppMatchResult
-import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFICATIONS
 import com.simprints.libsimprints.Identification
@@ -28,7 +27,7 @@ class CommCareIdentifyResponseTest : BaseCommCareClientApiTest() {
         mockAppModuleResponse(appIdentifyResponse, APP_IDENTIFY_ACTION)
 
         val scenario =
-            ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = COMMCARE_IDENTIFY_ACTION })
+            ActivityScenario.launch<CommCareActivity>(commCareBaseFlowIntentRequest.apply { action = COMMCARE_IDENTIFY_ACTION })
 
         assertCommCareIdentifyResponse(scenario, appIdentifyResponse)
     }

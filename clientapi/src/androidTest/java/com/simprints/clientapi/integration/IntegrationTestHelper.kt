@@ -1,9 +1,6 @@
 package com.simprints.clientapi.integration
 
-import com.simprints.moduleapi.app.requests.IAppEnrollRequest
-import com.simprints.moduleapi.app.requests.IAppIdentifyRequest
-import com.simprints.moduleapi.app.requests.IAppVerifyRequest
-import com.simprints.moduleapi.app.requests.confirmations.IAppIdentityConfirmationRequest
+import com.simprints.moduleapi.app.requests.*
 import com.simprints.moduleapi.app.responses.*
 import kotlinx.android.parcel.Parcelize
 
@@ -54,12 +51,21 @@ internal data class AppErrorResponse(
 ) : IAppErrorResponse
 
 @Parcelize
-internal data class AppEnrollRequest(
+internal data class AppEnrolRequest(
     override val projectId: String,
     override val userId: String,
     override val moduleId: String,
     override val metadata: String
-) : IAppEnrollRequest
+) : IAppEnrolRequest
+
+@Parcelize
+internal data class AppEnrolLastBiometricsRequest(
+    override val projectId: String,
+    override val userId: String,
+    override val moduleId: String,
+    override val metadata: String,
+    override val sessionId: String
+) : IAppEnrolLastBiometricsRequest
 
 @Parcelize
 internal data class AppIdentifyRequest(
@@ -79,11 +85,12 @@ internal data class AppVerifyRequest(
 ) : IAppVerifyRequest
 
 @Parcelize
-internal data class AppIdentityConfirmationRequest(
+internal data class AppConfirmIdentityRequest(
     override val projectId: String,
+    override val userId: String,
     override val sessionId: String,
     override val selectedGuid: String
-) : IAppIdentityConfirmationRequest
+) : IAppConfirmIdentityRequest
 
 fun Pair<String, String>.key() = first
 fun Pair<String, String>.value() = second

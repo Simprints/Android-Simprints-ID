@@ -2,8 +2,8 @@ package com.simprints.id.data.db.session.domain.models.events
 
 import androidx.annotation.Keep
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
+import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.tools.TimeHelper
 
 // At the end of the sequence of capture, we build a Person object used either for enrolment or verification/identification
