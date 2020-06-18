@@ -14,6 +14,7 @@ import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
+import com.simprints.id.activities.setup.SetupViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -441,5 +442,12 @@ open class AppModule {
         enrolmentHelper: EnrolmentHelper,
         timeHelper: TimeHelper
     ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper)
+
+    @ExperimentalCoroutinesApi
+    @Provides
+    open fun provideSetupViewModelFactory(
+        deviceManager: DeviceManager,
+        crashReportManager: CrashReportManager
+    ) = SetupViewModelFactory(deviceManager, crashReportManager)
 }
 
