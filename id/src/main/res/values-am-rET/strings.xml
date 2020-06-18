@@ -149,4 +149,11 @@
     <string name="verify_guid_not_found_title">ግለሰቡ አልተገኘም</string>
     <string name="fetch_guid_checking_person_in_database">ተገልጋዩ ዳታቤዝ ውስጥ መኖሩን ማረጋገጥ</string>
     <string name="progress_sync_overlay">በግንኙነት ላይ</string>
+    <string name="enrol_last_biometrics_alert_message">1 የማህደሩን %1$s  መመዝገብ አልተሳካም \n 2 መዝጊያውን ይጫኑ</string>
+    <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
+    <string name="enrol_last_biometrics_alert_message_fingerprint_param">የጣት አሻራ</string>
+    <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
+    <string name="enrol_last_biometrics_success">የተግባቦት ስህተት አጋጥሟል(የተሳሳተ ሲምፕሪንስ ኢንተንት) እባክዎ ለሲስተም አድሚኒስትሬተር ያሳውቁ</string>
+    <string name="enrol_last_biometrics_alert_title">መመዝገብ አልተቻለም</string>
+
 </resources>

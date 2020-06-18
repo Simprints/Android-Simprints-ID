@@ -2,6 +2,12 @@ apply plugin: 'com.android.dynamic-feature'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
+sonarqube {
+    properties {
+        property "sonar.sources", "src/main/java"
+    }
+}
+
 androidExtensions {
     experimental = true
 }
@@ -133,4 +139,5 @@ dependencies {
     // Mockk
     testImplementation deps.testing.mockk.core
     testImplementation deps.testing.truth
+    testImplementation deps.testing.robolectric.core
 }

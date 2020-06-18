@@ -9,7 +9,10 @@ import androidx.navigation.fragment.navArgs
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
+import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import kotlinx.android.synthetic.main.fragment_ota.*
 import org.koin.android.ext.android.inject
@@ -21,6 +24,7 @@ class OtaFragment : FingerprintFragment() {
 
     private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
     private val timeHelper: FingerprintTimeHelper by inject()
+    private val sessionManager: FingerprintSessionEventsManager by inject()
 
     private val viewModel: OtaViewModel by viewModel()
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
@@ -33,6 +37,8 @@ class OtaFragment : FingerprintFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
+
+        sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.Ota(args.otaFragmentRequest)))
 
         listenForProgress()
         listenForCompleteEvent()
@@ -70,6 +76,7 @@ class OtaFragment : FingerprintFragment() {
         }
         startUpdateButton.visibility = View.INVISIBLE
         startUpdateButton.isEnabled = false
+        connectScannerViewModel.disableBackButton()
         viewModel.startOta(args.otaFragmentRequest.availableOtas, args.otaFragmentRequest.currentRetryAttempt)
     }
 

@@ -120,7 +120,7 @@ object KoinInjector {
         factory { FirmwareLocalDataSource(androidContext()) }
         factory { FirmwareRemoteDataSource(get(), get()) }
         factory { FirmwareRepository(get(), get()) }
-        factory { FirmwareFileUpdateScheduler(androidContext()) }
+        factory { FirmwareFileUpdateScheduler(androidContext(), get()) }
 
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }

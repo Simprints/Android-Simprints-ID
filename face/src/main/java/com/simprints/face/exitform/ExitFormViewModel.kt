@@ -5,10 +5,16 @@ import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureViewModel
+import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
+import com.simprints.face.controllers.core.crashreport.FaceCrashReportTag.REFUSAL
+import com.simprints.face.controllers.core.crashreport.FaceCrashReportTrigger.UI
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.events.model.RefusalAnswer.*
 
-class ExitFormViewModel(private val mainVM: FaceCaptureViewModel) : ViewModel() {
+class ExitFormViewModel(
+    private val mainVM: FaceCaptureViewModel,
+    private val crashReportManager: FaceCrashReportManager
+) : ViewModel() {
     private var reason: RefusalAnswer? = null
 
     val requestReasonEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
@@ -64,8 +70,11 @@ class ExitFormViewModel(private val mainVM: FaceCaptureViewModel) : ViewModel() 
     }
 
     private fun logMessageForCrashReport(message: String) {
-        // TODO: log on the crash report manager
-//        crashReportManager.logMessageForCrashReport(CrashReportTag.REFUSAL, CrashReportTrigger.UI, message = message)
+        crashReportManager.logMessageForCrashReport(
+            REFUSAL,
+            UI,
+            message = message
+        )
     }
 
     private fun logExitFormEvent() {

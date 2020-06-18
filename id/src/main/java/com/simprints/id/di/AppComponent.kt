@@ -33,9 +33,10 @@ import com.simprints.id.activities.settings.syncinformation.SyncInformationActiv
 import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
+import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
+import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
-import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
@@ -45,6 +46,7 @@ import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncWorker
+import com.simprints.id.services.scheduledSync.sessionSync.UpSessionEventsWorker
 import com.simprints.id.services.scheduledSync.subjects.down.workers.SubjectsDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.subjects.down.workers.SubjectsDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsEndSyncReporterWorker
@@ -52,7 +54,6 @@ import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsS
 import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsSyncMasterWorker
 import com.simprints.id.services.scheduledSync.subjects.up.workers.SubjectsUpSyncCountWorker
 import com.simprints.id.services.scheduledSync.subjects.up.workers.SubjectsUpSyncUploaderWorker
-import com.simprints.id.services.scheduledSync.sessionSync.UpSessionEventsWorker
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import dagger.BindsInstance
@@ -140,6 +141,7 @@ interface AppComponent {
     fun getTimeHelper(): TimeHelper
     fun getPersonRepository(): SubjectRepository
     fun getFingerprintRecordLocalDataSource(): FingerprintIdentityLocalDataSource
+    fun getFaceIdentityLocalDataSource(): FaceIdentityLocalDataSource
     fun getPreferencesManager(): PreferencesManager
     fun getAnalyticsManager(): AnalyticsManager
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences

@@ -107,6 +107,7 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
         factory { component.getCrashReportManager() }
         factory { component.getTimeHelper() }
         factory { component.getFingerprintRecordLocalDataSource() }
+        factory { component.getFaceIdentityLocalDataSource() }
         factory { component.getImprovedSharedPreferences() }
         factory { component.getRemoteConfigWrapper() }
         factory { component.getAndroidResourcesHelper() }

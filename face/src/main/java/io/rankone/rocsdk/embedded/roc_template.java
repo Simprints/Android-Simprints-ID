@@ -12,12 +12,12 @@ public class roc_template {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected roc_template(long cPtr, boolean cMemoryOwn) {
+  public roc_template(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(roc_template obj) {
+  public static long getCPtr(roc_template obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -44,22 +44,6 @@ public class roc_template {
     return rocJNI.roc_template_algorithm_id_get(swigCPtr, this);
   }
 
-  public void setTimestamp(long value) {
-    rocJNI.roc_template_timestamp_set(swigCPtr, this, value);
-  }
-
-  public long getTimestamp() {
-    return rocJNI.roc_template_timestamp_get(swigCPtr, this);
-  }
-
-  public void setPerson_id(long value) {
-    rocJNI.roc_template_person_id_set(swigCPtr, this, value);
-  }
-
-  public long getPerson_id() {
-    return rocJNI.roc_template_person_id_get(swigCPtr, this);
-  }
-
   public void setDetection(roc_detection value) {
     rocJNI.roc_template_detection_set(swigCPtr, this, roc_detection.getCPtr(value), value);
   }
@@ -67,6 +51,41 @@ public class roc_template {
   public roc_detection getDetection() {
     long cPtr = rocJNI.roc_template_detection_get(swigCPtr, this);
     return (cPtr == 0) ? null : new roc_detection(cPtr, false);
+  }
+
+  public void setTemplate_id(roc_uuid value) {
+    rocJNI.roc_template_template_id_set(swigCPtr, this, roc_uuid.getCPtr(value), value);
+  }
+
+  public roc_uuid getTemplate_id() {
+    long cPtr = rocJNI.roc_template_template_id_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new roc_uuid(cPtr, false);
+  }
+
+  public void setPerson_id(roc_uuid value) {
+    rocJNI.roc_template_person_id_set(swigCPtr, this, roc_uuid.getCPtr(value), value);
+  }
+
+  public roc_uuid getPerson_id() {
+    long cPtr = rocJNI.roc_template_person_id_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new roc_uuid(cPtr, false);
+  }
+
+  public void setTimestamp(java.math.BigInteger value) {
+    rocJNI.roc_template_timestamp_set(swigCPtr, this, value);
+  }
+
+  public java.math.BigInteger getTimestamp() {
+    return rocJNI.roc_template_timestamp_get(swigCPtr, this);
+  }
+
+  public void setMedia_id(roc_hash value) {
+    rocJNI.roc_template_media_id_set(swigCPtr, this, roc_hash.getCPtr(value), value);
+  }
+
+  public roc_hash getMedia_id() {
+    long cPtr = rocJNI.roc_template_media_id_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new roc_hash(cPtr, false);
   }
 
   public void setMd_size(long value) {

@@ -46,13 +46,13 @@ class FingerViewPagerManager(
                 onFingerSelected(position)
             }
         })
-        viewPager.setOnTouchListener { _, _ -> !isAbleToSelectNewFinger() }
     }
 
     fun setCurrentPageAndFingerStates(fingerStates: List<FingerCollectionState>, currentFingerIndex: Int) {
         refreshActiveFingersIfChanged(fingerStates)
         updateIndicatorImages(fingerStates, currentFingerIndex)
         viewPager.currentItem = currentFingerIndex
+        viewPager.isUserInputEnabled = !fingerStates[currentFingerIndex].isCommunicating()
     }
 
     private fun refreshActiveFingersIfChanged(fingerStates: List<FingerCollectionState>) {

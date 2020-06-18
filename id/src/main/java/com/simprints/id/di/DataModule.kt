@@ -6,6 +6,7 @@ import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSourceImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
+import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -80,9 +81,9 @@ open class DataModule {
         eventRemoteDataSource: EventRemoteDataSource,
         subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
         preferencesManager: PreferencesManager,
-        subjectsSyncCache: SubjectsSyncCache) : SubjectRepositoryUpSyncHelper =
+        subjectsSyncCache: SubjectsSyncCache): SubjectRepositoryUpSyncHelper =
         SubjectRepositoryUpSyncHelperImpl(loginInfoManager, subjectLocalDataSource, eventRemoteDataSource,
-                subjectsUpSyncScopeRepository, preferencesManager.modalities)
+            subjectsUpSyncScopeRepository, preferencesManager.modalities)
 
     @Provides
     open fun providePersonRepositoryDownSyncHelper(subjectLocalDataSource: SubjectLocalDataSource,
@@ -123,8 +124,13 @@ open class DataModule {
 
     @Provides
     open fun provideFingerprintRecordLocalDataSource(
-            subjectLocalDataSource: SubjectLocalDataSource
+        subjectLocalDataSource: SubjectLocalDataSource
     ): FingerprintIdentityLocalDataSource = subjectLocalDataSource
+
+    @Provides
+    open fun provideFaceIdentityLocalDataSource(
+        subjectLocalDataSource: SubjectLocalDataSource
+    ): FaceIdentityLocalDataSource = subjectLocalDataSource
 
     @Provides
     open fun provideImageRepository(

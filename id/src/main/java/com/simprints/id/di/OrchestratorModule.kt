@@ -40,8 +40,11 @@ class OrchestratorModule {
         FingerprintRequestFactoryImpl()
 
     @Provides
-    fun provideFaceStepProcessor(faceRequestFactory: FaceRequestFactory): FaceStepProcessor =
-        FaceStepProcessorImpl(faceRequestFactory)
+    fun provideFaceStepProcessor(
+        faceRequestFactory: FaceRequestFactory,
+        preferenceManager: PreferencesManager
+    ): FaceStepProcessor =
+        FaceStepProcessorImpl(faceRequestFactory, preferenceManager)
 
     @Provides
     fun provideFingerprintStepProcessor(

@@ -3,12 +3,12 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import android.annotation.SuppressLint
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.AuthorizationEvent
 import com.simprints.id.data.db.session.domain.models.events.ConnectivitySnapshotEvent
 import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.events.callout.*
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
@@ -72,20 +72,22 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         ignoreException {
             sessionRepository.updateCurrentSession { currentSession ->
                 with(currentSession) {
-                    addEvent(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
+                    if (appRequest !is AppRequest.AppRequestFollowUp) {
+                        addEvent(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
+                    }
                     addEvent(buildRequestEvent(timeHelper.now(), appRequest))
                 }
             }
         }
     }
 
-    internal fun buildRequestEvent(relativeStarTime: Long, request: AppRequest): Event =
+    internal fun buildRequestEvent(relativeStartTime: Long, request: AppRequest): Event =
         when (request) {
-            is AppEnrolRequest -> buildEnrolmentCalloutEvent(request, relativeStarTime)
-            is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStarTime)
-            is AppIdentifyRequest -> buildIdentificationCalloutEvent(request, relativeStarTime)
-            is AppConfirmIdentityRequest -> addConfirmationCalloutEvent(request, relativeStarTime)
-            is AppEnrolLastBiometricsRequest -> addEnrolLastBiometricsCalloutEvent(request, relativeStarTime)
+            is AppEnrolRequest -> buildEnrolmentCalloutEvent(request, relativeStartTime)
+            is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStartTime)
+            is AppIdentifyRequest -> buildIdentificationCalloutEvent(request, relativeStartTime)
+            is AppConfirmIdentityRequest -> addConfirmationCalloutEvent(request, relativeStartTime)
+            is AppEnrolLastBiometricsRequest -> addEnrolLastBiometricsCalloutEvent(request, relativeStartTime)
         }
 
     internal fun addEnrolLastBiometricsCalloutEvent(request: AppEnrolLastBiometricsRequest, relativeStarTime: Long) =
@@ -97,32 +99,32 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             request.metadata,
             request.identificationSessionId)
 
-    internal fun addConfirmationCalloutEvent(request: AppConfirmIdentityRequest, relativeStarTime: Long) =
+    internal fun addConfirmationCalloutEvent(request: AppConfirmIdentityRequest, relativeStartTime: Long) =
         ConfirmationCalloutEvent(
-            relativeStarTime,
+            relativeStartTime,
             request.projectId,
             request.selectedGuid,
             request.sessionId)
 
-    internal fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStarTime: Long) =
+    internal fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStartTime: Long) =
         with(request) {
             IdentificationCalloutEvent(
-                relativeStarTime,
+                relativeStartTime,
                 projectId, userId, moduleId, metadata)
         }
 
-    internal fun buildVerificationCalloutEvent(request: AppVerifyRequest, relativeStarTime: Long) =
+    internal fun buildVerificationCalloutEvent(request: AppVerifyRequest, relativeStartTime: Long) =
         with(request) {
             VerificationCalloutEvent(
-                relativeStarTime,
+                relativeStartTime,
                 projectId, userId, moduleId, verifyGuid, metadata)
         }
 
 
-    internal fun buildEnrolmentCalloutEvent(request: AppEnrolRequest, relativeStarTime: Long) =
+    internal fun buildEnrolmentCalloutEvent(request: AppEnrolRequest, relativeStartTime: Long) =
         with(request) {
             EnrolmentCalloutEvent(
-                relativeStarTime,
+                relativeStartTime,
                 projectId, userId, moduleId, metadata)
         }
 
@@ -192,8 +194,15 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @SuppressLint("CheckResult")
     override suspend fun handleSignedInUser() {
         /** Hack to support multiple users: If all login checks success, then we consider
-         *  the userId in the Intent as new signed User */
-        loginInfoManager.signedInUserId = appRequest.userId
+         *  the userId in the Intent as new signed User
+         *  Because we move ConfirmIdentity behind the login check, some integration
+         *  doesn't have the userId in the intent. We don't want to switch the
+         *  user otherwise will be set to "" and the following requests would fail.
+         *  */
+        if (appRequest.userId.isNotEmpty()) {
+            loginInfoManager.signedInUserId = appRequest.userId
+        }
+
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
         ignoreException {

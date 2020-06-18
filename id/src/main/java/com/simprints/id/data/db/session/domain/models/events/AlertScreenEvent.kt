@@ -3,8 +3,10 @@ package com.simprints.id.data.db.session.domain.models.events
 import androidx.annotation.Keep
 
 @Keep
-class AlertScreenEvent(starTime: Long,
-                       val alertType: AlertScreenEventType) : Event(EventType.ALERT_SCREEN, starTime) {
+class AlertScreenEvent(
+    startTime: Long,
+    val alertType: AlertScreenEventType
+) : Event(EventType.ALERT_SCREEN, startTime) {
 
     enum class AlertScreenEventType {
         DIFFERENT_PROJECT_ID,
@@ -18,6 +20,12 @@ class AlertScreenEvent(starTime: Long,
         MULTIPLE_PAIRED_SCANNERS,
         NOT_PAIRED,
         BLUETOOTH_NOT_ENABLED,
+        NFC_NOT_ENABLED,
+        NFC_PAIR,
+        SERIAL_ENTRY_PAIR,
+        OTA,
+        OTA_RECOVERY,
+        OTA_FAILED,
         INVALID_INTENT_ACTION,
         INVALID_METADATA,
         INVALID_MODULE_ID,

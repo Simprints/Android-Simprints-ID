@@ -11,15 +11,15 @@ package io.rankone.rocsdk.embedded;
 public class SWIGTYPE_p_size_t {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_size_t(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  public SWIGTYPE_p_size_t(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_size_t() {
+  public SWIGTYPE_p_size_t() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SWIGTYPE_p_size_t obj) {
+  public static long getCPtr(SWIGTYPE_p_size_t obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

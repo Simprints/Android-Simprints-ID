@@ -6,7 +6,6 @@ import com.simprints.id.domain.Constants.Companion.SIMPRINTS_IDENTIFY_INTENT
 import com.simprints.id.domain.Constants.Companion.SIMPRINTS_REGISTER_INTENT
 import com.simprints.id.domain.Constants.Companion.SIMPRINTS_REGISTER_LAST_BIOMETRICS_INTENT
 import com.simprints.id.domain.Constants.Companion.SIMPRINTS_SELECT_GUID_INTENT
-import com.simprints.id.domain.Constants.Companion.SIMPRINTS_VERIFICATION
 import com.simprints.id.domain.Constants.Companion.SIMPRINTS_VERIFY_INTENT
 
 sealed class LibSimprintsAction(open val action: String?) {
@@ -17,8 +16,8 @@ sealed class LibSimprintsAction(open val action: String?) {
     }
 
     object Enrol : LibSimprintsAction(SIMPRINTS_REGISTER_INTENT)
-    object Verify : LibSimprintsAction(SIMPRINTS_IDENTIFY_INTENT)
-    object Identify : LibSimprintsAction(SIMPRINTS_VERIFICATION)
+    object Verify : LibSimprintsAction(SIMPRINTS_VERIFY_INTENT)
+    object Identify : LibSimprintsAction(SIMPRINTS_IDENTIFY_INTENT)
 
     object Invalid : LibSimprintsAction(null)
 

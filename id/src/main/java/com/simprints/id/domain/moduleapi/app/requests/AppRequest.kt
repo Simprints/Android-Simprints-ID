@@ -1,8 +1,6 @@
 package com.simprints.id.domain.moduleapi.app.requests
 
-import android.os.Parcel
 import android.os.Parcelable
-import com.simprints.id.orchestrator.steps.Step
 import kotlinx.android.parcel.Parcelize
 
 sealed class AppRequest(open val projectId: String,
@@ -44,13 +42,13 @@ sealed class AppRequest(open val projectId: String,
                                                  override val userId: String,
                                                  val moduleId: String,
                                                  val metadata: String,
-                                                 val identificationSessionId: String) : AppRequest(projectId, userId)
+                                                 val identificationSessionId: String) : AppRequestFollowUp(projectId, userId)
 
 
         @Parcelize
         data class AppConfirmIdentityRequest(override val projectId: String,
                                              override val userId: String,
                                              val sessionId: String,
-                                             val selectedGuid: String) : AppRequest(projectId, userId)
+                                             val selectedGuid: String) : AppRequestFollowUp(projectId, userId)
     }
 }

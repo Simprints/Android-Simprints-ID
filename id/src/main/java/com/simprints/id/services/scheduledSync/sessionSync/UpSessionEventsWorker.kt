@@ -18,7 +18,7 @@ class UpSessionEventsWorker(context: Context, params: WorkerParameters) : SimCor
     @Inject override lateinit var crashReportManager: CrashReportManager
 
     override suspend fun doWork(): Result {
-        Timber.d("SessionEventsMasterWorker doWork()")
+        Timber.d("UpSessionEventsWorker doWork()")
         injectDependencies()
 
         return try {

@@ -49,6 +49,7 @@ class ConnectScannerViewModel(
 
     val progress: MutableLiveData<Int> = MutableLiveData(0)
     val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
+    val backButtonBehaviour: MutableLiveData<BackButtonBehaviour> = MutableLiveData(BackButtonBehaviour.EXIT_FORM)
 
     val connectScannerIssue = MutableLiveData<LiveDataEventWithContent<ConnectScannerIssue>>()
     val launchAlert = MutableLiveData<LiveDataEventWithContent<FingerprintAlert>>()
@@ -84,6 +85,7 @@ class ConnectScannerViewModel(
     fun stopConnectingAndResetState() {
         progress.value = 0
         message.value = R.string.connect_scanner_bt_connect
+        backButtonBehaviour.value = BackButtonBehaviour.EXIT_FORM
         setupFlow?.dispose()
     }
 
@@ -209,6 +211,14 @@ class ConnectScannerViewModel(
         finish.postEvent()
     }
 
+    fun disableBackButton() {
+        backButtonBehaviour.value = BackButtonBehaviour.DISABLED
+    }
+
+    fun setBackButtonToExitWithError() {
+        backButtonBehaviour.value = BackButtonBehaviour.EXIT_WITH_ERROR
+    }
+
     private fun addBluetoothConnectivityEvent() {
         with(scannerManager) {
             sessionEventsManager.addEventInBackground(
@@ -252,6 +262,12 @@ class ConnectScannerViewModel(
     override fun onCleared() {
         super.onCleared()
         setupFlow?.dispose()
+    }
+
+    enum class BackButtonBehaviour {
+        DISABLED,
+        EXIT_FORM,
+        EXIT_WITH_ERROR
     }
 
     companion object {

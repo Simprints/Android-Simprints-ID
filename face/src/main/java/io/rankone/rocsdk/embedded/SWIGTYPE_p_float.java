@@ -11,15 +11,15 @@ package io.rankone.rocsdk.embedded;
 public class SWIGTYPE_p_float {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_float(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  public SWIGTYPE_p_float(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_float() {
+  public SWIGTYPE_p_float() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SWIGTYPE_p_float obj) {
+  public static long getCPtr(SWIGTYPE_p_float obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

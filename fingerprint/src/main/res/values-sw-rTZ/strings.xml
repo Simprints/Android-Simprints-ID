@@ -100,4 +100,16 @@
     <string name="serial_entry_pair_toast_invalid">Tafadhali ingiza namba 6 za serial za skana ya vidole</string>
     <string name="not_my_scanner">%1$s sio skana yangu</string>
     <string name="serial_entry_ok">Sawa</string>
+    <string name="ota_title">Skana inahitaji Kusasishwa</string>
+    <string name="ota_instructions">Skana ibaki imewashwa maana inasasishwa</string>
+    <string name="updating">Inasasisha</string>
+    <string name="updating_attempt">Inajaribu kusasisha %1$s of %2$s…</string>
+    <string name="update_complete">Imemaliza kusasisha</string>
+    <string name="start_update">Anza sasisho</string>
+    <string name="ota_recovery_title">Sasisho la Skana limeshindwa</string>
+    <string name="ota_recovery_soft_reset">Zima skana na jaribu tena</string>
+    <string name="ota_recovery_hard_reset">Bonyeza na kushikilia kitufe cha kuwasha kwa sekunde 5</string>
+    <string name="ota_failed_title">Sasisho la Skana limeshindwa</string>
+    <string name="ota_failed_instructions">Tafadhali wasiliana na msimamizi wako kupata msaada</string>
+    <string name="continue_button">Endelea</string>
 </resources>
