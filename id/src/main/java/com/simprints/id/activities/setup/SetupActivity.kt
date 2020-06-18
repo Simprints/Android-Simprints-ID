@@ -44,16 +44,17 @@ import kotlin.math.min
 @ExperimentalCoroutinesApi
 class SetupActivity: BaseSplitActivity() {
 
-    private lateinit var setupRequest: SetupRequest
-    private lateinit var splitInstallManager: SplitInstallManager
-    private val viewModel: SetupViewModel by lazy {
-        ViewModelProvider(this).get(SetupViewModel::class.java)
-    }
-
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var viewModelFactory: SetupViewModelFactory
+
+    private lateinit var setupRequest: SetupRequest
+    private lateinit var splitInstallManager: SplitInstallManager
+    private val viewModel: SetupViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory).get(SetupViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         injectDependencies()
@@ -81,6 +82,13 @@ class SetupActivity: BaseSplitActivity() {
                 is Downloading -> updateUiForDownloadProgress(it.bytesDownloaded, it.totalBytesToDownload)
                 ModalitiesInstalling -> updateUiForModalitiesInstalling()
                 ModalitiesInstalled -> updateUiForModalitiesInstalledAndAskPermissions()
+            }
+        })
+
+        viewModel.getDeviceNetworkLiveData().observe(this, Observer {
+            Timber.d("Setup network connection: $it")
+            if(it == DeviceOffline) {
+
             }
         })
     }
@@ -210,6 +218,8 @@ class SetupActivity: BaseSplitActivity() {
         class Downloading(val bytesDownloaded: Long, val totalBytesToDownload: Long): ViewState()
         object ModalitiesInstalling : ViewState()
         object ModalitiesInstalled : ViewState()
+        object DeviceOnline: ViewState()
+        object DeviceOffline: ViewState()
     }
 
     companion object {
