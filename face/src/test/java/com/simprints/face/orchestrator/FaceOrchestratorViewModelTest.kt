@@ -1,15 +1,20 @@
 package com.simprints.face.orchestrator
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.google.common.collect.Range
 import com.google.common.truth.Truth.assertThat
+import com.simprints.face.FixtureGenerator.generateFaceMatchResults
+import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.moduleapi.face.requests.IFaceCaptureRequest
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
+import com.simprints.moduleapi.face.responses.IFaceMatchResponse
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.every
 import io.mockk.mockk
@@ -19,7 +24,8 @@ import org.junit.Test
 import java.util.*
 
 class FaceOrchestratorViewModelTest {
-    private val viewModel = spyk(FaceOrchestratorViewModel())
+    private val faceCrashReportManager: FaceCrashReportManager = mockk(relaxUnitFun = true)
+    private val viewModel = spyk(FaceOrchestratorViewModel(faceCrashReportManager))
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -35,7 +41,7 @@ class FaceOrchestratorViewModelTest {
     }
 
     @Test
-    fun `return the correct response on finish`() {
+    fun `return the correct capture response on finish`() {
         viewModel.captureFinished(generateFakeCaptureResponse())
 
         viewModel.flowFinished.value?.let { liveData ->
@@ -44,9 +50,19 @@ class FaceOrchestratorViewModelTest {
                 assertThat(it.sample?.faceId).isNotEmpty()
                 assertThat(it.sample?.imageRef?.path?.parts).isEqualTo(arrayOf("file://someFile"))
             }
-
         }
+    }
 
+    @Test
+    fun `return the correct matching response on finish`() {
+        viewModel.matchFinished(generateFakeMatchResponse())
+
+        viewModel.flowFinished.value?.let { liveData ->
+            (liveData.peekContent() as IFaceMatchResponse).result.let {
+                assertThat(it[0].guid).isNotEmpty()
+                assertThat(it[0].confidence).isIn(Range.closed(0f, 100f))
+            }
+        }
     }
 
     @Test
@@ -73,6 +89,11 @@ class FaceOrchestratorViewModelTest {
         val result = FaceCaptureResult(0, sample)
         val captureResults = listOf(result)
         return FaceCaptureResponse(captureResults)
+    }
+
+    private fun generateFakeMatchResponse(): FaceMatchResponse {
+        val captureResults = generateFaceMatchResults(10)
+        return FaceMatchResponse(captureResults)
     }
 
 }

@@ -6,11 +6,7 @@ apply plugin: "kotlin-kapt"
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'realm-android'
 
-// Create a variable called keystorePropertiesFile, and initialize it to your
-// keystore.properties file, in the rootProject folder.
-def keystorePropertiesFile = rootProject.file("keystore.properties")
-def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+apply from: "${rootDir}${File.separator}ci${File.separator}signing_config.gradle"
 
 androidExtensions {
     experimental = true
@@ -24,8 +20,8 @@ android {
         minSdkVersion config.min_sdk
         targetSdkVersion 29
         vectorDrawables.useSupportLibrary = true
-        versionName "2020.2.0"
-        versionCode 222
+        versionName "2020.2.1"
+        versionCode 239
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -40,22 +36,6 @@ android {
     bundle {
         language {
             enableSplit = false
-        }
-    }
-
-    signingConfigs {
-        debug {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-        }
-
-        release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
         }
     }
 
@@ -74,6 +54,7 @@ android {
             manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
             signingConfig signingConfigs.release
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
+            buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-152315-firebase-storage\"")
         }
 
         debug {
@@ -85,11 +66,13 @@ android {
             manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
             signingConfig signingConfigs.debug
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
+            buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-dev-firebase-storage\"")
         }
 
         staging {
             initWith release
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCSmwYkm2iHlKi-cBjohMH-FS6jQuCqPTE\"")
+            buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-firebase-staging.appspot.com\"")
         }
     }
 

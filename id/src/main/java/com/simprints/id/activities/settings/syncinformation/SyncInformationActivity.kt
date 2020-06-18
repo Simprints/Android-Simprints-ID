@@ -59,14 +59,13 @@ class SyncInformationActivity : BaseSplitActivity() {
         observeUi()
         setupProgressOverlay()
         setupRecordsCountCards()
-
-        fetchRecordsInfo()
     }
 
     override fun onResume() {
         super.onResume()
         clearValues()
         setFocusOnDefaultModulesTab()
+        fetchRecordsInfo()
     }
 
     private fun setTextInLayout() {

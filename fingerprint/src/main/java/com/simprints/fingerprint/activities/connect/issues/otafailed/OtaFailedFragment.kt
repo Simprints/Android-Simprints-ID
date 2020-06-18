@@ -7,7 +7,11 @@ import android.view.ViewGroup
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
+import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.tools.livedata.postEvent
 import kotlinx.android.synthetic.main.fragment_ota_failed.*
 import org.koin.android.ext.android.inject
@@ -17,6 +21,8 @@ class OtaFailedFragment : FingerprintFragment() {
 
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
     private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
+    private val timeHelper: FingerprintTimeHelper by inject()
+    private val sessionManager: FingerprintSessionEventsManager by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_ota_failed, container, false)
@@ -25,6 +31,9 @@ class OtaFailedFragment : FingerprintFragment() {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
 
+        sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.OtaFailed))
+
+        connectScannerViewModel.setBackButtonToExitWithError()
         continueButton.setOnClickListener {
             connectScannerViewModel.finishAfterError.postEvent()
         }

@@ -258,6 +258,22 @@ open class SettingsPreferencesManagerImpl(
             FACE_QUALITY_THRESHOLD_DEFAULT
         )
 
+    override var faceNbOfFramesCaptured: Int
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            FACE_NB_OF_FRAMES_CAPTURED,
+            FACE_NB_OF_FRAMES_CAPTURED_DEFAULT
+        )
+
+    override var faceMatchThreshold: Float
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            FACE_MATCH_THRESHOLD,
+            FACE_MATCH_THRESHOLD_DEFAULT
+        )
+
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()
     }
@@ -351,6 +367,10 @@ open class SettingsPreferencesManagerImpl(
         const val FACE_MAX_RETRIES_DEFAULT = 2
         const val FACE_QUALITY_THRESHOLD = "FaceQualityThreshold"
         const val FACE_QUALITY_THRESHOLD_DEFAULT = -1f
+        const val FACE_NB_OF_FRAMES_CAPTURED = "FaceNbOfFramesCaptured"
+        const val FACE_NB_OF_FRAMES_CAPTURED_DEFAULT = 2
+        const val FACE_MATCH_THRESHOLD = "FaceMatchThreshold"
+        const val FACE_MATCH_THRESHOLD_DEFAULT = 0f
     }
 
 }

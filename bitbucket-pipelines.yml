@@ -116,32 +116,28 @@ definitions:
         ######################################################################
         -   step: &build-and-sign-universal-apk
                 name: "Build universal & test APKs"
-                max-time: 20
+                max-time: 30
                 caches:
                     - gradle
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
                     # Build ID Android Test APK
-                    - cat ci/debug_gradle_signing >> id/build.gradle
                     - ./gradlew id:assembleStandardDebugAndroidTest
                     - mv id/build/outputs/apk/androidTest/standard/debug/id-standard-debug-androidTest.apk id-standard-debug-androidTest.apk
                     # Build Client API Android Test APK
-                    - cat ci/debug_gradle_signing >> clientapi/build.gradle
                     - ./gradlew clientapi:assembleStandardDebugAndroidTest
                     - mv clientapi/build/outputs/apk/androidTest/standard/debug/clientapi-standard-debug-androidTest.apk clientapi-standard-debug-androidTest.apk
                     # Build Fingerprint Android Test APK
-                    - cat ci/debug_gradle_signing >> fingerprint/build.gradle
                     - ./gradlew fingerprint:assembleStandardDebugAndroidTest
                     - mv fingerprint/build/outputs/apk/androidTest/standard/debug/fingerprint-standard-debug-androidTest.apk fingerprint-standard-debug-androidTest.apk
                     # Build Face Android Test APK
-                    - cat ci/debug_gradle_signing >> face/build.gradle
                     - ./gradlew face:assembleStandardDebugAndroidTest
                     - mv face/build/outputs/apk/androidTest/standard/debug/face-standard-debug-androidTest.apk face-standard-debug-androidTest.apk
                     # Build Universal APK
                     - ./gradlew bundleStandardDebug --stacktrace
                     - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
-                    - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/standardDebug/id-standard-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=ci/debug_keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
+                    - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/standardDebug/id-standard-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=debug.keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
                     - mv universal.apks universal.zip
                     - unzip universal.zip
                 artifacts:

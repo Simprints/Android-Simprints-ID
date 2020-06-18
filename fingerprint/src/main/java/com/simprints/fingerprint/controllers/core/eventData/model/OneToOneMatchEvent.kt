@@ -7,10 +7,12 @@ import java.io.Serializable
 import com.simprints.id.data.db.session.domain.models.events.OneToOneMatchEvent as CoreOneToOneMatchEvent
 
 @Keep
-class OneToOneMatchEvent(starTime: Long,
-                         endTime: Long,
-                         val query: Serializable,
-                         val result: MatchEntry?) : Event(EventType.ONE_TO_ONE_MATCH, starTime, endTime)
+class OneToOneMatchEvent(
+    startTime: Long,
+    endTime: Long,
+    val query: Serializable,
+    val result: MatchEntry?
+) : Event(EventType.ONE_TO_ONE_MATCH, startTime, endTime)
 
 fun OneToOneMatchEvent.fromDomainToCore() =
     CoreOneToOneMatchEvent(

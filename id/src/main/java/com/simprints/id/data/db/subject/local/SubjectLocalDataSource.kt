@@ -4,7 +4,7 @@ import com.simprints.id.data.db.subject.domain.Subject
 import kotlinx.coroutines.flow.Flow
 import java.io.Serializable
 
-interface SubjectLocalDataSource : FingerprintIdentityLocalDataSource {
+interface SubjectLocalDataSource : FaceIdentityLocalDataSource, FingerprintIdentityLocalDataSource {
 
     class Query(val projectId: String? = null,
                 val subjectId: String? = null,

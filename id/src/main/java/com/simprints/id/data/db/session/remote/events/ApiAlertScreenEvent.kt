@@ -23,9 +23,17 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
         UNKNOWN_BLUETOOTH_ISSUE,
         UNEXPECTED_ERROR,
         DISCONNECTED,
+        @Deprecated("Fingerprint module doesn't triggers it anymore")
         MULTIPLE_PAIRED_SCANNERS,
+        @Deprecated("Fingerprint module doesn't triggers it anymore")
         NOT_PAIRED,
         BLUETOOTH_NOT_ENABLED,
+        NFC_NOT_ENABLED,
+        NFC_PAIR,
+        SERIAL_ENTRY_PAIR,
+        OTA,
+        OTA_RECOVERY,
+        OTA_FAILED,
         @Deprecated("That can never been triggered, so to be removed soon")
         INVALID_INTENT_ACTION,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
@@ -53,6 +61,12 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
                     AlertScreenEvent.AlertScreenEventType.MULTIPLE_PAIRED_SCANNERS -> MULTIPLE_PAIRED_SCANNERS
                     AlertScreenEvent.AlertScreenEventType.NOT_PAIRED -> NOT_PAIRED
                     AlertScreenEvent.AlertScreenEventType.BLUETOOTH_NOT_ENABLED -> BLUETOOTH_NOT_ENABLED
+                    AlertScreenEvent.AlertScreenEventType.NFC_NOT_ENABLED -> NFC_NOT_ENABLED
+                    AlertScreenEvent.AlertScreenEventType.NFC_PAIR -> NFC_PAIR
+                    AlertScreenEvent.AlertScreenEventType.SERIAL_ENTRY_PAIR -> SERIAL_ENTRY_PAIR
+                    AlertScreenEvent.AlertScreenEventType.OTA -> OTA
+                    AlertScreenEvent.AlertScreenEventType.OTA_RECOVERY -> OTA_RECOVERY
+                    AlertScreenEvent.AlertScreenEventType.OTA_FAILED -> OTA_FAILED
                     AlertScreenEvent.AlertScreenEventType.INVALID_INTENT_ACTION -> INVALID_INTENT_ACTION
                     AlertScreenEvent.AlertScreenEventType.INVALID_METADATA -> INVALID_METADATA
                     AlertScreenEvent.AlertScreenEventType.INVALID_MODULE_ID -> INVALID_MODULE_ID

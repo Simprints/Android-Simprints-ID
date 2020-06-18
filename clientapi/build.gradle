@@ -3,6 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
+sonarqube {
+    properties {
+        property "sonar.sources", "src/main/java"
+    }
+}
+
 androidExtensions {
     experimental = true
 }
@@ -32,6 +38,9 @@ android {
 
         staging {
             initWith release
+        }
+        debug {
+            testCoverageEnabled true
         }
     }
 

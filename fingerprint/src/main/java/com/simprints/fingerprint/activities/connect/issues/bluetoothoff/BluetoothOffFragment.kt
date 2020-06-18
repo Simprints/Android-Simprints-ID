@@ -13,7 +13,11 @@ import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
+import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import kotlinx.android.synthetic.main.fragment_bluetooth_off.*
@@ -25,6 +29,8 @@ class BluetoothOffFragment : FingerprintFragment() {
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
     private val bluetoothAdapter: ComponentBluetoothAdapter by inject()
     private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
+    private val sessionManager: FingerprintSessionEventsManager by inject()
+    private val timeHelper: FingerprintTimeHelper by inject()
 
     private val bluetoothOnReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -42,6 +48,8 @@ class BluetoothOffFragment : FingerprintFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
+
+        sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.BluetoothOff))
 
         turnOnBluetoothButton.setOnClickListener {
             if (bluetoothAdapter.isEnabled()) {

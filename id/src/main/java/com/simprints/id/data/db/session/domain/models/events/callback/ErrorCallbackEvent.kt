@@ -7,11 +7,11 @@ import com.simprints.id.data.db.session.domain.models.events.callback.ErrorCallb
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 
 @Keep
-class ErrorCallbackEvent(starTime: Long,
-                         val reason: Reason): Event(EventType.CALLBACK_ERROR, starTime) {
+class ErrorCallbackEvent(startTime: Long,
+                         val reason: Reason): Event(EventType.CALLBACK_ERROR, startTime) {
 
-    constructor(starTime: Long, reason: AppErrorResponse.Reason):
-        this(starTime, fromAppResponseErrorReasonToEventReason(reason))
+    constructor(startTime: Long, reason: AppErrorResponse.Reason):
+        this(startTime, fromAppResponseErrorReasonToEventReason(reason))
 
     enum class Reason {
         DIFFERENT_PROJECT_ID_SIGNED_IN,

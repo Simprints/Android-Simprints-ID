@@ -5,7 +5,9 @@ import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.events.EventType
 
 @Keep
-class ConfirmationCalloutEvent(starTime: Long,
-                               val projectId: String,
-                               val selectedGuid: String,
-                               val sessionId: String): Event(EventType.CALLOUT_CONFIRMATION, starTime)
+class ConfirmationCalloutEvent(
+    startTime: Long,
+    val projectId: String,
+    val selectedGuid: String,
+    val sessionId: String
+) : Event(EventType.CALLOUT_CONFIRMATION, startTime)
