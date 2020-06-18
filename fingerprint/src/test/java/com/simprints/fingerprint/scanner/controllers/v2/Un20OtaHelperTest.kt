@@ -3,14 +3,15 @@ package com.simprints.fingerprint.scanner.controllers.v2
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
-import com.simprints.fingerprint.scanner.data.FirmwareFileManager
+import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
+import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.CypressFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
-import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
+import com.simprints.testtools.common.reactive.advanceTime
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.CapturingSlot
 import io.mockk.every
@@ -19,16 +20,19 @@ import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.schedulers.TestScheduler
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
+import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 
 class Un20OtaHelperTest {
 
     private val scannerMock = mockk<Scanner>()
     private val connectionHelperMock = mockk<ConnectionHelper>()
-    private val firmwareFileManagerMock = mockk<FirmwareFileManager>()
-    private val un20OtaHelper = Un20OtaHelper(connectionHelperMock, firmwareFileManagerMock)
+    private val firmwareFileManagerMock = mockk<FirmwareLocalDataSource>()
+    private val testScheduler = TestScheduler()
+    private val un20OtaHelper = Un20OtaHelper(connectionHelperMock, firmwareFileManagerMock, testScheduler)
 
     @Before
     fun setup() {
@@ -43,17 +47,18 @@ class Un20OtaHelperTest {
         every { scannerMock.getUn20AppVersion() } returns Single.just(NEW_UN20_VERSION)
 
         every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns NEW_SCANNER_VERSION.toScannerFirmwareVersions()
-        every { firmwareFileManagerMock.getUn20FirmwareBytes() } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
+        every { firmwareFileManagerMock.loadUn20FirmwareBytes() } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
     }
 
     @Test
     fun performUn20Ota_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() {
         val expectedSteps = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { Un20OtaStep.TransferInProgress(it) } +
-            listOf(Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer, Un20OtaStep.ValidatingNewFirmwareVersion,
-                Un20OtaStep.ReconnectingAfterValidating, Un20OtaStep.UpdatingUnifiedVersionInformation)
+            listOf(Un20OtaStep.AwaitingCacheCommit, Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer,
+                Un20OtaStep.ValidatingNewFirmwareVersion, Un20OtaStep.ReconnectingAfterValidating, Un20OtaStep.UpdatingUnifiedVersionInformation)
 
         val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        testScheduler.advanceTime()
 
         testObserver.awaitAndAssertSuccess()
 
@@ -73,12 +78,13 @@ class Un20OtaHelperTest {
         val progressValues = listOf(0.0f, 0.2f, 0.4f)
         val expectedSteps = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
             progressValues.map { Un20OtaStep.TransferInProgress(it) }
-        val error = OtaFailedException("oops!")
+        val error = ScannerV2OtaFailedException("oops!")
 
         every { scannerMock.startUn20Ota(any()) } returns
             Observable.fromIterable(progressValues).concatWith(Observable.error(error))
 
         val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
 
@@ -93,12 +99,13 @@ class Un20OtaHelperTest {
     fun un20OtaFailsDuringTurningUn20OnSecondTime_propagatesError() {
         val expectedSteps = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { Un20OtaStep.TransferInProgress(it) } +
-            listOf(Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer)
+            listOf(Un20OtaStep.AwaitingCacheCommit, Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer)
         val error = IOException("oops!")
 
         every { scannerMock.turnUn20OnAndAwaitStateChangeEvent() } returnsMany listOf(Completable.complete(), Completable.error(error))
 
         val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
 
@@ -113,11 +120,13 @@ class Un20OtaHelperTest {
     fun un20OtaFailsToValidate_throwsOtaError() {
         val expectedSteps = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { Un20OtaStep.TransferInProgress(it) } +
-            listOf(Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer, Un20OtaStep.ValidatingNewFirmwareVersion)
+            listOf(Un20OtaStep.AwaitingCacheCommit, Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer,
+                Un20OtaStep.ValidatingNewFirmwareVersion)
 
         every { scannerMock.getUn20AppVersion() } returns Single.just(OLD_UN20_VERSION)
 
         val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
 

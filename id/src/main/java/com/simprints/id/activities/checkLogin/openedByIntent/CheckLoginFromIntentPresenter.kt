@@ -3,27 +3,25 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import android.annotation.SuppressLint
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.AuthorizationEvent
 import com.simprints.id.data.db.session.domain.models.events.ConnectivitySnapshotEvent
 import com.simprints.id.data.db.session.domain.models.events.Event
-import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.VerificationCalloutEvent
+import com.simprints.id.data.db.session.domain.models.events.callout.*
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
-import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.ignoreException
 import com.simprints.id.tools.utils.SimNetworkUtils
 import timber.log.Timber
@@ -42,7 +40,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private var setupFailed: Boolean = false
 
     @Inject lateinit var sessionRepository: SessionRepository
-    @Inject lateinit var personLocalDataSource: PersonLocalDataSource
+    @Inject lateinit var subjectLocalDataSource: SubjectLocalDataSource
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     internal lateinit var appRequest: AppRequest
 
@@ -74,7 +72,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         ignoreException {
             sessionRepository.updateCurrentSession { currentSession ->
                 with(currentSession) {
-                    addEvent(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
+                    if (appRequest !is AppRequest.AppRequestFollowUp) {
+                        addEvent(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
+                    }
                     addEvent(buildRequestEvent(timeHelper.now(), appRequest))
                 }
             }
@@ -86,8 +86,25 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             is AppEnrolRequest -> buildEnrolmentCalloutEvent(request, relativeStartTime)
             is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStartTime)
             is AppIdentifyRequest -> buildIdentificationCalloutEvent(request, relativeStartTime)
-            else -> throw InvalidAppRequest()
+            is AppConfirmIdentityRequest -> addConfirmationCalloutEvent(request, relativeStartTime)
+            is AppEnrolLastBiometricsRequest -> addEnrolLastBiometricsCalloutEvent(request, relativeStartTime)
         }
+
+    internal fun addEnrolLastBiometricsCalloutEvent(request: AppEnrolLastBiometricsRequest, relativeStarTime: Long) =
+        EnrolmentLastBiometricsCalloutEvent(
+            relativeStarTime,
+            request.projectId,
+            request.userId,
+            request.moduleId,
+            request.metadata,
+            request.identificationSessionId)
+
+    internal fun addConfirmationCalloutEvent(request: AppConfirmIdentityRequest, relativeStartTime: Long) =
+        ConfirmationCalloutEvent(
+            relativeStartTime,
+            request.projectId,
+            request.selectedGuid,
+            request.sessionId)
 
     internal fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStartTime: Long) =
         with(request) {
@@ -136,14 +153,19 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun extractSessionParametersOrThrow() =
         with(appRequest) {
-            analyticsManager.logCallout(this)
-            analyticsManager.logUserProperties(userId, projectId, moduleId, deviceId)
+            if (this is AppRequestFlow) {
+                analyticsManager.logCallout(this)
+                analyticsManager.logUserProperties(userId, projectId, moduleId, deviceId)
+            }
         }
 
     override fun handleNotSignedInUser() {
-        sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(AuthorizationEvent.Result.NOT_AUTHORIZED))
 
-        if (!loginAlreadyTried.get()) {
+        // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
+        // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
+        if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest && appRequest !is AppEnrolLastBiometricsRequest) {
+            sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(AuthorizationEvent.Result.NOT_AUTHORIZED))
+
             loginAlreadyTried.set(true)
             view.openLoginActivity(appRequest)
         } else {
@@ -172,12 +194,19 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @SuppressLint("CheckResult")
     override suspend fun handleSignedInUser() {
         /** Hack to support multiple users: If all login checks success, then we consider
-         *  the userId in the Intent as new signed User */
-        loginInfoManager.signedInUserId = appRequest.userId
+         *  the userId in the Intent as new signed User
+         *  Because we move ConfirmIdentity behind the login check, some integration
+         *  doesn't have the userId in the intent. We don't want to switch the
+         *  user otherwise will be set to "" and the following requests would fail.
+         *  */
+        if (appRequest.userId.isNotEmpty()) {
+            loginInfoManager.signedInUserId = appRequest.userId
+        }
+
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
         ignoreException {
-            val peopleInDb = personLocalDataSource.count()
+            val peopleInDb = subjectLocalDataSource.count()
             sessionRepository.updateCurrentSession { currentSession ->
                 val authorisationEvent = buildAuthorizationEvent(AuthorizationEvent.Result.AUTHORIZED)
 
@@ -198,7 +227,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
             setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
             setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
-            setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncSetting)
+            setDownSyncTriggersCrashlyticsKey(preferencesManager.subjectsDownSyncSetting)
             setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
         }
     }

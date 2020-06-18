@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
-import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
@@ -17,7 +17,7 @@ import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.network.NetworkConstants
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
 open class SettingsPreferencesManagerImpl(
@@ -28,7 +28,7 @@ open class SettingsPreferencesManagerImpl(
     modalitySerializer: Serializer<List<Modality>>,
     languagesStringArraySerializer: Serializer<Array<String>>,
     moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-    peopleDownSyncSettingSerializer: Serializer<PeopleDownSyncSetting>,
+    subjectsDownSyncSettingSerializer: Serializer<SubjectsDownSyncSetting>,
     captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
     saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
     scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
@@ -195,13 +195,13 @@ open class SettingsPreferencesManagerImpl(
             modalitySerializer
         )
 
-    override var peopleDownSyncSetting: PeopleDownSyncSetting
+    override var subjectsDownSyncSetting: SubjectsDownSyncSetting
         by RemoteConfigComplexPreference(
             prefs,
             remoteConfigWrapper,
             PEOPLE_DOWN_SYNC_SETTING_KEY,
             PEOPLE_DOWN_SYNC_SETTING_DEFAULT,
-            peopleDownSyncSettingSerializer
+            subjectsDownSyncSettingSerializer
         )
 
     override var fingerImagesExist: Boolean
@@ -344,7 +344,7 @@ open class SettingsPreferencesManagerImpl(
         const val LOCATION_REQUIRED_DEFAULT = true
 
         const val PEOPLE_DOWN_SYNC_SETTING_KEY = "DownSyncSetting"
-        val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = PeopleDownSyncSetting.ON
+        val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = SubjectsDownSyncSetting.ON
 
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"

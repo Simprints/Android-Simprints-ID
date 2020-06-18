@@ -13,3 +13,6 @@ fun Activity.hideKeyboard() {
     val flags = 0
     inputMethodManager.hideSoftInputFromWindow(focusedView.windowToken, flags)
 }
+
+fun Activity.removeAnimationsToNextActivity() =
+    overridePendingTransition(0, 0)

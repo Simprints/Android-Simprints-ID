@@ -13,7 +13,7 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
@@ -30,7 +30,7 @@ class SignerManagerImplTest {
     @MockK lateinit var mockLoginInfoManager: LoginInfoManager
     @MockK lateinit var mockPreferencesManager: PreferencesManager
     @MockK lateinit var mockSyncManager: SyncManager
-    @MockK lateinit var mockPeopleSyncManager: PeopleSyncManager
+    @MockK lateinit var mockSubjectsSyncManager: SubjectsSyncManager
     @MockK lateinit var mockSecurityStateScheduler: SecurityStateScheduler
     @MockK lateinit var mockLongConsentRepository: LongConsentRepository
     @MockK lateinit var mockSessionRepository: SessionRepository
@@ -50,7 +50,7 @@ class SignerManagerImplTest {
             mockRemoteDbManager,
             mockLoginInfoManager,
             mockPreferencesManager,
-            mockPeopleSyncManager,
+            mockSubjectsSyncManager,
             mockSyncManager,
             mockSecurityStateScheduler,
             mockLongConsentRepository,
@@ -259,6 +259,6 @@ class SignerManagerImplTest {
     private fun verifyUpSyncGotPaused() = verify { mockSyncManager.cancelBackgroundSyncs() }
     private fun verifyStoredCredentialsGotCleaned() = verify { mockLoginInfoManager.cleanCredentials() }
     private fun verifyRemoteManagerGotSignedOut() = verify { mockRemoteDbManager.signOut() }
-    private fun verifyLastSyncInfoGotDeleted() = coVerify { mockPeopleSyncManager.deleteSyncInfo() }
+    private fun verifyLastSyncInfoGotDeleted() = coVerify { mockSubjectsSyncManager.deleteSyncInfo() }
     private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() = verify { mockPreferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
 }

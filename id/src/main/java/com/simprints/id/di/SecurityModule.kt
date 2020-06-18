@@ -9,10 +9,10 @@ import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -28,7 +28,7 @@ import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourc
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepositoryImpl
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.tools.TimeHelper
@@ -48,7 +48,7 @@ open class SecurityModule {
         remoteDbManager: RemoteDbManager,
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
-        peopleSyncManager: PeopleSyncManager,
+        subjectsSyncManager: SubjectsSyncManager,
         syncManager: SyncManager,
         securityStateScheduler: SecurityStateScheduler,
         longConsentRepository: LongConsentRepository,
@@ -60,7 +60,7 @@ open class SecurityModule {
         remoteDbManager,
         loginInfoManager,
         preferencesManager,
-        peopleSyncManager,
+        subjectsSyncManager,
         syncManager,
         securityStateScheduler,
         longConsentRepository,
@@ -175,11 +175,11 @@ open class SecurityModule {
     @Provides
     open fun provideSecurityStateProcessor(
         imageRepository: ImageRepository,
-        personRepository: PersonRepository,
+        subjectRepository: SubjectRepository,
         signerManager: SignerManager
     ): SecurityStateProcessor = SecurityStateProcessorImpl(
         imageRepository,
-        personRepository,
+        subjectRepository,
         signerManager
     )
 

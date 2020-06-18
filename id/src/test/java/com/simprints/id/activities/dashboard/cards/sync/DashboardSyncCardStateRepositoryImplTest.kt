@@ -6,16 +6,16 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl.Companion.MAX_TIME_BEFORE_SYNC_AGAIN
 import com.simprints.id.commontesttools.DefaultTestConstants
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleDownSyncSetting
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncState.SyncWorkerInfo
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerState.*
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.DOWN_COUNTER
-import com.simprints.id.services.scheduledSync.people.master.models.PeopleSyncWorkerType.UP_COUNTER
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState.SyncWorkerInfo
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState.*
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerType.DOWN_COUNTER
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerType.UP_COUNTER
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.device.DeviceManager
@@ -37,15 +37,15 @@ class DashboardSyncCardStateRepositoryImplTest {
     private val syncCardTestLiveData
         get() = dashboardSyncCardStateRepository.syncCardStateLiveData
 
-    @MockK lateinit var peopleSyncManager: PeopleSyncManager
+    @MockK lateinit var subjectsSyncManager: SubjectsSyncManager
     @MockK lateinit var deviceManager: DeviceManager
     @MockK lateinit var preferencesManager: PreferencesManager
-    @MockK lateinit var syncScopeRepository: PeopleDownSyncScopeRepository
-    @MockK lateinit var cacheSync: PeopleSyncCache
+    @MockK lateinit var syncScopeRepository: SubjectsDownSyncScopeRepository
+    @MockK lateinit var cacheSync: SubjectsSyncCache
     @MockK lateinit var timeHelper: TimeHelper
 
     private lateinit var isConnectedUpdates: MutableLiveData<Boolean>
-    private lateinit var syncStateLiveData: MutableLiveData<PeopleSyncState>
+    private lateinit var syncStateLiveData: MutableLiveData<SubjectsSyncState>
     private val syncId = UUID.randomUUID().toString()
     private val lastSyncTime = Date()
 
@@ -56,11 +56,11 @@ class DashboardSyncCardStateRepositoryImplTest {
         isConnectedUpdates.value = true
         syncStateLiveData = MutableLiveData()
         every { deviceManager.isConnectedLiveData } returns isConnectedUpdates
-        every { peopleSyncManager.getLastSyncState() } returns syncStateLiveData
+        every { subjectsSyncManager.getLastSyncState() } returns syncStateLiveData
         every { syncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.projectSyncScope
         every { preferencesManager.selectedModules } returns emptySet()
         every { cacheSync.readLastSuccessfulSyncTime() } returns lastSyncTime
-        every { peopleSyncManager.hasSyncEverRunBefore() } returns true
+        every { subjectsSyncManager.hasSyncEverRunBefore() } returns true
 
         isConnectedUpdates.value = true
         dashboardSyncCardStateRepository = createRepository()
@@ -90,7 +90,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     fun downSyncSettingIsOnAndModulesEmpty_syncStateShouldBeSelectModules() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
         every { syncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.moduleSyncScope
-        every { preferencesManager.peopleDownSyncSetting } returns PeopleDownSyncSetting.ON
+        every { preferencesManager.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.ON
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.testObserver()
@@ -102,7 +102,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     fun downSyncSettingIsExtraAndModulesEmpty_syncStateShouldBeSelectModules() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
         every { syncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.moduleSyncScope
-        every { preferencesManager.peopleDownSyncSetting } returns PeopleDownSyncSetting.EXTRA
+        every { preferencesManager.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.EXTRA
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.testObserver()
@@ -114,7 +114,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     fun downSyncSettingIsOffAndModulesEmpty_syncStateShouldBeConnecting() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
         every { syncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.moduleSyncScope
-        every { preferencesManager.peopleDownSyncSetting } returns PeopleDownSyncSetting.OFF
+        every { preferencesManager.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.OFF
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.testObserver()
@@ -146,7 +146,7 @@ class DashboardSyncCardStateRepositoryImplTest {
 
     @Test
     fun syncWorkersCompleted_syncStateShouldBeCompleted() = runBlockingTest {
-        syncStateLiveData.value = PeopleSyncState(syncId, 10, 10,
+        syncStateLiveData.value = SubjectsSyncState(syncId, 10, 10,
             listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -157,7 +157,7 @@ class DashboardSyncCardStateRepositoryImplTest {
 
     @Test
     fun syncWorkersEnqueued_syncStateShouldBeConnecting() = runBlockingTest {
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null,
+        syncStateLiveData.value = SubjectsSyncState(syncId, 0, null,
             listOf(SyncWorkerInfo(DOWN_COUNTER, Enqueued)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -168,7 +168,7 @@ class DashboardSyncCardStateRepositoryImplTest {
 
     @Test
     fun syncWorkersFailedForNetworkIssues_syncStateShouldBeTryAgain() = runBlockingTest {
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null,
+        syncStateLiveData.value = SubjectsSyncState(syncId, 0, null,
             listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(false))), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -179,7 +179,7 @@ class DashboardSyncCardStateRepositoryImplTest {
 
     @Test
     fun syncWorkersFailedBecauseCloudIntegration_syncStateShouldBeFailed() = runBlockingTest {
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null,
+        syncStateLiveData.value = SubjectsSyncState(syncId, 0, null,
             listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(true))), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -191,7 +191,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun noHistoryAboutSync_syncStateShouldBeDefault() = runBlockingTest {
         syncStateLiveData.value =
-            PeopleSyncState(syncId, 0, null, emptyList(), emptyList())
+            SubjectsSyncState(syncId, 0, null, emptyList(), emptyList())
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.testObserver()
@@ -202,51 +202,51 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun syncSucceedInBackgroundLongTimeAgo_syncShouldBeTriggered() = runBlockingTest {
         dashboardSyncCardStateRepository = createRepository(TimeHelperImpl())
-        syncStateLiveData.value = PeopleSyncState(syncId, 10, 10,
+        syncStateLiveData.value = SubjectsSyncState(syncId, 10, 10,
             listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
         every { cacheSync.readLastSuccessfulSyncTime() } returns Date(System.currentTimeMillis() - MAX_TIME_BEFORE_SYNC_AGAIN - 1)
 
         dashboardSyncCardStateRepository.syncIfRequired()
         syncCardTestLiveData.testObserver()
 
-        verify { peopleSyncManager.sync() }
+        verify { subjectsSyncManager.sync() }
     }
 
     @Test
     fun syncSucceedInBackgroundNotTooLongAgo_syncShouldNotBeTriggered() = runBlockingTest {
         dashboardSyncCardStateRepository = createRepository(TimeHelperImpl())
-        syncStateLiveData.value = PeopleSyncState(syncId, 10, 10,
+        syncStateLiveData.value = SubjectsSyncState(syncId, 10, 10,
             listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
         every { cacheSync.readLastSuccessfulSyncTime() } returns Date()
 
         dashboardSyncCardStateRepository.syncIfRequired()
         syncCardTestLiveData.testObserver()
 
-        verify(exactly = 0) { peopleSyncManager.sync() }
+        verify(exactly = 0) { subjectsSyncManager.sync() }
     }
 
     @Test
     fun syncFinishedButOnlyRecently_syncIfRequired_shouldNotLaunchTheSync() = runBlockingTest {
         every { timeHelper.msBetweenNowAndTime(any()) } returns MAX_TIME_BEFORE_SYNC_AGAIN - 1
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null,
+        syncStateLiveData.value = SubjectsSyncState(syncId, 0, null,
             listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
         dashboardSyncCardStateRepository.syncIfRequired()
         dashboardSyncCardStateRepository.syncIfRequired()
 
-        verify(exactly = 0) { peopleSyncManager.sync() }
+        verify(exactly = 0) { subjectsSyncManager.sync() }
     }
 
     @Test
     fun noHistoryAboutSync_syncIfRequired_shouldNotLaunchTheSync() = runBlockingTest {
         dashboardSyncCardStateRepository.syncIfRequired()
 
-        verify(exactly = 0) { peopleSyncManager.sync() }
+        verify(exactly = 0) { subjectsSyncManager.sync() }
     }
 
     @Test
     fun syncWorkersFailedDueToTimeout_syncStateShouldBeFailed() = runBlockingTest {
-        syncStateLiveData.value = PeopleSyncState(syncId, 0, null,
+        syncStateLiveData.value = SubjectsSyncState(syncId, 0, null,
             listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(true))), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -259,7 +259,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     fun syncWorkersAreRunning_syncStateShouldBeInProgress() = runBlockingTest {
         val progress = 10
         val total = 100
-        syncStateLiveData.value = PeopleSyncState(syncId, progress, total,
+        syncStateLiveData.value = SubjectsSyncState(syncId, progress, total,
             listOf(SyncWorkerInfo(DOWN_COUNTER, Running)), listOf(SyncWorkerInfo(UP_COUNTER, Running)))
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -270,7 +270,7 @@ class DashboardSyncCardStateRepositoryImplTest {
 
 
     private fun createRepository(specificTimeHelper: TimeHelper = timeHelper) =
-        DashboardSyncCardStateRepositoryImpl(peopleSyncManager, deviceManager, preferencesManager, syncScopeRepository, cacheSync, specificTimeHelper)
+        DashboardSyncCardStateRepositoryImpl(subjectsSyncManager, deviceManager, preferencesManager, syncScopeRepository, cacheSync, specificTimeHelper)
 
 }
 

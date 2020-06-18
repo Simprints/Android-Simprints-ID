@@ -31,8 +31,8 @@ class FingerprintSessionEventsManagerImpl(private val sessionRepository: Session
     override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
         runBlocking {
             ignoreException {
-                sessionRepository.updateCurrentSession {
-                    val scannerConnectivityEvents = it.getEvents().filterIsInstance(ScannerConnectionEvent::class.java)
+                sessionRepository.updateCurrentSession { session ->
+                    val scannerConnectivityEvents = session.getEvents().filterIsInstance(ScannerConnectionEvent::class.java)
                     scannerConnectivityEvents.forEach { it.scannerInfo.hardwareVersion = hardwareVersion }
                 }
             }
@@ -49,5 +49,8 @@ class FingerprintSessionEventsManagerImpl(private val sessionRepository: Session
             PERSON_CREATION -> (event as PersonCreationEvent).fromDomainToCore()
             SCANNER_CONNECTION -> (event as ScannerConnectionEvent).fromDomainToCore()
             ALERT_SCREEN -> (event as AlertScreenEvent).fromDomainToCore()
+            ALERT_SCREEN_WITH_SCANNER_ISSUE -> (event as AlertScreenEventWithScannerIssue).fromDomainToCore()
+            VERO_2_INFO_SNAPSHOT -> (event as Vero2InfoSnapshotEvent).fromDomainToCore()
+            SCANNER_FIRMWARE_UPDATE -> (event as ScannerFirmwareUpdateEvent).fromDomainToCore()
         }
 }

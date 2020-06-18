@@ -4,7 +4,7 @@ import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.clientapi.domain.ClientBase
+import com.simprints.clientapi.domain.requests.BaseRequest
 import io.mockk.every
 
 abstract class RequestFactory {
@@ -25,7 +25,7 @@ abstract class RequestFactory {
 
     abstract fun getMockExtractor(): ClientRequestExtractor
 
-    abstract fun getValidSimprintsRequest(integrationInfo: IntegrationInfo): ClientBase
+    abstract fun getValidSimprintsRequest(integrationInfo: IntegrationInfo): BaseRequest
 
     open fun setMockDefaultExtractor(mockExtractor: ClientRequestExtractor) {
         every { mockExtractor.getProjectId() } returns MOCK_PROJECT_ID

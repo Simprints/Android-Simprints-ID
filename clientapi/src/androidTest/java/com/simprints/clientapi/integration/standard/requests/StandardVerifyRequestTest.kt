@@ -12,8 +12,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.integration.AppVerifyRequest
 import com.simprints.clientapi.integration.key
-import com.simprints.clientapi.integration.value
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
+import com.simprints.clientapi.integration.value
 import com.simprints.moduleapi.app.requests.IAppRequest
 import org.hamcrest.CoreMatchers
 import org.junit.Before
@@ -32,7 +32,7 @@ class StandardVerifyRequestTest : BaseStandardClientApiTest() {
 
     @Test
     fun callingAppSendsAVerifyRequest_shouldLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply {
+        ActivityScenario.launch<LibSimprintsActivity>(standardBaseFlowIntentRequest.apply {
             action = STANDARD_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
@@ -50,7 +50,7 @@ class StandardVerifyRequestTest : BaseStandardClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestSuspicious(standardBaseIntentRequest).apply {
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestSuspicious(standardBaseFlowIntentRequest).apply {
             action = STANDARD_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value()) 
         })
@@ -60,7 +60,7 @@ class StandardVerifyRequestTest : BaseStandardClientApiTest() {
 
     @Test
     fun callingAppSendsAnInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestInvalid(standardBaseIntentRequest).apply {
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestInvalid(standardBaseFlowIntentRequest).apply {
             action = STANDARD_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })

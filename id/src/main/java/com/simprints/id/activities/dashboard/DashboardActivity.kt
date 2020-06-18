@@ -25,8 +25,8 @@ import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
-import com.simprints.id.services.scheduledSync.people.common.SYNC_LOG_TAG
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.subjects.common.SYNC_LOG_TAG
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.activity_dashboard_card_daily_activity.*
@@ -47,7 +47,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
     @Inject lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
     @Inject lateinit var dailyActivityCardDisplayer: DashboardDailyActivityCardDisplayer
     @Inject lateinit var viewModelFactory: DashboardViewModelFactory
-    @Inject lateinit var peopleSyncManager: PeopleSyncManager
+    @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
     @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
     @Inject lateinit var securityStateRepository: SecurityStateRepository
 
@@ -161,7 +161,7 @@ class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard) {
 
         syncCardDisplayer.userWantsToSync.observe(this, LiveDataEventObserver {
             syncCardDisplayer.displayState(SyncConnecting(null, 0, null))
-            peopleSyncManager.sync()
+            subjectsSyncManager.sync()
         })
     }
 

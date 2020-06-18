@@ -9,11 +9,10 @@ import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.simprints.clientapi.activities.commcare.CommCareActivity
-import com.simprints.clientapi.integration.AppIdentityConfirmationRequest
+import com.simprints.clientapi.integration.AppConfirmIdentityRequest
 import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
-import com.simprints.moduleapi.app.requests.confirmations.IAppConfirmation
-import com.simprints.clientapi.integration.key
 import com.simprints.clientapi.integration.value
+import com.simprints.moduleapi.app.requests.IAppRequest
 import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.Test
@@ -34,13 +33,14 @@ class CommCareConfirmationIdentityRequestTest : BaseCommCareClientApiTest() {
     fun callingAppSendsAnConfirmRequest_shouldLaunchAnAppConfirmRequest() {
         ActivityScenario.launch<CommCareActivity>(commCareConfirmIntentRequest.apply { action = COMMCARE_CONFIRM_IDENTITY_ACTION })
 
-        val expectedAppRequest = AppIdentityConfirmationRequest(
+        val expectedAppRequest = AppConfirmIdentityRequest(
             projectIdField.value(),
+            userIdField.value(),
             sessionIdField.value(),
             selectedGuidField.value())
 
         Intents.intended(IntentMatchers.hasAction(APP_CONFIRM_ACTION))
-        Intents.intended(IntentMatchers.hasExtras(BundleMatchers.hasEntry(IAppConfirmation.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
+        Intents.intended(IntentMatchers.hasExtras(BundleMatchers.hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
     }
 
     @Test
