@@ -2,7 +2,7 @@ package com.simprints.fingerprint.scanner
 
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.scanner.exceptions.safe.*
-import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
+import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.NullScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
@@ -11,6 +11,7 @@ import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
 
 class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter,
@@ -30,6 +31,9 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
 
     override fun <T> scanner(method: ScannerWrapper.() -> Single<T>): Single<T> =
         Single.defer { delegateToScannerOrThrow(method) }
+
+    override fun <T> scannerObservable(method: ScannerWrapper.() -> Observable<T>): Observable<T> =
+        Observable.defer { delegateToScannerOrThrow(method) }
 
     private fun <T> delegateToScannerOrThrow(method: ScannerWrapper.() -> T) =
         scanner?.method() ?: throw NullScannerException()

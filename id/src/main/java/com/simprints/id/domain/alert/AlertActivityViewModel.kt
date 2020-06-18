@@ -61,6 +61,16 @@ enum class AlertActivityViewModel(val type: Type,
         leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
         message = R.string.unforeseen_error_message
+    ),
+
+    ENROLMENT_LAST_BIOMETRICS_FAILED(
+        type = Type.DataError(
+            title = R.string.enrol_last_biometrics_alert_title,
+            hintDrawable = null
+        ),
+        leftButton = ButtonAction.Close,
+        rightButton = ButtonAction.None,
+        message = R.string.enrol_last_biometrics_alert_message
     );
 
     companion object {
@@ -72,6 +82,7 @@ enum class AlertActivityViewModel(val type: Type,
                 AlertType.SAFETYNET_ERROR -> SAFETYNET_ERROR
                 AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
                 AlertType.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
+                AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
             }
     }
 

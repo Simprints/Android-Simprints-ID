@@ -9,14 +9,14 @@ import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardPr
 import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepository
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.di.DashboardActivityModule
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.internal.PeopleSyncCache
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
@@ -56,16 +56,16 @@ class TestDashboardActivityModule(
     }
 
     override fun provideDashboardSyncCardStateRepository(
-        peopleSyncManager: PeopleSyncManager,
+        subjectsSyncManager: SubjectsSyncManager,
         deviceManager: DeviceManager,
         preferencesManager: PreferencesManager,
-        syncScopeRepository: PeopleDownSyncScopeRepository,
-        cacheSync: PeopleSyncCache,
+        syncScopeRepository: SubjectsDownSyncScopeRepository,
+        cacheSync: SubjectsSyncCache,
         timeHelper: TimeHelper
     ): DashboardSyncCardStateRepository {
         return syncCardStateRepositoryRule.resolveDependency {
             super.provideDashboardSyncCardStateRepository(
-                peopleSyncManager,
+                subjectsSyncManager,
                 deviceManager,
                 preferencesManager,
                 syncScopeRepository,

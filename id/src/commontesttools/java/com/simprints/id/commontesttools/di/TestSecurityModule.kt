@@ -19,7 +19,7 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.*
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
@@ -39,7 +39,7 @@ class TestSecurityModule(
         remoteDbManager: RemoteDbManager,
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
-        peopleSyncManager: PeopleSyncManager,
+        subjectsSyncManager: SubjectsSyncManager,
         syncManager: SyncManager,
         securityStateScheduler: SecurityStateScheduler,
         longConsentRepository: LongConsentRepository,
@@ -52,7 +52,7 @@ class TestSecurityModule(
             remoteDbManager,
             loginInfoManager,
             preferencesManager,
-            peopleSyncManager,
+            subjectsSyncManager,
             syncManager,
             securityStateScheduler,
             longConsentRepository,

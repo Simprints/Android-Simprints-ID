@@ -9,11 +9,10 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
-import com.simprints.clientapi.integration.AppEnrollRequest
+import com.simprints.clientapi.integration.AppEnrolRequest
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
-import com.simprints.moduleapi.app.requests.IAppRequest
-import com.simprints.clientapi.integration.key
 import com.simprints.clientapi.integration.value
+import com.simprints.moduleapi.app.requests.IAppRequest
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
 import org.junit.Test
@@ -32,9 +31,9 @@ class StandardEnrolRequestTest : BaseStandardClientApiTest() {
 
     @Test
     fun callingAppSendsAnEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_ENROL_ACTION })
+        ActivityScenario.launch<LibSimprintsActivity>(standardBaseFlowIntentRequest.apply { action = STANDARD_ENROL_ACTION })
 
-        val expectedAppRequest = AppEnrollRequest(
+        val expectedAppRequest = AppEnrolRequest(
             projectIdField.value(),
             userIdField.value(),
             moduleIdField.value(),
@@ -46,13 +45,13 @@ class StandardEnrolRequestTest : BaseStandardClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestSuspicious(standardBaseIntentRequest).apply { action = STANDARD_ENROL_ACTION })
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestSuspicious(standardBaseFlowIntentRequest).apply { action = STANDARD_ENROL_ACTION })
         intended(hasAction(APP_ENROL_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidEnrolRequest_shouldNotLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestInvalid(standardBaseIntentRequest).apply { action = STANDARD_ENROL_ACTION })
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestInvalid(standardBaseFlowIntentRequest).apply { action = STANDARD_ENROL_ACTION })
         intended(not(hasAction(APP_ENROL_ACTION)), times(2))
     }
 }

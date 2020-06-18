@@ -20,7 +20,7 @@ class CommCareErrorResponseTest : BaseCommCareClientApiTest() {
         mockAppModuleResponse(appErrorResponse, APP_ENROL_ACTION)
 
         val scenario =
-            ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
+            ActivityScenario.launch<CommCareActivity>(commCareBaseFlowIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
 
         assertCommCareErrorResponse(scenario, RETURN_FOR_FLOW_COMPLETED)
     }
@@ -31,7 +31,7 @@ class CommCareErrorResponseTest : BaseCommCareClientApiTest() {
         mockAppModuleResponse(appErrorResponse, APP_ENROL_ACTION)
 
         val scenario =
-            ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
+            ActivityScenario.launch<CommCareActivity>(commCareBaseFlowIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
 
         assertCommCareErrorResponse(scenario, RETURN_FOR_FLOW_NOT_COMPLETED)
     }

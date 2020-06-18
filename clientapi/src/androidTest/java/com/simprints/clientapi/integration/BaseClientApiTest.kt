@@ -12,8 +12,6 @@ import com.simprints.clientapi.di.KoinInjector
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.moduleapi.app.responses.IAppResponse
-import com.simprints.clientapi.integration.key
-import com.simprints.clientapi.integration.value
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -22,7 +20,6 @@ import org.hamcrest.Description
 import org.junit.After
 import org.junit.Before
 import org.koin.test.KoinTest
-import org.koin.test.mock.declare
 import org.koin.test.mock.declareModule
 
 open class BaseClientApiTest : KoinTest {
@@ -37,16 +34,9 @@ open class BaseClientApiTest : KoinTest {
     private val extraField = "extra" to "some_extra"
     internal val packageName = ApplicationProvider.getApplicationContext<Application>().packageName
 
-    internal val baseConfirmIntentRequest = Intent().apply {
-        putExtra(projectIdField.key(), projectIdField.value())
-        putExtra(sessionIdField.key(), sessionIdField.value())
-        putExtra(selectedGuidField.key(), selectedGuidField.value())
-    }
-
     internal val baseIntentRequest = Intent().apply {
         putExtra(projectIdField.key(), projectIdField.value())
         putExtra(userIdField.key(), userIdField.value())
-        putExtra(moduleIdField.key(), moduleIdField.value())
         putExtra(metadataField.key(), metadataField.value())
     }
 
@@ -97,6 +87,7 @@ open class BaseClientApiTest : KoinTest {
         internal const val RETURN_FOR_FLOW_COMPLETED = true
         internal const val RETURN_FOR_FLOW_NOT_COMPLETED = !RETURN_FOR_FLOW_COMPLETED
         internal const val APP_ENROL_ACTION = "com.simprints.clientapp.REGISTER"
+        internal const val APP_ENROL_LAST_BIOMETRICS_ACTION = "com.simprints.clientapp.REGISTER_LAST_BIOMETRICS"
         internal const val APP_IDENTIFY_ACTION = "com.simprints.clientapp.IDENTIFY"
         internal const val APP_VERIFICATION_ACTION = "com.simprints.clientapp.VERIFY"
         internal const val APP_CONFIRM_ACTION = "com.simprints.clientapp.CONFIRM_IDENTITY"

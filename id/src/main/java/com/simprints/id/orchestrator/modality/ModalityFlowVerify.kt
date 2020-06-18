@@ -1,14 +1,14 @@
+
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.person.local.PersonLocalDataSource.Query
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
-import com.simprints.id.domain.moduleapi.core.response.FetchGUIDResponse
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -17,6 +17,8 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.Companion.isCoreResult
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
+import com.simprints.id.orchestrator.steps.core.requests.ConsentType.VERIFY
+import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFaceResult
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
@@ -34,7 +36,10 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppVerifyRequest)
-        super.startFlow(appRequest, modalities)
+        addSetupStep()
+        addCoreFetchGuidStep(appRequest.projectId, appRequest.verifyGuid)
+        addCoreConsentStepIfRequired(VERIFY)
+
         steps.addAll(buildStepsList(modalities))
     }
 
@@ -45,6 +50,10 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
                 FACE -> faceStepProcessor.buildCaptureStep()
             }
         }
+
+    private fun addCoreFetchGuidStep(projectId: String, verifyGuid: String) =
+        steps.add(coreStepProcessor.buildFetchGuidStep(projectId, verifyGuid))
+
 
     override fun getNextStepToLaunch(): Step? = steps.firstOrNull { it.getStatus() == NOT_STARTED }
 
@@ -74,11 +83,11 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
 
     private suspend fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, appRequest: AppVerifyRequest) {
         if (result is FingerprintCaptureResponse) {
-            val query = Query(personId = appRequest.verifyGuid)
+            val query = Query(subjectId = appRequest.verifyGuid)
             addMatchingStep(result.captureResult.mapNotNull { it.sample }, query)
             extractFingerprintAndAddPersonCreationEvent(result)
         } else if (result is FaceCaptureResponse) {
-            val query = Query(personId = appRequest.verifyGuid)
+            val query = Query(subjectId = appRequest.verifyGuid)
             addMatchingStepForFace(result.capturingResult.mapNotNull { it.result }, query)
         }
     }

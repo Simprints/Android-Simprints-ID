@@ -9,10 +9,9 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.commcare.CommCareActivity
-import com.simprints.clientapi.integration.AppEnrollRequest
+import com.simprints.clientapi.integration.AppEnrolRequest
 import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
-import com.simprints.clientapi.integration.key
 import com.simprints.clientapi.integration.value
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
@@ -32,9 +31,9 @@ class CommCareEnrolRequestTest : BaseCommCareClientApiTest() {
 
     @Test
     fun callingAppSendsAnEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
+        ActivityScenario.launch<CommCareActivity>(commCareBaseFlowIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
 
-        val expectedAppRequest = AppEnrollRequest(
+        val expectedAppRequest = AppEnrolRequest(
             projectIdField.value(),
             userIdField.value(),
             moduleIdField.value(),
@@ -46,13 +45,13 @@ class CommCareEnrolRequestTest : BaseCommCareClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<CommCareActivity>(makeIntentRequestSuspicious(commCareBaseIntentRequest).apply { action = COMMCARE_ENROL_ACTION })
+        ActivityScenario.launch<CommCareActivity>(makeIntentRequestSuspicious(commCareBaseFlowIntentRequest).apply { action = COMMCARE_ENROL_ACTION })
         intended(hasAction(APP_ENROL_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidEnrolRequest_shouldNotLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<CommCareActivity>(makeIntentRequestInvalid(commCareBaseIntentRequest).apply { action = COMMCARE_ENROL_ACTION })
+        ActivityScenario.launch<CommCareActivity>(makeIntentRequestInvalid(commCareBaseFlowIntentRequest).apply { action = COMMCARE_ENROL_ACTION })
         intended(not(hasAction(APP_ENROL_ACTION)), times(2))
     }
 }

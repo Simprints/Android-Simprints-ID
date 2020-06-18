@@ -3,17 +3,22 @@ package com.simprints.clientapi.integration.odk
 import android.content.Intent
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.integration.BaseClientApiTest
+import com.simprints.clientapi.integration.key
+import com.simprints.clientapi.integration.value
 
 open class BaseOdkClientApiTest : BaseClientApiTest() {
 
     private val odkActivityName = OdkActivity::class.qualifiedName!!
 
-    internal val odkConfirmIntentRequest = baseConfirmIntentRequest.apply {
+    internal val odkConfirmIntentRequest = baseIntentRequest.apply {
         setClassName(packageName, odkActivityName)
+        putExtra(sessionIdField.key(), sessionIdField.value())
+        putExtra(selectedGuidField.key(), selectedGuidField.value())
     }
 
-    internal val odkBaseIntentRequest = baseIntentRequest.apply {
+    internal val odkBaseFlowIntentRequest = baseIntentRequest.apply {
         setClassName(packageName, odkActivityName)
+        putExtra(moduleIdField.key(), moduleIdField.value())
     }
 
     fun makeIntentRequestInvalid(baseIntent: Intent, invalidParam: Pair<String, String> = projectIdField) =
@@ -38,6 +43,7 @@ open class BaseOdkClientApiTest : BaseClientApiTest() {
         internal const val ODK_EXIT_EXTRA = "odk-exit-extra"
 
         internal const val ODK_ENROL_ACTION = "com.simprints.simodkadapter.REGISTER"
+        internal const val ODK_ENROL_LAST_BIOMETRICS_ACTION = "com.simprints.simodkadapter.REGISTER_LAST_BIOMETRICS"
         internal const val ODK_IDENTIFY_ACTION = "com.simprints.simodkadapter.IDENTIFY"
         internal const val ODK_VERIFY_ACTION = "com.simprints.simodkadapter.VERIFY"
         internal const val ODK_CONFIRM_IDENTITY_ACTION = "com.simprints.simodkadapter.CONFIRM_IDENTITY"

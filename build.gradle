@@ -41,6 +41,10 @@ buildscript {
         // Android X Navigation components
         def androidx_navigation_version = "2.3.0-alpha04"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$androidx_navigation_version"
+
+        // CI Scanning
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
+        classpath "com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0"
     }
 
 }

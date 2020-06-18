@@ -9,13 +9,13 @@ import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
+import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
@@ -174,7 +174,7 @@ class TestAppModule(
             super.provideLocationManager(ctx)
         }
 
-    override fun provideSyncStatusDatabase(ctx: Context): PeopleSyncStatusDatabase =
+    override fun provideSyncStatusDatabase(ctx: Context): SubjectsSyncStatusDatabase =
         syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase(ctx) }
 
     // Android keystore is not available in unit tests - so it returns a mock that builds the standard shared prefs.
