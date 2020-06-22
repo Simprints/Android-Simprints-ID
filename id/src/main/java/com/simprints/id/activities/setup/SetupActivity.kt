@@ -8,17 +8,26 @@ import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.LocationRequest
+import com.google.android.play.core.ktx.requestSessionStates
+import com.google.android.play.core.ktx.status
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
+import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.BaseSplitActivity
+import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.id.activities.alert.response.AlertActResponse
+import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.CLOSE
+import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.TRY_AGAIN
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.Location
+import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
@@ -27,6 +36,7 @@ import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.tools.AndroidResourcesHelper
+import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
@@ -67,6 +77,12 @@ class SetupActivity: BaseSplitActivity() {
         observeViewState()
     }
 
+    private fun injectDependencies() {
+        val component = (application as Application).component
+        component.inject(this)
+    }
+
+
     private fun getRequiredModules() = setupRequest.modalitiesRequired.map {
         when (it) {
             Modality.FINGER -> getString(R.string.module_feature_finger)
@@ -86,12 +102,20 @@ class SetupActivity: BaseSplitActivity() {
         })
 
         viewModel.getDeviceNetworkLiveData().observe(this, Observer {
-            Timber.d("Setup network connection: $it")
-            if(it == DeviceOffline) {
-
+            if (it == DeviceOffline) {
+                launchAlertIfNecessary()
             }
         })
     }
+
+    private fun launchAlertIfNecessary() {
+        lifecycleScope.launchWhenResumed {
+            if(splitInstallManager.requestSessionStates().last().status() != REQUIRES_USER_CONFIRMATION) {
+                launchAlert(this@SetupActivity, AlertType.OFFLINE_DURING_SETUP)
+            }
+        }
+    }
+
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -103,11 +127,6 @@ class SetupActivity: BaseSplitActivity() {
             }
         }
         setResultAndFinish()
-    }
-
-    private fun injectDependencies() {
-        val component = (application as Application).component
-        component.inject(this)
     }
 
     private fun askPermissionsOrPerformSpecificActions() {
@@ -189,6 +208,32 @@ class SetupActivity: BaseSplitActivity() {
         }
         setupLogo.isVisible = false
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode) {
+            MODALITIES_DOWNLOAD_REQUEST_CODE -> handleModalityDownloadResult(resultCode)
+            InternalConstants.RequestIntents.ALERT_ACTIVITY_REQUEST -> handleAlertResponse(data)
+        }
+    }
+
+    private fun handleModalityDownloadResult(resultCode: Int) {
+        if(resultCode == Activity.RESULT_CANCELED) {
+            launchAlert(this, AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED)
+        }
+    }
+
+    private fun handleAlertResponse(data: Intent?) {
+        tryToGetAlertActResponseAndHandleAction(data) ?: finishAffinity()
+    }
+
+    private fun tryToGetAlertActResponseAndHandleAction(data: Intent?) =
+        data?.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
+            when(it.buttonAction) {
+                CLOSE -> finishAffinity()
+                TRY_AGAIN -> viewModel.startDownloadIfNecessary(splitInstallManager, getRequiredModules())
+            }
+        }
 
     private fun calculatePercentage(progressValue: Long, totalValue: Long) =
         min((100 * (progressValue.toFloat() / totalValue.toFloat())).toInt(), 100)

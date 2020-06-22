@@ -35,6 +35,7 @@ open class CheckLoginFromMainLauncherActivity : BaseSplitActivity(), CheckLoginF
         viewPresenter = CheckLoginFromMainLauncherPresenter(this, component)
     }
 
+
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {

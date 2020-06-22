@@ -92,6 +92,7 @@ class AlertPresenter(val view: AlertContract.View,
             is ButtonAction.Close -> view.closeActivityAfterCloseButton()
             is ButtonAction.TryAgain -> view.finishWithTryAgain()
             is ButtonAction.WifiSettings -> view.openWifiSettings()
+            ButtonAction.WifiSettingsWithFinish -> view.openWifiSettingsAndFinishWithTryAgain()
         }
     }
 
@@ -108,6 +109,8 @@ class AlertPresenter(val view: AlertContract.View,
             AlertType.GUID_NOT_FOUND_OFFLINE -> {
                 startExitFormActivity()
             }
+            AlertType.OFFLINE_DURING_SETUP,
+            AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED -> view.closeActivityAfterCloseButton()
         }
     }
 

@@ -114,8 +114,13 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        exitFormHelper.buildExitFormResponseForCore(data)?.let {
-            setResultAndFinish(it)
+        when(requestCode) {
+            WIFI_SETTINGS_REQUEST_CODE -> finishWithTryAgain()
+            CoreRequestCode.EXIT_FORM.value -> {
+                exitFormHelper.buildExitFormResponseForCore(data)?.let {
+                    setResultAndFinish(it)
+                }
+            }
         }
     }
 
@@ -134,6 +139,13 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
         startActivity(intent)
     }
 
+    override fun openWifiSettingsAndFinishWithTryAgain() {
+        val intent = Intent().apply {
+            action = android.provider.Settings.ACTION_WIFI_SETTINGS
+        }
+        startActivityForResult(intent, WIFI_SETTINGS_REQUEST_CODE)
+    }
+
     private fun setResultAndFinish(coreResponse: CoreResponse) {
         setResult(Activity.RESULT_OK, buildIntentForResponse(coreResponse))
         finish()
@@ -141,5 +153,9 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
 
     private fun buildIntentForResponse(coreResponse: CoreResponse) = Intent().apply {
         putExtra(CoreResponse.CORE_STEP_BUNDLE, coreResponse)
+    }
+
+    companion object {
+        private const val WIFI_SETTINGS_REQUEST_CODE = 100
     }
 }
