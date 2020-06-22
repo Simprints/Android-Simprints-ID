@@ -21,7 +21,7 @@ open class DbSession : RealmObject {
 
     var startTime: Long = 0L
     lateinit var realmEvents: RealmList<DbEvent>
-    lateinit var realmModalities: RealmList<DbModality>
+    lateinit var realmModalities: RealmList<String>
 
     var relativeEndTime: Long = 0L
     var relativeUploadTime: Long = 0L
@@ -61,7 +61,7 @@ open class DbSession : RealmObject {
 
     private fun setModalities(modalities: List<Modality>) = realmModalities.apply {
         clear()
-        addAll(modalities.map { DbModality(it) })
+        addAll(modalities.map { it.name })
     }
 
     fun timeRelativeToStartTime(time: Long): Long = time - startTime
@@ -77,7 +77,7 @@ fun DbSession.toDomain(): SessionEvents {
         startTime = startTime,
         databaseInfo = databaseInfo.toDomainDatabaseInfo(),
         events = ArrayList(realmEvents.mapNotNull { it.toDomainEvent() }),
-        modalities = ArrayList(realmModalities.map { it.toDomain() })
+        modalities = ArrayList(realmModalities.map { Modality.valueOf(it) })
     )
 
     session.relativeEndTime = this.relativeEndTime
