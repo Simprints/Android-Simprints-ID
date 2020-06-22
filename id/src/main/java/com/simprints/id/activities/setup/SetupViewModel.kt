@@ -3,14 +3,17 @@ package com.simprints.id.activities.setup
 import android.annotation.SuppressLint
 import androidx.lifecycle.*
 import com.google.android.play.core.ktx.requestProgressFlow
+import com.google.android.play.core.ktx.requestSessionStates
+import com.google.android.play.core.ktx.status
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallRequest
+import com.google.android.play.core.splitinstall.model.SplitInstallErrorCode.NETWORK_ERROR
+import com.google.android.play.core.splitinstall.model.SplitInstallErrorCode.NO_ERROR
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
+import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.*
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTag.ID_SETUP
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger.NETWORK
 import com.simprints.id.tools.device.DeviceManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,7 +28,7 @@ class SetupViewModel(private val deviceManager: DeviceManager,
     fun getViewStateLiveData(): LiveData<SetupActivity.ViewState> = viewStateLiveData
     fun getDeviceNetworkLiveData(): LiveData<SetupActivity.ViewState> = deviceNetwork
 
-    private lateinit var deviceNetwork: LiveData<SetupActivity.ViewState>
+    private var deviceNetwork: LiveData<SetupActivity.ViewState> = MutableLiveData()
     private val viewStateLiveData = MutableLiveData<SetupActivity.ViewState>()
 
     fun start(splitInstallManager: SplitInstallManager, modalitiesRequired: List<String>) {
@@ -53,28 +56,28 @@ class SetupViewModel(private val deviceManager: DeviceManager,
                 .collect { state ->
                     Timber.d("Split install state $state")
                     when (state.status()) {
-                        SplitInstallSessionStatus.DOWNLOADING -> {
+                        DOWNLOADING -> {
                             viewStateLiveData.postValue(Downloading(state.bytesDownloaded(), state.totalBytesToDownload()))
                         }
-                        SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION -> {
+                        REQUIRES_USER_CONFIRMATION -> {
                             logMessageForCrashReport("Modality download requires user confirmation")
                             viewStateLiveData.postValue(RequiresUserConfirmationToDownload(state))
                         }
-                        SplitInstallSessionStatus.INSTALLED -> {
+                        INSTALLED -> {
                             logMessageForCrashReport("Modalities Installed")
                             viewStateLiveData.postValue(ModalitiesInstalled)
                         }
-                        SplitInstallSessionStatus.INSTALLING -> {
+                        INSTALLING -> {
                             logMessageForCrashReport("Installing modalities")
                             viewStateLiveData.postValue(ModalitiesInstalling)
                         }
-                        SplitInstallSessionStatus.CANCELED -> {
-                            
-                        }
-                        SplitInstallSessionStatus.FAILED -> {
+                        FAILED -> {
                             Timber.d("Split install fail: ${state.errorCode()}")
+                            if (state.errorCode() != NETWORK_ERROR) {
+
+                            }
                         }
-                        SplitInstallSessionStatus.PENDING -> {
+                        PENDING -> {
                             logMessageForCrashReport("Starting modality download")
                             viewStateLiveData.postValue(StartingDownload)
                         }
@@ -96,4 +99,17 @@ class SetupViewModel(private val deviceManager: DeviceManager,
     private fun logMessageForCrashReport(message: String) {
         crashReportManager.logMessageForCrashReport(ID_SETUP, NETWORK, message = message)
     }
+
+    fun startDownloadIfNecessary(splitInstallManager: SplitInstallManager, modalitiesRequired: List<String>) {
+        viewModelScope.launch {
+            if (isModalityInstallOnGoing(splitInstallManager)) {
+                start(splitInstallManager, modalitiesRequired)
+            }
+        }
+    }
+
+    private suspend fun isModalityInstallOnGoing(splitInstallManager: SplitInstallManager) =
+        splitInstallManager.requestSessionStates().none {
+            (it.status == INSTALLED || it.status == INSTALLING || it.status == PENDING) && it.errorCode() == NO_ERROR
+        }
 }
