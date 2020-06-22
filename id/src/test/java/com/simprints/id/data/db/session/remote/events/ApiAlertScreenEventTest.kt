@@ -2,7 +2,6 @@ package com.simprints.id.data.db.session.remote.events
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
-import com.simprints.id.data.db.session.remote.events.ApiAlertScreenEvent
 import com.simprints.id.data.db.session.remote.events.ApiAlertScreenEvent.ApiAlertScreenEvent.Companion.fromDomainToApi
 import org.junit.Test
 
@@ -73,6 +72,7 @@ class ApiAlertScreenEventTest {
     }
 
     @Test
+    @Suppress("deprecation")
     fun multiplePairedScanners_fromDomainToApi() {
         val domain = AlertScreenEvent.AlertScreenEventType.MULTIPLE_PAIRED_SCANNERS
         val api = ApiAlertScreenEvent.ApiAlertScreenEvent.MULTIPLE_PAIRED_SCANNERS
@@ -81,6 +81,7 @@ class ApiAlertScreenEventTest {
     }
 
     @Test
+    @Suppress("deprecation")
     fun notPaired_fromDomainToApi() {
         val domain = AlertScreenEvent.AlertScreenEventType.NOT_PAIRED
         val api = ApiAlertScreenEvent.ApiAlertScreenEvent.NOT_PAIRED
@@ -97,6 +98,7 @@ class ApiAlertScreenEventTest {
     }
 
     @Test
+    @Suppress("deprecation")
     fun invalidIntentAction_fromDomainToApi() {
         val domain = AlertScreenEvent.AlertScreenEventType.INVALID_INTENT_ACTION
         val api = ApiAlertScreenEvent.ApiAlertScreenEvent.INVALID_INTENT_ACTION
@@ -164,6 +166,22 @@ class ApiAlertScreenEventTest {
     fun safetynetError_fromDomainToApi() {
         val domain = AlertScreenEvent.AlertScreenEventType.SAFETYNET_ERROR
         val api = ApiAlertScreenEvent.ApiAlertScreenEvent.SAFETYNET_ERROR
+
+        assertThat(fromDomainToApi(domain)).isEqualTo(api)
+    }
+
+    @Test
+    fun faceInvalidLicense_fromDomainToApi() {
+        val domain = AlertScreenEvent.AlertScreenEventType.FACE_INVALID_LICENSE
+        val api = ApiAlertScreenEvent.ApiAlertScreenEvent.FACE_INVALID_LICENSE
+
+        assertThat(fromDomainToApi(domain)).isEqualTo(api)
+    }
+
+    @Test
+    fun faceMissingLicense_fromDomainToApi() {
+        val domain = AlertScreenEvent.AlertScreenEventType.FACE_MISSING_LICENSE
+        val api = ApiAlertScreenEvent.ApiAlertScreenEvent.FACE_MISSING_LICENSE
 
         assertThat(fromDomainToApi(domain)).isEqualTo(api)
     }
