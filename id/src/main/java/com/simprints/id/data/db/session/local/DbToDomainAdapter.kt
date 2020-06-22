@@ -43,6 +43,7 @@ fun DbEvent.toDomainEvent(): Event? = jsonEvent?.let {
         EventType.FACE_ONBOARDING_COMPLETE -> JsonHelper.gson.fromJson(it, FaceOnboardingCompleteEvent::class.java)
         EventType.FACE_FALLBACK_CAPTURE -> JsonHelper.gson.fromJson(it, FaceFallbackCaptureEvent::class.java)
         EventType.FACE_CAPTURE -> JsonHelper.gson.fromJson(it, FaceCaptureEvent::class.java)
+        EventType.FACE_CAPTURE_CONFIRMATION -> JsonHelper.gson.fromJson(it, FaceCaptureConfirmationEvent::class.java)
         null -> null
     }
 }
