@@ -2,29 +2,35 @@ package com.simprints.id.data.db.session.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
-import com.simprints.id.data.db.session.remote.events.ApiAlertScreenEvent.ApiAlertScreenEvent.Companion.fromDomainToApi
+import com.simprints.id.data.db.session.remote.events.ApiAlertScreenEvent.ApiAlertScreenEventType.Companion.fromDomainToApi
 
 @Keep
-class ApiAlertScreenEvent(val relativeStartTime: Long,
-                          val alertType: ApiAlertScreenEvent) : ApiEvent(ApiEventType.ALERT_SCREEN) {
+class ApiAlertScreenEvent(
+    val relativeStartTime: Long,
+    val alertType: ApiAlertScreenEventType
+) : ApiEvent(ApiEventType.ALERT_SCREEN) {
 
     constructor(alertScreenEventDomain: AlertScreenEvent) :
-        this(alertScreenEventDomain.relativeStartTime ?: 0, fromDomainToApi(alertScreenEventDomain.alertType))
+        this(alertScreenEventDomain.relativeStartTime
+            ?: 0, fromDomainToApi(alertScreenEventDomain.alertType))
 
     @Keep
-    enum class ApiAlertScreenEvent {
+    enum class ApiAlertScreenEventType {
         DIFFERENT_PROJECT_ID,
         DIFFERENT_USER_ID,
         GUID_NOT_FOUND_ONLINE,
         GUID_NOT_FOUND_OFFLINE,
         BLUETOOTH_NOT_SUPPORTED,
         LOW_BATTERY,
+
         @Deprecated("Fingerprint module doesn't triggers it anymore")
         UNKNOWN_BLUETOOTH_ISSUE,
         UNEXPECTED_ERROR,
         DISCONNECTED,
+
         @Deprecated("Fingerprint module doesn't triggers it anymore")
         MULTIPLE_PAIRED_SCANNERS,
+
         @Deprecated("Fingerprint module doesn't triggers it anymore")
         NOT_PAIRED,
         BLUETOOTH_NOT_ENABLED,
@@ -34,6 +40,7 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
         OTA,
         OTA_RECOVERY,
         OTA_FAILED,
+
         @Deprecated("That can never been triggered, so to be removed soon")
         INVALID_INTENT_ACTION,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
@@ -50,7 +57,7 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
         FACE_MISSING_LICENSE;
 
         companion object {
-            fun fromDomainToApi(type: AlertScreenEvent.AlertScreenEventType): ApiAlertScreenEvent =
+            fun fromDomainToApi(type: AlertScreenEvent.AlertScreenEventType): ApiAlertScreenEventType =
                 when (type) {
                     AlertScreenEvent.AlertScreenEventType.DIFFERENT_PROJECT_ID -> DIFFERENT_PROJECT_ID
                     AlertScreenEvent.AlertScreenEventType.DIFFERENT_USER_ID -> DIFFERENT_USER_ID
