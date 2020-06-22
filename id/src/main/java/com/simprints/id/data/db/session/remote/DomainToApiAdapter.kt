@@ -44,4 +44,5 @@ fun Event.toApiEvent(): ApiEvent = when (this.type) {
     FACE_ONBOARDING_COMPLETE -> ApiFaceOnboardingCompleteEvent(this as FaceOnboardingCompleteEvent)
     FACE_FALLBACK_CAPTURE -> ApiFaceFallbackCaptureEvent(this as FaceFallbackCaptureEvent)
     FACE_CAPTURE -> ApiFaceCaptureEvent(this as FaceCaptureEvent)
+    FACE_CAPTURE_CONFIRMATION -> ApiFaceCaptureConfirmationEvent(this as FaceCaptureConfirmationEvent)
 }
