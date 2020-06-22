@@ -5,7 +5,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.sessionEvents.*
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPool
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPoolType
@@ -20,6 +19,8 @@ import com.simprints.id.data.db.session.remote.session.ApiDatabaseInfo
 import com.simprints.id.data.db.session.remote.session.ApiDevice
 import com.simprints.id.data.db.session.remote.session.ApiLocation
 import com.simprints.id.data.db.session.remote.session.ApiSessionEvents
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.testtools.TestApplication
@@ -457,7 +458,8 @@ class SessionEventsAdapterFactoryTest {
             "en",
             Device("28", "phone", "device_id"),
             0,
-            DatabaseInfo(0, 0)
+            DatabaseInfo(0, 0),
+            listOf(Modality.FINGER)
         )
         session.addEvent(
             AlertScreenEvent(
