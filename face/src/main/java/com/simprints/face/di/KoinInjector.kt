@@ -13,6 +13,8 @@ import com.simprints.face.controllers.core.preferencesManager.FacePreferencesMan
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManagerImpl
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.controllers.core.repository.FaceDbManagerImpl
+import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
+import com.simprints.face.controllers.core.timehelper.FaceTimeHelperImpl
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.detection.rankone.RankOneFaceDetector
 import com.simprints.face.exitform.ExitFormViewModel
@@ -63,6 +65,7 @@ object KoinInjector {
         factory<FaceImageManager> { FaceImageManagerImpl(get(), get()) }
         factory<FaceDbManager> { FaceDbManagerImpl(get()) }
         factory<FaceCrashReportManager> { FaceCrashReportManagerImpl(get()) }
+        factory<FaceTimeHelper> { FaceTimeHelperImpl(get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
