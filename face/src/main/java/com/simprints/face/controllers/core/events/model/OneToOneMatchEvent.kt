@@ -8,10 +8,15 @@ import com.simprints.id.data.db.session.domain.models.events.Matcher as CoreMatc
 import com.simprints.id.data.db.session.domain.models.events.OneToOneMatchEvent as CoreOneToOneMatchEvent
 
 @Keep
-class OneToOneMatchEvent(startTime: Long,
-                         endTime: Long,
-                         val query: Serializable,
-                         val result: MatchEntry?) : Event(EventType.ONE_TO_ONE_MATCH, startTime, endTime) {
+class OneToOneMatchEvent(
+    startTime: Long,
+    endTime: Long,
+    val query: Serializable,
+    val matcher: Matcher,
+    val result: MatchEntry?
+) : Event(EventType.ONE_TO_ONE_MATCH, startTime, endTime) {
+
+    // TODO: add matcher as a parameter of Core Match Event
     fun fromDomainToCore() = CoreOneToOneMatchEvent(
         startTime,
         endTime,
@@ -19,11 +24,9 @@ class OneToOneMatchEvent(startTime: Long,
         CoreMatcher.RANK_ONE, // TODO: implement Matcher in face module
         result?.fromDomainToCore()
     )
+
+    private fun SubjectLocalDataSource.Query.extractVerifyId() =
+        subjectId
+            ?: throw FaceUnexpectedException("null personId in candidate query when saving OneToOneMatchEvent")
+
 }
-
-
-fun SubjectLocalDataSource.Query.extractVerifyId() =
-    subjectId
-        ?: throw FaceUnexpectedException("null personId in candidate query when saving OneToOneMatchEvent")
-
-
