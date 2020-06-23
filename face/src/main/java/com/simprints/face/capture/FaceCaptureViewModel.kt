@@ -54,7 +54,6 @@ class FaceCaptureViewModel(
 
     fun flowFinished() {
         saveFaceDetections()
-        // TODO: add analytics for FlowFinished(SUCCESS) and EndSession
 
         val results = faceDetections.mapIndexed { index, detection ->
             FaceCaptureResult(index, detection.toFaceSample())
@@ -84,7 +83,6 @@ class FaceCaptureViewModel(
     }
 
     fun recapture() {
-        // TODO: add analytics for FlowFinished(RECAPTURE)
         crashReportManager.logMessageForCrashReport(
             FACE_CAPTURE,
             UI,
