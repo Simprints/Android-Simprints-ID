@@ -29,8 +29,8 @@ enum class FaceErrorReason {
     companion object {
         fun fromErrorType(errorType: ErrorType): FaceErrorReason =
             when (errorType) {
-                ErrorType.LICENSE_MISSING -> LICENSE_MISSING
-                ErrorType.LICENSE_INVALID -> LICENSE_INVALID
+                ErrorType.LicenseMissing -> LICENSE_MISSING
+                ErrorType.LicenseInvalid -> LICENSE_INVALID
             }
     }
 }
