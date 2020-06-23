@@ -3,12 +3,10 @@ package com.simprints.id.secure.securitystate.repository
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.secure.models.SecurityState
+import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
@@ -20,6 +18,7 @@ import retrofit2.HttpException
 class SecurityStateRepositoryImplTest {
 
     @MockK lateinit var mockRemoteDataSource: SecurityStateRemoteDataSource
+    @MockK lateinit var mockLocalDataSource: SecurityStateLocalDataSource
     @MockK lateinit var mockChannel: Channel<SecurityState.Status>
 
     private lateinit var repository: SecurityStateRepositoryImpl
@@ -28,7 +27,7 @@ class SecurityStateRepositoryImplTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
-        repository = SecurityStateRepositoryImpl(mockRemoteDataSource).apply {
+        repository = SecurityStateRepositoryImpl(mockRemoteDataSource, mockLocalDataSource).apply {
             securityStatusChannel = mockChannel
         }
     }
@@ -41,6 +40,17 @@ class SecurityStateRepositoryImplTest {
         val securityState = repository.getSecurityState()
 
         assertThat(securityState).isEqualTo(expected)
+    }
+
+    @Test
+    fun getSecurityState_shouldUpdateLocalDataSource() = runBlocking {
+        val status = SecurityState.Status.RUNNING
+        val state = SecurityState(DEVICE_ID, status)
+        coEvery { mockRemoteDataSource.getSecurityState() } returns state
+
+        repository.getSecurityState()
+
+        verify { mockLocalDataSource.setSecurityStatus(status) }
     }
 
     @Test(expected = SimprintsInternalServerException::class)
