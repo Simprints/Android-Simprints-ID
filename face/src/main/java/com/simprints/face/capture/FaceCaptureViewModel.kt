@@ -37,10 +37,10 @@ class FaceCaptureViewModel(
     val finishFlowWithExitFormEvent: MutableLiveData<LiveDataEventWithContent<FaceExitFormResponse>> =
         MutableLiveData()
 
-    private var retriesUsed: Int = 0
+    var attemptNumber: Int = 0
 
     val canRetry: Boolean
-        get() = retriesUsed++ < maxRetries
+        get() = attemptNumber++ < maxRetries
 
     var samplesToCapture = 1
 
