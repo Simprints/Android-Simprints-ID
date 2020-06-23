@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.session.domain.models.events
 
-import androidx.annotation.Keep
-
-@Keep
-enum class EventType {
+enum class EventPayloadType {
+    ENROLMENT_RECORD_CREATION,
+    ENROLMENT_RECORD_DELETION,
+    ENROLMENT_RECORD_MOVE,
     ARTIFICIAL_TERMINATION,
     AUTHENTICATION,
     CONSENT,

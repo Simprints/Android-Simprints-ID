@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.subject
 
 import com.simprints.core.tools.EncodingUtils
+import com.simprints.id.data.db.session.domain.models.events.Events
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
@@ -70,18 +71,18 @@ class SubjectRepositoryUpSyncHelperImpl(
     }
 
     internal fun createEvents(subjects: List<Subject>) =
-        Events(subjects.map { createEventFromPerson(it) })
+            Events(subjects.map { createEventFromPerson(it) })
 
     private fun createEventFromPerson(subject: Subject): Event =
         with(subject) {
             Event(
-                getRandomUuid(),
-                listOf(projectId),
-                listOf(subjectId),
-                listOf(attendantId),
-                listOf(moduleId),
-                modalities.map { it.toMode() },
-                createPayload(subject)
+                    getRandomUuid(),
+                    listOf(projectId),
+                    listOf(subjectId),
+                    listOf(attendantId),
+                    listOf(moduleId),
+                    modalities.map { it.toMode() },
+                    createPayload(subject)
             )
         }
 

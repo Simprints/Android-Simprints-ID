@@ -1,6 +1,5 @@
 package com.simprints.id.data.db.session.domain.models
 
-import com.simprints.id.data.db.session.domain.models.events.EventType
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.exceptions.safe.session.validator.GuidSelectEventValidatorException
 

@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.session.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.events.callout.*
 import com.simprints.id.data.db.session.remote.events.callout.*
 import java.lang.IllegalArgumentException

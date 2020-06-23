@@ -3,7 +3,6 @@ package com.simprints.id.commontesttools.sessionEvents
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.simprints.id.data.db.session.domain.models.events.EventType
 import com.simprints.id.data.db.session.remote.events.ApiAlertScreenEvent
 import com.simprints.id.data.db.session.remote.events.ApiArtificialTerminationEvent
 import com.simprints.id.data.db.session.remote.events.ApiAuthenticationEvent

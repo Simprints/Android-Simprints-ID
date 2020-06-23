@@ -1,21 +1,36 @@
 package com.simprints.id.data.db.session.domain.models.events
 
 import androidx.annotation.Keep
+import java.util.*
 
 @Keep
-class RefusalEvent(startTime: Long,
-                   endTime: Long,
-                   val reason: Answer,
-                   val otherText: String) : Event(EventType.REFUSAL, startTime, endTime) {
+class RefusalEvent(
+    startTime: Long,
+    endTime: Long,
+    reason: RefusalPayload.Answer,
+    otherText: String,
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+) : Event(
+    UUID.randomUUID().toString(),
+    listOf(EventLabel.SessionId(sessionId)),
+    RefusalPayload(startTime, endTime, reason, otherText)) {
+
 
     @Keep
-    enum class Answer {
-        REFUSED_RELIGION,
-        REFUSED_DATA_CONCERNS,
-        REFUSED_PERMISSION,
-        SCANNER_NOT_WORKING,
-        REFUSED_NOT_PRESENT,
-        REFUSED_YOUNG,
-        OTHER
+    class RefusalPayload(val startTime: Long,
+                         val endTime: Long,
+                         val reason: Answer,
+                         val otherText: String) : EventPayload(EventPayloadType.REFUSAL) {
+
+        @Keep
+        enum class Answer {
+            REFUSED_RELIGION,
+            REFUSED_DATA_CONCERNS,
+            REFUSED_PERMISSION,
+            SCANNER_NOT_WORKING,
+            REFUSED_NOT_PRESENT,
+            REFUSED_YOUNG,
+            OTHER
+        }
     }
 }

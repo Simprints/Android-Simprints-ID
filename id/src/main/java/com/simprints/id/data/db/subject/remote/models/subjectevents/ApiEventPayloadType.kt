@@ -2,7 +2,7 @@ package com.simprints.id.data.db.subject.remote.models.subjectevents
 
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
-import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType
+import com.simprints.id.data.db.session.domain.models.events.EventPayloadType
 import com.simprints.id.data.db.subject.remote.models.subjectevents.SerialisedApiNames.ENROLMENT_RECORD_CREATION_SERIALISED
 import com.simprints.id.data.db.subject.remote.models.subjectevents.SerialisedApiNames.ENROLMENT_RECORD_DELETION_SERIALISED
 import com.simprints.id.data.db.subject.remote.models.subjectevents.SerialisedApiNames.ENROLMENT_RECORD_MOVE_SERIALISED

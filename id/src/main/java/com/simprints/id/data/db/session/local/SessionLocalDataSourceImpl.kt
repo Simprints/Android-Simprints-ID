@@ -6,7 +6,6 @@ import com.simprints.id.data.db.session.SessionRepositoryImpl
 import com.simprints.id.data.db.session.domain.models.SessionEventValidator
 import com.simprints.id.data.db.session.domain.models.SessionQuery
 import com.simprints.id.data.db.session.domain.models.events.ArtificialTerminationEvent
-import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.session.domain.models.session.Device
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents

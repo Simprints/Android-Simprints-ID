@@ -1,5 +1,7 @@
 package com.simprints.id.data.db.subject.domain.subjectevents
 
+import com.simprints.id.data.db.session.domain.models.events.EventPayload
+import com.simprints.id.data.db.session.domain.models.events.EventPayloadType
 import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordCreationPayload
 
 data class EnrolmentRecordCreationPayload(

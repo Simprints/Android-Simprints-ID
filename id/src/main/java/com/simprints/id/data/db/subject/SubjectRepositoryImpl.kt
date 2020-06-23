@@ -9,8 +9,8 @@ import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.Subject.Companion.buildSubjectFromCreationPayload
 import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordMovePayload
-import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.*
-import com.simprints.id.data.db.subject.domain.subjectevents.fromApiToDomainOrNullIfNoBiometricReferences
+import com.simprints.id.data.db.session.domain.models.events.EventPayloadType.*
+import com.simprints.id.data.db.session.domain.models.events.fromApiToDomainOrNullIfNoBiometricReferences
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
