@@ -8,7 +8,6 @@ import com.simprints.core.tools.extentions.area
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
-import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
@@ -55,11 +54,12 @@ class LiveFeedbackFragmentViewModel(
         val potentialFace = faceDetector.analyze(previewFrame)
 
         val faceDetection = getFaceDetectionFromPotentialFace(potentialFace, previewFrame)
+        faceDetection.detectionStartTime = captureStartTime
+        faceDetection.detectionEndTime = faceTimeHelper.now()
 
         when (capturingState.value) {
             CapturingState.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
             CapturingState.CAPTURING -> {
-                sendUserCaptureEvent(captureStartTime, faceDetection)
                 userCaptures += faceDetection
                 if (userCaptures.size == mainVM.samplesToCapture) {
                     finishCapture()
@@ -81,13 +81,15 @@ class LiveFeedbackFragmentViewModel(
     }
 
     /**
-     * If any of the user captures are good, use them. If not, use the fallback capture
+     * If any of the user captures are good, use them. If not, use the fallback capture.
      */
     private fun finishCapture() {
         val sortedQualifyingCaptures = userCaptures
             .filter { it.hasValidStatus() && it.isAboveQualityThreshold(qualityThreshold) }
             .sortedByDescending { it.face?.quality }
             .ifEmpty { listOf(fallbackCapture) }
+
+        sendAllCaptureEvents()
 
         capturingState.value = CapturingState.FINISHED
         mainVM.captureFinished(sortedQualifyingCaptures)
@@ -161,20 +163,18 @@ class LiveFeedbackFragmentViewModel(
         )
     }
 
-    private fun sendUserCaptureEvent(startTime: Long, faceDetection: FaceDetection) {
-        val faceCaptureEvent = FaceCaptureEvent(
-            startTime,
-            faceTimeHelper.now(),
-            mainVM.attemptNumber,
-            qualityThreshold,
-            FaceCaptureEvent.Result.fromFaceDetectionStatus(faceDetection.status),
-            false,
-            FaceCaptureEvent.EventFace.fromFaceDetectionFace(faceDetection.face)
-        )
+    private fun sendCaptureEvent(faceDetection: FaceDetection) {
+        val faceCaptureEvent =
+            faceDetection.toFaceCaptureEvent(mainVM.attemptNumber, qualityThreshold)
 
         faceSessionEventsManager.addEventInBackground(faceCaptureEvent)
 
         faceDetection.id = faceCaptureEvent.id
+    }
+
+    private fun sendAllCaptureEvents() {
+        userCaptures.forEach { sendCaptureEvent(it) }
+        sendCaptureEvent(fallbackCapture)
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED, FINISHED_FAILED }
