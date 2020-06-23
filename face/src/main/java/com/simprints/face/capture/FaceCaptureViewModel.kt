@@ -97,19 +97,15 @@ class FaceCaptureViewModel(
     }
 
     private fun retryFlow() {
-        // TODO: add analytics for FlowFinished(RETRY)
         faceDetections = listOf()
         retryFlowEvent.send()
     }
 
-    // TODO: should have a better understanding on what to do after failed all retries
     private fun finishFlowWithFailedRetries() {
-        // TODO: add analytics for FlowFinished(RETRY_FAIL)
         flowFinished()
     }
 
     private fun startNewAnalyticsSession() {
-        // TODO: add analytics for StartSession
         crashReportManager.logMessageForCrashReport(
             FACE_CAPTURE,
             UI,
