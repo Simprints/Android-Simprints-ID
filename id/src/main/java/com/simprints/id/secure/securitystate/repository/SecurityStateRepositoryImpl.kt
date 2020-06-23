@@ -1,6 +1,7 @@
 package com.simprints.id.secure.securitystate.repository
 
 import com.simprints.id.secure.models.SecurityState
+import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,19 +11,22 @@ import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 class SecurityStateRepositoryImpl(
-    private val remoteDataSource: SecurityStateRemoteDataSource
+    private val remoteDataSource: SecurityStateRemoteDataSource,
+    private val localDataSource: SecurityStateLocalDataSource
 ) : SecurityStateRepository {
 
     override var securityStatusChannel: Channel<SecurityState.Status> = Channel(Channel.CONFLATED)
 
     init {
         CoroutineScope(Dispatchers.Main).launch {
-            securityStatusChannel.update(SecurityState.Status.RUNNING)
+            val securityStatus = localDataSource.getSecurityStatus()
+            securityStatusChannel.update(securityStatus)
         }
     }
 
     override suspend fun getSecurityState(): SecurityState {
         return remoteDataSource.getSecurityState().also {
+            localDataSource.setSecurityStatus(it.status)
             securityStatusChannel.update(it.status)
         }
     }

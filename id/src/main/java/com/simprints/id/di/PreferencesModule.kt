@@ -20,6 +20,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintIm
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
+import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 import dagger.Module
@@ -78,7 +79,8 @@ open class PreferencesModule {
         @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
         @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         @Named("SaveFingerprintImagesStrategySerializer") saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
-        @Named("ScannerGenerationsSerializer") scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
+        @Named("ScannerGenerationsSerializer") scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
+        @Named("SecurityStatusSerializer") securityStatusSerializer: Serializer<SecurityState.Status>
     ): SettingsPreferencesManager = SettingsPreferencesManagerImpl(
         prefs,
         remoteConfigWrapper,
@@ -90,7 +92,8 @@ open class PreferencesModule {
         subjectsDownSyncSettingSerializer,
         captureFingerprintStrategySerializer,
         saveFingerprintImagesStrategySerializer,
-        scannerGenerationsSerializer
+        scannerGenerationsSerializer,
+        securityStatusSerializer
     )
 
     @Provides
