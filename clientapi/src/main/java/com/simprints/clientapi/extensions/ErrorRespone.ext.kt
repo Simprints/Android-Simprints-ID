@@ -19,7 +19,9 @@ internal fun ErrorResponse.isFlowCompletedWithCurrentError(): Boolean =
         ErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED,
         ErrorResponse.Reason.INVALID_STATE_FOR_INTENT_ACTION,
         ErrorResponse.Reason.ENROLMENT_LAST_BIOMETRICS_FAILED,
-        ErrorResponse.Reason.GUID_NOT_FOUND_ONLINE -> Constants.RETURN_FOR_FLOW_COMPLETED
+        ErrorResponse.Reason.GUID_NOT_FOUND_ONLINE,
+        ErrorResponse.Reason.FACE_LICENSE_MISSING, // TODO: confirm
+        ErrorResponse.Reason.FACE_LICENSE_INVALID -> Constants.RETURN_FOR_FLOW_COMPLETED
         ErrorResponse.Reason.LOGIN_NOT_COMPLETE,
         ErrorResponse.Reason.ROOTED_DEVICE -> Constants.RETURN_FOR_FLOW_NOT_COMPLETED
     }
