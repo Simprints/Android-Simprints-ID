@@ -161,21 +161,20 @@ class LiveFeedbackFragmentViewModel(
         )
     }
 
-    private fun sendUserCaptureEvent(
-        startTime: Long,
-        faceDetection: FaceDetection
-    ) {
-        faceSessionEventsManager.addEventInBackground(
-            FaceCaptureEvent(
-                startTime,
-                faceTimeHelper.now(),
-                mainVM.attemptNumber,
-                qualityThreshold,
-                FaceCaptureEvent.Result.fromFaceDetectionStatus(faceDetection.status),
-                false,
-                FaceCaptureEvent.EventFace.fromFaceDetectionFace(faceDetection.face)
-            )
+    private fun sendUserCaptureEvent(startTime: Long, faceDetection: FaceDetection) {
+        val faceCaptureEvent = FaceCaptureEvent(
+            startTime,
+            faceTimeHelper.now(),
+            mainVM.attemptNumber,
+            qualityThreshold,
+            FaceCaptureEvent.Result.fromFaceDetectionStatus(faceDetection.status),
+            false,
+            FaceCaptureEvent.EventFace.fromFaceDetectionFace(faceDetection.face)
         )
+
+        faceSessionEventsManager.addEventInBackground(faceCaptureEvent)
+
+        faceDetection.id = faceCaptureEvent.id
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED, FINISHED_FAILED }

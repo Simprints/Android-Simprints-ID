@@ -119,13 +119,8 @@ class FaceCaptureViewModel(
             UI,
             message = "Saving captures to disk"
         )
-        // TODO: send the correct captureEventId once we can get it
-        faceDetections.forEachIndexed { index, faceDetection ->
-            saveImage(
-                faceDetection,
-                index.toString()
-            )
-        }
+
+        faceDetections.forEach { saveImage(it, it.id) }
     }
 
     private fun saveImage(faceDetection: FaceDetection, captureEventId: String) {

@@ -12,7 +12,8 @@ data class FaceDetection(
     val status: Status,
     var securedImageRef: SecuredImageRef? = null,
     val detectionTime: Long = System.currentTimeMillis(),
-    var isFallback: Boolean = false
+    var isFallback: Boolean = false,
+    var id: String = UUID.randomUUID().toString()
 ) {
     enum class Status {
         VALID,
@@ -25,7 +26,7 @@ data class FaceDetection(
     }
 
     fun toFaceSample(): FaceSample =
-        FaceSample(UUID.randomUUID().toString(), face?.template ?: ByteArray(0), securedImageRef)
+        FaceSample(id, face?.template ?: ByteArray(0), securedImageRef)
 
     fun hasValidStatus(): Boolean = status == Status.VALID || status == Status.VALID_CAPTURING
     fun isAboveQualityThreshold(qualityThreshold: Float): Boolean =
