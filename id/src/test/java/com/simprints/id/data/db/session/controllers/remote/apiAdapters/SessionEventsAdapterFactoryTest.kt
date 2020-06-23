@@ -322,6 +322,7 @@ class SessionEventsAdapterFactoryTest {
             10,
             10,
             MatchPool(MatchPoolType.MODULE, 10),
+            Matcher.SIM_AFIS,
             listOf(MatchEntry(UUID.randomUUID().toString(), 10F))
         )
         val apiEvent = ApiOneToManyMatchEvent(event)

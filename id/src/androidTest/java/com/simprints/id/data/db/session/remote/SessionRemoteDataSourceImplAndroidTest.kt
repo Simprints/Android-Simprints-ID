@@ -8,13 +8,13 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.session.SessionRepositoryImpl
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.ScannerConnectionEvent.ScannerGeneration
 import com.simprints.id.data.db.session.domain.models.events.callback.*
 import com.simprints.id.data.db.session.domain.models.events.callout.*
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
@@ -230,7 +230,13 @@ class SessionRemoteDataSourceImplAndroidTest {
 
     private fun SessionEvents.addOneToManyMatchEvent() {
         OneToManyMatchEvent.MatchPoolType.values().forEach {
-            addEvent(OneToManyMatchEvent(0, 0, OneToManyMatchEvent.MatchPool(it, 0), emptyList()))
+            addEvent(OneToManyMatchEvent(
+                0,
+                0,
+                OneToManyMatchEvent.MatchPool(it, 0),
+                Matcher.SIM_AFIS,
+                emptyList()
+            ))
         }
     }
 
