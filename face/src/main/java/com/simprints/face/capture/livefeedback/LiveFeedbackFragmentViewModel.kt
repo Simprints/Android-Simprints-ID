@@ -8,6 +8,7 @@ import com.simprints.core.tools.extentions.area
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
+import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
@@ -48,6 +49,7 @@ class LiveFeedbackFragmentViewModel(
         faceRectF: RectF,
         size: Size
     ) {
+        val captureStartTime = faceTimeHelper.now()
         val previewFrame = frameProcessor.previewFrameFrom(frame, faceRectF, size, false)
 
         val potentialFace = faceDetector.analyze(previewFrame)
@@ -57,6 +59,7 @@ class LiveFeedbackFragmentViewModel(
         when (capturingState.value) {
             CapturingState.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
             CapturingState.CAPTURING -> {
+                sendUserCaptureEvent(captureStartTime, faceDetection)
                 userCaptures += faceDetection
                 if (userCaptures.size == mainVM.samplesToCapture) {
                     finishCapture()
@@ -154,6 +157,23 @@ class LiveFeedbackFragmentViewModel(
             FaceFallbackCaptureEvent(
                 fallbackCaptureEventStartTime,
                 faceTimeHelper.now()
+            )
+        )
+    }
+
+    private fun sendUserCaptureEvent(
+        startTime: Long,
+        faceDetection: FaceDetection
+    ) {
+        faceSessionEventsManager.addEventInBackground(
+            FaceCaptureEvent(
+                startTime,
+                faceTimeHelper.now(),
+                mainVM.attemptNumber,
+                qualityThreshold,
+                FaceCaptureEvent.Result.fromFaceDetectionStatus(faceDetection.status),
+                false,
+                FaceCaptureEvent.EventFace.fromFaceDetectionFace(faceDetection.face)
             )
         )
     }
