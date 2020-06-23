@@ -7,6 +7,8 @@ import com.simprints.face.controllers.core.androidResources.FaceAndroidResources
 import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelperImpl
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManagerImpl
+import com.simprints.face.controllers.core.events.FaceSessionEventsManager
+import com.simprints.face.controllers.core.events.FaceSessionEventsManagerImpl
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.controllers.core.image.FaceImageManagerImpl
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
@@ -66,6 +68,7 @@ object KoinInjector {
         factory<FaceDbManager> { FaceDbManagerImpl(get()) }
         factory<FaceCrashReportManager> { FaceCrashReportManagerImpl(get()) }
         factory<FaceTimeHelper> { FaceTimeHelperImpl(get()) }
+        factory<FaceSessionEventsManager> { FaceSessionEventsManagerImpl(get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
