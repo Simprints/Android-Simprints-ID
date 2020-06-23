@@ -8,6 +8,8 @@ import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.face.FixtureGenerator.getFace
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
+import com.simprints.face.controllers.core.events.FaceSessionEventsManager
+import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
@@ -35,8 +37,18 @@ class LiveFeedbackFragmentViewModelTest {
     private val qualityThreshold = -1f
     private val faceDetector: FaceDetector = mockk()
     private val frameProcessor: FrameProcessor = mockk()
-    private val viewModel =
-        LiveFeedbackFragmentViewModel(mainVM, faceDetector, frameProcessor, qualityThreshold)
+    private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxUnitFun = true)
+    private val faceTimeHelper: FaceTimeHelper = mockk() {
+        every { now() } returns 0
+    }
+    private val viewModel = LiveFeedbackFragmentViewModel(
+        mainVM,
+        faceDetector,
+        frameProcessor,
+        qualityThreshold,
+        faceSessionEventsManager,
+        faceTimeHelper
+    )
 
     private val rectF: RectF = mockk()
     private val frame: Frame = mockk()
