@@ -7,9 +7,7 @@ import com.google.android.play.core.ktx.requestSessionStates
 import com.google.android.play.core.ktx.status
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallRequest
-import com.google.android.play.core.splitinstall.model.SplitInstallErrorCode.NETWORK_ERROR
 import com.google.android.play.core.splitinstall.model.SplitInstallErrorCode.NO_ERROR
-import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.*
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -40,13 +38,21 @@ class SetupViewModel(private val deviceManager: DeviceManager,
         if (modalitiesToDownload.isNotEmpty()) {
             logMessageForCrashReport("Modalities to download: $modalitiesToDownload")
             modalitiesToDownload.forEach { splitInstallRequestBuilder.addModule(it) }
-            splitInstallManager.startInstall(splitInstallRequestBuilder.build())
+            startDownloadingModules(splitInstallManager, splitInstallRequestBuilder.build())
             monitorDownloadProgress(splitInstallManager)
             monitorNetworkState()
         } else {
             logMessageForCrashReport("Modalities $modalitiesRequired already installed")
             viewStateLiveData.value = ModalitiesInstalled
         }
+    }
+
+    private fun startDownloadingModules(splitInstallManager: SplitInstallManager,
+                                        request: SplitInstallRequest) {
+        splitInstallManager.startInstall(request)
+            .addOnFailureListener {
+                startDownloadingModules(splitInstallManager, request)
+            }
     }
 
     @SuppressLint("SwitchIntDef")
@@ -70,12 +76,6 @@ class SetupViewModel(private val deviceManager: DeviceManager,
                         INSTALLING -> {
                             logMessageForCrashReport("Installing modalities")
                             viewStateLiveData.postValue(ModalitiesInstalling)
-                        }
-                        FAILED -> {
-                            Timber.d("Split install fail: ${state.errorCode()}")
-                            if (state.errorCode() != NETWORK_ERROR) {
-
-                            }
                         }
                         PENDING -> {
                             logMessageForCrashReport("Starting modality download")
@@ -102,14 +102,15 @@ class SetupViewModel(private val deviceManager: DeviceManager,
 
     fun startDownloadIfNecessary(splitInstallManager: SplitInstallManager, modalitiesRequired: List<String>) {
         viewModelScope.launch {
-            if (isModalityInstallOnGoing(splitInstallManager)) {
+            Timber.d("Modality install ongoing: ${isModalityInstallOnGoing(splitInstallManager)}")
+            if (!isModalityInstallOnGoing(splitInstallManager)) {
                 start(splitInstallManager, modalitiesRequired)
             }
         }
     }
 
     private suspend fun isModalityInstallOnGoing(splitInstallManager: SplitInstallManager) =
-        splitInstallManager.requestSessionStates().none {
+        splitInstallManager.requestSessionStates().last().let {
             (it.status == INSTALLED || it.status == INSTALLING || it.status == PENDING) && it.errorCode() == NO_ERROR
         }
 }
