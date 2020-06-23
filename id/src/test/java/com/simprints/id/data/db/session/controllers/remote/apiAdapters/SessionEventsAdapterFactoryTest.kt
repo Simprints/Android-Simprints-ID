@@ -350,7 +350,8 @@ class SessionEventsAdapterFactoryTest {
     fun validate_personCreationEventApiModel() {
         val event = PersonCreationEvent(
             10,
-            listOf(UUID.randomUUID().toString())
+            listOf(UUID.randomUUID().toString()),
+            null
         )
         val apiEvent = ApiPersonCreationEvent(event)
 
