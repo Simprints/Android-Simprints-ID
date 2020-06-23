@@ -128,7 +128,6 @@ class SessionRemoteDataSourceImplAndroidTest {
         }
     }
 
-
     private suspend fun executeUpload(sessions: MutableList<SessionEvents>) {
         sessionRemoteDataSource.uploadSessions(testProject.id, sessions)
     }
@@ -241,7 +240,13 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     private fun SessionEvents.addOneToOneMatchEvent() {
-        addEvent(OneToOneMatchEvent(0, 0, RANDOM_GUID, MatchEntry(RANDOM_GUID, 0F)))
+        addEvent(OneToOneMatchEvent(
+            0,
+            0,
+            RANDOM_GUID,
+            Matcher.SIM_AFIS,
+            MatchEntry(RANDOM_GUID, 0F)
+        ))
     }
 
     private fun SessionEvents.addPersonCreationEvent() {
