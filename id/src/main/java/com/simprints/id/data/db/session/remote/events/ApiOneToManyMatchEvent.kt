@@ -4,10 +4,13 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent
 
 @Keep
-class ApiOneToManyMatchEvent(val relativeStartTime: Long,
-                             val relativeEndTime: Long,
-                             val pool: ApiMatchPool,
-                             val result: List<ApiMatchEntry>?): ApiEvent(ApiEventType.ONE_TO_MANY_MATCH) {
+class ApiOneToManyMatchEvent(
+    val relativeStartTime: Long,
+    val relativeEndTime: Long,
+    val pool: ApiMatchPool,
+    val matcher: ApiMatcher,
+    val result: List<ApiMatchEntry>?
+) : ApiEvent(ApiEventType.ONE_TO_MANY_MATCH) {
 
     @Keep
     class ApiMatchPool(val type: ApiMatchPoolType, val count: Int) {
@@ -26,5 +29,6 @@ class ApiOneToManyMatchEvent(val relativeStartTime: Long,
         this(oneToManyMatchEvent.relativeStartTime ?: 0,
             oneToManyMatchEvent.relativeEndTime ?: 0,
             ApiMatchPool(oneToManyMatchEvent.pool),
+            ApiMatcher.valueOf(oneToManyMatchEvent.matcher.name),
             oneToManyMatchEvent.result?.map { ApiMatchEntry(it) })
 }
