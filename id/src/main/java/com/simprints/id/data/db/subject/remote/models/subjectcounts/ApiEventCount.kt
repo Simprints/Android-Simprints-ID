@@ -2,7 +2,7 @@ package com.simprints.id.data.db.subject.remote.models.subjectcounts
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType
+import com.simprints.id.data.db.session.domain.models.events.EventPayloadType
 import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEventPayloadType
 
 @Keep

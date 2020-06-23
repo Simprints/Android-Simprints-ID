@@ -2,7 +2,6 @@ package com.simprints.id.data.db.session.domain.models.session
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.session.domain.models.events.Event
-import com.simprints.id.data.db.session.domain.models.events.EventType
 import com.simprints.id.tools.TimeHelper
 import java.util.*
 

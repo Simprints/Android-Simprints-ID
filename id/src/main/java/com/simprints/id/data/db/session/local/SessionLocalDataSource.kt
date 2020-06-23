@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.session.local
 
 import com.simprints.id.data.db.session.domain.models.SessionQuery
-import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import kotlinx.coroutines.flow.Flow
 

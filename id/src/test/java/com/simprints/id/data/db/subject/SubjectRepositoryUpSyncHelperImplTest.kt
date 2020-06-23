@@ -3,6 +3,7 @@ package com.simprints.id.data.db.subject
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.EncodingUtils
+import com.simprints.id.data.db.session.domain.models.events.Events
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.FingerprintSample
@@ -193,13 +194,13 @@ class SubjectRepositoryUpSyncHelperImplTest {
     private fun createEventFromSubject(subject: Subject): Event =
         with(subject) {
             Event(
-                "random_uuid",
-                listOf(projectId),
-                listOf(subjectId),
-                listOf(attendantId),
-                listOf(moduleId),
-                modalities.map { it.toMode() },
-                createPayload(subject)
+                    "random_uuid",
+                    listOf(projectId),
+                    listOf(subjectId),
+                    listOf(attendantId),
+                    listOf(moduleId),
+                    modalities.map { it.toMode() },
+                    createPayload(subject)
             )
         }
 

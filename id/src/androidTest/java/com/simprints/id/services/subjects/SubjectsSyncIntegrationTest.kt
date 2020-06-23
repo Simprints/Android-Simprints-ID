@@ -25,7 +25,7 @@ import com.simprints.id.commontesttools.di.TestSyncModule
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
-import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.ENROLMENT_RECORD_CREATION
+import com.simprints.id.data.db.session.domain.models.events.EventPayloadType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteInterface
 import com.simprints.id.data.db.subject.remote.models.subjectcounts.ApiEventCount
@@ -36,7 +36,6 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState

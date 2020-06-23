@@ -1,13 +1,7 @@
 package com.simprints.id.data.db.subject.remote.models.subjectevents
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.subject.domain.subjectevents.Event
-import com.simprints.id.data.db.subject.domain.subjectevents.Events
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent.Companion.ATTENDANT_ID_LABEL
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent.Companion.MODE_LABEL
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent.Companion.MODULE_ID_LABEL
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent.Companion.PROJECT_ID_LABEL
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent.Companion.SUBJECT_ID_LABEL
+import com.simprints.id.data.db.session.domain.models.events.Events
 
 @Keep
 class ApiEvents(val events: List<ApiEvent>)

@@ -1,15 +1,28 @@
 package com.simprints.id.data.db.session.domain.models.events
 
 import androidx.annotation.Keep
+import java.util.*
 
 @Keep
 class ArtificialTerminationEvent(
     startTime: Long,
-    val reason: Reason
-) : Event(EventType.ARTIFICIAL_TERMINATION, startTime) {
+    reason: ArtificialTerminationPayload.Reason,
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+) : Event(
+    UUID.randomUUID().toString(),
+    listOf(EventLabel.SessionId(sessionId)),
+    ArtificialTerminationPayload(startTime, reason)) {
+
 
     @Keep
-    enum class Reason {
-        TIMED_OUT, NEW_SESSION
+    class ArtificialTerminationPayload(
+        val startTime: Long,
+        val reason: Reason
+    ) : EventPayload(EventPayloadType.ARTIFICIAL_TERMINATION) {
+
+        @Keep
+        enum class Reason {
+            TIMED_OUT, NEW_SESSION
+        }
     }
 }

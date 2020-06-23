@@ -1,6 +1,8 @@
 package com.simprints.id.data.db.subject.domain.subjectevents
 
 import androidx.annotation.Keep
+import com.simprints.id.data.db.session.domain.models.events.EventPayload
+import com.simprints.id.data.db.session.domain.models.events.fromApiToDomainOrNullIfNoBiometricReferences
 import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
 import com.simprints.id.domain.modality.Modes
 

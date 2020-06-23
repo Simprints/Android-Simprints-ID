@@ -1,19 +1,32 @@
 package com.simprints.id.data.db.session.domain.models.events
 
 import androidx.annotation.Keep
+import java.util.*
 
 @Keep
-class ScannerConnectionEvent(startTime: Long,
-                             val scannerInfo: ScannerInfo) : Event(EventType.SCANNER_CONNECTION, startTime) {
+class ScannerConnectionEvent(
+    startTime: Long,
+    scannerInfo: ScannerConnectionPayload.ScannerInfo,
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+) : Event(
+    UUID.randomUUID().toString(),
+    listOf(EventLabel.SessionId(sessionId)),
+    ScannerConnectionPayload(startTime, scannerInfo)) {
+
 
     @Keep
-    class ScannerInfo(val scannerId: String,
-                      val macAddress: String,
-                      val generation: ScannerGeneration,
-                      var hardwareVersion: String?)
+    class ScannerConnectionPayload(val startTime: Long,
+                                   val scannerInfo: ScannerInfo) : EventPayload(EventPayloadType.SCANNER_CONNECTION) {
 
-    enum class ScannerGeneration {
-        VERO_1,
-        VERO_2
+        @Keep
+        class ScannerInfo(val scannerId: String,
+                          val macAddress: String,
+                          val generation: ScannerGeneration,
+                          var hardwareVersion: String?)
+
+        enum class ScannerGeneration {
+            VERO_1,
+            VERO_2
+        }
     }
 }

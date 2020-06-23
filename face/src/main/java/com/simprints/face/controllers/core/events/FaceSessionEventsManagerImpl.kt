@@ -5,7 +5,6 @@ import com.simprints.face.controllers.core.events.model.EventType.*
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.tools.ignoreException
 import kotlinx.coroutines.runBlocking
-import com.simprints.id.data.db.session.domain.models.events.Event as CoreEvent
 
 class FaceSessionEventsManagerImpl(private val sessionRepository: SessionRepository) : FaceSessionEventsManager {
 

@@ -2,7 +2,7 @@ package com.simprints.id.data.db.subject.remote
 
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
-import com.simprints.id.data.db.subject.domain.subjectevents.Events
+import com.simprints.id.data.db.session.domain.models.events.Events
 import java.io.InputStream
 
 interface EventRemoteDataSource {
