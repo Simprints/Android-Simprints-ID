@@ -88,7 +88,9 @@ object KoinInjector {
                 mainVM,
                 get(),
                 get(),
-                get<FacePreferencesManager>().qualityThreshold
+                get<FacePreferencesManager>().qualityThreshold,
+                get(),
+                get()
             )
         }
         viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM, get()) }
