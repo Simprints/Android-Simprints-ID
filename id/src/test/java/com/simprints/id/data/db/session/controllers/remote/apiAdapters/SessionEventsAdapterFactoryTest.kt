@@ -337,6 +337,7 @@ class SessionEventsAdapterFactoryTest {
             10,
             10,
             UUID.randomUUID().toString(),
+            Matcher.SIM_AFIS,
             MatchEntry(UUID.randomUUID().toString(), 10F)
         )
         val apiEvent = ApiOneToOneMatchEvent(event)

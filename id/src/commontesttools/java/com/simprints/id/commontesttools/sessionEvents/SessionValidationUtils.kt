@@ -294,10 +294,11 @@ fun validateOneToOneMatchEventApiModel(json: JsonObject) {
     assertThat(json.get("relativeStartTime").asLong)
     assertThat(json.get("relativeEndTime").asLong)
     assertThat(json.get("candidateId").asString.isGuid()).isTrue()
+    assertThat(json.get("matcher").asString).isAnyOf("SIM_AFIS", "RANK_ONE")
     with(json.get("result").asJsonObject) {
         validateMatchEntryApiModel(this)
     }
-    assertThat(json.size()).isEqualTo(5)
+    assertThat(json.size()).isEqualTo(6)
 }
 
 fun validatePersonCreationEvent(json: JsonObject) {
