@@ -132,8 +132,8 @@ class LiveFeedbackFragmentViewModelTest {
             assertThat(it[2]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.FINISHED)
         }
 
-        assertThat(viewModel.captures.size).isEqualTo(2)
-        viewModel.captures.let {
+        assertThat(viewModel.userCaptures.size).isEqualTo(2)
+        viewModel.userCaptures.let {
             assertThat(it[0].status).isEqualTo(FaceDetection.Status.VALID_CAPTURING)
             assertThat(it[0].face).isEqualTo(validFace)
         }
@@ -177,8 +177,8 @@ class LiveFeedbackFragmentViewModelTest {
 
         assertThat(viewModel.fallbackCapture).isNotNull()
 
-        assertThat(viewModel.captures.size).isEqualTo(2)
-        viewModel.captures.let {
+        assertThat(viewModel.userCaptures.size).isEqualTo(2)
+        viewModel.userCaptures.let {
             with(it[0]) {
                 assertThat(status).isEqualTo(FaceDetection.Status.VALID_CAPTURING)
                 assertThat(face).isEqualTo(validFace)
@@ -241,8 +241,8 @@ class LiveFeedbackFragmentViewModelTest {
 
             assertThat(viewModel.fallbackCapture).isNotNull()
 
-            assertThat(viewModel.captures.size).isEqualTo(2)
-            viewModel.captures.let {
+            assertThat(viewModel.userCaptures.size).isEqualTo(2)
+            viewModel.userCaptures.let {
                 with(it[0]) {
                     assertThat(status).isEqualTo(FaceDetection.Status.VALID_CAPTURING)
                     assertThat(face).isEqualTo(validFace)
@@ -308,8 +308,8 @@ class LiveFeedbackFragmentViewModelTest {
             assertThat(it[2]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.FINISHED)
         }
 
-        assertThat(viewModel.captures.size).isEqualTo(2)
-        with(viewModel.captures[0]) {
+        assertThat(viewModel.userCaptures.size).isEqualTo(2)
+        with(viewModel.userCaptures[0]) {
             assertThat(status).isEqualTo(FaceDetection.Status.NOFACE)
             assertThat(face).isEqualTo(noFace)
         }

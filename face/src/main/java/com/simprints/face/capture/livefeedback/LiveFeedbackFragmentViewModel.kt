@@ -37,7 +37,7 @@ class LiveFeedbackFragmentViewModel(
     private var fallbackCaptureEventSent = false
 
     lateinit var fallbackCapture: FaceDetection
-    val captures = mutableListOf<FaceDetection>()
+    val userCaptures = mutableListOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
@@ -57,8 +57,8 @@ class LiveFeedbackFragmentViewModel(
         when (capturingState.value) {
             CapturingState.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
             CapturingState.CAPTURING -> {
-                captures += faceDetection
-                if (captures.size == mainVM.samplesToCapture) {
+                userCaptures += faceDetection
+                if (userCaptures.size == mainVM.samplesToCapture) {
                     finishCapture()
                 }
             }
@@ -81,7 +81,7 @@ class LiveFeedbackFragmentViewModel(
      * If any of the user captures are good, use them. If not, use the fallback capture
      */
     private fun finishCapture() {
-        val sortedQualifyingCaptures = captures
+        val sortedQualifyingCaptures = userCaptures
             .filter { it.hasValidStatus() && it.isAboveQualityThreshold(qualityThreshold) }
             .sortedByDescending { it.face?.quality }
             .ifEmpty { listOf(fallbackCapture) }
