@@ -38,8 +38,7 @@ class SetupViewModel(private val deviceManager: DeviceManager,
         if (modalitiesToDownload.isNotEmpty()) {
             logMessageForCrashReport("Modalities to download: $modalitiesToDownload")
             modalitiesToDownload.forEach { splitInstallRequestBuilder.addModule(it) }
-            startDownloadingModules(splitInstallManager, splitInstallRequestBuilder.build())
-            monitorDownloadProgress(splitInstallManager)
+            startDownloadingModulesAndMonitorProgress(splitInstallManager, splitInstallRequestBuilder.build())
             monitorNetworkState()
         } else {
             logMessageForCrashReport("Modalities $modalitiesRequired already installed")
@@ -47,12 +46,15 @@ class SetupViewModel(private val deviceManager: DeviceManager,
         }
     }
 
-    private fun startDownloadingModules(splitInstallManager: SplitInstallManager,
-                                        request: SplitInstallRequest) {
+    private fun startDownloadingModulesAndMonitorProgress(splitInstallManager: SplitInstallManager,
+                                                          request: SplitInstallRequest) {
         splitInstallManager.startInstall(request)
             .addOnFailureListener {
-                startDownloadingModules(splitInstallManager, request)
+                Timber.e(it)
+                startDownloadingModulesAndMonitorProgress(splitInstallManager, request)
             }
+
+        monitorDownloadProgress(splitInstallManager)
     }
 
     @SuppressLint("SwitchIntDef")
@@ -102,8 +104,8 @@ class SetupViewModel(private val deviceManager: DeviceManager,
 
     fun startDownloadIfNecessary(splitInstallManager: SplitInstallManager, modalitiesRequired: List<String>) {
         viewModelScope.launch {
-            Timber.d("Modality install ongoing: ${isModalityInstallOnGoing(splitInstallManager)}")
             if (!isModalityInstallOnGoing(splitInstallManager)) {
+                logMessageForCrashReport("Re-Starting modalities download")
                 start(splitInstallManager, modalitiesRequired)
             }
         }

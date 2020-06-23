@@ -24,6 +24,8 @@ import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.CLOSE
 import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.TRY_AGAIN
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
+import com.simprints.id.activities.setup.SetupActivityHelper.extractPermissionsFromRequest
+import com.simprints.id.activities.setup.SetupActivityHelper.storeUserLocationIntoCurrentSession
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.Location
@@ -136,7 +138,7 @@ class SetupActivity: BaseSplitActivity() {
         when(requestCode) {
             PERMISSIONS_REQUEST_CODE -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    storeUserLocationIntoCurrentSession()
+                    storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
                 }
             }
         }
@@ -144,7 +146,7 @@ class SetupActivity: BaseSplitActivity() {
     }
 
     private fun askPermissionsOrPerformSpecificActions() {
-        val permissions = extractPermissionsFromRequest()
+        val permissions = extractPermissionsFromRequest(setupRequest)
 
         if (permissions.all { hasPermission(it) }) {
             performPermissionActionsAndFinish()
@@ -153,35 +155,9 @@ class SetupActivity: BaseSplitActivity() {
         }
     }
 
-    private fun extractPermissionsFromRequest(): List<String> = setupRequest.requiredPermissions.map {
-        when (it) {
-            SetupPermission.LOCATION -> Manifest.permission.ACCESS_FINE_LOCATION
-        }
-    }
-
     private fun performPermissionActionsAndFinish() {
-        storeUserLocationIntoCurrentSession()
+        storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
         setResultAndFinish()
-    }
-
-    private fun storeUserLocationIntoCurrentSession() {
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
-                val locationRequest = LocationRequest().apply {
-                    priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-                }
-                val locationsFlow = locationManager.requestLocation(locationRequest).take(1)
-                locationsFlow.collect { locations ->
-                    val lastLocation = locations.last()
-                    sessionRepository.updateCurrentSession {
-                        Timber.d("Saving user's location into the current session")
-                        it.location = Location(lastLocation.latitude, lastLocation.longitude)
-                    }
-                }
-            } catch (t: Throwable) {
-                crashReportManager.logExceptionOrSafeException(FailedToRetrieveUserLocation(t))
-            }
-        }
     }
 
     private fun setResultAndFinish() {
