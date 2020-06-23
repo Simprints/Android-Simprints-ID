@@ -5,13 +5,13 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.LocationRequest
 import com.google.android.play.core.ktx.requestSessionStates
-import com.google.android.play.core.ktx.status
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
@@ -95,7 +95,10 @@ class SetupActivity: BaseSplitActivity() {
             when(it) {
                 StartingDownload -> updateUiForDownloadStarting()
                 is RequiresUserConfirmationToDownload -> requestUserConfirmationDoDownloadModalities(it.state)
-                is Downloading -> updateUiForDownloadProgress(it.bytesDownloaded, it.totalBytesToDownload)
+                is Downloading -> {
+                    updateUiForDownloadProgress(it.bytesDownloaded, it.totalBytesToDownload)
+                    monitorInactivityWhileDownloading(it.bytesDownloaded)
+                }
                 ModalitiesInstalling -> updateUiForModalitiesInstalling()
                 ModalitiesInstalled -> updateUiForModalitiesInstalledAndAskPermissions()
             }
@@ -114,6 +117,17 @@ class SetupActivity: BaseSplitActivity() {
                 launchAlert(this@SetupActivity, AlertType.OFFLINE_DURING_SETUP)
             }
         }
+    }
+
+    private fun monitorInactivityWhileDownloading(lastDownloadedBytes: Long) {
+        val handler = Handler()
+        handler.postDelayed({
+            viewModel.getViewStateLiveData().value?.let {
+                if (it is Downloading && it.bytesDownloaded == lastDownloadedBytes) {
+                    updateUiForDownloadTakingLonger()
+                }
+            }
+        }, SLOW_DOWNLOAD_DELAY_THRESHOLD)
     }
 
 
@@ -209,6 +223,18 @@ class SetupActivity: BaseSplitActivity() {
         setupLogo.isVisible = false
     }
 
+    private fun updateUiForDownloadTakingLonger() {
+        with(modalityDownloadText){
+            text = androidResourcesHelper.getString(R.string.modality_download_taking_longer)
+            isVisible = true
+        }
+        with(modalityDownloadProgressBar) {
+            isIndeterminate = true
+            isVisible = true
+        }
+        setupLogo.isVisible = false
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when(requestCode) {
@@ -270,5 +296,6 @@ class SetupActivity: BaseSplitActivity() {
     companion object {
         const val PERMISSIONS_REQUEST_CODE = 99
         const val MODALITIES_DOWNLOAD_REQUEST_CODE = 199
+        const val SLOW_DOWNLOAD_DELAY_THRESHOLD = 30000L
     }
 }

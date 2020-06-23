@@ -23,6 +23,8 @@ fun AlertType.fromAlertToAlertTypeEvent() = when (this) {
     AlertType.GUID_NOT_FOUND_ONLINE -> AlertScreenEventType.GUID_NOT_FOUND_ONLINE
     AlertType.GUID_NOT_FOUND_OFFLINE -> AlertScreenEventType.GUID_NOT_FOUND_OFFLINE
     AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED -> AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED
-    AlertType.OFFLINE_DURING_SETUP -> AlertScreenEventType.GUID_NOT_FOUND_OFFLINE
-    AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED -> AlertScreenEventType.GUID_NOT_FOUND_OFFLINE
+
+    //Will be added in the event as a part of the new events architecture
+    AlertType.OFFLINE_DURING_SETUP -> null
+    AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED -> null
 }

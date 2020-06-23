@@ -293,6 +293,7 @@
     <string name="modality_starting_download">Starting download…</string>
     <string name="modality_downloading">Downloading… %1$s</string>
     <string name="modality_installing">Installing…</string>
+    <string name="modality_download_taking_longer">Download taking longer than expected…</string>
 
     <string name="module_feature_finger">fingerprint</string>
     <string name="module_feature_face">face</string>
