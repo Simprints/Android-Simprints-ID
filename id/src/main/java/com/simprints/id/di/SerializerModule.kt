@@ -8,7 +8,6 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.ScannerGenerationsSerializer
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.id.tools.serializers.*
@@ -84,10 +83,5 @@ class SerializerModule {
     @Singleton
     @Named("ScannerGenerationsSerializer")
     fun provideScannerGenerationsSerializer(): Serializer<List<ScannerGeneration>> = ScannerGenerationsSerializer()
-
-    @Provides
-    @Singleton
-    @Named("SecurityStatusSerializer")
-    fun provideSecurityStatusSerializer(): Serializer<SecurityState.Status> = EnumSerializer(SecurityState.Status::class.java)
 
 }

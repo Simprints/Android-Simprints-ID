@@ -17,7 +17,7 @@ import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
@@ -165,8 +165,8 @@ open class SecurityModule {
 
     @Provides
     open fun provideSecurityStateLocalDataSource(
-        settingsPreferencesManager: SettingsPreferencesManager
-    ): SecurityStateLocalDataSource = SecurityStateLocalDataSourceImpl(settingsPreferencesManager)
+        prefs: ImprovedSharedPreferences
+    ): SecurityStateLocalDataSource = SecurityStateLocalDataSourceImpl(prefs)
 
     @Provides
     @Singleton

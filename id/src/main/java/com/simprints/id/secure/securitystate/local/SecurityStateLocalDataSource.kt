@@ -4,8 +4,6 @@ import com.simprints.id.secure.models.SecurityState
 
 interface SecurityStateLocalDataSource {
 
-    fun getSecurityStatus(): SecurityState.Status
-
-    fun setSecurityStatus(securityStatus: SecurityState.Status)
+    var securityStatus: SecurityState.Status
 
 }

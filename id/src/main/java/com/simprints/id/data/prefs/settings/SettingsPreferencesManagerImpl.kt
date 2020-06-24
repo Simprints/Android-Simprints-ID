@@ -17,7 +17,6 @@ import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.network.NetworkConstants
-import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
@@ -32,8 +31,7 @@ open class SettingsPreferencesManagerImpl(
     subjectsDownSyncSettingSerializer: Serializer<SubjectsDownSyncSetting>,
     captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
     saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
-    scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
-    securityStatusSerializer: Serializer<SecurityState.Status>
+    scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
 ) : SettingsPreferencesManager {
 
     /**
@@ -276,13 +274,6 @@ open class SettingsPreferencesManagerImpl(
             FACE_MATCH_THRESHOLD_DEFAULT
         )
 
-    override var securityStatus: SecurityState.Status by ComplexPreference(
-        prefs,
-        SECURITY_STATUS,
-        SECURITY_STATUS_DEFAULT,
-        securityStatusSerializer
-    )
-
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()
     }
@@ -381,9 +372,6 @@ open class SettingsPreferencesManagerImpl(
         const val FACE_NB_OF_FRAMES_CAPTURED_DEFAULT = 2
         const val FACE_MATCH_THRESHOLD = "FaceMatchThreshold"
         const val FACE_MATCH_THRESHOLD_DEFAULT = 0f
-
-        const val SECURITY_STATUS = "SecurityStatus"
-        val SECURITY_STATUS_DEFAULT = SecurityState.Status.RUNNING
     }
 
 }

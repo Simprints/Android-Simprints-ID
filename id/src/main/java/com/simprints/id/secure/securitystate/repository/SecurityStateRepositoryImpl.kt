@@ -19,14 +19,14 @@ class SecurityStateRepositoryImpl(
 
     init {
         CoroutineScope(Dispatchers.Main).launch {
-            val securityStatus = localDataSource.getSecurityStatus()
+            val securityStatus = localDataSource.securityStatus
             securityStatusChannel.update(securityStatus)
         }
     }
 
     override suspend fun getSecurityState(): SecurityState {
         return remoteDataSource.getSecurityState().also {
-            localDataSource.setSecurityStatus(it.status)
+            localDataSource.securityStatus = it.status
             securityStatusChannel.update(it.status)
         }
     }
