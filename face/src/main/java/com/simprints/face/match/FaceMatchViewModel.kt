@@ -16,6 +16,8 @@ import com.simprints.face.controllers.core.events.model.MatchEntry
 import com.simprints.face.controllers.core.events.model.Matcher
 import com.simprints.face.controllers.core.events.model.OneToManyMatchEvent
 import com.simprints.face.controllers.core.events.model.OneToOneMatchEvent
+import com.simprints.face.controllers.core.flow.Action
+import com.simprints.face.controllers.core.flow.MasterFlowManager
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
@@ -31,6 +33,7 @@ import kotlinx.coroutines.launch
 import java.io.Serializable
 
 class FaceMatchViewModel(
+    private val masterFlowManager: MasterFlowManager,
     private val faceDbManager: FaceDbManager,
     private val faceMatcher: FaceMatcher,
     private val preferencesManager: FacePreferencesManager,
@@ -54,12 +57,18 @@ class FaceMatchViewModel(
         MutableLiveData()
 
     fun setupMatch(faceRequest: FaceMatchRequest) = viewModelScope.launch {
+        if (masterFlowManager.getCurrentAction() == Action.ENROL) {
+            matchState.value = MatchState.Error
+            return@launch
+        }
+
         val candidates = loadCandidates(faceRequest.queryForCandidates)
         val results = matchCandidates(faceRequest.probeFaceSamples, candidates)
         val sortedResults = getSortedResult(results)
         val maxFilteredResults = getMaxFilteredResults(sortedResults)
 
         sendMatchEvent(
+            masterFlowManager.getCurrentAction(),
             faceRequest.queryForCandidates,
             sortedResults.size,
             maxFilteredResults.map { MatchEntry(it.guid, it.confidence) })
@@ -131,8 +140,13 @@ class FaceMatchViewModel(
             .filter { it.confidence >= preferencesManager.faceMatchThreshold }
     }
 
-    private fun sendMatchEvent(queryForCandidates: Serializable, candidatesCount: Int, matchEntries: List<MatchEntry>) {
-        val event = if (candidatesCount > 1)
+    private fun sendMatchEvent(
+        action: Action,
+        queryForCandidates: Serializable,
+        candidatesCount: Int,
+        matchEntries: List<MatchEntry>
+    ) {
+        val event = if (action == Action.IDENTIFY)
             getOneToManyEvent(queryForCandidates, candidatesCount, matchEntries)
         else
             getOneToOneEvent(queryForCandidates, matchEntries.first())
