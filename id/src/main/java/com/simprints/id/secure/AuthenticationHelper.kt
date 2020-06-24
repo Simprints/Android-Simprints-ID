@@ -1,6 +1,6 @@
 package com.simprints.id.secure
 
-import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
+import com.simprints.id.data.db.event.domain.events.AuthenticationEvent
 
 interface AuthenticationHelper {
 

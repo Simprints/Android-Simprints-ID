@@ -2,7 +2,7 @@ package com.simprints.id.activities.fingerprintexitform
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.SessionRepository
 
 class FingerprintExitFormViewModelFactory(private val sessionRepository: SessionRepository) : ViewModelProvider.Factory {
 

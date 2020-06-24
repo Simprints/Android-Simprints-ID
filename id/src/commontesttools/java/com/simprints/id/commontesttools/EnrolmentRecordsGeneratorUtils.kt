@@ -1,8 +1,8 @@
 package com.simprints.id.commontesttools
 
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.id.data.db.session.domain.models.events.EventPayloadType
-import com.simprints.id.data.db.subject.domain.subjectevents.*
+import com.simprints.id.data.db.event.domain.events.*
+import com.simprints.id.data.db.event.domain.events.subject.*
 import com.simprints.id.domain.modality.Modes
 import java.util.*
 
@@ -63,7 +63,7 @@ object EnrolmentRecordsGeneratorUtils {
             FingerprintReference(
                 listOf(
                     FingerprintTemplate(fingerprint.templateQualityScore,
-                    EncodingUtils.byteArrayToBase64(fingerprint.template), FingerIdentifier.LEFT_3RD_FINGER)
+                        EncodingUtils.byteArrayToBase64(fingerprint.template), FingerIdentifier.LEFT_3RD_FINGER)
                 ),
                 hashMapOf("vero" to "VERO_2")
             )

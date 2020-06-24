@@ -9,8 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.LocationRequest
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.session.Location
+import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.domain.session.Location
 import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
 import com.simprints.id.domain.moduleapi.core.response.SetupResponse

@@ -2,8 +2,8 @@ package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
 import com.simprints.moduleapi.face.responses.IFaceExitReason
-import com.simprints.id.data.db.session.domain.models.events.RefusalEvent as CoreRefusalEvent
-import com.simprints.id.data.db.session.domain.models.events.RefusalEvent.Answer as CoreRefusalAnswer
+import com.simprints.id.data.db.event.domain.events.RefusalEvent as CoreRefusalEvent
+import com.simprints.id.data.db.event.domain.events.RefusalEvent.Answer as CoreRefusalAnswer
 
 @Keep
 class RefusalEvent(startTime: Long,

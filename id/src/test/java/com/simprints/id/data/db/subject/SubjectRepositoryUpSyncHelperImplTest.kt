@@ -3,12 +3,12 @@ package com.simprints.id.data.db.subject
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.id.data.db.session.domain.models.events.Events
+import com.simprints.id.data.db.event.domain.events.*
+import com.simprints.id.data.db.event.domain.events.subject.*
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.domain.subjectevents.*
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository

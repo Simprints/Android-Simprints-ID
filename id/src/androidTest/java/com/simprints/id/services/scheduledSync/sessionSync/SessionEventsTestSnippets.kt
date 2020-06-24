@@ -1,11 +1,11 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
 import com.google.common.truth.Truth
-import com.simprints.id.data.db.session.domain.models.events.*
-import com.simprints.id.data.db.session.local.models.DbDatabaseInfo
-import com.simprints.id.data.db.session.local.models.DbDevice
-import com.simprints.id.data.db.session.local.models.DbEvent
-import com.simprints.id.data.db.session.local.models.DbLocation
+import com.simprints.id.data.db.event.domain.events.*
+import com.simprints.id.data.db.event.local.models.DbDatabaseInfo
+import com.simprints.id.data.db.event.local.models.DbDevice
+import com.simprints.id.data.db.event.local.models.DbEvent
+import com.simprints.id.data.db.event.local.models.DbLocation
 import io.realm.Realm
 import junit.framework.TestCase.*
 

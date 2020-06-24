@@ -3,13 +3,13 @@ package com.simprints.clientapi.controllers.core.eventData
 import com.google.common.truth.Truth
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
-import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType
-import com.simprints.id.data.db.session.domain.models.events.IntentParsingEvent
-import com.simprints.id.data.db.session.domain.models.events.InvalidIntentEvent
-import com.simprints.id.data.db.session.domain.models.events.SuspiciousIntentEvent
-import com.simprints.id.data.db.session.domain.models.session.SessionEvents
+import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.domain.events.AlertScreenEvent
+import com.simprints.id.data.db.event.domain.events.AlertScreenEvent.AlertScreenEventType
+import com.simprints.id.data.db.event.domain.events.IntentParsingEvent
+import com.simprints.id.data.db.event.domain.events.InvalidIntentEvent
+import com.simprints.id.data.db.event.domain.events.SuspiciousIntentEvent
+import com.simprints.id.data.db.event.domain.session.SessionEvents
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -19,7 +19,7 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import java.util.*
-import com.simprints.id.data.db.session.domain.models.events.IntentParsingEvent.IntegrationInfo as CoreIntegrationInfo
+import com.simprints.id.data.db.event.domain.events.IntentParsingEvent.IntegrationInfo as CoreIntegrationInfo
 
 class ClientApiSessionRepositoryImplTest {
 

@@ -1,6 +1,6 @@
 package com.simprints.id.data.exitform
 
-import com.simprints.id.data.db.session.domain.models.events.RefusalEvent
+import com.simprints.id.data.db.event.domain.events.RefusalEvent
 
 
 enum class CoreExitFormReason {
