@@ -1,7 +1,7 @@
 package com.simprints.id.secure.securitystate.local
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.secure.models.SecurityState
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -12,7 +12,7 @@ import org.junit.Test
 
 class SecurityStateLocalDataSourceImplTest {
 
-    @MockK lateinit var mockSettingsPreferencesManager: SettingsPreferencesManager
+    @MockK lateinit var mockPrefs: ImprovedSharedPreferences
 
     private lateinit var localDataSource: SecurityStateLocalDataSourceImpl
 
@@ -20,17 +20,20 @@ class SecurityStateLocalDataSourceImplTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
-        localDataSource = SecurityStateLocalDataSourceImpl(mockSettingsPreferencesManager)
+        localDataSource = SecurityStateLocalDataSourceImpl(mockPrefs)
     }
 
     @Test
     fun shouldGetSecurityStatusFromSharedPreferences() {
         val expected = SecurityState.Status.COMPROMISED
         every {
-            mockSettingsPreferencesManager.securityStatus
-        } returns expected
+            mockPrefs.getString(
+                SecurityStateLocalDataSourceImpl.KEY_SECURITY_STATUS,
+                SecurityStateLocalDataSourceImpl.DEFAULT_SECURITY_STATUS
+            )
+        } returns expected.name
 
-        val actual = localDataSource.getSecurityStatus()
+        val actual = localDataSource.securityStatus
 
         assertThat(actual).isEqualTo(expected)
     }
@@ -39,9 +42,14 @@ class SecurityStateLocalDataSourceImplTest {
     fun shouldSetSecurityStatusInSharedPreferences() {
         val status = SecurityState.Status.PROJECT_ENDED
 
-        localDataSource.setSecurityStatus(status)
+        localDataSource.securityStatus = status
 
-        verify { mockSettingsPreferencesManager.securityStatus = status }
+        verify {
+            mockPrefs.edit().putPrimitive(
+                SecurityStateLocalDataSourceImpl.KEY_SECURITY_STATUS,
+                status.name
+            )
+        }
     }
 
 }

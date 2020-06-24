@@ -1,18 +1,24 @@
 package com.simprints.id.secure.securitystate.local
 
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.secure.models.SecurityState
 
 class SecurityStateLocalDataSourceImpl(
-    private val settingsPreferencesManager: SettingsPreferencesManager
+    private val prefs: ImprovedSharedPreferences
 ) : SecurityStateLocalDataSource {
 
-    override fun getSecurityStatus(): SecurityState.Status {
-        return settingsPreferencesManager.securityStatus
-    }
+    override var securityStatus: SecurityState.Status
+        get() {
+            val name = prefs.getString(KEY_SECURITY_STATUS, DEFAULT_SECURITY_STATUS)
+            return SecurityState.Status.valueOf(name)
+        }
+        set(value) {
+            prefs.edit().putPrimitive(KEY_SECURITY_STATUS, value.name).commit()
+        }
 
-    override fun setSecurityStatus(securityStatus: SecurityState.Status) {
-        settingsPreferencesManager.securityStatus = securityStatus
+    companion object {
+        const val KEY_SECURITY_STATUS = "SecurityStatus"
+        val DEFAULT_SECURITY_STATUS = SecurityState.Status.RUNNING.name
     }
 
 }

@@ -7,7 +7,6 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintIm
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
@@ -45,8 +44,6 @@ interface SettingsPreferencesManager {
     var faceQualityThreshold: Float
     var faceNbOfFramesCaptured: Int
     var faceMatchThreshold: Float
-
-    var securityStatus: SecurityState.Status
 
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T

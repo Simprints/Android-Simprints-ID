@@ -11,7 +11,6 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.di.PreferencesModule
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.testtools.common.di.DependencyRule
@@ -37,8 +36,7 @@ class TestPreferencesModule(
         modalitiesSerializer: Serializer<List<Modality>>,
         captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
-        scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
-        securityStatusSerializer: Serializer<SecurityState.Status>
+        scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
     ): SettingsPreferencesManager = settingsPreferencesManagerRule.resolveDependency {
         super.provideSettingsPreferencesManager(
             prefs,
@@ -51,8 +49,7 @@ class TestPreferencesModule(
             modalitiesSerializer,
             captureFingerprintStrategySerializer,
             saveFingerprintImagesStrategySerializer,
-            scannerGenerationsSerializer,
-            securityStatusSerializer
+            scannerGenerationsSerializer
         )
     }
 

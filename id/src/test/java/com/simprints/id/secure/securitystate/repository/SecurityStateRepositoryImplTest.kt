@@ -50,7 +50,7 @@ class SecurityStateRepositoryImplTest {
 
         repository.getSecurityState()
 
-        verify { mockLocalDataSource.setSecurityStatus(status) }
+        verify { mockLocalDataSource.securityStatus = status }
     }
 
     @Test(expected = SimprintsInternalServerException::class)
