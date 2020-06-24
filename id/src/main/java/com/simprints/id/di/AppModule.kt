@@ -59,6 +59,7 @@ import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.BaseUrlProviderImpl
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
@@ -67,7 +68,6 @@ import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.cache.StepEncoderImpl
-import com.simprints.id.secure.BaseUrlProviderImpl
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
@@ -354,11 +354,10 @@ open class AppModule {
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository
-    ) =
-        SyncInformationViewModelFactory(
-            personRepository, subjectLocalDataSource, preferencesManager,
-            loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository
-        )
+    ) = SyncInformationViewModelFactory(
+        personRepository, subjectLocalDataSource, preferencesManager,
+        loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository
+    )
 
     @Provides
     open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =

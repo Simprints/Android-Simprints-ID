@@ -63,10 +63,6 @@ open class SessionRepositoryImpl(
         createBatchesFromLocalAndUploadSessions()
     }
 
-    override suspend fun deleteAllFromLocal() {
-        sessionLocalDataSource.delete(SessionQuery())
-    }
-
     private suspend fun createBatchesFromLocalAndUploadSessions() {
         loadSessionsToUpload()
             .filterClosedSessions()

@@ -9,6 +9,7 @@ import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientImpl
 import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.secure.models.SecurityState
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
@@ -58,8 +59,9 @@ class SecurityStateRemoteDataSourceImplTest {
         mockSuccessfulResponse()
 
         val response = remoteDataSource.getSecurityState()
+        val expected = SecurityState(DEVICE_ID, SecurityState.Status.COMPROMISED)
 
-        assertThat(response).isNotNull()
+        assertThat(response).isEqualTo(expected)
     }
 
     @Test(expected = SimprintsInternalServerException::class)
@@ -81,8 +83,8 @@ class SecurityStateRemoteDataSourceImplTest {
     }
 
     private fun mockSuccessfulResponse() {
-        // TODO: replace empty JSON with SecurityState
-        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody("{}"))
+        val json = "{ \"deviceId\": \"$DEVICE_ID\", \"status\": \"COMPROMISED\" }"
+        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(json))
     }
 
     private fun mockErrorResponse(code: Int) {
