@@ -1,3 +1,3 @@
 package com.simprints.face.controllers.core.events.model
 
-enum class Matcher { RANK_ONE }
+enum class Matcher { RANK_ONE, UNKNOWN }

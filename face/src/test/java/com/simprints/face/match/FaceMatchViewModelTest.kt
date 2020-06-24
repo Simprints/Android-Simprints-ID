@@ -5,8 +5,10 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.face.FixtureGenerator
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
+import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
 import com.simprints.face.controllers.core.repository.FaceDbManager
+import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
@@ -52,12 +54,18 @@ class FaceMatchViewModelTest {
     }
     private val faceMatcher: FaceMatcher = spyk()
     private val faceCrashReportManager: FaceCrashReportManager = mockk(relaxUnitFun = true)
+    private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxUnitFun = true)
+    private val faceTimeHelper: FaceTimeHelper = mockk() {
+        every { now() } returns 0
+    }
     private val viewModel: FaceMatchViewModel =
         FaceMatchViewModel(
             faceDbManager,
             faceMatcher,
             facePreferencesManager,
             faceCrashReportManager,
+            faceSessionEventsManager,
+            faceTimeHelper,
             testDispatcherProvider
         )
 
