@@ -2,11 +2,13 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.GuidSelectionEvent
+import com.simprints.id.data.db.event.domain.events.GuidSelectionEvent.GuidSelectionPayload
+import com.simprints.id.data.db.session.remote.events.ApiEvent
 
 @Keep
 class ApiGuidSelectionEvent(val relativeStartTime: Long,
                             val selectedId: String) : ApiEvent(ApiEventType.GUID_SELECTION) {
 
     constructor(guidSelectionEvent: GuidSelectionEvent) :
-        this(guidSelectionEvent.relativeStartTime ?: 0, guidSelectionEvent.selectedId)
+        this((guidSelectionEvent.payload as GuidSelectionPayload).relativeStartTime, guidSelectionEvent.payload.selectedId)
 }

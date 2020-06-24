@@ -2,6 +2,8 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.FingerprintCaptureEvent
+import com.simprints.id.data.db.event.domain.events.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.id.data.db.session.remote.events.ApiEvent
 
 @Keep
 class ApiFingerprintCaptureEvent(val id: String,
@@ -15,7 +17,7 @@ class ApiFingerprintCaptureEvent(val id: String,
     @Keep
     class ApiFingerprint(val finger: ApiFingerIdentifier, val quality: Int, val template: String) {
 
-        constructor(finger: FingerprintCaptureEvent.Fingerprint) : this(
+        constructor(finger: FingerprintCapturePayload.Fingerprint) : this(
             ApiFingerIdentifier.valueOf(finger.finger.toString()),
             finger.quality, finger.template)
     }
@@ -31,10 +33,10 @@ class ApiFingerprintCaptureEvent(val id: String,
 
     constructor(fingerprintCaptureEvent: FingerprintCaptureEvent) :
         this(fingerprintCaptureEvent.id,
-            fingerprintCaptureEvent.relativeStartTime ?: 0,
-            fingerprintCaptureEvent.relativeEndTime ?: 0,
-            fingerprintCaptureEvent.qualityThreshold,
-            fingerprintCaptureEvent.finger.toApiFingerIdentifier(),
-            ApiResult.valueOf(fingerprintCaptureEvent.result.toString()),
-            fingerprintCaptureEvent.fingerprint?.let { ApiFingerprint(fingerprintCaptureEvent.fingerprint) })
+            (fingerprintCaptureEvent.payload as FingerprintCapturePayload).relativeStartTime,
+            fingerprintCaptureEvent.payload.relativeEndTime,
+            fingerprintCaptureEvent.payload.qualityThreshold,
+            fingerprintCaptureEvent.payload.finger.toApiFingerIdentifier(),
+            ApiResult.valueOf(fingerprintCaptureEvent.payload.result.toString()),
+            fingerprintCaptureEvent.payload.fingerprint?.let { ApiFingerprint(it) })
 }

@@ -1,7 +1,10 @@
 package com.simprints.id.data.db.event.remote.events
 
 import com.simprints.id.data.db.event.domain.events.IntentParsingEvent
+import com.simprints.id.data.db.event.domain.events.IntentParsingEvent.IntentParsingPayload
+import com.simprints.id.data.db.event.domain.events.IntentParsingEvent.IntentParsingPayload.IntegrationInfo
 import com.simprints.id.data.db.event.remote.events.ApiIntentParsingEvent.ApiIntegrationInfo.Companion.fromDomainToApi
+import com.simprints.id.data.db.session.remote.events.ApiEvent
 import io.realm.internal.Keep
 
 @Keep
@@ -9,8 +12,8 @@ class ApiIntentParsingEvent(val relativeStartTime: Long,
                             val integration: ApiIntegrationInfo) : ApiEvent(ApiEventType.INTENT_PARSING) {
 
     constructor(event: IntentParsingEvent) : this(
-        event.relativeStartTime ?: 0,
-        fromDomainToApi(event.integration)
+        (event.payload as IntentParsingPayload).relativeStartTime,
+        fromDomainToApi(event.payload.integration)
     )
 
     @Keep
@@ -20,11 +23,11 @@ class ApiIntentParsingEvent(val relativeStartTime: Long,
         COMMCARE;
 
         companion object {
-            fun fromDomainToApi(integration: IntentParsingEvent.IntegrationInfo) =
+            fun fromDomainToApi(integration: IntegrationInfo) =
                 when(integration) {
-                    IntentParsingEvent.IntegrationInfo.ODK -> ODK
-                    IntentParsingEvent.IntegrationInfo.STANDARD -> STANDARD
-                    IntentParsingEvent.IntegrationInfo.COMMCARE -> COMMCARE
+                    IntegrationInfo.ODK -> ODK
+                    IntegrationInfo.STANDARD -> STANDARD
+                    IntegrationInfo.COMMCARE -> COMMCARE
                 }
         }
     }

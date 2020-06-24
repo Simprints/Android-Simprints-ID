@@ -2,11 +2,15 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent
+import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
+import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
+import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
+import com.simprints.id.data.db.session.remote.events.ApiEvent
 
 @Keep
 class ApiVero2InfoSnapshotEvent(val relativeStartTime: Long,
                                 val version: ApiVero2Version,
-                                val battery: ApiBatteryInfo): ApiEvent(ApiEventType.VERO_2_INFO_SNAPSHOT) {
+                                val battery: ApiBatteryInfo) : ApiEvent(ApiEventType.VERO_2_INFO_SNAPSHOT) {
 
     @Keep
     class ApiVero2Version(val master: Long,
@@ -17,7 +21,7 @@ class ApiVero2InfoSnapshotEvent(val relativeStartTime: Long,
                           val un20App: String,
                           val un20Api: String) {
 
-        constructor(vero2Version: Vero2InfoSnapshotEvent.Vero2Version):
+        constructor(vero2Version: Vero2Version) :
             this(vero2Version.master,
                 vero2Version.cypressApp,
                 vero2Version.cypressApi,
@@ -31,12 +35,12 @@ class ApiVero2InfoSnapshotEvent(val relativeStartTime: Long,
     class ApiBatteryInfo(val charge: Int, val voltage: Int,
                          val current: Int, val temperature: Int) {
 
-        constructor(batteryInfo: Vero2InfoSnapshotEvent.BatteryInfo):
+        constructor(batteryInfo: BatteryInfo) :
             this(batteryInfo.charge, batteryInfo.voltage, batteryInfo.current, batteryInfo.temperature)
     }
 
     constructor(vero2InfoSnapshotEvent: Vero2InfoSnapshotEvent) :
-        this(vero2InfoSnapshotEvent.relativeStartTime ?: 0,
-            ApiVero2Version(vero2InfoSnapshotEvent.version),
-            ApiBatteryInfo(vero2InfoSnapshotEvent.battery))
+        this((vero2InfoSnapshotEvent.payload as Vero2InfoSnapshotPayload).relativeStartTime ?: 0,
+            ApiVero2Version(vero2InfoSnapshotEvent.payload.version),
+            ApiBatteryInfo(vero2InfoSnapshotEvent.payload.battery))
 }
