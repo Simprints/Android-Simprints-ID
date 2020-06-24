@@ -50,8 +50,6 @@ class FaceMatchViewModel(
         const val matchingEndWaitTimeInMillis = 1000L
     }
 
-    private val startTime = faceTimeHelper.now()
-
     val matchState: MutableLiveData<MatchState> = MutableLiveData(MatchState.NotStarted)
     val faceMatchResponse: MutableLiveData<LiveDataEventWithContent<FaceMatchResponse>> =
         MutableLiveData()
@@ -62,12 +60,18 @@ class FaceMatchViewModel(
             return@launch
         }
 
+        val startTime = faceTimeHelper.now()
+
         val candidates = loadCandidates(faceRequest.queryForCandidates)
         val results = matchCandidates(faceRequest.probeFaceSamples, candidates)
         val sortedResults = getSortedResult(results)
         val maxFilteredResults = getMaxFilteredResults(sortedResults)
 
+        val endTime = faceTimeHelper.now()
+
         sendMatchEvent(
+            startTime,
+            endTime,
             masterFlowManager.getCurrentAction(),
             faceRequest.queryForCandidates,
             sortedResults.size,
@@ -141,37 +145,46 @@ class FaceMatchViewModel(
     }
 
     private fun sendMatchEvent(
+        startTime: Long,
+        endTime: Long,
         action: Action,
         queryForCandidates: Serializable,
         candidatesCount: Int,
         matchEntries: List<MatchEntry>
     ) {
         val event = if (action == Action.IDENTIFY)
-            getOneToManyEvent(queryForCandidates, candidatesCount, matchEntries)
+            getOneToManyEvent(startTime, endTime, queryForCandidates, candidatesCount, matchEntries)
         else
-            getOneToOneEvent(queryForCandidates, matchEntries.first())
+            getOneToOneEvent(startTime, endTime, queryForCandidates, matchEntries.first())
 
         faceSessionEventsManager.addEventInBackground(event)
     }
 
     private fun getOneToManyEvent(
+        startTime: Long,
+        endTime: Long,
         queryForCandidates: Serializable,
         candidatesCount: Int,
         matchEntries: List<MatchEntry>
     ): OneToManyMatchEvent =
         OneToManyMatchEvent(
             startTime,
-            faceTimeHelper.now(),
+            endTime,
             queryForCandidates,
             candidatesCount,
             faceMatcher.getEventMatcher(),
             matchEntries
         )
 
-    private fun getOneToOneEvent(queryForCandidates: Serializable, matchEntry: MatchEntry): OneToOneMatchEvent =
+    private fun getOneToOneEvent(
+        startTime: Long,
+        endTime: Long,
+        queryForCandidates: Serializable,
+        matchEntry: MatchEntry
+    ): OneToOneMatchEvent =
         OneToOneMatchEvent(
             startTime,
-            faceTimeHelper.now(),
+            endTime,
             queryForCandidates,
             faceMatcher.getEventMatcher(),
             matchEntry
