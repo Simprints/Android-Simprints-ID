@@ -9,6 +9,8 @@ import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManagerImpl
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.FaceSessionEventsManagerImpl
+import com.simprints.face.controllers.core.flow.MasterFlowManager
+import com.simprints.face.controllers.core.flow.MasterFlowManagerImpl
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.controllers.core.image.FaceImageManagerImpl
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
@@ -37,7 +39,8 @@ import org.koin.dsl.module
 object KoinInjector {
     private var koinModule: Module? = null
 
-    private fun Scope.appComponent() = (androidApplication() as Application).component
+    private fun Scope.appComponent() =
+        (androidApplication() as Application).component
 
     fun acquireFaceKoinModules() {
         if (koinModule == null) {
@@ -65,6 +68,7 @@ object KoinInjector {
         factory<FaceAndroidResourcesHelper> { FaceAndroidResourcesHelperImpl(get()) }
         factory<FacePreferencesManager> { FacePreferencesManagerImpl(get()) }
         factory<FaceImageManager> { FaceImageManagerImpl(get(), get()) }
+        factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
         factory<FaceDbManager> { FaceDbManagerImpl(get()) }
         factory<FaceCrashReportManager> { FaceCrashReportManagerImpl(get()) }
         factory<FaceTimeHelper> { FaceTimeHelperImpl(get()) }
@@ -81,7 +85,7 @@ object KoinInjector {
     private fun Module.defineBuildersForViewModels() {
         viewModel { FaceOrchestratorViewModel(get()) }
         viewModel { FaceCaptureViewModel(get<FacePreferencesManager>().maxRetries, get(), get()) }
-        viewModel { FaceMatchViewModel(get(), get(), get(), get(), get(), get()) }
+        viewModel { FaceMatchViewModel(get(), get(), get(), get(), get(), get(), get()) }
 
         viewModel { (mainVM: FaceCaptureViewModel) ->
             LiveFeedbackFragmentViewModel(
