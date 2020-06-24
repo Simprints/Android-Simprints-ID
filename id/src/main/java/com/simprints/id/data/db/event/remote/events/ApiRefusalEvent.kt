@@ -2,6 +2,9 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.RefusalEvent
+import com.simprints.id.data.db.event.domain.events.RefusalEvent.RefusalPayload
+import com.simprints.id.data.db.event.domain.events.RefusalEvent.RefusalPayload.Answer
+import com.simprints.id.data.db.session.remote.events.ApiEvent
 
 @Keep
 class ApiRefusalEvent(val relativeStartTime: Long,
@@ -21,19 +24,19 @@ class ApiRefusalEvent(val relativeStartTime: Long,
     }
 
     constructor(refusalEvent: RefusalEvent) :
-        this(refusalEvent.relativeStartTime ?: 0,
-            refusalEvent.relativeEndTime ?: 0,
-            refusalEvent.reason.toApiRefusalEventAnswer(),
-            refusalEvent.otherText)
+        this((refusalEvent.payload as RefusalPayload).relativeStartTime,
+            refusalEvent.payload.relativeEndTime,
+            refusalEvent.payload.reason.toApiRefusalEventAnswer(),
+            refusalEvent.payload.otherText)
 }
 
-fun RefusalEvent.Answer.toApiRefusalEventAnswer() =
+fun Answer.toApiRefusalEventAnswer() =
     when(this) {
-        RefusalEvent.Answer.REFUSED_RELIGION -> ApiRefusalEvent.ApiAnswer.REFUSED_RELIGION
-        RefusalEvent.Answer.REFUSED_DATA_CONCERNS -> ApiRefusalEvent.ApiAnswer.REFUSED_DATA_CONCERNS
-        RefusalEvent.Answer.REFUSED_PERMISSION -> ApiRefusalEvent.ApiAnswer.REFUSED_PERMISSION
-        RefusalEvent.Answer.SCANNER_NOT_WORKING -> ApiRefusalEvent.ApiAnswer.SCANNER_NOT_WORKING
-        RefusalEvent.Answer.REFUSED_NOT_PRESENT -> ApiRefusalEvent.ApiAnswer.REFUSED_NOT_PRESENT
-        RefusalEvent.Answer.REFUSED_YOUNG -> ApiRefusalEvent.ApiAnswer.REFUSED_YOUNG
-        RefusalEvent.Answer.OTHER -> ApiRefusalEvent.ApiAnswer.OTHER
+        Answer.REFUSED_RELIGION -> ApiRefusalEvent.ApiAnswer.REFUSED_RELIGION
+        Answer.REFUSED_DATA_CONCERNS -> ApiRefusalEvent.ApiAnswer.REFUSED_DATA_CONCERNS
+        Answer.REFUSED_PERMISSION -> ApiRefusalEvent.ApiAnswer.REFUSED_PERMISSION
+        Answer.SCANNER_NOT_WORKING -> ApiRefusalEvent.ApiAnswer.SCANNER_NOT_WORKING
+        Answer.REFUSED_NOT_PRESENT -> ApiRefusalEvent.ApiAnswer.REFUSED_NOT_PRESENT
+        Answer.REFUSED_YOUNG -> ApiRefusalEvent.ApiAnswer.REFUSED_YOUNG
+        Answer.OTHER -> ApiRefusalEvent.ApiAnswer.OTHER
     }
