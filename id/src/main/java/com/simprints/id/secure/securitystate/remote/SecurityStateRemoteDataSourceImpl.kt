@@ -5,6 +5,7 @@ import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.secure.models.SecurityState
 import retrofit2.HttpException
 import retrofit2.Response
 
@@ -14,7 +15,9 @@ class SecurityStateRemoteDataSourceImpl(
     private val deviceId: String
 ) : SecurityStateRemoteDataSource {
 
-    override suspend fun getSecurityState(): Any {
+    override suspend fun getSecurityState(): SecurityState {
+        // Uncomment when testing
+        // return SecurityState(deviceId, SecurityState.Status.RUNNING)
         val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
 
         val response = getClient().executeCall("requestSecurityState") {
@@ -30,7 +33,7 @@ class SecurityStateRemoteDataSourceImpl(
         return simApiClientFactory.buildClient(SecureApiInterface::class)
     }
 
-    private fun handleErrorResponse(response: Response<Any>): Nothing {
+    private fun handleErrorResponse(response: Response<SecurityState>): Nothing {
         when (response.code()) {
             in 500..599 -> throw SimprintsInternalServerException()
             else -> throw HttpException(response)

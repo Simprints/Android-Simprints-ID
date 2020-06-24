@@ -13,7 +13,6 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.startActivity
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using the Home button
@@ -54,7 +53,10 @@ open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginF
     }
 
     override fun openRequestLoginActivity() {
-        startActivity<RequestLoginActivity>()
+        val intent = Intent(this, RequestLoginActivity::class.java)
+            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+
         finish()
     }
 

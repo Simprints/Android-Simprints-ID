@@ -18,12 +18,16 @@ import com.simprints.id.di.SecurityModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.*
+import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
+import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
+import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class TestSecurityModule(
     private val loginActivityHelperRule: DependencyRule = RealRule,
@@ -31,7 +35,8 @@ class TestSecurityModule(
     private val projectAuthenticatorRule: DependencyRule = RealRule,
     private val authenticationHelperRule: DependencyRule = RealRule,
     private val safetyNetClientRule: DependencyRule = RealRule,
-    private val signerManagerRule: DependencyRule = RealRule
+    private val signerManagerRule: DependencyRule = RealRule,
+    private val securityStateRepositoryRule: DependencyRule = RealRule
 ) : SecurityModule() {
 
     override fun provideSignerManager(
@@ -134,6 +139,14 @@ class TestSecurityModule(
         return safetyNetClientRule.resolveDependency {
             super.provideSafetyNetClient(context)
         }
+    }
+
+    @ExperimentalCoroutinesApi
+    override fun provideSecurityStateRepository(
+        remoteDataSource: SecurityStateRemoteDataSource,
+        localDataSource: SecurityStateLocalDataSource
+    ): SecurityStateRepository = securityStateRepositoryRule.resolveDependency {
+        super.provideSecurityStateRepository(remoteDataSource, localDataSource)
     }
 
 }

@@ -1,6 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.secure.models.AuthRequestBody
+import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.ApiToken
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
@@ -33,10 +34,12 @@ class SecureApiServiceMock(
         buildSuccessResponseWith(getApiToken())
     ).requestCustomTokens(projectId, userId, credentials)
 
-    override suspend fun requestSecurityState(projectId: String, deviceId: String): Response<Any> {
-        // TODO: replace empty string with mock SecurityState in the response body
+    override suspend fun requestSecurityState(
+        projectId: String,
+        deviceId: String
+    ): Response<SecurityState> {
         return delegate.returning(
-            buildSuccessResponseWith("")
+            buildSuccessResponseWith(getSecurityState())
         ).requestSecurityState(projectId, deviceId)
     }
 
@@ -48,6 +51,10 @@ class SecureApiServiceMock(
     private fun <T> buildSuccessResponseWith(body: T?) = Calls.response(Response.success(body))
 
     private fun getApiToken() = ApiToken("legacy_token")
+
+    private fun getSecurityState() = SecurityState(
+        "mock-device-id", SecurityState.Status.RUNNING
+    )
 }
 
 fun createMockServiceToFailRequests(

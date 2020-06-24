@@ -17,12 +17,15 @@ import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
+import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.*
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
+import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
+import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSourceImpl
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourceImpl
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
@@ -35,6 +38,7 @@ import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.deviceId
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Singleton
 
 @Module
@@ -160,9 +164,17 @@ open class SecurityModule {
     )
 
     @Provides
+    open fun provideSecurityStateLocalDataSource(
+        prefs: ImprovedSharedPreferences
+    ): SecurityStateLocalDataSource = SecurityStateLocalDataSourceImpl(prefs)
+
+    @Provides
+    @Singleton
+    @ExperimentalCoroutinesApi
     open fun provideSecurityStateRepository(
-        remoteDataSource: SecurityStateRemoteDataSource
-    ): SecurityStateRepository = SecurityStateRepositoryImpl(remoteDataSource)
+        remoteDataSource: SecurityStateRemoteDataSource,
+        localDataSource: SecurityStateLocalDataSource
+    ): SecurityStateRepository = SecurityStateRepositoryImpl(remoteDataSource, localDataSource)
 
     @Provides
     open fun provideSecurityStateScheduler(
@@ -173,12 +185,10 @@ open class SecurityModule {
     open fun provideSecurityStateProcessor(
         imageRepository: ImageRepository,
         subjectRepository: SubjectRepository,
-        sessionRepository: SessionRepository,
         signerManager: SignerManager
     ): SecurityStateProcessor = SecurityStateProcessorImpl(
         imageRepository,
         subjectRepository,
-        sessionRepository,
         signerManager
     )
 

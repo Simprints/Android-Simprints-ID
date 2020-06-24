@@ -1,6 +1,5 @@
 package com.simprints.id.secure.securitystate
 
-import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.secure.SignerManager
@@ -17,7 +16,6 @@ class SecurityStateProcessorImplTest {
 
     @MockK lateinit var mockImageRepository: ImageRepository
     @MockK lateinit var mockSubjectRepository: SubjectRepository
-    @MockK lateinit var mockSessionRepository: SessionRepository
     @MockK lateinit var mockSignerManager: SignerManager
 
     private lateinit var securityStateProcessor: SecurityStateProcessorImpl
@@ -29,7 +27,6 @@ class SecurityStateProcessorImplTest {
         securityStateProcessor = SecurityStateProcessorImpl(
             mockImageRepository,
             mockSubjectRepository,
-            mockSessionRepository,
             mockSignerManager
         )
     }
@@ -45,7 +42,6 @@ class SecurityStateProcessorImplTest {
 
         verify(exactly = 0) { mockImageRepository.deleteStoredImages() }
         coVerify(exactly = 0) { mockSubjectRepository.deleteAll() }
-        coVerify(exactly = 0) { mockSessionRepository.deleteAllFromLocal() }
         coVerify(exactly = 0) { mockSignerManager.signOut() }
     }
 
@@ -60,7 +56,6 @@ class SecurityStateProcessorImplTest {
 
         verify(exactly = 1) { mockImageRepository.deleteStoredImages() }
         coVerify(exactly = 1) { mockSubjectRepository.deleteAll() }
-        coVerify(exactly = 1) { mockSessionRepository.deleteAllFromLocal() }
         coVerify(exactly = 1) { mockSignerManager.signOut() }
     }
 
@@ -75,7 +70,6 @@ class SecurityStateProcessorImplTest {
 
         verify(exactly = 1) { mockImageRepository.deleteStoredImages() }
         coVerify(exactly = 1) { mockSubjectRepository.deleteAll() }
-        coVerify(exactly = 1) { mockSessionRepository.deleteAllFromLocal() }
         coVerify(exactly = 1) { mockSignerManager.signOut() }
     }
 

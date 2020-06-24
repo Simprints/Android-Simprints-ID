@@ -77,7 +77,7 @@ class OrchestratorActivity : AppCompatActivity() {
     }
 
     private fun scheduleAndStartSyncIfNecessary() {
-        if(preferencesManager.subjectsDownSyncSetting == SubjectsDownSyncSetting.EXTRA) {
+        if (preferencesManager.subjectsDownSyncSetting == SubjectsDownSyncSetting.EXTRA) {
             subjectsSyncManager.sync()
         }
         syncManager.scheduleBackgroundSyncs()
@@ -88,7 +88,7 @@ class OrchestratorActivity : AppCompatActivity() {
         vm.saveState()
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         vm.restoreState()
         newActivity = false
@@ -96,6 +96,7 @@ class OrchestratorActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
         vm.ongoingStep.observe(this, observerForNextStep)
         vm.appResponse.observe(this, observerForFinalResponse)
 

@@ -1,8 +1,12 @@
 package com.simprints.id.secure.securitystate.repository
 
+import com.simprints.id.secure.models.SecurityState
+import kotlinx.coroutines.channels.Channel
+
 interface SecurityStateRepository {
 
-    // TODO: replace Any with SecurityState once PAS-900 gets merged in
-    suspend fun getSecurityState(): Any
+    val securityStatusChannel: Channel<SecurityState.Status>
+
+    suspend fun getSecurityState(): SecurityState
 
 }
