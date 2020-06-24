@@ -3,12 +3,12 @@ package com.simprints.id.commontesttools.sessionEvents
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.simprints.id.data.db.session.remote.events.ApiAlertScreenEvent
-import com.simprints.id.data.db.session.remote.events.ApiArtificialTerminationEvent
-import com.simprints.id.data.db.session.remote.events.ApiAuthenticationEvent
-import com.simprints.id.data.db.session.remote.events.ApiRefusalEvent
-import com.simprints.id.data.db.session.remote.events.callback.ApiCallbackType
-import com.simprints.id.data.db.session.remote.events.callout.ApiCalloutType
+import com.simprints.id.data.db.event.remote.events.ApiAlertScreenEvent
+import com.simprints.id.data.db.event.remote.events.ApiArtificialTerminationEvent
+import com.simprints.id.data.db.event.remote.events.ApiAuthenticationEvent
+import com.simprints.id.data.db.event.remote.events.ApiRefusalEvent
+import com.simprints.id.data.db.event.remote.events.callback.ApiCallbackType
+import com.simprints.id.data.db.event.remote.events.callout.ApiCalloutType
 import com.simprints.id.tools.extensions.getString
 import com.simprints.id.tools.extensions.isGuid
 

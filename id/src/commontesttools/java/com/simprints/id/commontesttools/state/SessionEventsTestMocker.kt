@@ -1,8 +1,8 @@
 package com.simprints.id.commontesttools.state
 
-import com.simprints.id.data.db.session.domain.models.SessionQuery
-import com.simprints.id.data.db.session.domain.models.session.SessionEvents
-import com.simprints.id.data.db.session.local.SessionLocalDataSource
+import com.simprints.id.data.db.event.domain.events.SessionQuery
+import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.local.SessionLocalDataSource
 import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import io.mockk.coEvery
 import io.reactivex.Completable

@@ -9,7 +9,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.SessionRepository
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest

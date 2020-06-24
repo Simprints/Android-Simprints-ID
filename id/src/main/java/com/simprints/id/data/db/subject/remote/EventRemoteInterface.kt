@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.subject.remote
 
-import com.simprints.id.data.db.subject.remote.models.ApiModes
-import com.simprints.id.data.db.subject.remote.models.subjectcounts.ApiEventCount
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvents
+import com.simprints.id.data.db.event.remote.events.subject.ApiModes
+import com.simprints.id.data.db.event.remote.events.ApiEventCount
+import com.simprints.id.data.db.event.remote.events.ApiEvents
 import com.simprints.id.network.SimRemoteInterface
 import okhttp3.ResponseBody
 import retrofit2.http.*

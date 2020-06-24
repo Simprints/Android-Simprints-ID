@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.EnrolmentEvent
+import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.domain.events.EnrolmentEvent
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample

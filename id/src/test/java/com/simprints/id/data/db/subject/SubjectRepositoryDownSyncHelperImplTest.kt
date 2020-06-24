@@ -6,11 +6,10 @@ import com.google.gson.JsonSyntaxException
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
 import com.simprints.id.data.db.subject.SubjectRepositoryDownSyncHelperImpl.Companion.BATCH_SIZE_FOR_DOWNLOADING
-import com.simprints.id.data.db.session.domain.models.events.EventPayloadType.*
+import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
-import com.simprints.id.data.db.subject.remote.models.subjectevents.fromDomainToApi
+import com.simprints.id.data.db.event.remote.events.ApiEvent
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationFactoryImpl

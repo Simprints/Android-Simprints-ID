@@ -2,7 +2,7 @@ package com.simprints.face.controllers.core.events
 
 import com.simprints.face.controllers.core.events.model.*
 import com.simprints.face.controllers.core.events.model.EventType.*
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.SessionRepository
 import com.simprints.id.tools.ignoreException
 import kotlinx.coroutines.runBlocking
 

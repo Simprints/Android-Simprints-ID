@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import java.io.Serializable
-import com.simprints.id.data.db.session.domain.models.events.OneToOneMatchEvent as CoreOneToOneMatchEvent
+import com.simprints.id.data.db.event.domain.events.OneToOneMatchEvent as CoreOneToOneMatchEvent
 
 @Keep
 class OneToOneMatchEvent(

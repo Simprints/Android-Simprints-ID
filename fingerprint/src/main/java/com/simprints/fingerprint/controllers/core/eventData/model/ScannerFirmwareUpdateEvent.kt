@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.session.domain.models.events.ScannerFirmwareUpdateEvent as ScannerFirmwareUpdateEventCore
+import com.simprints.id.data.db.event.domain.events.ScannerFirmwareUpdateEvent as ScannerFirmwareUpdateEventCore
 
 @Keep
 class ScannerFirmwareUpdateEvent(startTime: Long,

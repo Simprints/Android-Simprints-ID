@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.SessionRepository
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.orchestrator.enrolAppRequest
