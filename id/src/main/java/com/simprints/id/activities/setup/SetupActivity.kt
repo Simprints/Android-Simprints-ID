@@ -1,6 +1,5 @@
 package com.simprints.id.activities.setup
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,7 +9,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.location.LocationRequest
 import com.google.android.play.core.ktx.requestSessionStates
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
@@ -28,13 +26,10 @@ import com.simprints.id.activities.setup.SetupActivityHelper.extractPermissionsF
 import com.simprints.id.activities.setup.SetupActivityHelper.storeUserLocationIntoCurrentSession
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.session.Location
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
 import com.simprints.id.domain.moduleapi.core.response.SetupResponse
-import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.tools.AndroidResourcesHelper
@@ -43,12 +38,7 @@ import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import kotlinx.android.synthetic.main.activity_setup.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.min
@@ -77,6 +67,7 @@ class SetupActivity: BaseSplitActivity() {
 
         viewModel.start(splitInstallManager, getRequiredModules())
         observeViewState()
+        observeNetworkState()
     }
 
     private fun injectDependencies() {
@@ -105,9 +96,12 @@ class SetupActivity: BaseSplitActivity() {
                 ModalitiesInstalled -> updateUiForModalitiesInstalledAndAskPermissions()
             }
         })
+    }
 
+    private fun observeNetworkState() {
         viewModel.getDeviceNetworkLiveData().observe(this, Observer {
-            if (it == DeviceOffline) {
+            Timber.d("Setup - Observing network $it")
+            if (it == DeviceOffline && viewModel.getViewStateLiveData().value != ModalitiesInstalled) {
                 launchAlertIfNecessary()
             }
         })
@@ -233,7 +227,7 @@ class SetupActivity: BaseSplitActivity() {
         data?.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
             when(it.buttonAction) {
                 CLOSE -> finishAffinity()
-                TRY_AGAIN -> viewModel.startDownloadIfNecessary(splitInstallManager, getRequiredModules())
+                TRY_AGAIN -> viewModel.reStartDownloadIfNecessary(splitInstallManager, getRequiredModules())
             }
         }
 

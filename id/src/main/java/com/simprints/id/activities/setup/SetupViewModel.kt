@@ -20,13 +20,21 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @ExperimentalCoroutinesApi
-class SetupViewModel(private val deviceManager: DeviceManager,
+class SetupViewModel(val deviceManager: DeviceManager,
                      private val crashReportManager: CrashReportManager) : ViewModel() {
 
-    fun getViewStateLiveData(): LiveData<SetupActivity.ViewState> = viewStateLiveData
-    fun getDeviceNetworkLiveData(): LiveData<SetupActivity.ViewState> = deviceNetwork
+    internal val scope by lazy { viewModelScope }
 
-    private var deviceNetwork: LiveData<SetupActivity.ViewState> = MutableLiveData()
+    fun getViewStateLiveData(): LiveData<SetupActivity.ViewState> = viewStateLiveData
+    fun getDeviceNetworkLiveData(): LiveData<SetupActivity.ViewState> =
+        deviceManager.isConnectedLiveData.map {
+        if (it) {
+            DeviceOnline
+        } else {
+            DeviceOffline
+        }
+    }
+
     private val viewStateLiveData = MutableLiveData<SetupActivity.ViewState>()
 
     fun start(splitInstallManager: SplitInstallManager, modalitiesRequired: List<String>) {
@@ -39,7 +47,6 @@ class SetupViewModel(private val deviceManager: DeviceManager,
             logMessageForCrashReport("Modalities to download: $modalitiesToDownload")
             modalitiesToDownload.forEach { splitInstallRequestBuilder.addModule(it) }
             startDownloadingModulesAndMonitorProgress(splitInstallManager, splitInstallRequestBuilder.build())
-            monitorNetworkState()
         } else {
             logMessageForCrashReport("Modalities $modalitiesRequired already installed")
             viewStateLiveData.value = ModalitiesInstalled
@@ -62,7 +69,7 @@ class SetupViewModel(private val deviceManager: DeviceManager,
         viewModelScope.launch {
             splitInstallManager.requestProgressFlow()
                 .collect { state ->
-                    Timber.d("Split install state $state")
+                    Timber.d("Setup - Split install state $state")
                     when (state.status()) {
                         DOWNLOADING -> {
                             viewStateLiveData.postValue(Downloading(state.bytesDownloaded(), state.totalBytesToDownload()))
@@ -88,24 +95,17 @@ class SetupViewModel(private val deviceManager: DeviceManager,
         }
     }
 
-    private fun monitorNetworkState() {
-        deviceNetwork = deviceManager.isConnectedLiveData.map {
-            if (it) {
-                DeviceOnline
-            } else {
-                DeviceOffline
-            }
-        }
-    }
-
     private fun logMessageForCrashReport(message: String) {
         crashReportManager.logMessageForCrashReport(ID_SETUP, NETWORK, message = message)
     }
 
-    fun startDownloadIfNecessary(splitInstallManager: SplitInstallManager, modalitiesRequired: List<String>) {
+    fun reStartDownloadIfNecessary(splitInstallManager: SplitInstallManager, modalitiesRequired: List<String>) {
         viewModelScope.launch {
+            Timber.d("Setup - Restarting download: ${splitInstallManager.requestSessionStates().last()}")
+            Timber.d("Setup - Restarting modalities download: ${!isModalityInstallOnGoing(splitInstallManager)}")
             if (!isModalityInstallOnGoing(splitInstallManager)) {
-                logMessageForCrashReport("Re-Starting modalities download")
+                logMessageForCrashReport("Restarting modalities download")
+                splitInstallManager.cancelInstall(splitInstallManager.requestSessionStates().last().sessionId())
                 start(splitInstallManager, modalitiesRequired)
             }
         }
@@ -113,6 +113,6 @@ class SetupViewModel(private val deviceManager: DeviceManager,
 
     private suspend fun isModalityInstallOnGoing(splitInstallManager: SplitInstallManager) =
         splitInstallManager.requestSessionStates().last().let {
-            (it.status == INSTALLED || it.status == INSTALLING || it.status == PENDING) && it.errorCode() == NO_ERROR
+            (it.status == INSTALLED || it.status == INSTALLING || it.status == DOWNLOADING || it.status == DOWNLOADED) && it.errorCode() == NO_ERROR
         }
 }
