@@ -144,21 +144,21 @@ class LiveFeedbackFragmentViewModel(
     private fun updateFallbackCaptureIfValid(faceDetection: FaceDetection) {
         if (faceDetection.hasValidStatus()) {
             fallbackCapture = faceDetection.apply { isFallback = true }
-            createFirstFallbackCaptureEvent()
+            createFirstFallbackCaptureEvent(faceDetection)
         }
     }
 
     /**
      * Send a fallback capture event only once
      */
-    private fun createFirstFallbackCaptureEvent() {
+    private fun createFirstFallbackCaptureEvent(faceDetection: FaceDetection) {
         if (fallbackCaptureEventSent) return
 
         fallbackCaptureEventSent = true
         faceSessionEventsManager.addEventInBackground(
             FaceFallbackCaptureEvent(
                 fallbackCaptureEventStartTime,
-                faceTimeHelper.now()
+                faceDetection.detectionEndTime
             )
         )
     }
