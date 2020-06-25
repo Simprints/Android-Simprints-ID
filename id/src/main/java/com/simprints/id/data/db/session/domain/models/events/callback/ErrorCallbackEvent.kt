@@ -32,6 +32,8 @@ class ErrorCallbackEvent(startTime: Long,
                     AppErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                     AppErrorResponse.Reason.LOGIN_NOT_COMPLETE -> LOGIN_NOT_COMPLETE
                     AppErrorResponse.Reason.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
+                    // TODO - ALAN: confirm CONFIGURATION_ERROR mapping
+                    AppErrorResponse.Reason.CONFIGURATION_ERROR -> UNEXPECTED_ERROR
                 }
         }
     }
