@@ -10,7 +10,6 @@ import com.simprints.face.controllers.core.events.model.*
 import com.simprints.face.controllers.core.events.model.Matcher
 import com.simprints.face.controllers.core.flow.Action
 import com.simprints.face.controllers.core.flow.MasterFlowManager
-import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.data.db.person.FaceSample
@@ -51,29 +50,17 @@ class FaceMatchViewModelTest {
 
     private val masterFlowManager: MasterFlowManager = mockk()
     private val faceDbManager: FaceDbManager = mockk()
-    private val facePreferencesManager: FacePreferencesManager = mockk {
-        every { faceMatchThreshold } returns 0f
-    }
     private val faceMatcher: FaceMatcher = spyk()
     private val faceCrashReportManager: FaceCrashReportManager = mockk(relaxUnitFun = true)
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxUnitFun = true)
     private val faceTimeHelper: FaceTimeHelper = mockk {
         every { now() } returns 0
     }
-    private val viewModel: FaceMatchViewModel =
-        FaceMatchViewModel(
-            masterFlowManager,
-            faceDbManager,
-            faceMatcher,
-            facePreferencesManager,
-            faceCrashReportManager,
-            faceSessionEventsManager,
-            faceTimeHelper,
-            testDispatcherProvider
-        )
+    private lateinit var viewModel: FaceMatchViewModel
 
     @Test
     fun `Route correctly to an error if it's not identify or verify`() {
+        viewModel = newFaceMatchViewModel(0f)
         every { masterFlowManager.getCurrentAction() } returns Action.ENROL
 
         viewModel.setupMatch(identifyRequest)
@@ -83,6 +70,7 @@ class FaceMatchViewModelTest {
 
     @Test
     fun `Send events with correct values for identification`() = testCoroutineRule.runBlockingTest {
+        viewModel = newFaceMatchViewModel(0f)
         every { masterFlowManager.getCurrentAction() } returns Action.IDENTIFY
         // Doing this way so I can compare later
         val candidates = generateSequenceN(5) { FixtureGenerator.getFaceIdentity(2) }.toList()
@@ -141,10 +129,11 @@ class FaceMatchViewModelTest {
 
     @Test
     fun `Send events with correct values after filter for identification`() = testCoroutineRule.runBlockingTest {
+        viewModel = newFaceMatchViewModel(60f)
+
         every { masterFlowManager.getCurrentAction() } returns Action.IDENTIFY
         // Doing this way so I can compare later
         val candidates = generateSequenceN(5) { FixtureGenerator.getFaceIdentity(2) }.toList()
-        every { facePreferencesManager.faceMatchThreshold } returns 60f
         coEvery { faceDbManager.loadPeople(any()) } returns candidates.asFlow()
         coEvery { faceMatcher.getComparisonScore(any(), any()) } returnsMany listOf(
             90f, // person 1
@@ -198,6 +187,7 @@ class FaceMatchViewModelTest {
 
     @Test
     fun `Send events with correct values for verification`() = testCoroutineRule.runBlockingTest {
+        viewModel = newFaceMatchViewModel(0f)
         every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
         // Doing this way so I can compare later
         val candidates = generateSequenceN(1) { FixtureGenerator.getFaceIdentity(2) }.toList()
@@ -236,4 +226,16 @@ class FaceMatchViewModelTest {
         verify(atMost = 1) { faceSessionEventsManager.addEventInBackground(any()) }
     }
 
+    private fun newFaceMatchViewModel(faceMatchThreshold: Float): FaceMatchViewModel {
+        return FaceMatchViewModel(
+            masterFlowManager,
+            faceDbManager,
+            faceMatcher,
+            faceMatchThreshold,
+            faceCrashReportManager,
+            faceSessionEventsManager,
+            faceTimeHelper,
+            testDispatcherProvider
+        )
+    }
 }
