@@ -16,7 +16,8 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         LOGIN_NOT_COMPLETE,
         BLUETOOTH_NOT_SUPPORTED,
         GUID_NOT_FOUND_ONLINE,
-        ENROLMENT_LAST_BIOMETRICS_FAILED;
+        ENROLMENT_LAST_BIOMETRICS_FAILED,
+        FINGERPRINT_CONFIGURATION_ERROR;
 
         companion object {
             fun fromDomainAlertTypeToAppErrorType(alertType: AlertType) =

@@ -20,7 +20,8 @@ class ErrorCallbackEvent(startTime: Long,
         UNEXPECTED_ERROR,
         BLUETOOTH_NOT_SUPPORTED,
         LOGIN_NOT_COMPLETE,
-        ENROLMENT_LAST_BIOMETRICS_FAILED;
+        ENROLMENT_LAST_BIOMETRICS_FAILED,
+        FINGERPRINT_CONFIGURATION_ERROR;
 
         companion object {
             fun fromAppResponseErrorReasonToEventReason(appResponseErrorReason: AppErrorResponse.Reason) =
@@ -32,6 +33,7 @@ class ErrorCallbackEvent(startTime: Long,
                     AppErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                     AppErrorResponse.Reason.LOGIN_NOT_COMPLETE -> LOGIN_NOT_COMPLETE
                     AppErrorResponse.Reason.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
+                    AppErrorResponse.Reason.FINGERPRINT_CONFIGURATION_ERROR -> FINGERPRINT_CONFIGURATION_ERROR
                 }
         }
     }
