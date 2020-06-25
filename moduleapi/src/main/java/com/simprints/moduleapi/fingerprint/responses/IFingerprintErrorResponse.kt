@@ -6,5 +6,6 @@ interface IFingerprintErrorResponse: IFingerprintResponse {
 
 enum class IFingerprintErrorReason {
     UNEXPECTED_ERROR,
-    BLUETOOTH_NOT_SUPPORTED
+    BLUETOOTH_NOT_SUPPORTED,
+    CONFIGURATION_ERROR
 }

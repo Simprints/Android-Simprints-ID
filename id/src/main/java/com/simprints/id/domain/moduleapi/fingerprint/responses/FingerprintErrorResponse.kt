@@ -10,7 +10,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class FingerprintErrorResponse(
     val fingerprintErrorReason: FingerprintErrorReason
-): FingerprintResponse {
+) : FingerprintResponse {
 
     @IgnoredOnParcel override val type: FingerprintResponseType = FingerprintResponseType.ENROL
 }
@@ -22,18 +22,19 @@ fun IFingerprintErrorResponse.fromModuleApiToDomain() =
 enum class FingerprintErrorReason {
     UNEXPECTED_ERROR,
     BLUETOOTH_NOT_SUPPORTED,
-    GUID_NOT_FOUND_ONLINE
+    GUID_NOT_FOUND_ONLINE,
+    CONFIGURATION_ERROR
 }
 
-fun IFingerprintErrorReason.fromModuleApiToDomain(): FingerprintErrorReason =
-    when(this) {
-        IFingerprintErrorReason.UNEXPECTED_ERROR -> FingerprintErrorReason.UNEXPECTED_ERROR
-        IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED -> FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
-    }
+fun IFingerprintErrorReason.fromModuleApiToDomain(): FingerprintErrorReason = when (this) {
+    IFingerprintErrorReason.UNEXPECTED_ERROR -> FingerprintErrorReason.UNEXPECTED_ERROR
+    IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED -> FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
+    IFingerprintErrorReason.CONFIGURATION_ERROR -> FingerprintErrorReason.CONFIGURATION_ERROR
+}
 
-fun FingerprintErrorReason.toAppErrorReason(): AppErrorResponse.Reason =
-    when(this) {
-        FingerprintErrorReason.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
-        FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
-        FingerprintErrorReason.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
-    }
+fun FingerprintErrorReason.toAppErrorReason(): AppErrorResponse.Reason = when (this) {
+    FingerprintErrorReason.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
+    FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
+    FingerprintErrorReason.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
+    FingerprintErrorReason.CONFIGURATION_ERROR -> CONFIGURATION_ERROR
+}
