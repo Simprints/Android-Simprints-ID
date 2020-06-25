@@ -10,7 +10,7 @@ data class FaceErrorResponse(val faceErrorReason: FaceErrorReason): FaceResponse
     @IgnoredOnParcel override val type: FaceResponseType = FaceResponseType.ERROR
 }
 
-fun IFaceErrorResponse.fromModuleApiToDomain() = FaceErrorResponse(error.fromModuleApiToDomain())
+fun IFaceErrorResponse.fromModuleApiToDomain() = FaceErrorResponse(reason.fromModuleApiToDomain())
 
 enum class FaceErrorReason {
     UNEXPECTED_ERROR
