@@ -117,6 +117,7 @@ class SessionRemoteDataSourceImplAndroidTest {
                 addCallbackEvent()
                 addCalloutEvent()
                 addCompletionCheckEvent()
+                // TODO: add FACE_MISSING_LICENSE and FACE_INVALID_LICENSE once implemented by cloud
             }
 
             executeUpload(mutableListOf(session))
@@ -250,7 +251,7 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     private fun SessionEvents.addPersonCreationEvent() {
-        addEvent(PersonCreationEvent(0, listOf(RANDOM_GUID, RANDOM_GUID)))
+        addEvent(PersonCreationEvent(0, listOf(RANDOM_GUID, RANDOM_GUID), null))
     }
 
     private fun SessionEvents.addRefusalEvent() {
