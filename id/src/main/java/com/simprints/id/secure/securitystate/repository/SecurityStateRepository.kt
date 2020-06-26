@@ -9,4 +9,6 @@ interface SecurityStateRepository {
 
     suspend fun getSecurityState(): SecurityState
 
+    fun getSecurityStatusFromLocal(): SecurityState.Status
+
 }
