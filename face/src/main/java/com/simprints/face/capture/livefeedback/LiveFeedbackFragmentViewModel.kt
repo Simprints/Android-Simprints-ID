@@ -19,6 +19,7 @@ import com.simprints.uicomponents.models.FloatRange
 import com.simprints.uicomponents.models.PreviewFrame
 import com.simprints.uicomponents.models.Size
 import kotlinx.coroutines.channels.Channel
+import java.util.concurrent.atomic.AtomicBoolean
 
 class LiveFeedbackFragmentViewModel(
     private val mainVM: FaceCaptureViewModel,
@@ -34,7 +35,7 @@ class LiveFeedbackFragmentViewModel(
         FloatRange(0.25f, 0.5f)
     )
     private val fallbackCaptureEventStartTime = faceTimeHelper.now()
-    private var fallbackCaptureEventSent = false
+    private var shouldSendFallbackCaptureEvent: AtomicBoolean = AtomicBoolean(true)
 
     lateinit var fallbackCapture: FaceDetection
     val userCaptures = mutableListOf<FaceDetection>()
@@ -152,15 +153,14 @@ class LiveFeedbackFragmentViewModel(
      * Send a fallback capture event only once
      */
     private fun createFirstFallbackCaptureEvent(faceDetection: FaceDetection) {
-        if (fallbackCaptureEventSent) return
-
-        fallbackCaptureEventSent = true
-        faceSessionEventsManager.addEventInBackground(
-            FaceFallbackCaptureEvent(
-                fallbackCaptureEventStartTime,
-                faceDetection.detectionEndTime
+        if (shouldSendFallbackCaptureEvent.getAndSet(false)) {
+            faceSessionEventsManager.addEventInBackground(
+                FaceFallbackCaptureEvent(
+                    fallbackCaptureEventStartTime,
+                    faceDetection.detectionEndTime
+                )
             )
-        )
+        }
     }
 
     private fun sendCaptureEvent(faceDetection: FaceDetection) {
