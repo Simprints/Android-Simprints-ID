@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.event.local
 
+import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.SessionQuery
 import com.simprints.id.data.db.event.domain.session.SessionEvents
 import kotlinx.coroutines.flow.Flow

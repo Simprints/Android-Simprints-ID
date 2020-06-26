@@ -9,17 +9,15 @@ import java.util.*
 
 @Keep
 class ConfirmationCallbackEvent(
-    startTime: Long,
+    creationTime: Long,
     identificationOutcome: Boolean,
-    sessionId: String = UUID.randomUUID().toString(), //StopShip: to change in PAS-993
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    ConfirmationCallbackPayload(startTime, startTime - sessionStartTime, identificationOutcome)) {
+    ConfirmationCallbackPayload(creationTime, identificationOutcome)) {
 
-    class ConfirmationCallbackPayload(startTime: Long,
-                                      relativeStartTime: Long,
+    class ConfirmationCallbackPayload(creationTime: Long,
                                       val identificationOutcome: Boolean)
-        : EventPayload(EventPayloadType.CALLBACK_CONFIRMATION, startTime, relativeStartTime)
+        : EventPayload(EventPayloadType.CALLBACK_CONFIRMATION, creationTime)
 }

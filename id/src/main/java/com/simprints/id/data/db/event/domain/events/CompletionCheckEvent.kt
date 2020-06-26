@@ -7,15 +7,13 @@ import java.util.*
 class CompletionCheckEvent(
     startTime: Long,
     completed: Boolean,
-    sessionId: String = UUID.randomUUID().toString(), //StopShip: to change in PAS-993
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    CompletionCheckPayload(startTime, startTime - sessionStartTime, completed)) {
+    CompletionCheckPayload(startTime, completed)) {
 
     @Keep
     class CompletionCheckPayload(startTime: Long,
-                                 relativeStartTime: Long,
-                                 val completed: Boolean) : EventPayload(EventPayloadType.COMPLETION_CHECK, startTime, relativeStartTime)
+                                 val completed: Boolean) : EventPayload(EventPayloadType.COMPLETION_CHECK, startTime)
 }

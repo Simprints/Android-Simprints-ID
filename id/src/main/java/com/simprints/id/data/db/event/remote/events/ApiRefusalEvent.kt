@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.RefusalEvent
 import com.simprints.id.data.db.event.domain.events.RefusalEvent.RefusalPayload
 import com.simprints.id.data.db.event.domain.events.RefusalEvent.RefusalPayload.Answer
-import com.simprints.id.data.db.session.remote.events.ApiEvent
 
 @Keep
 class ApiRefusalEvent(val relativeStartTime: Long,
@@ -24,8 +23,8 @@ class ApiRefusalEvent(val relativeStartTime: Long,
     }
 
     constructor(refusalEvent: RefusalEvent) :
-        this((refusalEvent.payload as RefusalPayload).relativeStartTime,
-            refusalEvent.payload.relativeEndTime,
+        this((refusalEvent.payload as RefusalPayload).creationTime,
+            refusalEvent.payload.endTime,
             refusalEvent.payload.reason.toApiRefusalEventAnswer(),
             refusalEvent.payload.otherText)
 }

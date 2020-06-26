@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.ConnectivitySnapshotEvent
+import com.simprints.id.data.db.event.domain.events.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
 import com.simprints.id.tools.utils.SimNetworkUtils
 
 @Keep
@@ -17,7 +18,7 @@ class ApiConnectivitySnapshotEvent(
     }
 
     constructor(connectivitySnapshotEvent: ConnectivitySnapshotEvent) :
-        this(connectivitySnapshotEvent.relativeStartTime ?: 0,
-            connectivitySnapshotEvent.networkType,
-            connectivitySnapshotEvent.connections.map { ApiConnection(it) })
+        this((connectivitySnapshotEvent.payload as ConnectivitySnapshotPayload).creationTime ?: 0,
+            connectivitySnapshotEvent.payload.networkType,
+            connectivitySnapshotEvent.payload.connections.map { ApiConnection(it) })
 }

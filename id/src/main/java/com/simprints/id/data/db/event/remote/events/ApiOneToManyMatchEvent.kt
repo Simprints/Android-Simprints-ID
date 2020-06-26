@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent
 import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent.OneToManyMatchPayload
 import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
-import com.simprints.id.data.db.session.remote.events.ApiEvent
 
 @Keep
 class ApiOneToManyMatchEvent(val relativeStartTime: Long,
@@ -26,8 +25,8 @@ class ApiOneToManyMatchEvent(val relativeStartTime: Long,
     }
 
     constructor(oneToManyMatchEvent: OneToManyMatchEvent) :
-        this((oneToManyMatchEvent.payload as OneToManyMatchPayload).relativeStartTime,
-            oneToManyMatchEvent.payload.relativeEndTime,
+        this((oneToManyMatchEvent.payload as OneToManyMatchPayload).creationTime,
+            oneToManyMatchEvent.payload.endTime,
             ApiMatchPool(oneToManyMatchEvent.payload.pool),
             oneToManyMatchEvent.payload.result?.map { ApiMatchEntry(it) })
 }

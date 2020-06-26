@@ -5,7 +5,6 @@ import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent
 import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.ScannerConnectionPayload
 import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration
 import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
-import com.simprints.id.data.db.session.remote.events.ApiEvent
 
 @Keep
 class ApiScannerConnectionEvent(val relativeStartTime: Long,
@@ -22,7 +21,7 @@ class ApiScannerConnectionEvent(val relativeStartTime: Long,
     }
 
     constructor(scannerConnectionEvent: ScannerConnectionEvent) :
-        this((scannerConnectionEvent.payload as ScannerConnectionPayload).relativeStartTime,
+        this((scannerConnectionEvent.payload as ScannerConnectionPayload).creationTime,
             ApiScannerInfo(scannerConnectionEvent.payload.scannerInfo))
 
     enum class ApiScannerGeneration {

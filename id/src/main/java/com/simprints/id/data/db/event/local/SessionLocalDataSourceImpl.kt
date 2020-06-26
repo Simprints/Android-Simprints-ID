@@ -3,12 +3,13 @@ package com.simprints.id.data.db.event.local
 import android.content.Context
 import android.os.Build
 import com.simprints.id.data.db.event.SessionRepositoryImpl
-import com.simprints.id.data.db.event.domain.validators.SessionEventValidator
-import com.simprints.id.data.db.event.domain.events.SessionQuery
 import com.simprints.id.data.db.event.domain.events.ArtificialTerminationEvent
+import com.simprints.id.data.db.event.domain.events.Event
+import com.simprints.id.data.db.event.domain.events.SessionQuery
 import com.simprints.id.data.db.event.domain.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.session.Device
 import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.domain.validators.SessionEventValidator
 import com.simprints.id.data.db.event.local.models.DbSession
 import com.simprints.id.data.db.event.local.models.toDomain
 import com.simprints.id.data.secure.LocalDbKey
@@ -186,7 +187,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
             val currentSession = addQueryParams(reamInTrans, SessionQuery(openSession = true)).findAll()
             currentSession.forEach {
                 val updatedSession = it.toDomain()
-                val artificialTerminationEvent = ArtificialTerminationEvent(timeHelper.now(), ArtificialTerminationEvent.Reason.NEW_SESSION)
+                val artificialTerminationEvent = ArtificialTerminationEvent(timeHelper.now(), ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION)
 
                 with(updatedSession) {
                     addEvent(artificialTerminationEvent)

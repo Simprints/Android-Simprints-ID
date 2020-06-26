@@ -9,22 +9,20 @@ import java.util.*
 
 @Keep
 class ConfirmationCalloutEvent(
-    startTime: Long,
+    creationTime: Long,
     projectId: String,
     selectedGuid: String,
-    sessionId: String = UUID.randomUUID().toString(), //StopShip: to change in PAS-993
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    ConfirmationCalloutPayload(startTime, startTime - sessionStartTime, projectId, selectedGuid, sessionId)) {
+    ConfirmationCalloutPayload(creationTime, projectId, selectedGuid, sessionId)) {
 
     @Keep
     class ConfirmationCalloutPayload(
-        startTime: Long,
-        relativeStartTime: Long,
+        creationTime: Long,
         val projectId: String,
         val selectedGuid: String,
         val sessionId: String
-    ) : EventPayload(EventPayloadType.CALLOUT_CONFIRMATION, startTime, relativeStartTime)
+    ) : EventPayload(EventPayloadType.CALLOUT_CONFIRMATION, creationTime)
 }

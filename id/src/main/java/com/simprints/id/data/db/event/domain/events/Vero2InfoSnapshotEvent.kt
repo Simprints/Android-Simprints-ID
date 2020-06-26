@@ -10,18 +10,16 @@ class Vero2InfoSnapshotEvent(
     startTime: Long,
     version: Vero2Version,
     battery: BatteryInfo,
-    sessionId: String = UUID.randomUUID().toString(), //StopShip: to change in PAS-993
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    Vero2InfoSnapshotPayload(startTime, startTime - sessionStartTime, version, battery)) {
+    Vero2InfoSnapshotPayload(startTime, version, battery)) {
 
     @Keep
     class Vero2InfoSnapshotPayload(startTime: Long,
-                                   relativeStartTime: Long,
                                    val version: Vero2Version,
-                                   val battery: BatteryInfo) : EventPayload(EventPayloadType.VERO_2_INFO_SNAPSHOT, startTime, relativeStartTime) {
+                                   val battery: BatteryInfo) : EventPayload(EventPayloadType.VERO_2_INFO_SNAPSHOT, startTime) {
 
         @Keep
         class Vero2Version(

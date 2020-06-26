@@ -1,7 +1,9 @@
 package com.simprints.id.data.db.subject
 
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.id.data.db.event.domain.events.*
+import com.simprints.id.data.db.event.domain.events.Event
+import com.simprints.id.data.db.event.domain.events.EventLabel.*
+import com.simprints.id.data.db.event.domain.events.Events
 import com.simprints.id.data.db.event.domain.events.subject.*
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
@@ -71,25 +73,27 @@ class SubjectRepositoryUpSyncHelperImpl(
     }
 
     internal fun createEvents(subjects: List<Subject>) =
-            Events(subjects.map { createEventFromPerson(it) })
+        Events(subjects.map { createEventFromPerson(it) })
 
     private fun createEventFromPerson(subject: Subject): Event =
         with(subject) {
             Event(
-                    getRandomUuid(),
-                    listOf(projectId),
-                    listOf(subjectId),
-                    listOf(attendantId),
-                    listOf(moduleId),
-                    modalities.map { it.toMode() },
-                    createPayload(subject)
+                getRandomUuid(),
+                listOf(
+                    ProjectId(projectId),
+                    SubjectId(subjectId),
+                    AttendantId(attendantId),
+                    ModuleId(listOf(moduleId)),
+                    Mode(modalities.map { it.toMode() })
+                ),
+                createPayload(subject)
             )
         }
 
     internal fun getRandomUuid() = UUID.randomUUID().toString()
 
     private fun createPayload(subject: Subject) =
-        EnrolmentRecordCreationPayload(
+        EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(
             subjectId = subject.subjectId,
             projectId = subject.projectId,
             moduleId = subject.moduleId,
@@ -121,7 +125,9 @@ class SubjectRepositoryUpSyncHelperImpl(
                         it.fingerIdentifier.fromSubjectToEvent())
                 }
             )
-        } else { null }
+        } else {
+            null
+        }
 
     private fun buildFaceReference(faceSamples: List<FaceSample>) =
         if (faceSamples.isNotEmpty()) {
@@ -132,7 +138,9 @@ class SubjectRepositoryUpSyncHelperImpl(
                     )
                 }
             )
-        } else { null }
+        } else {
+            null
+        }
 
     private suspend fun markPeopleAsSynced(subjects: List<Subject>) {
         val updatedPeople = subjects.map { it.copy(toSync = false) }

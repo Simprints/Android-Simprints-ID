@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.event.local.models
 
+import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.session.Device
 import com.simprints.id.data.db.event.domain.session.SessionEvents
 import com.simprints.id.data.db.event.local.toDomainEvent

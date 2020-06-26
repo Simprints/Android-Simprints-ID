@@ -9,19 +9,17 @@ import java.util.*
 
 @Keep
 class VerificationCallbackEvent(
-    startTime: Long,
+    creationTime: Long,
     score: CallbackComparisonScore,
-    sessionId: String = UUID.randomUUID().toString(), //StopShip: to change in PAS-993
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    VerificationCallbackPayload(startTime, sessionStartTime - startTime, score)) {
+    VerificationCallbackPayload(creationTime, score)) {
 
     @Keep
     class VerificationCallbackPayload(
-        startTime: Long,
-        relativeStartTime: Long,
+        creationTime: Long,
         val score: CallbackComparisonScore
-    ) : EventPayload(EventPayloadType.CALLBACK_VERIFICATION, startTime, relativeStartTime)
+    ) : EventPayload(EventPayloadType.CALLBACK_VERIFICATION, creationTime)
 }

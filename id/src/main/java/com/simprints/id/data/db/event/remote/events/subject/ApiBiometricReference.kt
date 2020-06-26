@@ -36,17 +36,17 @@ private object ApiBiometricReferenceName{
 
 fun BiometricReference.fromDomainToApi() = when (this) {
     is DomainFaceReference -> {
-        ApiFaceReference(templates.map { com.simprints.id.data.db.event.remote.events.fromDomainToApi() }, metadata)
+        ApiFaceReference(templates.map { it.fromDomainToApi() }, metadata)
     }
     is DomainFingerprintReference -> {
-        ApiFingerprintReference(templates.map { com.simprints.id.data.db.event.remote.events.fromDomainToApi() }, metadata)
+        ApiFingerprintReference(templates.map { it.fromDomainToApi() }, metadata)
     }
 }
 
 fun FaceTemplate.fromDomainToApi() = ApiFaceTemplate(template)
 
 fun FingerprintTemplate.fromDomainToApi() =
-    ApiFingerprintTemplate(quality, template, com.simprints.id.data.db.event.remote.events.fromDomainToApi())
+    ApiFingerprintTemplate(quality, template, finger.fromDomainToApi())
 
 fun FingerIdentifier.fromDomainToApi() = when(this) {
     FingerIdentifier.RIGHT_5TH_FINGER -> ApiFingerIdentifier.RIGHT_5TH_FINGER

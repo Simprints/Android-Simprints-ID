@@ -2,6 +2,9 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.CandidateReadEvent
+import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload
+import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.LocalResult
+import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.RemoteResult
 
 @Keep
 class ApiCandidateReadEvent(val relativeStartTime: Long,
@@ -15,10 +18,10 @@ class ApiCandidateReadEvent(val relativeStartTime: Long,
         FOUND, NOT_FOUND;
 
         companion object {
-            fun fromDomainToApi(localResult: CandidateReadEvent.LocalResult) =
+            fun fromDomainToApi(localResult: LocalResult) =
                 when (localResult) {
-                    CandidateReadEvent.LocalResult.FOUND -> FOUND
-                    CandidateReadEvent.LocalResult.NOT_FOUND -> NOT_FOUND
+                    LocalResult.FOUND -> FOUND
+                    LocalResult.NOT_FOUND -> NOT_FOUND
                 }
         }
     }
@@ -28,21 +31,21 @@ class ApiCandidateReadEvent(val relativeStartTime: Long,
         FOUND, NOT_FOUND;
 
         companion object {
-            fun fromDomainToApi(remoteResult: CandidateReadEvent.RemoteResult?) =
+            fun fromDomainToApi(remoteResult: RemoteResult?) =
                 when (remoteResult) {
-                    CandidateReadEvent.RemoteResult.FOUND -> FOUND
-                    CandidateReadEvent.RemoteResult.NOT_FOUND -> NOT_FOUND
+                    RemoteResult.FOUND -> FOUND
+                    RemoteResult.NOT_FOUND -> NOT_FOUND
                     else -> null
                 }
         }
     }
 
     constructor(candidateReadEvent: CandidateReadEvent) :
-        this(candidateReadEvent.relativeStartTime ?: 0,
-            candidateReadEvent.relativeEndTime ?: 0,
-            candidateReadEvent.candidateId,
-            ApiLocalResult.fromDomainToApi(candidateReadEvent.localResult),
-            ApiRemoteResult.fromDomainToApi(candidateReadEvent.remoteResult))
+        this((candidateReadEvent.payload as CandidateReadPayload).creationTime,
+            candidateReadEvent.payload.endTime,
+            candidateReadEvent.payload.candidateId,
+            ApiLocalResult.fromDomainToApi(candidateReadEvent.payload.localResult),
+            ApiRemoteResult.fromDomainToApi(candidateReadEvent.payload.remoteResult))
 }
 
 

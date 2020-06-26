@@ -2,7 +2,8 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.AuthenticationEvent
-
+import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload
+import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.Result.*
 @Keep
 class ApiAuthenticationEvent(val relativeStartTime: Long,
                              val relativeEndTime: Long,
@@ -11,7 +12,7 @@ class ApiAuthenticationEvent(val relativeStartTime: Long,
 
     @Keep
     class ApiUserInfo(val projectId: String, val userId: String) {
-        constructor(userInfoDomain: AuthenticationEvent.UserInfo):
+        constructor(userInfoDomain: AuthenticationPayload.UserInfo):
             this(userInfoDomain.projectId, userInfoDomain.userId)
     }
 
@@ -26,19 +27,19 @@ class ApiAuthenticationEvent(val relativeStartTime: Long,
     }
 
     constructor(authenticationEventDomain: AuthenticationEvent) :
-        this(authenticationEventDomain.relativeStartTime ?: 0,
-            authenticationEventDomain.relativeEndTime ?: 0,
-            ApiUserInfo(authenticationEventDomain.userInfo),
-            authenticationEventDomain.result.toApiAuthenticationEventResult())
+        this((authenticationEventDomain.payload as AuthenticationPayload).creationTime,
+            authenticationEventDomain.payload.endTime,
+            ApiUserInfo(authenticationEventDomain.payload.userInfo),
+            authenticationEventDomain.payload.result.toApiAuthenticationEventResult())
 }
 
-fun AuthenticationEvent.Result.toApiAuthenticationEventResult() =
+fun AuthenticationEvent.AuthenticationPayload.Result.toApiAuthenticationEventResult() =
     when(this) {
-        AuthenticationEvent.Result.AUTHENTICATED -> ApiAuthenticationEvent.ApiResult.AUTHENTICATED
-        AuthenticationEvent.Result.BAD_CREDENTIALS -> ApiAuthenticationEvent.ApiResult.BAD_CREDENTIALS
-        AuthenticationEvent.Result.OFFLINE -> ApiAuthenticationEvent.ApiResult.OFFLINE
-        AuthenticationEvent.Result.TECHNICAL_FAILURE -> ApiAuthenticationEvent.ApiResult.TECHNICAL_FAILURE
-        AuthenticationEvent.Result.SAFETYNET_UNAVAILABLE -> ApiAuthenticationEvent.ApiResult.SAFETYNET_UNAVAILABLE
-        AuthenticationEvent.Result.SAFETYNET_INVALID_CLAIM -> ApiAuthenticationEvent.ApiResult.SAFETYNET_INVALID_CLAIM
-        AuthenticationEvent.Result.UNKNOWN -> ApiAuthenticationEvent.ApiResult.TECHNICAL_FAILURE
+        AUTHENTICATED -> ApiAuthenticationEvent.ApiResult.AUTHENTICATED
+        BAD_CREDENTIALS -> ApiAuthenticationEvent.ApiResult.BAD_CREDENTIALS
+        OFFLINE -> ApiAuthenticationEvent.ApiResult.OFFLINE
+        TECHNICAL_FAILURE -> ApiAuthenticationEvent.ApiResult.TECHNICAL_FAILURE
+        SAFETYNET_UNAVAILABLE -> ApiAuthenticationEvent.ApiResult.SAFETYNET_UNAVAILABLE
+        SAFETYNET_INVALID_CLAIM -> ApiAuthenticationEvent.ApiResult.SAFETYNET_INVALID_CLAIM
+        UNKNOWN -> ApiAuthenticationEvent.ApiResult.TECHNICAL_FAILURE
     }
