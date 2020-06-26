@@ -24,4 +24,6 @@ interface LoginActivityHelper {
     @Throws(JSONException::class)
     fun tryParseQrCodeResponse(response: Intent): QrCodeResponse
 
+    fun isSecurityStatusRunning(): Boolean
+
 }

@@ -73,7 +73,9 @@ open class SecurityModule {
     )
 
     @Provides
-    open fun provideLoginActivityHelper(): LoginActivityHelper = LoginActivityHelperImpl()
+    open fun provideLoginActivityHelper(
+        securityStateRepository: SecurityStateRepository
+    ): LoginActivityHelper = LoginActivityHelperImpl(securityStateRepository)
 
     @Provides
     open fun provideLoginViewModelFactory(
