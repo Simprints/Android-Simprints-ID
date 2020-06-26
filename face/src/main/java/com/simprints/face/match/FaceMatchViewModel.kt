@@ -18,7 +18,6 @@ import com.simprints.face.controllers.core.events.model.OneToManyMatchEvent
 import com.simprints.face.controllers.core.events.model.OneToOneMatchEvent
 import com.simprints.face.controllers.core.flow.Action
 import com.simprints.face.controllers.core.flow.MasterFlowManager
-import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.data.db.person.FaceIdentity
@@ -75,7 +74,8 @@ class FaceMatchViewModel(
             masterFlowManager.getCurrentAction(),
             faceRequest.queryForCandidates,
             sortedResults.size,
-            maxFilteredResults.map { MatchEntry(it.guid, it.confidence) })
+            maxFilteredResults
+        )
 
         sendFaceMatchResponse(sortedResults.size, maxFilteredResults)
     }
@@ -150,8 +150,9 @@ class FaceMatchViewModel(
         action: Action,
         queryForCandidates: Serializable,
         candidatesCount: Int,
-        matchEntries: List<MatchEntry>
+        results: List<FaceMatchResult>
     ) {
+        val matchEntries = results.map { MatchEntry(it.guid, it.confidence) }
         val event = if (action == Action.IDENTIFY)
             getOneToManyEvent(startTime, endTime, queryForCandidates, candidatesCount, matchEntries)
         else
