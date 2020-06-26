@@ -3,7 +3,6 @@ package com.simprints.id.data.db.event.remote.events
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.event.domain.events.FingerprintCaptureEvent.FingerprintCapturePayload
-import com.simprints.id.data.db.session.remote.events.ApiEvent
 
 @Keep
 class ApiFingerprintCaptureEvent(val id: String,
@@ -33,8 +32,8 @@ class ApiFingerprintCaptureEvent(val id: String,
 
     constructor(fingerprintCaptureEvent: FingerprintCaptureEvent) :
         this(fingerprintCaptureEvent.id,
-            (fingerprintCaptureEvent.payload as FingerprintCapturePayload).relativeStartTime,
-            fingerprintCaptureEvent.payload.relativeEndTime,
+            (fingerprintCaptureEvent.payload as FingerprintCapturePayload).creationTime,
+            fingerprintCaptureEvent.payload.endTime,
             fingerprintCaptureEvent.payload.qualityThreshold,
             fingerprintCaptureEvent.payload.finger.toApiFingerIdentifier(),
             ApiResult.valueOf(fingerprintCaptureEvent.payload.result.toString()),

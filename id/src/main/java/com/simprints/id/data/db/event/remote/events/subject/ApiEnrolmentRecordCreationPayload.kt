@@ -1,7 +1,8 @@
 package com.simprints.id.data.db.event.remote.events.subject
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordCreationPayload
+import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
+import com.simprints.id.data.db.event.domain.events.subject.fromApiToDomain
 import com.simprints.id.data.db.event.remote.events.ApiEventPayload
 import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType
 
@@ -18,3 +19,17 @@ data class ApiEnrolmentRecordCreationPayload(
         this(payload.subjectId, payload.projectId, payload.moduleId,
             payload.attendantId, payload.biometricReferences.map { it.fromDomainToApi() })
 }
+
+/* For GDPR, we might have to remove biometric references for some creation events,
+which would mean that we would get a response from the backend without biometric references,
+if that happens, we would  not be converting that event payload to domain. */
+fun ApiEnrolmentRecordCreationPayload.fromApiToDomainOrNullIfNoBiometricReferences() =
+    biometricReferences?.let { biometricRefs ->
+        EnrolmentRecordCreationPayload(
+            subjectId,
+            projectId,
+            moduleId,
+            attendantId,
+            biometricRefs.map { it.fromApiToDomain() }
+        )
+    }

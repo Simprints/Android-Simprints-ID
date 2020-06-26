@@ -1,28 +1,30 @@
 package com.simprints.id.data.db.event.domain.events.subject
 
+import androidx.annotation.Keep
+import com.simprints.id.data.db.event.domain.events.Event
+import com.simprints.id.data.db.event.domain.events.EventLabel
 import com.simprints.id.data.db.event.domain.events.EventPayload
 import com.simprints.id.data.db.event.domain.events.EventPayloadType
-import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationPayload
+import java.util.*
 
-data class EnrolmentRecordCreationPayload(
-    val subjectId: String,
-    val projectId: String,
-    val moduleId: String,
-    val attendantId: String,
-    val biometricReferences: List<BiometricReference>
-) : EventPayload(EventPayloadType.ENROLMENT_RECORD_CREATION, 0, 0)
+@Keep
+class EnrolmentRecordCreationEvent(
+    subjectId: String,
+    projectId: String,
+    moduleId: String,
+    attendantId: String,
+    biometricReferences: List<BiometricReference>
+) : Event(
+    UUID.randomUUID().toString(),
+    listOf(EventLabel.ProjectId(projectId), EventLabel.ModuleId(listOf(moduleId)), EventLabel.AttendantId(attendantId)),
+    EnrolmentRecordCreationPayload(subjectId, projectId, moduleId, attendantId, biometricReferences)) {
+
+    data class EnrolmentRecordCreationPayload(
+        val subjectId: String,
+        val projectId: String,
+        val moduleId: String,
+        val attendantId: String,
+        val biometricReferences: List<BiometricReference>
+    ) : EventPayload(EventPayloadType.ENROLMENT_RECORD_CREATION, 0)
 // startTime and relativeStartTime are not used for Pokodex events
-
-/* For GDPR, we might have to remove biometric references for some creation events,
-which would mean that we would get a response from the backend without biometric references,
-if that happens, we would  not be converting that event payload to domain. */
-fun ApiEnrolmentRecordCreationPayload.fromApiToDomainOrNullIfNoBiometricReferences() =
-    biometricReferences?.let { biometricRefs ->
-        EnrolmentRecordCreationPayload(
-            subjectId,
-            projectId,
-            moduleId,
-            attendantId,
-            biometricRefs.map { it.fromApiToDomain() }
-        )
-    }
+}

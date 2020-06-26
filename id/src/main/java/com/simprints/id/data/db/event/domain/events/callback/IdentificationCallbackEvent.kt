@@ -9,21 +9,19 @@ import java.util.*
 
 @Keep
 class IdentificationCallbackEvent(
-    startTime: Long,
+    creationTime: Long,
     sessionId: String,
-    scores: List<CallbackComparisonScore>,
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    scores: List<CallbackComparisonScore>
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    IdentificationCallbackPayload(startTime, startTime - sessionStartTime, sessionId, scores)) {
+    IdentificationCallbackPayload(creationTime, sessionId, scores)) {
 
     @Keep
     class IdentificationCallbackPayload(
-        startTime: Long,
-        relativeStartTime: Long,
+        creationTime: Long,
         val sessionId: String,
         val scores: List<CallbackComparisonScore>
-    ) : EventPayload(EventPayloadType.CALLBACK_IDENTIFICATION, startTime, relativeStartTime)
+    ) : EventPayload(EventPayloadType.CALLBACK_IDENTIFICATION, creationTime)
 
 }

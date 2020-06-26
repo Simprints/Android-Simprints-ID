@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.ConsentEvent
+import com.simprints.id.data.db.event.domain.events.ConsentEvent.ConsentPayload
 
 @Keep
 class ApiConsentEvent(val relativeStartTime: Long,
@@ -19,8 +20,8 @@ class ApiConsentEvent(val relativeStartTime: Long,
     }
 
     constructor(consentEvent: ConsentEvent) :
-        this(consentEvent.relativeStartTime ?: 0,
-            consentEvent.relativeEndTime ?: 0,
-            ApiType.valueOf(consentEvent.consentType.toString()),
-            ApiResult.valueOf(consentEvent.result.toString()))
+        this((consentEvent.payload as ConsentPayload).creationTime,
+            consentEvent.payload.endTime,
+            ApiType.valueOf(consentEvent.payload.consentType.toString()),
+            ApiResult.valueOf(consentEvent.payload.result.toString()))
 }

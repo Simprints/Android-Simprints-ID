@@ -10,25 +10,23 @@ import java.util.*
 
 @Keep
 class EnrolmentLastBiometricsCalloutEvent(
-    starTime: Long,
+    creationTime: Long,
     projectId: String,
     userId: String,
     moduleId: String,
     metadata: String?,
-    sessionId: String,
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    sessionId: String
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    EnrolmentLastBiometricsCalloutPayload(starTime, starTime - sessionStartTime, projectId, userId, moduleId, metadata, sessionId)) {
+    EnrolmentLastBiometricsCalloutPayload(creationTime, projectId, userId, moduleId, metadata, sessionId)) {
 
     @Keep
-    class EnrolmentLastBiometricsCalloutPayload(starTime: Long,
-                                                relativeStartTime: Long,
+    class EnrolmentLastBiometricsCalloutPayload(creationTime: Long,
                                                 val projectId: String,
                                                 val userId: String,
                                                 val moduleId: String,
                                                 val metadata: String?,
-                                                val sessionId: String) : EventPayload(EventPayloadType.CALLOUT_LAST_BIOMETRICS, starTime, relativeStartTime)
+                                                val sessionId: String) : EventPayload(EventPayloadType.CALLOUT_LAST_BIOMETRICS, creationTime)
 
 }

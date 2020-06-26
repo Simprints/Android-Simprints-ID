@@ -13,4 +13,4 @@ data class ApiEventQuery(val projectId: String,
 
 fun EventQuery.fromDomainToApi() =
     ApiEventQuery(projectId, userId, moduleIds, subjectId,
-        lastEventId, modes.map { it.fromDomainToApi() }, types.map { com.simprints.id.data.db.event.remote.events.subject.fromDomainToApi() })
+        lastEventId, modes.map { it.fromDomainToApi() }, types.map { fromDomainToApi() })

@@ -9,18 +9,16 @@ class InvalidIntentEvent(
     val startTime: Long,
     val action: String,
     val extras: Map<String, Any?>,
-    sessionId: String = UUID.randomUUID().toString(), //StopShip: to change in PAS-993
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    InvalidIntentPayload(startTime, startTime - sessionStartTime, action, extras)) {
+    InvalidIntentPayload(startTime, action, extras)) {
 
 
     @Keep
     class InvalidIntentPayload(startTime: Long,
-                               relativeStartTime: Long,
                                val action: String,
-                               val extras: Map<String, Any?>) : EventPayload(INVALID_INTENT, startTime, relativeStartTime)
+                               val extras: Map<String, Any?>) : EventPayload(INVALID_INTENT, startTime)
 
 }

@@ -9,24 +9,22 @@ import java.util.*
 
 @Keep
 class EnrolmentCalloutEvent(
-    startTime: Long,
+    creationTime: Long,
     projectId: String,
     userId: String,
     moduleId: String,
     metadata: String?,
-    sessionId: String = UUID.randomUUID().toString(), //StopShip: to change in PAS-993
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    EnrolmentCalloutPayload(startTime, startTime - sessionStartTime, projectId, userId, moduleId, metadata)) {
+    EnrolmentCalloutPayload(creationTime, projectId, userId, moduleId, metadata)) {
 
     @Keep
-    class EnrolmentCalloutPayload(startTime: Long,
-                                  relativeStartTime: Long,
+    class EnrolmentCalloutPayload(creationTime: Long,
                                   val projectId: String,
                                   val userId: String,
                                   val moduleId: String,
-                                  val metadata: String?) : EventPayload(EventPayloadType.CALLOUT_ENROLMENT, startTime, relativeStartTime)
+                                  val metadata: String?) : EventPayload(EventPayloadType.CALLOUT_ENROLMENT, creationTime)
 
 }

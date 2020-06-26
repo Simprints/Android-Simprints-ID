@@ -5,7 +5,6 @@ import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent
 import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
 import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
 import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
-import com.simprints.id.data.db.session.remote.events.ApiEvent
 
 @Keep
 class ApiVero2InfoSnapshotEvent(val relativeStartTime: Long,
@@ -40,7 +39,7 @@ class ApiVero2InfoSnapshotEvent(val relativeStartTime: Long,
     }
 
     constructor(vero2InfoSnapshotEvent: Vero2InfoSnapshotEvent) :
-        this((vero2InfoSnapshotEvent.payload as Vero2InfoSnapshotPayload).relativeStartTime ?: 0,
+        this((vero2InfoSnapshotEvent.payload as Vero2InfoSnapshotPayload).creationTime ?: 0,
             ApiVero2Version(vero2InfoSnapshotEvent.payload.version),
             ApiBatteryInfo(vero2InfoSnapshotEvent.payload.battery))
 }

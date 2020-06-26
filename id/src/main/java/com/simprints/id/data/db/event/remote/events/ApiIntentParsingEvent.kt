@@ -4,7 +4,6 @@ import com.simprints.id.data.db.event.domain.events.IntentParsingEvent
 import com.simprints.id.data.db.event.domain.events.IntentParsingEvent.IntentParsingPayload
 import com.simprints.id.data.db.event.domain.events.IntentParsingEvent.IntentParsingPayload.IntegrationInfo
 import com.simprints.id.data.db.event.remote.events.ApiIntentParsingEvent.ApiIntegrationInfo.Companion.fromDomainToApi
-import com.simprints.id.data.db.session.remote.events.ApiEvent
 import io.realm.internal.Keep
 
 @Keep
@@ -12,7 +11,7 @@ class ApiIntentParsingEvent(val relativeStartTime: Long,
                             val integration: ApiIntegrationInfo) : ApiEvent(ApiEventType.INTENT_PARSING) {
 
     constructor(event: IntentParsingEvent) : this(
-        (event.payload as IntentParsingPayload).relativeStartTime,
+        (event.payload as IntentParsingPayload).creationTime,
         fromDomainToApi(event.payload.integration)
     )
 

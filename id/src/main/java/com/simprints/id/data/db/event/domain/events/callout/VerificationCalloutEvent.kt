@@ -9,27 +9,25 @@ import java.util.*
 
 @Keep
 class VerificationCalloutEvent(
-    startTime: Long,
+    creationTime: Long,
     projectId: String,
     userId: String,
     moduleId: String,
     verifyGuid: String,
     metadata: String,
-    sessionId: String = UUID.randomUUID().toString(), //StopShip: to change in PAS-993
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    VerificationCalloutPayload(startTime, startTime - sessionStartTime, projectId, userId, moduleId, verifyGuid, metadata)) {
+    VerificationCalloutPayload(creationTime, projectId, userId, moduleId, verifyGuid, metadata)) {
 
     @Keep
     class VerificationCalloutPayload(
-        startTime: Long,
-        relativeStartTime: Long,
+        creationTime: Long,
         val projectId: String,
         val userId: String,
         val moduleId: String,
         val verifyGuid: String,
         val metadata: String
-    ) : EventPayload(EventPayloadType.CALLOUT_VERIFICATION, startTime, relativeStartTime)
+    ) : EventPayload(EventPayloadType.CALLOUT_VERIFICATION, creationTime)
 }

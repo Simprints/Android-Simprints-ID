@@ -9,7 +9,7 @@ import java.util.*
 
 @Keep
 class IdentificationCalloutEvent(
-    startTime: Long,
+    creationTime: Long,
     projectId: String,
     userId: String,
     moduleId: String,
@@ -19,15 +19,14 @@ class IdentificationCalloutEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    IdentificationCalloutPayload(startTime, startTime - sessionStartTime, projectId, userId, moduleId, metadata)) {
+    IdentificationCalloutPayload(creationTime, projectId, userId, moduleId, metadata)) {
 
     @Keep
     class IdentificationCalloutPayload(
-        startTime: Long,
-        relativeStartTime: Long,
+        creationTime: Long,
         val projectId: String,
         val userId: String,
         val moduleId: String,
         val metadata: String?
-    ) : EventPayload(EventPayloadType.CALLOUT_IDENTIFICATION, startTime, relativeStartTime)
+    ) : EventPayload(EventPayloadType.CALLOUT_IDENTIFICATION, creationTime)
 }

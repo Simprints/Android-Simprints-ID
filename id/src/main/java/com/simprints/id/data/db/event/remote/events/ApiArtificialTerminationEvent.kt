@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.ArtificialTerminationEvent
+import com.simprints.id.data.db.event.domain.events.ArtificialTerminationEvent.ArtificialTerminationPayload
 
 @Keep
 class ApiArtificialTerminationEvent(val relativeStartTime: Long,
@@ -13,5 +14,6 @@ class ApiArtificialTerminationEvent(val relativeStartTime: Long,
     }
 
     constructor(alertArtificialTerminationEventDomain: ArtificialTerminationEvent):
-        this(alertArtificialTerminationEventDomain.relativeStartTime ?: 0, ApiReason.valueOf(alertArtificialTerminationEventDomain.reason.toString()))
+        this((alertArtificialTerminationEventDomain.payload as ArtificialTerminationPayload).uploadTime ?: 0,
+            ApiReason.valueOf(alertArtificialTerminationEventDomain.payload.reason.toString()))
 }

@@ -7,17 +7,15 @@ import java.util.*
 class SuspiciousIntentEvent(
     startTime: Long,
     unexpectedExtras: Map<String, Any?>,
-    sessionId: String = UUID.randomUUID().toString(), //StopShip: to change in PAS-993
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    SuspiciousIntentPayload(startTime, startTime - sessionStartTime, unexpectedExtras)) {
+    SuspiciousIntentPayload(startTime, unexpectedExtras)) {
 
     @Keep
     class SuspiciousIntentPayload(
         startTime: Long,
-        relativeStartTime: Long,
         val unexpectedExtras: Map<String, Any?>
-    ) : EventPayload(EventPayloadType.SUSPICIOUS_INTENT, startTime, relativeStartTime)
+    ) : EventPayload(EventPayloadType.SUSPICIOUS_INTENT, startTime)
 }

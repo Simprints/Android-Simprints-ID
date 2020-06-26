@@ -8,21 +8,19 @@ import java.util.*
 
 @Keep
 class AuthorizationEvent(
-    startTime: Long,
+    creationTime: Long,
     result: Result,
     userInfo: UserInfo?,
-    sessionId: String = UUID.randomUUID().toString(), //StopShip: to change in PAS-993
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    AuthorizationPayload(startTime, startTime - sessionStartTime, result, userInfo)) {
+    AuthorizationPayload(creationTime, result, userInfo)) {
 
     @Keep
     class AuthorizationPayload(startTime: Long,
-                               relativeStartTime: Long,
                                val result: Result,
-                               val userInfo: UserInfo?) : EventPayload(AUTHORIZATION, startTime, relativeStartTime) {
+                               val userInfo: UserInfo?) : EventPayload(AUTHORIZATION, startTime) {
 
         @Keep
         enum class Result {

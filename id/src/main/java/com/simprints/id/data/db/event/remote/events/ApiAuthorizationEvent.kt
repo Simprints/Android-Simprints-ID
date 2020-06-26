@@ -3,7 +3,6 @@ package com.simprints.id.data.db.event.remote.events
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.AuthorizationEvent
 import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.UserInfo
-import com.simprints.id.data.db.session.remote.events.ApiEvent
 
 @Keep
 class ApiAuthorizationEvent(val relativeStartTime: Long,
@@ -23,7 +22,7 @@ class ApiAuthorizationEvent(val relativeStartTime: Long,
     }
 
     constructor(authorizationEventDomain: AuthorizationEvent) :
-        this((authorizationEventDomain.payload as AuthorizationEvent.AuthorizationPayload).relativeStartTime,
+        this((authorizationEventDomain.payload as AuthorizationEvent.AuthorizationPayload).creationTime,
             ApiResult.valueOf(authorizationEventDomain.payload.userInfo.toString()),
             authorizationEventDomain.payload.userInfo?.let { ApiUserInfo(it) })
 }

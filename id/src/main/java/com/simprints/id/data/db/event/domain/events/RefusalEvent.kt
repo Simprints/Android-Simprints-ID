@@ -9,21 +9,18 @@ class RefusalEvent(
     endTime: Long,
     reason: RefusalPayload.Answer,
     otherText: String,
-    sessionId: String = UUID.randomUUID().toString(), //StopShip: to change in PAS-993
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    RefusalPayload(startTime, startTime - sessionStartTime, endTime, endTime - sessionStartTime, reason, otherText)) {
+    RefusalPayload(startTime, endTime, reason, otherText)) {
 
 
     @Keep
     class RefusalPayload(startTime: Long,
-                         relativeStartTime: Long,
                          val endTime: Long,
-                         val relativeEndTime: Long,
                          val reason: Answer,
-                         val otherText: String) : EventPayload(EventPayloadType.REFUSAL, startTime, relativeStartTime) {
+                         val otherText: String) : EventPayload(EventPayloadType.REFUSAL, startTime) {
 
         @Keep
         enum class Answer {

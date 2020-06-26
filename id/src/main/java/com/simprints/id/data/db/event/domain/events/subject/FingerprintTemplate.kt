@@ -5,8 +5,8 @@ import com.simprints.id.data.db.event.remote.events.subject.ApiFingerprintTempla
 import com.simprints.id.data.db.subject.domain.FingerIdentifier as PersonFingerIdentifier
 
 data class FingerprintTemplate(val quality: Int,
-                          val template: String,
-                          val finger: FingerIdentifier)
+                               val template: String,
+                               val finger: FingerIdentifier)
 
 enum class FingerIdentifier {
     RIGHT_5TH_FINGER,
@@ -24,7 +24,7 @@ enum class FingerIdentifier {
 fun ApiFingerprintTemplate.fromApiToDomain() =
     FingerprintTemplate(quality, template, finger.fromApiToDomain())
 
-fun ApiFingerIdentifier.fromApiToDomain() = when(this) {
+fun ApiFingerIdentifier.fromApiToDomain() = when (this) {
     ApiFingerIdentifier.RIGHT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
     ApiFingerIdentifier.RIGHT_4TH_FINGER -> FingerIdentifier.RIGHT_4TH_FINGER
     ApiFingerIdentifier.RIGHT_3RD_FINGER -> FingerIdentifier.RIGHT_3RD_FINGER
@@ -37,7 +37,7 @@ fun ApiFingerIdentifier.fromApiToDomain() = when(this) {
     ApiFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
 }
 
-fun PersonFingerIdentifier.fromSubjectToEvent() = when(this) {
+fun PersonFingerIdentifier.fromSubjectToEvent() = when (this) {
     PersonFingerIdentifier.RIGHT_5TH_FINGER -> FingerIdentifier.RIGHT_5TH_FINGER
     PersonFingerIdentifier.RIGHT_4TH_FINGER -> FingerIdentifier.RIGHT_4TH_FINGER
     PersonFingerIdentifier.RIGHT_3RD_FINGER -> FingerIdentifier.RIGHT_3RD_FINGER
@@ -50,7 +50,7 @@ fun PersonFingerIdentifier.fromSubjectToEvent() = when(this) {
     PersonFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
 }
 
-fun FingerIdentifier.fromEventToPerson() = when(this) {
+fun FingerIdentifier.fromEventToPerson() = when (this) {
     FingerIdentifier.RIGHT_5TH_FINGER -> PersonFingerIdentifier.RIGHT_5TH_FINGER
     FingerIdentifier.RIGHT_4TH_FINGER -> PersonFingerIdentifier.RIGHT_4TH_FINGER
     FingerIdentifier.RIGHT_3RD_FINGER -> PersonFingerIdentifier.RIGHT_3RD_FINGER
