@@ -14,6 +14,7 @@ import com.simprints.id.data.db.session.local.models.DbSession
 import com.simprints.id.data.db.session.local.models.toDomain
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionDataSourceException
@@ -49,10 +50,13 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
     private val realm: Realm
         get() = getRealmInstance()
 
-    override suspend fun create(appVersionName: String,
-                                libSimprintsVersionName: String,
-                                language: String,
-                                deviceId: String) {
+    override suspend fun create(
+        appVersionName: String,
+        libSimprintsVersionName: String,
+        language: String,
+        deviceId: String,
+        modalities: List<Modality>
+    ) {
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
                 realm.refresh()
@@ -70,7 +74,9 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
                             Build.MANUFACTURER + "_" + Build.MODEL,
                             deviceId),
                         timeHelper.now(),
-                        DatabaseInfo(count))
+                        DatabaseInfo(count),
+                        modalities
+                    )
 
                     val dbSession = DbSession(session)
                     reamInTrans.insert(dbSession)
@@ -84,7 +90,8 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
                 realm.refresh()
-                addQueryParams(realm, query).findAll()?.map { it.toDomain() }?.asFlow() ?: emptyFlow()
+                addQueryParams(realm, query).findAll()?.map { it.toDomain() }?.asFlow()
+                    ?: emptyFlow()
             }
         }
 
@@ -115,7 +122,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
     }
 
     override suspend fun updateCurrentSession(updateBlock: (SessionEvents) -> Unit) {
-        if(count(SessionQuery(openSession = true)) > 1) {
+        if (count(SessionQuery(openSession = true)) > 1) {
             Timber.d("More than 1 session open!")
         }
         updateFirstSession(SessionQuery(openSession = true), updateBlock)
