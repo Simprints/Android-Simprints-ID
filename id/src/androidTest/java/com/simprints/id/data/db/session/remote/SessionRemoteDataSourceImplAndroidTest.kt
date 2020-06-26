@@ -32,6 +32,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,6 +55,7 @@ class SessionRemoteDataSourceImplAndroidTest {
     private lateinit var testProject: TestProject
 
     private lateinit var sessionRemoteDataSource: SessionRemoteDataSource
+
     @MockK
     var remoteDbManager = mockk<RemoteDbManager>()
 
@@ -91,6 +93,7 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     @Test
+    @Ignore("Wait until cloud implements camera events")
     fun closeSession_withAllEvents_shouldGetUploaded() {
         runBlocking {
             val session = createClosedSessions(1).first().apply {
@@ -117,7 +120,6 @@ class SessionRemoteDataSourceImplAndroidTest {
                 addCallbackEvent()
                 addCalloutEvent()
                 addCompletionCheckEvent()
-                // TODO: add FACE_MISSING_LICENSE and FACE_INVALID_LICENSE once implemented by cloud
             }
 
             executeUpload(mutableListOf(session))
@@ -139,9 +141,14 @@ class SessionRemoteDataSourceImplAndroidTest {
         }
 
     private fun SessionEvents.addAlertScreenEvents() {
-        AlertScreenEvent.AlertScreenEventType.values().forEach {
-            addEvent(AlertScreenEvent(0, it))
-        }
+        AlertScreenEvent.AlertScreenEventType.values()
+            // TODO: remove this filterNot once camera alert types are implemented by cloud
+            .filterNot {
+                it == AlertScreenEvent.AlertScreenEventType.FACE_MISSING_LICENSE ||
+                    it == AlertScreenEvent.AlertScreenEventType.FACE_INVALID_LICENSE
+            }.forEach {
+                addEvent(AlertScreenEvent(0, it))
+            }
     }
 
     private fun SessionEvents.addArtificialTerminationEvent() {
@@ -263,7 +270,7 @@ class SessionRemoteDataSourceImplAndroidTest {
     private fun SessionEvents.addScannerConnectionEvent() {
         addEvent(ScannerConnectionEvent(0,
             ScannerConnectionEvent.ScannerInfo("scanner_id", "macAddress",
-                ScannerGeneration.VERO_2,"hardware")))
+                ScannerGeneration.VERO_2, "hardware")))
     }
 
     private fun SessionEvents.addVero2InfoSnapshotEvents() {
