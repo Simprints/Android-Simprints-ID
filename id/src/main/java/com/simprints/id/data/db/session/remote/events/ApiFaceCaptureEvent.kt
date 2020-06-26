@@ -41,9 +41,18 @@ class ApiFaceCaptureEvent(
         faceCaptureEvent.relativeStartTime ?: 0,
         faceCaptureEvent.attemptNb,
         faceCaptureEvent.qualityThreshold,
-        ApiResult.valueOf(faceCaptureEvent.result.name),
+        faceCaptureEvent.result.fromDomainToApi(),
         faceCaptureEvent.isFallback,
         faceCaptureEvent.face?.let(::ApiFace)
     )
 
+}
+
+fun FaceCaptureEvent.Result.fromDomainToApi() = when (this) {
+    FaceCaptureEvent.Result.VALID -> ApiFaceCaptureEvent.ApiResult.VALID
+    FaceCaptureEvent.Result.INVALID -> ApiFaceCaptureEvent.ApiResult.INVALID
+    FaceCaptureEvent.Result.OFF_YAW -> ApiFaceCaptureEvent.ApiResult.OFF_YAW
+    FaceCaptureEvent.Result.OFF_ROLL -> ApiFaceCaptureEvent.ApiResult.OFF_ROLL
+    FaceCaptureEvent.Result.TOO_CLOSE -> ApiFaceCaptureEvent.ApiResult.TOO_CLOSE
+    FaceCaptureEvent.Result.TOO_FAR -> ApiFaceCaptureEvent.ApiResult.TOO_FAR
 }

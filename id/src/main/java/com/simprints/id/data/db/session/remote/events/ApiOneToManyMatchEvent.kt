@@ -15,20 +15,26 @@ class ApiOneToManyMatchEvent(
     @Keep
     class ApiMatchPool(val type: ApiMatchPoolType, val count: Int) {
         constructor(matchPool: OneToManyMatchEvent.MatchPool) :
-            this(ApiMatchPoolType.valueOf(matchPool.type.toString()), matchPool.count)
+            this(matchPool.type.fromDomainToApi(), matchPool.count)
     }
 
     @Keep
     enum class ApiMatchPoolType {
         USER,
         MODULE,
-        PROJECT;
+        PROJECT
     }
 
     constructor(oneToManyMatchEvent: OneToManyMatchEvent) :
         this(oneToManyMatchEvent.relativeStartTime ?: 0,
             oneToManyMatchEvent.relativeEndTime ?: 0,
             ApiMatchPool(oneToManyMatchEvent.pool),
-            ApiMatcher.valueOf(oneToManyMatchEvent.matcher.name),
+            oneToManyMatchEvent.matcher.fromDomainToApi(),
             oneToManyMatchEvent.result?.map { ApiMatchEntry(it) })
+}
+
+fun OneToManyMatchEvent.MatchPoolType.fromDomainToApi() = when (this) {
+    OneToManyMatchEvent.MatchPoolType.USER -> ApiOneToManyMatchEvent.ApiMatchPoolType.USER
+    OneToManyMatchEvent.MatchPoolType.MODULE -> ApiOneToManyMatchEvent.ApiMatchPoolType.MODULE
+    OneToManyMatchEvent.MatchPoolType.PROJECT -> ApiOneToManyMatchEvent.ApiMatchPoolType.PROJECT
 }

@@ -17,7 +17,12 @@ class ApiFaceCaptureConfirmationEvent(
 
     constructor(faceCaptureConfirmationEvent: FaceCaptureConfirmationEvent) : this(
         faceCaptureConfirmationEvent.relativeStartTime ?: 0,
-        ApiResult.valueOf(faceCaptureConfirmationEvent.result.name)
+        faceCaptureConfirmationEvent.result.fromDomainToApi()
     )
 
+}
+
+fun FaceCaptureConfirmationEvent.Result.fromDomainToApi() = when (this) {
+    FaceCaptureConfirmationEvent.Result.CONTINUE -> ApiFaceCaptureConfirmationEvent.ApiResult.CONTINUE
+    FaceCaptureConfirmationEvent.Result.RECAPTURE -> ApiFaceCaptureConfirmationEvent.ApiResult.RECAPTURE
 }

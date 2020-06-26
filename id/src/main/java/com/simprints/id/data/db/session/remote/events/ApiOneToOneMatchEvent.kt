@@ -16,6 +16,6 @@ class ApiOneToOneMatchEvent(
         this(oneToOneMatchEvent.relativeStartTime ?: 0,
             oneToOneMatchEvent.relativeEndTime ?: 0,
             oneToOneMatchEvent.candidateId,
-            ApiMatcher.valueOf(oneToOneMatchEvent.matcher.name),
+            oneToOneMatchEvent.matcher.fromDomainToApi(),
             oneToOneMatchEvent.result?.let { ApiMatchEntry(it) })
 }
