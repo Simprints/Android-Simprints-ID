@@ -1,8 +1,8 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -79,6 +79,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
         } else if (result is FaceCaptureResponse) {
             val query = buildQuery(appRequest, matchGroup)
             addMatchingStepForFace(result.capturingResult.mapNotNull { it.result }, query)
+            extractFaceAndAddPersonCreationEvent(result)
         }
     }
 

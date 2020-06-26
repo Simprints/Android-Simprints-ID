@@ -6,7 +6,11 @@ import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent
 @Keep
 class PersonCreationEvent(startTime: Long,
                           val faceCaptureIds: List<String>) : Event(EventType.PERSON_CREATION, startTime) {
-    fun fromDomainToCore() = CorePersonCreationEvent(startTime, faceCaptureIds)
+    fun fromDomainToCore() = CorePersonCreationEvent(
+        startTime,
+        fingerprintCaptureIds = null,
+        faceCaptureIds = faceCaptureIds
+    )
 }
 
 

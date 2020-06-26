@@ -45,7 +45,13 @@ open class SessionRepositoryImpl(
 
     override suspend fun createSession(libSimprintsVersionName: String) {
         reportExceptionIfNeeded {
-            sessionLocalDataSource.create(appVersionName, libSimprintsVersionName, preferencesManager.language, deviceId)
+            sessionLocalDataSource.create(
+                appVersionName,
+                libSimprintsVersionName,
+                preferencesManager.language,
+                deviceId,
+                preferencesManager.modalities
+            )
         }
     }
 
