@@ -3,39 +3,59 @@ package com.simprints.id.data.db.event.remote.events
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.event.domain.events.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.id.data.db.event.domain.events.FingerprintCaptureEvent.FingerprintCapturePayload.Result.*
+import com.simprints.id.data.db.event.remote.events.ApiFingerprintCaptureEvent.ApiFingerprintCapturePayload.ApiResult
 
 @Keep
-class ApiFingerprintCaptureEvent(val id: String,
-                                 val relativeStartTime: Long,
-                                 val relativeEndTime: Long,
-                                 val qualityThreshold: Int,
-                                 val finger: ApiFingerIdentifier,
-                                 val result: ApiResult,
-                                 val fingerprint: ApiFingerprint?) : ApiEvent(ApiEventType.FINGERPRINT_CAPTURE) {
+class ApiFingerprintCaptureEvent(domainEvent: FingerprintCaptureEvent) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
+
 
     @Keep
-    class ApiFingerprint(val finger: ApiFingerIdentifier, val quality: Int, val template: String) {
+    class ApiFingerprintCapturePayload(val id: String,
+                                       val relativeStartTime: Long,
+                                       val relativeEndTime: Long,
+                                       val qualityThreshold: Int,
+                                       val finger: ApiFingerIdentifier,
+                                       val result: ApiResult,
+                                       val fingerprint: ApiFingerprint?) : ApiEventPayload(ApiEventPayloadType.FINGERPRINT_CAPTURE) {
 
-        constructor(finger: FingerprintCapturePayload.Fingerprint) : this(
-            ApiFingerIdentifier.valueOf(finger.finger.toString()),
-            finger.quality, finger.template)
+        @Keep
+        class ApiFingerprint(val finger: ApiFingerIdentifier, val quality: Int, val template: String) {
+
+            constructor(finger: FingerprintCapturePayload.Fingerprint) : this(
+                ApiFingerIdentifier.valueOf(finger.finger.toString()),
+                finger.quality, finger.template)
+        }
+
+        @Keep
+        enum class ApiResult {
+            GOOD_SCAN,
+            BAD_QUALITY,
+            NO_FINGER_DETECTED,
+            SKIPPED,
+            FAILURE_TO_ACQUIRE
+        }
+
+        constructor(domainPayload: FingerprintCapturePayload) :
+            this(domainPayload.id,
+                domainPayload.creationTime,
+                domainPayload.endTime,
+                domainPayload.qualityThreshold,
+                domainPayload.finger.fromDomainToApi(),
+                domainPayload.result.fromDomainToApi(),
+                domainPayload.fingerprint?.let { ApiFingerprint(it) })
     }
-
-    @Keep
-    enum class ApiResult {
-        GOOD_SCAN,
-        BAD_QUALITY,
-        NO_FINGER_DETECTED,
-        SKIPPED,
-        FAILURE_TO_ACQUIRE
-    }
-
-    constructor(fingerprintCaptureEvent: FingerprintCaptureEvent) :
-        this(fingerprintCaptureEvent.id,
-            (fingerprintCaptureEvent.payload as FingerprintCapturePayload).creationTime,
-            fingerprintCaptureEvent.payload.endTime,
-            fingerprintCaptureEvent.payload.qualityThreshold,
-            fingerprintCaptureEvent.payload.finger.toApiFingerIdentifier(),
-            ApiResult.valueOf(fingerprintCaptureEvent.payload.result.toString()),
-            fingerprintCaptureEvent.payload.fingerprint?.let { ApiFingerprint(it) })
 }
+
+fun FingerprintCapturePayload.Result.fromDomainToApi() =
+    when (this) {
+        GOOD_SCAN -> ApiResult.GOOD_SCAN
+        BAD_QUALITY -> ApiResult.BAD_QUALITY
+        NO_FINGER_DETECTED -> ApiResult.NO_FINGER_DETECTED
+        SKIPPED -> ApiResult.SKIPPED
+        FAILURE_TO_ACQUIRE -> ApiResult.FAILURE_TO_ACQUIRE
+    }

@@ -1,52 +1,57 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.CandidateReadEvent
+import com.simprints.id.data.db.event.domain.events.AuthorizationEvent
 import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload
 import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.RemoteResult
+import com.simprints.id.data.db.event.remote.events.ApiCandidateReadEvent.ApiCandidateReadPayload.ApiLocalResult
+import com.simprints.id.data.db.event.remote.events.ApiCandidateReadEvent.ApiCandidateReadPayload.ApiRemoteResult
+import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.CANDIDATE_READ
 
 @Keep
-class ApiCandidateReadEvent(val relativeStartTime: Long,
-                            val relativeEndTime: Long,
-                            val candidateId: String,
-                            val localResult: ApiLocalResult,
-                            val remoteResult: ApiRemoteResult?) : ApiEvent(ApiEventType.CANDIDATE_READ) {
+class ApiCandidateReadEvent(domainEvent: AuthorizationEvent) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    enum class ApiLocalResult {
-        FOUND, NOT_FOUND;
+    class ApiCandidateReadPayload(val relativeStartTime: Long,
+                                  val relativeEndTime: Long,
+                                  val candidateId: String,
+                                  val localResult: ApiLocalResult,
+                                  val remoteResult: ApiRemoteResult?) : ApiEventPayload(CANDIDATE_READ) {
 
-        companion object {
-            fun fromDomainToApi(localResult: LocalResult) =
-                when (localResult) {
-                    LocalResult.FOUND -> FOUND
-                    LocalResult.NOT_FOUND -> NOT_FOUND
-                }
+        @Keep
+        enum class ApiLocalResult {
+            FOUND, NOT_FOUND;
         }
-    }
 
-    @Keep
-    enum class ApiRemoteResult {
-        FOUND, NOT_FOUND;
-
-        companion object {
-            fun fromDomainToApi(remoteResult: RemoteResult?) =
-                when (remoteResult) {
-                    RemoteResult.FOUND -> FOUND
-                    RemoteResult.NOT_FOUND -> NOT_FOUND
-                    else -> null
-                }
+        @Keep
+        enum class ApiRemoteResult {
+            FOUND, NOT_FOUND;
         }
-    }
 
-    constructor(candidateReadEvent: CandidateReadEvent) :
-        this((candidateReadEvent.payload as CandidateReadPayload).creationTime,
-            candidateReadEvent.payload.endTime,
-            candidateReadEvent.payload.candidateId,
-            ApiLocalResult.fromDomainToApi(candidateReadEvent.payload.localResult),
-            ApiRemoteResult.fromDomainToApi(candidateReadEvent.payload.remoteResult))
+        constructor(domainPayload: CandidateReadPayload) :
+            this(domainPayload.creationTime,
+                domainPayload.endTime,
+                domainPayload.candidateId,
+                domainPayload.localResult.fromDomainToApi(),
+                domainPayload.remoteResult?.fromDomainToApi())
+    }
 }
 
+fun LocalResult.fromDomainToApi() =
+    when (this) {
+        LocalResult.FOUND -> ApiLocalResult.FOUND
+        LocalResult.NOT_FOUND -> ApiLocalResult.NOT_FOUND
+    }
+
+fun RemoteResult.fromDomainToApi() =
+    when (this) {
+        RemoteResult.FOUND -> ApiRemoteResult.FOUND
+        RemoteResult.NOT_FOUND -> ApiRemoteResult.NOT_FOUND
+    }
 
 

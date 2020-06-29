@@ -2,47 +2,37 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.callout.*
+import com.simprints.id.data.db.event.domain.events.EventPayload
 import com.simprints.id.data.db.event.domain.events.callout.ConfirmationCalloutEvent.ConfirmationCalloutPayload
 import com.simprints.id.data.db.event.domain.events.callout.EnrolmentCalloutEvent.EnrolmentCalloutPayload
 import com.simprints.id.data.db.event.domain.events.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
 import com.simprints.id.data.db.event.domain.events.callout.IdentificationCalloutEvent.IdentificationCalloutPayload
 import com.simprints.id.data.db.event.domain.events.callout.VerificationCalloutEvent.VerificationCalloutPayload
-import com.simprints.id.data.db.event.remote.events.callout.*
+import com.simprints.id.data.db.event.remote.events.callout.ApiCallout
 
 @Keep
-class ApiCalloutEvent(val relativeStartTime: Long,
-                      val callout: ApiCallout) : ApiEvent(ApiEventType.CALLOUT) {
+class ApiCalloutEvent(id: String,
+                      labels: List<Event.EventLabel>,
+                      payload: EventPayload) :
+    ApiEvent(id, labels.fromDomainToApi(), payload.fromDomainToApi()) {
 
-    constructor(enrolmentCalloutEvent: EnrolmentCalloutEvent) :
-        this((enrolmentCalloutEvent.payload as EnrolmentCalloutPayload).creationTime,
-            fromDomainToApiCallout(enrolmentCalloutEvent))
+    @Keep
+    class ApiCalloutPayload(val callout: ApiCallout) : ApiEventPayload(ApiEventPayloadType.CALLOUT) {
 
-    constructor(identificationCalloutEvent: IdentificationCalloutEvent) :
-        this((identificationCalloutEvent.payload as IdentificationCalloutPayload).creationTime,
-            fromDomainToApiCallout(identificationCalloutEvent))
+        constructor(domainPayload: EnrolmentCalloutPayload) :
+            this(domainPayload.fromDomainToApi() as ApiCallout)
 
-    constructor(verificationCalloutEvent: VerificationCalloutEvent) :
-        this((verificationCalloutEvent.payload as VerificationCalloutPayload).creationTime,
-            fromDomainToApiCallout(verificationCalloutEvent))
+        constructor(domainPayload: IdentificationCalloutPayload) :
+            this(domainPayload.fromDomainToApi() as ApiCallout)
 
-    constructor(confirmationCalloutEvent: ConfirmationCalloutEvent) :
-        this((confirmationCalloutEvent.payload as ConfirmationCalloutPayload).creationTime,
-            fromDomainToApiCallout(confirmationCalloutEvent))
+        constructor(domainPayload: VerificationCalloutPayload) :
+            this(domainPayload.fromDomainToApi() as ApiCallout)
 
-    constructor(enrolLastBiometricsCalloutEvent: EnrolmentLastBiometricsCalloutEvent) :
-        this((enrolLastBiometricsCalloutEvent.payload as EnrolmentLastBiometricsCalloutPayload).creationTime,
-            fromDomainToApiCallout(enrolLastBiometricsCalloutEvent)
-        )
+        constructor(domainPayload: ConfirmationCalloutPayload) :
+            this(domainPayload.fromDomainToApi() as ApiCallout)
+
+        constructor(domainPayload: EnrolmentLastBiometricsCalloutPayload) :
+            this(domainPayload.fromDomainToApi() as ApiCallout)
+    }
 }
 
-
-fun fromDomainToApiCallout(event: Event): ApiCallout =
-    when (event.payload) {
-        is EnrolmentCalloutPayload -> with(event.payload) { ApiEnrolmentCallout(projectId, userId, moduleId, metadata) }
-        is IdentificationCalloutPayload -> with(event.payload) { ApiIdentificationCallout(projectId, userId, moduleId, metadata) }
-        is ConfirmationCalloutPayload -> with(event.payload) { ApiConfirmationCallout(selectedGuid, sessionId) }
-        is VerificationCalloutPayload -> with(event.payload) { ApiVerificationCallout(projectId, userId, moduleId, metadata, verifyGuid) }
-        is EnrolmentLastBiometricsCalloutPayload -> with(event.payload) { ApiEnrolmentLastBiometricsCallout(projectId, userId, moduleId, metadata, sessionId) }
-        else -> throw IllegalArgumentException("Invalid CalloutEvent")
-    }

@@ -5,9 +5,17 @@ import com.simprints.id.data.db.event.domain.events.CompletionCheckEvent
 import com.simprints.id.data.db.event.domain.events.CompletionCheckEvent.CompletionCheckPayload
 
 @Keep
-class ApiCompletionCheckEvent(val relativeStartTime: Long,
-                              val completed: Boolean) : ApiEvent(ApiEventType.COMPLETION_CHECK) {
+class ApiCompletionCheckEvent(domainEvent: CompletionCheckEvent) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
 
-    constructor(completionCheckEvent: CompletionCheckEvent) :
-        this((completionCheckEvent.payload as CompletionCheckPayload).creationTime, completionCheckEvent.payload.completed)
+    @Keep
+    class ApiCompletionCheckPayload(val relativeStartTime: Long,
+                                    val completed: Boolean) : ApiEventPayload(ApiEventPayloadType.COMPLETION_CHECK) {
+
+        constructor(domainPayload: CompletionCheckPayload) :
+            this(domainPayload.creationTime, domainPayload.completed)
+    }
 }
