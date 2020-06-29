@@ -9,6 +9,7 @@ import android.text.style.ForegroundColorSpan
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -20,8 +21,6 @@ import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManag
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState.*
 import kotlinx.android.synthetic.main.activity_debug.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -109,7 +108,7 @@ class DebugActivity : AppCompatActivity() {
         }
 
     private fun setSecurityStatus(status: SecurityState.Status) {
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             with(securityStateRepository.securityStatusChannel) {
                 if (!isClosedForSend) {
                     send(status)
