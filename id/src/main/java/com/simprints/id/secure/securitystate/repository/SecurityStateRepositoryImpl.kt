@@ -31,6 +31,10 @@ class SecurityStateRepositoryImpl(
         }
     }
 
+    override fun getSecurityStatusFromLocal(): SecurityState.Status {
+        return localDataSource.securityStatus
+    }
+
     private suspend fun Channel<SecurityState.Status>.update(status: SecurityState.Status) {
         if (!isClosedForSend)
             send(status)

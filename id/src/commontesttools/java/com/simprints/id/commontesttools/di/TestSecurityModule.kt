@@ -67,9 +67,11 @@ class TestSecurityModule(
         )
     }
 
-    override fun provideLoginActivityHelper(): LoginActivityHelper {
+    override fun provideLoginActivityHelper(
+        securityStateRepository: SecurityStateRepository
+    ): LoginActivityHelper {
         return loginActivityHelperRule.resolveDependency {
-            super.provideLoginActivityHelper()
+            super.provideLoginActivityHelper(securityStateRepository)
         }
     }
 

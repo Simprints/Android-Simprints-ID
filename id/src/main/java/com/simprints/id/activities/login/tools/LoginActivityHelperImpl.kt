@@ -3,8 +3,12 @@ package com.simprints.id.activities.login.tools
 import android.content.Intent
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.activities.login.response.QrCodeResponse
+import com.simprints.id.secure.models.SecurityState
+import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 
-class LoginActivityHelperImpl : LoginActivityHelper {
+class LoginActivityHelperImpl(
+    private val securityStateRepository: SecurityStateRepository
+) : LoginActivityHelper {
 
     override fun areMandatoryCredentialsPresent(
         projectId: String,
@@ -26,6 +30,10 @@ class LoginActivityHelperImpl : LoginActivityHelper {
     override fun tryParseQrCodeResponse(response: Intent): QrCodeResponse {
         val qrValue = response.getStringExtra(EXTRA_SCAN_RESULT)
         return JsonHelper.fromJson(qrValue)
+    }
+
+    override fun isSecurityStatusRunning(): Boolean {
+        return securityStateRepository.getSecurityStatusFromLocal() == SecurityState.Status.RUNNING
     }
 
     private companion object {
