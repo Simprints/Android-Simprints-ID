@@ -10,4 +10,4 @@ class PersonCreationEvent(
 ) : Event(EventType.PERSON_CREATION, startTime)
 
 fun PersonCreationEvent.fromDomainToCore() =
-    CorePersonCreationEvent(startTime, fingerprintCaptureIds)
+    CorePersonCreationEvent(startTime, fingerprintCaptureIds, faceCaptureIds = null)
