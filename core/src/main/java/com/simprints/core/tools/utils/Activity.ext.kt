@@ -52,7 +52,7 @@ object QuantityHelper{
      * @return The formatted final string
      */
     @JvmStatic
-    fun getStringPlural(context: Context, stringQuantityKey: Int, quantity: Int, params: Array<Any>): String {
+    internal fun getStringPlural(context: Context, stringQuantityKey: Int, quantity: Int, params: Array<Any>): String {
         val res = context.resources
 
         return try {
@@ -82,3 +82,5 @@ fun Context.getQuantityString(@PluralsRes resId: Int, quantity: Int): String {
 }
 
 fun Context.getStringArray(res: Int): Array<String> = resources.getStringArray(res)
+
+fun Context.getParamsString(resId: Int, params: Array<Any>): String = getString(resId, *params)

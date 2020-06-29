@@ -23,8 +23,8 @@ class DashboardDailyActivityCardDisplayerImpl(
     private lateinit var ctx: Context
 
     override fun initRoot(rootLayout: ViewGroup, context: Context) {
-        root = rootLayout
         ctx = context
+        root = rootLayout
     }
 
     override fun displayDailyActivityState(dailyActivityState: DashboardDailyActivityState) {

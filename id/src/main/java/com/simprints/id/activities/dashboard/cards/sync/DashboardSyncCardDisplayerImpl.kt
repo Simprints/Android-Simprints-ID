@@ -47,6 +47,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
     override val userWantsToSync = MutableLiveData<LiveDataEvent>()
 
     override fun initRoot(syncCardsRootLayout: LinearLayout, context: Context) {
+        ctx = context
         root = syncCardsRootLayout
         viewForDefaultState = createViewForSyncState(R.layout.activity_dashboard_card_sync_default, root)
         viewForSyncFailedState = createViewForSyncState(R.layout.activity_dashboard_card_sync_failed, root)
@@ -56,7 +57,6 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
         viewForProgressState = createViewForSyncState(R.layout.activity_dashboard_card_sync_progress, root)
         viewForConnectingState = viewForProgressState
         viewForCompleteState = viewForProgressState
-        ctx = context
     }
 
     private fun createViewForSyncState(layout: Int, root: ViewGroup) =

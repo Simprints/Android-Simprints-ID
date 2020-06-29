@@ -25,6 +25,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.core.tools.extentions.hideKeyboard
+import com.simprints.core.tools.utils.getParamsString
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.fragment_module_selection.*
@@ -237,7 +238,7 @@ class ModuleSelectionFragment(
     private fun notifyTooManyModulesSelected(maxAllowed: Int) {
         Toast.makeText(
             application,
-            getParamsString(R.string.settings_too_many_modules_toast, arrayOf(maxAllowed)),
+            requireActivity().getParamsString(R.string.settings_too_many_modules_toast, arrayOf(maxAllowed)),
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -276,7 +277,4 @@ class ModuleSelectionFragment(
             // The safe call above is necessary only when the 'up' action bar button is clicked
         }
     }
-
-    fun getParamsString(resId: Int, params: Array<Any>): String = getString(resId, *params)
-
 }

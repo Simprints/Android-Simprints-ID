@@ -11,11 +11,11 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.tools.utils.getParamsString
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -42,7 +42,6 @@ class NfcPairFragment : FingerprintFragment() {
     private val nfcManager: NfcManager by inject()
     private val scannerPairingManager: ScannerPairingManager by inject()
     private val serialNumberConverter: SerialNumberConverter by inject()
-    private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
     private val timeHelper: FingerprintTimeHelper by inject()
 
@@ -71,17 +70,15 @@ class NfcPairFragment : FingerprintFragment() {
         couldNotPairTextView.paintFlags = couldNotPairTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         couldNotPairTextView.setOnClickListener { goToSerialEntryPair() }
 
-        viewModel.showToastWithStringRes.fragmentObserveEventWith { context?.showToast(resourceHelper.getString(it)) }
+        viewModel.showToastWithStringRes.fragmentObserveEventWith { context?.showToast(getString(it)) }
         viewModel.awaitingToPairToMacAddress.fragmentObserveEventWith { handleAwaitingPair(it) }
     }
 
     private fun setTextInLayout() {
-        with(resourceHelper) {
-            couldNotPairTextView.text = getString(R.string.cannot_connect_devices)
-            tryAgainButton.text = getString(R.string.try_again_label)
-            nfcPairInstructionsTextView.text = getString(R.string.nfc_pair_instructions)
-            nfcPairTitleTextView.text = getString(R.string.nfc_pair_title)
-        }
+        couldNotPairTextView.text = getString(R.string.cannot_connect_devices)
+        tryAgainButton.text = getString(R.string.try_again_label)
+        nfcPairInstructionsTextView.text = getString(R.string.nfc_pair_instructions)
+        nfcPairTitleTextView.text = getString(R.string.nfc_pair_title)
     }
 
     private fun setupScannerPhoneTappingAnimation() {
@@ -135,7 +132,7 @@ class NfcPairFragment : FingerprintFragment() {
         tryAgainButton.visibility = View.INVISIBLE
         couldNotPairTextView.visibility = View.GONE
         nfcPairingProgressBar.visibility = View.VISIBLE
-        nfcPairInstructionsTextView.text = resourceHelper.getString(R.string.nfc_pairing_in_progress,
+        nfcPairInstructionsTextView.text = getString(R.string.nfc_pairing_in_progress,
             arrayOf(serialNumberConverter.convertMacAddressToSerialNumber(macAddress)))
         handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
     }
@@ -154,7 +151,7 @@ class NfcPairFragment : FingerprintFragment() {
             couldNotPairTextView.visibility = View.GONE
             nfcPairingProgressBar.visibility = View.INVISIBLE
             tryAgainButton.visibility = View.VISIBLE
-            nfcPairInstructionsTextView.text = resourceHelper.getString(R.string.nfc_pairing_try_again_instruction,
+            nfcPairInstructionsTextView.text = requireActivity().getParamsString(R.string.nfc_pairing_try_again_instruction,
                 arrayOf(serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())))
             tryAgainButton.setOnClickListener { viewModel.startPairing(macAddressEvent.peekContent()) }
         }

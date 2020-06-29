@@ -8,7 +8,6 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -20,7 +19,6 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 class OtaFailedFragment : FingerprintFragment() {
 
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
-    private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
     private val timeHelper: FingerprintTimeHelper by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
 
@@ -40,10 +38,9 @@ class OtaFailedFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        with(resourceHelper) {
-            otaFailedTitleTextView.text = getString(R.string.ota_failed_title)
-            otaFailedInstructionsTextView.text = getString(R.string.ota_failed_instructions)
-            continueButton.text = getString(R.string.continue_button)
-        }
+        otaFailedTitleTextView.text = getString(R.string.ota_failed_title)
+        otaFailedInstructionsTextView.text = getString(R.string.ota_failed_instructions)
+        continueButton.text = getString(R.string.continue_button)
+
     }
 }
