@@ -12,14 +12,14 @@ open class Event(val id: String,
                  val labels: List<EventLabel>,
                  val payload: EventPayload) {
 
-    sealed class EventLabel(val key: String, val labels: List<String>) {
+    sealed class EventLabel(val key: String) {
 
-        class ProjectId(labelValue: String) : EventLabel("projectId", listOf(labelValue))
-        class SubjectId(labelValue: String) : EventLabel("subjectId", listOf(labelValue))
-        class AttendantId(labelValue: String) : EventLabel("attendantId", listOf(labelValue))
-        class ModuleId(labelValues: List<String>) : EventLabel("moduleId", labelValues)
-        class Mode(labelValues: List<Modes>) : EventLabel("mode", labelValues.map { it.name })
-        class SessionId(labelValue: String) : EventLabel("sessionId", listOf(labelValue))
+        class ProjectId(val labelValue: String) : EventLabel("projectId")
+        class SubjectId(val labelValue: String) : EventLabel("subjectId")
+        class AttendantId(val labelValue: String) : EventLabel("attendantId")
+        class ModuleId(val labelValues: List<String>) : EventLabel("moduleId")
+        class Mode(val labelValues: List<Modes>) : EventLabel("mode")
+        class SessionId(val labelValue: String) : EventLabel("sessionId")
     }
 
     companion object {
