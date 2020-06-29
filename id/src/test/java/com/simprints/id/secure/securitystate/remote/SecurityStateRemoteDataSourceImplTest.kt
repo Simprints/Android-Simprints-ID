@@ -16,6 +16,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import retrofit2.HttpException
@@ -55,6 +56,7 @@ class SecurityStateRemoteDataSourceImplTest {
     }
 
     @Test
+    @Ignore("API call is commented out until backend implements security state endpoint")
     fun withSuccessfulResponse_shouldGetSecurityState() = runBlocking {
         mockSuccessfulResponse()
 
@@ -65,6 +67,7 @@ class SecurityStateRemoteDataSourceImplTest {
     }
 
     @Test(expected = SimprintsInternalServerException::class)
+    @Ignore("API call is commented out until backend implements security state endpoint")
     fun withErrorResponseCodeBetween500And599_shouldThrowInternalServerException() {
         mockErrorResponse(501)
 
@@ -74,6 +77,7 @@ class SecurityStateRemoteDataSourceImplTest {
     }
 
     @Test(expected = HttpException::class)
+    @Ignore("API call is commented out until backend implements security state endpoint")
     fun withErrorResponseCode_shouldThrowHttpException() {
         mockErrorResponse(404)
 
