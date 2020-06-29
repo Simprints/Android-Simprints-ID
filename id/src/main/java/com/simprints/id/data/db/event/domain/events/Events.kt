@@ -12,37 +12,12 @@ open class Event(val id: String,
                  val labels: List<EventLabel>,
                  val payload: EventPayload)
 
-sealed class EventLabel(val key: String) {
-    class ProjectId(labels: String) : EventLabel("projectId")
-    class SubjectId(labels: String) : EventLabel("subjectId")
-    class AttendantId(labels: String) : EventLabel("attendantId")
-    class ModuleId(labels: List<String>) : EventLabel("moduleId")
-    class Mode(labels: List<Modes>) : EventLabel("mode")
-    class SessionId(labels: String) : EventLabel("sessionId")
+sealed class EventLabel(val key: String, val labels: List<String>) {
 
-    companion object {
-        fun fromApiToDomain(labels: Map<String, List<String>>) =
-            labels.mapNotNull {
-                when (it.key) {
-                    ApiEventNew.PROJECT_ID_LABEL -> {
-                        ProjectId(it.value.first())
-                    }
-                    ApiEventNew.SUBJECT_ID_LABEL -> {
-                        SubjectId(it.value.first())
-                    }
-                    ApiEventNew.ATTENDANT_ID_LABEL -> {
-                        AttendantId(it.value.first())
-                    }
-                    ApiEventNew.MODULE_ID_LABEL -> {
-                        ModuleId(it.value)
-                    }
-                    ApiEventNew.MODE_LABEL -> {
-                        Mode(it.value.map { mode -> Modes.valueOf(mode) })
-                    }
-                    else -> {
-                        null
-                    }
-                }
-            }
-    }
+    class ProjectId(label: String) : EventLabel("projectId", listOf(label))
+    class SubjectId(label: String) : EventLabel("subjectId", listOf(label))
+    class AttendantId(label: String) : EventLabel("attendantId", listOf(label))
+    class ModuleId(labels: List<String>) : EventLabel("moduleId", labels)
+    class Mode(labels: List<Modes>) : EventLabel("mode", labels.map { it.name })
+    class SessionId(label: String) : EventLabel("sessionId", listOf(label))
 }
