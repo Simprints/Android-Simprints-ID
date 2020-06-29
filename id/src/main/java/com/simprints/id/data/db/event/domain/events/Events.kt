@@ -12,6 +12,10 @@ open class Event(val id: String,
                  val labels: List<EventLabel>,
                  val payload: EventPayload) {
 
+    companion object {
+        const val DEFAULT_EVENT_VERSION = 0
+    }
+
     sealed class EventLabel(val key: String) {
 
         class ProjectId(val labelValue: String) : EventLabel("projectId")
