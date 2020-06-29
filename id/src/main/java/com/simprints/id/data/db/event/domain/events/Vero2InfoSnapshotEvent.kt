@@ -7,19 +7,19 @@ import java.util.*
 
 @Keep
 class Vero2InfoSnapshotEvent(
-    startTime: Long,
+    creationTime: Long,
     version: Vero2Version,
     battery: BatteryInfo,
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    Vero2InfoSnapshotPayload(startTime, version, battery)) {
+    Vero2InfoSnapshotPayload(creationTime, version, battery)) {
 
     @Keep
-    class Vero2InfoSnapshotPayload(startTime: Long,
+    class Vero2InfoSnapshotPayload(creationTime: Long,
                                    val version: Vero2Version,
-                                   val battery: BatteryInfo) : EventPayload(EventPayloadType.VERO_2_INFO_SNAPSHOT, startTime) {
+                                   val battery: BatteryInfo) : EventPayload(EventPayloadType.VERO_2_INFO_SNAPSHOT, creationTime) {
 
         @Keep
         class Vero2Version(
