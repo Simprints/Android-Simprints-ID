@@ -57,7 +57,7 @@ class ScannerOffFragment : FingerprintFragment() {
     private fun initCouldNotConnectTextView() {
         connectScannerViewModel.showScannerErrorDialogWithScannerId.value?.let { scannerIdEvent ->
             couldNotConnectTextView.paintFlags = couldNotConnectTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-            couldNotConnectTextView.text = getString(R.string.not_my_scanner, arrayOf(scannerIdEvent.peekContent()))
+            couldNotConnectTextView.text = String.format(getString(R.string.not_my_scanner), scannerIdEvent.peekContent())
             couldNotConnectTextView.setOnClickListener { connectScannerViewModel.handleIncorrectScanner() }
             couldNotConnectTextView.visibility = View.VISIBLE
         }
