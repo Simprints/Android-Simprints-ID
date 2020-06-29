@@ -131,7 +131,7 @@ class NfcPairFragment : FingerprintFragment() {
         tryAgainButton.visibility = View.INVISIBLE
         couldNotPairTextView.visibility = View.GONE
         nfcPairingProgressBar.visibility = View.VISIBLE
-        nfcPairInstructionsTextView.text = getString(R.string.nfc_pairing_in_progress,
+        nfcPairInstructionsTextView.text = String.format(getString(R.string.nfc_pairing_in_progress),
             serialNumberConverter.convertMacAddressToSerialNumber(macAddress))
         handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
     }
