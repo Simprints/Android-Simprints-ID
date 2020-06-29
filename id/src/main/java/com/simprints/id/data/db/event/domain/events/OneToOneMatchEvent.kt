@@ -12,14 +12,16 @@ class OneToOneMatchEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    OneToOneMatchPayload(creationTime, endTime, candidateId, result)) {
+    OneToOneMatchPayload(creationTime, DEFAULT_EVENT_VERSION, endTime, candidateId, result)) {
 
     @Keep
     class OneToOneMatchPayload(
         creationTime: Long,
+        version: Int,
         val endTime: Long,
         val candidateId: String,
         val result: MatchEntry?
-    ) : EventPayload(EventPayloadType.ONE_TO_ONE_MATCH, creationTime)
+    ) : EventPayload(EventPayloadType.ONE_TO_ONE_MATCH, version, creationTime)
 }
