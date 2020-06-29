@@ -1,37 +1,48 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent
+import com.simprints.id.data.db.event.domain.events.RefusalEvent
 import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.ScannerConnectionPayload
 import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration
+import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
+import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_2
 import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
+import com.simprints.id.data.db.event.remote.events.ApiScannerConnectionEvent.ApiScannerConnectionPayload.ApiScannerGeneration
 
 @Keep
-class ApiScannerConnectionEvent(val relativeStartTime: Long,
-                                val scannerInfo: ApiScannerInfo) : ApiEvent(ApiEventType.SCANNER_CONNECTION) {
+class ApiScannerConnectionEvent(domainEvent: RefusalEvent) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiScannerInfo(val scannerId: String,
-                         val macAddress: String,
-                         val generation: ApiScannerGeneration?,
-                         var hardwareVersion: String?) {
-        constructor(scannerInfo: ScannerInfo) :
-            this(scannerInfo.scannerId, scannerInfo.macAddress,
-                scannerInfo.generation.toApiScannerGeneration(), scannerInfo.hardwareVersion)
-    }
+    class ApiScannerConnectionPayload(val relativeStartTime: Long,
+                                      val scannerInfo: ApiScannerInfo) : ApiEventPayload(ApiEventPayloadType.SCANNER_CONNECTION) {
 
-    constructor(scannerConnectionEvent: ScannerConnectionEvent) :
-        this((scannerConnectionEvent.payload as ScannerConnectionPayload).creationTime,
-            ApiScannerInfo(scannerConnectionEvent.payload.scannerInfo))
+        @Keep
+        class ApiScannerInfo(val scannerId: String,
+                             val macAddress: String,
+                             val generation: ApiScannerGeneration?,
+                             var hardwareVersion: String?) {
 
-    enum class ApiScannerGeneration {
-        VERO_1,
-        VERO_2
+            constructor(scannerInfo: ScannerInfo) :
+                this(scannerInfo.scannerId, scannerInfo.macAddress,
+                    scannerInfo.generation.toApiScannerGeneration(), scannerInfo.hardwareVersion)
+        }
+
+        constructor(domainPayload: ScannerConnectionPayload) :
+            this(domainPayload.creationTime, ApiScannerInfo(domainPayload.scannerInfo))
+
+        enum class ApiScannerGeneration {
+            VERO_1,
+            VERO_2
+        }
     }
 }
 
 fun ScannerGeneration.toApiScannerGeneration() =
     when (this) {
-        ScannerGeneration.VERO_1 -> ApiScannerConnectionEvent.ApiScannerGeneration.VERO_1
-        ScannerGeneration.VERO_2 -> ApiScannerConnectionEvent.ApiScannerGeneration.VERO_2
+        VERO_1 -> ApiScannerGeneration.VERO_1
+        VERO_2 -> ApiScannerGeneration.VERO_2
     }

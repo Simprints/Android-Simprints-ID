@@ -5,16 +5,24 @@ import com.simprints.id.data.db.event.domain.events.ScannerFirmwareUpdateEvent
 import com.simprints.id.data.db.event.domain.events.ScannerFirmwareUpdateEvent.ScannerFirmwareUpdatePayload
 
 @Keep
-class ApiScannerFirmwareUpdateEvent(val relativeStartTime: Long,
-                                    val relativeEndTime: Long,
-                                    val chip: String,
-                                    val targetAppVersion: String,
-                                    val failureReason: String?) : ApiEvent(ApiEventType.SCANNER_FIRMWARE_UPDATE) {
+class ApiScannerFirmwareUpdateEvent(domainEvent: ScannerFirmwareUpdateEvent) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
 
-    constructor(scannerFirmwareUpdateEvent: ScannerFirmwareUpdateEvent) :
-        this((scannerFirmwareUpdateEvent.payload as ScannerFirmwareUpdatePayload).creationTime,
-            scannerFirmwareUpdateEvent.payload.endTime,
-            scannerFirmwareUpdateEvent.payload.chip,
-            scannerFirmwareUpdateEvent.payload.targetAppVersion,
-            scannerFirmwareUpdateEvent.payload.failureReason)
+    @Keep
+    class ApiScannerFirmwareUpdatePayload(val relativeStartTime: Long,
+                                          val relativeEndTime: Long,
+                                          val chip: String,
+                                          val targetAppVersion: String,
+                                          val failureReason: String?) : ApiEventPayload(ApiEventPayloadType.SCANNER_FIRMWARE_UPDATE) {
+
+        constructor(domainPayload: ScannerFirmwareUpdatePayload) :
+            this(domainPayload.creationTime,
+                domainPayload.endTime,
+                domainPayload.chip,
+                domainPayload.targetAppVersion,
+                domainPayload.failureReason)
+    }
 }

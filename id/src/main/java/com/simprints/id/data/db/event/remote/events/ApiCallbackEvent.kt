@@ -2,51 +2,32 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
+import com.simprints.id.data.db.event.domain.events.EventPayload
 import com.simprints.id.data.db.event.domain.events.callback.*
-import com.simprints.id.data.db.event.domain.events.callback.ConfirmationCallbackEvent.ConfirmationCallbackPayload
-import com.simprints.id.data.db.event.domain.events.callback.EnrolmentCallbackEvent.EnrolmentCallbackPayload
-import com.simprints.id.data.db.event.domain.events.callback.ErrorCallbackEvent.ErrorCallbackEventPayload
-import com.simprints.id.data.db.event.domain.events.callback.IdentificationCallbackEvent.IdentificationCallbackPayload
-import com.simprints.id.data.db.event.domain.events.callback.RefusalCallbackEvent.RefusalCallbackPayload
-import com.simprints.id.data.db.event.domain.events.callback.VerificationCallbackEvent.VerificationCallbackPayload
-import com.simprints.id.data.db.event.remote.events.callback.*
 
 @Keep
-class ApiCallbackEvent(val relativeStartTime: Long,
-                       val callback: ApiCallback) : ApiEvent(ApiEventType.CALLBACK) {
+class ApiCallbackEvent(id: String,
+                       labels: List<Event.EventLabel>,
+                       payload: EventPayload) :
+    ApiEvent(id, labels.fromDomainToApi(), payload.fromDomainToApi()) {
+
 
     constructor(enrolmentCallbackEvent: EnrolmentCallbackEvent) :
-        this((enrolmentCallbackEvent.payload as EnrolmentCallbackPayload).creationTime,
-            fromDomainToApiCallback(enrolmentCallbackEvent))
+        this(enrolmentCallbackEvent.id, enrolmentCallbackEvent.labels, enrolmentCallbackEvent.payload)
 
     constructor(identificationCallbackEvent: IdentificationCallbackEvent) :
-        this((identificationCallbackEvent.payload as IdentificationCallbackPayload).creationTime,
-            fromDomainToApiCallback(identificationCallbackEvent))
+        this(identificationCallbackEvent.id, identificationCallbackEvent.labels, identificationCallbackEvent.payload)
 
     constructor(verificationCallbackEvent: VerificationCallbackEvent) :
-        this((verificationCallbackEvent.payload as VerificationCallbackPayload).creationTime,
-            fromDomainToApiCallback(verificationCallbackEvent))
+        this(verificationCallbackEvent.id, verificationCallbackEvent.labels, verificationCallbackEvent.payload)
 
     constructor(refusalCallbackEvent: RefusalCallbackEvent) :
-        this((refusalCallbackEvent.payload as RefusalCallbackPayload).creationTime,
-            fromDomainToApiCallback(refusalCallbackEvent))
+        this(refusalCallbackEvent.id, refusalCallbackEvent.labels, refusalCallbackEvent.payload)
 
     constructor(confirmationCallbackEvent: ConfirmationCallbackEvent) :
-        this((confirmationCallbackEvent.payload as ConfirmationCallbackPayload).creationTime,
-            fromDomainToApiCallback(confirmationCallbackEvent))
+        this(confirmationCallbackEvent.id, confirmationCallbackEvent.labels, confirmationCallbackEvent.payload)
 
     constructor(errorCallbackEvent: ErrorCallbackEvent) :
-        this((errorCallbackEvent.payload as EnrolmentCallbackPayload).creationTime,
-            fromDomainToApiCallback(errorCallbackEvent))
-}
+        this(errorCallbackEvent.id, errorCallbackEvent.labels, errorCallbackEvent.payload)
 
-fun fromDomainToApiCallback(event: Event): ApiCallback =
-    when (event.payload) {
-        is EnrolmentCallbackPayload -> with(event.payload) { ApiEnrolmentCallback(guid) }
-        is IdentificationCallbackPayload -> with(event.payload) { ApiIdentificationCallback(sessionId, scores.map { it.fromDomainToApi() }) }
-        is VerificationCallbackPayload -> with(event.payload) { ApiVerificationCallback(score.fromDomainToApi()) }
-        is RefusalCallbackPayload -> with(event.payload) { ApiRefusalCallback(reason, extra) }
-        is ConfirmationCallbackPayload -> with(event.payload) { ApiConfirmationCallback(identificationOutcome) }
-        is ErrorCallbackEventPayload -> with(event.payload) { ApiErrorCallback(reason.fromDomainToApi()) }
-        else -> throw IllegalArgumentException("Invalid CallbackEvent")
-    }
+}

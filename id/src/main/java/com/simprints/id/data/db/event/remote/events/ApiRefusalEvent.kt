@@ -4,38 +4,48 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.RefusalEvent
 import com.simprints.id.data.db.event.domain.events.RefusalEvent.RefusalPayload
 import com.simprints.id.data.db.event.domain.events.RefusalEvent.RefusalPayload.Answer
+import com.simprints.id.data.db.event.domain.events.RefusalEvent.RefusalPayload.Answer.*
+import com.simprints.id.data.db.event.remote.events.ApiRefusalEvent.ApiRefusalPayload.ApiAnswer
 
 @Keep
-class ApiRefusalEvent(val relativeStartTime: Long,
-                      val relativeEndTime: Long,
-                      val reason: ApiAnswer,
-                      val otherText: String): ApiEvent(ApiEventType.REFUSAL) {
+class ApiRefusalEvent(domainEvent: RefusalEvent) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    enum class ApiAnswer {
-        REFUSED_RELIGION,
-        REFUSED_DATA_CONCERNS,
-        REFUSED_PERMISSION,
-        SCANNER_NOT_WORKING,
-        REFUSED_NOT_PRESENT,
-        REFUSED_YOUNG,
-        OTHER
-    }
+    class ApiRefusalPayload(val relativeStartTime: Long,
+                            val relativeEndTime: Long,
+                            val reason: ApiAnswer,
+                            val otherText: String) : ApiEventPayload(ApiEventPayloadType.REFUSAL) {
 
-    constructor(refusalEvent: RefusalEvent) :
-        this((refusalEvent.payload as RefusalPayload).creationTime,
-            refusalEvent.payload.endTime,
-            refusalEvent.payload.reason.toApiRefusalEventAnswer(),
-            refusalEvent.payload.otherText)
+        @Keep
+        enum class ApiAnswer {
+            REFUSED_RELIGION,
+            REFUSED_DATA_CONCERNS,
+            REFUSED_PERMISSION,
+            SCANNER_NOT_WORKING,
+            REFUSED_NOT_PRESENT,
+            REFUSED_YOUNG,
+            OTHER
+        }
+
+        constructor(domainPayload: RefusalPayload) :
+            this(domainPayload.creationTime,
+                domainPayload.endTime,
+                domainPayload.reason.toApiRefusalEventAnswer(),
+                domainPayload.otherText)
+    }
 }
 
 fun Answer.toApiRefusalEventAnswer() =
-    when(this) {
-        Answer.REFUSED_RELIGION -> ApiRefusalEvent.ApiAnswer.REFUSED_RELIGION
-        Answer.REFUSED_DATA_CONCERNS -> ApiRefusalEvent.ApiAnswer.REFUSED_DATA_CONCERNS
-        Answer.REFUSED_PERMISSION -> ApiRefusalEvent.ApiAnswer.REFUSED_PERMISSION
-        Answer.SCANNER_NOT_WORKING -> ApiRefusalEvent.ApiAnswer.SCANNER_NOT_WORKING
-        Answer.REFUSED_NOT_PRESENT -> ApiRefusalEvent.ApiAnswer.REFUSED_NOT_PRESENT
-        Answer.REFUSED_YOUNG -> ApiRefusalEvent.ApiAnswer.REFUSED_YOUNG
-        Answer.OTHER -> ApiRefusalEvent.ApiAnswer.OTHER
+    when (this) {
+        REFUSED_RELIGION -> ApiAnswer.REFUSED_RELIGION
+        REFUSED_DATA_CONCERNS -> ApiAnswer.REFUSED_DATA_CONCERNS
+        REFUSED_PERMISSION -> ApiAnswer.REFUSED_PERMISSION
+        SCANNER_NOT_WORKING -> ApiAnswer.SCANNER_NOT_WORKING
+        REFUSED_NOT_PRESENT -> ApiAnswer.REFUSED_NOT_PRESENT
+        REFUSED_YOUNG -> ApiAnswer.REFUSED_YOUNG
+        OTHER -> ApiAnswer.OTHER
     }
