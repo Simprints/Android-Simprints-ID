@@ -14,7 +14,7 @@ import com.simprints.id.data.db.event.domain.events.*
 import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.ScannerGeneration
 import com.simprints.id.data.db.event.domain.events.callback.*
 import com.simprints.id.data.db.event.domain.events.callout.*
-import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.domain.events.session.SessionEvent
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
@@ -129,40 +129,40 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
 
-    private suspend fun executeUpload(sessions: MutableList<SessionEvents>) {
+    private suspend fun executeUpload(sessions: MutableList<SessionEvent>) {
         sessionRemoteDataSource.uploadSessions(testProject.id, sessions)
     }
 
     private fun createClosedSessions(nSessions: Int) =
-        mutableListOf<SessionEvents>().apply {
+        mutableListOf<SessionEvent>().apply {
             repeat(nSessions) { this.add(createFakeClosedSession(timeHelper, testProject.id)) }
         }
 
-    private fun SessionEvents.addAlertScreenEvents() {
+    private fun SessionEvent.addAlertScreenEvents() {
         AlertScreenEvent.AlertScreenEventType.values().forEach {
             addEvent(AlertScreenEvent(0, it))
         }
     }
 
-    private fun SessionEvents.addArtificialTerminationEvent() {
+    private fun SessionEvent.addArtificialTerminationEvent() {
         ArtificialTerminationEvent.Reason.values().forEach {
             addEvent(ArtificialTerminationEvent(0, it))
         }
     }
 
-    private fun SessionEvents.addAuthenticationEvent() {
+    private fun SessionEvent.addAuthenticationEvent() {
         AuthenticationEvent.Result.values().forEach {
             addEvent(AuthenticationEvent(0, 0, AuthenticationEvent.UserInfo("some_project", "user_id"), it))
         }
     }
 
-    private fun SessionEvents.addAuthorizationEvent() {
+    private fun SessionEvent.addAuthorizationEvent() {
         AuthorizationEvent.Result.values().forEach {
             addEvent(AuthorizationEvent(0, it, AuthorizationEvent.UserInfo("some_project", "user_id")))
         }
     }
 
-    private fun SessionEvents.addCandidateReadEvent() {
+    private fun SessionEvent.addCandidateReadEvent() {
         CandidateReadEvent.LocalResult.values().forEach { local ->
             CandidateReadEvent.RemoteResult.values().forEach { remote ->
                 addEvent(CandidateReadEvent(0, 0, RANDOM_GUID, local, remote))
@@ -170,11 +170,11 @@ class SessionRemoteDataSourceImplAndroidTest {
         }
     }
 
-    private fun SessionEvents.addConnectivitySnapshotEvent() {
+    private fun SessionEvent.addConnectivitySnapshotEvent() {
         addEvent(ConnectivitySnapshotEvent(0, "Unknown", listOf(SimNetworkUtils.Connection("connection", NetworkInfo.DetailedState.CONNECTED))))
     }
 
-    private fun SessionEvents.addConsentEvent() {
+    private fun SessionEvent.addConsentEvent() {
         ConsentEvent.Type.values().forEach { type ->
             ConsentEvent.Result.values().forEach { result ->
                 addEvent(ConsentEvent(0, 0, type, result))
@@ -182,11 +182,11 @@ class SessionRemoteDataSourceImplAndroidTest {
         }
     }
 
-    private fun SessionEvents.addEnrolmentEvent() {
+    private fun SessionEvent.addEnrolmentEvent() {
         addEvent(EnrolmentEvent(0, RANDOM_GUID))
     }
 
-    private fun SessionEvents.addFingerprintCaptureEvent() {
+    private fun SessionEvent.addFingerprintCaptureEvent() {
         FingerprintCaptureEvent.Result.values().forEach { result ->
             FingerIdentifier.values().forEach { fingerIdentifier ->
                 val fakeTemplate = EncodingUtils.byteArrayToBase64(
@@ -214,67 +214,67 @@ class SessionRemoteDataSourceImplAndroidTest {
         }
     }
 
-    private fun SessionEvents.addGuidSelectionEvent() {
+    private fun SessionEvent.addGuidSelectionEvent() {
         addEvent(GuidSelectionEvent(0, RANDOM_GUID))
     }
 
-    private fun SessionEvents.addIntentParsingEvent() {
+    private fun SessionEvent.addIntentParsingEvent() {
         IntentParsingEvent.IntegrationInfo.values().forEach {
             addEvent(IntentParsingEvent(0, it))
         }
     }
 
-    private fun SessionEvents.addInvalidIntentEvent() {
+    private fun SessionEvent.addInvalidIntentEvent() {
         addEvent(InvalidIntentEvent(0, "some_action", emptyMap()))
     }
 
-    private fun SessionEvents.addOneToManyMatchEvent() {
+    private fun SessionEvent.addOneToManyMatchEvent() {
         OneToManyMatchEvent.MatchPoolType.values().forEach {
             addEvent(OneToManyMatchEvent(0, 0, OneToManyMatchEvent.MatchPool(it, 0), emptyList()))
         }
     }
 
-    private fun SessionEvents.addOneToOneMatchEvent() {
+    private fun SessionEvent.addOneToOneMatchEvent() {
         addEvent(OneToOneMatchEvent(0, 0, RANDOM_GUID, MatchEntry(RANDOM_GUID, 0F)))
     }
 
-    private fun SessionEvents.addPersonCreationEvent() {
+    private fun SessionEvent.addPersonCreationEvent() {
         addEvent(PersonCreationEvent(0, listOf(RANDOM_GUID, RANDOM_GUID)))
     }
 
-    private fun SessionEvents.addRefusalEvent() {
+    private fun SessionEvent.addRefusalEvent() {
         RefusalEvent.Answer.values().forEach {
             addEvent(RefusalEvent(0, 0, it, "other_text"))
         }
     }
 
-    private fun SessionEvents.addScannerConnectionEvent() {
+    private fun SessionEvent.addScannerConnectionEvent() {
         addEvent(ScannerConnectionEvent(0,
             ScannerConnectionEvent.ScannerInfo("scanner_id", "macAddress",
                 ScannerGeneration.VERO_2,"hardware")))
     }
 
-    private fun SessionEvents.addVero2InfoSnapshotEvents() {
+    private fun SessionEvent.addVero2InfoSnapshotEvents() {
         addEvent(Vero2InfoSnapshotEvent(0,
             Vero2InfoSnapshotEvent.Vero2Version(Int.MAX_VALUE.toLong() + 1, "1.23",
                 "api", "stmApp", "stmApi", "un20App", "un20Api"),
             Vero2InfoSnapshotEvent.BatteryInfo(70, 15, 1, 37)))
     }
 
-    private fun SessionEvents.addScannerFirmwareUpdateEvent() {
+    private fun SessionEvent.addScannerFirmwareUpdateEvent() {
         addEvent(ScannerFirmwareUpdateEvent(0, 0, "stm",
             "targetApp", "failureReason"))
     }
 
-    private fun SessionEvents.addSuspiciousIntentEvent() {
+    private fun SessionEvent.addSuspiciousIntentEvent() {
         addEvent(SuspiciousIntentEvent(0, mapOf("some_extra_key" to "value")))
     }
 
-    private fun SessionEvents.addCompletionCheckEvent() {
+    private fun SessionEvent.addCompletionCheckEvent() {
         addEvent(CompletionCheckEvent(0, true))
     }
 
-    private fun SessionEvents.addCallbackEvent() {
+    private fun SessionEvent.addCallbackEvent() {
         addEvent(EnrolmentCallbackEvent(0, RANDOM_GUID))
 
         ErrorCallbackEvent.Reason.values().forEach {
@@ -290,7 +290,7 @@ class SessionRemoteDataSourceImplAndroidTest {
         addEvent(ConfirmationCallbackEvent(0, true))
     }
 
-    private fun SessionEvents.addCalloutEvent() {
+    private fun SessionEvent.addCalloutEvent() {
         addEvent(EnrolmentCalloutEvent(1, "project_id", "user_id", "module_id", "metadata"))
         addEvent(ConfirmationCalloutEvent(10, "projectId", RANDOM_GUID, RANDOM_GUID))
         addEvent(IdentificationCalloutEvent(0, "project_id", "user_id", "module_id", "metadata"))

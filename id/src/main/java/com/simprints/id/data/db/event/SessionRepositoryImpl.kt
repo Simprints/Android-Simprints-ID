@@ -3,7 +3,7 @@ package com.simprints.id.data.db.event
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.SessionQuery
-import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.domain.events.session.SessionEvent
 import com.simprints.id.data.db.event.local.SessionLocalDataSource
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManager
@@ -40,7 +40,7 @@ open class SessionRepositoryImpl(
 
     // as default, the manager tries to load the last open activeSession
     //
-    override suspend fun getCurrentSession(): SessionEvents =
+    override suspend fun getCurrentSession(): SessionEvent =
         reportExceptionIfNeeded { sessionLocalDataSource.load(SessionQuery(openSession = true)).first() }
 
     override suspend fun createSession(libSimprintsVersionName: String) {
@@ -79,15 +79,15 @@ open class SessionRepositoryImpl(
             Timber.d("Preparing sessions for $projectId: total $total (open $open, close $close)")
         }
 
-    private fun Flow<SessionEvents>.filterClosedSessions() =
+    private fun Flow<SessionEvent>.filterClosedSessions() =
         filter {
             it.isClosed()
         }
 
-    private suspend fun Flow<SessionEvents>.createBatches() =
+    private suspend fun Flow<SessionEvent>.createBatches() =
         this.bufferedChunks(SESSION_BATCH_SIZE)
 
-    private suspend fun Flow<List<SessionEvents>>.updateRelativeUploadTimeAndUploadSessions(): Flow<List<SessionEvents>> {
+    private suspend fun Flow<List<SessionEvent>>.updateRelativeUploadTimeAndUploadSessions(): Flow<List<SessionEvent>> {
         this.collect {
             val sessionsWithUpdatedRelativeUploadTime = it.updateRelativeUploadTime()
             Timber.d("Uploading ${sessionsWithUpdatedRelativeUploadTime.size} sessions")
@@ -96,7 +96,7 @@ open class SessionRepositoryImpl(
         return this
     }
 
-    private suspend fun Flow<List<SessionEvents>>.deleteSessionsFromDb() {
+    private suspend fun Flow<List<SessionEvent>>.deleteSessionsFromDb() {
         this.collect {sessions ->
             sessions.forEach {
                 sessionLocalDataSource.delete(SessionQuery(openSession = false))
@@ -104,7 +104,7 @@ open class SessionRepositoryImpl(
         }
     }
 
-    override suspend fun updateSession(sessionId: String, updateBlock: (SessionEvents) -> Unit) {
+    override suspend fun updateSession(sessionId: String, updateBlock: (SessionEvent) -> Unit) {
         reportExceptionIfNeeded {
             sessionLocalDataSource.update(sessionId) {
                 updateBlock(it)
@@ -112,7 +112,7 @@ open class SessionRepositoryImpl(
         }
     }
 
-    override suspend fun updateCurrentSession(updateBlock: (SessionEvents) -> Unit) {
+    override suspend fun updateCurrentSession(updateBlock: (SessionEvent) -> Unit) {
         reportExceptionIfNeeded {
             sessionLocalDataSource.updateCurrentSession(updateBlock)
         }
@@ -131,7 +131,7 @@ open class SessionRepositoryImpl(
             throw t
         }
 
-    private fun List<SessionEvents>.updateRelativeUploadTime() = map { session ->
+    private fun List<SessionEvent>.updateRelativeUploadTime() = map { session ->
         session.also {
             it.relativeUploadTime = timeHelper.now() - it.startTime
         }
