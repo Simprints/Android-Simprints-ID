@@ -10,11 +10,13 @@ class GuidSelectionEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    GuidSelectionPayload(creationTime, selectedId)) {
+    GuidSelectionPayload(creationTime, DEFAULT_EVENT_VERSION, selectedId)) {
 
     @Keep
-    class GuidSelectionPayload(startTime: Long,
-                               val selectedId: String) : EventPayload(EventPayloadType.GUID_SELECTION, startTime)
+    class GuidSelectionPayload(creationTime: Long,
+                               version: Int,
+                               val selectedId: String) : EventPayload(EventPayloadType.GUID_SELECTION, version, creationTime)
 
 }

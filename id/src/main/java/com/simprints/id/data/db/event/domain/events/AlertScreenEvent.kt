@@ -11,14 +11,16 @@ class AlertScreenEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    AlertScreenPayload(creationTime, alertType)) {
+    AlertScreenPayload(creationTime, DEFAULT_EVENT_VERSION, alertType)) {
 
     @Keep
     class AlertScreenPayload(
-        val startTime: Long,
+        creationTime: Long,
+        version: Int,
         val alertType: AlertScreenEventType
-    ) : EventPayload(EventPayloadType.ALERT_SCREEN, startTime) {
+    ) : EventPayload(EventPayloadType.ALERT_SCREEN, version, creationTime) {
 
         enum class AlertScreenEventType {
             DIFFERENT_PROJECT_ID,

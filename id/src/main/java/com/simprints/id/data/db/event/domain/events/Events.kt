@@ -9,6 +9,7 @@ data class Events(val events: List<Event>)
 
 @Keep
 open class Event(val id: String,
+                 val version: Int,
                  val labels: List<EventLabel>,
                  val payload: EventPayload) {
 
@@ -23,6 +24,8 @@ open class Event(val id: String,
     }
 
     companion object {
+        const val DEFAULT_EVENT_VERSION = 0
+
         fun fromApiToDomain(labels: Map<String, List<String>>) =
             labels.mapNotNull {
                 when (it.key) {

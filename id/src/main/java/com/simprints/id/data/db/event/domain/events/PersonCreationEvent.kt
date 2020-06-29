@@ -14,16 +14,18 @@ class PersonCreationEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    PersonCreationPayload(startTime, fingerprintCaptureIds)) {
+    PersonCreationPayload(startTime, DEFAULT_EVENT_VERSION, fingerprintCaptureIds)) {
 
 
     // At the end of the sequence of capture, we build a Person object used either for enrolment or verification/identification
     @Keep
     class PersonCreationPayload(
-        startTime: Long,
+        creationTime: Long,
+        version: Int,
         val fingerprintCaptureIds: List<String>
-    ) : EventPayload(EventPayloadType.PERSON_CREATION, startTime)
+    ) : EventPayload(EventPayloadType.PERSON_CREATION, version, creationTime)
 
     companion object {
         fun build(timeHelper: TimeHelper,
