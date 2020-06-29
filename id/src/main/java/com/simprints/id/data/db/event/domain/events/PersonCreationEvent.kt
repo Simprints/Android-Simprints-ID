@@ -2,7 +2,7 @@ package com.simprints.id.data.db.event.domain.events
 
 import androidx.annotation.Keep
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.domain.events.session.SessionEvent
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.tools.TimeHelper
 import java.util.*
@@ -27,7 +27,7 @@ class PersonCreationEvent(
 
     companion object {
         fun build(timeHelper: TimeHelper,
-                  currentSession: SessionEvents,
+                  currentSession: SessionEvent,
                   fingerprintSamples: List<FingerprintSample>) =
             PersonCreationEvent(
                 timeHelper.now(),
@@ -36,8 +36,8 @@ class PersonCreationEvent(
 
         // It extracts CaptureEvents Ids with the templates used to create the "Person" object for
         // identification, verification, enrolment.
-        private fun extractCaptureEventIdsBasedOnPersonTemplate(sessionEvents: SessionEvents, personTemplates: List<String>): List<String> =
-            sessionEvents.getEvents()
+        private fun extractCaptureEventIdsBasedOnPersonTemplate(sessionEvent: SessionEvent, personTemplates: List<String>): List<String> =
+            sessionEvent.getEvents()
                 .filter {
                     if (it.payload is FingerprintCaptureEvent.FingerprintCapturePayload) {
                         val payload = it.payload

@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.remote.SessionRemoteDataSourceImplAndroidT
 import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImplTest
 import com.simprints.id.di.*
 import com.simprints.id.services.subjects.SubjectsSyncIntegrationTest
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImplAndroidTest
+import com.simprints.id.services.scheduledSync.sessionSync.SessionEventSyncManagerImplAndroidTest
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -47,7 +47,7 @@ interface AppComponentForAndroidTests : AppComponent {
 
     fun inject(loginActivityAndroidTest: LoginActivityAndroidTest)
     fun inject(legacyLocalDbKeyProviderImplTest: LegacyLocalDbKeyProviderImplTest)
-    fun inject(sessionEventsSyncManagerImplTest: SessionEventsSyncManagerImplAndroidTest)
+    fun inject(sessionEventsSyncManagerImplTest: SessionEventSyncManagerImplAndroidTest)
     fun inject(moduleSelectionActivityAndroidTest: ModuleSelectionActivityAndroidTest)
     fun inject(subjectsSyncIntegrationTest: SubjectsSyncIntegrationTest)
     fun inject(dashboardActivityAndroidTest: DashboardActivityAndroidTest)

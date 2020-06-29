@@ -11,10 +11,10 @@ import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent.MatchPoo
 import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent.MatchPoolType
 import com.simprints.id.data.db.event.domain.events.callback.*
 import com.simprints.id.data.db.event.domain.events.callout.*
-import com.simprints.id.data.db.event.domain.session.DatabaseInfo
-import com.simprints.id.data.db.event.domain.session.Device
-import com.simprints.id.data.db.event.domain.session.Location
-import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.domain.events.session.DatabaseInfo
+import com.simprints.id.data.db.event.domain.events.session.Device
+import com.simprints.id.data.db.event.domain.events.session.Location
+import com.simprints.id.data.db.event.domain.events.session.SessionEvent
 import com.simprints.id.data.db.event.remote.events.*
 import com.simprints.id.data.db.event.remote.session.ApiDatabaseInfo
 import com.simprints.id.data.db.event.remote.session.ApiDevice
@@ -32,7 +32,7 @@ import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SessionEventsAdapterFactoryTest {
+class SessionEventAdapterFactoryTest {
 
     private val gsonWithAdapters = JsonHelper.gson
 
@@ -450,7 +450,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_sessionApiModel() {
-        val session = SessionEvents(
+        val session = SessionEvent(
             "project_id",
             "appVersionName",
             "libVersionName",

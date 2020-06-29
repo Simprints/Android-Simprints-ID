@@ -8,7 +8,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.SessionRepository
 import com.simprints.id.data.db.event.SessionRepositoryImpl
 import com.simprints.id.data.db.event.domain.events.SessionQuery
-import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.domain.events.session.SessionEvent
 import com.simprints.id.data.db.event.local.SessionLocalDataSource
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManager
@@ -112,7 +112,7 @@ class SessionRepositoryImplTest {
     @Test
     fun updateCurrentSession_shouldUpdateCurrentSession() {
         runBlockingTest {
-            val block: (SessionEvents) -> Unit = {}
+            val block: (SessionEvent) -> Unit = {}
             sessionsRepository.updateCurrentSession(block)
             coVerify(exactly = 1) { sessionLocalDataSourceMock.updateCurrentSession(block) }
         }

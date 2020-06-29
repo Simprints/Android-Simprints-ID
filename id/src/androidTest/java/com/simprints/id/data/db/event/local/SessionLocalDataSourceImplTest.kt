@@ -11,7 +11,7 @@ import com.simprints.id.data.db.event.domain.validators.SessionEventValidator
 import com.simprints.id.data.db.event.domain.events.SessionQuery
 import com.simprints.id.data.db.event.domain.events.AlertScreenEvent
 import com.simprints.id.data.db.event.domain.events.AlertScreenEvent.AlertScreenEventType.DIFFERENT_PROJECT_ID
-import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.domain.events.session.SessionEvent
 import com.simprints.id.data.db.event.local.SessionLocalDataSourceImpl.Companion.START_TIME
 import com.simprints.id.data.db.event.local.models.DbSession
 import com.simprints.id.data.db.event.local.models.toDomain
@@ -354,7 +354,7 @@ class SessionLocalDataSourceImplTest {
         }
     }
 
-    private fun saveFakeSessions(realm: Realm, sessions: List<SessionEvents>) {
+    private fun saveFakeSessions(realm: Realm, sessions: List<SessionEvent>) {
         every { realmConfigBuilder.build(any(), any()) } returns configForTest
         realm.executeTransaction {
             sessions.forEach {
@@ -383,8 +383,8 @@ class SessionLocalDataSourceImplTest {
         }
     }
 
-    private suspend fun Flow<SessionEvents>.ids() = this.toList().map { it.id }
-    private fun List<SessionEvents>.ids() = this.map { it.id }
+    private suspend fun Flow<SessionEvent>.ids() = this.toList().map { it.id }
+    private fun List<SessionEvent>.ids() = this.map { it.id }
 
     companion object {
         private const val APP_VERSION_NAME = "APP_VERSION_NAME"

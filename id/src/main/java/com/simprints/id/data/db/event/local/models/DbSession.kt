@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.event.local.models
 
 import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.session.Device
-import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.domain.events.session.Device
+import com.simprints.id.data.db.event.domain.events.session.SessionEvent
 import com.simprints.id.data.db.event.local.toDomainEvent
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -29,25 +29,25 @@ open class DbSession : RealmObject {
 
     constructor()
 
-    constructor(sessionEvents: SessionEvents) : this() {
-        this.id = sessionEvents.id
-        this.appVersionName = sessionEvents.appVersionName
-        this.libVersionName = sessionEvents.libVersionName
-        this.language = sessionEvents.language
-        this.projectId = sessionEvents.projectId
-        this.startTime = sessionEvents.startTime
+    constructor(sessionEvent: SessionEvent) : this() {
+        this.id = sessionEvent.id
+        this.appVersionName = sessionEvent.appVersionName
+        this.libVersionName = sessionEvent.libVersionName
+        this.language = sessionEvent.language
+        this.projectId = sessionEvent.projectId
+        this.startTime = sessionEvent.startTime
         this.realmEvents = RealmList()
-        setEvents(sessionEvents.getEvents())
-        this.relativeEndTime = sessionEvents.relativeEndTime
-        this.relativeUploadTime = sessionEvents.relativeUploadTime
-        this.device = DbDevice(sessionEvents.device)
-        this.databaseInfo = DbDatabaseInfo(sessionEvents.databaseInfo)
+        setEvents(sessionEvent.getEvents())
+        this.relativeEndTime = sessionEvent.relativeEndTime
+        this.relativeUploadTime = sessionEvent.relativeUploadTime
+        this.device = DbDevice(sessionEvent.device)
+        this.databaseInfo = DbDatabaseInfo(sessionEvent.databaseInfo)
 
-        sessionEvents.location?.let {
+        sessionEvent.location?.let {
             this.location = DbLocation(it)
         }
 
-        this.analyticsId = sessionEvents.analyticsId
+        this.analyticsId = sessionEvent.analyticsId
     }
 
     private fun setEvents(events: List<Event>) = realmEvents.apply {
@@ -58,8 +58,8 @@ open class DbSession : RealmObject {
     fun timeRelativeToStartTime(time: Long): Long = time - startTime
 }
 
-fun DbSession.toDomain(): SessionEvents {
-    val session = SessionEvents(id = id,
+fun DbSession.toDomain(): SessionEvent {
+    val session = SessionEvent(id = id,
         projectId = projectId,
         appVersionName = appVersionName,
         libVersionName = libVersionName,

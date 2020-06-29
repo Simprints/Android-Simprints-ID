@@ -1,9 +1,8 @@
 package com.simprints.id.data.db.event.remote.session
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.domain.events.session.SessionEvent
 import com.simprints.id.data.db.event.remote.events.ApiEvent
-import com.simprints.id.data.db.event.remote.toApiEvent
 import java.util.*
 
 @Keep
@@ -21,7 +20,7 @@ open class ApiSessionEvents(var appVersionName: String,
                             var analyticsId: String? = null) {
 
 
-    constructor(sessionDomain: SessionEvents) :
+    constructor(sessionDomain: SessionEvent) :
         this(sessionDomain.appVersionName,
             sessionDomain.libVersionName,
             // We are sending what we have in preference Manager as language

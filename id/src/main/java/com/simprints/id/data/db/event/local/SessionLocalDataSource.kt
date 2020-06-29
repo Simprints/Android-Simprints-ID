@@ -2,7 +2,7 @@ package com.simprints.id.data.db.event.local
 
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.SessionQuery
-import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.domain.events.session.SessionEvent
 import kotlinx.coroutines.flow.Flow
 
 interface SessionLocalDataSource {
@@ -13,10 +13,10 @@ interface SessionLocalDataSource {
                        deviceId: String)
 
     suspend fun count(query: SessionQuery): Int
-    suspend fun load(query: SessionQuery): Flow<SessionEvents>
+    suspend fun load(query: SessionQuery): Flow<SessionEvent>
     suspend fun delete(query: SessionQuery)
-    suspend fun update(sessionId: String, updateBlock: (SessionEvents) -> Unit)
+    suspend fun update(sessionId: String, updateBlock: (SessionEvent) -> Unit)
 
-    suspend fun updateCurrentSession(updateBlock: (SessionEvents) -> Unit)
+    suspend fun updateCurrentSession(updateBlock: (SessionEvent) -> Unit)
     suspend fun addEventToCurrentSession(event: Event)
 }

@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.event.remote
 
-import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.domain.events.session.SessionEvent
 import com.simprints.id.data.db.event.remote.session.ApiSessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.network.SimApiClient
@@ -11,7 +11,7 @@ class SessionRemoteDataSourceImpl(
 ) : SessionRemoteDataSource {
 
     override suspend fun uploadSessions(projectId: String,
-                                        sessions: List<SessionEvents>) {
+                                        sessions: List<SessionEvent>) {
         if (sessions.isEmpty()) {
             throw NoSessionsFoundException()
         }
