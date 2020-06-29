@@ -10,14 +10,17 @@ data class Events(val events: List<Event>)
 @Keep
 open class Event(val id: String,
                  val labels: List<EventLabel>,
-                 val payload: EventPayload)
+                 val payload: EventPayload) {
 
-sealed class EventLabel(val key: String, val labels: List<String>) {
+    sealed class EventLabel(val key: String, val labels: List<String>) {
+        sealed class EventLabel(val key: String, val labels: List<String>) {
 
-    class ProjectId(label: String) : EventLabel("projectId", listOf(label))
-    class SubjectId(label: String) : EventLabel("subjectId", listOf(label))
-    class AttendantId(label: String) : EventLabel("attendantId", listOf(label))
-    class ModuleId(labels: List<String>) : EventLabel("moduleId", labels)
-    class Mode(labels: List<Modes>) : EventLabel("mode", labels.map { it.name })
-    class SessionId(label: String) : EventLabel("sessionId", listOf(label))
+            class ProjectId(labelValue: String) : EventLabel("projectId", listOf(labelValue))
+            class AttendantId(labelValue: String) : EventLabel("attendantId", listOf(labelValue))
+            class SubjectId(labelValue: String) : EventLabel("subjectId", listOf(labelValue))
+            class Mode(labelValues: List<Modes>) : EventLabel("mode", labelValues.map { it.name })
+            class SessionId(labelValue: String) : EventLabel("sessionId", listOf(labelValue))
+            class ModuleId(labelValues: List<String>) : EventLabel("moduleId", labelValues)
+        }
+    }
 }
