@@ -19,8 +19,8 @@ class RefusalCallbackEvent(
     RefusalCallbackPayload(creationTime, reason, extra)) {
 
     @Keep
-    class RefusalCallbackPayload(startTime: Long,
+    class RefusalCallbackPayload(creationTime: Long,
                                  val reason: String,
-                                 val extra: String) : EventPayload(EventPayloadType.CALLBACK_REFUSAL, startTime)
+                                 val extra: String) : EventPayload(EventPayloadType.CALLBACK_REFUSAL, creationTime)
 
 }

@@ -5,18 +5,18 @@ import java.util.*
 
 @Keep
 class ScannerConnectionEvent(
-    startTime: Long,
+    creationTime: Long,
     scannerInfo: ScannerConnectionPayload.ScannerInfo,
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    ScannerConnectionPayload(startTime, scannerInfo)) {
+    ScannerConnectionPayload(creationTime, scannerInfo)) {
 
 
     @Keep
-    class ScannerConnectionPayload(startTime: Long,
-                                   val scannerInfo: ScannerInfo) : EventPayload(EventPayloadType.SCANNER_CONNECTION, startTime) {
+    class ScannerConnectionPayload(creationTime: Long,
+                                   val scannerInfo: ScannerInfo) : EventPayload(EventPayloadType.SCANNER_CONNECTION, creationTime) {
 
         @Keep
         class ScannerInfo(val scannerId: String,
