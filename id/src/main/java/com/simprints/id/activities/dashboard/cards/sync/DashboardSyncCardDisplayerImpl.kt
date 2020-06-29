@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.lifecycle.MutableLiveData
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.utils.getParamsString
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.tools.AndroidResourcesHelper
@@ -138,7 +139,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
                 } else {
                     ""
                 }
-                text =  ctx.getString(R.string.dashboard_sync_card_progress, arrayOf(percentageText))
+                text =  ctx.getParamsString(R.string.dashboard_sync_card_progress, arrayOf(percentageText))
                 textColor = getDefaultGrayTextColor(viewForConnectingState)
             }
             withVisible(progressCardSyncProgress()) {
@@ -218,7 +219,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
         lastSyncTime?.let {
             val lastSyncTimeText = timeHelper.readableBetweenNowAndTime(it)
             textView.visibility = VISIBLE
-            textView.text = ctx.getString(R.string.dashboard_card_sync_last_sync, arrayOf(lastSyncTimeText))
+            textView.text = ctx.getParamsString(R.string.dashboard_card_sync_last_sync, arrayOf(lastSyncTimeText))
         } ?: run { textView.visibility = GONE }
     }
 

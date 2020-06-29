@@ -6,6 +6,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.simprints.core.tools.utils.getParamsString
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
 import com.simprints.id.tools.AndroidResourcesHelper
@@ -35,7 +36,7 @@ class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDispl
     private fun View.setCurrentUser(currentUser: String) {
         findViewById<TextView>(
             R.id.dashboard_project_details_card_current_user
-        ).text = ctx.getString(
+        ).text = ctx.getParamsString(
             R.string.dashboard_card_current_user, arrayOf(currentUser)
         )
     }
@@ -48,7 +49,7 @@ class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDispl
                 this.visibility = GONE
             } else {
                 this.visibility = VISIBLE
-                text = ctx.getString(
+                text = ctx.getParamsString(
                     R.string.dashboard_card_scanner_used, arrayOf(scannerUsed)
                 )
             }
