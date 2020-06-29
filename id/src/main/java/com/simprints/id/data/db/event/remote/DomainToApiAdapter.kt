@@ -6,6 +6,8 @@ import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
 import com.simprints.id.data.db.event.domain.events.callback.*
 import com.simprints.id.data.db.event.domain.events.callout.*
 import com.simprints.id.data.db.event.remote.events.*
+import com.simprints.id.data.db.event.remote.events.callback.ApiCallbackEvent
+import com.simprints.id.data.db.event.remote.events.callout.ApiCalloutEvent
 
 @Keep
 fun Event.toApiEvent(): ApiEvent =

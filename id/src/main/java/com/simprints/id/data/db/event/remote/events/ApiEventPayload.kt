@@ -24,6 +24,12 @@ import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.Scann
 import com.simprints.id.data.db.event.domain.events.ScannerFirmwareUpdateEvent.ScannerFirmwareUpdatePayload
 import com.simprints.id.data.db.event.domain.events.SuspiciousIntentEvent.SuspiciousIntentPayload
 import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
+import com.simprints.id.data.db.event.domain.events.callback.ConfirmationCallbackEvent.ConfirmationCallbackPayload
+import com.simprints.id.data.db.event.domain.events.callback.EnrolmentCallbackEvent.EnrolmentCallbackPayload
+import com.simprints.id.data.db.event.domain.events.callback.ErrorCallbackEvent.ErrorCallbackPayload
+import com.simprints.id.data.db.event.domain.events.callback.IdentificationCallbackEvent.IdentificationCallbackPayload
+import com.simprints.id.data.db.event.domain.events.callback.RefusalCallbackEvent.RefusalCallbackPayload
+import com.simprints.id.data.db.event.domain.events.callback.VerificationCallbackEvent.VerificationCallbackPayload
 import com.simprints.id.data.db.event.domain.events.callout.ConfirmationCalloutEvent.ConfirmationCalloutPayload
 import com.simprints.id.data.db.event.domain.events.callout.EnrolmentCalloutEvent.EnrolmentCalloutPayload
 import com.simprints.id.data.db.event.domain.events.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
@@ -36,7 +42,6 @@ import com.simprints.id.data.db.event.remote.events.ApiAlertScreenEvent.ApiAlert
 import com.simprints.id.data.db.event.remote.events.ApiArtificialTerminationEvent.ApiArtificialTerminationPayload
 import com.simprints.id.data.db.event.remote.events.ApiAuthenticationEvent.ApiAuthenticationPayload
 import com.simprints.id.data.db.event.remote.events.ApiAuthorizationEvent.ApiAuthorizationPayload
-import com.simprints.id.data.db.event.remote.events.ApiCalloutEvent.ApiCalloutPayload
 import com.simprints.id.data.db.event.remote.events.ApiCandidateReadEvent.ApiCandidateReadPayload
 import com.simprints.id.data.db.event.remote.events.ApiCompletionCheckEvent.ApiCompletionCheckPayload
 import com.simprints.id.data.db.event.remote.events.ApiConnectivitySnapshotEvent.ApiConnectivitySnapshotPayload
@@ -44,7 +49,6 @@ import com.simprints.id.data.db.event.remote.events.ApiConsentEvent.ApiConsentPa
 import com.simprints.id.data.db.event.remote.events.ApiEnrolmentEvent.ApiEnrolmentPayload
 import com.simprints.id.data.db.event.remote.events.ApiFingerprintCaptureEvent.ApiFingerprintCapturePayload
 import com.simprints.id.data.db.event.remote.events.ApiGuidSelectionEvent.ApiGuidSelectionPayload
-import com.simprints.id.data.db.event.remote.events.ApiIntentParsingEvent.ApiIntentParsingEvent
 import com.simprints.id.data.db.event.remote.events.ApiIntentParsingEvent.ApiIntentParsingPayload
 import com.simprints.id.data.db.event.remote.events.ApiInvalidIntentEvent.ApiInvalidIntentPayload
 import com.simprints.id.data.db.event.remote.events.ApiOneToManyMatchEvent.ApiOneToManyMatchPayload
@@ -54,17 +58,19 @@ import com.simprints.id.data.db.event.remote.events.ApiRefusalEvent.ApiRefusalPa
 import com.simprints.id.data.db.event.remote.events.ApiScannerConnectionEvent.ApiScannerConnectionPayload
 import com.simprints.id.data.db.event.remote.events.ApiScannerFirmwareUpdateEvent.ApiScannerFirmwareUpdatePayload
 import com.simprints.id.data.db.event.remote.events.ApiSuspiciousIntentEvent.ApiSuspiciousIntentPayload
-import com.simprints.id.data.db.event.remote.events.ApiVero2InfoSnapshotEvent.ApiVero2InfoSnapshotEvent
 import com.simprints.id.data.db.event.remote.events.ApiVero2InfoSnapshotEvent.ApiVero2InfoSnapshotPayload
+import com.simprints.id.data.db.event.remote.events.callback.ApiCallbackEvent.ApiCallbackPayload
+import com.simprints.id.data.db.event.remote.events.callout.ApiCalloutEvent.ApiCalloutPayload
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationEvent.ApiEnrolmentRecordCreationPayload
-import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionEvent.ApiEnrolmentRecordDeletionPayload
-import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMoveEvent.ApiEnrolmentRecordMovePayload
-import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMovePayload
 
 @Keep
-abstract class ApiEventPayload(@Transient val type: ApiEventPayloadType)
+abstract class ApiEventPayload(
+    val type: ApiEventPayloadType,
+    val relativeStartTime: Int, //TODO: "relativeStartTime" to change
+    val creationTime: Long
+)
 
 fun EventPayload.fromDomainToApi() =
     when (this.type) {
@@ -94,12 +100,12 @@ fun EventPayload.fromDomainToApi() =
         EventPayloadType.CALLOUT_ENROLMENT -> ApiCalloutPayload(this as EnrolmentCalloutPayload)
         EventPayloadType.CALLOUT_VERIFICATION -> ApiCalloutPayload(this as VerificationCalloutPayload)
         EventPayloadType.CALLOUT_LAST_BIOMETRICS -> ApiCalloutPayload(this as EnrolmentLastBiometricsCalloutPayload)
-        EventPayloadType.CALLBACK_IDENTIFICATION -> ApiCalloutPayload(this as)
-        EventPayloadType.CALLBACK_ENROLMENT -> ApiCalloutPayload(this as Cal)
-        EventPayloadType.CALLBACK_REFUSAL -> TODO()
-        EventPayloadType.CALLBACK_VERIFICATION -> TODO()
-        EventPayloadType.CALLBACK_ERROR -> TODO()
-        EventPayloadType.CALLBACK_CONFIRMATION -> TODO()
+        EventPayloadType.CALLBACK_IDENTIFICATION -> ApiCallbackPayload(this as IdentificationCallbackPayload)
+        EventPayloadType.CALLBACK_ENROLMENT -> ApiCallbackPayload(this as EnrolmentCallbackPayload)
+        EventPayloadType.CALLBACK_REFUSAL -> ApiCallbackPayload(this as RefusalCallbackPayload)
+        EventPayloadType.CALLBACK_VERIFICATION -> ApiCallbackPayload(this as VerificationCallbackPayload)
+        EventPayloadType.CALLBACK_ERROR -> ApiCallbackPayload(this as ErrorCallbackPayload)
+        EventPayloadType.CALLBACK_CONFIRMATION -> ApiCallbackPayload(this as ConfirmationCallbackPayload)
         EventPayloadType.SUSPICIOUS_INTENT -> ApiSuspiciousIntentPayload(this as SuspiciousIntentPayload)
         EventPayloadType.INTENT_PARSING -> ApiIntentParsingPayload(this as IntentParsingPayload)
         EventPayloadType.COMPLETION_CHECK -> ApiCompletionCheckPayload(this as CompletionCheckPayload)
