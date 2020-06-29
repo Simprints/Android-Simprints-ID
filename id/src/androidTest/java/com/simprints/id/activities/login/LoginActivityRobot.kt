@@ -89,6 +89,14 @@ class LoginActivityRobot(
         shouldMatchSuppliedProjectIdAndIntentProjectId(false)
     }
 
+    fun withSecurityStatusRunning() {
+        every { mockLoginActivityHelper.isSecurityStatusRunning() } returns true
+    }
+
+    fun withSecurityStatusCompromisedOrProjectEnded() {
+        every { mockLoginActivityHelper.isSecurityStatusRunning() } returns false
+    }
+
     fun receiveValidQrCodeResponse() {
         every {
             mockLoginActivityHelper.tryParseQrCodeResponse(any())
@@ -186,6 +194,10 @@ class LoginActivityAssertions(
         assertToastIsDisplayed(
             "Project ID different from that supplied in intent. Please contact your system administrator."
         )
+    }
+
+    fun securityStateToastIsDisplayed() {
+        assertToastIsDisplayed("Login failed. Please contact your supervisor.")
     }
 
     fun userIsSignedIn() {
