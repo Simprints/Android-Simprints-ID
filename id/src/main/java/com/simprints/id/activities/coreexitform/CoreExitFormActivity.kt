@@ -34,7 +34,6 @@ class CoreExitFormActivity : BaseSplitActivity() {
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var coreExitFormViewModelFactory: CoreExitFormViewModelFactory
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     private var exitFormStartTime: Long = 0
     private var exitFormReason = OTHER
@@ -64,19 +63,17 @@ class CoreExitFormActivity : BaseSplitActivity() {
     }
 
     private fun setTextInLayout() {
-        with(androidResourcesHelper) {
-            whySkipBiometricsText.text = getString(R.string.why_did_you_skip_biometrics)
-            rbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
-            rbDataConcerns.text = getString(R.string.refusal_data_concerns)
-            rbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
-            rbAppNotWorking.text = getString(R.string.refusal_app_not_working)
-            rbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
-            rbTooYoung.text = getString(R.string.refusal_too_young)
-            rbOther.text = getString(R.string.refusal_other)
-            exitFormText.hint = getString(R.string.hint_other_reason)
-            btSubmitExitForm.text = getString(R.string.button_submit)
-            btGoBack.text = getString(R.string.exit_form_capture_face)
-        }
+        whySkipBiometricsText.text = getString(R.string.why_did_you_skip_biometrics)
+        rbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
+        rbDataConcerns.text = getString(R.string.refusal_data_concerns)
+        rbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
+        rbAppNotWorking.text = getString(R.string.refusal_app_not_working)
+        rbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
+        rbTooYoung.text = getString(R.string.refusal_too_young)
+        rbOther.text = getString(R.string.refusal_other)
+        exitFormText.hint = getString(R.string.hint_other_reason)
+        btSubmitExitForm.text = getString(R.string.button_submit)
+        btGoBack.text = getString(R.string.exit_form_capture_face)
     }
 
     private fun setRadioGroupListener() {
@@ -189,9 +186,9 @@ class CoreExitFormActivity : BaseSplitActivity() {
 
     override fun onBackPressed() {
         if (btSubmitExitForm.isEnabled) {
-            showToast(androidResourcesHelper, R.string.refusal_toast_submit)
+            showToast(R.string.refusal_toast_submit)
         } else {
-            showToast(androidResourcesHelper, R.string.refusal_toast_select_option_submit)
+            showToast(R.string.refusal_toast_select_option_submit)
         }
     }
 

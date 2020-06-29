@@ -49,9 +49,6 @@ object LanguageHelper {
         }
     }
 
-    fun contextWithSpecificLanguage(context: Context, languageString: String): Context =
-        context.createConfigurationContext(configurationWithSpecificLocale(languageString))
-
     fun getLanguageConfigurationContext(ctx: Context): Context {
         println("Testing language: $language")
         val conf = configurationWithSpecificLocale(language)

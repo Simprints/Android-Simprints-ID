@@ -35,9 +35,6 @@ class EnrolLastBiometricsActivity : BaseSplitActivity() {
     @Inject
     lateinit var viewModelFactory: EnrolLastBiometricsViewModelFactory
 
-    @Inject
-    lateinit var androidResourcesHelper: AndroidResourcesHelper
-
     private lateinit var enrolLastBiometricsRequest: EnrolLastBiometricsRequest
 
     private val vm: EnrolLastBiometricsViewModel by lazy {
@@ -66,7 +63,7 @@ class EnrolLastBiometricsActivity : BaseSplitActivity() {
     private fun observeViewState() {
         vm.getViewStateLiveData().observe(this, Observer {
             if (it is ViewState.Success) {
-                Toast.makeText(this, androidResourcesHelper.getString(R.string.enrol_last_biometrics_success), Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.enrol_last_biometrics_success), Toast.LENGTH_LONG).show()
                 sendOkResult(it.newGuid)
             } else {
                 AlertActivityHelper.launchAlert(this@EnrolLastBiometricsActivity, AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED)

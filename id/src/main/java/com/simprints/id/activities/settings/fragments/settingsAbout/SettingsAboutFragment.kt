@@ -31,9 +31,6 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
     override lateinit var deviceId: String
     override lateinit var viewPresenter: SettingsAboutContract.Presenter
 
-    @Inject
-    lateinit var androidResourcesHelper: AndroidResourcesHelper
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         addPreferencesFromResource(R.xml.pref_app_details)
@@ -68,13 +65,11 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
     }
 
     private fun setTextInLayout() {
-        with(androidResourcesHelper) {
-            getAppVersionPreference().title = getString(R.string.preference_app_version_title)
-            getDeviceIdPreference().title = getString(R.string.preference_device_id_title)
-            getScannerVersionPreference().title = getString(R.string.preference_scanner_version_title)
-            getSyncAndSearchConfigurationPreference().title = getString(R.string.preference_sync_and_search_title)
-            getLogoutPreference().title = getString(R.string.preference_logout_title)
-        }
+        getAppVersionPreference().title = getString(R.string.preference_app_version_title)
+        getDeviceIdPreference().title = getString(R.string.preference_device_id_title)
+        getScannerVersionPreference().title = getString(R.string.preference_scanner_version_title)
+        getSyncAndSearchConfigurationPreference().title = getString(R.string.preference_sync_and_search_title)
+        getLogoutPreference().title = getString(R.string.preference_logout_title)
     }
 
 
@@ -103,19 +98,19 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
         findPreference(getKeyForLogoutPreference())
 
     override fun getKeyForLogoutPreference(): String =
-        androidResourcesHelper.getString(R.string.preference_logout_key)
+        getString(R.string.preference_logout_key)
 
     override fun getKeyForSyncAndSearchConfigurationPreference(): String =
-        androidResourcesHelper.getString(R.string.preference_sync_and_search_key)
+        getString(R.string.preference_sync_and_search_key)
 
     override fun getKeyForAppVersionPreference(): String =
-        androidResourcesHelper.getString(R.string.preference_app_version_key)
+        getString(R.string.preference_app_version_key)
 
     override fun getKeyForScannerVersionPreference(): String =
-        androidResourcesHelper.getString(R.string.preference_scanner_version_key)
+        getString(R.string.preference_scanner_version_key)
 
     override fun getKeyForDeviceIdPreference(): String =
-        androidResourcesHelper.getString(R.string.preference_device_id_key)
+        getString(R.string.preference_device_id_key)
 
     override fun showConfirmationDialogForLogout() {
         activity.runOnUiThreadIfStillRunning {
@@ -125,17 +120,17 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
 
     internal fun buildConfirmationDialogForLogout(): AlertDialog =
         AlertDialog.Builder(activity)
-            .setTitle(androidResourcesHelper.getString(R.string.confirmation_logout_title))
-            .setMessage(androidResourcesHelper.getString(R.string.confirmation_logout_message))
+            .setTitle(getString(R.string.confirmation_logout_title))
+            .setMessage(getString(R.string.confirmation_logout_message))
             .setPositiveButton(
-                androidResourcesHelper.getString(R.string.logout)
+                getString(R.string.logout)
             ) { _, _ ->
                 CoroutineScope(Dispatchers.Main).launch {
                     viewPresenter.logout()
                 }
             }
             .setNegativeButton(
-                androidResourcesHelper.getString(R.string.confirmation_logout_cancel), null
+                getString(R.string.confirmation_logout_cancel), null
             ).create()
 
     override fun finishSettings() {

@@ -53,7 +53,6 @@ class SetupActivity: BaseSplitActivity() {
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionRepository: SessionRepository
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         injectDependencies()
@@ -154,7 +153,7 @@ class SetupActivity: BaseSplitActivity() {
 
     private fun updateUiForDownloadStarting() {
         with(modalityDownloadText){
-            text = androidResourcesHelper.getString(R.string.modality_starting_download)
+            text = getString(R.string.modality_starting_download)
             isVisible = true
         }
         with(modalityDownloadProgressBar) {
@@ -177,7 +176,7 @@ class SetupActivity: BaseSplitActivity() {
         }
         with(modalityDownloadText) {
             isVisible = true
-            text = androidResourcesHelper.getString(R.string.modality_downloading).format("$downloadProgress%")
+            text = getString(R.string.modality_downloading).format("$downloadProgress%")
         }
         setupLogo.isVisible = false
     }
@@ -187,7 +186,7 @@ class SetupActivity: BaseSplitActivity() {
 
     private fun updateUiForModalitiesInstalling() {
         with(modalityDownloadText){
-            text = androidResourcesHelper.getString(R.string.modality_installing)
+            text = getString(R.string.modality_installing)
             isVisible = true
         }
         with(modalityDownloadProgressBar) {

@@ -17,7 +17,6 @@ import javax.inject.Inject
 
 class PrivacyNoticeActivity : BaseSplitActivity() {
 
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var viewModelFactory: PrivacyNoticeViewModelFactory
     @Inject lateinit var deviceManager: DeviceManager
 
@@ -62,12 +61,12 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
         supportActionBar?.run {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            title = androidResourcesHelper.getString(R.string.privacy_notice_title)
+            title = getString(R.string.privacy_notice_title)
         }
     }
 
     private fun initInUi() {
-        longConsent_downloadButton.text = androidResourcesHelper.getString(R.string.long_consent_download_button_text)
+        longConsent_downloadButton.text = getString(R.string.long_consent_download_button_text)
         longConsent_downloadButton.setOnClickListener {
             if(deviceManager.isConnected()) {
                 viewModel.downloadLongConsent()
@@ -122,11 +121,11 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     }
 
     private fun showDownloadErrorToast() {
-        showToast(androidResourcesHelper, R.string.long_consent_failed_to_download)
+        showToast(R.string.long_consent_failed_to_download)
     }
 
     private fun showUserOfflineToast() {
-        showToast(androidResourcesHelper, R.string.login_no_network)
+        showToast(R.string.login_no_network)
     }
 
     companion object {

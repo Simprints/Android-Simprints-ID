@@ -18,9 +18,9 @@ fun Activity.runOnUiThreadIfStillRunning(then: () -> Unit, otherwise: () -> Unit
     }
 }
 
-fun Activity.showToast(androidResourcesHelper: AndroidResourcesHelper, stringRes: Int) =
+fun Activity.showToast(stringRes: Int) =
     runOnUiThread {
-        Toast.makeText(this, androidResourcesHelper.getString(stringRes), Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(stringRes), Toast.LENGTH_LONG).show()
     }
 
 fun Activity.hasPermission(permission: String): Boolean {

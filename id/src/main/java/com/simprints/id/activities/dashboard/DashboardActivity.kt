@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -28,7 +27,6 @@ import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.services.scheduledSync.subjects.common.SYNC_LOG_TAG
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
-import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.activity_dashboard_card_daily_activity.*
 import kotlinx.android.synthetic.main.activity_dashboard_card_project_details.*
@@ -43,7 +41,6 @@ class DashboardActivity : BaseSplitActivity() {
 
     private var syncAgainTicker: ReceiveChannel<Unit>? = null
 
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var projectDetailsCardDisplayer: DashboardProjectDetailsCardDisplayer
     @Inject lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
     @Inject lateinit var dailyActivityCardDisplayer: DashboardDailyActivityCardDisplayer
@@ -65,7 +62,7 @@ class DashboardActivity : BaseSplitActivity() {
         val component = (application as Application).component
         component.inject(this)
         setContentView(R.layout.activity_dashboard)
-        title = androidResourcesHelper.getString(R.string.dashboard_label)
+        title = getString(R.string.dashboard_label)
 
         setupActionBar()
         setupViewModel()
@@ -75,7 +72,7 @@ class DashboardActivity : BaseSplitActivity() {
     }
 
     private fun setupActionBar() {
-        dashboardToolbar.title = androidResourcesHelper.getString(R.string.dashboard_label)
+        dashboardToolbar.title = getString(R.string.dashboard_label)
         setSupportActionBar(dashboardToolbar)
         supportActionBar?.elevation = 4F
 
@@ -113,10 +110,10 @@ class DashboardActivity : BaseSplitActivity() {
             this.findItem(R.id.debug)?.isVisible = BuildConfig.DEBUG
 
             findItem(R.id.menuSettings).title =
-                androidResourcesHelper.getString(R.string.menu_settings)
+                getString(R.string.menu_settings)
 
             with(findItem(R.id.menuPrivacyNotice)) {
-                title = androidResourcesHelper.getString(R.string.menu_privacy_notice)
+                title = getString(R.string.menu_privacy_notice)
                 isVisible = settingsPreferencesManager.consentRequired
             }
         }
@@ -131,9 +128,9 @@ class DashboardActivity : BaseSplitActivity() {
     }
 
     private fun setupCards() {
-        projectDetailsCardDisplayer.initRoot(dashboard_project_details_card)
-        syncCardDisplayer.initRoot(dashboard_sync_card)
-        dailyActivityCardDisplayer.initRoot(dashboard_daily_activity_card_root)
+        projectDetailsCardDisplayer.initRoot(dashboard_project_details_card, this)
+        syncCardDisplayer.initRoot(dashboard_sync_card, this)
+        dailyActivityCardDisplayer.initRoot(dashboard_daily_activity_card_root, this)
     }
 
     private fun observeCardData() {

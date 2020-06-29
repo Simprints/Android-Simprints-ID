@@ -34,7 +34,6 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var fingerprintExitFormViewModelFactory: FingerprintExitFormViewModelFactory
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     private var fingerprintExitFormStartTime: Long = 0
     private var fingerprintExitFormReason = FingerprintExitFormReason.OTHER
@@ -65,19 +64,17 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
     }
 
     private fun setTextInLayout() {
-        with(androidResourcesHelper) {
-            whySkipFingerprintText.text = getString(R.string.why_did_you_skip_fingerprinting)
-            fingerprintRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
-            fingerprintRbDataConcerns.text = getString(R.string.refusal_data_concerns)
-            fingerprintRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
-            fingerprintRbAppNotWorking.text = getString(R.string.refusal_app_not_working)
-            fingerprintRbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
-            fingerprintRbTooYoung.text = getString(R.string.refusal_too_young)
-            fingerprintRbOther.text = getString(R.string.refusal_other)
-            fingerprintExitFormText.hint = getString(R.string.hint_other_reason)
-            fingerprintBtSubmitExitForm.text = getString(R.string.button_submit)
-            fingerprintBtGoBack.text = getString(R.string.button_scan_prints)
-        }
+        whySkipFingerprintText.text = getString(R.string.why_did_you_skip_fingerprinting)
+        fingerprintRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
+        fingerprintRbDataConcerns.text = getString(R.string.refusal_data_concerns)
+        fingerprintRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
+        fingerprintRbAppNotWorking.text = getString(R.string.refusal_app_not_working)
+        fingerprintRbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
+        fingerprintRbTooYoung.text = getString(R.string.refusal_too_young)
+        fingerprintRbOther.text = getString(R.string.refusal_other)
+        fingerprintExitFormText.hint = getString(R.string.hint_other_reason)
+        fingerprintBtSubmitExitForm.text = getString(R.string.button_submit)
+        fingerprintBtGoBack.text = getString(R.string.button_scan_prints)
     }
 
     private fun setRadioGroupListener() {
@@ -193,9 +190,9 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
 
     override fun onBackPressed() {
         if (fingerprintBtSubmitExitForm.isEnabled) {
-            showToast(androidResourcesHelper, R.string.refusal_toast_submit)
+            showToast(R.string.refusal_toast_submit)
         } else {
-            showToast(androidResourcesHelper, R.string.refusal_toast_select_option_submit)
+            showToast(R.string.refusal_toast_select_option_submit)
         }
     }
 
