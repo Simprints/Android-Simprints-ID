@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.widget.TabHost
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
@@ -18,17 +17,16 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.ConsentEvent
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.response.AskConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.ConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreResponseCode
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.TimeHelper
 import kotlinx.android.synthetic.main.activity_consent.*
@@ -64,13 +62,11 @@ class ConsentActivity : BaseSplitActivity() {
 
         askConsentRequestReceived = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
 
-        viewModel = ViewModelProvider(this, viewModelFactory.apply { askConsentRequest = askConsentRequestReceived })
-            .get(ConsentViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(ConsentViewModel::class.java)
 
         showLogoIfNecessary()
         setupTextInUi()
         setupTabs()
-        setupObserversForUi()
     }
 
     private fun injectDependencies() {
@@ -91,7 +87,35 @@ class ConsentActivity : BaseSplitActivity() {
         consentAcceptButton.text = getString(R.string.launch_consent_accept_button)
         privacyNoticeText.text = getString(R.string.privacy_notice_text)
         privacyNoticeText.paintFlags = privacyNoticeText.paintFlags or UNDERLINE_TEXT_FLAG
+
+        with(preferencesManager) {
+            generalConsentTextView.text =
+                buildGeneralConsentText(generalConsentOptionsJson, programName, organizationName, modalities)
+            parentalConsentTextView.text =
+                buildParentalConsentText(parentalConsentOptionsJson, programName, organizationName, modalities)
+        }
+
     }
+
+    private fun buildGeneralConsentText(generalConsentOptionsJson: String,
+                                        programName: String,
+                                        organizationName: String,
+                                        modalities: List<Modality>) =
+        GeneralConsentTextHelper(
+            generalConsentOptionsJson,
+            programName, organizationName, modalities,
+            crashReportManager, this
+        ).assembleText(askConsentRequestReceived)
+
+    private fun buildParentalConsentText(parentalConsentOptionsJson: String,
+                                         programName: String,
+                                         organizationName: String,
+                                         modalities: List<Modality>) =
+        ParentalConsentTextHelper(
+            parentalConsentOptionsJson,
+            programName, organizationName, modalities,
+            crashReportManager, this
+        ).assembleText(askConsentRequestReceived)
 
     private fun setupTabs() {
         tabHost.setup()
@@ -105,35 +129,12 @@ class ConsentActivity : BaseSplitActivity() {
             .setContent(R.id.parentalConsentTextView)
 
         tabHost.addTab(generalConsentTab)
+        if (preferencesManager.parentalConsentExists) {
+            tabHost.addTab(parentalConsentTab)
+        }
 
         generalConsentTextView.movementMethod = ScrollingMovementMethod()
         parentalConsentTextView.movementMethod = ScrollingMovementMethod()
-    }
-
-    private fun setupObserversForUi() {
-        observeGeneralConsentData()
-        observeParentalConsentData()
-        observeParentalConsentExistence()
-    }
-
-    private fun observeGeneralConsentData() {
-        viewModel.generalConsentText.observe(this, Observer {
-            generalConsentTextView.text = it
-        })
-    }
-
-    private fun observeParentalConsentData() {
-        viewModel.parentalConsentText.observe(this, Observer {
-            parentalConsentTextView.text = it
-        })
-    }
-
-    private fun observeParentalConsentExistence() {
-        viewModel.parentalConsentExists.observe(this, Observer {
-            if (it) {
-                tabHost.addTab(parentalConsentTab)
-            }
-        })
     }
 
     fun handleConsentAcceptClick(@Suppress("UNUSED_PARAMETER") view: View) {
