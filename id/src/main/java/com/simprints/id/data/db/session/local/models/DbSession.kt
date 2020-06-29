@@ -4,6 +4,7 @@ import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.session.Device
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.local.toDomainEvent
+import com.simprints.id.domain.modality.Modality
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
@@ -20,6 +21,7 @@ open class DbSession : RealmObject {
 
     var startTime: Long = 0L
     lateinit var realmEvents: RealmList<DbEvent>
+    lateinit var realmModalities: RealmList<String>
 
     var relativeEndTime: Long = 0L
     var relativeUploadTime: Long = 0L
@@ -42,6 +44,8 @@ open class DbSession : RealmObject {
         this.relativeUploadTime = sessionEvents.relativeUploadTime
         this.device = DbDevice(sessionEvents.device)
         this.databaseInfo = DbDatabaseInfo(sessionEvents.databaseInfo)
+        this.realmModalities = RealmList()
+        setModalities(sessionEvents.modalities)
 
         sessionEvents.location?.let {
             this.location = DbLocation(it)
@@ -53,6 +57,11 @@ open class DbSession : RealmObject {
     private fun setEvents(events: List<Event>) = realmEvents.apply {
         clear()
         addAll(events.map { DbEvent(it) })
+    }
+
+    private fun setModalities(modalities: List<Modality>) = realmModalities.apply {
+        clear()
+        addAll(modalities.map { it.name })
     }
 
     fun timeRelativeToStartTime(time: Long): Long = time - startTime
@@ -67,7 +76,9 @@ fun DbSession.toDomain(): SessionEvents {
         device = device?.toDomainDevice() ?: Device(),
         startTime = startTime,
         databaseInfo = databaseInfo.toDomainDatabaseInfo(),
-        events = ArrayList(realmEvents.mapNotNull { it.toDomainEvent() }))
+        events = ArrayList(realmEvents.mapNotNull { it.toDomainEvent() }),
+        modalities = ArrayList(realmModalities.map { Modality.valueOf(it) })
+    )
 
     session.relativeEndTime = this.relativeEndTime
     session.relativeUploadTime = this.relativeUploadTime
