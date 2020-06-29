@@ -20,10 +20,6 @@ import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSource
-import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSourceImpl
-import com.simprints.id.data.consent.shortconsent.ConsentRepository
-import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
@@ -310,33 +306,8 @@ open class AppModule {
     ): ImageUpSyncScheduler = ImageUpSyncSchedulerImpl(context)
 
     @Provides
-    open fun getConsentDataManager(
-        prefs: ImprovedSharedPreferences,
-        remoteConfigWrapper: RemoteConfigWrapper
-    ): ConsentLocalDataSource =
-        ConsentLocalDataSourceImpl(prefs, remoteConfigWrapper)
-
-    @Provides
-    open fun provideConsentTextManager(
-        context: Context,
-        consentLocalDataSource: ConsentLocalDataSource,
-        crashReportManager: CrashReportManager,
-        preferencesManager: PreferencesManager,
-        androidResourcesHelper: AndroidResourcesHelper
-    ): ConsentRepository =
-        ConsentRepositoryImpl(
-            consentLocalDataSource, crashReportManager, preferencesManager.programName,
-            preferencesManager.organizationName, androidResourcesHelper,
-            preferencesManager.modalities
-        )
-
-    @Provides
-    open fun provideConsentViewModelFactory(
-        consentTextManager: ConsentRepository,
-        sessionRepository: SessionRepository,
-        timeHelper: TimeHelper
-    ) =
-        ConsentViewModelFactory(consentTextManager, sessionRepository)
+    open fun provideConsentViewModelFactory(sessionRepository: SessionRepository) =
+        ConsentViewModelFactory(sessionRepository)
 
     @Provides
     open fun provideCoreExitFormViewModelFactory(sessionRepository: SessionRepository) =

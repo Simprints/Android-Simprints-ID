@@ -1,6 +1,7 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -151,6 +152,38 @@ open class SettingsPreferencesManagerImpl(
             remoteConfigWrapper,
             ORGANIZATION_NAME_KEY,
             ORGANIZATION_NAME_DEFAULT
+        )
+
+    /**
+     * Whether the parental consent should be shown
+      */
+    override var parentalConsentExists: Boolean
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            PARENTAL_CONSENT_EXISTS_KEY,
+            PARENTAL_CONSENT_EXISTS_DEFAULT
+        )
+
+    /**
+     * The options of the general consent as a JSON string of booleans
+     */
+    override var generalConsentOptionsJson: String
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            GENERAL_CONSENT_OPTIONS_JSON_KEY,
+            GENERAL_CONSENT_OPTIONS_JSON_DEFAULT
+        )
+
+    /**
+     * The options of the parental consent as a JSON string of booleans
+      */
+    override var parentalConsentOptionsJson: String
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            PARENTAL_CONSENT_OPTIONS_JSON_KEY, PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT
         )
 
     /**
@@ -333,6 +366,15 @@ open class SettingsPreferencesManagerImpl(
 
         const val ORGANIZATION_NAME_KEY = "OrganizationName"
         const val ORGANIZATION_NAME_DEFAULT = "This organization"
+
+        const val PARENTAL_CONSENT_EXISTS_KEY = "ConsentParentalExists"
+        const val PARENTAL_CONSENT_EXISTS_DEFAULT = false
+
+        const val GENERAL_CONSENT_OPTIONS_JSON_KEY = "ConsentGeneralOptions"
+        val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(com.simprints.id.data.consent.shortconsent.GeneralConsentOptions())
+
+        const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
+        val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(com.simprints.id.data.consent.shortconsent.ParentalConsentOptions())
 
         const val LOGO_EXISTS_KEY = "LogoExists"
         const val LOGO_EXISTS_DEFAULT = true
