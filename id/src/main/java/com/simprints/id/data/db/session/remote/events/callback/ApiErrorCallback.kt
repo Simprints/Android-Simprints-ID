@@ -23,8 +23,7 @@ class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.ERRO
         LOGIN_NOT_COMPLETE,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
         FACE_LICENSE_MISSING,
-        FACE_LICENSE_INVALID,
-        FINGERPRINT_CONFIGURATION_ERROR
+        FACE_LICENSE_INVALID
     }
 }
 
@@ -39,5 +38,5 @@ fun ErrorCallbackEvent.Reason.fromDomainToApi() =
         ENROLMENT_LAST_BIOMETRICS_FAILED -> ApiErrorCallback.ApiReason.ENROLMENT_LAST_BIOMETRICS_FAILED
         FACE_LICENSE_MISSING -> ApiErrorCallback.ApiReason.FACE_LICENSE_MISSING
         FACE_LICENSE_INVALID -> ApiErrorCallback.ApiReason.FACE_LICENSE_INVALID
-        FINGERPRINT_CONFIGURATION_ERROR -> ApiErrorCallback.ApiReason.FINGERPRINT_CONFIGURATION_ERROR
+        FINGERPRINT_CONFIGURATION_ERROR -> ApiErrorCallback.ApiReason.UNEXPECTED_ERROR
     }
