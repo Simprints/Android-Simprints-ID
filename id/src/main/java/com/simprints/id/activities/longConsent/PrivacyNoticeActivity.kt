@@ -3,13 +3,11 @@ package com.simprints.id.activities.longConsent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.BaseSplitActivity
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_privacy_notice.*

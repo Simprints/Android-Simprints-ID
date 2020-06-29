@@ -15,14 +15,12 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 
 class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {

@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.simprints.clientapi.R
+import com.simprints.clientapi.activities.BaseSplitActivity
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.clientapi.clientrequests.extractors.*
@@ -20,7 +21,7 @@ import com.simprints.moduleapi.app.responses.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
+abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestView {
 
     private var isActivityRestored = false
     private var requestProcessed = false

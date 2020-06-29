@@ -41,7 +41,6 @@ import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeReposito
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -207,10 +206,6 @@ open class AppModule {
     @Provides
     @Singleton
     fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
-
-    @Provides
-    fun provideAndroidResourcesHelper(ctx: Context): AndroidResourcesHelper =
-        AndroidResourcesHelperImpl(ctx)
 
     @Provides
     open fun provideSessionRealmConfigBuilder(): SessionRealmConfigBuilder =

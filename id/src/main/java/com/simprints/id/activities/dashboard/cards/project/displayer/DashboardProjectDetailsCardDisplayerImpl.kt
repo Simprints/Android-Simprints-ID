@@ -9,7 +9,6 @@ import android.widget.TextView
 import com.simprints.core.tools.utils.getParamsString
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
-import com.simprints.id.tools.AndroidResourcesHelper
 
 class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDisplayer {
 

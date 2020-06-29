@@ -8,10 +8,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
 import com.simprints.core.tools.extentions.nand
+import com.simprints.core.tools.utils.getParamsString
 import com.simprints.core.tools.utils.getQuantityString
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import kotlinx.android.synthetic.main.activity_dashboard_card_daily_activity.view.*
 
@@ -39,7 +39,7 @@ class DashboardDailyActivityCardDisplayerImpl(
 
     private fun View.setTitle() {
         val date = timeHelper.getCurrentDateAsString()
-        val text = ctx.getString(R.string.dashboard_card_activity, arrayOf(date))
+        val text = ctx.getParamsString(R.string.dashboard_card_activity, arrayOf(date))
         findViewById<TextView>(R.id.dashboard_daily_activity_card_title).text = text
     }
 

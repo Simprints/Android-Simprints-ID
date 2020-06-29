@@ -12,9 +12,7 @@ import com.simprints.core.tools.utils.getStringArray
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
-import javax.inject.Inject
 
 // TODO: replace with PreferenceFragmentCompat
 class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContract.View {

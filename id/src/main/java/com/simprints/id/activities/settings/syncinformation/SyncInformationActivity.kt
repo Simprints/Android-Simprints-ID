@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.TabHost
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,7 +21,6 @@ import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDo
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.ON
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
-import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_sync_information.*
 import javax.inject.Inject
 

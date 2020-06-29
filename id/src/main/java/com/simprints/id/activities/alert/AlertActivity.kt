@@ -9,7 +9,6 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -22,7 +21,6 @@ import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
-import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_alert.*
 import javax.inject.Inject
 

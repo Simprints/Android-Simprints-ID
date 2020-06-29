@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -19,7 +18,6 @@ import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequ
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject

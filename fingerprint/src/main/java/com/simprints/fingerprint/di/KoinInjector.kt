@@ -18,8 +18,6 @@ import com.simprints.fingerprint.activities.refusal.RefusalContract
 import com.simprints.fingerprint.activities.refusal.RefusalPresenter
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManagerImpl
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelperImpl
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManagerImpl
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -105,7 +103,6 @@ object KoinInjector {
         factory<FingerprintCrashReportManager> { FingerprintCrashReportManagerImpl(get()) }
         factory<FingerprintTimeHelper> { FingerprintTimeHelperImpl(get()) }
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
-        factory<FingerprintAndroidResourcesHelper> { FingerprintAndroidResourcesHelperImpl(get()) }
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
         factory<FingerprintImageManager> { FingerprintImageManagerImpl(get(), get()) }
         factory<FingerprintApiClientFactory> { FingerprintApiClientFactoryImpl(get()) }
