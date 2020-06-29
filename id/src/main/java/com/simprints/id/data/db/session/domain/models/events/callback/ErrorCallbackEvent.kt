@@ -21,6 +21,8 @@ class ErrorCallbackEvent(startTime: Long,
         BLUETOOTH_NOT_SUPPORTED,
         LOGIN_NOT_COMPLETE,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
+        FACE_LICENSE_MISSING,
+        FACE_LICENSE_INVALID,
         FINGERPRINT_CONFIGURATION_ERROR;
 
         companion object {
@@ -33,6 +35,8 @@ class ErrorCallbackEvent(startTime: Long,
                     AppErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                     AppErrorResponse.Reason.LOGIN_NOT_COMPLETE -> LOGIN_NOT_COMPLETE
                     AppErrorResponse.Reason.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
+                    AppErrorResponse.Reason.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
+                    AppErrorResponse.Reason.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
                     AppErrorResponse.Reason.FINGERPRINT_CONFIGURATION_ERROR -> FINGERPRINT_CONFIGURATION_ERROR
                 }
         }

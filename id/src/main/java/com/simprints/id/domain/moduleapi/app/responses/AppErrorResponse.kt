@@ -17,6 +17,8 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         BLUETOOTH_NOT_SUPPORTED,
         GUID_NOT_FOUND_ONLINE,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
+        FACE_LICENSE_MISSING,
+        FACE_LICENSE_INVALID,
         FINGERPRINT_CONFIGURATION_ERROR;
 
         companion object {

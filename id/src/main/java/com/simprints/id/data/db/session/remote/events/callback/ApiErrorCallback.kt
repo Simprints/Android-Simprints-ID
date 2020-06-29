@@ -22,12 +22,14 @@ class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.ERRO
         UNKNOWN_BLUETOOTH_ISSUE,
         LOGIN_NOT_COMPLETE,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
+        FACE_LICENSE_MISSING,
+        FACE_LICENSE_INVALID,
         FINGERPRINT_CONFIGURATION_ERROR
     }
 }
 
 fun ErrorCallbackEvent.Reason.fromDomainToApi() =
-    when(this) {
+    when (this) {
         DIFFERENT_PROJECT_ID_SIGNED_IN -> ApiErrorCallback.ApiReason.DIFFERENT_PROJECT_ID_SIGNED_IN
         DIFFERENT_USER_ID_SIGNED_IN -> ApiErrorCallback.ApiReason.DIFFERENT_USER_ID_SIGNED_IN
         GUID_NOT_FOUND_ONLINE -> ApiErrorCallback.ApiReason.GUID_NOT_FOUND_ONLINE
@@ -35,5 +37,7 @@ fun ErrorCallbackEvent.Reason.fromDomainToApi() =
         BLUETOOTH_NOT_SUPPORTED -> ApiErrorCallback.ApiReason.BLUETOOTH_NOT_SUPPORTED
         LOGIN_NOT_COMPLETE -> ApiErrorCallback.ApiReason.LOGIN_NOT_COMPLETE
         ENROLMENT_LAST_BIOMETRICS_FAILED -> ApiErrorCallback.ApiReason.ENROLMENT_LAST_BIOMETRICS_FAILED
+        FACE_LICENSE_MISSING -> ApiErrorCallback.ApiReason.FACE_LICENSE_MISSING
+        FACE_LICENSE_INVALID -> ApiErrorCallback.ApiReason.FACE_LICENSE_INVALID
         FINGERPRINT_CONFIGURATION_ERROR -> ApiErrorCallback.ApiReason.FINGERPRINT_CONFIGURATION_ERROR
     }
