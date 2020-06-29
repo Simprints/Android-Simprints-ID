@@ -5,7 +5,7 @@ import java.util.*
 
 @Keep
 class ConsentEvent(
-    startTime: Long,
+    creationTime: Long,
     endTime: Long,
     consentType: ConsentPayload.Type,
     result: ConsentPayload.Result,
@@ -13,14 +13,14 @@ class ConsentEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
-    ConsentPayload(startTime, endTime, consentType, result)) {
+    ConsentPayload(creationTime, endTime, consentType, result)) {
 
 
     @Keep
-    class ConsentPayload(startTime: Long,
+    class ConsentPayload(creationTime: Long,
                          val endTime: Long,
                          val consentType: Type,
-                         var result: Result) : EventPayload(EventPayloadType.CONSENT, startTime) {
+                         var result: Result) : EventPayload(EventPayloadType.CONSENT, creationTime) {
 
         @Keep
         enum class Type {

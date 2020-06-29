@@ -7,8 +7,7 @@ import java.util.*
 class ArtificialTerminationEvent(
     creationTime: Long,
     reason: ArtificialTerminationPayload.Reason,
-    sessionId: String = UUID.randomUUID().toString(), //StopShip: to change in PAS-993
-    sessionStartTime: Long = 0 //StopShip: to change in PAS-993
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     listOf(EventLabel.SessionId(sessionId)),
