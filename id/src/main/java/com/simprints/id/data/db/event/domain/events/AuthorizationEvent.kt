@@ -18,9 +18,9 @@ class AuthorizationEvent(
     AuthorizationPayload(creationTime, result, userInfo)) {
 
     @Keep
-    class AuthorizationPayload(startTime: Long,
+    class AuthorizationPayload(creationTime: Long,
                                val result: Result,
-                               val userInfo: UserInfo?) : EventPayload(AUTHORIZATION, startTime) {
+                               val userInfo: UserInfo?) : EventPayload(AUTHORIZATION, creationTime) {
 
         @Keep
         enum class Result {
