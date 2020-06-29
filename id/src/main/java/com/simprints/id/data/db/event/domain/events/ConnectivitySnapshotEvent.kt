@@ -13,15 +13,17 @@ class ConnectivitySnapshotEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    ConnectivitySnapshotPayload(creationTime, networkType, connections)) {
+    ConnectivitySnapshotPayload(creationTime, DEFAULT_EVENT_VERSION, networkType, connections)) {
 
     @Keep
     class ConnectivitySnapshotPayload(
-        startTime: Long,
+        creationTime: Long,
+        version: Int,
         val networkType: String,
         val connections: List<SimNetworkUtils.Connection>
-    ) : EventPayload(EventPayloadType.CONNECTIVITY_SNAPSHOT, startTime) {
+    ) : EventPayload(EventPayloadType.CONNECTIVITY_SNAPSHOT, version, creationTime) {
 
         companion object {
             fun buildEvent(simNetworkUtils: SimNetworkUtils,

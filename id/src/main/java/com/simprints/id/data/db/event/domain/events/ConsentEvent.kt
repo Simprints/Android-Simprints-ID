@@ -12,15 +12,17 @@ class ConsentEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    ConsentPayload(creationTime, endTime, consentType, result)) {
+    ConsentPayload(creationTime, DEFAULT_EVENT_VERSION, endTime, consentType, result)) {
 
 
     @Keep
     class ConsentPayload(creationTime: Long,
+                         version: Int,
                          val endTime: Long,
                          val consentType: Type,
-                         var result: Result) : EventPayload(EventPayloadType.CONSENT, creationTime) {
+                         var result: Result) : EventPayload(EventPayloadType.CONSENT, version, creationTime) {
 
         @Keep
         enum class Type {

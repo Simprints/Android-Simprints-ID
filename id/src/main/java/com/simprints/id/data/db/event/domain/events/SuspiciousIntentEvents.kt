@@ -10,12 +10,14 @@ class SuspiciousIntentEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    SuspiciousIntentPayload(creationTime, unexpectedExtras)) {
+    SuspiciousIntentPayload(creationTime, DEFAULT_EVENT_VERSION, unexpectedExtras)) {
 
     @Keep
     class SuspiciousIntentPayload(
         creationTime: Long,
+        version: Int,
         val unexpectedExtras: Map<String, Any?>
-    ) : EventPayload(EventPayloadType.SUSPICIOUS_INTENT, creationTime)
+    ) : EventPayload(EventPayloadType.SUSPICIOUS_INTENT, version, creationTime)
 }

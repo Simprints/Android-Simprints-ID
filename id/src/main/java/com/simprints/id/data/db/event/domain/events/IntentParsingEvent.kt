@@ -10,14 +10,16 @@ class IntentParsingEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    IntentParsingPayload(startTime, integration)) {
+    IntentParsingPayload(startTime, DEFAULT_EVENT_VERSION, integration)) {
 
     @Keep
     class IntentParsingPayload(
-        startTime: Long,
+        creationTime: Long,
+        version: Int,
         val integration: IntegrationInfo
-    ) : EventPayload(EventPayloadType.INTENT_PARSING, startTime) {
+    ) : EventPayload(EventPayloadType.INTENT_PARSING, version, creationTime) {
 
         @Keep
         enum class IntegrationInfo {

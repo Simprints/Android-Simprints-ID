@@ -16,19 +16,21 @@ class FingerprintCaptureEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     id,
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    FingerprintCapturePayload(startTime, endTime, finger, qualityThreshold, result, fingerprint, id)) {
+    FingerprintCapturePayload(startTime, DEFAULT_EVENT_VERSION, endTime, finger, qualityThreshold, result, fingerprint, id)) {
 
     @Keep
     class FingerprintCapturePayload(
-        startTime: Long,
+        creationTime: Long,
+        version: Int,
         val endTime: Long,
         val finger: FingerIdentifier,
         val qualityThreshold: Int,
         val result: Result,
         val fingerprint: Fingerprint?,
         val id: String
-    ) : EventPayload(EventPayloadType.FINGERPRINT_CAPTURE, startTime) {
+    ) : EventPayload(EventPayloadType.FINGERPRINT_CAPTURE, version, creationTime) {
 
         @Keep
         class Fingerprint(val finger: FingerIdentifier, val quality: Int, val template: String)

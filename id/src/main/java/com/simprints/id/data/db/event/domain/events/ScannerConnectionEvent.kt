@@ -10,13 +10,15 @@ class ScannerConnectionEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    ScannerConnectionPayload(creationTime, scannerInfo)) {
+    ScannerConnectionPayload(creationTime, DEFAULT_EVENT_VERSION, scannerInfo)) {
 
 
     @Keep
     class ScannerConnectionPayload(creationTime: Long,
-                                   val scannerInfo: ScannerInfo) : EventPayload(EventPayloadType.SCANNER_CONNECTION, creationTime) {
+                                   version: Int,
+                                   val scannerInfo: ScannerInfo) : EventPayload(EventPayloadType.SCANNER_CONNECTION, version, creationTime) {
 
         @Keep
         class ScannerInfo(val scannerId: String,

@@ -10,10 +10,12 @@ class CompletionCheckEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    CompletionCheckPayload(creationTime, completed)) {
+    CompletionCheckPayload(creationTime, DEFAULT_EVENT_VERSION, completed)) {
 
     @Keep
     class CompletionCheckPayload(creationTime: Long,
-                                 val completed: Boolean) : EventPayload(EventPayloadType.COMPLETION_CHECK, creationTime)
+                                 version: Int,
+                                 val completed: Boolean) : EventPayload(EventPayloadType.COMPLETION_CHECK, version, creationTime)
 }

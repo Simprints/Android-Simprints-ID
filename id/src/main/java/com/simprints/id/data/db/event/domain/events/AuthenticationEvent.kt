@@ -13,17 +13,19 @@ class AuthenticationEvent(
     result: Result,
     sessionId: String = UUID.randomUUID().toString()) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    AuthenticationPayload(creationTime, endTime, userInfo, result)) {
+    AuthenticationPayload(creationTime, DEFAULT_EVENT_VERSION, endTime, userInfo, result)) {
 
 
     @Keep
     class AuthenticationPayload(
-        startTime: Long,
+        creationTime: Long,
+        version: Int,
         val endTime: Long,
         val userInfo: UserInfo,
         val result: Result
-    ) : EventPayload(EventPayloadType.AUTHENTICATION, startTime) {
+    ) : EventPayload(EventPayloadType.AUTHENTICATION, version, creationTime) {
 
         @Keep
         class UserInfo(val projectId: String, val userId: String)
