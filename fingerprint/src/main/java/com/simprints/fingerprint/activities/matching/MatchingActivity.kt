@@ -9,7 +9,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import com.simprints.core.tools.utils.getStringPlural
+import com.simprints.core.tools.extentions.getStringPlural
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity

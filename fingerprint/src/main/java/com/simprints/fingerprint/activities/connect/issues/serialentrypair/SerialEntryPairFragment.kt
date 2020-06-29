@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.view.inputmethod.InputMethodManager
 import androidx.navigation.fragment.findNavController
-import com.simprints.core.tools.utils.getParamsString
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -131,8 +130,8 @@ class SerialEntryPairFragment : FingerprintFragment() {
             serialEntryPairProgressBar.visibility = View.INVISIBLE
             serialEntryOkButton.visibility = View.VISIBLE
             serialEntryPairInstructionsDetailTextView.visibility = View.INVISIBLE
-            serialEntryPairInstructionsTextView.text = requireActivity().getParamsString(R.string.serial_entry_pair_failed,
-                arrayOf(serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())))
+            serialEntryPairInstructionsTextView.text = String.format(getString(R.string.serial_entry_pair_failed),
+                serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent()))
         }
     }
 

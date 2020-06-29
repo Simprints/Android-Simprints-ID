@@ -25,7 +25,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.core.tools.extentions.hideKeyboard
-import com.simprints.core.tools.utils.getParamsString
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.fragment_module_selection.*
@@ -238,7 +237,7 @@ class ModuleSelectionFragment(
     private fun notifyTooManyModulesSelected(maxAllowed: Int) {
         Toast.makeText(
             application,
-            requireActivity().getParamsString(R.string.settings_too_many_modules_toast, arrayOf(maxAllowed)),
+            String.format(getString(R.string.settings_too_many_modules_toast), maxAllowed),
             Toast.LENGTH_SHORT
         ).show()
     }

@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.simprints.core.tools.utils.getParamsString
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -69,7 +68,8 @@ class OtaFragment : FingerprintFragment() {
         otaStatusTextView.visibility = View.VISIBLE
         otaStatusTextView.text = when (val retry = args.otaFragmentRequest.currentRetryAttempt) {
             0 -> getString(R.string.updating)
-            else -> requireActivity().getParamsString(R.string.updating_attempt, arrayOf("${retry + 1}", "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}"))
+            else -> String.format(requireActivity().getString(R.string.updating_attempt),
+                "${retry + 1}", "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}")
         }
         startUpdateButton.visibility = View.INVISIBLE
         startUpdateButton.isEnabled = false

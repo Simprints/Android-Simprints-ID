@@ -10,7 +10,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
-import com.simprints.id.tools.LanguageHelper
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.tools.extensions.isXLargeTablet
 import kotlinx.android.synthetic.main.settings_toolbar.*
 

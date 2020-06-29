@@ -7,8 +7,8 @@ import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.view.MenuItem
 import android.widget.Toast
+import com.simprints.core.tools.extentions.getStringArray
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
-import com.simprints.core.tools.utils.getStringArray
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsActivity

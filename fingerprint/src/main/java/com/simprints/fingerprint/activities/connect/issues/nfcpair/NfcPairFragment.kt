@@ -11,7 +11,6 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.simprints.core.tools.utils.getParamsString
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -133,7 +132,7 @@ class NfcPairFragment : FingerprintFragment() {
         couldNotPairTextView.visibility = View.GONE
         nfcPairingProgressBar.visibility = View.VISIBLE
         nfcPairInstructionsTextView.text = getString(R.string.nfc_pairing_in_progress,
-            arrayOf(serialNumberConverter.convertMacAddressToSerialNumber(macAddress)))
+            serialNumberConverter.convertMacAddressToSerialNumber(macAddress))
         handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
     }
 
@@ -151,7 +150,7 @@ class NfcPairFragment : FingerprintFragment() {
             couldNotPairTextView.visibility = View.GONE
             nfcPairingProgressBar.visibility = View.INVISIBLE
             tryAgainButton.visibility = View.VISIBLE
-            nfcPairInstructionsTextView.text = requireActivity().getParamsString(R.string.nfc_pairing_try_again_instruction,
+            nfcPairInstructionsTextView.text = String.format(requireActivity().getString(R.string.nfc_pairing_try_again_instruction),
                 arrayOf(serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())))
             tryAgainButton.setOnClickListener { viewModel.startPairing(macAddressEvent.peekContent()) }
         }

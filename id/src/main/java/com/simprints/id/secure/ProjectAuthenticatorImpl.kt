@@ -8,7 +8,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.secure.models.*
-import com.simprints.id.tools.LanguageHelper
+import com.simprints.core.tools.utils.LanguageHelper
 
 class ProjectAuthenticatorImpl(
     private val authManager: AuthManager,
