@@ -110,7 +110,6 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
         factory { component.getFaceIdentityLocalDataSource() }
         factory { component.getImprovedSharedPreferences() }
         factory { component.getRemoteConfigWrapper() }
-        factory { component.getAndroidResourcesHelper() }
         factory { orchestratorComponent.getFlowManager() }
         factory { component.getPersonRepository() }
         factory { component.getImageRepository() }
