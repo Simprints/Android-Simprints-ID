@@ -3,8 +3,7 @@ package com.simprints.id.activities
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.play.core.splitcompat.SplitCompat
-import com.simprints.id.tools.LanguageHelper
-import org.intellij.lang.annotations.Language
+import com.simprints.core.tools.utils.LanguageHelper
 
 abstract class BaseSplitActivity : AppCompatActivity() {
 

@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
-import com.simprints.id.tools.LanguageHelper
+import com.simprints.core.tools.utils.LanguageHelper
 
 /**
  * A [android.preference.PreferenceActivity] which implements and proxies the necessary calls

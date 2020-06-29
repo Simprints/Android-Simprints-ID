@@ -1,6 +1,5 @@
 package com.simprints.core.tools.utils
 
-import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import androidx.annotation.PluralsRes
@@ -18,7 +17,7 @@ private enum class QUANTITY constructor(private val title: String) {
     }
 }
 
-object QuantityHelper{
+object QuantityHelper {
 
     /**
      * Converts an integer to the grammatical concept of quantity. This is an incomplete conversion
@@ -67,20 +66,3 @@ object QuantityHelper{
         }
     }
 }
-
-fun Context.getStringPlural(stringQuantityKey: Int, quantity: Int, params: Array<Any>): String =
-    QuantityHelper.getStringPlural(this, stringQuantityKey, quantity, params)
-
-fun Context.getQuantityString(
-    @PluralsRes resId: Int,
-    quantity: Int,
-    params: Array<Any>
-): String = this.resources.getQuantityString(resId, quantity, params)
-
-fun Context.getQuantityString(@PluralsRes resId: Int, quantity: Int): String {
-    return resources.getQuantityString(resId, quantity)
-}
-
-fun Context.getStringArray(res: Int): Array<String> = resources.getStringArray(res)
-
-fun Context.getParamsString(resId: Int, params: Array<Any>): String = getString(resId, *params)

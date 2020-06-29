@@ -7,7 +7,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
-import com.simprints.id.tools.LanguageHelper
+import com.simprints.core.tools.utils.LanguageHelper
 import kotlinx.android.synthetic.main.settings_toolbar.*
 
 class ModuleSelectionActivity : BaseSplitActivity() {

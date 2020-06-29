@@ -2,6 +2,8 @@ package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_DEFAULT
+import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_KEY
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -60,8 +62,8 @@ open class SettingsPreferencesManagerImpl(
         by OverridableRemoteConfigPrimitivePreference(
             prefs,
             remoteConfigWrapper,
-            LANGUAGE_KEY,
-            LANGUAGE_DEFAULT
+            SHARED_PREFS_LANGUAGE_KEY,
+            SHARED_PREFS_LANGUAGE_DEFAULT
         )
 
     /**
@@ -328,9 +330,6 @@ open class SettingsPreferencesManagerImpl(
 
         const val PROJECT_LANGUAGES_POSITION_KEY = "ProjectLanguages"
         val PROJECT_LANGUAGES_POSITION_DEFAULT = arrayOf<String>()
-
-        const val LANGUAGE_KEY = "SelectedLanguage"
-        const val LANGUAGE_DEFAULT = "en"
 
         const val MODULE_ID_OPTIONS_KEY = "ModuleIdOptions"
         val MODULE_ID_OPTIONS_DEFAULT = setOf<String>()

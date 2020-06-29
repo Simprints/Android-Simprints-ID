@@ -7,7 +7,7 @@ import android.view.MenuItem
 import androidx.preference.PreferenceFragment
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
-import com.simprints.id.tools.LanguageHelper
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.tools.extensions.isXLargeTablet
 import kotlinx.android.synthetic.main.settings_toolbar.*
 
