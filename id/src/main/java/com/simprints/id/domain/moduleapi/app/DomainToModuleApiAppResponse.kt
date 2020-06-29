@@ -36,6 +36,7 @@ object DomainToModuleApiAppResponse {
             ENROLMENT_LAST_BIOMETRICS_FAILED -> IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED
             FACE_LICENSE_MISSING -> IAppErrorReason.FACE_LICENSE_MISSING
             FACE_LICENSE_INVALID -> IAppErrorReason.FACE_LICENSE_INVALID
+            FINGERPRINT_CONFIGURATION_ERROR -> IAppErrorReason.FINGERPRINT_CONFIGURATION_ERROR
         }
 
     private fun fromDomainToModuleApiAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)
