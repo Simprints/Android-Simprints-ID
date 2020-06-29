@@ -1,6 +1,6 @@
 package com.simprints.moduleapi.app.responses
 
-interface IAppErrorResponse: IAppResponse {
+interface IAppErrorResponse : IAppResponse {
     val reason: IAppErrorReason
 }
 
@@ -14,5 +14,6 @@ enum class IAppErrorReason {
     ROOTED_DEVICE,
     ENROLMENT_LAST_BIOMETRICS_FAILED,
     FACE_LICENSE_MISSING,
-    FACE_LICENSE_INVALID
+    FACE_LICENSE_INVALID,
+    FINGERPRINT_CONFIGURATION_ERROR
 }
