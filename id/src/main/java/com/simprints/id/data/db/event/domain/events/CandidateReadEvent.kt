@@ -13,18 +13,20 @@ class CandidateReadEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    CandidateReadPayload(startTime, endTime, candidateId, localResult, remoteResult)) {
+    CandidateReadPayload(startTime, DEFAULT_EVENT_VERSION, endTime, candidateId, localResult, remoteResult)) {
 
 
     @Keep
     class CandidateReadPayload(
-        startTime: Long,
+        creationTime: Long,
+        version: Int,
         val endTime: Long,
         val candidateId: String,
         val localResult: LocalResult,
         val remoteResult: RemoteResult?
-    ) : EventPayload(EventPayloadType.CANDIDATE_READ, startTime) {
+    ) : EventPayload(EventPayloadType.CANDIDATE_READ, version, creationTime) {
 
         @Keep
         enum class LocalResult {

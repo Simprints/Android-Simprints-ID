@@ -12,15 +12,17 @@ class RefusalEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    RefusalPayload(creationTime, endTime, reason, otherText)) {
+    RefusalPayload(creationTime, DEFAULT_EVENT_VERSION, endTime, reason, otherText)) {
 
 
     @Keep
     class RefusalPayload(creationTime: Long,
+                         version: Int,
                          val endTime: Long,
                          val reason: Answer,
-                         val otherText: String) : EventPayload(EventPayloadType.REFUSAL, creationTime) {
+                         val otherText: String) : EventPayload(EventPayloadType.REFUSAL, version, creationTime) {
 
         @Keep
         enum class Answer {

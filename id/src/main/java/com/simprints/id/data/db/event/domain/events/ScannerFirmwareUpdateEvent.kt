@@ -13,16 +13,18 @@ class ScannerFirmwareUpdateEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    ScannerFirmwareUpdatePayload(startTime, endTime, chip, targetAppVersion, failureReason)) {
+    ScannerFirmwareUpdatePayload(startTime, DEFAULT_EVENT_VERSION, endTime, chip, targetAppVersion, failureReason)) {
 
 
     @Keep
-    class ScannerFirmwareUpdatePayload(startTime: Long,
+    class ScannerFirmwareUpdatePayload(creationTime: Long,
+                                       version: Int,
                                        val endTime: Long,
                                        val chip: String,
                                        val targetAppVersion: String,
                                        var failureReason: String? = null)
-        : EventPayload(EventPayloadType.SCANNER_FIRMWARE_UPDATE, startTime)
+        : EventPayload(EventPayloadType.SCANNER_FIRMWARE_UPDATE, version, creationTime)
 
 }

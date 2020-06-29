@@ -8,6 +8,7 @@ data class Events(val events: List<Event>)
 
 @Keep
 open class Event(val id: String,
+                 val version: Int,
                  val labels: List<EventLabel>,
                  val payload: EventPayload) {
 
