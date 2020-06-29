@@ -1,5 +1,6 @@
 package com.simprints.id.activities.dashboard.cards.project.displayer
 
+import android.content.Context
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -9,13 +10,13 @@ import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
 import com.simprints.id.tools.AndroidResourcesHelper
 
-class DashboardProjectDetailsCardDisplayerImpl(
-    private val androidResourcesHelper: AndroidResourcesHelper
-) : DashboardProjectDetailsCardDisplayer {
+class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDisplayer {
 
     private lateinit var root: LinearLayout
+    private lateinit var ctx: Context
 
-    override fun initRoot(rootLayout: LinearLayout) {
+    override fun initRoot(rootLayout: LinearLayout, context: Context) {
+        ctx = context
         root = rootLayout
     }
 
@@ -34,7 +35,7 @@ class DashboardProjectDetailsCardDisplayerImpl(
     private fun View.setCurrentUser(currentUser: String) {
         findViewById<TextView>(
             R.id.dashboard_project_details_card_current_user
-        ).text = androidResourcesHelper.getString(
+        ).text = ctx.getString(
             R.string.dashboard_card_current_user, arrayOf(currentUser)
         )
     }
@@ -47,7 +48,7 @@ class DashboardProjectDetailsCardDisplayerImpl(
                 this.visibility = GONE
             } else {
                 this.visibility = VISIBLE
-                text = androidResourcesHelper.getString(
+                text = ctx.getString(
                     R.string.dashboard_card_scanner_used, arrayOf(scannerUsed)
                 )
             }

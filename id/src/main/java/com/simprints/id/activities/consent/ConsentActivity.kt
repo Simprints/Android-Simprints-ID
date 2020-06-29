@@ -49,7 +49,6 @@ class ConsentActivity : BaseSplitActivity() {
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var exitFormHelper: ExitFormHelper
     @Inject lateinit var sessionRepository: SessionRepository
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
 
@@ -88,23 +87,21 @@ class ConsentActivity : BaseSplitActivity() {
     }
 
     private fun setupTextInUi() {
-        with(androidResourcesHelper) {
-            consentDeclineButton.text = getString(R.string.launch_consent_decline_button)
-            consentAcceptButton.text = getString(R.string.launch_consent_accept_button)
-            privacyNoticeText.text = getString(R.string.privacy_notice_text)
-            privacyNoticeText.paintFlags = privacyNoticeText.paintFlags or UNDERLINE_TEXT_FLAG
-        }
+        consentDeclineButton.text = getString(R.string.launch_consent_decline_button)
+        consentAcceptButton.text = getString(R.string.launch_consent_accept_button)
+        privacyNoticeText.text = getString(R.string.privacy_notice_text)
+        privacyNoticeText.paintFlags = privacyNoticeText.paintFlags or UNDERLINE_TEXT_FLAG
     }
 
     private fun setupTabs() {
         tabHost.setup()
 
         generalConsentTab = tabHost.newTabSpec(GENERAL_CONSENT_TAB_TAG)
-            .setIndicator(androidResourcesHelper.getString(R.string.consent_general_title))
+            .setIndicator(getString(R.string.consent_general_title))
             .setContent(R.id.generalConsentTextView)
 
         parentalConsentTab = tabHost.newTabSpec(PARENTAL_CONSENT_TAB_TAG)
-            .setIndicator(androidResourcesHelper.getString(R.string.consent_parental_title))
+            .setIndicator(getString(R.string.consent_parental_title))
             .setContent(R.id.parentalConsentTextView)
 
         tabHost.addTab(generalConsentTab)

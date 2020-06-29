@@ -22,7 +22,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import dagger.Module
@@ -32,11 +31,8 @@ import dagger.Provides
 open class DashboardActivityModule {
 
     @Provides
-    open fun provideDashboardProjectDetailsCardDisplayer(
-        androidResourcesHelper: AndroidResourcesHelper
-    ): DashboardProjectDetailsCardDisplayer = DashboardProjectDetailsCardDisplayerImpl(
-        androidResourcesHelper
-    )
+    open fun provideDashboardProjectDetailsCardDisplayer(): DashboardProjectDetailsCardDisplayer =
+        DashboardProjectDetailsCardDisplayerImpl()
 
     @Provides
     open fun provideProjectDetailsRepository(
@@ -82,12 +78,8 @@ open class DashboardActivityModule {
 
     @Provides
     open fun provideDashboardDailyActivityCardDisplayer(
-        timeHelper: TimeHelper,
-        androidResourcesHelper: AndroidResourcesHelper
-    ): DashboardDailyActivityCardDisplayer = DashboardDailyActivityCardDisplayerImpl(
-        timeHelper,
-        androidResourcesHelper
-    )
+        timeHelper: TimeHelper
+    ): DashboardDailyActivityCardDisplayer = DashboardDailyActivityCardDisplayerImpl(timeHelper)
 
     @Provides
     open fun provideDashboardViewModelFactory(
@@ -104,10 +96,9 @@ open class DashboardActivityModule {
 
     @Provides
     open fun provideDashboardSyncCardDisplayer(
-        androidResourcesHelper: AndroidResourcesHelper,
         timeHelper: TimeHelper,
         ctx: Context
     ): DashboardSyncCardDisplayer =
-        DashboardSyncCardDisplayerImpl(androidResourcesHelper, timeHelper)
+        DashboardSyncCardDisplayerImpl(timeHelper)
 
 }

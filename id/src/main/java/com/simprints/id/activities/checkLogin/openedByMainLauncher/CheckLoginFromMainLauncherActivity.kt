@@ -21,13 +21,12 @@ import javax.inject.Inject
 open class CheckLoginFromMainLauncherActivity : BaseSplitActivity(), CheckLoginFromMainLauncherContract.View {
 
     override lateinit var viewPresenter: CheckLoginFromMainLauncherContract.Presenter
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
         setContentView(R.layout.splash_screen)
-        title = androidResourcesHelper.getString(R.string.title_activity_front)
+        title = getString(R.string.title_activity_front)
 
         val component = (application as Application).component
         component.inject(this)
