@@ -34,10 +34,9 @@ class TestDashboardActivityModule(
 ) : DashboardActivityModule() {
 
     override fun provideDashboardProjectDetailsCardDisplayer(
-        androidResourcesHelper: AndroidResourcesHelper
     ): DashboardProjectDetailsCardDisplayer {
         return projectDetailsCardDisplayerRule.resolveDependency {
-            super.provideDashboardProjectDetailsCardDisplayer(androidResourcesHelper)
+            super.provideDashboardProjectDetailsCardDisplayer()
         }
     }
 
@@ -91,11 +90,10 @@ class TestDashboardActivityModule(
     }
 
     override fun provideDashboardDailyActivityCardDisplayer(
-        timeHelper: TimeHelper,
-        androidResourcesHelper: AndroidResourcesHelper
+        timeHelper: TimeHelper
     ): DashboardDailyActivityCardDisplayer {
         return dailyActivityCardDisplayerRule.resolveDependency {
-            super.provideDashboardDailyActivityCardDisplayer(timeHelper, androidResourcesHelper)
+            super.provideDashboardDailyActivityCardDisplayer(timeHelper)
         }
     }
 
@@ -114,12 +112,11 @@ class TestDashboardActivityModule(
     }
 
     override fun provideDashboardSyncCardDisplayer(
-        androidResourcesHelper: AndroidResourcesHelper,
         timeHelper: TimeHelper,
         ctx: Context
     ): DashboardSyncCardDisplayer {
         return syncCardDisplayerRule.resolveDependency {
-            super.provideDashboardSyncCardDisplayer(androidResourcesHelper, timeHelper, ctx)
+            super.provideDashboardSyncCardDisplayer(timeHelper, ctx)
         }
     }
 }
