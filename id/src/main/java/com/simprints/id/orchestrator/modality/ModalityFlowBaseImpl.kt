@@ -1,10 +1,12 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent
+import com.simprints.id.data.db.subject.domain.FaceSample
+import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
+import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
@@ -34,6 +36,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
             steps.add(buildConsentStep(consentType))
         }
     }
+
     private fun buildConsentStep(consentType: ConsentType) =
         coreStepProcessor.buildStepConsent(consentType)
 
@@ -53,6 +56,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     } else {
         emptyList()
     }
+
     fun completeAllStepsIfExitFormHappened(requestCode: Int, resultCode: Int, data: Intent?) =
         tryProcessingResultFromCoreStepProcessor(data)
             ?: tryProcessingResultFromFingerprintStepProcessor(requestCode, resultCode, data)
@@ -80,8 +84,8 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         }
 
     private fun tryProcessingResultFromFaceStepProcessor(requestCode: Int,
-                                                                resultCode: Int,
-                                                                data: Intent?) =
+                                                         resultCode: Int,
+                                                         data: Intent?) =
         faceStepProcessor.processResult(requestCode, resultCode, data).also { faceResult ->
             if (faceResult is FaceExitFormResponse) {
                 completeAllSteps()
@@ -98,6 +102,11 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         addPersonCreationEventForFingerprintSamples(fingerprintSamples)
     }
 
+    suspend fun extractFaceAndAddPersonCreationEvent(faceCaptureResponse: FaceCaptureResponse) {
+        val faceSamples = extractFaceSamples(faceCaptureResponse)
+        addPersonCreationEventForFaceSamples(faceSamples)
+    }
+
     private fun extractFingerprintSamples(result: FingerprintCaptureResponse) =
         result.captureResult.mapNotNull { captureResult ->
             val fingerId = captureResult.identifier
@@ -106,12 +115,29 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
             }
         }
 
+    private fun extractFaceSamples(response: FaceCaptureResponse) =
+        response.capturingResult.mapNotNull { captureResult ->
+            captureResult.result?.let {
+                FaceSample(it.template)
+            }
+        }
+
     private suspend fun addPersonCreationEventForFingerprintSamples(fingerprintSamples: List<FingerprintSample>) {
         ignoreException {
             sessionRepository.updateCurrentSession {
-                val event = PersonCreationEvent.build(timeHelper, it, fingerprintSamples)
+                val event = PersonCreationEvent.build(timeHelper, it, fingerprintSamples, faceSamples = null)
                 it.addEvent(event)
             }
         }
     }
+
+    private suspend fun addPersonCreationEventForFaceSamples(faceSamples: List<FaceSample>) {
+        ignoreException {
+            sessionRepository.updateCurrentSession {
+                val event = PersonCreationEvent.build(timeHelper, it, fingerprintSamples = null, faceSamples = faceSamples)
+                it.addEvent(event)
+            }
+        }
+    }
+
 }
