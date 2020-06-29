@@ -1,8 +1,11 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.EventLabel
+import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.domain.modality.Modes
+import com.simprints.id.data.db.event.domain.events.Event.*
+import com.simprints.id.data.db.event.remote.events.ApiEvent.*
+
 
 @Keep
 class ApiEvents(val events: List<ApiEvent>)
@@ -12,36 +15,38 @@ open class ApiEvent(val id: String,
                     val labels: List<ApiEventLabel>,
                     val payload: ApiEventPayload) {
 
-    sealed class ApiEventLabel(val key: String) {
+    sealed class ApiEventLabel(val key: String, val labels: List<String>) {
 
-        class ApiProjectId(label: String) : ApiEventLabel("projectId")
-        class ApiSubjectId(label: String) : ApiEventLabel("subjectId")
-        class ApiAttendantId(labels: String) : ApiEventLabel("attendantId")
-        class ApiModuleId(label: List<String>) : ApiEventLabel("moduleId")
-        class ApiMode(label: List<Modes>) : ApiEventLabel("mode")
-        class ApiSessionId(label: String) : ApiEventLabel("sessionId")
+        class ApiProjectId(labelValue: String) : ApiEventLabel("projectId", listOf(labelValue))
+        class ApiSubjectId(labelValue: String) : ApiEventLabel("subjectId", listOf(labelValue))
+        class ApiAttendantId(labelValue: String) : ApiEventLabel("attendantId", listOf(labelValue))
+        class ApiModuleId(labelValues: List<String>) : ApiEventLabel("moduleId", labelValues)
+        class ApiMode(labelValues: List<String>) : ApiEventLabel("mode", labelValues)
+        class ApiSessionId(labelValue: String) : ApiEventLabel("sessionId", listOf(labelValue))
     }
 }
 
-fun List<EventLabel>.fromDomainToApi() =
+fun List<Event.EventLabel>.fromDomainToApi() =
     this.mapNotNull {
         when (it) {
             is EventLabel.ProjectId -> {
-                ApiEvent.ApiEventLabel.ApiProjectId(it.label)
+                ApiEventLabel.ApiProjectId(it.labels.first())
             }
             is EventLabel.SubjectId -> {
-                EventLabel.SubjectId(it.value.first())
+                ApiEventLabel.ApiSubjectId(it.labels.first())
             }
             is EventLabel.AttendantId -> {
-                EventLabel.AttendantId(it.value.first())
+                ApiEventLabel.ApiAttendantId(it.labels.first())
             }
             is EventLabel.ModuleId -> {
-                EventLabel.ModuleId(it.value)
+                ApiEventLabel.ApiModuleId(it.labels)
             }
             is EventLabel.Mode -> {
-                EventLabel.Mode(it.value.map { mode -> Modes.valueOf(mode) })
+                ApiEventLabel.ApiMode(it.labels)
             }
-            is EventLabel.SessionId -> TODO()
+            is EventLabel.SessionId -> {
+                ApiEventLabel.ApiSessionId(it.labels.first())
+            }
         }
     }
 }
