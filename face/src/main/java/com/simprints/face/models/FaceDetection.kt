@@ -1,5 +1,6 @@
 package com.simprints.face.models
 
+import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.detection.Face
@@ -11,8 +12,10 @@ data class FaceDetection(
     val face: Face?,
     val status: Status,
     var securedImageRef: SecuredImageRef? = null,
-    val detectionTime: Long = System.currentTimeMillis(),
-    var isFallback: Boolean = false
+    var detectionStartTime: Long = System.currentTimeMillis(),
+    var isFallback: Boolean = false,
+    var id: String = UUID.randomUUID().toString(),
+    var detectionEndTime: Long = System.currentTimeMillis()
 ) {
     enum class Status {
         VALID,
@@ -25,7 +28,18 @@ data class FaceDetection(
     }
 
     fun toFaceSample(): FaceSample =
-        FaceSample(UUID.randomUUID().toString(), face?.template ?: ByteArray(0), securedImageRef)
+        FaceSample(id, face?.template ?: ByteArray(0), securedImageRef)
+
+    fun toFaceCaptureEvent(attemptNumber: Int, qualityThreshold: Float): FaceCaptureEvent =
+        FaceCaptureEvent(
+            detectionStartTime,
+            detectionEndTime,
+            attemptNumber,
+            qualityThreshold,
+            FaceCaptureEvent.Result.fromFaceDetectionStatus(status),
+            isFallback,
+            FaceCaptureEvent.EventFace.fromFaceDetectionFace(face)
+        )
 
     fun hasValidStatus(): Boolean = status == Status.VALID || status == Status.VALID_CAPTURING
     fun isAboveQualityThreshold(qualityThreshold: Float): Boolean =
