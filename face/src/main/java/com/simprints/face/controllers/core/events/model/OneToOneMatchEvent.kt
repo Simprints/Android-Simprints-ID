@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.simprints.face.exceptions.FaceUnexpectedException
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import java.io.Serializable
-import com.simprints.id.data.db.session.domain.models.events.Matcher as CoreMatcher
 import com.simprints.id.data.db.session.domain.models.events.OneToOneMatchEvent as CoreOneToOneMatchEvent
 
 @Keep
@@ -16,12 +15,11 @@ class OneToOneMatchEvent(
     val result: MatchEntry?
 ) : Event(EventType.ONE_TO_ONE_MATCH, startTime, endTime) {
 
-    // TODO: add matcher as a parameter of Core Match Event
     fun fromDomainToCore() = CoreOneToOneMatchEvent(
         startTime,
         endTime,
         (query as SubjectLocalDataSource.Query).extractVerifyId(),
-        CoreMatcher.RANK_ONE, // TODO: implement Matcher in face module
+        matcher.fromDomainToCore(),
         result?.fromDomainToCore()
     )
 

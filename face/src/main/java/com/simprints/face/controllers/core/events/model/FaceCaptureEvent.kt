@@ -4,6 +4,9 @@ import androidx.annotation.Keep
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.face.models.FaceDetection
 import com.simprints.face.detection.Face as DetectionFace
+import com.simprints.id.data.db.session.domain.models.events.FaceCaptureEvent as CoreFaceCaptureEvent
+import com.simprints.id.data.db.session.domain.models.events.FaceCaptureEvent.Face as CoreFaceCaptureEventFace
+import com.simprints.id.data.db.session.domain.models.events.FaceCaptureEvent.Result as CoreFaceCaptureEventResult
 
 @Keep
 class FaceCaptureEvent(
@@ -16,8 +19,20 @@ class FaceCaptureEvent(
     val eventFace: EventFace?
 ) : Event(EventType.FACE_CAPTURE, startTime, endTime) {
 
+    fun fromDomainToCore(): CoreFaceCaptureEvent = CoreFaceCaptureEvent(
+        startTime,
+        endTime,
+        attemptNb,
+        qualityThreshold,
+        result.fromDomainToCore(),
+        isFallback,
+        eventFace?.fromDomainToCore()
+    )
+
     @Keep
     class EventFace(val yaw: Float, var roll: Float, val quality: Float, val template: String) {
+        fun fromDomainToCore(): CoreFaceCaptureEventFace = CoreFaceCaptureEventFace(yaw, roll, quality, template)
+
         companion object {
             fun fromFaceDetectionFace(face: DetectionFace?): EventFace? =
                 face?.let {
@@ -39,6 +54,15 @@ class FaceCaptureEvent(
         OFF_ROLL,
         TOO_CLOSE,
         TOO_FAR;
+
+        fun fromDomainToCore(): CoreFaceCaptureEventResult = when (this) {
+            VALID -> CoreFaceCaptureEventResult.VALID
+            INVALID -> CoreFaceCaptureEventResult.INVALID
+            OFF_YAW -> CoreFaceCaptureEventResult.OFF_YAW
+            OFF_ROLL -> CoreFaceCaptureEventResult.OFF_ROLL
+            TOO_CLOSE -> CoreFaceCaptureEventResult.TOO_CLOSE
+            TOO_FAR -> CoreFaceCaptureEventResult.TOO_FAR
+        }
 
         companion object {
             fun fromFaceDetectionStatus(status: FaceDetection.Status): Result = when (status) {
