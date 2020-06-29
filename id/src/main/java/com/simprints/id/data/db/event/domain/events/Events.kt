@@ -10,15 +10,17 @@ data class Events(val events: List<Event>)
 @Keep
 open class Event(val id: String,
                  val labels: List<EventLabel>,
-                 val payload: EventPayload)
+                 val payload: EventPayload) {
 
-sealed class EventLabel(val key: String) {
-    class ProjectId(labels: String) : EventLabel("projectId")
-    class SubjectId(labels: String) : EventLabel("subjectId")
-    class AttendantId(labels: String) : EventLabel("attendantId")
-    class ModuleId(labels: List<String>) : EventLabel("moduleId")
-    class Mode(labels: List<Modes>) : EventLabel("mode")
-    class SessionId(labels: String) : EventLabel("sessionId")
+    sealed class EventLabel(val key: String, val labels: List<String>) {
+
+        class ProjectId(labelValue: String) : EventLabel("projectId", listOf(labelValue))
+        class SubjectId(labelValue: String) : EventLabel("subjectId", listOf(labelValue))
+        class AttendantId(labelValue: String) : EventLabel("attendantId", listOf(labelValue))
+        class ModuleId(labelValues: List<String>) : EventLabel("moduleId", labelValues)
+        class Mode(labelValues: List<Modes>) : EventLabel("mode", labelValues.map { it.name })
+        class SessionId(labelValue: String) : EventLabel("sessionId", listOf(labelValue))
+    }
 
     companion object {
         fun fromApiToDomain(labels: Map<String, List<String>>) =
