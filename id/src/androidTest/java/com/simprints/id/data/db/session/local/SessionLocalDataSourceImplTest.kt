@@ -15,6 +15,7 @@ import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl.Companion.START_TIME
 import com.simprints.id.data.db.session.local.models.DbSession
 import com.simprints.id.data.db.session.local.models.toDomain
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.safe.session.SessionDataSourceException
 import com.simprints.id.tools.TimeHelperImpl
 import io.mockk.MockKAnnotations
@@ -68,7 +69,13 @@ class SessionLocalDataSourceImplTest {
     fun create_shouldStoreANewSession() {
         runBlockingInIO {
             assertThat(sessionLocalDataSource.count(SessionQuery())).isEqualTo(0)
-            sessionLocalDataSource.create(APP_VERSION_NAME, LIB_SIMPRINTS_VERSION_NAME, LANGUAGE, DEVICE_ID)
+            sessionLocalDataSource.create(
+                APP_VERSION_NAME,
+                LIB_SIMPRINTS_VERSION_NAME,
+                LANGUAGE,
+                DEVICE_ID,
+                listOf(Modality.FINGER)
+            )
             assertThat(sessionLocalDataSource.count(SessionQuery())).isEqualTo(1)
         }
     }
@@ -78,7 +85,13 @@ class SessionLocalDataSourceImplTest {
         runBlockingInIO {
             saveFakeSessions(realmForTest, listOf(createFakeOpenSession(TimeHelperImpl())))
 
-            sessionLocalDataSource.create(APP_VERSION_NAME, LIB_SIMPRINTS_VERSION_NAME, LANGUAGE, DEVICE_ID)
+            sessionLocalDataSource.create(
+                APP_VERSION_NAME,
+                LIB_SIMPRINTS_VERSION_NAME,
+                LANGUAGE,
+                DEVICE_ID,
+                listOf(Modality.FINGER)
+            )
 
             val sessions = realmForTest.where(DbSession::class.java).findAll().sort(START_TIME, Sort.DESCENDING)
             assertThat(sessions.first()?.toDomain()?.isClosed()).isFalse()
@@ -89,7 +102,13 @@ class SessionLocalDataSourceImplTest {
     @Test
     fun create_shouldHaveTheRightContent() {
         runBlockingInIO {
-            sessionLocalDataSource.create(APP_VERSION_NAME, LIB_SIMPRINTS_VERSION_NAME, LANGUAGE, DEVICE_ID)
+            sessionLocalDataSource.create(
+                APP_VERSION_NAME,
+                LIB_SIMPRINTS_VERSION_NAME,
+                LANGUAGE,
+                DEVICE_ID,
+                listOf(Modality.FINGER)
+            )
 
             val session = realmForTest.where(DbSession::class.java).findAll().sort(START_TIME, Sort.DESCENDING).first()
             assertNewSession(session)
@@ -101,7 +120,13 @@ class SessionLocalDataSourceImplTest {
         runBlockingInIO {
             every { realmConfigBuilder.build(any(), any()) } throws Throwable("Missing config")
             checkException<SessionDataSourceException> {
-                sessionLocalDataSource.create(APP_VERSION_NAME, LIB_SIMPRINTS_VERSION_NAME, LANGUAGE, DEVICE_ID)
+                sessionLocalDataSource.create(
+                    APP_VERSION_NAME,
+                    LIB_SIMPRINTS_VERSION_NAME,
+                    LANGUAGE,
+                    DEVICE_ID,
+                    listOf(Modality.FINGER)
+                )
             }
         }
     }
