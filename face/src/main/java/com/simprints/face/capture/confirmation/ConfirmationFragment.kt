@@ -11,6 +11,7 @@ import com.simprints.face.controllers.core.events.model.FaceCaptureConfirmationE
 import com.simprints.face.controllers.core.events.model.FaceCaptureConfirmationEvent.Result.RECAPTURE
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import kotlinx.android.synthetic.main.fragment_confirmation.*
+import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
