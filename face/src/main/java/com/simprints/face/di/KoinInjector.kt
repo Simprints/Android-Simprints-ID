@@ -5,12 +5,18 @@ import com.simprints.face.capture.livefeedback.LiveFeedbackFragmentViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManagerImpl
+import com.simprints.face.controllers.core.events.FaceSessionEventsManager
+import com.simprints.face.controllers.core.events.FaceSessionEventsManagerImpl
+import com.simprints.face.controllers.core.flow.MasterFlowManager
+import com.simprints.face.controllers.core.flow.MasterFlowManagerImpl
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.controllers.core.image.FaceImageManagerImpl
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
 import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManagerImpl
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.controllers.core.repository.FaceDbManagerImpl
+import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
+import com.simprints.face.controllers.core.timehelper.FaceTimeHelperImpl
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.detection.rankone.RankOneFaceDetector
 import com.simprints.face.exitform.ExitFormViewModel
@@ -31,7 +37,8 @@ import org.koin.dsl.module
 object KoinInjector {
     private var koinModule: Module? = null
 
-    private fun Scope.appComponent() = (androidApplication() as Application).component
+    private fun Scope.appComponent() =
+        (androidApplication() as Application).component
 
     fun acquireFaceKoinModules() {
         if (koinModule == null) {
@@ -58,8 +65,11 @@ object KoinInjector {
     private fun Module.defineBuildersForFaceManagers() {
         factory<FacePreferencesManager> { FacePreferencesManagerImpl(get()) }
         factory<FaceImageManager> { FaceImageManagerImpl(get(), get()) }
+        factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
         factory<FaceDbManager> { FaceDbManagerImpl(get()) }
         factory<FaceCrashReportManager> { FaceCrashReportManagerImpl(get()) }
+        factory<FaceTimeHelper> { FaceTimeHelperImpl(get()) }
+        factory<FaceSessionEventsManager> { FaceSessionEventsManagerImpl(get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
@@ -72,14 +82,26 @@ object KoinInjector {
     private fun Module.defineBuildersForViewModels() {
         viewModel { FaceOrchestratorViewModel(get()) }
         viewModel { FaceCaptureViewModel(get<FacePreferencesManager>().maxRetries, get(), get()) }
-        viewModel { FaceMatchViewModel(get(), get(), get(), get()) }
+        viewModel {
+            FaceMatchViewModel(
+                get(),
+                get(),
+                get(),
+                get<FacePreferencesManager>().faceMatchThreshold,
+                get(),
+                get(),
+                get()
+            )
+        }
 
         viewModel { (mainVM: FaceCaptureViewModel) ->
             LiveFeedbackFragmentViewModel(
                 mainVM,
                 get(),
                 get(),
-                get<FacePreferencesManager>().qualityThreshold
+                get<FacePreferencesManager>().qualityThreshold,
+                get(),
+                get()
             )
         }
         viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM, get()) }

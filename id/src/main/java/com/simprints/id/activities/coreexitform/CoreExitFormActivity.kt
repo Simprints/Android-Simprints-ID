@@ -136,7 +136,7 @@ class CoreExitFormActivity : BaseSplitActivity() {
                 logRadioOptionForCrashReport("Does not have permission")
             }
             R.id.rbAppNotWorking -> {
-                exitFormReason = SCANNER_NOT_WORKING
+                exitFormReason = APP_NOT_WORKING
                 setFocusOnExitReasonAndDisableSubmit()
                 logRadioOptionForCrashReport("App not working")
             }

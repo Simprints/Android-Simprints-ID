@@ -32,7 +32,9 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
         BLUETOOTH_NOT_SUPPORTED,
         ROOTED_DEVICE,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
-        INVALID_STATE_FOR_INTENT_ACTION;
+        INVALID_STATE_FOR_INTENT_ACTION,
+        FACE_LICENSE_MISSING,
+        FACE_LICENSE_INVALID;
 
         companion object {
 
@@ -46,6 +48,8 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
                     IAppErrorReason.LOGIN_NOT_COMPLETE -> LOGIN_NOT_COMPLETE
                     IAppErrorReason.ROOTED_DEVICE -> ROOTED_DEVICE
                     IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
+                    IAppErrorReason.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
+                    IAppErrorReason.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
                 }
 
             fun fromAlertTypeToDomain(clientApiAlert: ClientApiAlert): Reason =
