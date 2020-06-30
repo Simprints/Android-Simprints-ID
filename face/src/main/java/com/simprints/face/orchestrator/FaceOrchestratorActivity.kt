@@ -4,11 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.core.livedata.LiveDataEventObserver
+import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.extentions.showToast
 import com.simprints.core.tools.whenNonNull
 import com.simprints.core.tools.whenNull
+import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureActivity
 import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException
@@ -18,7 +18,7 @@ import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class FaceOrchestratorActivity : AppCompatActivity() {
+class FaceOrchestratorActivity : AppCompatActivity(R.layout.activity_orchestrator) {
     private val viewModel: FaceOrchestratorViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,17 +66,9 @@ class FaceOrchestratorActivity : AppCompatActivity() {
         viewModel.startMatching.observe(this, LiveDataEventWithContentObserver {
             startActivityForResult(FaceMatchActivity.getStartingIntent(this, it), MATCH_REQUEST)
         })
-        viewModel.missingLicenseEvent.observe(this, LiveDataEventObserver {
-            // TODO: this is temporary, should route user the an error screen
-            showToast("RankOne license is missing")
-            setResult(Activity.RESULT_CANCELED)
-            finish()
-        })
-        viewModel.invalidLicenseEvent.observe(this, LiveDataEventObserver {
-            // TODO: this is temporary, should route user the an error screen
-            showToast("RankOne license is invalid")
-            setResult(Activity.RESULT_CANCELED)
-            finish()
+        viewModel.errorEvent.observe(this, LiveDataEventWithContentObserver {
+            findNavController(R.id.orchestrator_host_fragment)
+                .navigate(BlankFragmentDirections.actionBlankFragmentToErrorFragment(it))
         })
     }
 
