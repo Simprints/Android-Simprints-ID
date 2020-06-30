@@ -10,6 +10,7 @@ import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.FaceCaptureRetryEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import kotlinx.android.synthetic.main.fragment_retry.*
+import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class RetryFragment : Fragment(R.layout.fragment_retry) {

@@ -9,6 +9,7 @@ import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.FaceOnboardingCompleteEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import kotlinx.android.synthetic.main.fragment_preparation.*
+import org.koin.android.ext.android.inject
 
 class PreparationFragment : Fragment(R.layout.fragment_preparation) {
     private val faceSessionEventsManager: FaceSessionEventsManager by inject()
