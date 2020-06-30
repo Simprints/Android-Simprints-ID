@@ -2,24 +2,25 @@ package com.simprints.id.data.db.event.domain.events.callback
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.EventLabel
 import com.simprints.id.data.db.event.domain.events.EventPayload
 import com.simprints.id.data.db.event.domain.events.EventPayloadType
 import java.util.*
 
 @Keep
 class VerificationCallbackEvent(
-    creationTime: Long,
+    createdAt: Long,
     score: CallbackComparisonScore,
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    VerificationCallbackPayload(creationTime, score)) {
+    VerificationCallbackPayload(createdAt, DEFAULT_EVENT_VERSION, score)) {
 
     @Keep
     class VerificationCallbackPayload(
-        creationTime: Long,
+        createdAt: Long,
+        eventVersion: Int,
         val score: CallbackComparisonScore
-    ) : EventPayload(EventPayloadType.CALLBACK_VERIFICATION, creationTime)
+    ) : EventPayload(EventPayloadType.CALLBACK_VERIFICATION, eventVersion, createdAt)
 }

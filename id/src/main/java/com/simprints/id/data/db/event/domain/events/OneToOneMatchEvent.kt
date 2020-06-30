@@ -5,7 +5,7 @@ import java.util.*
 
 @Keep
 class OneToOneMatchEvent(
-    creationTime: Long,
+    createdAt: Long,
     endTime: Long,
     candidateId: String,
     result: MatchEntry?,
@@ -14,14 +14,14 @@ class OneToOneMatchEvent(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    OneToOneMatchPayload(creationTime, DEFAULT_EVENT_VERSION, endTime, candidateId, result)) {
+    OneToOneMatchPayload(createdAt, DEFAULT_EVENT_VERSION, endTime, candidateId, result)) {
 
     @Keep
     class OneToOneMatchPayload(
-        creationTime: Long,
-        version: Int,
+        createdAt: Long,
+        eventVersion: Int,
         val endTime: Long,
         val candidateId: String,
         val result: MatchEntry?
-    ) : EventPayload(EventPayloadType.ONE_TO_ONE_MATCH, version, creationTime)
+    ) : EventPayload(EventPayloadType.ONE_TO_ONE_MATCH, eventVersion, createdAt)
 }

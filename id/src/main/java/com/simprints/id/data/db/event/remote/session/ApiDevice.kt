@@ -13,3 +13,6 @@ open class ApiDevice(
     constructor(deviceId: Device) :
         this(deviceId.androidSdkVersion, deviceId.deviceModel, deviceId.deviceId)
 }
+
+fun Device.fromDomainToApi() =
+    ApiDevice(androidSdkVersion, deviceModel, deviceId)

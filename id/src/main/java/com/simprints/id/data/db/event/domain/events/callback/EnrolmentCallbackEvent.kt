@@ -8,16 +8,16 @@ import java.util.*
 
 @Keep
 class EnrolmentCallbackEvent(
-    creationTime: Long,
+    createdAt: Long,
     guid: String,
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    EnrolmentCallbackPayload(creationTime, DEFAULT_EVENT_VERSION, guid)) {
+    EnrolmentCallbackPayload(createdAt, DEFAULT_EVENT_VERSION, guid)) {
 
-    class EnrolmentCallbackPayload(creationTime: Long,
+    class EnrolmentCallbackPayload(createdAt: Long,
                                    eventVersion: Int,
-                                   val guid: String) : EventPayload(EventPayloadType.CALLBACK_ENROLMENT, eventVersion, creationTime)
+                                   val guid: String) : EventPayload(EventPayloadType.CALLBACK_ENROLMENT, eventVersion, createdAt)
 }

@@ -5,7 +5,7 @@ import java.util.*
 
 @Keep
 class CandidateReadEvent(
-    startTime: Long,
+    createdAt: Long,
     endTime: Long,
     candidateId: String,
     localResult: CandidateReadPayload.LocalResult,
@@ -15,18 +15,18 @@ class CandidateReadEvent(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    CandidateReadPayload(startTime, DEFAULT_EVENT_VERSION, endTime, candidateId, localResult, remoteResult)) {
+    CandidateReadPayload(createdAt, DEFAULT_EVENT_VERSION, endTime, candidateId, localResult, remoteResult)) {
 
 
     @Keep
     class CandidateReadPayload(
-        creationTime: Long,
-        version: Int,
+        createdAt: Long,
+        eventVersion: Int,
         val endTime: Long,
         val candidateId: String,
         val localResult: LocalResult,
         val remoteResult: RemoteResult?
-    ) : EventPayload(EventPayloadType.CANDIDATE_READ, version, creationTime) {
+    ) : EventPayload(EventPayloadType.CANDIDATE_READ, eventVersion, createdAt) {
 
         @Keep
         enum class LocalResult {

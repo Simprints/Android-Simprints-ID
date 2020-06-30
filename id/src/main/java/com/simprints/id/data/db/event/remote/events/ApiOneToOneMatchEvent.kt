@@ -12,13 +12,15 @@ class ApiOneToOneMatchEvent(domainEvent: OneToOneMatchEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiOneToOneMatchPayload(val relativeStartTime: Long,
+    class ApiOneToOneMatchPayload(createdAt: Long,
+                                  eventVersion: Int,
                                   val relativeEndTime: Long,
                                   val candidateId: String,
-                                  val result: ApiMatchEntry?) : ApiEventPayload(ApiEventPayloadType.ONE_TO_ONE_MATCH) {
+                                  val result: ApiMatchEntry?) : ApiEventPayload(ApiEventPayloadType.ONE_TO_ONE_MATCH, eventVersion, createdAt) {
 
         constructor(domainPayload: OneToOneMatchPayload) :
-            this(domainPayload.creationTime,
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
                 domainPayload.endTime,
                 domainPayload.candidateId,
                 domainPayload.result?.let { ApiMatchEntry(it) })

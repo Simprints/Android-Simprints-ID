@@ -22,40 +22,40 @@ class ApiCallbackEvent(id: String,
 
     @Keep
     class ApiCallbackPayload(
-        creationTime: Long,
-        eventVersion: Int,
+        createdAt: Long,
+        version: Int,
         val callout: ApiCallback
-    ) : ApiEventPayload(CALLBACK, eventVersion, creationTime) {
+    ) : ApiEventPayload(CALLBACK, version, createdAt) {
 
         constructor(domainPayload: EnrolmentCallbackPayload) : this(
-            domainPayload.creationTime,
+            domainPayload.createdAt,
             domainPayload.eventVersion,
             ApiEnrolmentCallback(domainPayload.guid)
         )
 
         constructor(domainPayload: IdentificationCallbackPayload) : this(
-            domainPayload.creationTime,
+            domainPayload.createdAt,
             domainPayload.eventVersion,
             ApiIdentificationCallback(domainPayload.sessionId, domainPayload.scores.map { it.fromDomainToApi() })
         )
 
         constructor(domainPayload: VerificationCallbackPayload) : this(
-            domainPayload.creationTime,
+            domainPayload.createdAt,
             domainPayload.eventVersion,
             ApiVerificationCallback(domainPayload.score.fromDomainToApi()))
 
         constructor(domainPayload: ConfirmationCallbackPayload) : this(
-            domainPayload.creationTime,
+            domainPayload.createdAt,
             domainPayload.eventVersion,
             ApiConfirmationCallback(domainPayload.identificationOutcome))
 
         constructor(domainPayload: ErrorCallbackPayload) : this(
-            domainPayload.creationTime,
+            domainPayload.createdAt,
             domainPayload.eventVersion,
             ApiErrorCallback(domainPayload.reason.fromDomainToApi()))
 
         constructor(domainPayload: RefusalCallbackPayload) : this(
-            domainPayload.creationTime,
+            domainPayload.createdAt,
             domainPayload.eventVersion,
             ApiRefusalCallback(domainPayload.reason, domainPayload.extra))
     }

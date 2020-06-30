@@ -13,11 +13,13 @@ class ApiPersonCreationEvent(domainEvent: PersonCreationEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiPersonCreationPayload(val relativeStartTime: Long,
-                                   val fingerprintCaptureIds: List<String>) : ApiEventPayload(ApiEventPayloadType.PERSON_CREATION) {
+    class ApiPersonCreationPayload(createdAt: Long,
+                                   eventVersion: Int,
+                                   val fingerprintCaptureIds: List<String>) : ApiEventPayload(ApiEventPayloadType.PERSON_CREATION, eventVersion, createdAt) {
 
         constructor(domainPayload: PersonCreationPayload) :
-            this(domainPayload.creationTime,
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
                 domainPayload.fingerprintCaptureIds)
     }
 }

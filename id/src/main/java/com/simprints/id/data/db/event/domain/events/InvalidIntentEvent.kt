@@ -18,9 +18,9 @@ class InvalidIntentEvent(
 
 
     @Keep
-    class InvalidIntentPayload(creationTime: Long,
-                               version: Int,
+    class InvalidIntentPayload(createdAt: Long,
+                               eventVersion: Int,
                                val action: String,
-                               val extras: Map<String, Any?>) : EventPayload(INVALID_INTENT, version, creationTime)
+                               val extras: Map<String, Any?>) : EventPayload(INVALID_INTENT, eventVersion, createdAt)
 
 }

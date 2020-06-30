@@ -18,10 +18,11 @@ class ApiConsentEvent(domainEvent: ConsentEvent) :
 
 
     @Keep
-    class ApiConsentPayload(val relativeStartTime: Long,
-                            var relativeEndTime: Long,
+    class ApiConsentPayload(createdAt: Long,
+                            eventVersion: Int,
+                            var endedAt: Long,
                             val consentType: ApiType,
-                            var result: ApiResult) : ApiEventPayload(ApiEventPayloadType.CONSENT) {
+                            var result: ApiResult) : ApiEventPayload(ApiEventPayloadType.CONSENT, eventVersion, createdAt) {
         @Keep
         enum class ApiType {
             INDIVIDUAL, PARENTAL
@@ -33,7 +34,8 @@ class ApiConsentEvent(domainEvent: ConsentEvent) :
         }
 
         constructor(domainPayload: ConsentPayload) :
-            this(domainPayload.creationTime,
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
                 domainPayload.endTime,
                 domainPayload.consentType.fromDomainToApi(),
                 domainPayload.result.fromDomainToApi())

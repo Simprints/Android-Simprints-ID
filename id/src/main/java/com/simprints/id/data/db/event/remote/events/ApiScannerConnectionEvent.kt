@@ -17,8 +17,9 @@ class ApiScannerConnectionEvent(domainEvent: RefusalEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiScannerConnectionPayload(val relativeStartTime: Long,
-                                      val scannerInfo: ApiScannerInfo) : ApiEventPayload(ApiEventPayloadType.SCANNER_CONNECTION) {
+    class ApiScannerConnectionPayload(createdAt: Long,
+                                      eventVersion: Int,
+                                      val scannerInfo: ApiScannerInfo) : ApiEventPayload(ApiEventPayloadType.SCANNER_CONNECTION, eventVersion, createdAt) {
 
         @Keep
         class ApiScannerInfo(val scannerId: String,
@@ -31,8 +32,10 @@ class ApiScannerConnectionEvent(domainEvent: RefusalEvent) :
                     scannerInfo.generation.toApiScannerGeneration(), scannerInfo.hardwareVersion)
         }
 
-        constructor(domainPayload: ScannerConnectionPayload) :
-            this(domainPayload.creationTime, ApiScannerInfo(domainPayload.scannerInfo))
+        constructor(domainPayload: ScannerConnectionPayload) : this(
+            domainPayload.createdAt,
+            domainPayload.eventVersion,
+            ApiScannerInfo(domainPayload.scannerInfo))
 
         enum class ApiScannerGeneration {
             VERO_1,

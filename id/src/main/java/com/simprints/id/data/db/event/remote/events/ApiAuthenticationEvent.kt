@@ -14,10 +14,11 @@ class ApiAuthenticationEvent(domainEvent: AuthenticationEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiAuthenticationPayload(val relativeStartTime: Long,
-                                   val relativeEndTime: Long,
+    class ApiAuthenticationPayload(createdAt: Long,
+                                   version: Int,
+                                   val endedAt: Long,
                                    val userInfo: ApiUserInfo,
-                                   val result: ApiResult) : ApiEventPayload(ApiEventPayloadType.AUTHENTICATION) {
+                                   val result: ApiResult) : ApiEventPayload(ApiEventPayloadType.AUTHENTICATION, version, createdAt) {
 
         @Keep
         class ApiUserInfo(val projectId: String, val userId: String) {
@@ -36,7 +37,8 @@ class ApiAuthenticationEvent(domainEvent: AuthenticationEvent) :
         }
 
         constructor(domainPayload: AuthenticationPayload) :
-            this(domainPayload.creationTime,
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
                 domainPayload.endTime,
                 ApiUserInfo(domainPayload.userInfo),
                 domainPayload.result.fromDomainToApi())

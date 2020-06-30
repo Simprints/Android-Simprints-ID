@@ -13,11 +13,13 @@ class ApiSuspiciousIntentEvent(domainEvent: SuspiciousIntentEvent) :
 
 
     @Keep
-    class ApiSuspiciousIntentPayload(val relativeStartTime: Long,
-                                     val unexpectedExtras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.SUSPICIOUS_INTENT) {
+    class ApiSuspiciousIntentPayload(createdAt: Long,
+                                     eventVersion: Int,
+                                     val unexpectedExtras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.SUSPICIOUS_INTENT, eventVersion, createdAt) {
 
         constructor(domainPayload: SuspiciousIntentPayload) :
-            this(domainPayload.creationTime,
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
                 domainPayload.unexpectedExtras)
     }
 }

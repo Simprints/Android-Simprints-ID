@@ -11,7 +11,7 @@ import com.simprints.id.data.db.event.domain.events.ConnectivitySnapshotEvent.Co
 import com.simprints.id.data.db.event.domain.events.ConsentEvent.ConsentPayload
 import com.simprints.id.data.db.event.domain.events.EnrolmentEvent.EnrolmentPayload
 import com.simprints.id.data.db.event.domain.events.EventPayload
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
 import com.simprints.id.data.db.event.domain.events.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.id.data.db.event.domain.events.GuidSelectionEvent.GuidSelectionPayload
 import com.simprints.id.data.db.event.domain.events.IntentParsingEvent.IntentParsingPayload
@@ -35,6 +35,7 @@ import com.simprints.id.data.db.event.domain.events.callout.EnrolmentCalloutEven
 import com.simprints.id.data.db.event.domain.events.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
 import com.simprints.id.data.db.event.domain.events.callout.IdentificationCalloutEvent.IdentificationCalloutPayload
 import com.simprints.id.data.db.event.domain.events.callout.VerificationCalloutEvent.VerificationCalloutPayload
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload
@@ -64,49 +65,51 @@ import com.simprints.id.data.db.event.remote.events.callout.ApiCalloutEvent.ApiC
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationEvent.ApiEnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionEvent.ApiEnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMoveEvent.ApiEnrolmentRecordMovePayload
+import com.simprints.id.data.db.event.remote.session.ApiSessionCapture.ApiSessionCapturePayload
 
 @Keep
 abstract class ApiEventPayload(
     val type: ApiEventPayloadType,
-    val relativeStartTime: Int, //TODO: "relativeStartTime" to change
-    val creationTime: Long
+    val version: Int, //TODO: "relativeStartTime" to change
+    val createdAt: Long
 )
 
 fun EventPayload.fromDomainToApi() =
     when (this.type) {
-        EventPayloadType.ENROLMENT_RECORD_CREATION -> ApiEnrolmentRecordCreationPayload(this as EnrolmentRecordCreationPayload)
-        EventPayloadType.ENROLMENT_RECORD_DELETION -> ApiEnrolmentRecordDeletionPayload(this as EnrolmentRecordDeletionPayload)
-        EventPayloadType.ENROLMENT_RECORD_MOVE -> ApiEnrolmentRecordMovePayload(this as EnrolmentRecordMovePayload)
-        EventPayloadType.ARTIFICIAL_TERMINATION -> ApiArtificialTerminationPayload(this as ArtificialTerminationPayload)
-        EventPayloadType.AUTHENTICATION -> ApiAuthenticationPayload(this as AuthenticationPayload)
-        EventPayloadType.CONSENT -> ApiConsentPayload(this as ConsentPayload)
-        EventPayloadType.ENROLMENT -> ApiEnrolmentPayload(this as EnrolmentPayload)
-        EventPayloadType.AUTHORIZATION -> ApiAuthorizationPayload(this as AuthorizationPayload)
-        EventPayloadType.FINGERPRINT_CAPTURE -> ApiFingerprintCapturePayload(this as FingerprintCapturePayload)
-        EventPayloadType.ONE_TO_ONE_MATCH -> ApiOneToOneMatchPayload(this as OneToOneMatchPayload)
-        EventPayloadType.ONE_TO_MANY_MATCH -> ApiOneToManyMatchPayload(this as OneToManyMatchPayload)
-        EventPayloadType.PERSON_CREATION -> ApiPersonCreationPayload(this as PersonCreationPayload)
-        EventPayloadType.ALERT_SCREEN -> ApiAlertScreenPayload(this as AlertScreenPayload)
-        EventPayloadType.GUID_SELECTION -> ApiGuidSelectionPayload(this as GuidSelectionPayload)
-        EventPayloadType.CONNECTIVITY_SNAPSHOT -> ApiConnectivitySnapshotPayload(this as ConnectivitySnapshotPayload)
-        EventPayloadType.REFUSAL -> ApiRefusalPayload(this as RefusalPayload)
-        EventPayloadType.CANDIDATE_READ -> ApiCandidateReadPayload(this as CandidateReadPayload)
-        EventPayloadType.SCANNER_CONNECTION -> ApiScannerConnectionPayload(this as ScannerConnectionPayload)
-        EventPayloadType.VERO_2_INFO_SNAPSHOT -> ApiVero2InfoSnapshotPayload(this as Vero2InfoSnapshotPayload)
-        EventPayloadType.SCANNER_FIRMWARE_UPDATE -> ApiScannerFirmwareUpdatePayload(this as ScannerFirmwareUpdatePayload)
-        EventPayloadType.INVALID_INTENT -> ApiInvalidIntentPayload(this as InvalidIntentPayload)
-        EventPayloadType.CALLOUT_CONFIRMATION -> ApiCalloutPayload(this as ConfirmationCalloutPayload)
-        EventPayloadType.CALLOUT_IDENTIFICATION -> ApiCalloutPayload(this as IdentificationCalloutPayload)
-        EventPayloadType.CALLOUT_ENROLMENT -> ApiCalloutPayload(this as EnrolmentCalloutPayload)
-        EventPayloadType.CALLOUT_VERIFICATION -> ApiCalloutPayload(this as VerificationCalloutPayload)
-        EventPayloadType.CALLOUT_LAST_BIOMETRICS -> ApiCalloutPayload(this as EnrolmentLastBiometricsCalloutPayload)
-        EventPayloadType.CALLBACK_IDENTIFICATION -> ApiCallbackPayload(this as IdentificationCallbackPayload)
-        EventPayloadType.CALLBACK_ENROLMENT -> ApiCallbackPayload(this as EnrolmentCallbackPayload)
-        EventPayloadType.CALLBACK_REFUSAL -> ApiCallbackPayload(this as RefusalCallbackPayload)
-        EventPayloadType.CALLBACK_VERIFICATION -> ApiCallbackPayload(this as VerificationCallbackPayload)
-        EventPayloadType.CALLBACK_ERROR -> ApiCallbackPayload(this as ErrorCallbackPayload)
-        EventPayloadType.CALLBACK_CONFIRMATION -> ApiCallbackPayload(this as ConfirmationCallbackPayload)
-        EventPayloadType.SUSPICIOUS_INTENT -> ApiSuspiciousIntentPayload(this as SuspiciousIntentPayload)
-        EventPayloadType.INTENT_PARSING -> ApiIntentParsingPayload(this as IntentParsingPayload)
-        EventPayloadType.COMPLETION_CHECK -> ApiCompletionCheckPayload(this as CompletionCheckPayload)
+        ENROLMENT_RECORD_CREATION -> ApiEnrolmentRecordCreationPayload(this as EnrolmentRecordCreationPayload)
+        ENROLMENT_RECORD_DELETION -> ApiEnrolmentRecordDeletionPayload(this as EnrolmentRecordDeletionPayload)
+        ENROLMENT_RECORD_MOVE -> ApiEnrolmentRecordMovePayload(this as EnrolmentRecordMovePayload)
+        ARTIFICIAL_TERMINATION -> ApiArtificialTerminationPayload(this as ArtificialTerminationPayload)
+        AUTHENTICATION -> ApiAuthenticationPayload(this as AuthenticationPayload)
+        CONSENT -> ApiConsentPayload(this as ConsentPayload)
+        ENROLMENT -> ApiEnrolmentPayload(this as EnrolmentPayload)
+        AUTHORIZATION -> ApiAuthorizationPayload(this as AuthorizationPayload)
+        FINGERPRINT_CAPTURE -> ApiFingerprintCapturePayload(this as FingerprintCapturePayload)
+        ONE_TO_ONE_MATCH -> ApiOneToOneMatchPayload(this as OneToOneMatchPayload)
+        ONE_TO_MANY_MATCH -> ApiOneToManyMatchPayload(this as OneToManyMatchPayload)
+        PERSON_CREATION -> ApiPersonCreationPayload(this as PersonCreationPayload)
+        ALERT_SCREEN -> ApiAlertScreenPayload(this as AlertScreenPayload)
+        GUID_SELECTION -> ApiGuidSelectionPayload(this as GuidSelectionPayload)
+        CONNECTIVITY_SNAPSHOT -> ApiConnectivitySnapshotPayload(this as ConnectivitySnapshotPayload)
+        REFUSAL -> ApiRefusalPayload(this as RefusalPayload)
+        CANDIDATE_READ -> ApiCandidateReadPayload(this as CandidateReadPayload)
+        SCANNER_CONNECTION -> ApiScannerConnectionPayload(this as ScannerConnectionPayload)
+        VERO_2_INFO_SNAPSHOT -> ApiVero2InfoSnapshotPayload(this as Vero2InfoSnapshotPayload)
+        SCANNER_FIRMWARE_UPDATE -> ApiScannerFirmwareUpdatePayload(this as ScannerFirmwareUpdatePayload)
+        INVALID_INTENT -> ApiInvalidIntentPayload(this as InvalidIntentPayload)
+        CALLOUT_CONFIRMATION -> ApiCalloutPayload(this as ConfirmationCalloutPayload)
+        CALLOUT_IDENTIFICATION -> ApiCalloutPayload(this as IdentificationCalloutPayload)
+        CALLOUT_ENROLMENT -> ApiCalloutPayload(this as EnrolmentCalloutPayload)
+        CALLOUT_VERIFICATION -> ApiCalloutPayload(this as VerificationCalloutPayload)
+        CALLOUT_LAST_BIOMETRICS -> ApiCalloutPayload(this as EnrolmentLastBiometricsCalloutPayload)
+        CALLBACK_IDENTIFICATION -> ApiCallbackPayload(this as IdentificationCallbackPayload)
+        CALLBACK_ENROLMENT -> ApiCallbackPayload(this as EnrolmentCallbackPayload)
+        CALLBACK_REFUSAL -> ApiCallbackPayload(this as RefusalCallbackPayload)
+        CALLBACK_VERIFICATION -> ApiCallbackPayload(this as VerificationCallbackPayload)
+        CALLBACK_ERROR -> ApiCallbackPayload(this as ErrorCallbackPayload)
+        CALLBACK_CONFIRMATION -> ApiCallbackPayload(this as ConfirmationCallbackPayload)
+        SUSPICIOUS_INTENT -> ApiSuspiciousIntentPayload(this as SuspiciousIntentPayload)
+        INTENT_PARSING -> ApiIntentParsingPayload(this as IntentParsingPayload)
+        COMPLETION_CHECK -> ApiCompletionCheckPayload(this as CompletionCheckPayload)
+        SESSION_CAPTURE -> ApiSessionCapturePayload(this as SessionCapturePayload)
     }

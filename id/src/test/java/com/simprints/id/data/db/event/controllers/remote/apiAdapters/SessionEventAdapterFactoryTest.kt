@@ -14,14 +14,14 @@ import com.simprints.id.data.db.event.domain.events.callout.*
 import com.simprints.id.data.db.event.domain.events.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.events.session.Device
 import com.simprints.id.data.db.event.domain.events.session.Location
-import com.simprints.id.data.db.event.domain.events.session.SessionEvent
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.remote.events.*
 import com.simprints.id.data.db.event.remote.events.callback.ApiCallbackEvent
 import com.simprints.id.data.db.event.remote.events.callout.ApiCalloutEvent
 import com.simprints.id.data.db.event.remote.session.ApiDatabaseInfo
 import com.simprints.id.data.db.event.remote.session.ApiDevice
 import com.simprints.id.data.db.event.remote.session.ApiLocation
-import com.simprints.id.data.db.event.remote.session.ApiSessionEvents
+import com.simprints.id.data.db.event.remote.session.ApiSessionCapture
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.testtools.TestApplication
@@ -452,7 +452,7 @@ class SessionEventAdapterFactoryTest {
 
     @Test
     fun validate_sessionApiModel() {
-        val session = SessionEvent(
+        val session = SessionCaptureEvent(
             "project_id",
             "appVersionName",
             "libVersionName",
@@ -467,7 +467,7 @@ class SessionEventAdapterFactoryTest {
                 AlertScreenEvent.AlertScreenEventType.INVALID_SELECTED_ID
             )
         )
-        val apiSession = ApiSessionEvents(session)
+        val apiSession = ApiSessionCapture(session)
         val json = gsonWithAdapters.toJsonTree(apiSession).asJsonObject
         validateSessionEventsApiModel(json)
     }

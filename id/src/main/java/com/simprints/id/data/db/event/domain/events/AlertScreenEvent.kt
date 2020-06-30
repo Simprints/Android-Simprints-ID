@@ -6,21 +6,21 @@ import java.util.*
 
 @Keep
 class AlertScreenEvent(
-    creationTime: Long,
+    createdAt: Long,
     alertType: AlertScreenPayload.AlertScreenEventType,
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    AlertScreenPayload(creationTime, DEFAULT_EVENT_VERSION, alertType)) {
+    AlertScreenPayload(createdAt, DEFAULT_EVENT_VERSION, alertType)) {
 
     @Keep
     class AlertScreenPayload(
-        creationTime: Long,
+        createdAt: Long,
         version: Int,
         val alertType: AlertScreenEventType
-    ) : EventPayload(EventPayloadType.ALERT_SCREEN, version, creationTime) {
+    ) : EventPayload(EventPayloadType.ALERT_SCREEN, version, createdAt) {
 
         enum class AlertScreenEventType {
             DIFFERENT_PROJECT_ID,

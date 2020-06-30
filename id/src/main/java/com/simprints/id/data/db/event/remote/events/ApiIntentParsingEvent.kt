@@ -16,11 +16,13 @@ class ApiIntentParsingEvent(domainEvent: IntentParsingEvent) :
 
 
     @Keep
-    class ApiIntentParsingPayload(val relativeStartTime: Long,
-                                  val integration: ApiIntegrationInfo) : ApiEventPayload(ApiEventPayloadType.INTENT_PARSING) {
+    class ApiIntentParsingPayload(createdAt: Long,
+                                  eventVersion: Int,
+                                  val integration: ApiIntegrationInfo) : ApiEventPayload(ApiEventPayloadType.INTENT_PARSING, eventVersion, createdAt) {
 
         constructor(domainPayload: IntentParsingPayload) : this(
-            domainPayload.creationTime,
+            domainPayload.createdAt,
+            domainPayload.eventVersion,
             domainPayload.integration.fromDomainToApi())
 
         @Keep

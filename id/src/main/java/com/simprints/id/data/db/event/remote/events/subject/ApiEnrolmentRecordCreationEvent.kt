@@ -16,16 +16,18 @@ class ApiEnrolmentRecordCreationEvent(domainEvent: EnrolmentRecordCreationEvent)
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    data class ApiEnrolmentRecordCreationPayload(
+    class ApiEnrolmentRecordCreationPayload(
+        createdAt: Long,
+        version: Int,
         val subjectId: String,
         val projectId: String,
         val moduleId: String,
         val attendantId: String,
         val biometricReferences: List<ApiBiometricReference>?
-    ) : ApiEventPayload(ApiEventPayloadType.ENROLMENT_RECORD_CREATION) {
+    ) : ApiEventPayload(ApiEventPayloadType.ENROLMENT_RECORD_CREATION, version, createdAt) {
 
         constructor(payload: EnrolmentRecordCreationPayload) :
-            this(payload.subjectId, payload.projectId, payload.moduleId,
+            this(payload.createdAt, payload.eventVersion, payload.subjectId, payload.projectId, payload.moduleId,
                 payload.attendantId, payload.biometricReferences.map { it.fromDomainToApi() })
     }
 }

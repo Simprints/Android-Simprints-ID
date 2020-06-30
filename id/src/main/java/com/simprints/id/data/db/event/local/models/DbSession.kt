@@ -2,7 +2,7 @@ package com.simprints.id.data.db.event.local.models
 
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.session.Device
-import com.simprints.id.data.db.event.domain.events.session.SessionEvent
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.toDomainEvent
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -29,7 +29,7 @@ open class DbSession : RealmObject {
 
     constructor()
 
-    constructor(sessionEvent: SessionEvent) : this() {
+    constructor(sessionEvent: SessionCaptureEvent) : this() {
         this.id = sessionEvent.id
         this.appVersionName = sessionEvent.appVersionName
         this.libVersionName = sessionEvent.libVersionName
@@ -58,8 +58,8 @@ open class DbSession : RealmObject {
     fun timeRelativeToStartTime(time: Long): Long = time - startTime
 }
 
-fun DbSession.toDomain(): SessionEvent {
-    val session = SessionEvent(id = id,
+fun DbSession.toDomain(): SessionCaptureEvent {
+    val session = SessionCaptureEvent(id = id,
         projectId = projectId,
         appVersionName = appVersionName,
         libVersionName = libVersionName,

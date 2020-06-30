@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.SessionQuery
 import com.simprints.id.data.db.event.domain.events.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.events.session.Device
-import com.simprints.id.data.db.event.domain.events.session.SessionEvent
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidator
 import com.simprints.id.data.db.event.local.models.DbSession
 import com.simprints.id.data.db.event.local.models.toDomain
@@ -60,7 +60,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
                     closeAnyOpenSession(reamInTrans)
 
                     val count = addQueryParams(reamInTrans, SessionQuery()).count().toInt()
-                    val session = SessionEvent(
+                    val session = SessionCaptureEvent(
                         SessionRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN,
                         appVersionName,
                         libSimprintsVersionName,
@@ -80,7 +80,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         }
     }
 
-    override suspend fun load(query: SessionQuery): Flow<SessionEvent> =
+    override suspend fun load(query: SessionQuery): Flow<SessionCaptureEvent> =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
                 realm.refresh()
@@ -114,19 +114,19 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         }
     }
 
-    override suspend fun updateCurrentSession(updateBlock: (SessionEvent) -> Unit) {
+    override suspend fun updateCurrentSession(updateBlock: (SessionCaptureEvent) -> Unit) {
         if(count(SessionQuery(openSession = true)) > 1) {
             Timber.d("More than 1 session open!")
         }
         updateFirstSession(SessionQuery(openSession = true), updateBlock)
     }
 
-    override suspend fun update(sessionId: String, updateBlock: (SessionEvent) -> Unit) {
+    override suspend fun update(sessionId: String, updateBlock: (SessionCaptureEvent) -> Unit) {
         updateFirstSession(SessionQuery(id = sessionId), updateBlock)
     }
 
 
-    private suspend fun updateFirstSession(query: SessionQuery, updateBlock: (SessionEvent) -> Unit) {
+    private suspend fun updateFirstSession(query: SessionQuery, updateBlock: (SessionCaptureEvent) -> Unit) {
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
                 realm.refresh()

@@ -5,7 +5,7 @@ import java.util.*
 
 @Keep
 class ScannerFirmwareUpdateEvent(
-    startTime: Long,
+    createdAt: Long,
     endTime: Long,
     chip: String,
     targetAppVersion: String,
@@ -15,16 +15,16 @@ class ScannerFirmwareUpdateEvent(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    ScannerFirmwareUpdatePayload(startTime, DEFAULT_EVENT_VERSION, endTime, chip, targetAppVersion, failureReason)) {
+    ScannerFirmwareUpdatePayload(createdAt, DEFAULT_EVENT_VERSION, endTime, chip, targetAppVersion, failureReason)) {
 
 
     @Keep
-    class ScannerFirmwareUpdatePayload(creationTime: Long,
-                                       version: Int,
+    class ScannerFirmwareUpdatePayload(createdAt: Long,
+                                       eventVersion: Int,
                                        val endTime: Long,
                                        val chip: String,
                                        val targetAppVersion: String,
                                        var failureReason: String? = null)
-        : EventPayload(EventPayloadType.SCANNER_FIRMWARE_UPDATE, version, creationTime)
+        : EventPayload(EventPayloadType.SCANNER_FIRMWARE_UPDATE, eventVersion, createdAt)
 
 }

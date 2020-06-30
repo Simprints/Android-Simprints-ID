@@ -8,7 +8,7 @@ import java.util.*
 
 @Keep
 class VerificationCalloutEvent(
-    creationTime: Long,
+    createdAt: Long,
     projectId: String,
     userId: String,
     moduleId: String,
@@ -19,16 +19,16 @@ class VerificationCalloutEvent(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    VerificationCalloutPayload(creationTime, DEFAULT_EVENT_VERSION, projectId, userId, moduleId, verifyGuid, metadata)) {
+    VerificationCalloutPayload(createdAt, DEFAULT_EVENT_VERSION, projectId, userId, moduleId, verifyGuid, metadata)) {
 
     @Keep
     class VerificationCalloutPayload(
-        creationTime: Long,
-        version: Int,
+        createdAt: Long,
+        eventVersion: Int,
         val projectId: String,
         val userId: String,
         val moduleId: String,
         val verifyGuid: String,
         val metadata: String
-    ) : EventPayload(EventPayloadType.CALLOUT_VERIFICATION, version, creationTime)
+    ) : EventPayload(EventPayloadType.CALLOUT_VERIFICATION, eventVersion, createdAt)
 }

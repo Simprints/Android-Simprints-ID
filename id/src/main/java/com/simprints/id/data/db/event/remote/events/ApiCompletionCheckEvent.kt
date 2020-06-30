@@ -12,10 +12,11 @@ class ApiCompletionCheckEvent(domainEvent: CompletionCheckEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiCompletionCheckPayload(val relativeStartTime: Long,
-                                    val completed: Boolean) : ApiEventPayload(ApiEventPayloadType.COMPLETION_CHECK) {
+    class ApiCompletionCheckPayload(createdAt: Long,
+                                    eventVersion: Int,
+                                    val completed: Boolean) : ApiEventPayload(ApiEventPayloadType.COMPLETION_CHECK, eventVersion, createdAt) {
 
         constructor(domainPayload: CompletionCheckPayload) :
-            this(domainPayload.creationTime, domainPayload.completed)
+            this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.completed)
     }
 }

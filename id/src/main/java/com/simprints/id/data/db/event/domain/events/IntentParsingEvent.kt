@@ -5,21 +5,21 @@ import java.util.*
 
 @androidx.annotation.Keep
 class IntentParsingEvent(
-    startTime: Long,
+    createdAt: Long,
     integration: IntentParsingPayload.IntegrationInfo,
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    IntentParsingPayload(startTime, DEFAULT_EVENT_VERSION, integration)) {
+    IntentParsingPayload(createdAt, DEFAULT_EVENT_VERSION, integration)) {
 
     @Keep
     class IntentParsingPayload(
-        creationTime: Long,
-        version: Int,
+        createdAt: Long,
+        eventVersion: Int,
         val integration: IntegrationInfo
-    ) : EventPayload(EventPayloadType.INTENT_PARSING, version, creationTime) {
+    ) : EventPayload(EventPayloadType.INTENT_PARSING, eventVersion, createdAt) {
 
         @Keep
         enum class IntegrationInfo {

@@ -16,14 +16,16 @@ class ApiEnrolmentRecordDeletionEvent(domainEvent: EnrolmentRecordDeletionEvent)
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    data class ApiEnrolmentRecordDeletionPayload(
+    class ApiEnrolmentRecordDeletionPayload(
+        createdAt: Long,
+        version: Int,
         val subjectId: String,
         val projectId: String,
         val moduleId: String,
         val attendantId: String
-    ) : ApiEventPayload(ApiEventPayloadType.ENROLMENT_RECORD_DELETION) {
+    ) : ApiEventPayload(ApiEventPayloadType.ENROLMENT_RECORD_DELETION, version, createdAt) {
 
         constructor(payload: EnrolmentRecordDeletionPayload) :
-            this(payload.subjectId, payload.projectId, payload.moduleId, payload.attendantId)
+            this(payload.createdAt, payload.eventVersion, payload.subjectId, payload.projectId, payload.moduleId, payload.attendantId)
     }
 }
