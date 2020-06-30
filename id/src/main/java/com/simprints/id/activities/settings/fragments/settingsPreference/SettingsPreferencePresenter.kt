@@ -120,7 +120,6 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     private fun handleLanguagePreferenceChanged(listPreference: ListPreference, stringValue: String): Boolean {
         val index = listPreference.findIndexOfValue(stringValue)
         preferencesManager.language = stringValue
-        LanguageHelper.language = stringValue
         logMessageForCrashReport("Language set to ${preferencesManager.language}")
 
         listPreference.summary = if (index >= 0) {
