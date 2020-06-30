@@ -1,10 +1,12 @@
 package com.simprints.id.data.db.event.remote.events.subject
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordDeletionEvent
 import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordMoveEvent
 import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload
-import com.simprints.id.data.db.event.remote.events.*
+import com.simprints.id.data.db.event.remote.events.ApiEvent
+import com.simprints.id.data.db.event.remote.events.ApiEventPayload
+import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType
+import com.simprints.id.data.db.event.remote.events.fromDomainToApi
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationEvent.ApiEnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionEvent.ApiEnrolmentRecordDeletionPayload
 
@@ -16,14 +18,17 @@ class ApiEnrolmentRecordMoveEvent(domainEvent: EnrolmentRecordMoveEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    data class ApiEnrolmentRecordMovePayload(
-        val enrolmentRecordCreation: ApiEnrolmentRecordCreationPayload,
+    class ApiEnrolmentRecordMovePayload(
+        createdAt: Long,
+        version: Int,
+        val enrolmentRecordCreation: ApiEnrolmentRecordCreationPayload?,
         val enrolmentRecordDeletion: ApiEnrolmentRecordDeletionPayload
-    ) : ApiEventPayload(ApiEventPayloadType.ENROLMENT_RECORD_MOVE) {
+    ) : ApiEventPayload(ApiEventPayloadType.ENROLMENT_RECORD_MOVE, version, createdAt) {
 
-        constructor(payload: EnrolmentRecordMovePayload) :
-            this(ApiEnrolmentRecordCreationPayload(payload.enrolmentRecordCreation
-                ?: throw IllegalStateException("Domain creation payload should always have biometric references")),
-                ApiEnrolmentRecordDeletionPayload(payload.enrolmentRecordDeletion))
+        constructor(payload: EnrolmentRecordMovePayload) : this(
+            payload.createdAt,
+            payload.eventVersion,
+            payload.enrolmentRecordCreation?.fromDomainToApi() as ApiEnrolmentRecordCreationPayload?,
+            payload.enrolmentRecordDeletion.fromDomainToApi() as ApiEnrolmentRecordDeletionPayload)
     }
 }

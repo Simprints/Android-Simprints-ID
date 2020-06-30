@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.domain.events.AlertScreenEvent.AlertScreen
 import com.simprints.id.data.db.event.domain.events.IntentParsingEvent
 import com.simprints.id.data.db.event.domain.events.InvalidIntentEvent
 import com.simprints.id.data.db.event.domain.events.SuspiciousIntentEvent
-import com.simprints.id.data.db.event.domain.events.session.SessionEvent
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -37,7 +37,7 @@ class ClientApiSessionRepositoryImplTest {
     @Test
     fun createSession_shouldInvokeCreateSessionAndAddIntentParsingEventInCoreLib() {
         runBlockingTest {
-            val session = mockk<SessionEvent>()
+            val session = mockk<SessionCaptureEvent>()
             every { session.id } returns UUID.randomUUID().toString()
             coEvery { coreSessionEventsMgrMock.getCurrentSession() } returns session
             clientSessionEventsMgr.createSession(IntegrationInfo.ODK)

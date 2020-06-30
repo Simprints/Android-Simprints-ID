@@ -9,19 +9,19 @@ import java.util.*
 
 @Keep
 class ErrorCallbackEvent(
-    creationTime: Long,
+    createdAt: Long,
     reason: ErrorCallbackPayload.Reason,
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    ErrorCallbackPayload(creationTime, DEFAULT_EVENT_VERSION, reason)) {
+    ErrorCallbackPayload(createdAt, DEFAULT_EVENT_VERSION, reason)) {
 
     @Keep
-    class ErrorCallbackPayload(creationTime: Long,
+    class ErrorCallbackPayload(createdAt: Long,
                                eventVersion: Int,
-                               val reason: Reason) : EventPayload(EventPayloadType.CALLBACK_ERROR, eventVersion, creationTime) {
+                               val reason: Reason) : EventPayload(EventPayloadType.CALLBACK_ERROR, eventVersion, createdAt) {
 
         enum class Reason {
             DIFFERENT_PROJECT_ID_SIGNED_IN,

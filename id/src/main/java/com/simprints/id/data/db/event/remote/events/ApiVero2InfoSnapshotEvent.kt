@@ -14,9 +14,10 @@ class ApiVero2InfoSnapshotEvent(domainEvent: Vero2InfoSnapshotEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiVero2InfoSnapshotPayload(val relativeStartTime: Long,
-                                      val version: ApiVero2Version,
-                                      val battery: ApiBatteryInfo) : ApiEventPayload(ApiEventPayloadType.VERO_2_INFO_SNAPSHOT) {
+    class ApiVero2InfoSnapshotPayload(createdAt: Long,
+                                      eventVersion: Int,
+                                      val scannerVersion: ApiVero2Version,
+                                      val battery: ApiBatteryInfo) : ApiEventPayload(ApiEventPayloadType.VERO_2_INFO_SNAPSHOT, eventVersion, createdAt) {
 
         @Keep
         class ApiVero2Version(val master: Long,
@@ -46,7 +47,8 @@ class ApiVero2InfoSnapshotEvent(domainEvent: Vero2InfoSnapshotEvent) :
         }
 
         constructor(domainPayload: Vero2InfoSnapshotPayload) :
-            this(domainPayload.creationTime,
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
                 ApiVero2Version(domainPayload.version),
                 ApiBatteryInfo(domainPayload.battery))
     }

@@ -13,10 +13,11 @@ class ApiOneToManyMatchEvent(domainEvent: OneToManyMatchEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiOneToManyMatchPayload(val relativeStartTime: Long,
+    class ApiOneToManyMatchPayload(createdAt: Long,
+                                   eventVersion: Int,
                                    val relativeEndTime: Long,
                                    val pool: ApiMatchPool,
-                                   val result: List<ApiMatchEntry>?) : ApiEventPayload(ApiEventPayloadType.ONE_TO_MANY_MATCH) {
+                                   val result: List<ApiMatchEntry>?) : ApiEventPayload(ApiEventPayloadType.ONE_TO_MANY_MATCH, eventVersion, createdAt) {
 
         @Keep
         class ApiMatchPool(val type: ApiMatchPoolType, val count: Int) {
@@ -32,7 +33,8 @@ class ApiOneToManyMatchEvent(domainEvent: OneToManyMatchEvent) :
         }
 
         constructor(domainPayload: OneToManyMatchPayload) :
-            this(domainPayload.creationTime,
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
                 domainPayload.endTime,
                 ApiMatchPool(domainPayload.pool),
                 domainPayload.result?.map { ApiMatchEntry(it) })

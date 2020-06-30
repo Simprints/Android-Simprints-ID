@@ -12,11 +12,12 @@ class ApiEnrolmentEvent(domainEvent: EnrolmentEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiEnrolmentPayload(val relativeStartTime: Long,
-                              val personId: String) : ApiEventPayload(ApiEventPayloadType.ENROLMENT) {
+    class ApiEnrolmentPayload(createdAt: Long,
+                              eventVersion: Int,
+                              val personId: String) : ApiEventPayload(ApiEventPayloadType.ENROLMENT, eventVersion, createdAt) {
 
         constructor(domainPayload: EnrolmentPayload) :
-            this(domainPayload.creationTime, domainPayload.personId)
+            this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.personId)
     }
 
 }

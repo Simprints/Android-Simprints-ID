@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.remote
 
-import com.simprints.id.data.db.event.domain.events.session.SessionEvent
-import com.simprints.id.data.db.event.remote.session.ApiSessionEvents
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.remote.session.ApiSessionCapture
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
@@ -11,7 +11,7 @@ class SessionRemoteDataSourceImpl(
 ) : SessionRemoteDataSource {
 
     override suspend fun uploadSessions(projectId: String,
-                                        sessions: List<SessionEvent>) {
+                                        sessions: List<SessionCaptureEvent>) {
         if (sessions.isEmpty()) {
             throw NoSessionsFoundException()
         }
@@ -19,7 +19,7 @@ class SessionRemoteDataSourceImpl(
         executeCall("uploadSessionsBatch") { sessionsRemoteInterface ->
             sessionsRemoteInterface.uploadSessions(
                 projectId,
-                hashMapOf("sessions" to sessions.map { ApiSessionEvents(it) }.toTypedArray())
+                hashMapOf("sessions" to sessions.map { ApiSessionCapture(it) }.toTypedArray())
             )
         }
     }

@@ -17,11 +17,12 @@ class ApiCandidateReadEvent(domainEvent: AuthorizationEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiCandidateReadPayload(val relativeStartTime: Long,
-                                  val relativeEndTime: Long,
+    class ApiCandidateReadPayload(createdAt: Long,
+                                  eventVersion: Int,
+                                  val endedAt: Long,
                                   val candidateId: String,
                                   val localResult: ApiLocalResult,
-                                  val remoteResult: ApiRemoteResult?) : ApiEventPayload(CANDIDATE_READ) {
+                                  val remoteResult: ApiRemoteResult?) : ApiEventPayload(CANDIDATE_READ, eventVersion, createdAt) {
 
         @Keep
         enum class ApiLocalResult {
@@ -34,7 +35,8 @@ class ApiCandidateReadEvent(domainEvent: AuthorizationEvent) :
         }
 
         constructor(domainPayload: CandidateReadPayload) :
-            this(domainPayload.creationTime,
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
                 domainPayload.endTime,
                 domainPayload.candidateId,
                 domainPayload.localResult.fromDomainToApi(),

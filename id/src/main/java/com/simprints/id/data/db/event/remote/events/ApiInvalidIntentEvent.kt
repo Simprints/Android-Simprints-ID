@@ -12,12 +12,14 @@ class ApiInvalidIntentEvent(domainEvent: InvalidIntentEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiInvalidIntentPayload(val relativeStartTime: Long,
+    class ApiInvalidIntentPayload(createdAt: Long,
+                                  eventVersion: Int,
                                   val action: String,
-                                  val extras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.INVALID_INTENT) {
+                                  val extras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.INVALID_INTENT, eventVersion, createdAt) {
 
         constructor(domainPayload: InvalidIntentPayload) :
-            this(domainPayload.creationTime,
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
                 domainPayload.action,
                 domainPayload.extras)
     }

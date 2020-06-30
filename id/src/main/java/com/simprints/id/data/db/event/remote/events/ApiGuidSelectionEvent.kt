@@ -13,11 +13,13 @@ class ApiGuidSelectionEvent(domainEvent: GuidSelectionEvent) :
 
 
     @Keep
-    class ApiGuidSelectionPayload(val relativeStartTime: Long,
-                                  val selectedId: String) : ApiEventPayload(ApiEventPayloadType.GUID_SELECTION) {
+    class ApiGuidSelectionPayload(createdAt: Long,
+                                  eventVersion: Int,
+                                  val selectedId: String) : ApiEventPayload(ApiEventPayloadType.GUID_SELECTION, eventVersion, createdAt) {
 
         constructor(domainPayload: GuidSelectionPayload) :
-            this(domainPayload.creationTime,
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
                 domainPayload.selectedId)
     }
 }

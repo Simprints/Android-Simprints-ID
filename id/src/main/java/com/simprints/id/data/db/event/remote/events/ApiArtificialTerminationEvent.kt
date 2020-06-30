@@ -16,11 +16,12 @@ class ApiArtificialTerminationEvent(domainEvent: ArtificialTerminationEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiArtificialTerminationPayload(val relativeStartTime: Long,
-                                          val reason: ApiReason) : ApiEventPayload(ApiEventPayloadType.ARTIFICIAL_TERMINATION) {
+    class ApiArtificialTerminationPayload(createdAt: Long,
+                                          version: Int,
+                                          val reason: ApiReason) : ApiEventPayload(ApiEventPayloadType.ARTIFICIAL_TERMINATION, version, createdAt) {
 
         constructor(domainPayload: ArtificialTerminationPayload) :
-            this(domainPayload.creationTime, domainPayload.reason.fromDomainToApi())
+            this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.reason.fromDomainToApi())
 
         @Keep
         enum class ApiReason {

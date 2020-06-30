@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.remote.events
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.ALERT_SCREEN_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.ARTIFICIAL_TERMINATION_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.AUTHENTICATION_SERIALISED
@@ -27,6 +28,7 @@ import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.PERSON_CR
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.REFUSAL_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.SCANNER_CONNECTION_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.SCANNER_FIRMWARE_UPDATE_SERIALISED
+import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.SESSION_CAPTURE_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.SUSPICIOUS_INTENT_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.VERO_2_INFO_SNAPSHOT_SERIALISED
 
@@ -57,7 +59,8 @@ enum class ApiEventPayloadType(val apiName: String) {
     @SerializedName(INVALID_INTENT_SERIALISED) INVALID_INTENT(INVALID_INTENT_SERIALISED),
     @SerializedName(SUSPICIOUS_INTENT_SERIALISED) SUSPICIOUS_INTENT(SUSPICIOUS_INTENT_SERIALISED),
     @SerializedName(INTENT_PARSING_SERIALISED) INTENT_PARSING(INTENT_PARSING_SERIALISED),
-    @SerializedName(COMPLETION_CHECK_SERIALISED) COMPLETION_CHECK(COMPLETION_CHECK_SERIALISED)
+    @SerializedName(COMPLETION_CHECK_SERIALISED) COMPLETION_CHECK(COMPLETION_CHECK_SERIALISED),
+    @SerializedName(SESSION_CAPTURE_SERIALISED) SESSION_CAPTURE(SESSION_CAPTURE_SERIALISED)
 }
 
 private object SerialisedApiNames {
@@ -87,43 +90,76 @@ private object SerialisedApiNames {
     const val SUSPICIOUS_INTENT_SERIALISED = "SuspiciousIntent"
     const val INTENT_PARSING_SERIALISED = "IntentParsing"
     const val COMPLETION_CHECK_SERIALISED = "CompletionCheck"
+    const val SESSION_CAPTURE_SERIALISED = "SessionCapture"
 }
 
 
 fun EventPayloadType.fromDomainToApi() = when (this) {
-    EventPayloadType.ENROLMENT_RECORD_CREATION -> ApiEventPayloadType.ENROLMENT_RECORD_CREATION
-    EventPayloadType.ENROLMENT_RECORD_DELETION -> ApiEventPayloadType.ENROLMENT_RECORD_DELETION
-    EventPayloadType.ENROLMENT_RECORD_MOVE -> ApiEventPayloadType.ENROLMENT_RECORD_MOVE
-    EventPayloadType.ARTIFICIAL_TERMINATION -> TODO()
-    EventPayloadType.AUTHENTICATION -> TODO()
-    EventPayloadType.CONSENT -> TODO()
-    EventPayloadType.ENROLMENT -> TODO()
-    EventPayloadType.AUTHORIZATION -> TODO()
-    EventPayloadType.FINGERPRINT_CAPTURE -> TODO()
-    EventPayloadType.ONE_TO_ONE_MATCH -> TODO()
-    EventPayloadType.ONE_TO_MANY_MATCH -> TODO()
-    EventPayloadType.PERSON_CREATION -> TODO()
-    EventPayloadType.ALERT_SCREEN -> TODO()
-    EventPayloadType.GUID_SELECTION -> TODO()
-    EventPayloadType.CONNECTIVITY_SNAPSHOT -> TODO()
-    EventPayloadType.REFUSAL -> TODO()
-    EventPayloadType.CANDIDATE_READ -> TODO()
-    EventPayloadType.SCANNER_CONNECTION -> TODO()
-    EventPayloadType.VERO_2_INFO_SNAPSHOT -> TODO()
-    EventPayloadType.SCANNER_FIRMWARE_UPDATE -> TODO()
-    EventPayloadType.INVALID_INTENT -> TODO()
-    EventPayloadType.CALLOUT_CONFIRMATION -> TODO()
-    EventPayloadType.CALLOUT_IDENTIFICATION -> TODO()
-    EventPayloadType.CALLOUT_ENROLMENT -> TODO()
-    EventPayloadType.CALLOUT_VERIFICATION -> TODO()
-    EventPayloadType.CALLOUT_LAST_BIOMETRICS -> TODO()
-    EventPayloadType.CALLBACK_IDENTIFICATION -> TODO()
-    EventPayloadType.CALLBACK_ENROLMENT -> TODO()
-    EventPayloadType.CALLBACK_REFUSAL -> TODO()
-    EventPayloadType.CALLBACK_VERIFICATION -> TODO()
-    EventPayloadType.CALLBACK_ERROR -> TODO()
-    EventPayloadType.SUSPICIOUS_INTENT -> TODO()
-    EventPayloadType.INTENT_PARSING -> TODO()
-    EventPayloadType.COMPLETION_CHECK -> TODO()
-    EventPayloadType.CALLBACK_CONFIRMATION -> TODO()
+    ENROLMENT_RECORD_CREATION -> ApiEventPayloadType.ENROLMENT_RECORD_CREATION
+    ENROLMENT_RECORD_DELETION -> ApiEventPayloadType.ENROLMENT_RECORD_DELETION
+    ARTIFICIAL_TERMINATION -> TODO()
+    AUTHENTICATION -> TODO()
+    CONSENT -> TODO()
+    ENROLMENT -> TODO()
+    AUTHORIZATION -> TODO()
+    FINGERPRINT_CAPTURE -> TODO()
+    ONE_TO_ONE_MATCH -> TODO()
+    ONE_TO_MANY_MATCH -> TODO()
+    PERSON_CREATION -> TODO()
+    ALERT_SCREEN -> TODO()
+    GUID_SELECTION -> TODO()
+    CONNECTIVITY_SNAPSHOT -> TODO()
+    REFUSAL -> TODO()
+    CANDIDATE_READ -> TODO()
+    SCANNER_CONNECTION -> TODO()
+    VERO_2_INFO_SNAPSHOT -> TODO()
+    SCANNER_FIRMWARE_UPDATE -> TODO()
+    INVALID_INTENT -> TODO()
+    CALLOUT_CONFIRMATION -> TODO()
+    CALLOUT_IDENTIFICATION -> TODO()
+    CALLOUT_ENROLMENT -> TODO()
+    CALLOUT_VERIFICATION -> TODO()
+    CALLOUT_LAST_BIOMETRICS -> TODO()
+    CALLBACK_IDENTIFICATION -> TODO()
+    CALLBACK_ENROLMENT -> TODO()
+    CALLBACK_REFUSAL -> TODO()
+    CALLBACK_VERIFICATION -> TODO()
+    CALLBACK_ERROR -> TODO()
+    SUSPICIOUS_INTENT -> TODO()
+    INTENT_PARSING -> TODO()
+    COMPLETION_CHECK -> TODO()
+    CALLBACK_CONFIRMATION -> TODO()
+    SESSION_CAPTURE -> TODO()
+    ENROLMENT_RECORD_MOVE -> TODO()
 }
+
+fun ApiEventPayloadType.fromApiToDomain() =
+    when (this) {
+        ApiEventPayloadType.ENROLMENT_RECORD_CREATION -> EventPayloadType.ENROLMENT_RECORD_CREATION
+        ApiEventPayloadType.ENROLMENT_RECORD_DELETION -> EventPayloadType.ENROLMENT_RECORD_DELETION
+        ApiEventPayloadType.ENROLMENT_RECORD_MOVE -> EventPayloadType.ENROLMENT_RECORD_MOVE
+        ApiEventPayloadType.ARTIFICIAL_TERMINATION -> TODO()
+        ApiEventPayloadType.AUTHENTICATION -> TODO()
+        ApiEventPayloadType.CONSENT -> TODO()
+        ApiEventPayloadType.ENROLMENT -> TODO()
+        ApiEventPayloadType.AUTHORIZATION -> TODO()
+        ApiEventPayloadType.FINGERPRINT_CAPTURE -> TODO()
+        ApiEventPayloadType.ONE_TO_ONE_MATCH -> TODO()
+        ApiEventPayloadType.ONE_TO_MANY_MATCH -> TODO()
+        ApiEventPayloadType.PERSON_CREATION -> TODO()
+        ApiEventPayloadType.ALERT_SCREEN -> TODO()
+        ApiEventPayloadType.GUID_SELECTION -> TODO()
+        ApiEventPayloadType.CONNECTIVITY_SNAPSHOT -> TODO()
+        ApiEventPayloadType.REFUSAL -> TODO()
+        ApiEventPayloadType.CANDIDATE_READ -> TODO()
+        ApiEventPayloadType.SCANNER_CONNECTION -> TODO()
+        ApiEventPayloadType.VERO_2_INFO_SNAPSHOT -> TODO()
+        ApiEventPayloadType.SCANNER_FIRMWARE_UPDATE -> TODO()
+        ApiEventPayloadType.INVALID_INTENT -> TODO()
+        ApiEventPayloadType.CALLBACK -> TODO()
+        ApiEventPayloadType.CALLOUT -> TODO()
+        ApiEventPayloadType.SUSPICIOUS_INTENT -> TODO()
+        ApiEventPayloadType.INTENT_PARSING -> TODO()
+        ApiEventPayloadType.COMPLETION_CHECK -> TODO()
+        ApiEventPayloadType.SESSION_CAPTURE -> TODO()
+    }

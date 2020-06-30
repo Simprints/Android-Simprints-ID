@@ -16,18 +16,19 @@ class ApiFingerprintCaptureEvent(domainEvent: FingerprintCaptureEvent) :
 
     @Keep
     class ApiFingerprintCapturePayload(val id: String,
-                                       val relativeStartTime: Long,
+                                       createdAt: Long,
+                                       eventVersion: Int,
                                        val relativeEndTime: Long,
                                        val qualityThreshold: Int,
                                        val finger: ApiFingerIdentifier,
                                        val result: ApiResult,
-                                       val fingerprint: ApiFingerprint?) : ApiEventPayload(ApiEventPayloadType.FINGERPRINT_CAPTURE) {
+                                       val fingerprint: ApiFingerprint?) : ApiEventPayload(ApiEventPayloadType.FINGERPRINT_CAPTURE, eventVersion, createdAt) {
 
         @Keep
         class ApiFingerprint(val finger: ApiFingerIdentifier, val quality: Int, val template: String) {
 
             constructor(finger: FingerprintCapturePayload.Fingerprint) : this(
-                ApiFingerIdentifier.valueOf(finger.finger.toString()),
+                finger.finger.fromDomainToApi(),
                 finger.quality, finger.template)
         }
 
@@ -42,7 +43,8 @@ class ApiFingerprintCaptureEvent(domainEvent: FingerprintCaptureEvent) :
 
         constructor(domainPayload: FingerprintCapturePayload) :
             this(domainPayload.id,
-                domainPayload.creationTime,
+                domainPayload.createdAt,
+                domainPayload.eventVersion,
                 domainPayload.endTime,
                 domainPayload.qualityThreshold,
                 domainPayload.finger.fromDomainToApi(),

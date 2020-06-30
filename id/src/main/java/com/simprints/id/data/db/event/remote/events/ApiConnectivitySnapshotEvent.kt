@@ -16,9 +16,10 @@ class ApiConnectivitySnapshotEvent(domainEvent: ConnectivitySnapshotEvent) :
 
     @Keep
     class ApiConnectivitySnapshotPayload(
-        val relativeStartTime: Long,
+        createdAt: Long,
+        eventVersion: Int,
         val networkType: String,
-        val connections: List<ApiConnection>) : ApiEventPayload(ApiEventPayloadType.CONNECTIVITY_SNAPSHOT) {
+        val connections: List<ApiConnection>) : ApiEventPayload(ApiEventPayloadType.CONNECTIVITY_SNAPSHOT, eventVersion, createdAt) {
 
         @Keep
         class ApiConnection(val type: String, val state: String) {
@@ -27,7 +28,8 @@ class ApiConnectivitySnapshotEvent(domainEvent: ConnectivitySnapshotEvent) :
         }
 
         constructor(domainPayload: ConnectivitySnapshotPayload) :
-            this(domainPayload.creationTime,
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
                 domainPayload.networkType,
                 domainPayload.connections.map { ApiConnection(it) })
     }

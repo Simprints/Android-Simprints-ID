@@ -9,3 +9,6 @@ open class ApiDatabaseInfo(var recordCount: Int?,
     constructor(databaseInfo: DatabaseInfo) :
         this(databaseInfo.recordCount, databaseInfo.sessionCount)
 }
+
+fun DatabaseInfo.fromDomainToApi() =
+    ApiDatabaseInfo(recordCount, sessionCount)

@@ -15,10 +15,11 @@ class ApiRefusalEvent(domainEvent: RefusalEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiRefusalPayload(val relativeStartTime: Long,
+    class ApiRefusalPayload(createdAt: Long,
+                            eventVersion: Int,
                             val relativeEndTime: Long,
                             val reason: ApiAnswer,
-                            val otherText: String) : ApiEventPayload(ApiEventPayloadType.REFUSAL) {
+                            val otherText: String) : ApiEventPayload(ApiEventPayloadType.REFUSAL, eventVersion, createdAt) {
 
         @Keep
         enum class ApiAnswer {
@@ -31,11 +32,12 @@ class ApiRefusalEvent(domainEvent: RefusalEvent) :
             OTHER
         }
 
-        constructor(domainPayload: RefusalPayload) :
-            this(domainPayload.creationTime,
-                domainPayload.endTime,
-                domainPayload.reason.toApiRefusalEventAnswer(),
-                domainPayload.otherText)
+        constructor(domainPayload: RefusalPayload) : this(
+            domainPayload.createdAt,
+            domainPayload.eventVersion,
+            domainPayload.endTime,
+            domainPayload.reason.toApiRefusalEventAnswer(),
+            domainPayload.otherText)
     }
 }
 

@@ -12,14 +12,16 @@ class ApiScannerFirmwareUpdateEvent(domainEvent: ScannerFirmwareUpdateEvent) :
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiScannerFirmwareUpdatePayload(val relativeStartTime: Long,
+    class ApiScannerFirmwareUpdatePayload(createdAt: Long,
+                                          eventVersion: Int,
                                           val relativeEndTime: Long,
                                           val chip: String,
                                           val targetAppVersion: String,
-                                          val failureReason: String?) : ApiEventPayload(ApiEventPayloadType.SCANNER_FIRMWARE_UPDATE) {
+                                          val failureReason: String?) : ApiEventPayload(ApiEventPayloadType.SCANNER_FIRMWARE_UPDATE, eventVersion, createdAt) {
 
         constructor(domainPayload: ScannerFirmwareUpdatePayload) :
-            this(domainPayload.creationTime,
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
                 domainPayload.endTime,
                 domainPayload.chip,
                 domainPayload.targetAppVersion,

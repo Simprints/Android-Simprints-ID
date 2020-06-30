@@ -8,7 +8,7 @@ import java.util.*
 
 @Keep
 class IdentificationCalloutEvent(
-    creationTime: Long,
+    createdAt: Long,
     projectId: String,
     userId: String,
     moduleId: String,
@@ -18,15 +18,15 @@ class IdentificationCalloutEvent(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    IdentificationCalloutPayload(creationTime, DEFAULT_EVENT_VERSION, projectId, userId, moduleId, metadata)) {
+    IdentificationCalloutPayload(createdAt, DEFAULT_EVENT_VERSION, projectId, userId, moduleId, metadata)) {
 
     @Keep
     class IdentificationCalloutPayload(
-        creationTime: Long,
-        version: Int,
+        createdAt: Long,
+        eventVersion: Int,
         val projectId: String,
         val userId: String,
         val moduleId: String,
         val metadata: String?
-    ) : EventPayload(EventPayloadType.CALLOUT_IDENTIFICATION, version, creationTime)
+    ) : EventPayload(EventPayloadType.CALLOUT_IDENTIFICATION, eventVersion, createdAt)
 }
