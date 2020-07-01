@@ -48,7 +48,6 @@ class SetupActivity: BaseSplitActivity() {
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionRepository: SessionRepository
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var viewModelFactory: SetupViewModelFactory
 
     private lateinit var setupRequest: SetupRequest
@@ -56,10 +55,6 @@ class SetupActivity: BaseSplitActivity() {
     private val viewModel: SetupViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(SetupViewModel::class.java)
     }
-
-    @Inject lateinit var locationManager: LocationManager
-    @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var sessionRepository: SessionRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         injectDependencies()
@@ -198,7 +193,7 @@ class SetupActivity: BaseSplitActivity() {
 
     private fun updateUiForDownloadTakingLonger() {
         with(modalityDownloadText){
-            text = androidResourcesHelper.getString(R.string.modality_download_taking_longer)
+            text = getString(R.string.modality_download_taking_longer)
             isVisible = true
         }
         with(modalityDownloadProgressBar) {
