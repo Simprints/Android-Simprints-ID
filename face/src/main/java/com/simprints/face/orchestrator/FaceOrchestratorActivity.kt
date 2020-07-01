@@ -3,7 +3,6 @@ package com.simprints.face.orchestrator
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.whenNonNull

@@ -67,7 +67,10 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
         }
     }
 
-    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int,  params: Array<Any>) { message.text = getString(stringRes, params) }
+    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int,  params: Array<Any>) {
+        message.text = String.format(getString(stringRes), *params)
+    }
+
     override fun getTranslatedString(@StringRes stringRes: Int) = getString(stringRes)
 
     override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
