@@ -9,8 +9,7 @@ import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
-import com.simprints.id.domain.alert.AlertActivityViewModel.ButtonAction
-import com.simprints.id.domain.alert.AlertActivityViewModel.ENROLMENT_LAST_BIOMETRICS_FAILED
+import com.simprints.id.domain.alert.AlertActivityViewModel.*
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.alert.fromAlertToAlertTypeEvent
 import com.simprints.id.domain.modality.Modality
@@ -68,19 +67,40 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     private fun getParamsForMessageString(): List<Any> {
-        return if (alertViewModel == ENROLMENT_LAST_BIOMETRICS_FAILED) {
-            with(preferencesManager.modalities) {
-                when {
-                    isFingerprintAndFace() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_all_param)) }
-                    isFace() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_face_param)) }
-                    isFingerprint() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_fingerprint_param)) }
-                    else -> {
-                        emptyList<String>()
-                    }
-                }
+        return when (alertViewModel) {
+            ENROLMENT_LAST_BIOMETRICS_FAILED -> {
+               getParamsForLastBiometricsFailedAlert()
             }
-        } else {
-            emptyList<String>()
+            MODALITY_DOWNLOAD_CANCELLED -> {
+                getParamsForModalityDownloadCancelledAlert()
+            }
+            else -> {
+                emptyList()
+            }
+        }
+    }
+
+    private fun getParamsForLastBiometricsFailedAlert() =  with(preferencesManager.modalities) {
+        when {
+            isFingerprintAndFace() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_all_param)) }
+            isFace() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_face_param)) }
+            isFingerprint() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_fingerprint_param)) }
+            else -> {
+                emptyList()
+            }
+        }
+    }
+
+    private fun getParamsForModalityDownloadCancelledAlert() = with(preferencesManager.modalities) {
+        when {
+            isFingerprintAndFace() -> {
+                listOf(view.getTranslatedString(R.string.fingerprint_face_feature_alert)) }
+            isFace() -> {
+                listOf(view.getTranslatedString(R.string.face_feature_alert)) }
+            isFingerprint() -> {
+                listOf(view.getTranslatedString(R.string.fingerprint_feature_alert)) }
+            else -> {
+                emptyList() }
         }
     }
 

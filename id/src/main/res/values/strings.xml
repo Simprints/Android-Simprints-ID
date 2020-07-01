@@ -98,7 +98,7 @@
     <string name="alert_try_again">Try again</string>
     <string name="enrol_last_biometrics_alert_title">Unable to save</string>
     <string name="modality_installation_offline_title">Error in downloading modalities</string>
-    <string name="feature_not_downloaded_title">Simprints feature not downloaded</string>
+    <string name="feature_not_downloaded_title">Simprints download incomplete</string>
 
     <!-- Error Message Text -->
     <string name="different_projectId_message">A configuration error has occurred (different Project Id), please sign out from the home screen or contact your system administrator</string>
@@ -112,7 +112,10 @@
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">Fingerprint</string>
     <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
     <string name="modality_installation_offline">Check Wi-Fi or mobile data is turned on in settings to complete download</string>
-    <string name="feature_not_downloaded">To use Simprints, please download the necessary features</string>
+    <string name="feature_not_downloaded">To use Simprints please continue and download the %1$s</string>
+    <string name="fingerprint_feature_alert">fingerprint feature</string>
+    <string name="face_feature_alert">face feature</string>
+    <string name="fingerprint_face_feature_alert">fingerprint and face features</string>
 
     <!-- Button Labels For Error Messages -->
     <string name="close">CLOSE</string>
