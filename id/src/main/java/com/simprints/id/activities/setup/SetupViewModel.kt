@@ -14,6 +14,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag.ID_SETUP
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger.NETWORK
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.id.tools.extensions.trace
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -24,6 +25,7 @@ class SetupViewModel(val deviceManager: DeviceManager,
                      private val crashReportManager: CrashReportManager) : ViewModel() {
 
     internal val scope by lazy { viewModelScope }
+    private val modalityDownloadTrace by lazy { trace("modalityDownload") }
 
     fun getViewStateLiveData(): LiveData<SetupActivity.ViewState> = viewStateLiveData
     fun getDeviceNetworkLiveData(): LiveData<SetupActivity.ViewState> =
@@ -80,6 +82,7 @@ class SetupViewModel(val deviceManager: DeviceManager,
                         }
                         INSTALLED -> {
                             logMessageForCrashReport("Modalities Installed")
+                            modalityDownloadTrace.stop()
                             viewStateLiveData.postValue(ModalitiesInstalled)
                         }
                         INSTALLING -> {
@@ -88,6 +91,7 @@ class SetupViewModel(val deviceManager: DeviceManager,
                         }
                         PENDING -> {
                             logMessageForCrashReport("Starting modality download")
+                            modalityDownloadTrace.start()
                             viewStateLiveData.postValue(StartingDownload)
                         }
                     }
@@ -101,8 +105,6 @@ class SetupViewModel(val deviceManager: DeviceManager,
 
     fun reStartDownloadIfNecessary(splitInstallManager: SplitInstallManager, modalitiesRequired: List<String>) {
         viewModelScope.launch {
-            Timber.d("Setup - Restarting download: ${splitInstallManager.requestSessionStates().last()}")
-            Timber.d("Setup - Restarting modalities download: ${!isModalityInstallOnGoing(splitInstallManager)}")
             if (!isModalityInstallOnGoing(splitInstallManager)) {
                 logMessageForCrashReport("Restarting modalities download")
                 splitInstallManager.cancelInstall(splitInstallManager.requestSessionStates().last().sessionId())
