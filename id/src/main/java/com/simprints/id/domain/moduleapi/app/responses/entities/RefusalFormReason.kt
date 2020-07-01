@@ -21,6 +21,7 @@ fun CoreExitFormReason.fromDomainToModuleApi(): RefusalFormReason =
         CoreExitFormReason.REFUSED_DATA_CONCERNS -> RefusalFormReason.REFUSED_DATA_CONCERNS
         CoreExitFormReason.REFUSED_PERMISSION -> RefusalFormReason.REFUSED_PERMISSION
         CoreExitFormReason.SCANNER_NOT_WORKING -> RefusalFormReason.SCANNER_NOT_WORKING
+        CoreExitFormReason.APP_NOT_WORKING -> RefusalFormReason.APP_NOT_WORKING
         CoreExitFormReason.REFUSED_NOT_PRESENT -> RefusalFormReason.REFUSED_NOT_PRESENT
         CoreExitFormReason.REFUSED_YOUNG -> RefusalFormReason.REFUSED_YOUNG
         CoreExitFormReason.OTHER -> RefusalFormReason.OTHER

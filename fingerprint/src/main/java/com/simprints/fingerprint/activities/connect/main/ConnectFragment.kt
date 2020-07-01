@@ -11,14 +11,11 @@ import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.confirmscannererror.ConfirmScannerErrorBuilder
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 abstract class ConnectFragment(@LayoutRes private val layout: Int) : FingerprintFragment() {
 
     protected val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
-    protected val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
 
     private var scannerErrorConfirmationDialog: AlertDialog? = null
 
@@ -72,7 +69,7 @@ abstract class ConnectFragment(@LayoutRes private val layout: Int) : Fingerprint
     private fun buildConfirmScannerErrorAlertDialog(scannerId: String) =
         ConfirmScannerErrorBuilder()
             .build(
-                requireContext(), androidResourcesHelper, scannerId,
+                requireContext(), scannerId,
                 onYes = { connectScannerViewModel.handleScannerDisconnectedYesClick() },
                 onNo = { connectScannerViewModel.handleScannerDisconnectedNoClick() }
             )

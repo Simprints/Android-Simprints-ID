@@ -5,7 +5,7 @@ import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
 import androidx.multidex.MultiDexApplication
 import com.google.android.play.core.splitcompat.SplitCompat
-import com.simprints.id.tools.LanguageHelper
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.di.*
 import com.simprints.id.tools.logging.LoggingConfigHelper
 import com.simprints.id.tools.logging.NoLoggingConfigHelper
@@ -30,7 +30,6 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
     override fun attachBaseContext(base: Context) {
         LanguageHelper.init(base)
         val ctx = LanguageHelper.getLanguageConfigurationContext(base)
-        println("Testing language: ${ctx.getString(R.string.launch_consent_accept_button)}")
         super.attachBaseContext(ctx)
         SplitCompat.install(this)
     }
@@ -110,7 +109,6 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
         factory { component.getFaceIdentityLocalDataSource() }
         factory { component.getImprovedSharedPreferences() }
         factory { component.getRemoteConfigWrapper() }
-        factory { component.getAndroidResourcesHelper() }
         factory { orchestratorComponent.getFlowManager() }
         factory { component.getPersonRepository() }
         factory { component.getImageRepository() }

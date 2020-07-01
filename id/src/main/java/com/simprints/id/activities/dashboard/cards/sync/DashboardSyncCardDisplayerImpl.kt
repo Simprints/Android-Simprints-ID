@@ -1,5 +1,6 @@
 package com.simprints.id.activities.dashboard.cards.sync
 
+import android.content.Context
 import android.graphics.PorterDuff
 import android.view.View
 import android.view.View.GONE
@@ -14,7 +15,6 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
@@ -24,13 +24,13 @@ import java.util.*
 import kotlin.math.min
 
 
-class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResourcesHelper,
-                                     val timeHelper: TimeHelper) : DashboardSyncCardDisplayer {
+class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSyncCardDisplayer {
 
     var tickerToUpdateLastSyncTimeText: ReceiveChannel<Unit>? = null
     private var lastSyncTimeTextView: TextView? = null
     private var cachedLastSyncTime: Date? = null
 
+    private lateinit var ctx: Context
     private lateinit var root: LinearLayout
     private lateinit var viewForDefaultState: View
     private lateinit var viewForSyncFailedState: View
@@ -45,7 +45,8 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     override val userWantsToOpenSettings = MutableLiveData<LiveDataEvent>()
     override val userWantsToSync = MutableLiveData<LiveDataEvent>()
 
-    override fun initRoot(syncCardsRootLayout: LinearLayout) {
+    override fun initRoot(syncCardsRootLayout: LinearLayout, context: Context) {
+        ctx = context
         root = syncCardsRootLayout
         viewForDefaultState = createViewForSyncState(R.layout.activity_dashboard_card_sync_default, root)
         viewForSyncFailedState = createViewForSyncState(R.layout.activity_dashboard_card_sync_failed, root)
@@ -101,8 +102,8 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
         withVisible(viewForCompleteState) {
             progressCardConnectingProgress().visibility = GONE
             withVisible(progressCardStateText()) {
-                setTextColor(androidResourcesHelper.getColorStateList(R.color.simprints_green_dark))
-                text = androidResourcesHelper.getString(R.string.dashboard_sync_card_complete)
+                setTextColor(ctx.getColorStateList(R.color.simprints_green_dark))
+                text = ctx.getString(R.string.dashboard_sync_card_complete)
             }
             withVisible(progressCardSyncProgress()) {
                 setSyncProgress(100, 100)
@@ -136,7 +137,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
                 } else {
                     ""
                 }
-                text = androidResourcesHelper.getString(R.string.dashboard_sync_card_progress, arrayOf(percentageText))
+                text =  String.format(ctx.getString(R.string.dashboard_sync_card_progress), percentageText)
                 textColor = getDefaultGrayTextColor(viewForConnectingState)
             }
             withVisible(progressCardSyncProgress()) {
@@ -216,7 +217,7 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
         lastSyncTime?.let {
             val lastSyncTimeText = timeHelper.readableBetweenNowAndTime(it)
             textView.visibility = VISIBLE
-            textView.text = androidResourcesHelper.getString(R.string.dashboard_card_sync_last_sync, arrayOf(lastSyncTimeText))
+            textView.text = String.format(ctx.getString(R.string.dashboard_card_sync_last_sync), lastSyncTimeText)
         } ?: run { textView.visibility = GONE }
     }
 
@@ -236,9 +237,9 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     // Hacky way to extract the color from the title and use for the other TextViews
     private fun getDefaultGrayTextColor(view: View): Int = view.textViewCardTitle().textColors.defaultColor
 
-    private fun getString(res: Int) = androidResourcesHelper.getString(res)
+    private fun getString(res: Int) = ctx.getString(res)
 
-    private fun getDefaultColor(colorState: Int) = androidResourcesHelper.getColorStateList(colorState)?.defaultColor
+    private fun getDefaultColor(colorState: Int) = ctx.getColorStateList(colorState)?.defaultColor
 
     private fun View.textViewCardTitle() = this.findViewById<TextView>(R.id.dashboard_sync_card_title)
     private fun View.progressCardConnectingProgress() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)

@@ -5,6 +5,7 @@ import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
@@ -53,7 +54,9 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
                     addEventIfFingerprintCaptureResponse(it)
                 }
             }
-            isFaceResult(requestCode) -> faceEnrolProcessor.processResult(requestCode, resultCode, data)
+            isFaceResult(requestCode) -> faceEnrolProcessor.processResult(requestCode, resultCode, data).also {
+                addEventIfFaceCaptureResponse(it)
+            }
             else -> throw IllegalStateException("Invalid result from intent")
         }
         completeAllStepsIfExitFormHappened(requestCode, resultCode, data)
@@ -67,4 +70,10 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
             extractFingerprintAndAddPersonCreationEvent(it)
         }
     }
+
+    private suspend fun addEventIfFaceCaptureResponse(response: Step.Result?) {
+        if (response is FaceCaptureResponse)
+            extractFaceAndAddPersonCreationEvent(response)
+    }
+
 }

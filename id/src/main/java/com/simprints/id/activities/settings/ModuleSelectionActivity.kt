@@ -1,20 +1,23 @@
 package com.simprints.id.activities.settings
 
+import android.content.Context
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
-import com.simprints.id.tools.AndroidResourcesHelper
+import com.simprints.core.tools.utils.LanguageHelper
 import kotlinx.android.synthetic.main.settings_toolbar.*
-import javax.inject.Inject
 
 class ModuleSelectionActivity : BaseSplitActivity() {
 
     private lateinit var moduleSelectionFragment: ModuleSelectionFragment
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+
+    override fun attachBaseContext(newBase: Context) {
+        val languageCtx = LanguageHelper.getLanguageConfigurationContext(newBase)
+        super.attachBaseContext(languageCtx)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +26,7 @@ class ModuleSelectionActivity : BaseSplitActivity() {
         setContentView(R.layout.settings_toolbar)
         configureToolbar()
         moduleSelectionFragment = ModuleSelectionFragment(application as Application)
-        title = androidResourcesHelper.getString(R.string.preference_select_modules_title)
+        title = getString(R.string.preference_select_modules_title)
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.prefContent, moduleSelectionFragment)

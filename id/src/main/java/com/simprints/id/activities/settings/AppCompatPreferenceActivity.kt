@@ -1,5 +1,6 @@
 package com.simprints.id.activities.settings
 
+import android.content.Context
 import android.os.Bundle
 import android.preference.PreferenceActivity
 import android.view.MenuInflater
@@ -8,12 +9,18 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import com.simprints.core.tools.utils.LanguageHelper
 
 /**
  * A [android.preference.PreferenceActivity] which implements and proxies the necessary calls
  * to be used with AppCompat.
  */
 abstract class AppCompatPreferenceActivity : PreferenceActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        val languageCtx = LanguageHelper.getLanguageConfigurationContext(newBase)
+        super.attachBaseContext(languageCtx)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -54,7 +54,6 @@ import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsS
 import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsSyncMasterWorker
 import com.simprints.id.services.scheduledSync.subjects.up.workers.SubjectsUpSyncCountWorker
 import com.simprints.id.services.scheduledSync.subjects.up.workers.SubjectsUpSyncUploaderWorker
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import dagger.BindsInstance
 import dagger.Component
@@ -146,7 +145,6 @@ interface AppComponent {
     fun getAnalyticsManager(): AnalyticsManager
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
-    fun getAndroidResourcesHelper(): AndroidResourcesHelper
     fun getImageRepository(): ImageRepository
     fun getSimClientFactory(): SimApiClientFactory
 }

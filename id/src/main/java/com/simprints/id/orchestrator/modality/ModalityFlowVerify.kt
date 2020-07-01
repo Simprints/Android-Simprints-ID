@@ -2,8 +2,8 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
@@ -90,6 +90,7 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
         } else if (result is FaceCaptureResponse) {
             val query = Query(subjectId = appRequest.verifyGuid)
             addMatchingStepForFace(result.capturingResult.mapNotNull { it.result }, query)
+            extractFaceAndAddPersonCreationEvent(result)
         }
     }
 
@@ -102,10 +103,8 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
     }
 
     private fun completeAllStepsIfFetchGuidResponseAndFailed(result: Step.Result?) {
-        if (result is FetchGUIDResponse) {
-            if (!result.isGuidFound) {
-                steps.forEach { it.setStatus(Step.Status.COMPLETED) }
-            }
+        if (result is FetchGUIDResponse && !result.isGuidFound) {
+            steps.forEach { it.setStatus(Step.Status.COMPLETED) }
         }
     }
 }
