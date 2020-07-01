@@ -9,7 +9,6 @@ import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
 import com.simprints.fingerprint.activities.collect.resources.*
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import kotlinx.android.synthetic.main.fragment_finger.*
@@ -20,7 +19,6 @@ class FingerFragment : FingerprintFragment() {
 
     private val vm: CollectFingerprintsViewModel by sharedViewModel()
 
-    private val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
     private val fingerprintPreferencesManager: FingerprintPreferencesManager by inject()
 
     private lateinit var fingerId: FingerIdentifier
@@ -53,20 +51,20 @@ class FingerFragment : FingerprintFragment() {
     }
 
     private fun updateFingerNameText() {
-        fingerNumberText.text = androidResourcesHelper.getString(fingerId.nameTextId())
+        fingerNumberText.text = getString(fingerId.nameTextId())
         fingerNumberText.setTextColor(resources.getColor(fingerId.nameTextColour(), null))
     }
 
     private fun CollectFingerprintsState.updateFingerResultText() {
         fingerStates.find { it.id == fingerId }?.run {
-            fingerResultText.text = androidResourcesHelper.getString(resultTextId())
+            fingerResultText.text = getString(resultTextId())
             fingerResultText.setTextColor(resources.getColor(resultTextColour(), null))
         }
     }
 
     private fun CollectFingerprintsState.updateFingerDirectionText() {
         fingerStates.find { it.id == fingerId }?.run {
-            fingerDirectionText.text = androidResourcesHelper.getString(directionTextId(isOnLastFinger()))
+            fingerDirectionText.text = getString(directionTextId(isOnLastFinger()))
             fingerDirectionText.setTextColor(resources.getColor(directionTextColour(), null))
         }
     }

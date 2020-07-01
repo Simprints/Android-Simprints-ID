@@ -13,6 +13,7 @@ import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.TimeHelperImpl
@@ -61,6 +62,7 @@ class SessionRepositoryImplTest {
 
     private fun mockPreferenceManagerInfo() {
         every { preferencesManagerMock.language } returns LANGUAGE
+        every { preferencesManagerMock.modalities } returns listOf(Modality.FINGER)
     }
 
     @Test
@@ -68,7 +70,15 @@ class SessionRepositoryImplTest {
         runBlocking {
             sessionsRepository.createSession(LIB_VERSION_NAME)
 
-            coVerify(exactly = 1) { sessionLocalDataSourceMock.create(APP_VERSION_NAME, LIB_VERSION_NAME, LANGUAGE, DEVICE_ID) }
+            coVerify(exactly = 1) {
+                sessionLocalDataSourceMock.create(
+                    APP_VERSION_NAME,
+                    LIB_VERSION_NAME,
+                    LANGUAGE,
+                    DEVICE_ID,
+                    listOf(Modality.FINGER)
+                )
+            }
             coVerify(exactly = 1) { preferencesManagerMock.language }
         }
     }

@@ -6,12 +6,12 @@ import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.simprints.clientapi.R
-import com.simprints.clientapi.activities.commcare.CommCareAction
+import com.simprints.clientapi.activities.BaseSplitActivity
 import com.simprints.clientapi.activities.errors.request.AlertActRequest
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
-import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_error.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.backgroundColor
@@ -19,10 +19,9 @@ import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
 
-class ErrorActivity : AppCompatActivity(), ErrorContract.View {
+class ErrorActivity : BaseSplitActivity(), ErrorContract.View {
 
     override val presenter: ErrorContract.Presenter by inject { parametersOf(this) }
-    private val androidResHelper: AndroidResourcesHelper by inject()
 
     private lateinit var clientApiAlertType: ClientApiAlert
 
@@ -43,10 +42,8 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
     }
 
     private fun setTextInLayout() {
-        with(androidResHelper) {
-            alert_image.contentDescription = getString(R.string.main_error_graphic)
-            textView_close_button.text = getString(R.string.close)
-        }
+        alert_image.contentDescription = getString(R.string.main_error_graphic)
+        textView_close_button.text = getString(R.string.close)
     }
 
     override fun closeActivity() {
@@ -74,9 +71,9 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
         imageView_error_hint.visibility = if (isHintVisible) VISIBLE else GONE
     }
 
-    override fun getStringFromResources(res: Int): String = androidResHelper.getString(res)
+    override fun getStringFromResources(res: Int): String = getString(res)
 
-    override fun getColourFromResources(colourId: Int): Int = androidResHelper.getColour(colourId)
+    override fun getColourFromResources(colourId: Int): Int = ContextCompat.getColor(this, colourId)
 
     override fun onBackPressed() {
         presenter.handleCloseOrBackClick()

@@ -10,7 +10,6 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.issues.ota.OtaFragmentRequest
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -21,7 +20,6 @@ import org.koin.android.viewmodel.ext.android.viewModel
 
 class OtaRecoveryFragment : FingerprintFragment() {
 
-    private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
     private val timeHelper: FingerprintTimeHelper by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
 
@@ -45,15 +43,13 @@ class OtaRecoveryFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        with(resourceHelper) {
-            otaRecoveryTitleTextView.text = getString(R.string.ota_recovery_title)
-            tryAgainButton.text = getString(R.string.try_again_label)
-            otaRecoveryInstructionsTextView.text = getString(when (args.otaRecoveryFragmentRequest.recoveryStrategy) {
-                OtaRecoveryStrategy.HARD_RESET -> R.string.ota_recovery_hard_reset
-                OtaRecoveryStrategy.SOFT_RESET,
-                OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY -> R.string.ota_recovery_soft_reset
-            })
-        }
+        otaRecoveryTitleTextView.text = getString(R.string.ota_recovery_title)
+        tryAgainButton.text = getString(R.string.try_again_label)
+        otaRecoveryInstructionsTextView.text = getString(when (args.otaRecoveryFragmentRequest.recoveryStrategy) {
+            OtaRecoveryStrategy.HARD_RESET -> R.string.ota_recovery_hard_reset
+            OtaRecoveryStrategy.SOFT_RESET,
+            OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY -> R.string.ota_recovery_soft_reset
+        })
     }
 
     private fun setupTryAgainButton() {

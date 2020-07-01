@@ -12,8 +12,11 @@ import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResu
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
+import com.simprints.face.error.ErrorType
 import com.simprints.moduleapi.face.requests.IFaceCaptureRequest
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
+import com.simprints.moduleapi.face.responses.IFaceErrorReason
+import com.simprints.moduleapi.face.responses.IFaceErrorResponse
 import com.simprints.moduleapi.face.responses.IFaceMatchResponse
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.every
@@ -68,13 +71,23 @@ class FaceOrchestratorViewModelTest {
     @Test
     fun `route user to invalid license flow if needed`() {
         viewModel.invalidLicense()
-        assertThat(viewModel.invalidLicenseEvent.value).isNotNull()
+        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LicenseInvalid)
+        viewModel.finishWithError(ErrorType.LicenseInvalid)
+        viewModel.flowFinished.value?.peekContent()?.let { response ->
+            assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
+            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.UNEXPECTED_ERROR)
+        }
     }
 
     @Test
     fun `route user to missing license flow if needed`() {
         viewModel.missingLicense()
-        assertThat(viewModel.missingLicenseEvent.value).isNotNull()
+        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LicenseMissing)
+        viewModel.finishWithError(ErrorType.LicenseMissing)
+        viewModel.flowFinished.value?.peekContent()?.let { response ->
+            assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
+            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.UNEXPECTED_ERROR)
+        }
     }
 
     private fun generateCaptureRequest(captures: Int) = mockk<IFaceCaptureRequest> {

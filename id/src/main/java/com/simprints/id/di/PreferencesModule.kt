@@ -2,6 +2,8 @@ package com.simprints.id.di
 
 import android.content.SharedPreferences
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_FILE_NAME
+import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_MODE
 import com.simprints.id.Application
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
@@ -45,7 +47,7 @@ open class PreferencesModule {
     @Singleton
     fun provideSharedPreferences(
         app: Application
-    ): SharedPreferences = app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
+    ): SharedPreferences = app.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
 
     @Provides
     @Singleton

@@ -9,7 +9,7 @@ class InitialConnectFragment : ConnectFragment(R.layout.fragment_initial_connect
 
     override fun observeScannerEvents() {
         connectScannerViewModel.progress.fragmentObserveWith { connectScannerProgressBar.progress = it }
-        connectScannerViewModel.message.fragmentObserveWith { connectScannerInfoTextView.text = androidResourcesHelper.getString(it) }
+        connectScannerViewModel.message.fragmentObserveWith { connectScannerInfoTextView.text = getString(it) }
         connectScannerViewModel.showScannerErrorDialogWithScannerId.fragmentObserveEventWith { showDialogForScannerErrorConfirmation(it) }
     }
 }
