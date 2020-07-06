@@ -264,6 +264,6 @@ class SetupActivity: BaseSplitActivity() {
     companion object {
         const val PERMISSIONS_REQUEST_CODE = 99
         const val MODALITIES_DOWNLOAD_REQUEST_CODE = 199
-        const val SLOW_DOWNLOAD_DELAY_THRESHOLD = 30000L
+        const val SLOW_DOWNLOAD_DELAY_THRESHOLD = 15000L
     }
 }
