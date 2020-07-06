@@ -231,7 +231,7 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
                 requireContext(),
                 if (valid) UCR.color.capture_green else UCR.color.capture_grey
             )
-        capture_progress.value = vm.captures.size.toFloat()
+        capture_progress.value = vm.userCaptures.size.toFloat()
     }
 
     private fun toggleCaptureButtons(valid: Boolean) {
