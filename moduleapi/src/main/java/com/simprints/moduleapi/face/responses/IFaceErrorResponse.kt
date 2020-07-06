@@ -6,5 +6,6 @@ interface IFaceErrorResponse : IFaceResponse {
 
 // TODO: create new errors: LICENSE_MISSING, LICENSE_INVALID
 enum class IFaceErrorReason {
-    UNEXPECTED_ERROR
+    UNEXPECTED_ERROR,
+    FACE_CONFIGURATION_ERROR
 }

@@ -39,4 +39,5 @@ fun ErrorCallbackEvent.Reason.fromDomainToApi() =
         FACE_LICENSE_MISSING -> ApiErrorCallback.ApiReason.FACE_LICENSE_MISSING
         FACE_LICENSE_INVALID -> ApiErrorCallback.ApiReason.FACE_LICENSE_INVALID
         FINGERPRINT_CONFIGURATION_ERROR -> ApiErrorCallback.ApiReason.UNEXPECTED_ERROR
+        FACE_CONFIGURATION_ERROR -> ApiErrorCallback.ApiReason.UNEXPECTED_ERROR
     }

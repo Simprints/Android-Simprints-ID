@@ -13,10 +13,12 @@ data class FaceErrorResponse(val faceErrorReason: FaceErrorReason): FaceResponse
 fun IFaceErrorResponse.fromModuleApiToDomain() = FaceErrorResponse(reason.fromModuleApiToDomain())
 
 enum class FaceErrorReason {
-    UNEXPECTED_ERROR
+    UNEXPECTED_ERROR,
+    FACE_CONFIGURATION_ERROR
 }
 
 fun IFaceErrorReason.fromModuleApiToDomain() = when (this) {
     IFaceErrorReason.UNEXPECTED_ERROR -> FaceErrorReason.UNEXPECTED_ERROR
+    IFaceErrorReason.FACE_CONFIGURATION_ERROR -> FaceErrorReason.FACE_CONFIGURATION_ERROR
 }
 
