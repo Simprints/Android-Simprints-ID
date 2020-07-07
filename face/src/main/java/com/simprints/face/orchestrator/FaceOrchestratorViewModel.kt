@@ -73,7 +73,7 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
             UI,
             message = "License is missing"
         )
-        errorEvent.send(ErrorType.LicenseMissing)
+        errorEvent.send(ErrorType.LICENSE_MISSING)
     }
 
     fun invalidLicense() {
@@ -83,7 +83,7 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
             UI,
             message = "License is invalid"
         )
-        errorEvent.send(ErrorType.LicenseInvalid)
+        errorEvent.send(ErrorType.LICENSE_INVALID)
     }
 
 }
