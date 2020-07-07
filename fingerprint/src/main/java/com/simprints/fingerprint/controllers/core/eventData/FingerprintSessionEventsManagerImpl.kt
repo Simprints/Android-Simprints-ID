@@ -3,11 +3,10 @@ package com.simprints.fingerprint.controllers.core.eventData
 import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.SessionRepository
 import com.simprints.id.tools.ignoreException
 import io.reactivex.Completable
 import kotlinx.coroutines.runBlocking
-import com.simprints.id.data.db.session.domain.models.events.Event as CoreEvent
 
 class FingerprintSessionEventsManagerImpl(private val sessionRepository: SessionRepository) : FingerprintSessionEventsManager {
 

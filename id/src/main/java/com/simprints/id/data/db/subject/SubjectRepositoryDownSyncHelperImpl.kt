@@ -1,17 +1,16 @@
 package com.simprints.id.data.db.subject
 
 import com.google.gson.stream.JsonReader
+import com.simprints.id.data.db.event.remote.events.fromApiToDomainOrNullIfNoBiometricReferences
+import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
+import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload
+import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationPayload
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMovePayload
 import com.simprints.id.data.db.subject.domain.Subject.Companion.buildSubjectFromCreationPayload
-import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
-import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordDeletionPayload
-import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordMovePayload
-import com.simprints.id.data.db.subject.domain.subjectevents.fromApiToDomainOrNullIfNoBiometricReferences
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordCreationPayload
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordDeletionPayload
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordMovePayload
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
@@ -30,6 +29,7 @@ import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.Reader
 import java.util.*
+import com.simprints.id.data.db.event.remote.events.ApiEventNew as ApiEvent
 
 class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLocalDataSource,
                                           private val eventRemoteDataSource: EventRemoteDataSource,

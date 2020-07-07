@@ -5,15 +5,15 @@ import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.SubjectsCount
+import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
+import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
+import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload
+import com.simprints.id.data.db.event.remote.events.ApiEvent
+import com.simprints.id.data.db.event.remote.events.fromApiToDomainOrNullIfNoBiometricReferences
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.Subject.Companion.buildSubjectFromCreationPayload
-import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
-import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordMovePayload
-import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.*
-import com.simprints.id.data.db.subject.domain.subjectevents.fromApiToDomainOrNullIfNoBiometricReferences
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
@@ -95,6 +95,7 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
                         SubjectFetchResult(buildSubjectFromCreationPayload(it), REMOTE)
                     } ?: SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
                 }
+                else -> throw Throwable("To change") //StopShip
             }
         } ?: SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
     }

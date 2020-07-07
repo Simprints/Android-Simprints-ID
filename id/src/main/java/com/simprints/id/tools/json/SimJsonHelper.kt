@@ -4,10 +4,11 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.subject.remote.models.subjectevents.*
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiBiometricReferenceType.FACE_REFERENCE
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiBiometricReferenceType.FINGERPRINT_REFERENCE
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEventPayloadType.*
+import com.simprints.id.data.db.event.remote.events.ApiEventPayload
+import com.simprints.id.data.db.event.remote.events.subject.*
+import com.simprints.id.data.db.event.remote.events.subject.ApiBiometricReferenceType.FACE_REFERENCE
+import com.simprints.id.data.db.event.remote.events.subject.ApiBiometricReferenceType.FINGERPRINT_REFERENCE
+import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.*
 
 object SimJsonHelper {
     private val gsonBuilder: GsonBuilder by lazy {

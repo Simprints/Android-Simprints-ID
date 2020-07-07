@@ -1,7 +1,7 @@
 package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent as CorePersonCreationEvent
+import com.simprints.id.data.db.event.domain.events.PersonCreationEvent as CorePersonCreationEvent
 
 @Keep
 class PersonCreationEvent(startTime: Long,

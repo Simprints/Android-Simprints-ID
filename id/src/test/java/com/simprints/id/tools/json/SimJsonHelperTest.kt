@@ -2,10 +2,10 @@ package com.simprints.id.tools.json
 
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.reflect.TypeToken
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordCreationPayload
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordDeletionPayload
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordMovePayload
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationPayload
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMovePayload
+import com.simprints.id.data.db.event.remote.events.ApiEvent
 import org.junit.Test
 
 class SimJsonHelperTest {

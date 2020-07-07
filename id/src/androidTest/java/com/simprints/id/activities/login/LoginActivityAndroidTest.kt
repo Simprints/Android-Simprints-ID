@@ -8,7 +8,7 @@ import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestLoginModule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
+import com.simprints.id.data.db.event.domain.events.AuthenticationEvent
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule

@@ -4,12 +4,12 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.*
-import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
+import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.domain.events.*
+import com.simprints.id.data.db.event.domain.events.callout.IdentificationCalloutEvent
 import com.simprints.libsimprints.BuildConfig
 import kotlinx.coroutines.runBlocking
-import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
+import com.simprints.id.data.db.event.domain.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
 
 class ClientApiSessionEventsManagerImpl(private val coreSessionRepository: SessionRepository,
                                         private val timeHelper: ClientApiTimeHelper) :

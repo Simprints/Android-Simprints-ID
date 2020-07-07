@@ -3,7 +3,7 @@ package com.simprints.face.controllers.core.image
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.SessionRepository
 import timber.log.Timber
 import com.simprints.id.data.images.model.Path as CorePath
 
