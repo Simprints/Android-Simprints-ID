@@ -7,10 +7,9 @@ import com.simprints.id.domain.modality.Modes
 data class Events(val events: List<Event>)
 
 @Keep
-open class Event(val id: String,
-                 val version: Int,
-                 val labels: List<EventLabel>,
-                 val payload: EventPayload) {
+abstract class Event(val id: String,
+                     val labels: List<EventLabel>,
+                     val payload: EventPayload) {
 
     companion object {
         const val DEFAULT_EVENT_VERSION = 0
