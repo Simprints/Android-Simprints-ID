@@ -24,11 +24,11 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorI
 class ModalityFlowEnrolImplTest {
 
     companion object {
-        const val NUMBER_STEPS_FACE_OR_FINGER = 3
-        const val NUMBER_STEPS_FACE_AND_FINGER = 4
+        const val NUMBER_STEPS_FACE_OR_FINGER = 4
+        const val NUMBER_STEPS_FACE_AND_FINGER = 6
 
-        const val NUMBER_STEPS_FACE_OR_FINGER_WITHOUT_CONSENT = 2
-        const val NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT = 3
+        const val NUMBER_STEPS_FACE_OR_FINGER_WITHOUT_CONSENT = 3
+        const val NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT = 5
     }
 
     private lateinit var modalityFlowEnrol: ModalityFlowEnrolImpl
@@ -53,6 +53,8 @@ class ModalityFlowEnrolImplTest {
 
         every { fingerprintStepProcessor.buildStepToCapture() } returns fingerprintStepMock
         every { faceStepProcessor.buildCaptureStep() } returns faceStepMock
+        every { fingerprintStepProcessor.buildConfigurationStep() } returns fingerprintStepMock
+        every { faceStepProcessor.buildConfigurationStep() } returns faceStepMock
         every { coreStepProcessor.buildStepConsent(any()) } returns consentStepMock
         every { coreStepProcessor.buildStepSetup(any()) } returns setupStepMock
     }
@@ -108,9 +110,11 @@ class ModalityFlowEnrolImplTest {
         verify(exactly = 1) { faceStepProcessor.buildCaptureStep() }
 
         with(modalityFlowEnrol.steps) {
-            assertThat(get(0).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
-            assertThat(get(1).activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
-            assertThat(get(2).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(0).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(1).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+            assertThat(get(2).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
+            assertThat(get(3).activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
+            assertThat(get(4).activityName).isEqualTo(FACE_ACTIVITY_NAME)
         }
     }
 
@@ -123,9 +127,11 @@ class ModalityFlowEnrolImplTest {
         verify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
 
         with(modalityFlowEnrol.steps) {
-            assertThat(get(0).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
-            assertThat(get(1).activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
-            assertThat(get(2).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+            assertThat(get(0).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+            assertThat(get(1).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(2).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
+            assertThat(get(3).activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
+            assertThat(get(4).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -139,8 +145,10 @@ class ModalityFlowEnrolImplTest {
         verify(exactly = 1) { faceStepProcessor.buildCaptureStep() }
 
         with(modalityFlowEnrol.steps) {
-            assertThat(get(0).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
-            assertThat(get(1).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(0).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(1).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+            assertThat(get(2).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
+            assertThat(get(3).activityName).isEqualTo(FACE_ACTIVITY_NAME)
         }
     }
 
@@ -153,8 +161,10 @@ class ModalityFlowEnrolImplTest {
         verify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
 
         with(modalityFlowEnrol.steps) {
-            assertThat(get(0).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
-            assertThat(get(1).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+            assertThat(get(0).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+            assertThat(get(1).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(2).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
+            assertThat(get(3).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
