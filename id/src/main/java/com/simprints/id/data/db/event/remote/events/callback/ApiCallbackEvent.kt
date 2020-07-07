@@ -2,7 +2,6 @@ package com.simprints.id.data.db.event.remote.events.callback
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.EventPayload
 import com.simprints.id.data.db.event.domain.events.callback.ConfirmationCallbackEvent.ConfirmationCallbackPayload
 import com.simprints.id.data.db.event.domain.events.callback.EnrolmentCallbackEvent.EnrolmentCallbackPayload
 import com.simprints.id.data.db.event.domain.events.callback.ErrorCallbackEvent.ErrorCallbackPayload
@@ -15,10 +14,11 @@ import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.CALLBACK
 import com.simprints.id.data.db.event.remote.events.fromDomainToApi
 
 @Keep
-class ApiCallbackEvent(id: String,
-                       labels: List<Event.EventLabel>,
-                       payload: EventPayload) :
-    ApiEvent(id, labels.fromDomainToApi(), payload.fromDomainToApi()) {
+class ApiCallbackEvent(domainEvent: Event) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
 
     @Keep
     class ApiCallbackPayload(

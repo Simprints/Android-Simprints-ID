@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.remote.session
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.AuthorizationEvent
 import com.simprints.id.data.db.event.domain.events.session.Location
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.db.event.remote.events.ApiEvent
 import com.simprints.id.data.db.event.remote.events.ApiEventPayload
@@ -11,7 +12,7 @@ import com.simprints.id.data.db.event.remote.events.fromDomainToApi
 import java.util.*
 
 @Keep
-class ApiSessionCapture(domainEvent: AuthorizationEvent) :
+class ApiSessionCapture(domainEvent: SessionCaptureEvent) :
     ApiEvent(
         domainEvent.id,
         domainEvent.labels.fromDomainToApi(),

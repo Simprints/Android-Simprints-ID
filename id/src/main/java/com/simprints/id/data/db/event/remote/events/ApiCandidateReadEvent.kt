@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.AuthorizationEvent
+import com.simprints.id.data.db.event.domain.events.CandidateReadEvent
 import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload
 import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.RemoteResult
@@ -10,7 +11,7 @@ import com.simprints.id.data.db.event.remote.events.ApiCandidateReadEvent.ApiCan
 import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.CANDIDATE_READ
 
 @Keep
-class ApiCandidateReadEvent(domainEvent: AuthorizationEvent) :
+class ApiCandidateReadEvent(domainEvent: CandidateReadEvent) :
     ApiEvent(
         domainEvent.id,
         domainEvent.labels.fromDomainToApi(),
