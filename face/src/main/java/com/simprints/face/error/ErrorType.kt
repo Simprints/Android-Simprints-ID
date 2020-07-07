@@ -9,22 +9,21 @@ import com.simprints.id.R as IDR
 import com.simprints.uicomponents.R as UIR
 
 @Keep
-sealed class ErrorType(
+enum class ErrorType(
     @StringRes val title: Int,
     @StringRes val message: Int,
     @StringRes val buttonText: Int,
     @ColorRes val backgroundColor: Int,
     @DrawableRes val mainDrawable: Int
 ) {
-    object LicenseMissing : ErrorType(
+    LICENSE_MISSING(
         R.string.error_licence_missing_title,
         R.string.error_licence_missing_message,
         R.string.error_licence_missing_button,
         IDR.color.simprints_grey,
         UIR.drawable.ic_exclamation_92dp
-    )
-
-    object LicenseInvalid : ErrorType(
+    ),
+    LICENSE_INVALID(
         R.string.error_licence_invalid_title,
         R.string.error_licence_invalid_message,
         R.string.error_licence_invalid_button,
