@@ -367,6 +367,7 @@ open class SettingsPreferencesManagerImpl(
         const val FACE_MAX_RETRIES_DEFAULT = 2
         const val FACE_QUALITY_THRESHOLD = "FaceQualityThreshold"
         const val FACE_QUALITY_THRESHOLD_DEFAULT = -1f
+
         const val FACE_NB_OF_FRAMES_CAPTURED = "FaceNbOfFramesCaptured"
         const val FACE_NB_OF_FRAMES_CAPTURED_DEFAULT = 2
         const val FACE_MATCH_THRESHOLD = "FaceMatchThreshold"

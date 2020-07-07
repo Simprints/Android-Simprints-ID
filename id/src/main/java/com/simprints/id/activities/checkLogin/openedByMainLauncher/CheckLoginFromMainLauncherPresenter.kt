@@ -20,6 +20,7 @@ class CheckLoginFromMainLauncherPresenter(
     }
 
     override suspend fun handleSignedInUser() {
+        super.handleSignedInUser()
         view.openDashboardActivity()
     }
 
