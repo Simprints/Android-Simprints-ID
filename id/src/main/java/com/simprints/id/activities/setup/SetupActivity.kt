@@ -134,7 +134,7 @@ class SetupActivity: BaseSplitActivity() {
                 }
             }
         }
-        setResultAndFinish(true)
+        setResultAndFinish(SETUP_COMPLETE_FLAG)
     }
 
     private fun askPermissionsOrPerformSpecificActions() {
@@ -149,11 +149,11 @@ class SetupActivity: BaseSplitActivity() {
 
     private fun performPermissionActionsAndFinish() {
         storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
-        setResultAndFinish(true)
+        setResultAndFinish(SETUP_COMPLETE_FLAG)
     }
 
-    private fun setResultAndFinish(setupComplete: Boolean) {
-        setResult(Activity.RESULT_OK, buildIntentForResponse(setupComplete))
+    private fun setResultAndFinish(setupCompleteFlag: Boolean) {
+        setResult(Activity.RESULT_OK, buildIntentForResponse(setupCompleteFlag))
         finish()
     }
 
@@ -224,7 +224,7 @@ class SetupActivity: BaseSplitActivity() {
     private fun tryToGetAlertActResponseAndHandleAction(data: Intent?) =
         data?.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
             when(it.buttonAction) {
-                CLOSE -> setResultAndFinish(false)
+                CLOSE -> setResultAndFinish(SETUP_NOT_COMPLETE_FLAG)
                 TRY_AGAIN -> viewModel.reStartDownloadIfNecessary(splitInstallManager, getRequiredModules())
             }
         }
@@ -251,6 +251,10 @@ class SetupActivity: BaseSplitActivity() {
         askPermissionsOrPerformSpecificActions()
     }
 
+    override fun onBackPressed() {
+        setResultAndFinish(SETUP_NOT_COMPLETE_FLAG)
+    }
+
     sealed class ViewState {
         object StartingDownload : ViewState()
         class RequiresUserConfirmationToDownload(val state: SplitInstallSessionState): ViewState()
@@ -262,8 +266,10 @@ class SetupActivity: BaseSplitActivity() {
     }
 
     companion object {
-        const val PERMISSIONS_REQUEST_CODE = 99
-        const val MODALITIES_DOWNLOAD_REQUEST_CODE = 199
-        const val SLOW_DOWNLOAD_DELAY_THRESHOLD = 15000L
+        private const val PERMISSIONS_REQUEST_CODE = 99
+        private const val MODALITIES_DOWNLOAD_REQUEST_CODE = 199
+        private const val SLOW_DOWNLOAD_DELAY_THRESHOLD = 15000L
+        private const val SETUP_COMPLETE_FLAG = true
+        private const val SETUP_NOT_COMPLETE_FLAG = false
     }
 }
