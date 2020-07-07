@@ -19,7 +19,8 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         ENROLMENT_LAST_BIOMETRICS_FAILED,
         FACE_LICENSE_MISSING,
         FACE_LICENSE_INVALID,
-        FINGERPRINT_CONFIGURATION_ERROR;
+        FINGERPRINT_CONFIGURATION_ERROR,
+        FACE_CONFIGURATION_ERROR;
 
         companion object {
             fun fromDomainAlertTypeToAppErrorType(alertType: AlertType) =
