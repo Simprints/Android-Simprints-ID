@@ -71,8 +71,8 @@ class FaceOrchestratorViewModelTest {
     @Test
     fun `route user to invalid license flow if needed`() {
         viewModel.invalidLicense()
-        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LicenseInvalid)
-        viewModel.finishWithError(ErrorType.LicenseInvalid)
+        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LICENSE_INVALID)
+        viewModel.finishWithError(ErrorType.LICENSE_INVALID)
         viewModel.flowFinished.value?.peekContent()?.let { response ->
             assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
             assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.UNEXPECTED_ERROR)
@@ -82,8 +82,8 @@ class FaceOrchestratorViewModelTest {
     @Test
     fun `route user to missing license flow if needed`() {
         viewModel.missingLicense()
-        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LicenseMissing)
-        viewModel.finishWithError(ErrorType.LicenseMissing)
+        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LICENSE_MISSING)
+        viewModel.finishWithError(ErrorType.LICENSE_MISSING)
         viewModel.flowFinished.value?.peekContent()?.let { response ->
             assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
             assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.UNEXPECTED_ERROR)

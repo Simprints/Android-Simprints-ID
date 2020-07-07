@@ -14,8 +14,8 @@ enum class FaceAlertType {
 
     companion object {
         fun fromErrorType(errorType: ErrorType): FaceAlertType = when (errorType) {
-            ErrorType.LicenseMissing -> FACE_MISSING_LICENSE
-            ErrorType.LicenseInvalid -> FACE_INVALID_LICENSE
+            ErrorType.LICENSE_MISSING -> FACE_MISSING_LICENSE
+            ErrorType.LICENSE_INVALID -> FACE_INVALID_LICENSE
         }
     }
 }
