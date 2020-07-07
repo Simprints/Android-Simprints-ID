@@ -17,6 +17,8 @@ class ErrorCallbackEvent(startTime: Long,
         DIFFERENT_PROJECT_ID_SIGNED_IN,
         DIFFERENT_USER_ID_SIGNED_IN,
         GUID_NOT_FOUND_ONLINE,
+        SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD,
+        SETUP_MODALITY_DOWNLOAD_CANCELLED,
         UNEXPECTED_ERROR,
         BLUETOOTH_NOT_SUPPORTED,
         LOGIN_NOT_COMPLETE,
@@ -36,6 +38,8 @@ class ErrorCallbackEvent(startTime: Long,
                     AppErrorResponse.Reason.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
                     AppErrorResponse.Reason.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
                     AppErrorResponse.Reason.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
+                    AppErrorResponse.Reason.SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD -> SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD
+                    AppErrorResponse.Reason.SETUP_MODALITY_DOWNLOAD_CANCELLED -> SETUP_MODALITY_DOWNLOAD_CANCELLED
                 }
         }
     }

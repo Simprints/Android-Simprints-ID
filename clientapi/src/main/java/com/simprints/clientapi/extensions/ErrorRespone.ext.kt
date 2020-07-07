@@ -23,5 +23,7 @@ internal fun ErrorResponse.isFlowCompletedWithCurrentError(): Boolean =
         ErrorResponse.Reason.LOGIN_NOT_COMPLETE,
         ErrorResponse.Reason.ROOTED_DEVICE,
         ErrorResponse.Reason.FACE_LICENSE_MISSING,
+        ErrorResponse.Reason.SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD,
+        ErrorResponse.Reason.SETUP_MODALITY_DOWNLOAD_CANCELLED,
         ErrorResponse.Reason.FACE_LICENSE_INVALID -> Constants.RETURN_FOR_FLOW_NOT_COMPLETED
     }

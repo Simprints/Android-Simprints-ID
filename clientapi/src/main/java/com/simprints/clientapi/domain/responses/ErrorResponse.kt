@@ -29,6 +29,8 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
         GUID_NOT_FOUND_ONLINE,
         LOGIN_NOT_COMPLETE,
         UNEXPECTED_ERROR,
+        SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD,
+        SETUP_MODALITY_DOWNLOAD_CANCELLED,
         BLUETOOTH_NOT_SUPPORTED,
         ROOTED_DEVICE,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
@@ -50,6 +52,8 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
                     IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
                     IAppErrorReason.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
                     IAppErrorReason.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
+                    IAppErrorReason.SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD -> SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD
+                    IAppErrorReason.SETUP_MODALITY_DOWNLOAD_CANCELLED -> SETUP_MODALITY_DOWNLOAD_CANCELLED
                 }
 
             fun fromAlertTypeToDomain(clientApiAlert: ClientApiAlert): Reason =
