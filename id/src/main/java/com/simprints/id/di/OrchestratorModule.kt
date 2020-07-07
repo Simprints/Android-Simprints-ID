@@ -5,7 +5,6 @@ import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
@@ -194,7 +193,7 @@ class OrchestratorModule {
     }
 
     @Provides
-    open fun provideAppResponseBuilderFactory(
+    fun provideAppResponseBuilderFactory(
         enrolmentHelper: EnrolmentHelper,
         timeHelper: TimeHelper
     ): AppResponseFactory = AppResponseFactoryImpl(enrolmentHelper, timeHelper)

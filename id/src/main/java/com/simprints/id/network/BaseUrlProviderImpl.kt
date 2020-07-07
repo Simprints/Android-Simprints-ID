@@ -1,11 +1,10 @@
-package com.simprints.id.secure
+package com.simprints.id.network
 
-import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.NetworkConstants.Companion.BASE_URL_SUFFIX
-import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.network.NetworkConstants.Companion.BASE_URL_SUFFIX
+import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 
 class BaseUrlProviderImpl(
     private val settingsPreferencesManager: SettingsPreferencesManager,

@@ -27,7 +27,7 @@ import javax.inject.Singleton
         DataModule::class,
         SyncModule::class,
         DashboardActivityModule::class,
-        LoginModule::class
+        SecurityModule::class
     ]
 )
 interface AppComponentForTests : AppComponent {
@@ -42,7 +42,7 @@ interface AppComponentForTests : AppComponent {
         fun syncModule(syncModule: SyncModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
-        fun loginModule(loginModule: LoginModule): Builder
+        fun securityModule(securityModule: SecurityModule): Builder
 
         fun build(): AppComponentForTests
     }
