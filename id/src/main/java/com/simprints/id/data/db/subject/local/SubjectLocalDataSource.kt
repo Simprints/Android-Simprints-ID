@@ -15,5 +15,6 @@ interface SubjectLocalDataSource : FaceIdentityLocalDataSource, FingerprintIdent
     suspend fun insertOrUpdate(subjects: List<Subject>)
     suspend fun load(query: Query? = null): Flow<Subject>
     suspend fun delete(queries: List<Query>)
+    suspend fun deleteAll()
     suspend fun count(query: Query = Query()): Int
 }
