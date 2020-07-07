@@ -9,14 +9,13 @@ import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
-import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
 import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
+import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
@@ -29,9 +28,6 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.secure.SignerManager
-import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
@@ -83,36 +79,17 @@ class TestAppModule(
 
     override fun provideLoginInfoManager(
         improvedSharedPreferences: ImprovedSharedPreferences
-    ): LoginInfoManager =
-        loginInfoManagerRule.resolveDependency {
-            super.provideLoginInfoManager(
-                improvedSharedPreferences
-            )
-        }
+    ): LoginInfoManager = loginInfoManagerRule.resolveDependency {
+        super.provideLoginInfoManager(
+            improvedSharedPreferences
+        )
+    }
 
     override fun provideRandomGenerator(): RandomGenerator =
         randomGeneratorRule.resolveDependency { super.provideRandomGenerator() }
 
     override fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager =
         remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager(loginInfoManager) }
-
-    override fun provideSignerManager(
-            projectRepository: ProjectRepository,
-            remoteDbManager: RemoteDbManager,
-            loginInfoManager: LoginInfoManager,
-            preferencesManager: PreferencesManager,
-            subjectsSyncManager: SubjectsSyncManager,
-            syncManager: SyncManager
-    ): SignerManager = dbManagerRule.resolveDependency {
-        super.provideSignerManager(
-            projectRepository,
-            remoteDbManager,
-            loginInfoManager,
-            preferencesManager,
-            subjectsSyncManager,
-            syncManager
-        )
-    }
 
     override fun provideSecureLocalDbKeyProvider(
         builder: EncryptedSharedPreferencesBuilder,
