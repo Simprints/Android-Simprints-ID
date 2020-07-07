@@ -11,10 +11,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusa
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppRefusalFormReason
 import com.simprints.id.domain.moduleapi.fingerprint.responses.toAppErrorReason
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
+import com.simprints.id.orchestrator.steps.core.response.*
 
 abstract class BaseAppResponseBuilder : AppResponseBuilder {
 
@@ -44,6 +41,9 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
             results.any { it is FetchGUIDResponse } -> {
                 buildAppErrorResponse(results.find { it is FetchGUIDResponse } as FetchGUIDResponse)
             }
+            results.any { it is SetupResponse } -> {
+                buildAppErrorResponse(results.find { it is SetupResponse } as SetupResponse)
+            }
             else -> {
                 null
             }
@@ -68,6 +68,13 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
     private fun buildAppErrorResponse(fetchGUIDResponse: FetchGUIDResponse) =
         if (!fetchGUIDResponse.isGuidFound) {
             AppErrorResponse(AppErrorResponse.Reason.GUID_NOT_FOUND_ONLINE)
+        } else {
+            null
+        }
+
+    private fun buildAppErrorResponse(setupResponse: SetupResponse) =
+        if(!setupResponse.isSetupComplete) {
+            AppErrorResponse(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE)
         } else {
             null
         }

@@ -6,7 +6,7 @@ import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
+import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -17,6 +17,7 @@ import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.tools.TimeHelper
@@ -66,7 +67,8 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
 
     private fun tryProcessingResultFromCoreStepProcessor(data: Intent?) =
         coreStepProcessor.processResult(data).also { coreResult ->
-            if (isExitFormResponse(coreResult)) {
+            if (isExitFormResponse(coreResult) ||
+                !isSetupResponseAndSetupComplete(coreResult)) {
                 completeAllSteps()
             }
         }
@@ -75,6 +77,9 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         coreResult is CoreExitFormResponse ||
             coreResult is CoreFingerprintExitFormResponse ||
             coreResult is CoreFaceExitFormResponse
+
+    private fun isSetupResponseAndSetupComplete(coreResult: Step.Result?) =
+        coreResult is SetupResponse && coreResult.isSetupComplete
 
     private fun tryProcessingResultFromFingerprintStepProcessor(requestCode: Int,
                                                                 resultCode: Int,
