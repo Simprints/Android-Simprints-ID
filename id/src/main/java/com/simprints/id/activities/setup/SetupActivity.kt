@@ -28,8 +28,8 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
-import com.simprints.id.domain.moduleapi.core.response.SetupResponse
+import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
+import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.tools.InternalConstants
@@ -134,7 +134,7 @@ class SetupActivity: BaseSplitActivity() {
                 }
             }
         }
-        setResultAndFinish()
+        setResultAndFinish(true)
     }
 
     private fun askPermissionsOrPerformSpecificActions() {
@@ -149,16 +149,16 @@ class SetupActivity: BaseSplitActivity() {
 
     private fun performPermissionActionsAndFinish() {
         storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
-        setResultAndFinish()
+        setResultAndFinish(true)
     }
 
-    private fun setResultAndFinish() {
-        setResult(Activity.RESULT_OK, buildIntentForResponse())
+    private fun setResultAndFinish(setupComplete: Boolean) {
+        setResult(Activity.RESULT_OK, buildIntentForResponse(setupComplete))
         finish()
     }
 
-    private fun buildIntentForResponse() = Intent().apply {
-        putExtra(CoreResponse.CORE_STEP_BUNDLE, SetupResponse())
+    private fun buildIntentForResponse(setupComplete: Boolean) = Intent().apply {
+        putExtra(CoreResponse.CORE_STEP_BUNDLE, SetupResponse(setupComplete))
     }
 
     private fun updateUiForDownloadStarting() {
@@ -224,7 +224,7 @@ class SetupActivity: BaseSplitActivity() {
     private fun tryToGetAlertActResponseAndHandleAction(data: Intent?) =
         data?.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
             when(it.buttonAction) {
-                CLOSE -> finishAffinity()
+                CLOSE -> setResultAndFinish(false)
                 TRY_AGAIN -> viewModel.reStartDownloadIfNecessary(splitInstallManager, getRequiredModules())
             }
         }

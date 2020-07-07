@@ -1,8 +1,8 @@
-package com.simprints.id.domain.moduleapi.core.response
+package com.simprints.id.orchestrator.steps.core.response
 
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponseType
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class SetupResponse: CoreResponse(type = CoreResponseType.SETUP)
+class SetupResponse(val isSetupComplete: Boolean): CoreResponse(type = CoreResponseType.SETUP)

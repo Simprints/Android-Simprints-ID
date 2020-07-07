@@ -31,8 +31,10 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                     AlertType.GUID_NOT_FOUND_OFFLINE ->
                         throw Throwable("No ErrorType associated. GUID_NOT_FOUND_OFFLINE should return a ExitForm, not a Error Response.")
                     AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
-                    AlertType.OFFLINE_DURING_SETUP -> TODO()
-                    AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED -> TODO()
+
+
+                    AlertType.OFFLINE_DURING_SETUP -> LOGIN_NOT_COMPLETE
+                    AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED -> LOGIN_NOT_COMPLETE
                 }
         }
     }

@@ -5,8 +5,8 @@ import com.google.android.gms.location.LocationRequest
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.session.Location
-import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
-import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
+import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
+import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.tools.LocationManager
 import kotlinx.coroutines.CoroutineScope
