@@ -12,11 +12,11 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
-import com.simprints.id.data.db.session.local.SessionLocalDataSource
-import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
-import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
+import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilder
+import com.simprints.id.data.db.event.local.SessionLocalDataSource
+import com.simprints.id.data.db.event.local.SessionRealmConfigBuilder
+import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager

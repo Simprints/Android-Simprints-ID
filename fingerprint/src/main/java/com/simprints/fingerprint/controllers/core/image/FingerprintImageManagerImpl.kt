@@ -3,7 +3,7 @@ package com.simprints.fingerprint.controllers.core.image
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.fingerprint.data.domain.images.Path
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.SessionRepository
 import timber.log.Timber
 import com.simprints.id.data.images.model.Path as CorePath
 

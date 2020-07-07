@@ -1,0 +1,37 @@
+package com.simprints.id.data.db.event.domain.events
+
+import androidx.annotation.Keep
+import java.util.*
+
+@Keep
+class ConsentEvent(
+    creationTime: Long,
+    endTime: Long,
+    consentType: ConsentPayload.Type,
+    result: ConsentPayload.Result,
+    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+) : Event(
+    UUID.randomUUID().toString(),
+    DEFAULT_EVENT_VERSION,
+    listOf(EventLabel.SessionId(sessionId)),
+    ConsentPayload(creationTime, DEFAULT_EVENT_VERSION, endTime, consentType, result)) {
+
+
+    @Keep
+    class ConsentPayload(creationTime: Long,
+                         version: Int,
+                         val endTime: Long,
+                         val consentType: Type,
+                         var result: Result) : EventPayload(EventPayloadType.CONSENT, version, creationTime) {
+
+        @Keep
+        enum class Type {
+            INDIVIDUAL, PARENTAL
+        }
+
+        @Keep
+        enum class Result {
+            ACCEPTED, DECLINED, NO_RESPONSE
+        }
+    }
+}

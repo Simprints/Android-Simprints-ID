@@ -14,19 +14,20 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.ConsentEvent
+import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.domain.events.ConsentEvent
+import com.simprints.id.data.db.event.domain.events.ConsentEvent.ConsentPayload.Result
+import com.simprints.id.data.db.event.domain.events.ConsentEvent.ConsentPayload.Type
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.exitformhandler.ExitFormHelper
+import com.simprints.id.orchestrator.steps.core.CoreRequestCode
+import com.simprints.id.orchestrator.steps.core.CoreResponseCode
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.response.AskConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.ConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
-import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.id.exitformhandler.ExitFormHelper
-import com.simprints.id.orchestrator.steps.core.CoreRequestCode
-import com.simprints.id.orchestrator.steps.core.CoreResponseCode
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.TimeHelper
@@ -139,7 +140,7 @@ class ConsentActivity : AppCompatActivity() {
     }
 
     fun handleConsentAcceptClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.ACCEPTED))
+        viewModel.addConsentEvent(buildConsentEventForResult(Result.ACCEPTED))
         setResult(CoreResponseCode.CONSENT.value, Intent().apply {
             putExtra(CORE_STEP_BUNDLE, AskConsentResponse(ConsentResponse.ACCEPTED))
         })
@@ -147,7 +148,7 @@ class ConsentActivity : AppCompatActivity() {
     }
 
     fun handleConsentDeclineClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.DECLINED))
+        viewModel.addConsentEvent(buildConsentEventForResult(Result.DECLINED))
         startExitFormActivity()
     }
 
@@ -155,12 +156,12 @@ class ConsentActivity : AppCompatActivity() {
         startPrivacyNoticeActivity()
     }
 
-    private fun buildConsentEventForResult(consentResult: ConsentEvent.Result) =
+    private fun buildConsentEventForResult(consentResult: Result) =
         ConsentEvent(startConsentEventTime, timeHelper.now(), getCurrentConsentTab(), consentResult)
 
     private fun getCurrentConsentTab() = when (tabHost.currentTabTag) {
-        GENERAL_CONSENT_TAB_TAG -> ConsentEvent.Type.INDIVIDUAL
-        PARENTAL_CONSENT_TAB_TAG -> ConsentEvent.Type.PARENTAL
+        GENERAL_CONSENT_TAB_TAG -> Type.INDIVIDUAL
+        PARENTAL_CONSENT_TAB_TAG -> Type.PARENTAL
         else -> throw IllegalStateException("Invalid consent tab selected")
     }
 

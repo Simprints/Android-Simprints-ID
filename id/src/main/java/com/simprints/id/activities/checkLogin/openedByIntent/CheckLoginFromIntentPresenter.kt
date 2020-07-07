@@ -3,11 +3,12 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import android.annotation.SuppressLint
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.AuthorizationEvent
-import com.simprints.id.data.db.session.domain.models.events.ConnectivitySnapshotEvent
-import com.simprints.id.data.db.session.domain.models.events.Event
-import com.simprints.id.data.db.session.domain.models.events.callout.*
+import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.domain.events.AuthorizationEvent
+import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.Result
+import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.UserInfo
+import com.simprints.id.data.db.event.domain.events.Event
+import com.simprints.id.data.db.event.domain.events.callout.*
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
@@ -27,6 +28,7 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import com.simprints.id.data.db.event.domain.events.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload.Companion.buildEvent as buildConnectivitySnapshotEvent
 
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     val deviceId: String,
@@ -73,7 +75,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             sessionRepository.updateCurrentSession { currentSession ->
                 with(currentSession) {
                     if (appRequest !is AppRequest.AppRequestFollowUp) {
-                        addEvent(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
+                        addEvent(buildConnectivitySnapshotEvent(simNetworkUtils, timeHelper))
                     }
                     addEvent(buildRequestEvent(timeHelper.now(), appRequest))
                 }
@@ -164,7 +166,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
         // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
         if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest && appRequest !is AppEnrolLastBiometricsRequest) {
-            sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(AuthorizationEvent.Result.NOT_AUTHORIZED))
+            sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(Result.NOT_AUTHORIZED))
 
             loginAlreadyTried.set(true)
             view.openLoginActivity(appRequest)
@@ -208,7 +210,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         ignoreException {
             val peopleInDb = subjectLocalDataSource.count()
             sessionRepository.updateCurrentSession { currentSession ->
-                val authorisationEvent = buildAuthorizationEvent(AuthorizationEvent.Result.AUTHORIZED)
+                val authorisationEvent = buildAuthorizationEvent(Result.AUTHORIZED)
 
                 with(currentSession) {
                     addEvent(authorisationEvent)
@@ -245,12 +247,12 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    private fun buildAuthorizationEvent(result: AuthorizationEvent.Result) =
+    private fun buildAuthorizationEvent(result: Result) =
         AuthorizationEvent(
             timeHelper.now(),
             result,
-            if (result == AuthorizationEvent.Result.AUTHORIZED) {
-                AuthorizationEvent.UserInfo(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
+            if (result == Result.AUTHORIZED) {
+                UserInfo(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
             } else {
                 null
             }

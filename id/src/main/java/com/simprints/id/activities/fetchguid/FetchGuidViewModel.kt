@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.CandidateReadEvent
+import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.domain.events.CandidateReadEvent
+import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.LocalResult
+import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.RemoteResult
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
@@ -59,15 +61,15 @@ class FetchGuidViewModel(private val subjectRepository: SubjectRepository,
 
     private fun getLocalResultForFetchEvent(subjectSource: SubjectSource) =
         if (subjectSource == SubjectSource.LOCAL) {
-            CandidateReadEvent.LocalResult.FOUND
+            LocalResult.FOUND
         } else {
-            CandidateReadEvent.LocalResult.NOT_FOUND
+            LocalResult.NOT_FOUND
         }
 
     private fun getRemoteResultForFetchEvent(subjectSource: SubjectSource) =
         if (subjectSource == SubjectSource.REMOTE) {
-            CandidateReadEvent.RemoteResult.FOUND
+            RemoteResult.FOUND
         } else {
-            CandidateReadEvent.RemoteResult.NOT_FOUND
+            RemoteResult.NOT_FOUND
         }
 }

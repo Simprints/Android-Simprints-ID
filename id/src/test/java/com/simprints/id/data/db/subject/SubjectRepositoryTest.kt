@@ -10,14 +10,14 @@ import com.simprints.id.commontesttools.DefaultTestConstants.userSyncScope
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.common.models.EventCount
+import com.simprints.id.data.db.event.domain.events.*
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.domain.subjectevents.*
-import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.ENROLMENT_RECORD_CREATION
+import com.simprints.id.data.db.event.domain.events.EventPayloadType.ENROLMENT_RECORD_CREATION
+import com.simprints.id.data.db.event.domain.events.subject.*
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
-import com.simprints.id.data.db.subject.remote.models.subjectevents.fromDomainToApi
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
 import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
@@ -273,7 +273,8 @@ class SubjectRepositoryTest {
     private fun buildBiometricReferences(fingerprintSamples: List<FingerprintSample>, faceSamples: List<FaceSample>): List<BiometricReference> {
         val fingerprintReference = FingerprintReference(fingerprintSamples.map {
             FingerprintTemplate(it.templateQualityScore, EncodingUtils.byteArrayToBase64(it.template),
-                FingerIdentifier.valueOf(it.fingerIdentifier.name)) })
+                FingerIdentifier.valueOf(it.fingerIdentifier.name))
+        })
         val faceReference = FaceReference(faceSamples.map { FaceTemplate(EncodingUtils.byteArrayToBase64(it.template)) })
 
         return listOf(fingerprintReference, faceReference)
