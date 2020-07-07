@@ -1,4 +1,4 @@
-package com.simprints.id.services
+package com.simprints.id.services.guidselection
 
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 

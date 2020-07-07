@@ -33,9 +33,9 @@ import com.simprints.id.activities.settings.syncinformation.SyncInformationActiv
 import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
-import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
@@ -54,6 +54,7 @@ import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsS
 import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsSyncMasterWorker
 import com.simprints.id.services.scheduledSync.subjects.up.workers.SubjectsUpSyncCountWorker
 import com.simprints.id.services.scheduledSync.subjects.up.workers.SubjectsUpSyncUploaderWorker
+import com.simprints.id.services.securitystate.SecurityStateWorker
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import dagger.BindsInstance
@@ -64,7 +65,7 @@ import javax.inject.Singleton
     modules = [
         AppModule::class,
         DataModule::class,
-        LoginModule::class,
+        SecurityModule::class,
         PreferencesModule::class,
         SerializerModule::class,
         SyncModule::class,
@@ -82,7 +83,7 @@ interface AppComponent {
         fun appModule(appModule: AppModule): Builder
         fun dataModule(dataModule: DataModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
-        fun loginModule(loginModule: LoginModule): Builder
+        fun securityModule(securityModule: SecurityModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun syncModule(syncModule: SyncModule): Builder
         fun dashboardActivityModule(dashboardActivityModule: DashboardActivityModule): Builder
@@ -135,6 +136,7 @@ interface AppComponent {
     fun inject(qrCaptureActivity: QrCaptureActivity)
     fun inject(enrolLastBiometricsActivity: EnrolLastBiometricsActivity)
     fun inject(setupActivity: SetupActivity)
+    fun inject(securityStateWorker: SecurityStateWorker)
 
     fun getSessionEventsManager(): SessionRepository
     fun getCrashReportManager(): CoreCrashReportManager
