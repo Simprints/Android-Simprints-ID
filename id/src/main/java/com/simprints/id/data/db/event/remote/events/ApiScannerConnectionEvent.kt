@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.RefusalEvent
+import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent
 import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.ScannerConnectionPayload
 import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration
 import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
@@ -10,7 +11,7 @@ import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.Scann
 import com.simprints.id.data.db.event.remote.events.ApiScannerConnectionEvent.ApiScannerConnectionPayload.ApiScannerGeneration
 
 @Keep
-class ApiScannerConnectionEvent(domainEvent: RefusalEvent) :
+class ApiScannerConnectionEvent(domainEvent: ScannerConnectionEvent) :
     ApiEvent(
         domainEvent.id,
         domainEvent.labels.fromDomainToApi(),
