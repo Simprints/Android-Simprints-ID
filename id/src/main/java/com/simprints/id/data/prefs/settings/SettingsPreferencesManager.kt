@@ -31,6 +31,8 @@ interface SettingsPreferencesManager {
     var consentRequired: Boolean
     var locationPermissionRequired: Boolean
 
+    var enrolmentPlus: Boolean
+
     var modalities: List<Modality>
     var subjectsDownSyncSetting: SubjectsDownSyncSetting
 
