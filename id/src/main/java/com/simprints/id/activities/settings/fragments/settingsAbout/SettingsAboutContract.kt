@@ -35,6 +35,8 @@ interface SettingsAboutContract {
 
         fun showConfirmationDialogForLogout()
 
+        fun removePreference(preference: Preference)
+
         fun finishSettings()
     }
 

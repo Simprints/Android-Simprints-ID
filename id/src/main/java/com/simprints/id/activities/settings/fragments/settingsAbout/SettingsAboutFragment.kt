@@ -123,6 +123,10 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
         }
     }
 
+    override fun removePreference(preference: Preference) {
+        preferenceScreen.removePreference(preference)
+    }
+
     internal fun buildConfirmationDialogForLogout(): AlertDialog =
         AlertDialog.Builder(activity)
             .setTitle(androidResourcesHelper.getString(R.string.confirmation_logout_title))
