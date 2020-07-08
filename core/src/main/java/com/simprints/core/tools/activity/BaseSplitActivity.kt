@@ -1,4 +1,4 @@
-package com.simprints.face.base
+package com.simprints.core.tools.activity
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity

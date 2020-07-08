@@ -9,11 +9,10 @@ import android.os.Bundle
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.qrcapture.tools.CameraHelper
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.tools.extensions.hasPermission

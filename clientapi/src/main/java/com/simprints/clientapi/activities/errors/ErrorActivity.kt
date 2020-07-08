@@ -5,13 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.simprints.clientapi.R
-import com.simprints.clientapi.activities.BaseSplitActivity
 import com.simprints.clientapi.activities.errors.request.AlertActRequest
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
+import com.simprints.core.tools.activity.BaseSplitActivity
 import kotlinx.android.synthetic.main.activity_error.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.backgroundColor
