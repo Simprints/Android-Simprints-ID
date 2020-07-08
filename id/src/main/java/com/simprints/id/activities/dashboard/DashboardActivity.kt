@@ -128,9 +128,9 @@ class DashboardActivity : BaseSplitActivity() {
     }
 
     private fun setupCards() {
-        projectDetailsCardDisplayer.initRoot(dashboard_project_details_card, this)
-        syncCardDisplayer.initRoot(dashboard_sync_card, this)
-        dailyActivityCardDisplayer.initRoot(dashboard_daily_activity_card_root, this)
+        projectDetailsCardDisplayer.initRoot(dashboard_project_details_card)
+        syncCardDisplayer.initRoot(dashboard_sync_card)
+        dailyActivityCardDisplayer.initRoot(dashboard_daily_activity_card_root)
     }
 
     private fun observeCardData() {

@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.widget.TabHost
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -104,7 +103,7 @@ class ConsentActivity : BaseSplitActivity() {
         GeneralConsentTextHelper(
             generalConsentOptionsJson,
             programName, organizationName, modalities,
-            crashReportManager, this
+            crashReportManager
         ).assembleText(askConsentRequestReceived)
 
     private fun buildParentalConsentText(parentalConsentOptionsJson: String,
@@ -114,7 +113,7 @@ class ConsentActivity : BaseSplitActivity() {
         ParentalConsentTextHelper(
             parentalConsentOptionsJson,
             programName, organizationName, modalities,
-            crashReportManager, this
+            crashReportManager
         ).assembleText(askConsentRequestReceived)
 
     private fun setupTabs() {

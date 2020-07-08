@@ -12,18 +12,16 @@ import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjec
 class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDisplayer {
 
     private lateinit var root: LinearLayout
-    private lateinit var ctx: Context
 
-    override fun initRoot(rootLayout: LinearLayout, context: Context) {
-        ctx = context
+    override fun initRoot(rootLayout: LinearLayout) {
         root = rootLayout
     }
 
     override fun displayProjectDetails(projectDetails: DashboardProjectState) {
         with(root) {
             setTitle(projectDetails.title)
-            setCurrentUser(projectDetails.lastUser)
-            setScannerUsed(projectDetails.lastScanner)
+            setCurrentUser(projectDetails.lastUser, context)
+            setScannerUsed(projectDetails.lastScanner, context)
         }
     }
 
@@ -31,14 +29,14 @@ class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDispl
         findViewById<TextView>(R.id.dashboard_project_details_card_title).text = title
     }
 
-    private fun View.setCurrentUser(currentUser: String) {
+    private fun View.setCurrentUser(currentUser: String, ctx: Context) {
         findViewById<TextView>(
             R.id.dashboard_project_details_card_current_user
         ).text = String.format(ctx.getString(
             R.string.dashboard_card_current_user), currentUser)
     }
 
-    private fun View.setScannerUsed(scannerUsed: String) {
+    private fun View.setScannerUsed(scannerUsed: String, ctx: Context) {
         with(findViewById<TextView>(
             R.id.dashboard_project_details_card_scanner_used
         )) {

@@ -19,30 +19,28 @@ class DashboardDailyActivityCardDisplayerImpl(
 ) : DashboardDailyActivityCardDisplayer {
 
     private lateinit var root: ViewGroup
-    private lateinit var ctx: Context
 
-    override fun initRoot(rootLayout: ViewGroup, context: Context) {
-        ctx = context
+    override fun initRoot(rootLayout: ViewGroup) {
         root = rootLayout
     }
 
     override fun displayDailyActivityState(dailyActivityState: DashboardDailyActivityState) {
         with(root) {
-            setTitle()
-            setEnrolmentsCount(dailyActivityState.enrolments)
-            setIdentificationsCount(dailyActivityState.identifications)
-            setVerificationsCount(dailyActivityState.verifications)
+            setTitle(context)
+            setEnrolmentsCount(dailyActivityState.enrolments, context)
+            setIdentificationsCount(dailyActivityState.identifications, context)
+            setVerificationsCount(dailyActivityState.verifications, context)
             setDividers(dailyActivityState)
         }
     }
 
-    private fun View.setTitle() {
+    private fun View.setTitle(ctx: Context) {
         val date = timeHelper.getCurrentDateAsString()
         val text = String.format(ctx.getString(R.string.dashboard_card_activity), date)
         findViewById<TextView>(R.id.dashboard_daily_activity_card_title).text = text
     }
 
-    private fun View.setEnrolmentsCount(enrolmentsCount: Int) {
+    private fun View.setEnrolmentsCount(enrolmentsCount: Int, ctx: Context) {
         val enrolmentsGroup = findViewById<Group>(R.id.group_enrolments)
 
         if (enrolmentsCount > 0) {
@@ -62,7 +60,7 @@ class DashboardDailyActivityCardDisplayerImpl(
         }
     }
 
-    private fun View.setIdentificationsCount(identificationsCount: Int) {
+    private fun View.setIdentificationsCount(identificationsCount: Int, ctx: Context) {
         val identificationsGroup = findViewById<Group>(R.id.group_identifications)
 
         if (identificationsCount > 0) {
@@ -83,7 +81,7 @@ class DashboardDailyActivityCardDisplayerImpl(
         }
     }
 
-    private fun View.setVerificationsCount(verificationsCount: Int) {
+    private fun View.setVerificationsCount(verificationsCount: Int, ctx: Context) {
         val verificationsGroup = findViewById<Group>(R.id.group_verifications)
 
         if (verificationsCount > 0) {

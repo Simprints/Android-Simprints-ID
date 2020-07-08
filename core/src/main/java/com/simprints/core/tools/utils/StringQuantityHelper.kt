@@ -2,9 +2,8 @@ package com.simprints.core.tools.utils
 
 import android.content.Context
 import android.content.res.Resources
-import androidx.annotation.PluralsRes
 
-private enum class QUANTITY constructor(private val title: String) {
+private enum class Quantity constructor(private val title: String) {
     ZERO("zero"),
     ONE("one"),
     TWO("two"),
@@ -27,15 +26,15 @@ object QuantityHelper {
      * @param quantity The integer number that describes the quantity
      * @return The heuristic description of the number
      */
-    private fun intToQuantity(quantity: Int): QUANTITY {
+    private fun intToQuantity(quantity: Int): Quantity {
         when (quantity) {
-            0 -> return QUANTITY.ZERO
-            1 -> return QUANTITY.ONE
-            2 -> return QUANTITY.TWO
-            3, 4 -> return QUANTITY.FEW
+            0 -> return Quantity.ZERO
+            1 -> return Quantity.ONE
+            2 -> return Quantity.TWO
+            3, 4 -> return Quantity.FEW
         }
 
-        return if (quantity > 4) QUANTITY.MANY else QUANTITY.OTHER
+        return if (quantity > 4) Quantity.MANY else Quantity.OTHER
     }
 
     /**
@@ -60,7 +59,7 @@ object QuantityHelper {
             res.getString(targetStringResourceId, *params)
         } catch (e: Resources.NotFoundException) {
             // If we can't find the resource, try instead to find the "other" version
-            val targetStringResourceName = res.getString(stringQuantityKey) + "_" + QUANTITY.OTHER.toString()
+            val targetStringResourceName = res.getString(stringQuantityKey) + "_" + Quantity.OTHER.toString()
             val targetStringResourceId = res.getIdentifier(targetStringResourceName, "string", context.packageName)
             res.getString(targetStringResourceId, *params)
         }
