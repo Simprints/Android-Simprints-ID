@@ -184,6 +184,17 @@ open class SettingsPreferencesManagerImpl(
         )
 
     /**
+     * Flag for v1 of Enrolment+
+     */
+    override var enrolmentPlus: Boolean
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            ENROLMENT_PLUS_KEY,
+            ENROLMENT_PLUS_DEFAULT
+        )
+
+    /**
      * List of modalities to use
      */
     override var modalities: List<Modality>
@@ -342,6 +353,9 @@ open class SettingsPreferencesManagerImpl(
 
         const val LOCATION_REQUIRED_KEY = "LocationRequired"
         const val LOCATION_REQUIRED_DEFAULT = true
+
+        const val ENROLMENT_PLUS_KEY = "EnrolmentPlus"
+        const val ENROLMENT_PLUS_DEFAULT = false
 
         const val PEOPLE_DOWN_SYNC_SETTING_KEY = "DownSyncSetting"
         val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = SubjectsDownSyncSetting.ON
