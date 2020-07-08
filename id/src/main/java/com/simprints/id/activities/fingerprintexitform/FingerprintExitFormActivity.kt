@@ -6,9 +6,9 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult.Action
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult.Answer

@@ -3,13 +3,12 @@ package com.simprints.face.orchestrator
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.whenNonNull
 import com.simprints.core.tools.whenNull
 import com.simprints.face.R
-import com.simprints.face.base.BaseSplitActivity
 import com.simprints.face.capture.FaceCaptureActivity
 import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException

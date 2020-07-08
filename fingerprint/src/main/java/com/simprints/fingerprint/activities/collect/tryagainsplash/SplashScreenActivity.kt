@@ -2,8 +2,8 @@ package com.simprints.fingerprint.activities.collect.tryagainsplash
 
 import android.os.Bundle
 import android.os.Handler
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.base.BaseSplitActivity
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel.Companion.TRY_DIFFERENT_FINGER_SPLASH_DELAY
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 

@@ -6,9 +6,9 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult.Action.GO_BACK
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult.Action.SUBMIT

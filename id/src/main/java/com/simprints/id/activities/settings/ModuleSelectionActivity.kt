@@ -2,9 +2,9 @@ package com.simprints.id.activities.settings
 
 import android.os.Bundle
 import android.view.MenuItem
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import kotlinx.android.synthetic.main.settings_toolbar.*
 
