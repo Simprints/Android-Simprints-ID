@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.displayer
 
-import android.content.Context
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -26,21 +25,21 @@ class DashboardDailyActivityCardDisplayerImpl(
 
     override fun displayDailyActivityState(dailyActivityState: DashboardDailyActivityState) {
         with(root) {
-            setTitle(context)
-            setEnrolmentsCount(dailyActivityState.enrolments, context)
-            setIdentificationsCount(dailyActivityState.identifications, context)
-            setVerificationsCount(dailyActivityState.verifications, context)
+            setTitle()
+            setEnrolmentsCount(dailyActivityState.enrolments)
+            setIdentificationsCount(dailyActivityState.identifications)
+            setVerificationsCount(dailyActivityState.verifications)
             setDividers(dailyActivityState)
         }
     }
 
-    private fun View.setTitle(ctx: Context) {
+    private fun View.setTitle() {
         val date = timeHelper.getCurrentDateAsString()
-        val text = String.format(ctx.getString(R.string.dashboard_card_activity), date)
+        val text = String.format(resources.getString(R.string.dashboard_card_activity), date)
         findViewById<TextView>(R.id.dashboard_daily_activity_card_title).text = text
     }
 
-    private fun View.setEnrolmentsCount(enrolmentsCount: Int, ctx: Context) {
+    private fun View.setEnrolmentsCount(enrolmentsCount: Int) {
         val enrolmentsGroup = findViewById<Group>(R.id.group_enrolments)
 
         if (enrolmentsCount > 0) {
@@ -48,7 +47,7 @@ class DashboardDailyActivityCardDisplayerImpl(
                 R.id.dashboard_daily_activity_card_enrolments_count
             ).text = "$enrolmentsCount"
 
-            val labelText = ctx.getQuantityString(
+            val labelText = context.getQuantityString(
                 R.plurals.dashboard_card_enrolments,
                 enrolmentsCount
             )
@@ -60,7 +59,7 @@ class DashboardDailyActivityCardDisplayerImpl(
         }
     }
 
-    private fun View.setIdentificationsCount(identificationsCount: Int, ctx: Context) {
+    private fun View.setIdentificationsCount(identificationsCount: Int) {
         val identificationsGroup = findViewById<Group>(R.id.group_identifications)
 
         if (identificationsCount > 0) {
@@ -68,7 +67,7 @@ class DashboardDailyActivityCardDisplayerImpl(
                 R.id.dashboard_daily_activity_card_identifications_count
             ).text = "$identificationsCount"
 
-            val labelText = ctx.getQuantityString(
+            val labelText = context.getQuantityString(
                 R.plurals.dashboard_card_identifications,
                 identificationsCount
             )
@@ -81,7 +80,7 @@ class DashboardDailyActivityCardDisplayerImpl(
         }
     }
 
-    private fun View.setVerificationsCount(verificationsCount: Int, ctx: Context) {
+    private fun View.setVerificationsCount(verificationsCount: Int) {
         val verificationsGroup = findViewById<Group>(R.id.group_verifications)
 
         if (verificationsCount > 0) {
@@ -89,7 +88,7 @@ class DashboardDailyActivityCardDisplayerImpl(
                 R.id.dashboard_daily_activity_card_verifications_count
             ).text = "$verificationsCount"
 
-            val labelText = ctx.getQuantityString(
+            val labelText = context.getQuantityString(
                 R.plurals.dashboard_card_verifications,
                 verificationsCount
             )
