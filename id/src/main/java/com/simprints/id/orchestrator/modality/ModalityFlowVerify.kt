@@ -36,6 +36,7 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppVerifyRequest)
+        addModalityConfigurationSteps(modalities)
         addSetupStep()
         addCoreFetchGuidStep(appRequest.projectId, appRequest.verifyGuid)
         addCoreConsentStepIfRequired(VERIFY)
