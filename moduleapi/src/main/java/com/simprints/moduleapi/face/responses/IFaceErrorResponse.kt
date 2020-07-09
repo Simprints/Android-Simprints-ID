@@ -4,8 +4,9 @@ interface IFaceErrorResponse : IFaceResponse {
     val reason: IFaceErrorReason
 }
 
-// TODO: create new errors: LICENSE_MISSING, LICENSE_INVALID
 enum class IFaceErrorReason {
     UNEXPECTED_ERROR,
+    LICENSE_MISSING,
+    LICENSE_INVALID,
     FACE_CONFIGURATION_ERROR
 }
