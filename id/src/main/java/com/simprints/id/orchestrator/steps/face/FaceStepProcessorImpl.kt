@@ -8,9 +8,8 @@ import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFaceResult
-import com.simprints.id.orchestrator.steps.face.FaceRequestCode.MATCH
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 
@@ -50,4 +49,10 @@ class FaceStepProcessorImpl(
         } else {
             null
         }
+
+    override fun buildConfigurationStep(): Step =
+        faceRequestFactory.buildFaceConfigurationRequest().run {
+            buildStep(CONFIGURATION, this)
+        }
+
 }

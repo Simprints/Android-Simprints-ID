@@ -61,8 +61,8 @@ class ModalityFlowIdentifyImplTest {
 
         with(modalityFlowIdentify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER)
-            verifyStepWasAdded(get(1), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
         }
     }
 
@@ -75,8 +75,8 @@ class ModalityFlowIdentifyImplTest {
             println(this)
 
             assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER)
-            verifyStepWasAdded(get(1), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -88,9 +88,9 @@ class ModalityFlowIdentifyImplTest {
         with(modalityFlowIdentify.steps) {
             println(this)
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
-            verifyStepWasAdded(get(1), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FACE_ACTIVITY_NAME)
-            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(5), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -103,9 +103,9 @@ class ModalityFlowIdentifyImplTest {
             println(this)
 
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
-            verifyStepWasAdded(get(1), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(5), FACE_ACTIVITY_NAME)
         }
     }
 
@@ -116,7 +116,7 @@ class ModalityFlowIdentifyImplTest {
 
         with(modalityFlowIdentify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), FACE_ACTIVITY_NAME)
         }
     }
 
@@ -129,7 +129,7 @@ class ModalityFlowIdentifyImplTest {
             println(this)
 
             assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(1), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -141,8 +141,8 @@ class ModalityFlowIdentifyImplTest {
         with(modalityFlowIdentify.steps) {
             println(this)
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -154,8 +154,8 @@ class ModalityFlowIdentifyImplTest {
         with(modalityFlowIdentify.steps) {
             println(this)
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(1), FINGERPRINT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), FACE_ACTIVITY_NAME)
         }
     }
 
