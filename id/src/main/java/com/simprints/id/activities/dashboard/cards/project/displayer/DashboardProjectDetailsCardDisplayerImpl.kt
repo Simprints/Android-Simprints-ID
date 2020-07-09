@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard.cards.project.displayer
 
-import android.content.Context
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -20,8 +19,8 @@ class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDispl
     override fun displayProjectDetails(projectDetails: DashboardProjectState) {
         with(root) {
             setTitle(projectDetails.title)
-            setCurrentUser(projectDetails.lastUser, context)
-            setScannerUsed(projectDetails.lastScanner, context)
+            setCurrentUser(projectDetails.lastUser)
+            setScannerUsed(projectDetails.lastScanner)
         }
     }
 
@@ -29,14 +28,14 @@ class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDispl
         findViewById<TextView>(R.id.dashboard_project_details_card_title).text = title
     }
 
-    private fun View.setCurrentUser(currentUser: String, ctx: Context) {
+    private fun View.setCurrentUser(currentUser: String) {
         findViewById<TextView>(
             R.id.dashboard_project_details_card_current_user
-        ).text = String.format(ctx.getString(
+        ).text = String.format(context.getString(
             R.string.dashboard_card_current_user), currentUser)
     }
 
-    private fun View.setScannerUsed(scannerUsed: String, ctx: Context) {
+    private fun View.setScannerUsed(scannerUsed: String) {
         with(findViewById<TextView>(
             R.id.dashboard_project_details_card_scanner_used
         )) {
@@ -44,7 +43,7 @@ class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDispl
                 this.visibility = GONE
             } else {
                 this.visibility = VISIBLE
-                text = String.format(ctx.getString(
+                text = String.format(context.getString(
                     R.string.dashboard_card_scanner_used), scannerUsed)
             }
         }
