@@ -155,4 +155,9 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
         }
     }
 
+    override fun tryRemoveOrDisablePreference(preference: Preference) {
+        if (!preferenceScreen.removePreference(preference))
+            preference.isEnabled = false
+    }
+
 }
