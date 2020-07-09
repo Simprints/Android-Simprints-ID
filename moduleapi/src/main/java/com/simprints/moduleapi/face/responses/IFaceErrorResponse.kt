@@ -7,5 +7,6 @@ interface IFaceErrorResponse : IFaceResponse {
 enum class IFaceErrorReason {
     UNEXPECTED_ERROR,
     LICENSE_MISSING,
-    LICENSE_INVALID
+    LICENSE_INVALID,
+    FACE_CONFIGURATION_ERROR
 }

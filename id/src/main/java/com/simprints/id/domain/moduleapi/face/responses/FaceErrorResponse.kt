@@ -17,19 +17,21 @@ fun IFaceErrorResponse.fromModuleApiToDomain() = FaceErrorResponse(reason.fromMo
 enum class FaceErrorReason {
     UNEXPECTED_ERROR,
     FACE_LICENSE_MISSING,
-    FACE_LICENSE_INVALID;
+    FACE_LICENSE_INVALID,
+    FACE_CONFIGURATION_ERROR;
 
-    fun toAppErrorReason(): AppErrorResponse.Reason =
-        when (this) {
-            UNEXPECTED_ERROR -> AppErrorResponse.Reason.UNEXPECTED_ERROR
-            FACE_LICENSE_MISSING -> AppErrorResponse.Reason.FACE_LICENSE_MISSING
-            FACE_LICENSE_INVALID -> AppErrorResponse.Reason.FACE_LICENSE_INVALID
-        }
+    fun toAppErrorReason(): AppErrorResponse.Reason = when (this) {
+        UNEXPECTED_ERROR -> AppErrorResponse.Reason.UNEXPECTED_ERROR
+        FACE_LICENSE_MISSING -> AppErrorResponse.Reason.FACE_LICENSE_MISSING
+        FACE_LICENSE_INVALID -> AppErrorResponse.Reason.FACE_LICENSE_INVALID
+        FACE_CONFIGURATION_ERROR -> AppErrorResponse.Reason.FACE_CONFIGURATION_ERROR
+    }
 }
 
 fun IFaceErrorReason.fromModuleApiToDomain() = when (this) {
     IFaceErrorReason.UNEXPECTED_ERROR -> FaceErrorReason.UNEXPECTED_ERROR
     IFaceErrorReason.LICENSE_MISSING -> FaceErrorReason.FACE_LICENSE_MISSING
     IFaceErrorReason.LICENSE_INVALID -> FaceErrorReason.FACE_LICENSE_INVALID
+    IFaceErrorReason.FACE_CONFIGURATION_ERROR -> FaceErrorReason.FACE_CONFIGURATION_ERROR
 }
 

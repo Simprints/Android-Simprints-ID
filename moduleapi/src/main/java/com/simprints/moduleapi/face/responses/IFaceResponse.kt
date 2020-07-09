@@ -17,6 +17,7 @@ enum class IFaceResponseType {
     CAPTURE,
     MATCH,
     EXIT_FORM,
-    ERROR
+    ERROR,
+    CONFIGURATION
 }
 

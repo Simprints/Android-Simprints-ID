@@ -10,9 +10,8 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.domain.moduleapi.fingerprint.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CAPTURE
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.*
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.MATCH
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY as RESPONSE_BUNDLE_KEY
@@ -50,4 +49,10 @@ class FingerprintStepProcessorImpl(private val fingerprintRequestFactory: Finger
         } else {
             null
         }
+
+    override fun buildConfigurationStep(): Step =
+        fingerprintRequestFactory.buildFingerprintConfigurationRequest().run {
+            buildStep(CONFIGURATION, this)
+        }
+
 }
