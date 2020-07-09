@@ -1,0 +1,3 @@
+package com.simprints.moduleapi.fingerprint.requests
+
+interface IFingerprintConfigurationRequest : IFingerprintRequest
