@@ -18,4 +18,7 @@ interface FaceStepProcessor {
     fun processResult(requestCode: Int,
                       resultCode: Int,
                       data: Intent?): Step.Result?
+
+    fun buildConfigurationStep(): Step
+
 }

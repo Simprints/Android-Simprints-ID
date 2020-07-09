@@ -18,5 +18,6 @@ enum class IFingerprintResponseType {
     CAPTURE,
     MATCH,
     REFUSAL,
-    ERROR
+    ERROR,
+    CONFIGURATION
 }

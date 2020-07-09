@@ -5,6 +5,7 @@ import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
@@ -45,8 +46,19 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         steps.addAll(stepsToRestore)
     }
 
+    protected fun addModalityConfigurationSteps(modalities: List<Modality>) {
+        steps.addAll(buildModalityConfigurationSteps(modalities))
+    }
+
     protected fun addSetupStep() {
         steps.add(buildSetupStep())
+    }
+
+    private fun buildModalityConfigurationSteps(modalities: List<Modality>) = modalities.map {
+        when (it) {
+            Modality.FINGER -> fingerprintStepProcessor.buildConfigurationStep()
+            Modality.FACE -> faceStepProcessor.buildConfigurationStep()
+        }
     }
 
     private fun buildSetupStep() = coreStepProcessor.buildStepSetup(getPermissions())
