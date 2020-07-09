@@ -4,7 +4,6 @@ import android.preference.Preference
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 
-
 interface SettingsAboutContract {
 
     interface  View: BaseView<Presenter> {
@@ -35,7 +34,7 @@ interface SettingsAboutContract {
 
         fun showConfirmationDialogForLogout()
 
-        fun removePreference(preference: Preference)
+        fun tryRemoveOrDisablePreference(preference: Preference)
 
         fun finishSettings()
     }

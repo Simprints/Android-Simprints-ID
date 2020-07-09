@@ -123,8 +123,9 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
         }
     }
 
-    override fun removePreference(preference: Preference) {
-        preferenceScreen.removePreference(preference)
+    override fun tryRemoveOrDisablePreference(preference: Preference) {
+        if (!preferenceScreen.removePreference(preference))
+            preference.isEnabled = false
     }
 
     internal fun buildConfirmationDialogForLogout(): AlertDialog =

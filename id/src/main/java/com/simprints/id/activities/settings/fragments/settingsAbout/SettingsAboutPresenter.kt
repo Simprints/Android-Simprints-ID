@@ -35,8 +35,8 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     }
 
     private fun removeScannerVersionIfFaceOnly() {
-        if (!preferencesManager.modalities.contains(Modality.FINGER))
-            view.removePreference(view.getScannerVersionPreference())
+        if (preferencesManager.modalities.none { it == Modality.FINGER })
+            view.tryRemoveOrDisablePreference(view.getScannerVersionPreference())
     }
 
     internal fun loadValueAndBindChangeListener(preference: Preference) {
