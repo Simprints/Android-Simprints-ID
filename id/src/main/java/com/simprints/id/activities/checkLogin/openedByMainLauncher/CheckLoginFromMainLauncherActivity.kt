@@ -3,16 +3,15 @@ package com.simprints.id.activities.checkLogin.openedByMainLauncher
 import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.domain.alert.AlertType
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.startActivity
 
 // App launched when user open SimprintsID using the Home button
 open class CheckLoginFromMainLauncherActivity : BaseSplitActivity(), CheckLoginFromMainLauncherContract.View {
@@ -52,7 +51,8 @@ open class CheckLoginFromMainLauncherActivity : BaseSplitActivity(), CheckLoginF
     }
 
     override fun openRequestLoginActivity() {
-        startActivity<RequestLoginActivity>()
+        val requestLoginIntent = Intent(this, RequestLoginActivity::class.java)
+        startActivity(requestLoginIntent)
         finish()
     }
 

@@ -5,9 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Action
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Answer

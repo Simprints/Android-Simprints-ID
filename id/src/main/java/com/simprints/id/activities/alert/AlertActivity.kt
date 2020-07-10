@@ -10,9 +10,9 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.alert.request.AlertActRequest
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.di.AppComponent

@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.displayer
 
-import android.content.Context
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -19,10 +18,8 @@ class DashboardDailyActivityCardDisplayerImpl(
 ) : DashboardDailyActivityCardDisplayer {
 
     private lateinit var root: ViewGroup
-    private lateinit var ctx: Context
 
-    override fun initRoot(rootLayout: ViewGroup, context: Context) {
-        ctx = context
+    override fun initRoot(rootLayout: ViewGroup) {
         root = rootLayout
     }
 
@@ -38,7 +35,7 @@ class DashboardDailyActivityCardDisplayerImpl(
 
     private fun View.setTitle() {
         val date = timeHelper.getCurrentDateAsString()
-        val text = String.format(ctx.getString(R.string.dashboard_card_activity), date)
+        val text = String.format(resources.getString(R.string.dashboard_card_activity), date)
         findViewById<TextView>(R.id.dashboard_daily_activity_card_title).text = text
     }
 
@@ -50,7 +47,7 @@ class DashboardDailyActivityCardDisplayerImpl(
                 R.id.dashboard_daily_activity_card_enrolments_count
             ).text = "$enrolmentsCount"
 
-            val labelText = ctx.getQuantityString(
+            val labelText = context.getQuantityString(
                 R.plurals.dashboard_card_enrolments,
                 enrolmentsCount
             )
@@ -70,7 +67,7 @@ class DashboardDailyActivityCardDisplayerImpl(
                 R.id.dashboard_daily_activity_card_identifications_count
             ).text = "$identificationsCount"
 
-            val labelText = ctx.getQuantityString(
+            val labelText = context.getQuantityString(
                 R.plurals.dashboard_card_identifications,
                 identificationsCount
             )
@@ -91,7 +88,7 @@ class DashboardDailyActivityCardDisplayerImpl(
                 R.id.dashboard_daily_activity_card_verifications_count
             ).text = "$verificationsCount"
 
-            val labelText = ctx.getQuantityString(
+            val labelText = context.getQuantityString(
                 R.plurals.dashboard_card_verifications,
                 verificationsCount
             )

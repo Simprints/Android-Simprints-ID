@@ -35,7 +35,7 @@ class GeneralConsentTextHelperTest {
     @Test
     fun getGeneralConsentTextForFinger_shouldReturnCorrectGeneralConsentText() {
         val generalConsentText = GeneralConsentTextHelper(generalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER), mockk(), context).assembleText(request)
+            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER), mockk()).assembleText(request, context)
 
         assertThat(generalConsentText).isEqualTo(GENERAL_CONSENT_ENROL_FINGER_TEXT)
     }
@@ -46,7 +46,7 @@ class GeneralConsentTextHelperTest {
         val request = AskConsentRequest(ConsentType.ENROL)
 
         val generalConsentText = GeneralConsentTextHelper(generalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FACE), mockk(), context).assembleText(request)
+            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FACE), mockk()).assembleText(request, context)
 
         assertThat(generalConsentText).isEqualTo(GENERAL_CONSENT_ENROL_FACE_TEXT)
     }
@@ -54,7 +54,7 @@ class GeneralConsentTextHelperTest {
     @Test
     fun getGeneralConsentTextForMultiModal_shouldReturnCorrectGeneralConsentText() {
         val generalConsentText = GeneralConsentTextHelper(generalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER, Modality.FACE), mockk(), context).assembleText(request)
+            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER, Modality.FACE), mockk()).assembleText(request, context)
 
         assertThat(generalConsentText).isEqualTo(GENERAL_CONSENT_ENROL_MULTI_TEXT)
     }

@@ -3,10 +3,8 @@ package com.simprints.clientapi.activities.baserequest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.simprints.clientapi.R
-import com.simprints.clientapi.activities.BaseSplitActivity
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.clientapi.clientrequests.extractors.*
@@ -17,6 +15,7 @@ import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.moduleapi.app.responses.*
 import kotlinx.coroutines.launch
 import timber.log.Timber

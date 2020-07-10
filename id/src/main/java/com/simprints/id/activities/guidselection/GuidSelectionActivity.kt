@@ -3,13 +3,12 @@ package com.simprints.id.activities.guidselection
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.guidselection.GuidSelectionWorker
