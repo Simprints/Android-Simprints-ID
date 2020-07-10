@@ -7,9 +7,9 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.work.WorkManager
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.db.subjects_sync.down.local.SubjectsDownSyncOperationLocalDataSource
@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.activity_debug.*
 import javax.inject.Inject
 
 
-class DebugActivity : AppCompatActivity() {
+class DebugActivity : BaseSplitActivity() {
 
     @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
     @Inject lateinit var subjectsDownSyncOperationLocalDataSource: SubjectsDownSyncOperationLocalDataSource

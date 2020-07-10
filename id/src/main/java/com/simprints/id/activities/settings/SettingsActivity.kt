@@ -1,34 +1,35 @@
 package com.simprints.id.activities.settings
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.preference.PreferenceFragment
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
-import com.simprints.id.tools.AndroidResourcesHelper
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.tools.extensions.isXLargeTablet
 import kotlinx.android.synthetic.main.settings_toolbar.*
-import javax.inject.Inject
 
 class SettingsActivity : AppCompatPreferenceActivity() {
-
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
         private const val LOGOUT_RESULT_CODE = 1
     }
 
+    override fun attachBaseContext(newBase: Context) {
+        val languageCtx = LanguageHelper.getLanguageConfigurationContext(newBase)
+        super.attachBaseContext(languageCtx)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_toolbar)
-        (application as Application).component.inject(this)
-        title = androidResourcesHelper.getString(R.string.title_activity_settings)
+        title = getString(R.string.title_activity_settings)
 
         setupActionBar()
 
@@ -38,7 +39,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     }
 
     private fun setupActionBar() {
-        settingsToolbar.title = androidResourcesHelper.getString(R.string.settings_title)
+        settingsToolbar.title = getString(R.string.settings_title)
         setSupportActionBar(settingsToolbar)
     }
 

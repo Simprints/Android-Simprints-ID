@@ -39,7 +39,7 @@ class ModalityFlowEnrolLastBiometricsTest {
     fun startFlow_shouldBuildTheRightListOfSteps() {
         val previousSteps = listOf<Step>()
         every { hotCache.load() } returns previousSteps
-        modalityFlowEnrolLastBiometrics.startFlow(appRequest.fromModuleApiToDomain(), emptyList())
+        modalityFlowEnrolLastBiometrics.startFlow(appRequest.fromModuleApiToDomain())
 
         Truth.assertThat(modalityFlowEnrolLastBiometrics.steps).hasSize(1)
         verify { coreProcessorMock.buildAppEnrolLastBiometricsStep(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, previousSteps, GUID1) }
@@ -51,7 +51,7 @@ class ModalityFlowEnrolLastBiometricsTest {
         every { step.getStatus() } returns Step.Status.NOT_STARTED
         every { coreProcessorMock.buildAppEnrolLastBiometricsStep(any(), any(), any(), any(), any()) } returns step
 
-        modalityFlowEnrolLastBiometrics.startFlow(appRequest.fromModuleApiToDomain(), emptyList())
+        modalityFlowEnrolLastBiometrics.startFlow(appRequest.fromModuleApiToDomain())
 
         val next = modalityFlowEnrolLastBiometrics.getNextStepToLaunch()
 

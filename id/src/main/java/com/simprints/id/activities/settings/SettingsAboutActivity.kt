@@ -1,30 +1,31 @@
 package com.simprints.id.activities.settings
 
+import android.content.Context
 import android.os.Bundle
 import android.preference.PreferenceActivity
 import android.view.MenuItem
 import androidx.preference.PreferenceFragment
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
-import com.simprints.id.tools.AndroidResourcesHelper
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.tools.extensions.isXLargeTablet
 import kotlinx.android.synthetic.main.settings_toolbar.*
-import javax.inject.Inject
 
 
 class SettingsAboutActivity : AppCompatPreferenceActivity() {
-
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     companion object {
         private const val LOGOUT_RESULT_CODE = 1
     }
 
+    override fun attachBaseContext(newBase: Context) {
+        val languageCtx = LanguageHelper.getLanguageConfigurationContext(newBase)
+        super.attachBaseContext(languageCtx)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as Application).component.inject(this)
-        title = androidResourcesHelper.getString(R.string.title_activity_settings_about)
+        title = getString(R.string.title_activity_settings_about)
 
         setContentView(R.layout.settings_toolbar)
         setSupportActionBar(settingsToolbar)
@@ -55,7 +56,7 @@ class SettingsAboutActivity : AppCompatPreferenceActivity() {
     }
 
     fun finishActivityBecauseLogout() {
-        setResult(SettingsAboutActivity.LOGOUT_RESULT_CODE)
+        setResult(LOGOUT_RESULT_CODE)
         finish()
     }
 }

@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.widget.Toast
 import androidx.core.app.ActivityCompat.requestPermissions
-import com.simprints.id.tools.AndroidResourcesHelper
 
 fun Activity.runOnUiThreadIfStillRunning(then: () -> Unit) {
     runOnUiThreadIfStillRunning(then, {})
@@ -18,9 +17,9 @@ fun Activity.runOnUiThreadIfStillRunning(then: () -> Unit, otherwise: () -> Unit
     }
 }
 
-fun Activity.showToast(androidResourcesHelper: AndroidResourcesHelper, stringRes: Int) =
+fun Activity.showToast(stringRes: Int) =
     runOnUiThread {
-        Toast.makeText(this, androidResourcesHelper.getString(stringRes), Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(stringRes), Toast.LENGTH_LONG).show()
     }
 
 fun Activity.hasPermission(permission: String): Boolean {

@@ -10,7 +10,6 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -22,7 +21,6 @@ import kotlin.concurrent.schedule
 
 class OtaFragment : FingerprintFragment() {
 
-    private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
     private val timeHelper: FingerprintTimeHelper by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
 
@@ -54,11 +52,9 @@ class OtaFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        with(resourceHelper) {
-            otaTitleTextView.text = getString(R.string.ota_title)
-            otaInstructionsTextView.text = getString(R.string.ota_instructions)
-            startUpdateButton.text = getString(R.string.start_update)
-        }
+        otaTitleTextView.text = getString(R.string.ota_title)
+        otaInstructionsTextView.text = getString(R.string.ota_instructions)
+        startUpdateButton.text = getString(R.string.start_update)
     }
 
     private fun initStartUpdateButton() {
@@ -71,8 +67,9 @@ class OtaFragment : FingerprintFragment() {
         otaProgressBar.visibility = View.VISIBLE
         otaStatusTextView.visibility = View.VISIBLE
         otaStatusTextView.text = when (val retry = args.otaFragmentRequest.currentRetryAttempt) {
-            0 -> resourceHelper.getString(R.string.updating)
-            else -> resourceHelper.getString(R.string.updating_attempt, arrayOf("${retry + 1}", "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}"))
+            0 -> getString(R.string.updating)
+            else -> String.format(requireActivity().getString(R.string.updating_attempt),
+                "${retry + 1}", "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}")
         }
         startUpdateButton.visibility = View.INVISIBLE
         startUpdateButton.isEnabled = false
@@ -100,7 +97,7 @@ class OtaFragment : FingerprintFragment() {
 
     private fun listenForCompleteEvent() {
         viewModel.otaComplete.fragmentObserveEventWith {
-            otaStatusTextView.text = resourceHelper.getString(R.string.update_complete)
+            otaStatusTextView.text = getString(R.string.update_complete)
             timeHelper.newTimer().schedule(FINISHED_TIME_DELAY_MS) {
                 requireActivity().runOnUiThread { retryConnectAndFinishFragment() }
             }

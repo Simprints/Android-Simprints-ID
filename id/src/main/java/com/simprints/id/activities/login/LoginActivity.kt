@@ -3,9 +3,9 @@ package com.simprints.id.activities.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
@@ -25,7 +25,6 @@ import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
@@ -33,10 +32,9 @@ import kotlinx.android.synthetic.main.activity_login.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class LoginActivity : AppCompatActivity(R.layout.activity_login) {
+class LoginActivity : BaseSplitActivity() {
 
     @Inject lateinit var viewModelFactory: LoginViewModelFactory
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var loginActivityHelper: LoginActivityHelper
     @Inject lateinit var baseUrlProvider: BaseUrlProvider
@@ -52,6 +50,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
+        setContentView(R.layout.activity_login)
 
         baseUrlProvider.resetApiBaseUrl()
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
@@ -67,14 +66,12 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     }
 
     private fun setUpTexts() {
-        with(androidResourcesHelper) {
-            loginEditTextUserId.hint = getString(R.string.login_user_id_hint)
-            loginEditTextProjectSecret.hint = getString(R.string.login_secret_hint)
-            loginButtonScanQr.text = getString(R.string.scan_qr)
-            loginButtonSignIn.text = getString(R.string.login)
-            loginEditTextProjectId.hint = getString(R.string.login_id_hint)
-            loginImageViewLogo.contentDescription = getString(R.string.simprints_logo)
-        }
+        loginEditTextUserId.hint = getString(R.string.login_user_id_hint)
+        loginEditTextProjectSecret.hint = getString(R.string.login_secret_hint)
+        loginButtonScanQr.text = getString(R.string.scan_qr)
+        loginButtonSignIn.text = getString(R.string.login)
+        loginEditTextProjectId.hint = getString(R.string.login_id_hint)
+        loginImageViewLogo.contentDescription = getString(R.string.simprints_logo)
     }
 
     private fun setUpButtons() {
@@ -155,11 +152,11 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     }
 
     private fun showErrorForInvalidQRCode() {
-        showToast(androidResourcesHelper, R.string.login_invalid_qr_code)
+        showToast(R.string.login_invalid_qr_code)
     }
 
     private fun showErrorForQRCodeFailed() {
-        showToast(androidResourcesHelper, R.string.login_qr_code_scanning_problem)
+        showToast(R.string.login_qr_code_scanning_problem)
     }
 
     private fun logMessageForCrashReport(message: String) {
@@ -196,12 +193,12 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
 
     private fun handleMissingCredentials() {
         progressDialog.dismiss()
-        showToast(androidResourcesHelper, R.string.login_missing_credentials)
+        showToast(R.string.login_missing_credentials)
     }
 
     private fun handleProjectIdMismatch() {
         progressDialog.dismiss()
-        showToast(androidResourcesHelper, R.string.login_project_id_intent_mismatch)
+        showToast(R.string.login_project_id_intent_mismatch)
     }
 
     private fun handleSignInSuccess() {
@@ -212,17 +209,17 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
 
     private fun handleSignInFailedNoConnection() {
         progressDialog.dismiss()
-        showToast(androidResourcesHelper, R.string.login_no_network)
+        showToast(R.string.login_no_network)
     }
 
     private fun handleSignInFailedInvalidCredentials() {
         progressDialog.dismiss()
-        showToast(androidResourcesHelper, R.string.login_invalid_credentials)
+        showToast(R.string.login_invalid_credentials)
     }
 
     private fun handleSignInFailedServerError() {
         progressDialog.dismiss()
-        showToast(androidResourcesHelper, R.string.login_server_error)
+        showToast(R.string.login_server_error)
     }
 
     private fun handleSafetyNetDownError() {
