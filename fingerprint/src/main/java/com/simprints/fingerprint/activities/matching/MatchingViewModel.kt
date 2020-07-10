@@ -60,7 +60,7 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
         this.matchingRequest = matchingRequest
         this.libMatcherConstructor = libMatcherConstructor
         when (masterFlowManager.getCurrentAction()) {
-            Action.IDENTIFY -> startMatchTask(::IdentificationTask)
+            Action.ENROL, Action.IDENTIFY -> startMatchTask(::IdentificationTask)
             Action.VERIFY -> startMatchTask(::VerificationTask)
             else -> handleUnexpectedCallout()
         }

@@ -34,7 +34,7 @@ class OdkEnrolLastBiometricsRequestTest : BaseOdkClientApiTest() {
         Intents.intending(IntentMatchers.hasAction(APP_ENROL_LAST_BIOMETRICS_ACTION)).respondWith(intentResultOk)
 
         clientApiSessionEventsManager = mockk(relaxed = true)
-        coEvery { clientApiSessionEventsManager.isCurrentSessionAnIdentification() } returns true
+        coEvery { clientApiSessionEventsManager.isCurrentSessionAnIdentificationOrEnrolment() } returns true
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns sessionIdField.value()
 
         declareModule {
