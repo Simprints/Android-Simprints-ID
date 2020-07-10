@@ -94,9 +94,9 @@ class AlertPresenter(val view: AlertContract.View,
     private fun getParamsForModalityDownloadCancelledAlert() = with(preferencesManager.modalities) {
         when {
             isFingerprintAndFace() -> {
-                listOf(view.getTranslatedString(R.string.fingerprint_camera_feature_alert)) }
+                listOf(view.getTranslatedString(R.string.fingerprint_face_feature_alert)) }
             isFace() -> {
-                listOf(view.getTranslatedString(R.string.camera_feature_alert)) }
+                listOf(view.getTranslatedString(R.string.face_feature_alert)) }
             isFingerprint() -> {
                 listOf(view.getTranslatedString(R.string.fingerprint_feature_alert)) }
             else -> {
