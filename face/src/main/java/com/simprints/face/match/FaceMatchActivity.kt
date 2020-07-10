@@ -11,9 +11,9 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.getStringPlural
 import com.simprints.face.R
-import com.simprints.face.base.BaseSplitActivity
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.face.match.FaceMatchViewModel.MatchState.*

@@ -3,12 +3,11 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.LoginActivity

@@ -7,9 +7,9 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest

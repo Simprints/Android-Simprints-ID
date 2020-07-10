@@ -7,10 +7,10 @@ import android.os.Bundle
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.whenNonNull
 import com.simprints.core.tools.whenNull
 import com.simprints.face.R
-import com.simprints.face.base.BaseSplitActivity
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceRequest

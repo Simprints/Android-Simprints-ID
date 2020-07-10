@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard.cards.project.displayer
 
-import android.content.Context
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -12,10 +11,8 @@ import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjec
 class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDisplayer {
 
     private lateinit var root: LinearLayout
-    private lateinit var ctx: Context
 
-    override fun initRoot(rootLayout: LinearLayout, context: Context) {
-        ctx = context
+    override fun initRoot(rootLayout: LinearLayout) {
         root = rootLayout
     }
 
@@ -34,7 +31,7 @@ class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDispl
     private fun View.setCurrentUser(currentUser: String) {
         findViewById<TextView>(
             R.id.dashboard_project_details_card_current_user
-        ).text = String.format(ctx.getString(
+        ).text = String.format(context.getString(
             R.string.dashboard_card_current_user), currentUser)
     }
 
@@ -46,7 +43,7 @@ class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDispl
                 this.visibility = GONE
             } else {
                 this.visibility = VISIBLE
-                text = String.format(ctx.getString(
+                text = String.format(context.getString(
                     R.string.dashboard_card_scanner_used), scannerUsed)
             }
         }

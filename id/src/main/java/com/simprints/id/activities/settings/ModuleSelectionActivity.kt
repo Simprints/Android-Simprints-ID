@@ -1,23 +1,16 @@
 package com.simprints.id.activities.settings
 
-import android.content.Context
 import android.os.Bundle
 import android.view.MenuItem
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.BaseSplitActivity
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
-import com.simprints.core.tools.utils.LanguageHelper
 import kotlinx.android.synthetic.main.settings_toolbar.*
 
 class ModuleSelectionActivity : BaseSplitActivity() {
 
     private lateinit var moduleSelectionFragment: ModuleSelectionFragment
-
-    override fun attachBaseContext(newBase: Context) {
-        val languageCtx = LanguageHelper.getLanguageConfigurationContext(newBase)
-        super.attachBaseContext(languageCtx)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
