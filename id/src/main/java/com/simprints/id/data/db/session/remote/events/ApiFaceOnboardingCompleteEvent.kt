@@ -5,11 +5,15 @@ import com.simprints.id.data.db.session.domain.models.events.FaceOnboardingCompl
 
 @Keep
 class ApiFaceOnboardingCompleteEvent(
-    val relativeStartTime: Long
+    val relativeStartTime: Long,
+    val relativeEndTime: Long
 ) : ApiEvent(ApiEventType.FACE_ONBOARDING_COMPLETE) {
 
     constructor(
         faceOnboardingCompleteEvent: FaceOnboardingCompleteEvent
-    ) : this(faceOnboardingCompleteEvent.relativeStartTime ?: 0)
+    ) : this(
+        faceOnboardingCompleteEvent.relativeStartTime ?: 0,
+        faceOnboardingCompleteEvent.relativeEndTime ?: 0
+    )
 
 }

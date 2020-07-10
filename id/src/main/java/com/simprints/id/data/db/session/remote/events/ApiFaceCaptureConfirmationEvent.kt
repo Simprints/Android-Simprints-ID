@@ -6,6 +6,7 @@ import com.simprints.id.data.db.session.domain.models.events.FaceCaptureConfirma
 @Keep
 class ApiFaceCaptureConfirmationEvent(
     val relativeStartTime: Long,
+    val relativeEndTime: Long,
     val result: ApiResult
 ) : ApiEvent(ApiEventType.FACE_CAPTURE_CONFIRMATION) {
 
@@ -17,6 +18,7 @@ class ApiFaceCaptureConfirmationEvent(
 
     constructor(faceCaptureConfirmationEvent: FaceCaptureConfirmationEvent) : this(
         faceCaptureConfirmationEvent.relativeStartTime ?: 0,
+        faceCaptureConfirmationEvent.relativeEndTime ?: 0,
         faceCaptureConfirmationEvent.result.fromDomainToApi()
     )
 
