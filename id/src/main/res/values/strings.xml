@@ -114,8 +114,8 @@
     <string name="modality_installation_offline">Check Wi-Fi or mobile data is turned on in settings to complete download</string>
     <string name="feature_not_downloaded">To use Simprints please continue and download the %1$s</string>
     <string name="fingerprint_feature_alert">fingerprint feature</string>
-    <string name="camera_feature_alert">camera feature</string>
-    <string name="fingerprint_camera_feature_alert">fingerprint and camera features</string>
+    <string name="face_feature_alert">face feature</string>
+    <string name="fingerprint_face_feature_alert">fingerprint and face features</string>
 
     <!-- Button Labels For Error Messages -->
     <string name="close">CLOSE</string>
