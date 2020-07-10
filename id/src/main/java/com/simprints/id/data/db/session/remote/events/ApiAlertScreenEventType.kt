@@ -53,8 +53,8 @@ class ApiAlertScreenEvent(
         INVALID_USER_ID,
         INVALID_VERIFY_ID,
         SAFETYNET_ERROR,
-        FACE_INVALID_LICENSE,
-        FACE_MISSING_LICENSE;
+        FACE_LICENSE_INVALID,
+        FACE_LICENSE_MISSING;
 
         companion object {
             fun fromDomainToApi(type: AlertScreenEvent.AlertScreenEventType): ApiAlertScreenEventType =
@@ -87,8 +87,8 @@ class ApiAlertScreenEvent(
                     AlertScreenEvent.AlertScreenEventType.SAFETYNET_ERROR -> SAFETYNET_ERROR
                     AlertScreenEvent.AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
                     AlertScreenEvent.AlertScreenEventType.INVALID_STATE_FOR_INTENT_ACTION -> INVALID_STATE_FOR_INTENT_ACTION
-                    AlertScreenEvent.AlertScreenEventType.FACE_INVALID_LICENSE -> FACE_INVALID_LICENSE
-                    AlertScreenEvent.AlertScreenEventType.FACE_MISSING_LICENSE -> FACE_MISSING_LICENSE
+                    AlertScreenEvent.AlertScreenEventType.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
+                    AlertScreenEvent.AlertScreenEventType.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
                 }
         }
     }
