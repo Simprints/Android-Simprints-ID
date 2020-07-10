@@ -94,7 +94,8 @@ class OrchestratorModule {
             timeHelper,
             sessionRepository,
             preferenceManager.consentRequired,
-            preferenceManager.locationPermissionRequired
+            preferenceManager.locationPermissionRequired,
+            preferenceManager.modalities
         )
 
     @Provides
@@ -114,7 +115,8 @@ class OrchestratorModule {
             timeHelper,
             sessionRepository,
             preferenceManager.consentRequired,
-            preferenceManager.locationPermissionRequired
+            preferenceManager.locationPermissionRequired,
+            preferenceManager.modalities
         )
 
     @Provides
@@ -128,14 +130,9 @@ class OrchestratorModule {
         sessionRepository: SessionRepository
     ): ModalityFlow =
         ModalityFlowIdentifyImpl(
-            fingerprintStepProcessor,
-            faceStepProcessor,
-            coreStepProcessor,
-            prefs.matchGroup,
-            timeHelper,
-            sessionRepository,
-            prefs.consentRequired,
-            prefs.locationPermissionRequired
+            fingerprintStepProcessor, faceStepProcessor,
+            coreStepProcessor, prefs.matchGroup, timeHelper, sessionRepository, prefs.consentRequired, prefs.locationPermissionRequired,
+            prefs.modalities
         )
 
     // Orchestration

@@ -7,11 +7,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
-import com.simprints.id.tools.AndroidResourcesHelper
 
-class DashboardProjectDetailsCardDisplayerImpl(
-    private val androidResourcesHelper: AndroidResourcesHelper
-) : DashboardProjectDetailsCardDisplayer {
+class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDisplayer {
 
     private lateinit var root: LinearLayout
 
@@ -34,9 +31,8 @@ class DashboardProjectDetailsCardDisplayerImpl(
     private fun View.setCurrentUser(currentUser: String) {
         findViewById<TextView>(
             R.id.dashboard_project_details_card_current_user
-        ).text = androidResourcesHelper.getString(
-            R.string.dashboard_card_current_user, arrayOf(currentUser)
-        )
+        ).text = String.format(context.getString(
+            R.string.dashboard_card_current_user), currentUser)
     }
 
     private fun View.setScannerUsed(scannerUsed: String) {
@@ -47,9 +43,8 @@ class DashboardProjectDetailsCardDisplayerImpl(
                 this.visibility = GONE
             } else {
                 this.visibility = VISIBLE
-                text = androidResourcesHelper.getString(
-                    R.string.dashboard_card_scanner_used, arrayOf(scannerUsed)
-                )
+                text = String.format(context.getString(
+                    R.string.dashboard_card_scanner_used), scannerUsed)
             }
         }
     }
