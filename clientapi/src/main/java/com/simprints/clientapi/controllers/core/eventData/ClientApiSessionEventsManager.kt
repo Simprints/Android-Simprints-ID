@@ -18,5 +18,5 @@ interface ClientApiSessionEventsManager {
 
     suspend fun getCurrentSessionId(): String
 
-    suspend fun isCurrentSessionAnIdentification(): Boolean
+    suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean
 }

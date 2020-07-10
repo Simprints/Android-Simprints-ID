@@ -93,7 +93,9 @@ class OrchestratorModule {
             timeHelper,
             sessionRepository,
             preferenceManager.consentRequired,
-            preferenceManager.locationPermissionRequired
+            preferenceManager.locationPermissionRequired,
+            preferenceManager.enrolmentPlus,
+            preferenceManager.matchGroup
         )
 
     @Provides
@@ -195,8 +197,9 @@ class OrchestratorModule {
     @Provides
     fun provideAppResponseBuilderFactory(
         enrolmentHelper: EnrolmentHelper,
-        timeHelper: TimeHelper
-    ): AppResponseFactory = AppResponseFactoryImpl(enrolmentHelper, timeHelper)
+        timeHelper: TimeHelper,
+        preferenceManager: PreferencesManager
+    ): AppResponseFactory = AppResponseFactoryImpl(enrolmentHelper, timeHelper, preferenceManager.enrolmentPlus)
 
     @Provides
     fun provideFlowManager(
