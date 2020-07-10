@@ -59,10 +59,11 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
                                                LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = ::LibMatcher) {
         this.matchingRequest = matchingRequest
         this.libMatcherConstructor = libMatcherConstructor
+
+        //Will be deprecated. The matching will have to run irrespective of the action from the calling app.
         when (masterFlowManager.getCurrentAction()) {
             Action.ENROL, Action.IDENTIFY -> startMatchTask(::IdentificationTask)
             Action.VERIFY -> startMatchTask(::VerificationTask)
-            else -> handleUnexpectedCallout()
         }
     }
 
@@ -114,11 +115,6 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
                 EVENT.MATCH_COMPLETED -> emitter.onSuccess(MatchResult(candidates, scores))
                 else -> emitter.onError(FingerprintSimprintsException("Matching Error : $event"))
             }
-    }
-
-    private fun handleUnexpectedCallout() {
-        crashReportManager.logExceptionOrSafeException(InvalidRequestForMatchingActivityException("Invalid action in MatchingActivity"))
-        alert.postValue(FingerprintAlert.UNEXPECTED_ERROR)
     }
 
     override fun onCleared() {
