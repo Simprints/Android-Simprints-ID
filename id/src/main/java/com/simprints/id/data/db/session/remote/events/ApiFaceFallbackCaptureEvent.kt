@@ -5,11 +5,15 @@ import com.simprints.id.data.db.session.domain.models.events.FaceFallbackCapture
 
 @Keep
 class ApiFaceFallbackCaptureEvent(
-    val relativeStartTime: Long
+    val relativeStartTime: Long,
+    val relativeEndTime: Long
 ) : ApiEvent(ApiEventType.FACE_FALLBACK_CAPTURE) {
 
     constructor(
         faceFallbackCaptureEvent: FaceFallbackCaptureEvent
-    ) : this(faceFallbackCaptureEvent.relativeStartTime ?: 0)
+    ) : this(
+        faceFallbackCaptureEvent.relativeStartTime ?: 0,
+        faceFallbackCaptureEvent.relativeEndTime ?: 0
+    )
 
 }

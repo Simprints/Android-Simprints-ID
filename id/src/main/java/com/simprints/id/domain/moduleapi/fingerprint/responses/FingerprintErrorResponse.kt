@@ -22,13 +22,15 @@ fun IFingerprintErrorResponse.fromModuleApiToDomain() =
 enum class FingerprintErrorReason {
     UNEXPECTED_ERROR,
     BLUETOOTH_NOT_SUPPORTED,
-    GUID_NOT_FOUND_ONLINE
+    GUID_NOT_FOUND_ONLINE,
+    FINGERPRINT_CONFIGURATION_ERROR
 }
 
 fun IFingerprintErrorReason.fromModuleApiToDomain(): FingerprintErrorReason =
     when(this) {
         IFingerprintErrorReason.UNEXPECTED_ERROR -> FingerprintErrorReason.UNEXPECTED_ERROR
         IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED -> FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
+        IFingerprintErrorReason.FINGERPRINT_CONFIGURATION_ERROR -> FingerprintErrorReason.FINGERPRINT_CONFIGURATION_ERROR
     }
 
 fun FingerprintErrorReason.toAppErrorReason(): AppErrorResponse.Reason =
@@ -36,4 +38,5 @@ fun FingerprintErrorReason.toAppErrorReason(): AppErrorResponse.Reason =
         FingerprintErrorReason.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
         FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
         FingerprintErrorReason.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
+        FingerprintErrorReason.FINGERPRINT_CONFIGURATION_ERROR -> FINGERPRINT_CONFIGURATION_ERROR
     }

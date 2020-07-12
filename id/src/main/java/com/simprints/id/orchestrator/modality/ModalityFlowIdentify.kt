@@ -34,6 +34,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppIdentifyRequest)
+        addModalityConfigurationSteps(modalities)
         addSetupStep()
         addCoreConsentStepIfRequired(ConsentType.IDENTIFY)
         steps.addAll(buildStepsList(modalities))

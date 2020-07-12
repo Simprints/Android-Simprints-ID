@@ -25,10 +25,10 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorI
 class ModalityFlowVerifyImplTest {
 
     companion object {
-        const val NUMBER_STEPS_FACE_OR_FINGER_VERIFY = 4
-        const val NUMBER_STEPS_FACE_AND_FINGER_VERIFY = 5
-        const val NUMBER_STEPS_FACE_OR_FINGER_VERIFY_WITHOUT_CONSENT = 3
-        const val NUMBER_STEPS_FACE_AND_FINGER_VERIFY_WITHOUT_CONSENT = 4
+        const val NUMBER_STEPS_FACE_OR_FINGER_VERIFY = 5
+        const val NUMBER_STEPS_FACE_AND_FINGER_VERIFY = 7
+        const val NUMBER_STEPS_FACE_OR_FINGER_VERIFY_WITHOUT_CONSENT = 4
+        const val NUMBER_STEPS_FACE_AND_FINGER_VERIFY_WITHOUT_CONSENT = 6
     }
 
     private lateinit var modalityFlowVerify: ModalityFlowVerifyImpl
@@ -55,6 +55,8 @@ class ModalityFlowVerifyImplTest {
 
         every { fingerprintStepProcessor.buildStepToCapture() } returns fingerprintStepMock
         every { faceStepProcessor.buildCaptureStep() } returns faceStepMock
+        every { fingerprintStepProcessor.buildConfigurationStep() } returns fingerprintStepMock
+        every { faceStepProcessor.buildConfigurationStep() } returns faceStepMock
         every { coreStepProcessor.buildFetchGuidStep(any(), any()) } returns verifyCoreStepMock
         every { coreStepProcessor.buildStepConsent(any()) } returns consentCoreStepMock
         every { coreStepProcessor.buildStepSetup(any()) } returns setupCoreStepMock
@@ -67,10 +69,11 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER_VERIFY)
-            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), FETCH_GUID_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), FETCH_GUID_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), FACE_ACTIVITY_NAME)
         }
     }
 
@@ -81,10 +84,11 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER_VERIFY)
-            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), FETCH_GUID_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), FETCH_GUID_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -95,11 +99,13 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY)
-            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), FETCH_GUID_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
-            verifyStepWasAdded(get(4), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FETCH_GUID_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(5), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(6), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -110,11 +116,13 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY)
-            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), FETCH_GUID_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(4), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FETCH_GUID_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(5), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(6), FACE_ACTIVITY_NAME)
         }
     }
 
@@ -125,9 +133,10 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER_VERIFY_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), FETCH_GUID_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), FETCH_GUID_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
         }
     }
 
@@ -138,9 +147,10 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER_VERIFY_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), FETCH_GUID_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), FETCH_GUID_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -151,10 +161,12 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), FETCH_GUID_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FACE_ACTIVITY_NAME)
-            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FETCH_GUID_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(5), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -165,10 +177,12 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), FETCH_GUID_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FETCH_GUID_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(5), FACE_ACTIVITY_NAME)
         }
     }
 
