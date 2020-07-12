@@ -1,22 +1,30 @@
 package com.simprints.id.orchestrator.modality
 
+import android.app.Activity
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.enrolAppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CONSENT_ACTIVITY_NAME
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.SETUP_ACTIVITY_NAME
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.tools.TimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl.Companion.ACTIVITY_CLASS_NAME as FACE_ACTIVITY_NAME
@@ -159,8 +167,35 @@ class ModalityFlowEnrolImplTest {
         }
     }
 
-    private fun buildModalityFlowEnrol(consentRequired: Boolean) {
+    @Test
+    fun enrolmentPlusForFinger_shouldAddMatchStepAfterCapture() = runBlockingTest {
+        val fingerprintCaptureResponse = mockk<FingerprintCaptureResponse>()
+        buildModalityFlowEnrol(consentRequired = false, isEnrolmentPlus = true)
+        val appRequest = buildAppEnrolRequest()
+        every { fingerprintStepProcessor.processResult(any(), any(), any()) } returns fingerprintCaptureResponse
+
+        modalityFlowEnrol.handleIntentResult(appRequest, FingerprintRequestCode.CAPTURE.value, Activity.RESULT_OK, mockk())
+
+        verify(exactly = 1) { fingerprintStepProcessor.buildStepToMatch(any(), any()) }
+    }
+
+    @Test
+    fun enrolmentPlusForFace_shouldAddMatchStepAfterCapture() = runBlockingTest {
+        val faceCaptureResponse = mockk<FaceCaptureResponse>()
+        buildModalityFlowEnrol(consentRequired = false, isEnrolmentPlus = true)
+        val appRequest = buildAppEnrolRequest()
+        every { faceStepProcessor.processResult(any(), any(), any()) } returns faceCaptureResponse
+
+        modalityFlowEnrol.handleIntentResult(appRequest, FaceRequestCode.CAPTURE.value, Activity.RESULT_OK, mockk())
+
+        verify(exactly = 1) { faceStepProcessor.buildStepMatch(any(), any()) }
+    }
+
+    private fun buildAppEnrolRequest() =
+        AppEnrolRequest("projectId", "userId", "moduleId", "metadata")
+
+    private fun buildModalityFlowEnrol(consentRequired: Boolean, isEnrolmentPlus: Boolean = false) {
         modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired = true, isEnrolmentPlus = false, matchGroup = GROUP.GLOBAL)
+            coreStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired = true, isEnrolmentPlus = isEnrolmentPlus, matchGroup = GROUP.GLOBAL)
     }
 }
