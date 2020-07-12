@@ -5,6 +5,7 @@ import com.simprints.id.data.db.event.domain.events.*
 import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
 import com.simprints.id.data.db.event.domain.events.callback.*
 import com.simprints.id.data.db.event.domain.events.callout.*
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordDeletionEvent
 import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordMoveEvent
@@ -48,6 +49,8 @@ fun DbEvent.toDomainEvent(): Event? =
             ENROLMENT_RECORD_CREATION -> JsonHelper.gson.fromJson(it, EnrolmentRecordCreationEvent::class.java)
             ENROLMENT_RECORD_DELETION -> JsonHelper.gson.fromJson(it, EnrolmentRecordDeletionEvent::class.java)
             ENROLMENT_RECORD_MOVE -> JsonHelper.gson.fromJson(it, EnrolmentRecordMoveEvent::class.java)
+            SESSION_CAPTURE -> JsonHelper.gson.fromJson(it, SessionCaptureEvent::class.java)
+
             null -> null
         }
     }
