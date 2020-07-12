@@ -124,7 +124,7 @@ object KoinInjector {
 
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
-        single { ScannerPairingManager(get()) }
+        single { ScannerPairingManager(get(), get(), get(), get()) }
         single { ScannerInitialSetupHelper(get(), get(), get()) }
         single { ConnectionHelper(get()) }
         single { CypressOtaHelper(get(), get()) }
