@@ -47,14 +47,14 @@ class NfcPairFragment : FingerprintFragment() {
     private val timeHelper: FingerprintTimeHelper by inject()
 
     private val bluetoothPairStateChangeReceiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
-        onPairSuccess = ::checkIfNowBondedToSingleScannerThenProceed,
+        onPairSuccess = ::checkIfNowBondedToChosenScannerThenProceed,
         onPairFailed = ::handlePairingAttemptFailed
     )
 
     // Sometimes the BOND_BONDED state is never sent, so we need to check after a timeout whether the devices are paired
     private val handler = Handler()
     private val determineWhetherPairingWasSuccessful = Runnable {
-        checkIfNowBondedToSingleScannerThenProceed()
+        checkIfNowBondedToChosenScannerThenProceed()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -140,8 +140,9 @@ class NfcPairFragment : FingerprintFragment() {
         handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
     }
 
-    private fun checkIfNowBondedToSingleScannerThenProceed() {
-        if (scannerPairingManager.isOnlyPairedToOneScanner()) {
+    private fun checkIfNowBondedToChosenScannerThenProceed() {
+        if (viewModel.awaitingToPairToMacAddress.value?.peekContent()
+                ?.let { scannerPairingManager.isAddressPaired(it) } == true) {
             retryConnectAndFinishFragment()
         } else {
             handlePairingAttemptFailed()

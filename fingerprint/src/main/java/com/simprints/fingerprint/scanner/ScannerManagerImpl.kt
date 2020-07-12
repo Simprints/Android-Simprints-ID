@@ -39,17 +39,16 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
         scanner?.method() ?: throw NullScannerException()
 
     override fun initScanner(): Completable = Completable.create {
-        val pairedScanners = pairingManager.getPairedScannerAddresses()
-        when {
-            pairedScanners.isEmpty() -> it.onError(ScannerNotPairedException())
-            pairedScanners.size > 1 -> it.onError(MultipleScannersPairedException())
-            else -> {
-                val macAddress = pairedScanners[0]
-                scanner = scannerFactory.create(macAddress)
-                lastPairedMacAddress = macAddress
-                lastPairedScannerId = serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
-                it.onComplete()
-            }
+        try {
+            val macAddress = pairingManager.getPairedScannerAddressToUse()
+            scanner = scannerFactory.create(macAddress)
+            lastPairedMacAddress = macAddress
+            lastPairedScannerId = serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
+            it.onComplete()
+        } catch (e: ScannerNotPairedException) {
+            it.onError(e)
+        } catch (e: MultipleScannersPairedException) {
+            it.onError(e)
         }
     }
 
