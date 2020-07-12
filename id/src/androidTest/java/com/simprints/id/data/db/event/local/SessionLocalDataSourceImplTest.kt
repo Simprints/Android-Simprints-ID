@@ -1,10 +1,8 @@
 package com.simprints.id.data.db.event.local
 
-import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.utils.isValidGuid
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidator

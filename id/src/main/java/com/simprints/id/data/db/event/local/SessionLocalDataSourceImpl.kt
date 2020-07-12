@@ -25,10 +25,10 @@ import io.realm.RealmQuery
 import io.realm.Sort
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.*
 
 open class SessionLocalDataSourceImpl(private val appContext: Context,
                                       private val secureDataManager: SecureLocalDbKeyProvider,
@@ -60,7 +60,9 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
                     closeAnyOpenSession(reamInTrans)
 
                     val count = addQueryParams(reamInTrans, SessionQuery()).count().toInt()
-                    val session = SessionCaptureEvent(
+                    val sessionCaptureEvent = SessionCaptureEvent(
+                        timeHelper.now(),
+                        UUID.randomUUID().toString(),
                         SessionRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN,
                         appVersionName,
                         libSimprintsVersionName,
@@ -69,12 +71,10 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
                             Build.VERSION.SDK_INT.toString(),
                             Build.MANUFACTURER + "_" + Build.MODEL,
                             deviceId),
-                        timeHelper.now(),
                         DatabaseInfo(count))
 
-                    val dbSession = DbSession(session)
-                    reamInTrans.insert(dbSession)
-                    Timber.d("Session created ${dbSession.id}")
+                    reamInTrans.insert(sessionCaptureEvent.fr)
+                    Timber.d("Session created ${sessionCaptureEvent.id}")
                 }
             }
         }
