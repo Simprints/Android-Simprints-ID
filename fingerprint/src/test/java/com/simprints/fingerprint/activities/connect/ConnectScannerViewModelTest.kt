@@ -15,10 +15,9 @@ import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration.*
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.versions.*
-import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
-import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
+import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
+import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
 import com.simprints.fingerprint.testtools.assertEventReceived
@@ -51,6 +50,7 @@ class ConnectScannerViewModelTest : KoinTest {
     private val crashReportManager: FingerprintCrashReportManager = mockk(relaxed = true)
     private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true)
     private val bluetoothAdapter: ComponentBluetoothAdapter = mockk()
+    private val pairingManager: ScannerPairingManager = mockk()
     private val nfcManager: NfcManager = mockk()
     private val scannerFactory: ScannerFactory = mockk()
 
@@ -65,6 +65,7 @@ class ConnectScannerViewModelTest : KoinTest {
             factory { crashReportManager }
             factory { preferencesManager }
             factory { bluetoothAdapter }
+            factory { pairingManager }
             factory { nfcManager }
             factory { scannerFactory }
         }
@@ -310,7 +311,11 @@ class ConnectScannerViewModelTest : KoinTest {
 
     private fun setupBluetooth(isEnabled: Boolean = true, numberOfPairedScanners: Int = 1) {
         every { bluetoothAdapter.isEnabled() } returns isEnabled
-        every { bluetoothAdapter.getBondedDevices() } returns List(numberOfPairedScanners) { DummyBluetoothDevice.random() }.toSet()
+        when (numberOfPairedScanners) {
+            0 -> every { pairingManager.getPairedScannerAddressToUse() } throws ScannerNotPairedException()
+            1 -> every { pairingManager.getPairedScannerAddressToUse() } returns DummyBluetoothDevice.random().address
+            else -> every { pairingManager.getPairedScannerAddressToUse() } throws MultipleScannersPairedException()
+        }
     }
 
     private fun setupNfc(doesDeviceHaveNfcCapability: Boolean? = null, isEnabled: Boolean? = null) {
