@@ -9,7 +9,7 @@ import java.util.*
 
 @Keep
 class EnrolmentRecordCreationEvent(
-    creationTime: Long,
+    createdAt: Long,
     subjectId: String,
     projectId: String,
     moduleId: String,
@@ -19,16 +19,16 @@ class EnrolmentRecordCreationEvent(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(ProjectId(projectId), ModuleId(listOf(moduleId)), AttendantId(attendantId)),
-    EnrolmentRecordCreationPayload(creationTime, DEFAULT_EVENT_VERSION, subjectId, projectId, moduleId, attendantId, biometricReferences)) {
+    EnrolmentRecordCreationPayload(createdAt, DEFAULT_EVENT_VERSION, subjectId, projectId, moduleId, attendantId, biometricReferences)) {
 
     class EnrolmentRecordCreationPayload(
-        creationTime: Long,
-        version: Int,
+        createdAt: Long,
+        eventVersion: Int,
         val subjectId: String,
         val projectId: String,
         val moduleId: String,
         val attendantId: String,
         val biometricReferences: List<BiometricReference>
-    ) : EventPayload(EventPayloadType.ENROLMENT_RECORD_CREATION, version, creationTime)
+    ) : EventPayload(EventPayloadType.ENROLMENT_RECORD_CREATION, eventVersion, createdAt)
 // startTime and relativeStartTime are not used for Pokodex events
 }

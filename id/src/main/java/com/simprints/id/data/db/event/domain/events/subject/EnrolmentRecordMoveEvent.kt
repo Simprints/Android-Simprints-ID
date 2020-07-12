@@ -10,19 +10,19 @@ import java.util.*
 
 @Keep
 class EnrolmentRecordMoveEvent(
-    creationTime: Long,
+    createdAt: Long,
     enrolmentRecordCreation: EnrolmentRecordCreationPayload?,
     enrolmentRecordDeletion: EnrolmentRecordDeletionPayload
 ) : Event(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(), //StopShip: to check with cloud - labels empty?
-    EnrolmentRecordMovePayload(creationTime, DEFAULT_EVENT_VERSION, enrolmentRecordCreation, enrolmentRecordDeletion)) {
+    EnrolmentRecordMovePayload(createdAt, DEFAULT_EVENT_VERSION, enrolmentRecordCreation, enrolmentRecordDeletion)) {
 
     class EnrolmentRecordMovePayload(
-        creationTime: Long,
-        version: Int,
+        createdAt: Long,
+        eventVersion: Int,
         val enrolmentRecordCreation: EnrolmentRecordCreationPayload?,
         val enrolmentRecordDeletion: EnrolmentRecordDeletionPayload
-    ) : EventPayload(EventPayloadType.ENROLMENT_RECORD_MOVE, version, creationTime)
+    ) : EventPayload(EventPayloadType.ENROLMENT_RECORD_MOVE, eventVersion, createdAt)
 }

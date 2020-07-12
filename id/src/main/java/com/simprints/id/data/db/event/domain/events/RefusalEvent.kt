@@ -5,7 +5,7 @@ import java.util.*
 
 @Keep
 class RefusalEvent(
-    creationTime: Long,
+    createdAt: Long,
     endTime: Long,
     reason: RefusalPayload.Answer,
     otherText: String,
@@ -14,15 +14,15 @@ class RefusalEvent(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    RefusalPayload(creationTime, DEFAULT_EVENT_VERSION, endTime, reason, otherText)) {
+    RefusalPayload(createdAt, DEFAULT_EVENT_VERSION, endTime, reason, otherText)) {
 
 
     @Keep
-    class RefusalPayload(creationTime: Long,
-                         version: Int,
+    class RefusalPayload(createdAt: Long,
+                         eventVersion: Int,
                          val endTime: Long,
                          val reason: Answer,
-                         val otherText: String) : EventPayload(EventPayloadType.REFUSAL, version, creationTime) {
+                         val otherText: String) : EventPayload(EventPayloadType.REFUSAL, eventVersion, createdAt) {
 
         @Keep
         enum class Answer {

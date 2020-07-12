@@ -5,20 +5,32 @@ import com.simprints.id.data.db.event.domain.events.ConnectivitySnapshotEvent
 import com.simprints.id.data.db.event.domain.events.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
 import com.simprints.id.tools.utils.SimNetworkUtils
 
+
 @Keep
-class ApiConnectivitySnapshotEvent(
-    val relativeStartTime: Long,
-    val networkType: String,
-    val connections: List<ApiConnection>) : ApiEvent(ApiEventType.CONNECTIVITY_SNAPSHOT) {
+class ApiConnectivitySnapshotEvent(domainEvent: ConnectivitySnapshotEvent) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
+
 
     @Keep
-    class ApiConnection(val type: String, val state: String) {
-        constructor(connection: SimNetworkUtils.Connection)
-            : this(connection.type, connection.state.toString())
-    }
+    class ApiConnectivitySnapshotPayload(
+        createdAt: Long,
+        eventVersion: Int,
+        val networkType: String,
+        val connections: List<ApiConnection>) : ApiEventPayload(ApiEventPayloadType.CONNECTIVITY_SNAPSHOT, eventVersion, createdAt) {
 
-    constructor(connectivitySnapshotEvent: ConnectivitySnapshotEvent) :
-        this((connectivitySnapshotEvent.payload as ConnectivitySnapshotPayload).creationTime ?: 0,
-            connectivitySnapshotEvent.payload.networkType,
-            connectivitySnapshotEvent.payload.connections.map { ApiConnection(it) })
+        @Keep
+        class ApiConnection(val type: String, val state: String) {
+            constructor(connection: SimNetworkUtils.Connection)
+                : this(connection.type, connection.state.toString())
+        }
+
+        constructor(domainPayload: ConnectivitySnapshotPayload) :
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
+                domainPayload.networkType,
+                domainPayload.connections.map { ApiConnection(it) })
+    }
 }

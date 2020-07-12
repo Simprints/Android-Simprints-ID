@@ -5,9 +5,21 @@ import com.simprints.id.data.db.event.domain.events.GuidSelectionEvent
 import com.simprints.id.data.db.event.domain.events.GuidSelectionEvent.GuidSelectionPayload
 
 @Keep
-class ApiGuidSelectionEvent(val relativeStartTime: Long,
-                            val selectedId: String) : ApiEvent(ApiEventType.GUID_SELECTION) {
+class ApiGuidSelectionEvent(domainEvent: GuidSelectionEvent) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
 
-    constructor(guidSelectionEvent: GuidSelectionEvent) :
-        this((guidSelectionEvent.payload as GuidSelectionPayload).creationTime, guidSelectionEvent.payload.selectedId)
+
+    @Keep
+    class ApiGuidSelectionPayload(createdAt: Long,
+                                  eventVersion: Int,
+                                  val selectedId: String) : ApiEventPayload(ApiEventPayloadType.GUID_SELECTION, eventVersion, createdAt) {
+
+        constructor(domainPayload: GuidSelectionPayload) :
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
+                domainPayload.selectedId)
+    }
 }

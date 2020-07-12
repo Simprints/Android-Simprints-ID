@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.remote.events.callback
 
-import com.simprints.id.data.db.event.domain.events.callback.ErrorCallbackEvent.ErrorCallbackEventPayload
-import com.simprints.id.data.db.event.domain.events.callback.ErrorCallbackEvent.ErrorCallbackEventPayload.Reason.*
+import com.simprints.id.data.db.event.domain.events.callback.ErrorCallbackEvent.ErrorCallbackPayload
+import com.simprints.id.data.db.event.domain.events.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.*
 import io.realm.internal.Keep
 
 @Keep
@@ -25,7 +25,7 @@ class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.ERRO
     }
 }
 
-fun ErrorCallbackEventPayload.Reason.fromDomainToApi() =
+fun ErrorCallbackPayload.Reason.fromDomainToApi() =
     when(this) {
         DIFFERENT_PROJECT_ID_SIGNED_IN -> ApiErrorCallback.ApiReason.DIFFERENT_PROJECT_ID_SIGNED_IN
         DIFFERENT_USER_ID_SIGNED_IN -> ApiErrorCallback.ApiReason.DIFFERENT_USER_ID_SIGNED_IN

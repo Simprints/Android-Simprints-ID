@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.remote.session
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.session.DatabaseInfo
+import com.simprints.id.data.db.event.domain.events.session.DatabaseInfo
 
 @Keep
 open class ApiDatabaseInfo(var recordCount: Int?,
@@ -9,3 +9,6 @@ open class ApiDatabaseInfo(var recordCount: Int?,
     constructor(databaseInfo: DatabaseInfo) :
         this(databaseInfo.recordCount, databaseInfo.sessionCount)
 }
+
+fun DatabaseInfo.fromDomainToApi() =
+    ApiDatabaseInfo(recordCount, sessionCount)

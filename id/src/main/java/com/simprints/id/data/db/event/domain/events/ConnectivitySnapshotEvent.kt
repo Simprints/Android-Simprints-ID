@@ -7,7 +7,7 @@ import java.util.*
 
 @Keep
 class ConnectivitySnapshotEvent(
-    creationTime: Long,
+    createdAt: Long,
     networkType: String,
     connections: List<SimNetworkUtils.Connection>,
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
@@ -15,15 +15,15 @@ class ConnectivitySnapshotEvent(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    ConnectivitySnapshotPayload(creationTime, DEFAULT_EVENT_VERSION, networkType, connections)) {
+    ConnectivitySnapshotPayload(createdAt, DEFAULT_EVENT_VERSION, networkType, connections)) {
 
     @Keep
     class ConnectivitySnapshotPayload(
-        creationTime: Long,
-        version: Int,
+        createdAt: Long,
+        eventVersion: Int,
         val networkType: String,
         val connections: List<SimNetworkUtils.Connection>
-    ) : EventPayload(EventPayloadType.CONNECTIVITY_SNAPSHOT, version, creationTime) {
+    ) : EventPayload(EventPayloadType.CONNECTIVITY_SNAPSHOT, eventVersion, createdAt) {
 
         companion object {
             fun buildEvent(simNetworkUtils: SimNetworkUtils,

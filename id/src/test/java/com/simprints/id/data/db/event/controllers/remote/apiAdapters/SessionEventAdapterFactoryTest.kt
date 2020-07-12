@@ -11,15 +11,17 @@ import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent.MatchPoo
 import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent.MatchPoolType
 import com.simprints.id.data.db.event.domain.events.callback.*
 import com.simprints.id.data.db.event.domain.events.callout.*
-import com.simprints.id.data.db.event.domain.session.DatabaseInfo
-import com.simprints.id.data.db.event.domain.session.Device
-import com.simprints.id.data.db.event.domain.session.Location
-import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.domain.events.session.DatabaseInfo
+import com.simprints.id.data.db.event.domain.events.session.Device
+import com.simprints.id.data.db.event.domain.events.session.Location
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.remote.events.*
+import com.simprints.id.data.db.event.remote.events.callback.ApiCallbackEvent
+import com.simprints.id.data.db.event.remote.events.callout.ApiCalloutEvent
 import com.simprints.id.data.db.event.remote.session.ApiDatabaseInfo
 import com.simprints.id.data.db.event.remote.session.ApiDevice
 import com.simprints.id.data.db.event.remote.session.ApiLocation
-import com.simprints.id.data.db.event.remote.session.ApiSessionEvents
+import com.simprints.id.data.db.event.remote.session.ApiSessionCapture
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.testtools.TestApplication
@@ -32,7 +34,7 @@ import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SessionEventsAdapterFactoryTest {
+class SessionEventAdapterFactoryTest {
 
     private val gsonWithAdapters = JsonHelper.gson
 
@@ -450,7 +452,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_sessionApiModel() {
-        val session = SessionEvents(
+        val session = SessionCaptureEvent(
             "project_id",
             "appVersionName",
             "libVersionName",
@@ -465,7 +467,7 @@ class SessionEventsAdapterFactoryTest {
                 AlertScreenEvent.AlertScreenEventType.INVALID_SELECTED_ID
             )
         )
-        val apiSession = ApiSessionEvents(session)
+        val apiSession = ApiSessionCapture(session)
         val json = gsonWithAdapters.toJsonTree(apiSession).asJsonObject
         validateSessionEventsApiModel(json)
     }

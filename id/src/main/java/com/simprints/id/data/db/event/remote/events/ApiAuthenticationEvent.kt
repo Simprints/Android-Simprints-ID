@@ -4,42 +4,54 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.AuthenticationEvent
 import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload
 import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.Result.*
+import com.simprints.id.data.db.event.remote.events.ApiAuthenticationEvent.ApiAuthenticationPayload.ApiResult
+
 @Keep
-class ApiAuthenticationEvent(val relativeStartTime: Long,
-                             val relativeEndTime: Long,
-                             val userInfo: ApiUserInfo,
-                             val result: ApiResult) : ApiEvent(ApiEventType.AUTHENTICATION) {
+class ApiAuthenticationEvent(domainEvent: AuthenticationEvent) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiUserInfo(val projectId: String, val userId: String) {
-        constructor(userInfoDomain: AuthenticationPayload.UserInfo):
-            this(userInfoDomain.projectId, userInfoDomain.userId)
-    }
+    class ApiAuthenticationPayload(createdAt: Long,
+                                   version: Int,
+                                   val endedAt: Long,
+                                   val userInfo: ApiUserInfo,
+                                   val result: ApiResult) : ApiEventPayload(ApiEventPayloadType.AUTHENTICATION, version, createdAt) {
 
-    @Keep
-    enum class ApiResult {
-        AUTHENTICATED,
-        BAD_CREDENTIALS,
-        OFFLINE,
-        TECHNICAL_FAILURE,
-        SAFETYNET_UNAVAILABLE,
-        SAFETYNET_INVALID_CLAIM
-    }
+        @Keep
+        class ApiUserInfo(val projectId: String, val userId: String) {
+            constructor(userInfoDomain: AuthenticationPayload.UserInfo) :
+                this(userInfoDomain.projectId, userInfoDomain.userId)
+        }
 
-    constructor(authenticationEventDomain: AuthenticationEvent) :
-        this((authenticationEventDomain.payload as AuthenticationPayload).creationTime,
-            authenticationEventDomain.payload.endTime,
-            ApiUserInfo(authenticationEventDomain.payload.userInfo),
-            authenticationEventDomain.payload.result.toApiAuthenticationEventResult())
+        @Keep
+        enum class ApiResult {
+            AUTHENTICATED,
+            BAD_CREDENTIALS,
+            OFFLINE,
+            TECHNICAL_FAILURE,
+            SAFETYNET_UNAVAILABLE,
+            SAFETYNET_INVALID_CLAIM
+        }
+
+        constructor(domainPayload: AuthenticationPayload) :
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
+                domainPayload.endTime,
+                ApiUserInfo(domainPayload.userInfo),
+                domainPayload.result.fromDomainToApi())
+    }
 }
 
-fun AuthenticationEvent.AuthenticationPayload.Result.toApiAuthenticationEventResult() =
-    when(this) {
-        AUTHENTICATED -> ApiAuthenticationEvent.ApiResult.AUTHENTICATED
-        BAD_CREDENTIALS -> ApiAuthenticationEvent.ApiResult.BAD_CREDENTIALS
-        OFFLINE -> ApiAuthenticationEvent.ApiResult.OFFLINE
-        TECHNICAL_FAILURE -> ApiAuthenticationEvent.ApiResult.TECHNICAL_FAILURE
-        SAFETYNET_UNAVAILABLE -> ApiAuthenticationEvent.ApiResult.SAFETYNET_UNAVAILABLE
-        SAFETYNET_INVALID_CLAIM -> ApiAuthenticationEvent.ApiResult.SAFETYNET_INVALID_CLAIM
-        UNKNOWN -> ApiAuthenticationEvent.ApiResult.TECHNICAL_FAILURE
+fun AuthenticationPayload.Result.fromDomainToApi() =
+    when (this) {
+        AUTHENTICATED -> ApiResult.AUTHENTICATED
+        BAD_CREDENTIALS -> ApiResult.BAD_CREDENTIALS
+        OFFLINE -> ApiResult.OFFLINE
+        TECHNICAL_FAILURE -> ApiResult.TECHNICAL_FAILURE
+        SAFETYNET_UNAVAILABLE -> ApiResult.SAFETYNET_UNAVAILABLE
+        SAFETYNET_INVALID_CLAIM -> ApiResult.SAFETYNET_INVALID_CLAIM
+        UNKNOWN -> ApiResult.TECHNICAL_FAILURE
     }

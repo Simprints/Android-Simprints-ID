@@ -3,31 +3,40 @@ package com.simprints.id.data.db.event.remote.events
 import com.simprints.id.data.db.event.domain.events.IntentParsingEvent
 import com.simprints.id.data.db.event.domain.events.IntentParsingEvent.IntentParsingPayload
 import com.simprints.id.data.db.event.domain.events.IntentParsingEvent.IntentParsingPayload.IntegrationInfo
-import com.simprints.id.data.db.event.remote.events.ApiIntentParsingEvent.ApiIntegrationInfo.Companion.fromDomainToApi
+import com.simprints.id.data.db.event.domain.events.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.*
+import com.simprints.id.data.db.event.remote.events.ApiIntentParsingEvent.ApiIntentParsingPayload.ApiIntegrationInfo
 import io.realm.internal.Keep
 
-@Keep
-class ApiIntentParsingEvent(val relativeStartTime: Long,
-                            val integration: ApiIntegrationInfo) : ApiEvent(ApiEventType.INTENT_PARSING) {
+@androidx.annotation.Keep
+class ApiIntentParsingEvent(domainEvent: IntentParsingEvent) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
 
-    constructor(event: IntentParsingEvent) : this(
-        (event.payload as IntentParsingPayload).creationTime,
-        fromDomainToApi(event.payload.integration)
-    )
 
     @Keep
-    enum class ApiIntegrationInfo {
-        ODK,
-        STANDARD,
-        COMMCARE;
+    class ApiIntentParsingPayload(createdAt: Long,
+                                  eventVersion: Int,
+                                  val integration: ApiIntegrationInfo) : ApiEventPayload(ApiEventPayloadType.INTENT_PARSING, eventVersion, createdAt) {
 
-        companion object {
-            fun fromDomainToApi(integration: IntegrationInfo) =
-                when(integration) {
-                    IntegrationInfo.ODK -> ODK
-                    IntegrationInfo.STANDARD -> STANDARD
-                    IntegrationInfo.COMMCARE -> COMMCARE
-                }
+        constructor(domainPayload: IntentParsingPayload) : this(
+            domainPayload.createdAt,
+            domainPayload.eventVersion,
+            domainPayload.integration.fromDomainToApi())
+
+        @Keep
+        enum class ApiIntegrationInfo {
+            ODK,
+            STANDARD,
+            COMMCARE;
         }
     }
 }
+
+fun IntegrationInfo.fromDomainToApi() =
+    when (this) {
+        ODK -> ApiIntegrationInfo.ODK
+        STANDARD -> ApiIntegrationInfo.STANDARD
+        COMMCARE -> ApiIntegrationInfo.COMMCARE
+    }

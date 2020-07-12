@@ -1,10 +1,10 @@
 package com.simprints.id.data.db.event.domain.validators
 
-import com.simprints.id.data.db.event.domain.session.SessionEvents
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 
 class GuidSelectionEventValidator: SessionEventValidator {
 
-    override fun validate(session: SessionEvents) {
+    override fun validate(session: SessionCaptureEvent) {
         //StopShip: To get fixed when Session disappear
 //        if (session.hasEvent(EventType.GUID_SELECTION)) {
 //

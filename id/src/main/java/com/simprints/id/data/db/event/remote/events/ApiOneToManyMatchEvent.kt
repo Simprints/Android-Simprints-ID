@@ -6,27 +6,37 @@ import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent.OneToMan
 import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
 
 @Keep
-class ApiOneToManyMatchEvent(val relativeStartTime: Long,
-                             val relativeEndTime: Long,
-                             val pool: ApiMatchPool,
-                             val result: List<ApiMatchEntry>?) : ApiEvent(ApiEventType.ONE_TO_MANY_MATCH) {
+class ApiOneToManyMatchEvent(domainEvent: OneToManyMatchEvent) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiMatchPool(val type: ApiMatchPoolType, val count: Int) {
-        constructor(matchPool: MatchPool) :
-            this(ApiMatchPoolType.valueOf(matchPool.type.toString()), matchPool.count)
-    }
+    class ApiOneToManyMatchPayload(createdAt: Long,
+                                   eventVersion: Int,
+                                   val relativeEndTime: Long,
+                                   val pool: ApiMatchPool,
+                                   val result: List<ApiMatchEntry>?) : ApiEventPayload(ApiEventPayloadType.ONE_TO_MANY_MATCH, eventVersion, createdAt) {
 
-    @Keep
-    enum class ApiMatchPoolType {
-        USER,
-        MODULE,
-        PROJECT;
-    }
+        @Keep
+        class ApiMatchPool(val type: ApiMatchPoolType, val count: Int) {
+            constructor(matchPool: MatchPool) :
+                this(ApiMatchPoolType.valueOf(matchPool.type.toString()), matchPool.count)
+        }
 
-    constructor(oneToManyMatchEvent: OneToManyMatchEvent) :
-        this((oneToManyMatchEvent.payload as OneToManyMatchPayload).creationTime,
-            oneToManyMatchEvent.payload.endTime,
-            ApiMatchPool(oneToManyMatchEvent.payload.pool),
-            oneToManyMatchEvent.payload.result?.map { ApiMatchEntry(it) })
+        @Keep
+        enum class ApiMatchPoolType {
+            USER,
+            MODULE,
+            PROJECT;
+        }
+
+        constructor(domainPayload: OneToManyMatchPayload) :
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
+                domainPayload.endTime,
+                ApiMatchPool(domainPayload.pool),
+                domainPayload.result?.map { ApiMatchEntry(it) })
+    }
 }

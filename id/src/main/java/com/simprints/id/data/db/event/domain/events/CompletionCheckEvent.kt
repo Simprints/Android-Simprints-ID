@@ -5,17 +5,17 @@ import java.util.*
 
 @Keep
 class CompletionCheckEvent(
-    creationTime: Long,
+    createdAt: Long,
     completed: Boolean,
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    CompletionCheckPayload(creationTime, DEFAULT_EVENT_VERSION, completed)) {
+    CompletionCheckPayload(createdAt, DEFAULT_EVENT_VERSION, completed)) {
 
     @Keep
-    class CompletionCheckPayload(creationTime: Long,
-                                 version: Int,
-                                 val completed: Boolean) : EventPayload(EventPayloadType.COMPLETION_CHECK, version, creationTime)
+    class CompletionCheckPayload(createdAt: Long,
+                                 eventVersion: Int,
+                                 val completed: Boolean) : EventPayload(EventPayloadType.COMPLETION_CHECK, eventVersion, createdAt)
 }
