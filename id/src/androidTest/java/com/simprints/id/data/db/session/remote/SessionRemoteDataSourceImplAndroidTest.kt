@@ -142,11 +142,7 @@ class SessionRemoteDataSourceImplAndroidTest {
 
     private fun SessionEvents.addAlertScreenEvents() {
         AlertScreenEvent.AlertScreenEventType.values()
-            // TODO: remove this filterNot once camera alert types are implemented by cloud
-            .filterNot {
-                it == AlertScreenEvent.AlertScreenEventType.FACE_MISSING_LICENSE ||
-                    it == AlertScreenEvent.AlertScreenEventType.FACE_INVALID_LICENSE
-            }.forEach {
+            .forEach {
                 addEvent(AlertScreenEvent(0, it))
             }
     }
@@ -178,7 +174,13 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     private fun SessionEvents.addConnectivitySnapshotEvent() {
-        addEvent(ConnectivitySnapshotEvent(0, "Unknown", listOf(SimNetworkUtils.Connection("connection", NetworkInfo.DetailedState.CONNECTED))))
+        addEvent(
+            ConnectivitySnapshotEvent(
+                0,
+                "Unknown",
+                listOf(SimNetworkUtils.Connection("connection", NetworkInfo.DetailedState.CONNECTED))
+            )
+        )
     }
 
     private fun SessionEvents.addConsentEvent() {
@@ -237,24 +239,28 @@ class SessionRemoteDataSourceImplAndroidTest {
 
     private fun SessionEvents.addOneToManyMatchEvent() {
         OneToManyMatchEvent.MatchPoolType.values().forEach {
-            addEvent(OneToManyMatchEvent(
-                0,
-                0,
-                OneToManyMatchEvent.MatchPool(it, 0),
-                Matcher.SIM_AFIS,
-                emptyList()
-            ))
+            addEvent(
+                OneToManyMatchEvent(
+                    0,
+                    0,
+                    OneToManyMatchEvent.MatchPool(it, 0),
+                    Matcher.SIM_AFIS,
+                    emptyList()
+                )
+            )
         }
     }
 
     private fun SessionEvents.addOneToOneMatchEvent() {
-        addEvent(OneToOneMatchEvent(
-            0,
-            0,
-            RANDOM_GUID,
-            Matcher.SIM_AFIS,
-            MatchEntry(RANDOM_GUID, 0F)
-        ))
+        addEvent(
+            OneToOneMatchEvent(
+                0,
+                0,
+                RANDOM_GUID,
+                Matcher.SIM_AFIS,
+                MatchEntry(RANDOM_GUID, 0F)
+            )
+        )
     }
 
     private fun SessionEvents.addPersonCreationEvent() {
@@ -268,21 +274,37 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     private fun SessionEvents.addScannerConnectionEvent() {
-        addEvent(ScannerConnectionEvent(0,
-            ScannerConnectionEvent.ScannerInfo("scanner_id", "macAddress",
-                ScannerGeneration.VERO_2, "hardware")))
+        addEvent(
+            ScannerConnectionEvent(
+                0,
+                ScannerConnectionEvent.ScannerInfo(
+                    "scanner_id", "macAddress",
+                    ScannerGeneration.VERO_2, "hardware"
+                )
+            )
+        )
     }
 
     private fun SessionEvents.addVero2InfoSnapshotEvents() {
-        addEvent(Vero2InfoSnapshotEvent(0,
-            Vero2InfoSnapshotEvent.Vero2Version(Int.MAX_VALUE.toLong() + 1, "1.23",
-                "api", "stmApp", "stmApi", "un20App", "un20Api"),
-            Vero2InfoSnapshotEvent.BatteryInfo(70, 15, 1, 37)))
+        addEvent(
+            Vero2InfoSnapshotEvent(
+                0,
+                Vero2InfoSnapshotEvent.Vero2Version(
+                    Int.MAX_VALUE.toLong() + 1, "1.23",
+                    "api", "stmApp", "stmApi", "un20App", "un20Api"
+                ),
+                Vero2InfoSnapshotEvent.BatteryInfo(70, 15, 1, 37)
+            )
+        )
     }
 
     private fun SessionEvents.addScannerFirmwareUpdateEvent() {
-        addEvent(ScannerFirmwareUpdateEvent(0, 0, "stm",
-            "targetApp", "failureReason"))
+        addEvent(
+            ScannerFirmwareUpdateEvent(
+                0, 0, "stm",
+                "targetApp", "failureReason"
+            )
+        )
     }
 
     private fun SessionEvents.addSuspiciousIntentEvent() {

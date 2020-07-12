@@ -34,7 +34,9 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
         ENROLMENT_LAST_BIOMETRICS_FAILED,
         INVALID_STATE_FOR_INTENT_ACTION,
         FACE_LICENSE_MISSING,
-        FACE_LICENSE_INVALID;
+        FACE_LICENSE_INVALID,
+        FINGERPRINT_CONFIGURATION_ERROR,
+        FACE_CONFIGURATION_ERROR;
 
         companion object {
 
@@ -50,6 +52,8 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
                     IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
                     IAppErrorReason.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
                     IAppErrorReason.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
+                    IAppErrorReason.FINGERPRINT_CONFIGURATION_ERROR -> FINGERPRINT_CONFIGURATION_ERROR
+                    IAppErrorReason.FACE_CONFIGURATION_ERROR -> FACE_CONFIGURATION_ERROR
                 }
 
             fun fromAlertTypeToDomain(clientApiAlert: ClientApiAlert): Reason =

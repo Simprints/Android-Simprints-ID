@@ -172,16 +172,16 @@ class ApiAlertScreenEventTypeTest {
 
     @Test
     fun faceInvalidLicense_fromDomainToApi() {
-        val domain = AlertScreenEvent.AlertScreenEventType.FACE_INVALID_LICENSE
-        val api = ApiAlertScreenEvent.ApiAlertScreenEventType.FACE_INVALID_LICENSE
+        val domain = AlertScreenEvent.AlertScreenEventType.FACE_LICENSE_INVALID
+        val api = ApiAlertScreenEvent.ApiAlertScreenEventType.FACE_LICENSE_INVALID
 
         assertThat(fromDomainToApi(domain)).isEqualTo(api)
     }
 
     @Test
     fun faceMissingLicense_fromDomainToApi() {
-        val domain = AlertScreenEvent.AlertScreenEventType.FACE_MISSING_LICENSE
-        val api = ApiAlertScreenEvent.ApiAlertScreenEventType.FACE_MISSING_LICENSE
+        val domain = AlertScreenEvent.AlertScreenEventType.FACE_LICENSE_MISSING
+        val api = ApiAlertScreenEvent.ApiAlertScreenEventType.FACE_LICENSE_MISSING
 
         assertThat(fromDomainToApi(domain)).isEqualTo(api)
     }
