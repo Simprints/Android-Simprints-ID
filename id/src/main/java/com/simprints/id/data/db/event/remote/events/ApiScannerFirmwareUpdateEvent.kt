@@ -5,16 +5,26 @@ import com.simprints.id.data.db.event.domain.events.ScannerFirmwareUpdateEvent
 import com.simprints.id.data.db.event.domain.events.ScannerFirmwareUpdateEvent.ScannerFirmwareUpdatePayload
 
 @Keep
-class ApiScannerFirmwareUpdateEvent(val relativeStartTime: Long,
-                                    val relativeEndTime: Long,
-                                    val chip: String,
-                                    val targetAppVersion: String,
-                                    val failureReason: String?) : ApiEvent(ApiEventType.SCANNER_FIRMWARE_UPDATE) {
+class ApiScannerFirmwareUpdateEvent(domainEvent: ScannerFirmwareUpdateEvent) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
 
-    constructor(scannerFirmwareUpdateEvent: ScannerFirmwareUpdateEvent) :
-        this((scannerFirmwareUpdateEvent.payload as ScannerFirmwareUpdatePayload).creationTime,
-            scannerFirmwareUpdateEvent.payload.endTime,
-            scannerFirmwareUpdateEvent.payload.chip,
-            scannerFirmwareUpdateEvent.payload.targetAppVersion,
-            scannerFirmwareUpdateEvent.payload.failureReason)
+    @Keep
+    class ApiScannerFirmwareUpdatePayload(createdAt: Long,
+                                          eventVersion: Int,
+                                          val relativeEndTime: Long,
+                                          val chip: String,
+                                          val targetAppVersion: String,
+                                          val failureReason: String?) : ApiEventPayload(ApiEventPayloadType.SCANNER_FIRMWARE_UPDATE, eventVersion, createdAt) {
+
+        constructor(domainPayload: ScannerFirmwareUpdatePayload) :
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
+                domainPayload.endTime,
+                domainPayload.chip,
+                domainPayload.targetAppVersion,
+                domainPayload.failureReason)
+    }
 }

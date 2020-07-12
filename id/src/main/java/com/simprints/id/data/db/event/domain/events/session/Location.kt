@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.domain.session
+package com.simprints.id.data.db.event.domain.events.session
 
 import androidx.annotation.Keep
 import java.util.*

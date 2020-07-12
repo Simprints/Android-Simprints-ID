@@ -7,7 +7,7 @@ import java.util.*
 
 @Keep
 class AuthenticationEvent(
-    creationTime: Long,
+    createdAt: Long,
     endTime: Long,
     userInfo: UserInfo,
     result: Result,
@@ -15,17 +15,17 @@ class AuthenticationEvent(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    AuthenticationPayload(creationTime, DEFAULT_EVENT_VERSION, endTime, userInfo, result)) {
+    AuthenticationPayload(createdAt, DEFAULT_EVENT_VERSION, endTime, userInfo, result)) {
 
 
     @Keep
     class AuthenticationPayload(
-        creationTime: Long,
-        version: Int,
+        createdAt: Long,
+        eventVersion: Int,
         val endTime: Long,
         val userInfo: UserInfo,
         val result: Result
-    ) : EventPayload(EventPayloadType.AUTHENTICATION, version, creationTime) {
+    ) : EventPayload(EventPayloadType.AUTHENTICATION, eventVersion, createdAt) {
 
         @Keep
         class UserInfo(val projectId: String, val userId: String)

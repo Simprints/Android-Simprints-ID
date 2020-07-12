@@ -5,7 +5,17 @@ import com.simprints.id.data.db.event.domain.events.*
 import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
 import com.simprints.id.data.db.event.domain.events.callback.*
 import com.simprints.id.data.db.event.domain.events.callout.*
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordCreationEvent
+import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordDeletionEvent
+import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordMoveEvent
 import com.simprints.id.data.db.event.remote.events.*
+import com.simprints.id.data.db.event.remote.events.callback.ApiCallbackEvent
+import com.simprints.id.data.db.event.remote.events.callout.ApiCalloutEvent
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationEvent
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionEvent
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMoveEvent
+import com.simprints.id.data.db.event.remote.session.ApiSessionCapture
 
 @Keep
 fun Event.toApiEvent(): ApiEvent =
@@ -42,7 +52,8 @@ fun Event.toApiEvent(): ApiEvent =
         CALLBACK_ERROR -> ApiCallbackEvent(this as ErrorCallbackEvent)
         VERO_2_INFO_SNAPSHOT -> ApiVero2InfoSnapshotEvent(this as Vero2InfoSnapshotEvent)
         SCANNER_FIRMWARE_UPDATE -> ApiScannerFirmwareUpdateEvent(this as ScannerFirmwareUpdateEvent)
-        ENROLMENT_RECORD_CREATION -> TODO() //StopShip: Addressed in PAS-1000
-        ENROLMENT_RECORD_DELETION -> TODO()
-        ENROLMENT_RECORD_MOVE -> TODO()
+        ENROLMENT_RECORD_CREATION -> ApiEnrolmentRecordCreationEvent(this as EnrolmentRecordCreationEvent)
+        ENROLMENT_RECORD_DELETION -> ApiEnrolmentRecordDeletionEvent(this as EnrolmentRecordDeletionEvent)
+        ENROLMENT_RECORD_MOVE -> ApiEnrolmentRecordMoveEvent(this as EnrolmentRecordMoveEvent)
+        SESSION_CAPTURE -> ApiSessionCapture(this as SessionCaptureEvent)
     }

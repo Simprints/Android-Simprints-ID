@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.event.local
 
-import com.simprints.id.data.db.event.local.models.*
+import com.simprints.id.data.db.event.local.models.DbEvent
 import com.simprints.id.data.db.event.local.oldschemas.SessionEventsSchemaV3
 import io.realm.DynamicRealm
 import io.realm.RealmMigration
@@ -10,7 +10,7 @@ import io.realm.annotations.RealmModule
 //TODO: Delete it - not required. We delete the db if migration is needed.
 internal class SessionRealmMigration : RealmMigration {
 
-    @RealmModule(classes = [DbDatabaseInfo::class, DbDevice::class, DbLocation::class, DbEvent::class, DbSession::class])
+    @RealmModule(classes = [DbEvent::class])
     class SessionModule
 
     companion object {

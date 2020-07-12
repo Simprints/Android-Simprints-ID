@@ -5,10 +5,21 @@ import com.simprints.id.data.db.event.domain.events.SuspiciousIntentEvent
 import com.simprints.id.data.db.event.domain.events.SuspiciousIntentEvent.SuspiciousIntentPayload
 
 @Keep
-class ApiSuspiciousIntentEvent(val relativeStartTime: Long,
-                               val unexpectedExtras: Map<String, Any?>) : ApiEvent(ApiEventType.SUSPICIOUS_INTENT) {
+class ApiSuspiciousIntentEvent(domainEvent: SuspiciousIntentEvent) :
+    ApiEvent(
+        domainEvent.id,
+        domainEvent.labels.fromDomainToApi(),
+        domainEvent.payload.fromDomainToApi()) {
 
-    constructor(suspiciousIntentEvent: SuspiciousIntentEvent) :
-        this((suspiciousIntentEvent.payload as SuspiciousIntentPayload).creationTime ?: 0,
-            suspiciousIntentEvent.payload.unexpectedExtras)
+
+    @Keep
+    class ApiSuspiciousIntentPayload(createdAt: Long,
+                                     eventVersion: Int,
+                                     val unexpectedExtras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.SUSPICIOUS_INTENT, eventVersion, createdAt) {
+
+        constructor(domainPayload: SuspiciousIntentPayload) :
+            this(domainPayload.createdAt,
+                domainPayload.eventVersion,
+                domainPayload.unexpectedExtras)
+    }
 }

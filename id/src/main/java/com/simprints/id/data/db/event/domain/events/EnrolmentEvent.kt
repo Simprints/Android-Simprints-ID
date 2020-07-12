@@ -5,18 +5,18 @@ import java.util.*
 
 @Keep
 class EnrolmentEvent(
-    startTime: Long,
+    createdAt: Long,
     personId: String,
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    EnrolmentPayload(startTime, DEFAULT_EVENT_VERSION, personId)) {
+    EnrolmentPayload(createdAt, DEFAULT_EVENT_VERSION, personId)) {
 
 
     @Keep
-    class EnrolmentPayload(creationTime: Long,
-                           version: Int,
-                           val personId: String) : EventPayload(EventPayloadType.ENROLMENT, version, creationTime)
+    class EnrolmentPayload(createdAt: Long,
+                           eventVersion: Int,
+                           val personId: String) : EventPayload(EventPayloadType.ENROLMENT, eventVersion, createdAt)
 }

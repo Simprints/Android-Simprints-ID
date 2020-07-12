@@ -8,7 +8,7 @@ import java.util.*
 
 @Keep
 class EnrolmentCalloutEvent(
-    creationTime: Long,
+    createdAt: Long,
     projectId: String,
     userId: String,
     moduleId: String,
@@ -18,14 +18,14 @@ class EnrolmentCalloutEvent(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    EnrolmentCalloutPayload(creationTime, DEFAULT_EVENT_VERSION, projectId, userId, moduleId, metadata)) {
+    EnrolmentCalloutPayload(createdAt, DEFAULT_EVENT_VERSION, projectId, userId, moduleId, metadata)) {
 
     @Keep
-    class EnrolmentCalloutPayload(creationTime: Long,
-                                  version: Int,
+    class EnrolmentCalloutPayload(createdAt: Long,
+                                  eventVersion: Int,
                                   val projectId: String,
                                   val userId: String,
                                   val moduleId: String,
-                                  val metadata: String?) : EventPayload(EventPayloadType.CALLOUT_ENROLMENT, version, creationTime)
+                                  val metadata: String?) : EventPayload(EventPayloadType.CALLOUT_ENROLMENT, eventVersion, createdAt)
 
 }

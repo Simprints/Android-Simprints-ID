@@ -9,7 +9,7 @@ import java.util.*
 
 @Keep
 class EnrolmentRecordDeletionEvent(
-    creationTime: Long,
+    createdAt: Long,
     subjectId: String,
     projectId: String,
     moduleId: String,
@@ -18,14 +18,14 @@ class EnrolmentRecordDeletionEvent(
     UUID.randomUUID().toString(),
     DEFAULT_EVENT_VERSION,
     listOf(ProjectId(projectId), ModuleId(listOf(moduleId)), AttendantId(attendantId)),
-    EnrolmentRecordDeletionPayload(creationTime, DEFAULT_EVENT_VERSION, subjectId, projectId, moduleId, attendantId)) {
+    EnrolmentRecordDeletionPayload(createdAt, DEFAULT_EVENT_VERSION, subjectId, projectId, moduleId, attendantId)) {
 
     class EnrolmentRecordDeletionPayload(
-        creationTime: Long,
-        version: Int,
+        createdAt: Long,
+        eventVersion: Int,
         val subjectId: String,
         val projectId: String,
         val moduleId: String,
         val attendantId: String
-    ) : EventPayload(EventPayloadType.ENROLMENT_RECORD_DELETION, version, creationTime)
+    ) : EventPayload(EventPayloadType.ENROLMENT_RECORD_DELETION, eventVersion, createdAt)
 }

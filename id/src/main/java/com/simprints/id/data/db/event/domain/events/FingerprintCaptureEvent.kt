@@ -6,7 +6,7 @@ import java.util.*
 
 @Keep
 class FingerprintCaptureEvent(
-    startTime: Long,
+    createdAt: Long,
     endTime: Long,
     finger: FingerIdentifier,
     qualityThreshold: Int,
@@ -18,19 +18,19 @@ class FingerprintCaptureEvent(
     id,
     DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
-    FingerprintCapturePayload(startTime, DEFAULT_EVENT_VERSION, endTime, finger, qualityThreshold, result, fingerprint, id)) {
+    FingerprintCapturePayload(createdAt, DEFAULT_EVENT_VERSION, endTime, finger, qualityThreshold, result, fingerprint, id)) {
 
     @Keep
     class FingerprintCapturePayload(
-        creationTime: Long,
-        version: Int,
+        createdAt: Long,
+        eventVersion: Int,
         val endTime: Long,
         val finger: FingerIdentifier,
         val qualityThreshold: Int,
         val result: Result,
         val fingerprint: Fingerprint?,
         val id: String
-    ) : EventPayload(EventPayloadType.FINGERPRINT_CAPTURE, version, creationTime) {
+    ) : EventPayload(EventPayloadType.FINGERPRINT_CAPTURE, eventVersion, createdAt) {
 
         @Keep
         class Fingerprint(val finger: FingerIdentifier, val quality: Int, val template: String)
