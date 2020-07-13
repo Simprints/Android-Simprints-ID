@@ -20,8 +20,8 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
                          private val serialNumberConverter: SerialNumberConverter) : ScannerManager {
 
     override var scanner: ScannerWrapper? = null
-    override var lastPairedScannerId: String? = null
-    override var lastPairedMacAddress: String? = null
+    override var currentScannerId: String? = null
+    override var currentMacAddress: String? = null
 
     override fun <T> onScanner(method: ScannerWrapper.() -> T): T =
         delegateToScannerOrThrow(method)
@@ -42,8 +42,8 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
         try {
             val macAddress = pairingManager.getPairedScannerAddressToUse()
             scanner = scannerFactory.create(macAddress)
-            lastPairedMacAddress = macAddress
-            lastPairedScannerId = serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
+            currentMacAddress = macAddress
+            currentScannerId = serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
             it.onComplete()
         } catch (e: ScannerNotPairedException) {
             it.onError(e)
