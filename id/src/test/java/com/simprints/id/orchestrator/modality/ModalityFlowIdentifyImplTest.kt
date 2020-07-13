@@ -50,6 +50,8 @@ class ModalityFlowIdentifyImplTest {
 
         every { fingerprintStepProcessor.buildStepToCapture() } returns fingerprintStepMock
         every { faceStepProcessor.buildCaptureStep() } returns faceStepMock
+        every { fingerprintStepProcessor.buildConfigurationStep() } returns fingerprintStepMock
+        every { faceStepProcessor.buildConfigurationStep(any(), any()) } returns faceStepMock
         every { coreStepProcessor.buildStepConsent(any()) } returns consentStepMock
         every { coreStepProcessor.buildStepSetup(any()) } returns setupStepMock
     }
@@ -164,6 +166,7 @@ class ModalityFlowIdentifyImplTest {
 
     private fun buildModalityFlowIdentify(consentRequired: Boolean) {
         modalityFlowIdentify = ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, GROUP.GLOBAL, timeHelper, sessionRepository, consentRequired, false)
+            coreStepProcessor, GROUP.GLOBAL, timeHelper, sessionRepository,
+            consentRequired, false, "projectId", "deviceId")
     }
 }
