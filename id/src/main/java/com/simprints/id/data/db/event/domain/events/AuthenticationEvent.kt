@@ -11,9 +11,9 @@ class AuthenticationEvent(
     endTime: Long,
     userInfo: UserInfo,
     result: Result,
-    sessionId: String = UUID.randomUUID().toString()) : Event(
+    sessionId: String = UUID.randomUUID().toString()
+) : Event(
     UUID.randomUUID().toString(),
-    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
     AuthenticationPayload(createdAt, DEFAULT_EVENT_VERSION, endTime, userInfo, result)) {
 

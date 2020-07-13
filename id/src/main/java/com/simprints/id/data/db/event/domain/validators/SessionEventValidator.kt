@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.event.domain.validators
 
-import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.events.Event
 
 interface SessionEventValidator {
 
-    fun validate(session: SessionCaptureEvent)
+    fun validate(currentEvents: List<Event>, eventToAdd: Event)
 
 }

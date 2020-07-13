@@ -12,7 +12,7 @@ import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCr
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMovePayload
 import com.simprints.id.data.db.event.remote.events.ApiEvent
-import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
+import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.network.*
 import com.simprints.id.testtools.UnitTestConfig
@@ -138,7 +138,7 @@ class EventRemoteDataSourceImplTest {
     private fun buildApiEventsList() =
         getRandomEnrolmentEvents(5, PROJECT_ID, USER_ID, "module_id", ENROLMENT_RECORD_CREATION)
 
-    private fun buildEventQuery() = EventQuery(
+    private fun buildEventQuery() = SyncEventQuery(
         PROJECT_ID,
         USER_ID,
         MODULES,

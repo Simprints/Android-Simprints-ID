@@ -11,7 +11,7 @@ import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordDelet
 import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordMoveEvent
 import com.simprints.id.data.db.event.local.models.DbEvent
 
-fun DbEvent.toDomainEvent(): Event? =
+fun DbEvent.fromDbToDomain(): Event =
     jsonEvent?.let {
         when (getType()) {
             ARTIFICIAL_TERMINATION -> JsonHelper.gson.fromJson(it, ArtificialTerminationEvent::class.java)
@@ -50,8 +50,7 @@ fun DbEvent.toDomainEvent(): Event? =
             ENROLMENT_RECORD_DELETION -> JsonHelper.gson.fromJson(it, EnrolmentRecordDeletionEvent::class.java)
             ENROLMENT_RECORD_MOVE -> JsonHelper.gson.fromJson(it, EnrolmentRecordMoveEvent::class.java)
             SESSION_CAPTURE -> JsonHelper.gson.fromJson(it, SessionCaptureEvent::class.java)
-
-            null -> null
+            null -> throw Throwable("Db Event type null")
         }
-    }
+    } ?:  throw Throwable("Db Event null")
 

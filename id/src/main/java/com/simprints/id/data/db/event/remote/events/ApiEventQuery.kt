@@ -2,7 +2,7 @@ package com.simprints.id.data.db.event.remote.events
 
 import com.simprints.id.data.db.event.remote.events.subject.ApiModes
 import com.simprints.id.data.db.event.remote.events.subject.fromDomainToApi
-import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
+import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
 
 data class ApiEventQuery(val projectId: String,
                          val userId: String?,
@@ -12,6 +12,6 @@ data class ApiEventQuery(val projectId: String,
                          val modes: List<ApiModes>,
                          val types: List<ApiEventPayloadType>)
 
-fun EventQuery.fromDomainToApi() =
+fun SyncEventQuery.fromDomainToApi() =
     ApiEventQuery(projectId, userId, moduleIds, subjectId,
         lastEventId, modes.map { it.fromDomainToApi() }, types.map { it.fromDomainToApi() })

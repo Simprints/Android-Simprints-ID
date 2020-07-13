@@ -17,7 +17,6 @@ class EnrolmentRecordCreationEvent(
     biometricReferences: List<BiometricReference>
 ) : Event(
     UUID.randomUUID().toString(),
-    DEFAULT_EVENT_VERSION,
     listOf(ProjectId(projectId), ModuleId(listOf(moduleId)), AttendantId(attendantId)),
     EnrolmentRecordCreationPayload(createdAt, DEFAULT_EVENT_VERSION, subjectId, projectId, moduleId, attendantId, biometricReferences)) {
 

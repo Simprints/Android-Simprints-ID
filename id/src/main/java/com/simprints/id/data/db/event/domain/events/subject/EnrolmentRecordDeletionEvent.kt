@@ -16,7 +16,6 @@ class EnrolmentRecordDeletionEvent(
     attendantId: String
 ) : Event(
     UUID.randomUUID().toString(),
-    DEFAULT_EVENT_VERSION,
     listOf(ProjectId(projectId), ModuleId(listOf(moduleId)), AttendantId(attendantId)),
     EnrolmentRecordDeletionPayload(createdAt, DEFAULT_EVENT_VERSION, subjectId, projectId, moduleId, attendantId)) {
 
