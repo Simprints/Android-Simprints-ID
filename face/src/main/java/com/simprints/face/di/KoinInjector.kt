@@ -20,12 +20,17 @@ import com.simprints.face.controllers.core.timehelper.FaceTimeHelperImpl
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.detection.rankone.RankOneFaceDetector
 import com.simprints.face.exitform.ExitFormViewModel
+import com.simprints.face.license.data.remote.BasicAuthInterceptor
+import com.simprints.face.license.data.remote.SimprintsLicenseServer
 import com.simprints.face.match.FaceMatchViewModel
 import com.simprints.face.match.FaceMatcher
 import com.simprints.face.match.rankone.RankOneFaceMatcher
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.id.Application
+import com.simprints.id.network.TimberLogger
 import com.simprints.uicomponents.imageTools.LibYuvJni
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
@@ -34,6 +39,7 @@ import org.koin.core.module.Module
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import java.util.concurrent.atomic.AtomicInteger
+import retrofit2.Retrofit
 
 /**
  * Consider this flow:
@@ -83,6 +89,7 @@ object KoinInjector {
             defineBuildersForFaceManagers()
             defineBuildersForDomainClasses()
             defineBuildersForViewModels()
+            defineBuildersForRemote()
         }
 
     private fun Module.defineBuildersForFaceManagers() {
@@ -128,5 +135,26 @@ object KoinInjector {
             )
         }
         viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM, get()) }
+    }
+
+    private fun Module.defineBuildersForRemote() {
+        factory {
+            val loggingInterceptor = HttpLoggingInterceptor(TimberLogger()).apply {
+                level = HttpLoggingInterceptor.Level.HEADERS
+            }
+
+            OkHttpClient.Builder()
+                .addInterceptor(BasicAuthInterceptor("VYHffwmvMxiaoxzm", "3fM01e10sn5Vq6FV2EVd"))
+                .addInterceptor(loggingInterceptor)
+                .build()
+        }
+
+        factory {
+            Retrofit.Builder()
+                .baseUrl(SimprintsLicenseServer.BASE_URL)
+                .client(get())
+                .build()
+                .create(SimprintsLicenseServer::class.java)
+        }
     }
 }
