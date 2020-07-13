@@ -12,8 +12,6 @@ interface ComponentBluetoothDevice {
 
     fun createBond(): Boolean
 
-    fun removeBond(): Boolean
-
     @Throws(IOException::class)
     fun createRfcommSocketToServiceRecord(uuid: UUID): ComponentBluetoothSocket
 
