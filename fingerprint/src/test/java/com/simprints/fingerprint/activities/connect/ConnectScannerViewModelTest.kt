@@ -314,7 +314,7 @@ class ConnectScannerViewModelTest : KoinTest {
         when (numberOfPairedScanners) {
             0 -> every { pairingManager.getPairedScannerAddressToUse() } throws ScannerNotPairedException()
             1 -> every { pairingManager.getPairedScannerAddressToUse() } returns DummyBluetoothDevice.random().address
-            else -> every { pairingManager.getPairedScannerAddressToUse() } throws MultipleScannersPairedException()
+            else -> every { pairingManager.getPairedScannerAddressToUse() } throws MultiplePossibleScannersPairedException()
         }
     }
 
