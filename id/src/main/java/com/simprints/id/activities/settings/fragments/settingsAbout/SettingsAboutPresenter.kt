@@ -23,7 +23,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
 
     override fun start() {
         loadPreferenceValuesAndBindThemToChangeListeners()
-        removeScannerVersionIfFaceOnly()
+        enableSettingsBasedOnModalities()
     }
 
     private fun loadPreferenceValuesAndBindThemToChangeListeners() {
@@ -34,9 +34,21 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
         loadValueAndBindChangeListener(view.getLogoutPreference())
     }
 
-    private fun removeScannerVersionIfFaceOnly() {
-        if (preferencesManager.modalities.none { it == Modality.FINGER })
-            view.tryRemoveOrDisablePreference(view.getScannerVersionPreference())
+    private fun enableSettingsBasedOnModalities() {
+        preferencesManager.modalities.forEach {
+            when (it) {
+                Modality.FINGER -> enableFingerprintSettings()
+                Modality.FACE -> enableFaceSettings()
+            }
+        }
+    }
+
+    private fun enableFingerprintSettings() {
+        view.enablePreference(view.getScannerVersionPreference())
+    }
+
+    private fun enableFaceSettings() {
+        // No face-specific settings yet
     }
 
     internal fun loadValueAndBindChangeListener(preference: Preference) {

@@ -28,12 +28,24 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     override fun start() {
         configureAvailableLanguageEntriesFromProjectLanguages()
         loadPreferenceValuesAndBindThemToChangeListeners()
-        removeDefaultFingersIfFaceOnly()
+        enableSettingsBasedOnModalities()
     }
 
-    private fun removeDefaultFingersIfFaceOnly() {
-        if (preferencesManager.modalities.none { it == Modality.FINGER })
-            view.tryRemoveOrDisablePreference(view.getPreferenceForDefaultFingers())
+    private fun enableSettingsBasedOnModalities() {
+        preferencesManager.modalities.forEach {
+            when (it) {
+                Modality.FINGER -> enableFingerprintSettings()
+                Modality.FACE -> enableFaceSettings()
+            }
+        }
+    }
+
+    private fun enableFingerprintSettings() {
+        view.enablePreference(view.getPreferenceForDefaultFingers())
+    }
+
+    private fun enableFaceSettings() {
+        // No face-specific settings yet
     }
 
     private fun configureAvailableLanguageEntriesFromProjectLanguages() {
