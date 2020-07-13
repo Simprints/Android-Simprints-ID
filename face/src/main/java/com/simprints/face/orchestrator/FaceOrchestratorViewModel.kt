@@ -40,11 +40,14 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
         when (request) {
             is FaceCaptureRequest -> startCapture.send(request)
             is FaceMatchRequest -> startMatching.send(request)
-            is FaceConfigurationRequest -> flowFinished.send(
-                DomainToFaceResponse.fromDomainToFaceResponse(
-                    FaceConfigurationResponse()
+            is FaceConfigurationRequest -> {
+                // STOPSHIP
+                flowFinished.send(
+                    DomainToFaceResponse.fromDomainToFaceResponse(
+                        FaceConfigurationResponse()
+                    )
                 )
-            )
+            }
         }
         faceRequest = request
     }
