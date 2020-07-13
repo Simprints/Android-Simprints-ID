@@ -14,35 +14,43 @@ object DomainToFaceResponse {
             FaceResponseType.MATCH -> fromDomainToFaceMatchResponse(faceResponse as FaceMatchResponse)
             FaceResponseType.EXIT_FORM -> fromDomainToExitFormResponse(faceResponse as FaceExitFormResponse)
             FaceResponseType.ERROR -> fromDomainToErrorResponse(faceResponse as FaceErrorResponse)
+            FaceResponseType.CONFIGURATION -> fromDomainToConfigurationResponse(faceResponse as FaceConfigurationResponse)
         }
 
-    private fun fromDomainToErrorResponse(faceErrorResponse: FaceErrorResponse): IFaceResponse =
-        IFaceErrorResponseImpl(faceErrorResponse.reason.fromDomainToFaceErrorReason())
-
     private fun fromDomainToFaceCaptureResponse(faceCaptureResponse: FaceCaptureResponse): IFaceCaptureResponseImpl =
-        IFaceCaptureResponseImpl(faceCaptureResponse.capturingResult, IFaceResponseType.CAPTURE)
+        IFaceCaptureResponseImpl(faceCaptureResponse.capturingResult)
 
     private fun fromDomainToFaceMatchResponse(faceMatchResponse: FaceMatchResponse): IFaceMatchResponseImpl =
-        IFaceMatchResponseImpl(faceMatchResponse.result, IFaceResponseType.MATCH)
+        IFaceMatchResponseImpl(faceMatchResponse.result)
 
     private fun fromDomainToExitFormResponse(faceExitFormResponse: FaceExitFormResponse): IFaceExitFormResponseImpl =
         IFaceExitFormResponseImpl(
             faceExitFormResponse.reason.fromDomainToExitReason(),
             faceExitFormResponse.extra
         )
+
+    private fun fromDomainToErrorResponse(faceErrorResponse: FaceErrorResponse): IFaceResponse =
+        IFaceErrorResponseImpl(faceErrorResponse.reason.fromDomainToFaceErrorReason())
+
+    private fun fromDomainToConfigurationResponse(faceConfigurationResponse: FaceConfigurationResponse): IFaceResponse =
+        IFaceConfigurationResponseImpl()
 }
 
 @Parcelize
 private class IFaceCaptureResponseImpl(
-    override val capturingResult: List<IFaceCaptureResult>,
-    override val type: IFaceResponseType
-) : IFaceCaptureResponse
+    override val capturingResult: List<IFaceCaptureResult>
+) : IFaceCaptureResponse {
+    @IgnoredOnParcel
+    override val type: IFaceResponseType = IFaceResponseType.CAPTURE
+}
 
 @Parcelize
 private class IFaceMatchResponseImpl(
-    override val result: List<IFaceMatchResult>,
-    override val type: IFaceResponseType
-) : IFaceMatchResponse
+    override val result: List<IFaceMatchResult>
+) : IFaceMatchResponse {
+    @IgnoredOnParcel
+    override val type: IFaceResponseType = IFaceResponseType.MATCH
+}
 
 @Parcelize
 private class IFaceExitFormResponseImpl(
@@ -57,4 +65,10 @@ private class IFaceExitFormResponseImpl(
 private class IFaceErrorResponseImpl(override val reason: IFaceErrorReason) : IFaceErrorResponse {
     @IgnoredOnParcel
     override val type: IFaceResponseType = IFaceResponseType.ERROR
+}
+
+@Parcelize
+private class IFaceConfigurationResponseImpl : IFaceConfigurationResponse {
+    @IgnoredOnParcel
+    override val type: IFaceResponseType = IFaceResponseType.CONFIGURATION
 }
