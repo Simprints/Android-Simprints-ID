@@ -29,8 +29,11 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
                                timeHelper: TimeHelper,
                                sessionRepository: SessionRepository,
                                consentRequired: Boolean,
-                               locationRequired: Boolean) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired) {
+                               locationRequired: Boolean,
+                               projectId: String,
+                               deviceId: String) :
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper,
+        sessionRepository, consentRequired, locationRequired, projectId, deviceId) {
 
     override val steps: MutableList<Step> = mutableListOf()
 
