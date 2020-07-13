@@ -16,7 +16,6 @@ class IdentificationCalloutEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
-    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
     IdentificationCalloutPayload(createdAt, DEFAULT_EVENT_VERSION, projectId, userId, moduleId, metadata)) {
 

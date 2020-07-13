@@ -21,11 +21,9 @@ open class SessionCaptureEvent(createdAt: Long,
                                analyticsId: String? = null) :
     Event(
         UUID.randomUUID().toString(),
-        DEFAULT_EVENT_VERSION,
         listOf(EventLabel.SessionId(id)),
         SessionCapturePayload(
             createdAt,
-            DEFAULT_EVENT_VERSION,
             id,
             projectId,
             appVersionName,

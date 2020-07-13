@@ -12,7 +12,7 @@ import com.simprints.id.data.db.subject.domain.Subject.Companion.buildSubjectFro
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
-import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
+import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationResult
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationResult.DownSyncState.*
@@ -41,7 +41,7 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
     @ExperimentalCoroutinesApi
     override suspend fun performDownSyncWithProgress(scope: CoroutineScope,
                                                      downSyncOperation: SubjectsDownSyncOperation,
-                                                     eventQuery: EventQuery): ReceiveChannel<SubjectsDownSyncProgress> =
+                                                     eventQuery: SyncEventQuery): ReceiveChannel<SubjectsDownSyncProgress> =
         scope.produce {
 
             this@SubjectRepositoryDownSyncHelperImpl.downSyncOperation = downSyncOperation
@@ -78,7 +78,7 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
             }
         }
 
-    private suspend fun getDownSyncStreamFromRemote(eventQuery: EventQuery) =
+    private suspend fun getDownSyncStreamFromRemote(eventQuery: SyncEventQuery) =
         eventRemoteDataSource.getStreaming(eventQuery)
 
     private fun setupJsonReaderFromResponse(responseStream: InputStream): JsonReader =

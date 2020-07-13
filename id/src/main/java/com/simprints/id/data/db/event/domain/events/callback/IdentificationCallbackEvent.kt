@@ -13,7 +13,6 @@ class IdentificationCallbackEvent(
     scores: List<CallbackComparisonScore>
 ) : Event(
     UUID.randomUUID().toString(),
-    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
     IdentificationCallbackPayload(createdAt, DEFAULT_EVENT_VERSION, sessionId, scores)) {
 

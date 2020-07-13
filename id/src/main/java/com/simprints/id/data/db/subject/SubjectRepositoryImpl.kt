@@ -15,7 +15,7 @@ import com.simprints.id.data.db.subject.domain.Subject.Companion.buildSubjectFro
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
-import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
+import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncProgress
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
@@ -138,7 +138,7 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
 
     private fun buildEventQuery(peopleDownSyncOperation: SubjectsDownSyncOperation) =
         with(peopleDownSyncOperation) {
-            EventQuery(
+            SyncEventQuery(
                 projectId = projectId,
                 userId = attendantId,
                 moduleIds = moduleId?.let { listOf(it) },
@@ -148,7 +148,7 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
             )
         }
 
-    private fun buildEventQueryForSubjectFetch(projectId: String, subjectId: String) = EventQuery(
+    private fun buildEventQueryForSubjectFetch(projectId: String, subjectId: String) = SyncEventQuery(
         projectId = projectId,
         subjectId = subjectId,
         modes = listOf(Modes.FINGERPRINT),

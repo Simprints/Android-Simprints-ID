@@ -16,7 +16,6 @@ class EnrolmentLastBiometricsCalloutEvent(
     sessionId: String
 ) : Event(
     UUID.randomUUID().toString(),
-    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
     EnrolmentLastBiometricsCalloutPayload(createdAt, DEFAULT_EVENT_VERSION, projectId, userId, moduleId, metadata, sessionId)) {
 

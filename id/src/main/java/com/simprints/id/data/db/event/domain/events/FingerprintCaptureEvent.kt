@@ -16,7 +16,6 @@ class FingerprintCaptureEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     id,
-    DEFAULT_EVENT_VERSION,
     listOf(EventLabel.SessionId(sessionId)),
     FingerprintCapturePayload(createdAt, DEFAULT_EVENT_VERSION, endTime, finger, qualityThreshold, result, fingerprint, id)) {
 
