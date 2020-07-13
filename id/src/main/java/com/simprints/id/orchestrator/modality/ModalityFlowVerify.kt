@@ -31,8 +31,11 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
                              timeHelper: TimeHelper,
                              sessionRepository: SessionRepository,
                              consentRequired: Boolean,
-                             locationRequired: Boolean) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired) {
+                             locationRequired: Boolean,
+                             projectId: String,
+                             deviceId: String) :
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper,
+        sessionRepository, consentRequired, locationRequired, projectId, deviceId) {
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppVerifyRequest)
@@ -72,7 +75,7 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
             else -> throw IllegalStateException("Invalid result from intent")
         }
 
-        completeAllStepsIfExitFormHappened(requestCode, resultCode, data)
+        completeAllStepsIfExitFormOrErrorHappened(requestCode, resultCode, data)
 
         val stepRequested = steps.firstOrNull { it.requestCode == requestCode }
         stepRequested?.setResult(result)
