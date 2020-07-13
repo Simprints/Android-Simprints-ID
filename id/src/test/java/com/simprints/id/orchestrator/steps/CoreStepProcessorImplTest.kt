@@ -125,7 +125,7 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     @Test
     fun stepProcessor_shouldProcessResultFromSetup() {
         val setupData = Intent().apply {
-            putExtra(CORE_STEP_BUNDLE, SetupResponse())
+            putExtra(CORE_STEP_BUNDLE, SetupResponse(true))
         }
 
         val result = coreStepProcessor.processResult(setupData)
