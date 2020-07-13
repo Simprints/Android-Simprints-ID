@@ -62,7 +62,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
             else -> throw IllegalStateException("Invalid result from intent")
         }
 
-        completeAllStepsIfExitFormHappened(requestCode, resultCode, data)
+        completeAllStepsIfExitFormOrErrorHappened(requestCode, resultCode, data)
 
         val stepRequested = steps.firstOrNull { it.requestCode == requestCode }
         stepRequested?.setResult(result)
