@@ -36,7 +36,7 @@ interface SettingsPreferenceContract {
 
         fun clearActivityStackAndRelaunchApp()
 
-        fun tryRemoveOrDisablePreference(preference: Preference)
+        fun enablePreference(preference: Preference)
     }
 
     interface Presenter : BasePresenter
