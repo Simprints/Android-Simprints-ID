@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Handler
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -39,7 +38,9 @@ import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import kotlinx.android.synthetic.main.activity_setup.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
+import kotlin.concurrent.schedule
 import kotlin.math.min
 
 @ExperimentalCoroutinesApi
@@ -55,6 +56,8 @@ class SetupActivity: BaseSplitActivity() {
     private val viewModel: SetupViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(SetupViewModel::class.java)
     }
+
+    private var slowDownloadTimer: TimerTask? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         injectDependencies()
@@ -88,7 +91,7 @@ class SetupActivity: BaseSplitActivity() {
                 is RequiresUserConfirmationToDownload -> requestUserConfirmationDoDownloadModalities(it.state)
                 is Downloading -> {
                     updateUiForDownloadProgress(it.bytesDownloaded, it.totalBytesToDownload)
-                    monitorInactivityWhileDownloading(it.bytesDownloaded)
+                    cancelSlowDownloadTimerAndScheduleNewForSlowDownloadUi()
                 }
                 ModalitiesInstalling -> updateUiForModalitiesInstalling()
                 ModalitiesInstalled -> updateUiForModalitiesInstalledAndAskPermissions()
@@ -113,24 +116,15 @@ class SetupActivity: BaseSplitActivity() {
         }
     }
 
-    private fun monitorInactivityWhileDownloading(lastDownloadedBytes: Long) {
-        val handler = Handler()
-        handler.postDelayed({
-            viewModel.getViewStateLiveData().value?.let {
-                if (it is Downloading && it.bytesDownloaded == lastDownloadedBytes) {
-                    updateUiForDownloadTakingLonger()
-                }
-            }
-        }, SLOW_DOWNLOAD_DELAY_THRESHOLD)
-    }
-
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when(requestCode) {
             PERMISSIONS_REQUEST_CODE -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
+                    lifecycleScope.launchWhenResumed {
+                        storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
+                    }
                 }
             }
         }
@@ -148,7 +142,9 @@ class SetupActivity: BaseSplitActivity() {
     }
 
     private fun performPermissionActionsAndFinish() {
-        storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
+        lifecycleScope.launchWhenResumed {
+            storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
+        }
         setResultAndFinish(SETUP_COMPLETE_FLAG)
     }
 
@@ -191,6 +187,13 @@ class SetupActivity: BaseSplitActivity() {
         setupLogo.isVisible = false
     }
 
+    private fun cancelSlowDownloadTimerAndScheduleNewForSlowDownloadUi() {
+        slowDownloadTimer?.cancel()
+        slowDownloadTimer = Timer().schedule(SLOW_DOWNLOAD_DELAY_THRESHOLD) {
+            updateUiForDownloadTakingLonger()
+        }
+    }
+
     private fun updateUiForDownloadTakingLonger() {
         with(modalityDownloadText){
             text = getString(R.string.modality_download_taking_longer)
@@ -218,16 +221,13 @@ class SetupActivity: BaseSplitActivity() {
     }
 
     private fun handleAlertResponse(data: Intent?) {
-        tryToGetAlertActResponseAndHandleAction(data) ?: finishAffinity()
-    }
-
-    private fun tryToGetAlertActResponseAndHandleAction(data: Intent?) =
         data?.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
             when(it.buttonAction) {
                 CLOSE -> setResultAndFinish(SETUP_NOT_COMPLETE_FLAG)
                 TRY_AGAIN -> viewModel.reStartDownloadIfNecessary(splitInstallManager, getRequiredModules())
             }
-        }
+        } ?: setResultAndFinish(SETUP_NOT_COMPLETE_FLAG)
+    }
 
     private fun calculatePercentage(progressValue: Long, totalValue: Long) =
         min((100 * (progressValue.toFloat() / totalValue.toFloat())).toInt(), 100)

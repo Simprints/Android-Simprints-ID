@@ -25,25 +25,23 @@ object SetupActivityHelper {
             }
         }
 
-    internal fun storeUserLocationIntoCurrentSession(locationManager: LocationManager,
-                                                    sessionRepository: SessionRepository,
-                                                    crashReportManager: CrashReportManager) {
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
-                val locationRequest = LocationRequest().apply {
-                    priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-                }
-                val locationsFlow = locationManager.requestLocation(locationRequest).take(1)
-                locationsFlow.collect { locations ->
-                    val lastLocation = locations.last()
-                    sessionRepository.updateCurrentSession {
-                        Timber.d("Saving user's location into the current session")
-                        it.location = Location(lastLocation.latitude, lastLocation.longitude)
-                    }
-                }
-            } catch (t: Throwable) {
-                crashReportManager.logExceptionOrSafeException(FailedToRetrieveUserLocation(t))
+    internal suspend fun storeUserLocationIntoCurrentSession(locationManager: LocationManager,
+                                                     sessionRepository: SessionRepository,
+                                                     crashReportManager: CrashReportManager) {
+        try {
+            val locationRequest = LocationRequest().apply {
+                priority = LocationRequest.PRIORITY_HIGH_ACCURACY
             }
+            val locationsFlow = locationManager.requestLocation(locationRequest).take(1)
+            locationsFlow.collect { locations ->
+                val lastLocation = locations.last()
+                sessionRepository.updateCurrentSession {
+                    Timber.d("Saving user's location into the current session")
+                    it.location = Location(lastLocation.latitude, lastLocation.longitude)
+                }
+            }
+        } catch (t: Throwable) {
+            crashReportManager.logExceptionOrSafeException(FailedToRetrieveUserLocation(t))
         }
     }
 }
