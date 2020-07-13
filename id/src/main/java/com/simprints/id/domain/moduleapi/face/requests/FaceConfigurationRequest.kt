@@ -5,11 +5,14 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class FaceConfigurationRequest(
-    override val type: FaceRequestType = FaceRequestType.CONFIGURATION
+    override val type: FaceRequestType = FaceRequestType.CONFIGURATION,
+    val projectId: String,
+    val deviceId: String
 ) : FaceRequest
 
 fun FaceConfigurationRequest.fromDomainToModuleApi(): IFaceConfigurationRequest =
-    IFaceConfigurationRequestImpl()
+    IFaceConfigurationRequestImpl(projectId, deviceId)
 
 @Parcelize
-private class IFaceConfigurationRequestImpl : IFaceConfigurationRequest
+private class IFaceConfigurationRequestImpl(override val projectId: String,
+                                            override val deviceId: String) : IFaceConfigurationRequest
