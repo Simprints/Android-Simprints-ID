@@ -47,7 +47,7 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
             it.onComplete()
         } catch (e: ScannerNotPairedException) {
             it.onError(e)
-        } catch (e: MultipleScannersPairedException) {
+        } catch (e: MultiplePossibleScannersPairedException) {
             it.onError(e)
         }
     }
@@ -66,7 +66,7 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
         when (e) {
             is BluetoothNotEnabledException -> FingerprintAlert.BLUETOOTH_NOT_ENABLED
             is BluetoothNotSupportedException -> FingerprintAlert.BLUETOOTH_NOT_SUPPORTED
-            is MultipleScannersPairedException -> FingerprintAlert.MULTIPLE_PAIRED_SCANNERS
+            is MultiplePossibleScannersPairedException -> FingerprintAlert.MULTIPLE_PAIRED_SCANNERS
             is ScannerLowBatteryException -> FingerprintAlert.LOW_BATTERY
             is ScannerNotPairedException -> FingerprintAlert.NOT_PAIRED
             is ScannerDisconnectedException -> FingerprintAlert.DISCONNECTED

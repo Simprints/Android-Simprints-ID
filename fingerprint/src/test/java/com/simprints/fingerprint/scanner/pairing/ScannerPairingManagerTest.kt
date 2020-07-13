@@ -3,7 +3,7 @@ package com.simprints.fingerprint.scanner.pairing
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.exceptions.safe.MultipleScannersPairedException
+import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
@@ -112,7 +112,7 @@ class ScannerPairingManagerTest {
         every { prefsMock.scannerGenerations } returns listOf(correctGeneration, incorrectGeneration)
         every { prefsMock.lastScannerUsed } returns ""
 
-        assertThrows<MultipleScannersPairedException> { scannerPairingManager.getPairedScannerAddressToUse() }
+        assertThrows<MultiplePossibleScannersPairedException> { scannerPairingManager.getPairedScannerAddressToUse() }
     }
 
     @Test
@@ -125,7 +125,7 @@ class ScannerPairingManagerTest {
         every { prefsMock.scannerGenerations } returns listOf(correctGeneration, incorrectGeneration)
         every { prefsMock.lastScannerUsed } returns someOtherSerial
 
-        assertThrows<MultipleScannersPairedException> { scannerPairingManager.getPairedScannerAddressToUse() }
+        assertThrows<MultiplePossibleScannersPairedException> { scannerPairingManager.getPairedScannerAddressToUse() }
     }
 
     companion object {

@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.scanner.exceptions.safe.MultipleScannersPairedException
+import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
@@ -35,7 +35,7 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
 
     /**
      * @throws ScannerNotPairedException
-     * @throws MultipleScannersPairedException
+     * @throws MultiplePossibleScannersPairedException
      */
     fun getPairedScannerAddressToUse(): String {
         val validPairedScanners = getPairedScannerAddresses().filter { isScannerGenerationValidForProject(it) }
@@ -59,10 +59,10 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
             if (pairedScanners.contains(lastAddressUsed)) {
                 return lastAddressUsed
             } else {
-                throw MultipleScannersPairedException()
+                throw MultiplePossibleScannersPairedException()
             }
         } else {
-            throw MultipleScannersPairedException()
+            throw MultiplePossibleScannersPairedException()
         }
     }
 

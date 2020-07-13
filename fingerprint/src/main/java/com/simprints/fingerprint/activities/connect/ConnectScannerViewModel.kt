@@ -148,7 +148,7 @@ class ConnectScannerViewModel(
         when (e) {
             is BluetoothNotEnabledException ->
                 connectScannerIssue.postEvent(ConnectScannerIssue.BluetoothOff)
-            is ScannerNotPairedException, is MultipleScannersPairedException ->
+            is ScannerNotPairedException, is MultiplePossibleScannersPairedException ->
                 connectScannerIssue.postEvent(determineAppropriateScannerIssueForPairing())
             is ScannerDisconnectedException, is UnknownScannerIssueException ->
                 scannerManager.currentScannerId?.let { showScannerErrorDialogWithScannerId.postEvent(it) }
