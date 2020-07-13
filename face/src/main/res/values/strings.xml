@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="face_capture_preview">Face Capture Preview</string>
-
     <string name="capture_title_howto">How to scan a face</string>
     <string name="capture_title_previewing">Preparing to scan</string>
     <string name="capture_title_looks_good">Scan is ready!</string>
@@ -69,6 +67,4 @@
     <string name="error_licence_missing_title">License missing</string>
     <string name="error_licence_missing_message">Face license is missing, please contact your system administrator</string>
     <string name="error_licence_missing_button">Close</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
