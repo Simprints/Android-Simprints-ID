@@ -13,6 +13,6 @@ interface FaceRequestFactory {
     fun buildFaceMatchRequest(probeFaceSamples: List<FaceCaptureSample>,
                               queryForCandidates: Serializable): FaceMatchRequest
 
-    fun buildFaceConfigurationRequest(): FaceConfigurationRequest
+    fun buildFaceConfigurationRequest(projectId: String, deviceId: String): FaceConfigurationRequest
 
 }
