@@ -19,6 +19,6 @@ interface FaceStepProcessor {
                       resultCode: Int,
                       data: Intent?): Step.Result?
 
-    fun buildConfigurationStep(): Step
+    fun buildConfigurationStep(projectId: String, deviceId: String): Step
 
 }
