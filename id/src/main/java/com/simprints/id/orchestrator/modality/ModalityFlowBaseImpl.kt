@@ -30,7 +30,9 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
                                     private val timeHelper: TimeHelper,
                                     private val sessionRepository: SessionRepository,
                                     private val consentRequired: Boolean,
-                                    private val locationRequired: Boolean) : ModalityFlow {
+                                    private val locationRequired: Boolean,
+                                    private val projectId: String,
+                                    private val deviceId: String) : ModalityFlow {
 
     override val steps: MutableList<Step> = mutableListOf()
 
@@ -59,7 +61,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     private fun buildModalityConfigurationSteps(modalities: List<Modality>) = modalities.map {
         when (it) {
             Modality.FINGER -> fingerprintStepProcessor.buildConfigurationStep()
-            Modality.FACE -> faceStepProcessor.buildConfigurationStep()
+            Modality.FACE -> faceStepProcessor.buildConfigurationStep(projectId, deviceId)
         }
     }
 
