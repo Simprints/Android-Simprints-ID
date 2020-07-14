@@ -15,7 +15,6 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.event.SessionRepository
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilder
 import com.simprints.id.data.db.event.local.SessionLocalDataSource
-import com.simprints.id.data.db.event.local.SessionRealmConfigBuilder
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager

@@ -35,8 +35,6 @@ import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBu
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilderImpl
 import com.simprints.id.data.db.event.local.SessionLocalDataSource
 import com.simprints.id.data.db.event.local.SessionLocalDataSourceImpl
-import com.simprints.id.data.db.event.local.SessionRealmConfigBuilder
-import com.simprints.id.data.db.event.local.SessionRealmConfigBuilderImpl
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSourceImpl
 import com.simprints.id.data.db.subject.SubjectRepository
