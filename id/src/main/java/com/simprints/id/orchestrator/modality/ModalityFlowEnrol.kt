@@ -33,8 +33,8 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
     override fun startFlow(appRequest: AppRequest) {
 
         require(appRequest is AppEnrolRequest)
-        addModalityConfigurationSteps(modalities)
         addSetupStep()
+        addModalityConfigurationSteps(modalities)
         addCoreConsentStepIfRequired(ENROL)
         steps.addAll(buildStepsList(modalities))
     }
