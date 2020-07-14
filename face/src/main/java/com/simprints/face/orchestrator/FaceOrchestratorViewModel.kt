@@ -40,9 +40,9 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
     fun start(iFaceRequest: IFaceRequest) {
         val request = FaceToDomainRequest.fromFaceToDomainRequest(iFaceRequest)
         when (request) {
+            is FaceConfigurationRequest -> startConfiguration.send(request)
             is FaceCaptureRequest -> startCapture.send(request)
             is FaceMatchRequest -> startMatching.send(request)
-            is FaceConfigurationRequest -> startConfiguration.send(request)
         }
         faceRequest = request
     }
@@ -91,12 +91,13 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
         errorEvent.send(ErrorType.LICENSE_INVALID)
     }
 
-    fun configurationFinished() {
-        flowFinished.send(
-            DomainToFaceResponse.fromDomainToFaceResponse(
-                FaceConfigurationResponse()
-            )
-        )
+    fun configurationFinished(isSuccess: Boolean) {
+        val response = if (isSuccess)
+            FaceConfigurationResponse()
+        else
+            FaceErrorResponse(FaceErrorReason.CONFIGURATION_ERROR)
+
+        flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(response))
     }
 
 }

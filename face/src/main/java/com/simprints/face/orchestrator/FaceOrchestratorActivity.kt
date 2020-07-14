@@ -6,14 +6,11 @@ import android.os.Bundle
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.core.tools.whenNonNull
-import com.simprints.core.tools.whenNull
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureActivity
 import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.face.match.FaceMatchActivity
-import com.simprints.face.models.RankOneInitializer
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -32,23 +29,6 @@ class FaceOrchestratorActivity : BaseSplitActivity() {
         observeViewModel()
 
         viewModel.start(iFaceRequest)
-    }
-
-    private fun tryInitWithLicense(rankOneLicense: String) {
-        if (RankOneInitializer.tryInitWithLicense(this, rankOneLicense)) {
-            viewModel.configurationFinished()
-        } else {
-            viewModel.invalidLicense()
-        }
-    }
-
-    private fun getRankOneLicense(): String? = try {
-        assets.open("ROC.lic").use {
-            String(it.readBytes())
-        }
-    } catch (t: Throwable) {
-        // TODO get license from storage
-        null
     }
 
     override fun onDestroy() {
@@ -73,17 +53,13 @@ class FaceOrchestratorActivity : BaseSplitActivity() {
                 .navigate(BlankFragmentDirections.actionBlankFragmentToErrorFragment(it))
         })
         viewModel.startConfiguration.observe(this, LiveDataEventWithContentObserver {
-            getRankOneLicense()
-                .whenNull {
-                    findNavController(R.id.orchestrator_host_fragment)
-                        .navigate(
-                            BlankFragmentDirections.actionBlankFragmentToConfigurationFragment(
-                                it.deviceId,
-                                it.projectId
-                            )
-                        )
-                }
-                .whenNonNull { tryInitWithLicense(this) }
+            findNavController(R.id.orchestrator_host_fragment)
+                .navigate(
+                    BlankFragmentDirections.actionBlankFragmentToConfigurationFragment(
+                        it.projectId,
+                        it.deviceId
+                    )
+                )
         })
     }
 
