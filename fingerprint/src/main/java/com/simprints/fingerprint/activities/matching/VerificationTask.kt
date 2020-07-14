@@ -9,6 +9,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
+import com.simprints.fingerprint.controllers.core.eventData.model.Matcher
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -51,6 +52,7 @@ class VerificationTask(private val viewModel: MatchingViewModel,
             matchStartTime,
             timeHelper.now(),
             matchingRequest.queryForCandidates,
+            Matcher.SIM_AFIS,
             verificationResult))
 
         val resultData = Intent().putExtra(MatchingTaskResult.BUNDLE_KEY,
