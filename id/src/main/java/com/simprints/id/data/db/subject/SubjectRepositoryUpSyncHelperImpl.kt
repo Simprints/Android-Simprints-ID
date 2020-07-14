@@ -3,8 +3,6 @@ package com.simprints.id.data.db.subject
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.Event.EventLabel.*
-import com.simprints.id.data.db.event.domain.events.EventLabel.*
-import com.simprints.id.data.db.event.domain.events.Events
 import com.simprints.id.data.db.event.domain.events.subject.*
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
@@ -74,33 +72,23 @@ class SubjectRepositoryUpSyncHelperImpl(
     }
 
     internal fun createEvents(subjects: List<Subject>) =
-        Events(subjects.map { createEventFromPerson(it) })
+        subjects.map { createEventFromPerson(it) }
 
     private fun createEventFromPerson(subject: Subject): Event =
         with(subject) {
-            Event(
-                getRandomUuid(),
-                listOf(
-                    ProjectId(projectId),
-                    SubjectId(subjectId),
-                    AttendantId(attendantId),
-                    ModuleId(listOf(moduleId)),
-                    Mode(modalities.map { it.toMode() })
-                ),
-                createPayload(subject)
+            EnrolmentRecordCreationEvent(
+                0, //STOPSHIP
+                subjectId,
+                projectId,
+                moduleId,
+                attendantId,
+                modalities.map { it.toMode() },
+                buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples)
             )
         }
 
     internal fun getRandomUuid() = UUID.randomUUID().toString()
 
-    private fun createPayload(subject: Subject) =
-        EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(
-            subjectId = subject.subjectId,
-            projectId = subject.projectId,
-            moduleId = subject.moduleId,
-            attendantId = subject.attendantId,
-            biometricReferences = buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples)
-        )
 
     private fun buildBiometricReferences(fingerprintSamples: List<FingerprintSample>,
                                          faceSamples: List<FaceSample>): List<BiometricReference> {

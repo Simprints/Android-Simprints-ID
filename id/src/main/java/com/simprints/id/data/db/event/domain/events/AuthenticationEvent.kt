@@ -14,7 +14,7 @@ class AuthenticationEvent(
     sessionId: String = UUID.randomUUID().toString()
 ) : Event(
     UUID.randomUUID().toString(),
-    listOf(EventLabel.SessionId(sessionId)),
+    mutableListOf(EventLabel.SessionId(sessionId)),
     AuthenticationPayload(createdAt, DEFAULT_EVENT_VERSION, endTime, userInfo, result)) {
 
 

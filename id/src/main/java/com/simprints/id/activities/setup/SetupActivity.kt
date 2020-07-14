@@ -9,8 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.LocationRequest
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.events.session.Location
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
 import com.simprints.id.domain.moduleapi.core.response.SetupResponse
@@ -28,26 +29,27 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-class SetupActivity: AppCompatActivity() {
+class SetupActivity : AppCompatActivity() {
 
     private lateinit var setupRequest: SetupRequest
 
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var sessionRepository: SessionRepository
+    @Inject lateinit var eventRepository: EventRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         injectDependencies()
         super.onCreate(savedInstanceState)
 
-        setupRequest = intent.extras?.getParcelable(CoreResponse.CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
+        setupRequest = intent.extras?.getParcelable(CoreResponse.CORE_STEP_BUNDLE)
+            ?: throw InvalidAppRequest()
 
         askPermissionsOrPerformSpecificActions()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when(requestCode) {
+        when (requestCode) {
             PERMISSIONS_REQUEST_CODE -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     storeUserLocationIntoCurrentSession()
@@ -92,9 +94,9 @@ class SetupActivity: AppCompatActivity() {
                 val locationsFlow = locationManager.requestLocation(locationRequest).take(1)
                 locationsFlow.collect { locations ->
                     val lastLocation = locations.last()
-                    sessionRepository.updateCurrentSession {
+                    eventRepository.updateCurrentSession {
                         Timber.d("Saving user's location into the current session")
-                        it.location = Location(lastLocation.latitude, lastLocation.longitude)
+                        (it.payload as SessionCapturePayload).location = Location(lastLocation.latitude, lastLocation.longitude)
                     }
                 }
             } catch (t: Throwable) {

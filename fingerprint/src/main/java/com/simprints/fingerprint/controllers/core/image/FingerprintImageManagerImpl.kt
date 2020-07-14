@@ -1,14 +1,15 @@
 package com.simprints.fingerprint.controllers.core.image
 
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.fingerprint.data.domain.images.Path
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent.SessionCapturePayload
+import com.simprints.id.data.images.repository.ImageRepository
 import timber.log.Timber
 import com.simprints.id.data.images.model.Path as CorePath
 
 class FingerprintImageManagerImpl(private val coreImageRepository: ImageRepository,
-                                  private val coreSessionRepository: SessionRepository) : FingerprintImageManager {
+                                  private val coreEventRepository: EventRepository) : FingerprintImageManager {
 
     override suspend fun save(imageBytes: ByteArray, captureEventId: String, fileExtension: String): FingerprintImageRef? =
         determinePath(captureEventId, fileExtension)?.let { path ->
@@ -25,9 +26,9 @@ class FingerprintImageManagerImpl(private val coreImageRepository: ImageReposito
 
     private suspend fun determinePath(captureEventId: String, fileExtension: String): CorePath? =
         try {
-            val currentSession = coreSessionRepository.getCurrentSession()
+            val currentSession = coreEventRepository.getCurrentSession()
 
-            val projectId = currentSession.projectId
+            val projectId = (currentSession.payload as SessionCapturePayload).projectId
             val sessionId = currentSession.id
             CorePath(arrayOf(
                 PROJECTS_PATH, projectId, SESSIONS_PATH, sessionId, FINGERPRINTS_PATH, "$captureEventId.$fileExtension"

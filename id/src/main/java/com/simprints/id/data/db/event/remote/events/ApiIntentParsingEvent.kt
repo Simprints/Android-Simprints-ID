@@ -11,7 +11,7 @@ import io.realm.internal.Keep
 class ApiIntentParsingEvent(domainEvent: IntentParsingEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.fromDomainToApi(),
+        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
         domainEvent.payload.fromDomainToApi()) {
 
 

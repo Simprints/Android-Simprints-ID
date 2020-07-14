@@ -5,6 +5,7 @@ import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.Event.EventLabel.*
 import com.simprints.id.data.db.event.domain.events.EventPayload
 import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.domain.modality.Modes
 import java.util.*
 
 @Keep
@@ -14,10 +15,11 @@ class EnrolmentRecordCreationEvent(
     projectId: String,
     moduleId: String,
     attendantId: String,
+    modes: List<Modes>,
     biometricReferences: List<BiometricReference>
 ) : Event(
     UUID.randomUUID().toString(),
-    listOf(ProjectId(projectId), ModuleId(listOf(moduleId)), AttendantId(attendantId)),
+    mutableListOf(ProjectId(projectId), ModuleId(listOf(moduleId)), AttendantId(attendantId), Mode(modes)),
     EnrolmentRecordCreationPayload(createdAt, DEFAULT_EVENT_VERSION, subjectId, projectId, moduleId, attendantId, biometricReferences)) {
 
     class EnrolmentRecordCreationPayload(

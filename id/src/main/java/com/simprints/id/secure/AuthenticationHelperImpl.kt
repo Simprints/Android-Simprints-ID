@@ -1,14 +1,14 @@
 package com.simprints.id.secure
 
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.events.AuthenticationEvent
 import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.Result
-import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.Result.*
-import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload
+import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
@@ -24,7 +24,7 @@ class AuthenticationHelperImpl(
     private val loginInfoManager: LoginInfoManager,
     private val timeHelper: TimeHelper,
     private val projectAuthenticator: ProjectAuthenticator,
-    private val sessionRepository: SessionRepository
+    private val eventRepository: EventRepository
 ) : AuthenticationHelper {
 
     private var loginStartTime = 0L
@@ -97,6 +97,6 @@ class AuthenticationHelperImpl(
             UserInfo(projectId, userId),
             result
         )
-        sessionRepository.addEventToCurrentSessionInBackground(event)
+        inBackground { eventRepository.addEvent(event) }
     }
 }

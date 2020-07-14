@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
@@ -21,10 +21,10 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
                             private val faceEnrolProcessor: FaceStepProcessor,
                             private val coreStepProcessor: CoreStepProcessor,
                             timeHelper: TimeHelper,
-                            sessionRepository: SessionRepository,
+                            eventRepository: EventRepository,
                             consentRequired: Boolean,
                             locationRequired: Boolean) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceEnrolProcessor, timeHelper, sessionRepository, consentRequired, locationRequired) {
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceEnrolProcessor, timeHelper, eventRepository, consentRequired, locationRequired) {
 
     override fun startFlow(appRequest: AppRequest,
                            modalities: List<Modality>) {

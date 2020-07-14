@@ -16,7 +16,7 @@ class EnrolmentLastBiometricsCalloutEvent(
     sessionId: String
 ) : Event(
     UUID.randomUUID().toString(),
-    listOf(EventLabel.SessionId(sessionId)),
+    mutableListOf(EventLabel.SessionId(sessionId)),
     EnrolmentLastBiometricsCalloutPayload(createdAt, DEFAULT_EVENT_VERSION, projectId, userId, moduleId, metadata, sessionId)) {
 
     @Keep

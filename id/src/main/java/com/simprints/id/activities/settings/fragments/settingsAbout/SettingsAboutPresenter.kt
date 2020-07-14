@@ -3,7 +3,7 @@ package com.simprints.id.activities.settings.fragments.settingsAbout
 import android.preference.Preference
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
@@ -20,7 +20,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var signerManager: SignerManager
     @Inject lateinit var syncManager: SyncManager
-    @Inject lateinit var sessionEventManager: SessionRepository
+    @Inject lateinit var eventEventManager: EventRepository
     @Inject lateinit var recentEventsManager: RecentEventsPreferencesManager
     @Inject lateinit var baseUrlProvider: BaseUrlProvider
     @Inject lateinit var longConsentRepository: LongConsentRepository
@@ -92,7 +92,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
         signerManager.signOut()
         syncManager.cancelBackgroundSyncs()
         longConsentRepository.deleteLongConsents()
-        sessionEventManager.signOut()
+        eventEventManager.signOut()
         baseUrlProvider.resetApiBaseUrl()
         remoteConfigWrapper.clearRemoteConfig()
         

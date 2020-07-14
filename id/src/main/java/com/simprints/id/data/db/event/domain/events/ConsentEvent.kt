@@ -12,7 +12,7 @@ class ConsentEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
-    listOf(EventLabel.SessionId(sessionId)),
+    mutableListOf(EventLabel.SessionId(sessionId)),
     ConsentPayload(createdAt, DEFAULT_EVENT_VERSION, endTime, consentType, result)) {
 
 

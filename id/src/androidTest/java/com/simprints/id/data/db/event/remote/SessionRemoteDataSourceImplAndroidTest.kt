@@ -9,7 +9,7 @@ import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.db.event.SessionRepositoryImpl
+import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.events.*
 import com.simprints.id.data.db.event.domain.events.ScannerConnectionEvent.ScannerGeneration
 import com.simprints.id.data.db.event.domain.events.callback.*
@@ -74,7 +74,7 @@ class SessionRemoteDataSourceImplAndroidTest {
     @Test
     fun closeSessions_shouldGetUploaded() {
         runBlocking {
-            val nSession = SessionRepositoryImpl.SESSION_BATCH_SIZE + 1
+            val nSession = EventRepositoryImpl.SESSION_BATCH_SIZE + 1
             val sessions = createClosedSessions(nSession)
 
             sessions.forEach {

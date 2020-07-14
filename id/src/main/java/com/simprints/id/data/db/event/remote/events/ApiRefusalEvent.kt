@@ -11,7 +11,7 @@ import com.simprints.id.data.db.event.remote.events.ApiRefusalEvent.ApiRefusalPa
 class ApiRefusalEvent(domainEvent: RefusalEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.fromDomainToApi(),
+        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep

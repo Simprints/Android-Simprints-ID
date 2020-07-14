@@ -1,24 +1,28 @@
 package com.simprints.face.controllers.core.events
 
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.face.controllers.core.events.model.*
 import com.simprints.face.controllers.core.events.model.EventType.*
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.tools.ignoreException
 import kotlinx.coroutines.runBlocking
+import com.simprints.id.data.db.event.domain.events.Event as CoreEvent
 
-class FaceSessionEventsManagerImpl(private val sessionRepository: SessionRepository) : FaceSessionEventsManager {
+class FaceSessionEventsManagerImpl(private val eventRepository: EventRepository) : FaceSessionEventsManager {
 
     override fun addEventInBackground(event: Event) {
-        fromDomainToCore(event)?.let { sessionRepository.addEventToCurrentSessionInBackground(it) }
+        fromDomainToCore(event)?.let {
+            inBackground {
+                eventRepository.addEvent(it)
+            }
+        }
     }
 
     override fun addEvent(event: Event) {
         runBlocking {
             ignoreException {
                 fromDomainToCore(event)?.let {
-                    sessionRepository.updateCurrentSession { currentSession ->
-                        currentSession.addEvent(it)
-                    }
+                    eventRepository.addEvent(it)
                 }
             }
         }

@@ -5,11 +5,8 @@ import com.simprints.id.data.db.event.domain.events.Event.EventLabel.SessionId
 import com.simprints.id.domain.modality.Modes
 
 @Keep
-data class Events(val events: List<Event>)
-
-@Keep
 abstract class Event(val id: String,
-                     val labels: List<EventLabel>,
+                     val labels: MutableList<EventLabel>,
                      val payload: EventPayload) {
 
     companion object {
@@ -17,6 +14,8 @@ abstract class Event(val id: String,
     }
 
     sealed class EventLabel(val key: String) {
+        sealed class SingleEventLabel(key: String, val value: String) : EventLabel(key)
+        sealed class MultipleEventLabel(key: String, val values: List<String>) : EventLabel(key)
 
         class ProjectId(val labelValue: String) : EventLabel("projectId")
         class SubjectId(val labelValue: String) : EventLabel("subjectId")

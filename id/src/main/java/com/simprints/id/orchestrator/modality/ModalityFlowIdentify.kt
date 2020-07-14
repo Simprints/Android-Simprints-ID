@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -27,10 +27,10 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
                                private val coreStepProcessor: CoreStepProcessor,
                                private val matchGroup: GROUP,
                                timeHelper: TimeHelper,
-                               sessionRepository: SessionRepository,
+                               eventRepository: EventRepository,
                                consentRequired: Boolean,
                                locationRequired: Boolean) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired) {
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, eventRepository, consentRequired, locationRequired) {
 
     override val steps: MutableList<Step> = mutableListOf()
 

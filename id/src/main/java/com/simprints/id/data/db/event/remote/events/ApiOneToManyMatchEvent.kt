@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent.OneToMan
 class ApiOneToManyMatchEvent(domainEvent: OneToManyMatchEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.fromDomainToApi(),
+        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep

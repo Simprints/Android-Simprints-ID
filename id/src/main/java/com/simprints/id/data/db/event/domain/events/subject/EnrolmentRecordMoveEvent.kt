@@ -15,7 +15,7 @@ class EnrolmentRecordMoveEvent(
     enrolmentRecordDeletion: EnrolmentRecordDeletionPayload
 ) : Event(
     UUID.randomUUID().toString(),
-    listOf(), //StopShip: to check with cloud - labels empty?
+    mutableListOf(), //STOPSHIP: to check with cloud - labels empty?
     EnrolmentRecordMovePayload(createdAt, DEFAULT_EVENT_VERSION, enrolmentRecordCreation, enrolmentRecordDeletion)) {
 
     class EnrolmentRecordMovePayload(

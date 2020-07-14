@@ -14,10 +14,11 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.events.ConsentEvent
 import com.simprints.id.data.db.event.domain.events.ConsentEvent.ConsentPayload.Result
 import com.simprints.id.data.db.event.domain.events.ConsentEvent.ConsentPayload.Type
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.exitformhandler.ExitFormHelper
@@ -48,7 +49,7 @@ class ConsentActivity : AppCompatActivity() {
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var exitFormHelper: ExitFormHelper
-    @Inject lateinit var sessionRepository: SessionRepository
+    @Inject lateinit var eventRepository: EventRepository
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
@@ -63,7 +64,8 @@ class ConsentActivity : AppCompatActivity() {
 
         startConsentEventTime = timeHelper.now()
 
-        askConsentRequestReceived = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
+        askConsentRequestReceived = intent.extras?.getParcelable(CORE_STEP_BUNDLE)
+            ?: throw InvalidAppRequest()
 
         viewModel = ViewModelProvider(this, viewModelFactory.apply { askConsentRequest = askConsentRequestReceived })
             .get(ConsentViewModel::class.java)
@@ -191,8 +193,8 @@ class ConsentActivity : AppCompatActivity() {
 
     private fun deleteLocationInfoFromSession() {
         CoroutineScope(Dispatchers.Main).launch {
-            sessionRepository.updateCurrentSession {
-                it.location = null
+            eventRepository.updateCurrentSession {
+                (it.payload as SessionCapturePayload).location = null
             }
         }
     }
