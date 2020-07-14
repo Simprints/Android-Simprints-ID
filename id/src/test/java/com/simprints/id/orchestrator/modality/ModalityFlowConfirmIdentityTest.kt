@@ -34,7 +34,7 @@ class ModalityFlowConfirmIdentityTest {
     @Test
     fun startFlow_shouldBuildTheRightListOfSteps() {
         val appRequest = AppConfirmaConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
-        modalityFlowConfirmIdentity.startFlow(appRequest.fromModuleApiToDomain(), emptyList())
+        modalityFlowConfirmIdentity.startFlow(appRequest.fromModuleApiToDomain())
 
         assertThat(modalityFlowConfirmIdentity.steps).hasSize(1)
         verify { coreProcessorMock.buildConfirmIdentityStep(DEFAULT_PROJECT_ID, GUID1, GUID2) }
@@ -47,7 +47,7 @@ class ModalityFlowConfirmIdentityTest {
         every { step.getStatus() } returns Step.Status.NOT_STARTED
         every { coreProcessorMock.buildConfirmIdentityStep(any(), any(), any()) } returns step
 
-        modalityFlowConfirmIdentity.startFlow(appRequest.fromModuleApiToDomain(), emptyList())
+        modalityFlowConfirmIdentity.startFlow(appRequest.fromModuleApiToDomain())
 
         val next = modalityFlowConfirmIdentity.getNextStepToLaunch()
 

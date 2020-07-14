@@ -1,10 +1,29 @@
-package com.simprints.core.tools
+package com.simprints.core.tools.utils
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.Configuration
+import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_FILE_NAME
+import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_MODE
 import java.util.*
 
 object LanguageHelper {
+
+    const val SHARED_PREFS_LANGUAGE_KEY = "SelectedLanguage"
+    const val SHARED_PREFS_LANGUAGE_DEFAULT = "en"
+
+    lateinit var prefs: SharedPreferences
+    var language: String
+        get() {
+            return prefs.getString(SHARED_PREFS_LANGUAGE_KEY, SHARED_PREFS_LANGUAGE_DEFAULT)!!
+        }
+        set(value) {
+            prefs.edit().putString(SHARED_PREFS_LANGUAGE_KEY, value).apply()
+        }
+
+    fun init(ctx: Context){
+        prefs = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
+    }
 
     private fun configurationWithSpecificLocale(languageString: String): Configuration =
         Configuration().apply {
@@ -31,6 +50,8 @@ object LanguageHelper {
         }
     }
 
-    fun contextWithSpecificLanguage(context: Context, languageString: String): Context =
-        context.createConfigurationContext(configurationWithSpecificLocale(languageString))
+    fun getLanguageConfigurationContext(ctx: Context): Context {
+        val conf = configurationWithSpecificLocale(language)
+        return ctx.createConfigurationContext(conf)
+    }
 }

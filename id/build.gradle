@@ -215,6 +215,8 @@ dependencies {
     api deps.koin.core
     api deps.koin.android
     api deps.koin.viewmodel
+    api deps.playcore.core
+    api deps.playcore.core_ktx
 
     // ######################################################
     //                      Unit test

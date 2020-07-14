@@ -2,18 +2,15 @@ package com.simprints.id.activities.settings
 
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
-import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.settings_toolbar.*
-import javax.inject.Inject
 
-class ModuleSelectionActivity : AppCompatActivity() {
+class ModuleSelectionActivity : BaseSplitActivity() {
 
     private lateinit var moduleSelectionFragment: ModuleSelectionFragment
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,7 +19,7 @@ class ModuleSelectionActivity : AppCompatActivity() {
         setContentView(R.layout.settings_toolbar)
         configureToolbar()
         moduleSelectionFragment = ModuleSelectionFragment(application as Application)
-        title = androidResourcesHelper.getString(R.string.preference_select_modules_title)
+        title = getString(R.string.preference_select_modules_title)
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.prefContent, moduleSelectionFragment)
