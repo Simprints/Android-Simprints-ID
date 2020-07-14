@@ -1,5 +1,5 @@
-package com.simprints.core.tools.extentions
 
+package com.simprints.core.tools.extentions
 import android.app.Activity
 import android.content.Context
 import android.view.View

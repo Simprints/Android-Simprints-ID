@@ -6,7 +6,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
-import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.FaceCaptureRetryEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
@@ -17,7 +16,6 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 class RetryFragment : Fragment(R.layout.fragment_retry) {
 
     private val mainVM: FaceCaptureViewModel by sharedViewModel()
-    private val androidResourcesHelper: FaceAndroidResourcesHelper by inject()
     private val faceSessionEventsManager: FaceSessionEventsManager by inject()
     private val faceTimeHelper: FaceTimeHelper by inject()
     private val startTime = faceTimeHelper.now()
@@ -32,18 +30,16 @@ class RetryFragment : Fragment(R.layout.fragment_retry) {
     }
 
     private fun setTextInLayout() {
-        with(androidResourcesHelper) {
-            retry_confirmation_title.text = getString(R.string.title_confirmation)
-            retry_txt.text = getString(R.string.captured_unsuccessful)
-            retry_tips_text.text = getString(R.string.retry_tips)
-            retry_btn.text = getString(R.string.btn_capture_again)
-        }
+        retry_confirmation_title.text = getString(R.string.title_confirmation)
+        retry_txt.text = getString(R.string.captured_unsuccessful)
+        retry_tips_text.text = getString(R.string.retry_tips)
+        retry_btn.text = getString(R.string.btn_capture_again)
         if (!mainVM.canRetry) setUiForFailedRetries()
     }
 
     private fun setUiForFailedRetries() {
         layout_retry_tips.isVisible = false
-        retry_btn.text = androidResourcesHelper.getString(R.string.btn_finish)
+        retry_btn.text = getString(R.string.btn_finish)
     }
 
     private fun sendRetryEvent() {

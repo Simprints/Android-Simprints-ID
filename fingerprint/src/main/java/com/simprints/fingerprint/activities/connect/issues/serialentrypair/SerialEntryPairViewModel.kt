@@ -16,7 +16,7 @@ class SerialEntryPairViewModel(
 
     fun startPairing(serialNumber: String) {
         val macAddress = serialNumberConverter.convertSerialNumberToMacAddress(serialNumber)
-        scannerPairingManager.pairOnlyToDevice(macAddress)
+        scannerPairingManager.startPairingToDevice(macAddress)
         awaitingToPairToMacAddress.postEvent(macAddress)
     }
 }

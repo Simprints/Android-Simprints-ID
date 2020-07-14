@@ -4,20 +4,18 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 
 class ConfirmFingerprintsDialog(private val context: Context,
-                                private val androidResourcesHelper: FingerprintAndroidResourcesHelper,
                                 private val scannedFingers: Map<String, Boolean>,
                                 private val callbackConfirm: () -> Unit,
                                 private val callbackRestart: () -> Unit) {
 
     fun create(): AlertDialog =
         AlertDialog.Builder(context)
-            .setTitle(androidResourcesHelper.getString(R.string.confirm_fingers_dialog_title))
+            .setTitle(context.getString(R.string.confirm_fingers_dialog_title))
             .setMessage(getMapOfFingersAndQualityAsText())
-            .setPositiveButton(androidResourcesHelper.getString(R.string.confirm)) { _, _ -> callbackConfirm() }
-            .setNegativeButton(androidResourcesHelper.getString(R.string.restart)) { _, _ -> callbackRestart() }
+            .setPositiveButton(context.getString(R.string.confirm)) { _, _ -> callbackConfirm() }
+            .setNegativeButton(context.getString(R.string.restart)) { _, _ -> callbackRestart() }
             .setCancelable(false).create()
 
     @SuppressLint("DefaultLocale")

@@ -16,13 +16,15 @@ data class FaceErrorResponse(val reason: FaceErrorReason) : FaceResponse {
 enum class FaceErrorReason {
     UNEXPECTED_ERROR,
     LICENSE_MISSING,
-    LICENSE_INVALID;
+    LICENSE_INVALID,
+    CONFIGURATION_ERROR;
 
     fun fromDomainToFaceErrorReason(): IFaceErrorReason =
         when (this) {
             UNEXPECTED_ERROR -> IFaceErrorReason.UNEXPECTED_ERROR
             LICENSE_MISSING -> IFaceErrorReason.LICENSE_MISSING
             LICENSE_INVALID -> IFaceErrorReason.LICENSE_INVALID
+            CONFIGURATION_ERROR -> IFaceErrorReason.FACE_CONFIGURATION_ERROR
         }
 
     companion object {
