@@ -6,7 +6,6 @@ import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
@@ -16,9 +15,11 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusa
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
+import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.tools.TimeHelper
@@ -31,6 +32,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
                                     private val sessionRepository: SessionRepository,
                                     private val consentRequired: Boolean,
                                     private val locationRequired: Boolean,
+                                    private val modalities: List<Modality>,
                                     private val projectId: String,
                                     private val deviceId: String) : ModalityFlow {
 
@@ -65,7 +67,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         }
     }
 
-    private fun buildSetupStep() = coreStepProcessor.buildStepSetup(getPermissions())
+    private fun buildSetupStep() = coreStepProcessor.buildStepSetup(modalities, getPermissions())
 
     private fun getPermissions() = if (locationRequired) {
         listOf(SetupPermission.LOCATION)
@@ -80,7 +82,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
 
     private fun tryProcessingResultFromCoreStepProcessor(data: Intent?) =
         coreStepProcessor.processResult(data).also { coreResult ->
-            if (isExitFormResponse(coreResult)) {
+            if (isExitFormResponse(coreResult) || isSetupResponseAndSetupIncomplete(coreResult)) {
                 completeAllSteps()
             }
         }
@@ -89,6 +91,9 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         coreResult is CoreExitFormResponse ||
             coreResult is CoreFingerprintExitFormResponse ||
             coreResult is CoreFaceExitFormResponse
+
+    private fun isSetupResponseAndSetupIncomplete(coreResult: Step.Result?) =
+        coreResult is SetupResponse && !coreResult.isSetupComplete
 
     private fun tryProcessingResultFromFingerprintStepProcessor(requestCode: Int,
                                                                 resultCode: Int,

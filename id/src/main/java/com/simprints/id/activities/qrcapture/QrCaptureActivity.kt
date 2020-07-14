@@ -9,8 +9,8 @@ import android.os.Bundle
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.qrcapture.tools.CameraHelper
@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.activity_qr_capture.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
+class QrCaptureActivity : BaseSplitActivity() {
 
     @Inject lateinit var cameraHelper: CameraHelper
     @Inject lateinit var qrCodeProducer: QrCodeProducer
@@ -28,6 +28,7 @@ class QrCaptureActivity : AppCompatActivity(R.layout.activity_qr_capture) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
+        setContentView(R.layout.activity_qr_capture)
 
         if (hasPermission(CAMERA))
             startCamera()

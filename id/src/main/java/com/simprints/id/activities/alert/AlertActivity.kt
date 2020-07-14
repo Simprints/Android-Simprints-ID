@@ -9,8 +9,8 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.request.AlertActRequest
@@ -21,22 +21,20 @@ import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
-import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_alert.*
 import javax.inject.Inject
 
-class AlertActivity : AppCompatActivity(), AlertContract.View {
+class AlertActivity : BaseSplitActivity(), AlertContract.View {
 
     override lateinit var viewPresenter: AlertContract.Presenter
     private lateinit var alertTypeType: AlertType
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var exitFormHelper: ExitFormHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_alert)
         (application as Application).component.inject(this)
-        title = androidResourcesHelper.getString(R.string.alert_title)
+        title = getString(R.string.alert_title)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         val app = application as Application
@@ -59,7 +57,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
     override fun setLayoutBackgroundColor(@ColorInt color: Int) = alertLayout.setBackgroundColor(color)
     override fun setLeftButtonBackgroundColor(@ColorInt color: Int) = alertLeftButton.setBackgroundColor(color)
     override fun setRightButtonBackgroundColor(@ColorInt color: Int) = alertRightButton.setBackgroundColor(color)
-    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) { alertTitle.text = androidResourcesHelper.getString(stringRes) }
+    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) { alertTitle.text = getString(stringRes) }
     override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) = alertImage.setImageResource(drawableId)
     override fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?) {
         if (alertHintDrawableId != null) {
@@ -69,12 +67,15 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         }
     }
 
-    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int,  params: Array<Any>) { message.text = androidResourcesHelper.getString(stringRes, params) }
-    override fun getTranslatedString(@StringRes stringRes: Int) = androidResourcesHelper.getString(stringRes)
+    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int,  params: Array<Any>) {
+        message.text = String.format(getString(stringRes), *params)
+    }
+
+    override fun getTranslatedString(@StringRes stringRes: Int) = getString(stringRes)
 
     override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
         if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {
-            alertLeftButton.text = androidResourcesHelper.getString(leftButtonAction.buttonText)
+            alertLeftButton.text = getString(leftButtonAction.buttonText)
             alertLeftButton.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
         } else {
             alertLeftButton.visibility = View.GONE
@@ -83,7 +84,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction) {
         if (rightButtonAction !is AlertActivityViewModel.ButtonAction.None) {
-            alertRightButton.text = androidResourcesHelper.getString(rightButtonAction.buttonText)
+            alertRightButton.text = getString(rightButtonAction.buttonText)
             alertRightButton.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }
         } else {
             alertRightButton.visibility = View.GONE
@@ -113,8 +114,13 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        exitFormHelper.buildExitFormResponseForCore(data)?.let {
-            setResultAndFinish(it)
+        when(requestCode) {
+            WIFI_SETTINGS_REQUEST_CODE -> finishWithTryAgain()
+            CoreRequestCode.EXIT_FORM.value -> {
+                exitFormHelper.buildExitFormResponseForCore(data)?.let {
+                    setResultAndFinish(it)
+                }
+            }
         }
     }
 
@@ -133,6 +139,13 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         startActivity(intent)
     }
 
+    override fun openWifiSettingsAndFinishWithTryAgain() {
+        val intent = Intent().apply {
+            action = android.provider.Settings.ACTION_WIFI_SETTINGS
+        }
+        startActivityForResult(intent, WIFI_SETTINGS_REQUEST_CODE)
+    }
+
     private fun setResultAndFinish(coreResponse: CoreResponse) {
         setResult(Activity.RESULT_OK, buildIntentForResponse(coreResponse))
         finish()
@@ -140,5 +153,9 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     private fun buildIntentForResponse(coreResponse: CoreResponse) = Intent().apply {
         putExtra(CoreResponse.CORE_STEP_BUNDLE, coreResponse)
+    }
+
+    companion object {
+        private const val WIFI_SETTINGS_REQUEST_CODE = 100
     }
 }

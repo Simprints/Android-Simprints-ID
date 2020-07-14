@@ -27,6 +27,7 @@ interface AlertContract {
         fun startExitForm(exitFormActivityClass: String?)
         fun finishWithTryAgain()
         fun openWifiSettings()
+        fun openWifiSettingsAndFinishWithTryAgain()
     }
 
     interface Presenter : BasePresenter {

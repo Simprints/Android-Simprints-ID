@@ -1,15 +1,15 @@
 package com.simprints.id.orchestrator.steps.core
 
 import android.content.Intent
-import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
-import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
-import com.simprints.id.domain.moduleapi.core.response.SetupResponse
+import com.simprints.id.domain.modality.Modality
+import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
+import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
+import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.*
 import com.simprints.id.orchestrator.steps.core.requests.*
 import com.simprints.id.orchestrator.steps.core.response.*
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import kotlin.reflect.jvm.internal.impl.descriptors.Modality
 
 class CoreStepProcessorImpl : CoreStepProcessor {
 
@@ -21,17 +21,18 @@ class CoreStepProcessorImpl : CoreStepProcessor {
         const val LAST_BIOMETRICS_CORE_ACTIVITY_NAME = "com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity"
     }
 
-    override fun buildStepSetup(permissions: List<SetupPermission>): Step = buildSetupStep(permissions)
+    override fun buildStepSetup(modalities: List<Modality>,
+                                permissions: List<SetupPermission>): Step = buildSetupStep(modalities, permissions)
 
     override fun buildStepConsent(consentType: ConsentType) =
         buildConsentStep(consentType)
 
 
-    private fun buildSetupStep(permissions: List<SetupPermission>) = Step(
+    private fun buildSetupStep(modalities: List<Modality>, permissions: List<SetupPermission>) = Step(
         requestCode = SETUP.value,
         activityName = SETUP_ACTIVITY_NAME,
         bundleKey = CORE_STEP_BUNDLE,
-        request = SetupRequest(permissions),
+        request = SetupRequest(modalities, permissions),
         status = Step.Status.NOT_STARTED
     )
 

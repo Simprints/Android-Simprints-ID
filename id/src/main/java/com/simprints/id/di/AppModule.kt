@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
@@ -15,16 +14,13 @@ import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
+import com.simprints.id.activities.setup.SetupViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSource
-import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSourceImpl
-import com.simprints.id.data.consent.shortconsent.ConsentRepository
-import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -45,7 +41,6 @@ import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeReposito
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -197,19 +192,8 @@ open class AppModule {
     fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
 
     @Provides
-    fun provideAndroidResourcesHelper(
-        ctx: Context,
-        preferencesManager: PreferencesManager
-    ): AndroidResourcesHelper {
-        val contextWithSpecificLanguage =
-            LanguageHelper.contextWithSpecificLanguage(ctx, preferencesManager.language)
-        return AndroidResourcesHelperImpl(contextWithSpecificLanguage)
-    }
-
-    @Provides
     open fun provideSessionRealmConfigBuilder(): SessionRealmConfigBuilder =
         SessionRealmConfigBuilderImpl()
-
 
     @Provides
     @Singleton
@@ -301,33 +285,8 @@ open class AppModule {
     ): ImageUpSyncScheduler = ImageUpSyncSchedulerImpl(context)
 
     @Provides
-    open fun getConsentDataManager(
-        prefs: ImprovedSharedPreferences,
-        remoteConfigWrapper: RemoteConfigWrapper
-    ): ConsentLocalDataSource =
-        ConsentLocalDataSourceImpl(prefs, remoteConfigWrapper)
-
-    @Provides
-    open fun provideConsentTextManager(
-        context: Context,
-        consentLocalDataSource: ConsentLocalDataSource,
-        crashReportManager: CrashReportManager,
-        preferencesManager: PreferencesManager,
-        androidResourcesHelper: AndroidResourcesHelper
-    ): ConsentRepository =
-        ConsentRepositoryImpl(
-            consentLocalDataSource, crashReportManager, preferencesManager.programName,
-            preferencesManager.organizationName, androidResourcesHelper,
-            preferencesManager.modalities
-        )
-
-    @Provides
-    open fun provideConsentViewModelFactory(
-        consentTextManager: ConsentRepository,
-        sessionRepository: SessionRepository,
-        timeHelper: TimeHelper
-    ) =
-        ConsentViewModelFactory(consentTextManager, sessionRepository)
+    open fun provideConsentViewModelFactory(sessionRepository: SessionRepository) =
+        ConsentViewModelFactory(sessionRepository)
 
     @Provides
     open fun provideCoreExitFormViewModelFactory(sessionRepository: SessionRepository) =
@@ -432,5 +391,11 @@ open class AppModule {
         timeHelper: TimeHelper
     ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper)
 
+    @ExperimentalCoroutinesApi
+    @Provides
+    open fun provideSetupViewModelFactory(
+        deviceManager: DeviceManager,
+        crashReportManager: CrashReportManager
+    ) = SetupViewModelFactory(deviceManager, crashReportManager)
 }
 
