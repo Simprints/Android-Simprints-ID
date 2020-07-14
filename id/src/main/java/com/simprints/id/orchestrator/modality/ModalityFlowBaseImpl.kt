@@ -82,8 +82,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
 
     private fun tryProcessingResultFromCoreStepProcessor(data: Intent?) =
         coreStepProcessor.processResult(data).also { coreResult ->
-            if (isExitFormResponse(coreResult) ||
-                !isSetupResponseAndSetupComplete(coreResult)) {
+            if (isExitFormResponse(coreResult) || isSetupResponseAndSetupIncomplete(coreResult)) {
                 completeAllSteps()
             }
         }
@@ -93,8 +92,8 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
             coreResult is CoreFingerprintExitFormResponse ||
             coreResult is CoreFaceExitFormResponse
 
-    private fun isSetupResponseAndSetupComplete(coreResult: Step.Result?) =
-        coreResult is SetupResponse && coreResult.isSetupComplete
+    private fun isSetupResponseAndSetupIncomplete(coreResult: Step.Result?) =
+        coreResult is SetupResponse && !coreResult.isSetupComplete
 
     private fun tryProcessingResultFromFingerprintStepProcessor(requestCode: Int,
                                                                 resultCode: Int,
