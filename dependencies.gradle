@@ -74,6 +74,11 @@ def playservices = [
     safetynet: "com.google.android.gms:play-services-safetynet:$playservices_version"
 ]
 
+def playcore = [
+    core: "com.google.android.play:core:1.7.3",
+    core_ktx: "com.google.android.play:core-ktx:1.7.0"
+]
+
 def firebase = [
     core         : "com.google.firebase:firebase-core:17.2.3",
     auth         : "com.google.firebase:firebase-auth:19.2.0",
@@ -212,6 +217,7 @@ ext.deps = [
     support        : support,
     arch_components: arch_components,
     playservices   : playservices,
+    playcore       : playcore,
     firebase       : firebase,
     retrofit       : retrofit,
     gson           : gson,

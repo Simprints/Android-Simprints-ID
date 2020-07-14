@@ -26,7 +26,6 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.deviceId
 import dagger.Module
 import dagger.Provides
@@ -100,8 +99,11 @@ class OrchestratorModule {
             sessionRepository,
             preferenceManager.consentRequired,
             preferenceManager.locationPermissionRequired,
+            preferenceManager.modalities,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
-            ctx.deviceId
+            ctx.deviceId,
+            preferenceManager.isEnrolmentPlus,
+            preferenceManager.matchGroup
         )
 
     @Provides
@@ -124,6 +126,7 @@ class OrchestratorModule {
             sessionRepository,
             preferenceManager.consentRequired,
             preferenceManager.locationPermissionRequired,
+            preferenceManager.modalities,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             ctx.deviceId
         )
@@ -149,6 +152,7 @@ class OrchestratorModule {
             sessionRepository,
             prefs.consentRequired,
             prefs.locationPermissionRequired,
+            prefs.modalities,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             ctx.deviceId
         )
@@ -211,8 +215,9 @@ class OrchestratorModule {
     @Provides
     fun provideAppResponseBuilderFactory(
         enrolmentHelper: EnrolmentHelper,
-        timeHelper: TimeHelper
-    ): AppResponseFactory = AppResponseFactoryImpl(enrolmentHelper, timeHelper)
+        timeHelper: TimeHelper,
+        preferenceManager: PreferencesManager
+    ): AppResponseFactory = AppResponseFactoryImpl(enrolmentHelper, timeHelper, preferenceManager.isEnrolmentPlus)
 
     @Provides
     fun provideFlowManager(

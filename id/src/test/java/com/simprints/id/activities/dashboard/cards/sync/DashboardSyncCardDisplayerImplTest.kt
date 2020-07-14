@@ -17,8 +17,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
-import com.simprints.id.tools.AndroidResourcesHelper
-import com.simprints.id.tools.AndroidResourcesHelperImpl
 import com.simprints.id.tools.TimeHelperImpl
 import org.junit.Before
 import org.junit.Test
@@ -28,7 +26,6 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class DashboardSyncCardDisplayerImplTest {
 
-    private lateinit var androidResHelper: AndroidResourcesHelper
     private lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
     private lateinit var syncCardRootLayout: LinearLayout
     private lateinit var ctx: Context
@@ -43,8 +40,7 @@ class DashboardSyncCardDisplayerImplTest {
     fun setUp() {
         ctx = ApplicationProvider.getApplicationContext()
         syncCardRootLayout = LinearLayout(ctx)
-        androidResHelper = AndroidResourcesHelperImpl(ctx)
-        syncCardDisplayer = DashboardSyncCardDisplayerImpl(androidResHelper, TimeHelperImpl())
+        syncCardDisplayer = DashboardSyncCardDisplayerImpl(TimeHelperImpl())
         syncCardDisplayer.initRoot(syncCardRootLayout)
     }
 

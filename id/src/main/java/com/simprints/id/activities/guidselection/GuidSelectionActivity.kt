@@ -3,10 +3,10 @@ package com.simprints.id.activities.guidselection
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.db.session.SessionRepository
@@ -19,7 +19,7 @@ import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
 
-class GuidSelectionActivity : AppCompatActivity() {
+class GuidSelectionActivity : BaseSplitActivity() {
 
     @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var timeHelper: TimeHelper

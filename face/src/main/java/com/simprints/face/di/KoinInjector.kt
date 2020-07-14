@@ -3,8 +3,6 @@ package com.simprints.face.di
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.LiveFeedbackFragmentViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
-import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
-import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelperImpl
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManagerImpl
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
@@ -88,7 +86,6 @@ object KoinInjector {
         }
 
     private fun Module.defineBuildersForFaceManagers() {
-        factory<FaceAndroidResourcesHelper> { FaceAndroidResourcesHelperImpl(get()) }
         factory<FacePreferencesManager> { FacePreferencesManagerImpl(get()) }
         factory<FaceImageManager> { FaceImageManagerImpl(get(), get()) }
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }

@@ -6,6 +6,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.*
+import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
 import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
 import com.simprints.libsimprints.BuildConfig
 import kotlinx.coroutines.runBlocking
@@ -43,8 +44,10 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionRepository: Sessi
 
     override suspend fun getCurrentSessionId(): String = coreSessionRepository.getCurrentSession().id
 
-    override suspend fun isCurrentSessionAnIdentification(): Boolean =
-        coreSessionRepository.getCurrentSession().getEvents().filterIsInstance(IdentificationCalloutEvent::class.java).isNotEmpty()
+    override suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean =
+        coreSessionRepository.getCurrentSession().getEvents().any {
+            it is IdentificationCalloutEvent || it is EnrolmentCalloutEvent
+        }
 }
 
 fun ClientApiAlert.fromAlertToAlertTypeEvent(): CoreAlertScreenEventType =

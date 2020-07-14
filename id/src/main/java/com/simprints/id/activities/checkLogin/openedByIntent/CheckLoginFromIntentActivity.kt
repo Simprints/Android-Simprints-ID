@@ -3,8 +3,8 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -19,7 +19,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.parseAppRequest
@@ -29,11 +28,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
-open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromIntentContract.View {
+open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromIntentContract.View {
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     override lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
 
@@ -43,7 +41,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
         val component = (application as Application).component
         component.inject(this)
-        title = androidResourcesHelper.getString(R.string.title_activity_front)
+        title = getString(R.string.title_activity_front)
         viewPresenter = CheckLoginFromIntentPresenter(this, deviceId, component)
 
         lifecycleScope.launchWhenCreated {

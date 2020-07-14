@@ -38,7 +38,7 @@ class OdkPresenterTest {
 
 
         MockKAnnotations.init(this, relaxed = true)
-        coEvery { clientApiSessionEventsManager.isCurrentSessionAnIdentification() } returns true
+        coEvery { clientApiSessionEventsManager.isCurrentSessionAnIdentificationOrEnrolment() } returns true
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns RequestFactory.MOCK_SESSION_ID
         coEvery { clientApiSessionEventsManager.createSession(any()) } returns "session_id"
     }
