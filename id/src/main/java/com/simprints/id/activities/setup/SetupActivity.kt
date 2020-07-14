@@ -37,6 +37,7 @@ import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import kotlinx.android.synthetic.main.activity_setup.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -122,7 +123,7 @@ class SetupActivity: BaseSplitActivity() {
         when(requestCode) {
             PERMISSIONS_REQUEST_CODE -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    lifecycleScope.launchWhenResumed {
+                    lifecycleScope.launch {
                         storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
                     }
                 }
@@ -135,6 +136,7 @@ class SetupActivity: BaseSplitActivity() {
         val permissions = extractPermissionsFromRequest(setupRequest)
 
         if (permissions.all { hasPermission(it) }) {
+            Timber.d("All permissions are granted")
             performPermissionActionsAndFinish()
         } else {
             requestPermissionsIfRequired(permissions, PERMISSIONS_REQUEST_CODE)
@@ -142,7 +144,8 @@ class SetupActivity: BaseSplitActivity() {
     }
 
     private fun performPermissionActionsAndFinish() {
-        lifecycleScope.launchWhenResumed {
+        lifecycleScope.launch {
+            Timber.d("Adding location to session")
             storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
         }
         setResultAndFinish(SETUP_COMPLETE_FLAG)
