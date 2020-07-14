@@ -22,7 +22,7 @@ import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.testtools.android.waitOnSystem
 import io.mockk.MockKAnnotations
@@ -32,7 +32,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,11 +43,12 @@ class SessionRemoteDataSourceImplAndroidTest {
     companion object {
         const val SIGNED_ID_USER = "some_signed_user"
         const val CLOUD_ASYNC_SESSION_CREATION_TIMEOUT = 5000L
+        const val DEFAULT_TIME = 1000L
         val RANDOM_GUID = UUID.randomUUID().toString()
     }
 
     private val remoteTestingManager: RemoteTestingManager = RemoteTestingManager.create()
-    private val timeHelper = TimeHelperImpl()
+    @MockK lateinit var timeHelper: TimeHelper
 
     @get:Rule
     val testProjectRule = TestProjectRule()
@@ -71,10 +71,11 @@ class SessionRemoteDataSourceImplAndroidTest {
         sessionRemoteDataSource = SessionRemoteDataSourceImpl(
             SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device", remoteDbManager)
         )
+        every { timeHelper.nowMinus(any(), any()) } returns 100
+        every { timeHelper.now() } returns 100
     }
 
     @Test
-    @Ignore("Cloud added more checks recently and it looks like this test is broken. To be fixed")
     fun closeSessions_shouldGetUploaded() {
         runBlocking {
             val nSession = SessionRepositoryImpl.SESSION_BATCH_SIZE + 1
@@ -144,32 +145,32 @@ class SessionRemoteDataSourceImplAndroidTest {
     private fun SessionEvents.addAlertScreenEvents() {
         AlertScreenEvent.AlertScreenEventType.values()
             .forEach {
-                addEvent(AlertScreenEvent(0, it))
+                addEvent(AlertScreenEvent(DEFAULT_TIME, it))
             }
     }
 
     private fun SessionEvents.addArtificialTerminationEvent() {
         ArtificialTerminationEvent.Reason.values().forEach {
-            addEvent(ArtificialTerminationEvent(0, it))
+            addEvent(ArtificialTerminationEvent(DEFAULT_TIME, it))
         }
     }
 
     private fun SessionEvents.addAuthenticationEvent() {
         AuthenticationEvent.Result.values().forEach {
-            addEvent(AuthenticationEvent(0, 0, AuthenticationEvent.UserInfo("some_project", "user_id"), it))
+            addEvent(AuthenticationEvent(DEFAULT_TIME, DEFAULT_TIME, AuthenticationEvent.UserInfo("some_project", "user_id"), it))
         }
     }
 
     private fun SessionEvents.addAuthorizationEvent() {
         AuthorizationEvent.Result.values().forEach {
-            addEvent(AuthorizationEvent(0, it, AuthorizationEvent.UserInfo("some_project", "user_id")))
+            addEvent(AuthorizationEvent(DEFAULT_TIME, it, AuthorizationEvent.UserInfo("some_project", "user_id")))
         }
     }
 
     private fun SessionEvents.addCandidateReadEvent() {
         CandidateReadEvent.LocalResult.values().forEach { local ->
             CandidateReadEvent.RemoteResult.values().forEach { remote ->
-                addEvent(CandidateReadEvent(0, 0, RANDOM_GUID, local, remote))
+                addEvent(CandidateReadEvent(DEFAULT_TIME, DEFAULT_TIME, RANDOM_GUID, local, remote))
             }
         }
     }
@@ -177,7 +178,7 @@ class SessionRemoteDataSourceImplAndroidTest {
     private fun SessionEvents.addConnectivitySnapshotEvent() {
         addEvent(
             ConnectivitySnapshotEvent(
-                0,
+                DEFAULT_TIME,
                 "Unknown",
                 listOf(SimNetworkUtils.Connection("connection", NetworkInfo.DetailedState.CONNECTED))
             )
@@ -187,13 +188,13 @@ class SessionRemoteDataSourceImplAndroidTest {
     private fun SessionEvents.addConsentEvent() {
         ConsentEvent.Type.values().forEach { type ->
             ConsentEvent.Result.values().forEach { result ->
-                addEvent(ConsentEvent(0, 0, type, result))
+                addEvent(ConsentEvent(DEFAULT_TIME, DEFAULT_TIME, type, result))
             }
         }
     }
 
     private fun SessionEvents.addEnrolmentEvent() {
-        addEvent(EnrolmentEvent(0, RANDOM_GUID))
+        addEvent(EnrolmentEvent(DEFAULT_TIME, RANDOM_GUID))
     }
 
     private fun SessionEvents.addFingerprintCaptureEvent() {
@@ -210,8 +211,8 @@ class SessionRemoteDataSourceImplAndroidTest {
                 )
 
                 val event = FingerprintCaptureEvent(
-                    0,
-                    0,
+                    DEFAULT_TIME,
+                    DEFAULT_TIME,
                     fingerIdentifier,
                     0,
                     result,
@@ -225,25 +226,25 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     private fun SessionEvents.addGuidSelectionEvent() {
-        addEvent(GuidSelectionEvent(0, RANDOM_GUID))
+        addEvent(GuidSelectionEvent(DEFAULT_TIME, RANDOM_GUID))
     }
 
     private fun SessionEvents.addIntentParsingEvent() {
         IntentParsingEvent.IntegrationInfo.values().forEach {
-            addEvent(IntentParsingEvent(0, it))
+            addEvent(IntentParsingEvent(DEFAULT_TIME, it))
         }
     }
 
     private fun SessionEvents.addInvalidIntentEvent() {
-        addEvent(InvalidIntentEvent(0, "some_action", emptyMap()))
+        addEvent(InvalidIntentEvent(DEFAULT_TIME, "some_action", emptyMap()))
     }
 
     private fun SessionEvents.addOneToManyMatchEvent() {
         OneToManyMatchEvent.MatchPoolType.values().forEach {
             addEvent(
                 OneToManyMatchEvent(
-                    0,
-                    0,
+                    DEFAULT_TIME,
+                    DEFAULT_TIME,
                     OneToManyMatchEvent.MatchPool(it, 0),
                     Matcher.SIM_AFIS,
                     emptyList()
@@ -255,8 +256,8 @@ class SessionRemoteDataSourceImplAndroidTest {
     private fun SessionEvents.addOneToOneMatchEvent() {
         addEvent(
             OneToOneMatchEvent(
-                0,
-                0,
+                DEFAULT_TIME,
+                DEFAULT_TIME,
                 RANDOM_GUID,
                 Matcher.SIM_AFIS,
                 MatchEntry(RANDOM_GUID, 0F)
@@ -265,19 +266,19 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     private fun SessionEvents.addPersonCreationEvent() {
-        addEvent(PersonCreationEvent(0, listOf(RANDOM_GUID, RANDOM_GUID), null))
+        addEvent(PersonCreationEvent(DEFAULT_TIME, listOf(RANDOM_GUID, RANDOM_GUID), null))
     }
 
     private fun SessionEvents.addRefusalEvent() {
         RefusalEvent.Answer.values().forEach {
-            addEvent(RefusalEvent(0, 0, it, "other_text"))
+            addEvent(RefusalEvent(DEFAULT_TIME, DEFAULT_TIME, it, "other_text"))
         }
     }
 
     private fun SessionEvents.addScannerConnectionEvent() {
         addEvent(
             ScannerConnectionEvent(
-                0,
+                DEFAULT_TIME,
                 ScannerConnectionEvent.ScannerInfo(
                     "scanner_id", "macAddress",
                     ScannerGeneration.VERO_2, "hardware"
@@ -289,7 +290,7 @@ class SessionRemoteDataSourceImplAndroidTest {
     private fun SessionEvents.addVero2InfoSnapshotEvents() {
         addEvent(
             Vero2InfoSnapshotEvent(
-                0,
+                DEFAULT_TIME,
                 Vero2InfoSnapshotEvent.Vero2Version(
                     Int.MAX_VALUE.toLong() + 1, "1.23",
                     "api", "stmApp", "stmApi", "un20App", "un20Api"
@@ -302,41 +303,41 @@ class SessionRemoteDataSourceImplAndroidTest {
     private fun SessionEvents.addScannerFirmwareUpdateEvent() {
         addEvent(
             ScannerFirmwareUpdateEvent(
-                0, 0, "stm",
+                DEFAULT_TIME, DEFAULT_TIME, "stm",
                 "targetApp", "failureReason"
             )
         )
     }
 
     private fun SessionEvents.addSuspiciousIntentEvent() {
-        addEvent(SuspiciousIntentEvent(0, mapOf("some_extra_key" to "value")))
+        addEvent(SuspiciousIntentEvent(DEFAULT_TIME, mapOf("some_extra_key" to "value")))
     }
 
     private fun SessionEvents.addCompletionCheckEvent() {
-        addEvent(CompletionCheckEvent(0, true))
+        addEvent(CompletionCheckEvent(DEFAULT_TIME, true))
     }
 
     private fun SessionEvents.addCallbackEvent() {
-        addEvent(EnrolmentCallbackEvent(0, RANDOM_GUID))
+        addEvent(EnrolmentCallbackEvent(DEFAULT_TIME, RANDOM_GUID))
 
         ErrorCallbackEvent.Reason.values().forEach {
-            addEvent(ErrorCallbackEvent(0, it))
+            addEvent(ErrorCallbackEvent(DEFAULT_TIME, it))
         }
 
         Tier.values().forEach {
-            addEvent(IdentificationCallbackEvent(0, RANDOM_GUID, listOf(CallbackComparisonScore(RANDOM_GUID, 0, it))))
+            addEvent(IdentificationCallbackEvent(DEFAULT_TIME, RANDOM_GUID, listOf(CallbackComparisonScore(RANDOM_GUID, 0, it))))
         }
 
-        addEvent(RefusalCallbackEvent(0, "reason", "other_text"))
-        addEvent(VerificationCallbackEvent(0, CallbackComparisonScore(RANDOM_GUID, 0, Tier.TIER_1)))
-        addEvent(ConfirmationCallbackEvent(0, true))
+        addEvent(RefusalCallbackEvent(DEFAULT_TIME, "reason", "other_text"))
+        addEvent(VerificationCallbackEvent(DEFAULT_TIME, CallbackComparisonScore(RANDOM_GUID, 0, Tier.TIER_1)))
+        addEvent(ConfirmationCallbackEvent(DEFAULT_TIME, true))
     }
 
     private fun SessionEvents.addCalloutEvent() {
-        addEvent(EnrolmentCalloutEvent(1, "project_id", "user_id", "module_id", "metadata"))
-        addEvent(ConfirmationCalloutEvent(10, "projectId", RANDOM_GUID, RANDOM_GUID))
-        addEvent(IdentificationCalloutEvent(0, "project_id", "user_id", "module_id", "metadata"))
-        addEvent(VerificationCalloutEvent(2, "project_id", "user_id", "module_id", RANDOM_GUID, "metadata"))
-        addEvent(EnrolmentLastBiometricsCalloutEvent(2, "project_id", "user_id", "module_id", "metadata", RANDOM_GUID))
+        addEvent(EnrolmentCalloutEvent(DEFAULT_TIME, "project_id", "user_id", "module_id", "metadata"))
+        addEvent(ConfirmationCalloutEvent(DEFAULT_TIME, "projectId", RANDOM_GUID, RANDOM_GUID))
+        addEvent(IdentificationCalloutEvent(DEFAULT_TIME, "project_id", "user_id", "module_id", "metadata"))
+        addEvent(VerificationCalloutEvent(DEFAULT_TIME, "project_id", "user_id", "module_id", RANDOM_GUID, "metadata"))
+        addEvent(EnrolmentLastBiometricsCalloutEvent(DEFAULT_TIME, "project_id", "user_id", "module_id", "metadata", RANDOM_GUID))
     }
 }
