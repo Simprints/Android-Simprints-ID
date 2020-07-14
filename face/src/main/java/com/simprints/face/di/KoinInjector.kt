@@ -3,6 +3,7 @@ package com.simprints.face.di
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.LiveFeedbackFragmentViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
+import com.simprints.face.configuration.ConfigurationViewModel
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManagerImpl
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
@@ -38,8 +39,8 @@ import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
-import java.util.concurrent.atomic.AtomicInteger
 import retrofit2.Retrofit
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Consider this flow:
@@ -135,6 +136,8 @@ object KoinInjector {
             )
         }
         viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM, get()) }
+
+        viewModel { ConfigurationViewModel() }
     }
 
     private fun Module.defineBuildersForRemote() {

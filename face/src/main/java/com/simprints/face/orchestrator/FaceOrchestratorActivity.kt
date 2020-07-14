@@ -74,7 +74,15 @@ class FaceOrchestratorActivity : BaseSplitActivity() {
         })
         viewModel.startConfiguration.observe(this, LiveDataEventWithContentObserver {
             getRankOneLicense()
-                .whenNull { viewModel.missingLicense() }
+                .whenNull {
+                    findNavController(R.id.orchestrator_host_fragment)
+                        .navigate(
+                            BlankFragmentDirections.actionBlankFragmentToConfigurationFragment(
+                                it.deviceId,
+                                it.projectId
+                            )
+                        )
+                }
                 .whenNonNull { tryInitWithLicense(this) }
         })
     }
