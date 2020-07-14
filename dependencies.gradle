@@ -44,7 +44,7 @@ def androidx = [
         preference      : "androidx.preference:preference:1.1.0-alpha03",
         viewpager2      : "androidx.viewpager2:viewpager2:1.0.0"
     ],
-    security  : ['androidx.security:security-crypto:1.0.0-alpha02'],
+    security  : ['androidx.security:security-crypto:1.0.0-rc02'],
     camerax   : [
         core     : "androidx.camera:camera-core:$androidx_camerax_version",
         camera2  : "androidx.camera:camera-camera2:$androidx_camerax_version",
