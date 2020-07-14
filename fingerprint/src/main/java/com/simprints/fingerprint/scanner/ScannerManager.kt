@@ -9,8 +9,8 @@ import io.reactivex.Single
 interface ScannerManager {
 
     var scanner: ScannerWrapper?
-    var lastPairedScannerId: String?
-    var lastPairedMacAddress: String?
+    var currentScannerId: String?
+    var currentMacAddress: String?
 
     fun <T> onScanner(method: ScannerWrapper.() -> T): T
     fun scanner(method: ScannerWrapper.() -> Completable): Completable
