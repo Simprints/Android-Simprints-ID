@@ -39,8 +39,8 @@ ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProces
 
     override fun startFlow(appRequest: AppRequest) {
         require(appRequest is AppVerifyRequest)
-        addModalityConfigurationSteps(modalities)
         addSetupStep()
+        addModalityConfigurationSteps(modalities)
         addCoreFetchGuidStep(appRequest.projectId, appRequest.verifyGuid)
         addCoreConsentStepIfRequired(VERIFY)
 
