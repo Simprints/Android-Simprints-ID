@@ -54,7 +54,7 @@ class ModalityFlowEnrolImplTest {
         every { fingerprintStepProcessor.buildStepToCapture() } returns fingerprintStepMock
         every { faceStepProcessor.buildCaptureStep() } returns faceStepMock
         every { fingerprintStepProcessor.buildConfigurationStep() } returns fingerprintStepMock
-        every { faceStepProcessor.buildConfigurationStep() } returns faceStepMock
+        every { faceStepProcessor.buildConfigurationStep(any(), any()) } returns faceStepMock
         every { coreStepProcessor.buildStepConsent(any()) } returns consentStepMock
         every { coreStepProcessor.buildStepSetup(any()) } returns setupStepMock
     }
@@ -170,6 +170,7 @@ class ModalityFlowEnrolImplTest {
 
     private fun buildModalityFlowEnrol(consentRequired: Boolean) {
         modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, timeHelper, sessionRepository, consentRequired, true)
+            coreStepProcessor, timeHelper, sessionRepository,
+            consentRequired, true, "projectId", "deviceId")
     }
 }
