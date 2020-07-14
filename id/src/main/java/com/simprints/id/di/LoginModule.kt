@@ -9,7 +9,7 @@ import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
@@ -85,18 +85,18 @@ open class LoginModule {
 
     @Provides
     open fun provideAuthenticationHelper(
-        crashReportManager: CrashReportManager,
-        loginInfoManager: LoginInfoManager,
-        timeHelper: TimeHelper,
-        projectAuthenticator: ProjectAuthenticator,
-        sessionRepository: SessionRepository
+            crashReportManager: CrashReportManager,
+            loginInfoManager: LoginInfoManager,
+            timeHelper: TimeHelper,
+            projectAuthenticator: ProjectAuthenticator,
+            eventRepository: EventRepository
     ): AuthenticationHelper {
         return AuthenticationHelperImpl(
             crashReportManager,
             loginInfoManager,
             timeHelper,
             projectAuthenticator,
-            sessionRepository
+            eventRepository
         )
     }
 

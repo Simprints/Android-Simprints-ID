@@ -5,8 +5,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.SessionRepository
-import com.simprints.id.data.db.event.SessionRepositoryImpl
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.events.SessionQuery
 import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.SessionLocalDataSource
@@ -32,14 +32,14 @@ import org.robolectric.shadows.ShadowLog
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SessionRepositoryImplTest {
+class EventRepositoryImplTest {
 
     @MockK private lateinit var sessionEventsSyncManagerMock: SessionEventsSyncManager
     @MockK private lateinit var sessionLocalDataSourceMock: SessionLocalDataSource
     @MockK private lateinit var sessionRemoteDataSourceMock: SessionRemoteDataSource
     @MockK private lateinit var preferencesManagerMock: PreferencesManager
     @MockK private lateinit var crashReportManagerMock: CrashReportManager
-    private lateinit var sessionsRepository: SessionRepository
+    private lateinit var sessionsRepository: EventRepository
     private val timeHelper = TimeHelperImpl()
 
     @Before
@@ -49,7 +49,7 @@ class SessionRepositoryImplTest {
 
         coEvery { sessionLocalDataSourceMock.count(any()) } returns 0
 
-        sessionsRepository = SessionRepositoryImpl(
+        sessionsRepository = EventRepositoryImpl(
             DEVICE_ID,
             APP_VERSION_NAME,
             PROJECT_ID,

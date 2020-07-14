@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.id.data.db.event.domain.events.AlertScreenEvent as CoreAlertScreenEvent
-import com.simprints.id.data.db.event.domain.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
+import com.simprints.id.data.db.event.domain.events.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
 @Keep
 class AlertScreenEvent(startTime: Long,

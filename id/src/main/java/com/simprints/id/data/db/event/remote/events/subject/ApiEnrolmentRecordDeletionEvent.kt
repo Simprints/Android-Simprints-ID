@@ -12,7 +12,7 @@ import io.realm.internal.Keep
 class ApiEnrolmentRecordDeletionEvent(domainEvent: EnrolmentRecordDeletionEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.fromDomainToApi(),
+        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep

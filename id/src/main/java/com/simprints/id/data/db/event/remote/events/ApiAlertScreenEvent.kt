@@ -12,15 +12,16 @@ import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.ALERT_SC
 class ApiAlertScreenEvent(domainEvent: AlertScreenEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.fromDomainToApi(),
+        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep
-    class ApiAlertScreenPayload(val relativeStartTime: Long,
-                                val alertType: ApiAlertScreenEventType) : ApiEventPayload(ALERT_SCREEN) {
+    class ApiAlertScreenPayload(createdAt: Long,
+                                version: Int,
+                                val alertType: ApiAlertScreenEventType) : ApiEventPayload(ALERT_SCREEN, version, createdAt) {
 
         constructor(domainPayload: AlertScreenPayload) :
-            this(domainPayload.startTime, domainPayload.alertType.fromDomainToApi())
+            this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.alertType.fromDomainToApi())
 
         @Keep
         enum class ApiAlertScreenEventType {

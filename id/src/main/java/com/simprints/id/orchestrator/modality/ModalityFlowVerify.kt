@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
@@ -29,10 +29,10 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
                              private val faceStepProcessor: FaceStepProcessor,
                              private val coreStepProcessor: CoreStepProcessor,
                              timeHelper: TimeHelper,
-                             sessionRepository: SessionRepository,
+                             eventRepository: EventRepository,
                              consentRequired: Boolean,
                              locationRequired: Boolean) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired) {
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, eventRepository, consentRequired, locationRequired) {
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppVerifyRequest)

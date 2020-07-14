@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.domain.events.CompletionCheckEvent.Complet
 class ApiCompletionCheckEvent(domainEvent: CompletionCheckEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.fromDomainToApi(),
+        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep

@@ -10,7 +10,7 @@ class IntentParsingEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
-    listOf(EventLabel.SessionId(sessionId)),
+    mutableListOf(EventLabel.SessionId(sessionId)),
     IntentParsingPayload(createdAt, DEFAULT_EVENT_VERSION, integration)) {
 
     @Keep

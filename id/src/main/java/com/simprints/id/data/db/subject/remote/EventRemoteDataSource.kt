@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.subject.remote
 
 import com.simprints.id.data.db.common.models.EventCount
+import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
-import com.simprints.id.data.db.event.domain.events.Events
 import java.io.InputStream
 
 interface EventRemoteDataSource {
@@ -11,6 +11,6 @@ interface EventRemoteDataSource {
 
     suspend fun getStreaming(query: SyncEventQuery): InputStream
 
-    suspend fun post(projectId: String, events: Events)
+    suspend fun post(projectId: String, events: List<Event>)
 
 }

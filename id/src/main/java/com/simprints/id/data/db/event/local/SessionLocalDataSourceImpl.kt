@@ -2,30 +2,27 @@ package com.simprints.id.data.db.event.local
 
 import android.content.Context
 import android.os.Build
-import com.simprints.core.tools.extentions.safeSealedWhens
-import com.simprints.id.data.db.event.SessionRepositoryImpl
-import com.simprints.id.data.db.event.domain.events.*
-import com.simprints.id.data.db.event.domain.events.Event.EventLabel.SessionId
-import com.simprints.id.data.db.event.domain.events.EventQuery.SessionCaptureEventQuery
+import com.simprints.id.data.db.event.EventRepositoryImpl
+import com.simprints.id.data.db.event.domain.events.ArtificialTerminationEvent
+import com.simprints.id.data.db.event.domain.events.Event
+import com.simprints.id.data.db.event.domain.events.EventPayloadType.SESSION_CAPTURE
+import com.simprints.id.data.db.event.domain.events.EventQuery
+import com.simprints.id.data.db.event.domain.events.EventQuery.byDate
+import com.simprints.id.data.db.event.domain.events.EventQuery.byType
+import com.simprints.id.data.db.event.domain.events.getSessionLabelIfExists
 import com.simprints.id.data.db.event.domain.events.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.events.session.Device
 import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidator
-import com.simprints.id.data.db.event.local.models.DbEvent
-import com.simprints.id.data.db.event.local.models.DbSession
-import com.simprints.id.data.db.event.local.models.toDomain
+import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
-import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.exceptions.safe.session.SessionDataSourceException
-import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.tools.TimeHelper
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.RealmQuery
-import io.realm.Sort
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
@@ -45,10 +42,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         const val SESSIONS_REALM_DB_FILE_NAME = "event_data"
     }
 
-    private var realmConfig: RealmConfiguration? = null
     private var localDbKey: LocalDbKey? = null
-    private val realm: Realm
-        get() = getRealmInstance()
 
     override suspend fun create(appVersionName: String,
                                 libSimprintsVersionName: String,
@@ -56,173 +50,105 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
                                 deviceId: String) {
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                realm.refresh()
                 closeAnyOpenSession()
 
-                realm.executeTransaction { reamInTrans ->
+                val count = roomDao.count()
+                val sessionCaptureEvent = SessionCaptureEvent(
+                    timeHelper.now(),
+                    UUID.randomUUID().toString(),
+                    EventRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN,
+                    appVersionName,
+                    libSimprintsVersionName,
+                    language,
+                    Device(
+                        Build.VERSION.SDK_INT.toString(),
+                        Build.MANUFACTURER + "_" + Build.MODEL,
+                        deviceId),
+                    DatabaseInfo(count))
 
-                    val count = addQueryParams(reamInTrans, SessionCaptureEventQuery()).count().toInt()
-                    val sessionCaptureEvent = SessionCaptureEvent(
-                        timeHelper.now(),
-                        UUID.randomUUID().toString(),
-                        SessionRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN,
-                        appVersionName,
-                        libSimprintsVersionName,
-                        language,
-                        Device(
-                            Build.VERSION.SDK_INT.toString(),
-                            Build.MANUFACTURER + "_" + Build.MODEL,
-                            deviceId),
-                        DatabaseInfo(count))
-
-                    reamInTrans.insert(DbEvent(sessionCaptureEvent))
-                    Timber.d("Session created ${sessionCaptureEvent.id}")
-                }
+                roomDao.insertOrUpdate(sessionCaptureEvent.fromDomainToDb())
+                Timber.d("Session created ${sessionCaptureEvent.id}")
             }
         }
     }
 
-    override suspend fun currentSessionId(): String? {
-        val sessionCaptureEvents = load(SessionCaptureEventQuery(openSession = true)).toList()
-        val currentSessionCaptureEvent = sessionCaptureEvents.firstOrNull() as? SessionCaptureEvent
-        if (sessionCaptureEvents.size > 1) {
-            Timber.d("More than 1 session open!")
-        }
+    override suspend fun currentSessionId(): String? =
+        wrapSuspendExceptionIfNeeded {
+            withContext(Dispatchers.IO) {
+                val currentSessionCaptureEvent =
+                    roomDao.loadByType(SESSION_CAPTURE)
+                        .map { it.fromDbToDomain() }
+                        .filterIsInstance<SessionCaptureEvent>()
+                        .firstOrNull { (it.payload as SessionCapturePayload).endTime > 0 }
 
-        return currentSessionCaptureEvent?.id
-    }
+                currentSessionCaptureEvent?.id
+            }
+        }
 
     override suspend fun load(query: EventQuery): Flow<Event> =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                realm.refresh()
-                addQueryParams(realm, query).findAll()?.map { it.fromDbToDomain() }?.asFlow() ?: emptyFlow()
+                when (query) {
+                    is byType -> {
+                        roomDao.loadByType(query.type)
+                    }
+                    is byDate -> {
+                        roomDao.load().filter { it.addedAt.time < query.startedBefore }
+                    } //StopShip
+                    else -> throw Throwable("s")
+                }.map { it.fromDbToDomain() }.asFlow()
             }
         }
+
 
     override suspend fun count(query: EventQuery): Int =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                realm.refresh()
-                addQueryParams(realm, query).findAll()?.count() ?: 0
+                //StopShip: query
+                roomDao.count()
             }
         }
 
     override suspend fun delete(query: EventQuery) {
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                realm.refresh()
-                realm.executeTransaction {
-                    val events = addQueryParams(it, query).findAll()
-                    events?.deleteAllFromRealm()
-                }
+                //StopShip: query
+                roomDao.count()
             }
         }
     }
 
-    override suspend fun insertOrUpdate(event: Event) {
+    override suspend fun insertOrUpdate(event: Event) =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                realm.refresh()
-                if (event.getSessionLabelIfExists() != null) {
-                    val eventsInTheSameSession = load(SessionCaptureEventQuery(sessionId = event.getSessionLabelIfExists()?.labelValue))
-
-                    sessionEventsValidators.forEach { it.validate(e) }
+                val sessionId = event.getSessionLabelIfExists()
+                if (sessionId != null) {
+                    val eventsInTheSameSession = roomDao.loadBySessionId(sessionId.labelValue).map { it.fromDbToDomain() }
+                    sessionEventsValidators.forEach {
+                        it.validate(eventsInTheSameSession, event)
+                    }
                 }
-                realm.executeTransaction {
-
-                    it.insertOrUpdate(DbEvent(event))
-                }
+                roomDao.insertOrUpdate(event.fromDomainToDb())
             }
         }
-    }
-
-    private fun addQueryParams(realm: Realm, query: EventQuery): RealmQuery<DbEvent> =
-        realm.where(DbEvent::class.java).apply {
-            when (query) {
-                is SessionCaptureEventQuery -> addQueryParamsForSessionCaptureEvent(this, query)
-            }.safeSealedWhens
-        }.sort(START_TIME, Sort.DESCENDING)
-
-    private fun addQueryParamsForSessionCaptureEvent(realmQuery: RealmQuery<DbEvent>, query: SessionCaptureEventQuery) {
-        addQueryParamForSessionId(query.sessionId, realmQuery)
-        addQueryParamForSessionId(query.sessionId, realmQuery)
-        addQueryParamForProjectId(query.projectId, realmQuery)
-        addQueryParamForOpenSession(query.openSession, realmQuery)
-        addQueryParamForStartTime(query.startedBefore, realmQuery)
-    }
-
-    private fun addQueryParamForEventType(eventType: String?, query: RealmQuery<DbEvent>) {
-        eventType?.let {
-            query.equalTo(TYPE, it)
-        }
-    }
-
-    private fun addQueryParamForProjectId(projectId: String?, query: RealmQuery<DbEvent>) {
-        projectId?.let {
-            query.equalTo(PROJECT_ID, it)
-        }
-    }
-
-    private fun addQueryParamForSessionId(sessionId: String?, query: RealmQuery<DbEvent>) {
-        sessionId?.let {
-            query.equalTo(SESSION_ID, it)
-        }
-    }
-
-    private fun addQueryParamForStartTime(startedBefore: Long?, query: RealmQuery<DbEvent>) {
-        startedBefore?.let {
-            query.greaterThan(START_TIME, it).not()
-        }
-    }
-
-    private fun addQueryParamForOpenSession(openSession: Boolean?, query: RealmQuery<DbEvent>) {
-        openSession?.let {
-            if (it) {
-                query.equalTo(END_TIME, 0L)
-            } else {
-                query.greaterThan(END_TIME, 0L)
-            }
-        }
-    }
 
     private suspend fun closeAnyOpenSession() {
         wrapSuspendExceptionIfNeeded {
-            val openSessionEvents = load(SessionCaptureEventQuery(openSession = true))
-            openSessionEvents.onEach { sessionEvent ->
+            val openSessionIds = roomDao.loadByType(SESSION_CAPTURE)
+                .map { it.fromDbToDomain() }
+                .filterIsInstance<SessionCaptureEvent>()
+                .filter { (it.payload as SessionCapturePayload).endTime == 0L }
+                .map { it.id }
+
+            openSessionIds.onEach { sessionId ->
                 val artificialTerminationEvent = ArtificialTerminationEvent(
                     timeHelper.now(),
                     ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION,
-                    sessionEvent.id
+                    sessionId
                 )
                 insertOrUpdate(artificialTerminationEvent)
             }
         }
-    }
-
-    private fun getRealmInstance(): Realm {
-        initDbIfRequired()
-        return realmConfig?.let {
-            Realm.getInstance(it)
-        } ?: throw RealmUninitialisedException("No valid realm Config")
-    }
-
-    private fun initDbIfRequired() {
-        if (this.localDbKey == null || realmConfig == null) {
-            Realm.init(appContext)
-            val localKey = generateDbKeyIfRequired()
-            realmConfig = realmConfigBuilder.build(localKey.projectId, localKey.value)
-            this.localDbKey = localKey
-        }
-    }
-
-    private fun generateDbKeyIfRequired(): LocalDbKey {
-        try {
-            secureDataManager.getLocalDbKeyOrThrow(SESSIONS_REALM_DB_FILE_NAME)
-        } catch (e: MissingLocalDatabaseKeyException) {
-            secureDataManager.setLocalDatabaseKey(SESSIONS_REALM_DB_FILE_NAME)
-        }
-        return secureDataManager.getLocalDbKeyOrThrow(SESSIONS_REALM_DB_FILE_NAME)
     }
 
     private fun <T> wrapExceptionIfNeeded(block: () -> T): T =

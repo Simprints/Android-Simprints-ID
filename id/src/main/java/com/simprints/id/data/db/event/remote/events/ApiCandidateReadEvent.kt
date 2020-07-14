@@ -14,7 +14,7 @@ import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.CANDIDAT
 class ApiCandidateReadEvent(domainEvent: CandidateReadEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.fromDomainToApi(),
+        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep

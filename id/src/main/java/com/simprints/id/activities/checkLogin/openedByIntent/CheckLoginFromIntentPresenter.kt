@@ -1,14 +1,16 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.events.AuthorizationEvent
 import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.Result
 import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.UserInfo
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.callout.*
+import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
@@ -41,7 +43,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var setupFailed: Boolean = false
 
-    @Inject lateinit var sessionRepository: SessionRepository
+    @Inject lateinit var eventRepository: EventRepository
     @Inject lateinit var subjectLocalDataSource: SubjectLocalDataSource
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     internal lateinit var appRequest: AppRequest
@@ -72,14 +74,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     internal suspend fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
         ignoreException {
-            sessionRepository.updateCurrentSession { currentSession ->
-                with(currentSession) {
-                    if (appRequest !is AppRequest.AppRequestFollowUp) {
-                        addEvent(buildConnectivitySnapshotEvent(simNetworkUtils, timeHelper))
-                    }
-                    addEvent(buildRequestEvent(timeHelper.now(), appRequest))
-                }
+            if (appRequest !is AppRequest.AppRequestFollowUp) {
+                eventRepository.addEvent(buildConnectivitySnapshotEvent(simNetworkUtils, timeHelper))
             }
+            eventRepository.addEvent(buildRequestEvent(timeHelper.now(), appRequest))
         }
     }
 
@@ -166,7 +164,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
         // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
         if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest && appRequest !is AppEnrolLastBiometricsRequest) {
-            sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(Result.NOT_AUTHORIZED))
+            inBackground { eventRepository.addEvent(buildAuthorizationEvent(Result.NOT_AUTHORIZED)) }
 
             loginAlreadyTried.set(true)
             view.openLoginActivity(appRequest)
@@ -208,15 +206,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
         ignoreException {
-            val peopleInDb = subjectLocalDataSource.count()
-            sessionRepository.updateCurrentSession { currentSession ->
-                val authorisationEvent = buildAuthorizationEvent(Result.AUTHORIZED)
+            eventRepository.updateCurrentSession { currentSessionEvent ->
+                val peopleInDb = subjectLocalDataSource.count()
+                (currentSessionEvent.payload as SessionCapturePayload).projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+                currentSessionEvent.payload.databaseInfo.recordCount = peopleInDb
 
-                with(currentSession) {
-                    addEvent(authorisationEvent)
-                    projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-                    databaseInfo.recordCount = peopleInDb
-                }
+                eventRepository.addEvent(currentSessionEvent)
+                eventRepository.addEvent(buildAuthorizationEvent(Result.AUTHORIZED))
             }
         }
 
@@ -237,14 +233,16 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     internal suspend fun addAnalyticsInfoAndProjectId() {
         ignoreException {
             val analyticsId = analyticsManager.getAnalyticsId()
-            sessionRepository.updateCurrentSession { currentSession ->
-                val signedInProject = loginInfoManager.getSignedInProjectIdOrEmpty()
-                if (signedInProject.isNotEmpty()) {
-                    currentSession.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-                }
-                currentSession.analyticsId = analyticsId
+            val signedInProject = loginInfoManager.getSignedInProjectIdOrEmpty()
+            val currentSessionEvent = eventRepository.getCurrentSession()
+
+            if (signedInProject.isNotEmpty()) {
+                (currentSessionEvent.payload as SessionCapturePayload).projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             }
+            (currentSessionEvent.payload as SessionCapturePayload).analyticsId = analyticsId
+            eventRepository.addEvent(currentSessionEvent)
         }
+
     }
 
     private fun buildAuthorizationEvent(result: Result) =
@@ -262,7 +260,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @SuppressLint("CheckResult")
     private suspend fun setSessionIdCrashlyticsKey() {
         ignoreException {
-            crashReportManager.setSessionIdCrashlyticsKey(sessionRepository.getCurrentSession().id)
+            crashReportManager.setSessionIdCrashlyticsKey(eventRepository.getCurrentSession().id)
         }
     }
 }

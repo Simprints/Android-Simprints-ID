@@ -5,7 +5,7 @@ import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
@@ -79,19 +79,19 @@ class OrchestratorModule {
     @Provides
     @Named("ModalityFlowEnrol")
     fun provideModalityFlow(
-        fingerprintStepProcessor: FingerprintStepProcessor,
-        faceStepProcessor: FaceStepProcessor,
-        coreStepProcessor: CoreStepProcessor,
-        timeHelper: TimeHelper,
-        sessionRepository: SessionRepository,
-        preferenceManager: PreferencesManager
+            fingerprintStepProcessor: FingerprintStepProcessor,
+            faceStepProcessor: FaceStepProcessor,
+            coreStepProcessor: CoreStepProcessor,
+            timeHelper: TimeHelper,
+            eventRepository: EventRepository,
+            preferenceManager: PreferencesManager
     ): ModalityFlow =
         ModalityFlowEnrolImpl(
             fingerprintStepProcessor,
             faceStepProcessor,
             coreStepProcessor,
             timeHelper,
-            sessionRepository,
+            eventRepository,
             preferenceManager.consentRequired,
             preferenceManager.locationPermissionRequired
         )
@@ -99,19 +99,19 @@ class OrchestratorModule {
     @Provides
     @Named("ModalityFlowVerify")
     fun provideModalityFlowVerify(
-        fingerprintStepProcessor: FingerprintStepProcessor,
-        faceStepProcessor: FaceStepProcessor,
-        coreStepProcessor: CoreStepProcessor,
-        timeHelper: TimeHelper,
-        sessionRepository: SessionRepository,
-        preferenceManager: PreferencesManager
+            fingerprintStepProcessor: FingerprintStepProcessor,
+            faceStepProcessor: FaceStepProcessor,
+            coreStepProcessor: CoreStepProcessor,
+            timeHelper: TimeHelper,
+            eventRepository: EventRepository,
+            preferenceManager: PreferencesManager
     ): ModalityFlow =
         ModalityFlowVerifyImpl(
             fingerprintStepProcessor,
             faceStepProcessor,
             coreStepProcessor,
             timeHelper,
-            sessionRepository,
+            eventRepository,
             preferenceManager.consentRequired,
             preferenceManager.locationPermissionRequired
         )
@@ -119,12 +119,12 @@ class OrchestratorModule {
     @Provides
     @Named("ModalityFlowIdentify")
     fun provideModalityFlowIdentify(
-        fingerprintStepProcessor: FingerprintStepProcessor,
-        faceStepProcessor: FaceStepProcessor,
-        coreStepProcessor: CoreStepProcessor,
-        timeHelper: TimeHelper,
-        prefs: PreferencesManager,
-        sessionRepository: SessionRepository
+            fingerprintStepProcessor: FingerprintStepProcessor,
+            faceStepProcessor: FaceStepProcessor,
+            coreStepProcessor: CoreStepProcessor,
+            timeHelper: TimeHelper,
+            prefs: PreferencesManager,
+            eventRepository: EventRepository
     ): ModalityFlow =
         ModalityFlowIdentifyImpl(
             fingerprintStepProcessor,
@@ -132,7 +132,7 @@ class OrchestratorModule {
             coreStepProcessor,
             prefs.matchGroup,
             timeHelper,
-            sessionRepository,
+            eventRepository,
             prefs.consentRequired,
             prefs.locationPermissionRequired
         )
@@ -169,24 +169,24 @@ class OrchestratorModule {
 
     @Provides
     fun provideOrchestratorEventsHelper(
-        sessionRepository: SessionRepository,
-        timeHelper: TimeHelper
+            eventRepository: EventRepository,
+            timeHelper: TimeHelper
     ): OrchestratorEventsHelper =
-        OrchestratorEventsHelperImpl(sessionRepository, timeHelper)
+        OrchestratorEventsHelperImpl(eventRepository, timeHelper)
 
     @Provides
     fun provideOrchestratorViewModelFactory(
-        orchestratorManager: OrchestratorManager,
-        orchestratorEventsHelper: OrchestratorEventsHelper,
-        preferenceManager: PreferencesManager,
-        sessionRepository: SessionRepository,
-        crashReportManager: CrashReportManager
+            orchestratorManager: OrchestratorManager,
+            orchestratorEventsHelper: OrchestratorEventsHelper,
+            preferenceManager: PreferencesManager,
+            eventRepository: EventRepository,
+            crashReportManager: CrashReportManager
     ): OrchestratorViewModelFactory {
         return OrchestratorViewModelFactory(
             orchestratorManager,
             orchestratorEventsHelper,
             preferenceManager.modalities,
-            sessionRepository,
+            eventRepository,
             DomainToModuleApiAppResponse,
             crashReportManager
         )

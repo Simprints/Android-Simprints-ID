@@ -12,7 +12,7 @@ import com.simprints.id.data.db.event.remote.events.ApiArtificialTerminationEven
 class ApiArtificialTerminationEvent(domainEvent: ArtificialTerminationEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.fromDomainToApi(),
+        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep

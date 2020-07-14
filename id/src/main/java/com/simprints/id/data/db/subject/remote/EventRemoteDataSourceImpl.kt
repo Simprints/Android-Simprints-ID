@@ -1,7 +1,8 @@
 package com.simprints.id.data.db.subject.remote
 
 import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.event.domain.events.Events
+import com.simprints.id.data.db.event.domain.events.Event
+import com.simprints.id.data.db.event.remote.events.ApiEvents
 import com.simprints.id.data.db.event.remote.events.fromApiToDomain
 import com.simprints.id.data.db.event.remote.events.fromDomainToApi
 import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
@@ -39,9 +40,9 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
         }
     }.byteStream()
 
-    override suspend fun post(projectId: String, events: Events) {
+    override suspend fun post(projectId: String, events: List<Event>) {
         executeCall("EventUpload") {
-            it.uploadEvents(projectId, events.fromDomainToApi())
+            it.uploadEvents(projectId, ApiEvents(events.map { it.fromDomainToApi() }))
         }
     }
 

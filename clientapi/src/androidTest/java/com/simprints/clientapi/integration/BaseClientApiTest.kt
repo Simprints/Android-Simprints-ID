@@ -9,7 +9,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.simprints.clientapi.di.KoinInjector
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import com.simprints.moduleapi.app.responses.IAppResponse
 import io.mockk.coEvery
@@ -60,10 +60,10 @@ open class BaseClientApiTest : KoinTest {
         }
     }
 
-    private fun buildDummySessionEventsManagerMock(): SessionRepository {
+    private fun buildDummySessionEventsManagerMock(): EventRepository {
         val sessionMock = mockk<SessionCaptureEvent>(relaxed = true)
         every { sessionMock.id } returns ""
-        val repo = mockk<SessionRepository>(relaxed = true)
+        val repo = mockk<EventRepository>(relaxed = true)
         coEvery { repo.getCurrentSession() } returns sessionMock
         return repo
     }

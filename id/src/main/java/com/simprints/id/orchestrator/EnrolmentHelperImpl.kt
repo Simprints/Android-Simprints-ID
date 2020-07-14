@@ -1,6 +1,7 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.core.tools.extentions.inBackground
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.events.EnrolmentEvent
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.FaceSample
@@ -12,7 +13,7 @@ import com.simprints.id.tools.TimeHelper
 import java.util.*
 
 class EnrolmentHelperImpl(private val repository: SubjectRepository,
-                          private val sessionRepository: SessionRepository,
+                          private val eventRepository: EventRepository,
                           private val timeHelper: TimeHelper) : EnrolmentHelper {
 
     override suspend fun enrol(subject: Subject) {
@@ -25,11 +26,10 @@ class EnrolmentHelperImpl(private val repository: SubjectRepository,
     }
 
     private fun registerEvent(subject: Subject) {
-        with(sessionRepository) {
-            addEventToCurrentSessionInBackground(EnrolmentEvent(
-                timeHelper.now(),
-                subject.subjectId
-            ))
+        inBackground {
+            eventRepository.addEvent(
+                EnrolmentEvent(timeHelper.now(), subject.subjectId)
+            )
         }
     }
 

@@ -4,8 +4,8 @@ import androidx.annotation.Keep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.domain.BatteryInfo as BatteryInfoDomain
 import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent as Vero2InfoSnapshotEventCore
-import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent.BatteryInfo as BatteryInfoCore
-import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent.Vero2Version as Vero2VersionCore
+import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo as BatteryInfoCore
+import com.simprints.id.data.db.event.domain.events.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version as Vero2VersionCore
 
 @Keep
 class Vero2InfoSnapshotEvent(startTime: Long,

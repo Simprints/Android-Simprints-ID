@@ -3,9 +3,10 @@ package com.simprints.id.activities.fetchguid
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.events.CandidateReadEvent
 import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.RemoteResult
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
 
 class FetchGuidViewModel(private val subjectRepository: SubjectRepository,
                          private val deviceManager: DeviceManager,
-                         private val sessionRepository: SessionRepository,
+                         private val eventRepository: EventRepository,
                          private val timeHelper: TimeHelper) : ViewModel() {
 
     var subjectFetch = MutableLiveData<SubjectSource>()
@@ -46,8 +47,9 @@ class FetchGuidViewModel(private val subjectRepository: SubjectRepository,
     private fun addSubjectFetchEventToSession(subjectFetchResult: SubjectFetchResult,
                                               subjectFetchStartTime: Long,
                                               verifyGuid: String) {
-        sessionRepository.addEventToCurrentSessionInBackground(getCandidateReadEvent(subjectFetchResult,
-            subjectFetchStartTime, verifyGuid))
+        inBackground {
+            eventRepository.addEvent(getCandidateReadEvent(subjectFetchResult, subjectFetchStartTime, verifyGuid))
+        }
     }
 
     private fun getCandidateReadEvent(subjectFetchResult: SubjectFetchResult,

@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.domain.events.GuidSelectionEvent.GuidSelec
 class ApiGuidSelectionEvent(domainEvent: GuidSelectionEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.fromDomainToApi(),
+        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
         domainEvent.payload.fromDomainToApi()) {
 
 

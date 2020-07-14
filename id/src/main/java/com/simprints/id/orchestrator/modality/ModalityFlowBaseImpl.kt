@@ -1,9 +1,9 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.subject.domain.FingerprintSample
-import com.simprints.id.data.db.event.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.events.PersonCreationEvent
+import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -23,7 +23,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
                                     private val fingerprintStepProcessor: FingerprintStepProcessor,
                                     private val faceStepProcessor: FaceStepProcessor,
                                     private val timeHelper: TimeHelper,
-                                    private val sessionRepository: SessionRepository,
+                                    private val eventRepository: EventRepository,
                                     private val consentRequired: Boolean,
                                     private val locationRequired: Boolean) : ModalityFlow {
 
@@ -108,10 +108,8 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
 
     private suspend fun addPersonCreationEventForFingerprintSamples(fingerprintSamples: List<FingerprintSample>) {
         ignoreException {
-            sessionRepository.updateCurrentSession {
-                val event = PersonCreationEvent.build(timeHelper, it, fingerprintSamples)
-                it.addEvent(event)
-            }
+            val currentCaptureSessionEvent = eventRepository.getCurrentSession()
+            eventRepository.addEvent(PersonCreationEvent.build(timeHelper, currentCaptureSessionEvent, fingerprintSamples))
         }
     }
 }

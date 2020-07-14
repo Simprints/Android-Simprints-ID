@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.domain.events.EnrolmentEvent.EnrolmentPayl
 class ApiEnrolmentEvent(domainEvent: EnrolmentEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.fromDomainToApi(),
+        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep

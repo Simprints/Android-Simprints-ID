@@ -153,7 +153,7 @@ class SettingsAboutPresenterTest {
 
         presenter.logout()
 
-        coVerify(exactly = 1) { presenter.sessionEventManager.signOut() }
+        coVerify(exactly = 1) { presenter.eventEventManager.signOut() }
     }
 
     @Test
@@ -179,7 +179,7 @@ class SettingsAboutPresenterTest {
             signerManager = mockk(relaxed = true)
             syncManager = mockk(relaxed = true)
             longConsentRepository = mockk(relaxed = true)
-            sessionEventManager = mockk(relaxed = true)
+            eventEventManager = mockk(relaxed = true)
             baseUrlProvider = mockk()
             remoteConfigWrapper = mockk(relaxed = true)
         }

@@ -13,7 +13,7 @@ class IdentificationCallbackEvent(
     scores: List<CallbackComparisonScore>
 ) : Event(
     UUID.randomUUID().toString(),
-    listOf(EventLabel.SessionId(sessionId)),
+    mutableListOf(EventLabel.SessionId(sessionId)),
     IdentificationCallbackPayload(createdAt, DEFAULT_EVENT_VERSION, sessionId, scores)) {
 
     @Keep
