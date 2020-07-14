@@ -31,22 +31,23 @@ class FaceOrchestratorActivity : BaseSplitActivity() {
 
         observeViewModel()
 
-        getRankOneLicense()
-            .whenNull { viewModel.missingLicense() }
-            .whenNonNull { tryInitWithLicense(this, iFaceRequest) }
+        viewModel.start(iFaceRequest)
     }
 
-    private fun tryInitWithLicense(rankOneLicense: String, iFaceRequest: IFaceRequest) {
+    private fun tryInitWithLicense(rankOneLicense: String) {
         if (RankOneInitializer.tryInitWithLicense(this, rankOneLicense)) {
-            viewModel.start(iFaceRequest)
+            viewModel.configurationFinished()
         } else {
             viewModel.invalidLicense()
         }
     }
 
     private fun getRankOneLicense(): String? = try {
-        String(assets.open("ROC.lic").readBytes())
+        assets.open("ROC.lic").use {
+            String(it.readBytes())
+        }
     } catch (t: Throwable) {
+        // TODO get license from storage
         null
     }
 
@@ -70,6 +71,11 @@ class FaceOrchestratorActivity : BaseSplitActivity() {
         viewModel.errorEvent.observe(this, LiveDataEventWithContentObserver {
             findNavController(R.id.orchestrator_host_fragment)
                 .navigate(BlankFragmentDirections.actionBlankFragmentToErrorFragment(it))
+        })
+        viewModel.startConfiguration.observe(this, LiveDataEventWithContentObserver {
+            getRankOneLicense()
+                .whenNull { viewModel.missingLicense() }
+                .whenNonNull { tryInitWithLicense(this) }
         })
     }
 

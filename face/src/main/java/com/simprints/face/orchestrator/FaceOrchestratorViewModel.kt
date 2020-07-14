@@ -30,6 +30,8 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
         MutableLiveData()
     val startMatching: MutableLiveData<LiveDataEventWithContent<FaceMatchRequest>> =
         MutableLiveData()
+    val startConfiguration: MutableLiveData<LiveDataEventWithContent<FaceConfigurationRequest>> =
+        MutableLiveData()
 
     val flowFinished: MutableLiveData<LiveDataEventWithContent<IFaceResponse>> = MutableLiveData()
 
@@ -40,14 +42,7 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
         when (request) {
             is FaceCaptureRequest -> startCapture.send(request)
             is FaceMatchRequest -> startMatching.send(request)
-            is FaceConfigurationRequest -> {
-                // STOPSHIP
-                flowFinished.send(
-                    DomainToFaceResponse.fromDomainToFaceResponse(
-                        FaceConfigurationResponse()
-                    )
-                )
-            }
+            is FaceConfigurationRequest -> startConfiguration.send(request)
         }
         faceRequest = request
     }
@@ -94,6 +89,14 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
             message = "License is invalid"
         )
         errorEvent.send(ErrorType.LICENSE_INVALID)
+    }
+
+    fun configurationFinished() {
+        flowFinished.send(
+            DomainToFaceResponse.fromDomainToFaceResponse(
+                FaceConfigurationResponse()
+            )
+        )
     }
 
 }
