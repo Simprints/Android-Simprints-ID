@@ -49,6 +49,7 @@ import org.koin.core.module.Module
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import retrofit2.Retrofit
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -170,6 +171,7 @@ object KoinInjector {
             Retrofit.Builder()
                 .baseUrl(SimprintsLicenseServer.BASE_URL)
                 .client(get())
+                .addConverterFactory(ScalarsConverterFactory.create())
                 .build()
                 .create(SimprintsLicenseServer::class.java)
         }
