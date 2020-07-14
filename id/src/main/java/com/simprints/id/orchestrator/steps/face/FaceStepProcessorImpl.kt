@@ -50,8 +50,8 @@ class FaceStepProcessorImpl(
             null
         }
 
-    override fun buildConfigurationStep(): Step =
-        faceRequestFactory.buildFaceConfigurationRequest().run {
+    override fun buildConfigurationStep(projectId: String, deviceId: String): Step =
+        faceRequestFactory.buildFaceConfigurationRequest(projectId, deviceId).run {
             buildStep(CONFIGURATION, this)
         }
 
