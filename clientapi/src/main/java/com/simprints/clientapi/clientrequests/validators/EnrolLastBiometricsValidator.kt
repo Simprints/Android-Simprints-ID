@@ -6,13 +6,13 @@ import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 
 class EnrolLastBiometricsValidator(val extractor: EnrolLastBiometricsExtractor,
                                    private val currentSession: String,
-                                   private val isCurrentSessionAnIdentification: Boolean)
+                                   private val isCurrentSessionAnEnrolmentOrIdentification: Boolean)
     : ClientRequestValidator(extractor) {
 
     override fun validateClientRequest() {
         validateProjectId()
         validateSessionId(extractor.getSessionId())
-        if(!isCurrentSessionAnIdentification) {
+        if(!isCurrentSessionAnEnrolmentOrIdentification) {
             throw InvalidStateForIntentAction("Calling app wants to enrol last biometrics, but last flow was not an identification.")
         }
     }
