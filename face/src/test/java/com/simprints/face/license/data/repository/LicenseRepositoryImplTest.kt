@@ -10,6 +10,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.toCollection
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
@@ -63,5 +64,52 @@ class LicenseRepositoryImplTest {
         val newLicense = licenseRepositoryImpl.getLicense("invalidProject", "deviceId")
 
         assertThat(newLicense).isNull()
+    }
+
+    @Test
+    fun `Get license flow from local`() = runBlockingTest {
+        every { licenseLocalDataSource.getLicense() } returns license
+
+        val licenseStates = mutableListOf<LicenseState>()
+        licenseRepositoryImpl.getLicenseFlow("invalidProject", "deviceId")
+            .toCollection(licenseStates)
+
+        with(licenseStates) {
+            assertThat(size).isEqualTo(2)
+            assertThat(get(0)).isEqualTo(LicenseState.Started)
+            assertThat(get(1)).isEqualTo(LicenseState.FinishedWithSuccess(license))
+        }
+    }
+
+    @Test
+    fun `Get license flow from remote`() = runBlockingTest {
+        every { licenseLocalDataSource.getLicense() } returns null
+
+        val licenseStates = mutableListOf<LicenseState>()
+        licenseRepositoryImpl.getLicenseFlow("validProject", "deviceId")
+            .toCollection(licenseStates)
+
+        with(licenseStates) {
+            assertThat(size).isEqualTo(3)
+            assertThat(get(0)).isEqualTo(LicenseState.Started)
+            assertThat(get(1)).isEqualTo(LicenseState.Downloading)
+            assertThat(get(2)).isEqualTo(LicenseState.FinishedWithSuccess(license))
+        }
+    }
+
+    @Test
+    fun `Get null license flow if things go wrong`() = runBlockingTest {
+        every { licenseLocalDataSource.getLicense() } returns null
+
+        val licenseStates = mutableListOf<LicenseState>()
+        licenseRepositoryImpl.getLicenseFlow("invalidProject", "deviceId")
+            .toCollection(licenseStates)
+
+        with(licenseStates) {
+            assertThat(size).isEqualTo(3)
+            assertThat(get(0)).isEqualTo(LicenseState.Started)
+            assertThat(get(1)).isEqualTo(LicenseState.Downloading)
+            assertThat(get(2)).isEqualTo(LicenseState.FinishedWithError)
+        }
     }
 }
