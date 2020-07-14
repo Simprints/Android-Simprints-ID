@@ -167,7 +167,7 @@ class ModalityFlowIdentifyImplTest {
 
     private fun buildModalityFlowIdentify(consentRequired: Boolean, modalities: List<Modality>) {
         modalityFlowIdentify = ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, GROUP.GLOBAL, timeHelper, sessionRepository, modalities
-            consentRequired, false, "projectId", "deviceId")
+            coreStepProcessor, GROUP.GLOBAL, timeHelper, sessionRepository, consentRequired, true,
+            modalities,"projectId", "deviceId")
     }
 }

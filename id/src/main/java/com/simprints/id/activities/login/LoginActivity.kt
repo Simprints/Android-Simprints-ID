@@ -207,7 +207,7 @@ class LoginActivity : BaseSplitActivity() {
 
     private fun handleCompromisedDeviceOrProjectEnded() {
         progressDialog.dismiss()
-        showToast(androidResourcesHelper, R.string.toast_login_failed)
+        showToast(R.string.toast_login_failed)
     }
 
     private fun handleSignInSuccess() {

@@ -192,7 +192,7 @@ class ModalityFlowVerifyImplTest {
 
     private fun buildModalityFlowVerify(consentRequired: Boolean, modalities: List<Modality>) {
         modalityFlowVerify = ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, timeHelper, sessionRepository, modalities
-            consentRequired, false, "projectId", "deviceId")
+            coreStepProcessor, timeHelper, sessionRepository, consentRequired, true,
+            modalities,"projectId", "deviceId")
     }
 }
