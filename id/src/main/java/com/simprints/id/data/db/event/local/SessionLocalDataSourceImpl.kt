@@ -33,7 +33,7 @@ import java.util.*
 open class SessionLocalDataSourceImpl(private val appContext: Context,
                                       private val secureDataManager: SecureLocalDbKeyProvider,
                                       private val timeHelper: TimeHelper,
-                                      private val realmConfigBuilder: SessionRealmConfigBuilder,
+                                      private val roomDao: EventRoomDao,
                                       private val sessionEventsValidators: Array<SessionEventValidator>) : SessionLocalDataSource {
     companion object {
         const val PROJECT_ID = "projectId"

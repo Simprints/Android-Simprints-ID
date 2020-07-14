@@ -1,30 +1,58 @@
 package com.simprints.id.data.db.event.local.models
 
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
-import com.simprints.id.data.db.event.domain.events.EventPayloadType.valueOf
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
+import com.simprints.id.data.db.event.domain.events.Event.EventLabel
+import com.simprints.id.data.db.event.domain.events.EventPayload
 
-open class DbEvent : RealmObject {
+data class DbEvent(
+    @PrimaryKey var id: String,
+    var labels: List<EventLabel>,
+    var payload: EventPayload
+) {
 
-    @PrimaryKey
-    lateinit var id: String
+    constructor() : this() {}
 
-    var typeEventDescription: String? = null
-    var jsonEvent: String? = null
+    class Converters {
+        @TypeConverter
+        fun fromEventLabelToString(label: EventLabel): String =
+            JsonHelper.toJson(label)
 
-    private fun saveType(type: EventPayloadType) {
-        this.typeEventDescription = type.toString()
+        @TypeConverter
+        fun fromStringToEventLabel(jsonEventLabel: String): EventLabel =
+            JsonHelper.fromJson(jsonEventLabel)
+
+        @TypeConverter
+        fun fromPayloadToString(payload: EventPayload): String =
+            JsonHelper.toJson(payload)
+
+        @TypeConverter
+        fun fromStringToPayload(jsonPayload: String): EventPayload =
+            JsonHelper.fromJson(jsonPayload)
     }
 
-    fun getType(): EventPayloadType? = typeEventDescription?.let { valueOf(it) }
-
-    constructor()
     constructor(event: Event) : this() {
-        saveType(event.payload.type)
         id = event.id
+        payloadType = event.payload.type
         jsonEvent = JsonHelper.toJson(event)
     }
 }
+
+//constructor(event: Event) : this() {
+//    id = event.id
+//    payloadType = event.payload.type
+//    jsonEvent = JsonHelper.toJson(event)
+//}
+
+//
+//data class DbSubjectsDownSyncOperation(
+//    @androidx.room.PrimaryKey var id: DbSubjectsDownSyncOperationKey,
+//    var projectId: String,
+//    var userId: String? = null,
+//    var moduleId: String? = null,
+//    var modes: List<Modes> = emptyList(),
+//    var lastState: DownSyncState?,
+//    var lastEventId: String?,
+//    var lastSyncTime: Long? = null
+//)
