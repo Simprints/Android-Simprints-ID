@@ -95,7 +95,6 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     @Test
-    @Ignore("Wait until cloud implements camera events")
     fun closeSession_withAllEvents_shouldGetUploaded() {
         runBlocking {
             val session = createClosedSessions(1).first().apply {
