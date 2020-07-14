@@ -10,8 +10,8 @@ import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
-import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
+import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
+import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.LocationManager

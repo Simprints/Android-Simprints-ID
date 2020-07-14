@@ -1,22 +1,26 @@
 package com.simprints.id.activities.setup
 
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.play.core.ktx.requestProgressFlow
+import com.google.android.play.core.ktx.requestSessionStates
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
-import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
-import com.google.android.play.core.splitinstall.testing.FakeSplitInstallManager
+import com.google.android.play.core.splitinstall.model.SplitInstallErrorCode.NO_ERROR
+import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.DOWNLOADING
 import com.google.common.truth.Truth.assertThat
-import com.simprints.testtools.common.syntax.verifyExactly
+import com.simprints.id.activities.setup.SetupActivity.ViewState.*
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.tools.device.DeviceManager
+import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
 import org.junit.runner.RunWith
 
 @ExperimentalCoroutinesApi
@@ -24,10 +28,17 @@ import org.junit.runner.RunWith
 class SetupViewModelTest {
 
     @MockK lateinit var splitInstallManagerMock: SplitInstallManager
+    @MockK lateinit var deviceManagerMock: DeviceManager
+    @MockK lateinit var crashReportManagerMock: CrashReportManager
+
+    private lateinit var isConnectedUpdates: MutableLiveData<Boolean>
 
     @Before
     fun setUp() {
+        UnitTestConfig(this).coroutinesMainThread()
         MockKAnnotations.init(this)
+        isConnectedUpdates = MutableLiveData()
+        every { deviceManagerMock.isConnectedLiveData } returns isConnectedUpdates
     }
 
     @Test
@@ -35,7 +46,7 @@ class SetupViewModelTest {
         val modalityList = listOf("fingerprint","face")
         every { splitInstallManagerMock.installedModules } returns emptySet()
 
-        val viewModel = SetupViewModel()
+        val viewModel = SetupViewModel(deviceManagerMock, crashReportManagerMock)
         viewModel.start(splitInstallManagerMock, modalityList)
 
         verify(exactly = 1) { splitInstallManagerMock.startInstall(any()) }
@@ -46,9 +57,30 @@ class SetupViewModelTest {
         val modalityList = listOf("fingerprint","face")
         every { splitInstallManagerMock.installedModules } returns setOf("fingerprint","face")
 
-        val viewModel = SetupViewModel()
+        val viewModel = SetupViewModel(deviceManagerMock, crashReportManagerMock)
         viewModel.start(splitInstallManagerMock, modalityList)
 
-        assertThat(viewModel.getViewStateLiveData().value).isEqualTo(SetupActivity.ViewState.ModalitiesInstalled)
+        assertThat(viewModel.getViewStateLiveData().testObserver().observedValues.last())
+            .isEqualTo(ModalitiesInstalled)
+    }
+
+    @Test
+    fun deviceOffline_shouldHaveCorrectViewState() {
+        isConnectedUpdates.value = false
+
+        val viewModel = SetupViewModel(deviceManagerMock, crashReportManagerMock)
+
+        assertThat(viewModel.getDeviceNetworkLiveData().testObserver().observedValues.last())
+            .isEqualTo(DeviceOffline)
+    }
+
+    @Test
+    fun deviceOnline_shouldHaveCorrectViewState() {
+        isConnectedUpdates.value = true
+
+        val viewModel = SetupViewModel(deviceManagerMock, crashReportManagerMock)
+
+        assertThat(viewModel.getDeviceNetworkLiveData().testObserver().observedValues.last())
+            .isEqualTo(DeviceOnline)
     }
 }
