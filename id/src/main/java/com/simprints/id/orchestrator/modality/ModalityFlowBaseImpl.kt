@@ -6,7 +6,6 @@ import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
@@ -16,6 +15,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusa
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
+import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse

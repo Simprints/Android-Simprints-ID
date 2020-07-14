@@ -170,7 +170,7 @@ class ModalityFlowEnrolImplTest {
 
     private fun buildModalityFlowEnrol(consentRequired: Boolean, modalities: List<Modality>) {
         modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, timeHelper, sessionRepository, modalities
-            consentRequired, true, "projectId", "deviceId")
+            coreStepProcessor, timeHelper, sessionRepository, consentRequired, true,
+            modalities, "projectId", "deviceId")
     }
 }
