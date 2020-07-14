@@ -9,8 +9,9 @@ import androidx.test.rule.GrantPermissionRule
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
-import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
+import com.simprints.id.domain.modality.Modality
+import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
+import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.LocationManager
@@ -65,7 +66,7 @@ class SetupActivityTest {
 
     @Test
     fun launchSetupActivityWithLocationPermissions_shouldAddLocationToSession() {
-        val request = SetupRequest(listOf(SetupPermission.LOCATION))
+        val request = SetupRequest(listOf(Modality.FINGER, Modality.FACE), listOf(SetupPermission.LOCATION))
         val intent = Intent().apply {
             setClassName(ApplicationProvider.getApplicationContext<android.app.Application>().packageName,
                 SetupActivity::class.qualifiedName!!)

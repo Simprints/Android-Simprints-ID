@@ -100,6 +100,7 @@ class OrchestratorModule {
             sessionRepository,
             preferenceManager.consentRequired,
             preferenceManager.locationPermissionRequired,
+            preferenceManager.modalities,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             ctx.deviceId
         )
@@ -124,6 +125,7 @@ class OrchestratorModule {
             sessionRepository,
             preferenceManager.consentRequired,
             preferenceManager.locationPermissionRequired,
+            preferenceManager.modalities,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             ctx.deviceId
         )
@@ -149,6 +151,7 @@ class OrchestratorModule {
             sessionRepository,
             prefs.consentRequired,
             prefs.locationPermissionRequired,
+            prefs.modalities,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             ctx.deviceId
         )

@@ -3,7 +3,6 @@ package com.simprints.fingerprint.controllers.core.eventData.model
 import androidx.annotation.Keep
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import java.io.Serializable
-import com.simprints.id.data.db.session.domain.models.events.Matcher as CoreMatcher
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent as CoreOneToManyMatchEvent
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPool as CoreMatchPool
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPoolType as CoreMatchPoolType
@@ -14,6 +13,7 @@ class OneToManyMatchEvent(
     endTime: Long,
     val query: Serializable,
     val count: Int,
+    val matcher: Matcher,
     val result: List<MatchEntry>?
 ) : Event(EventType.ONE_TO_MANY_MATCH, startTime, endTime)
 
@@ -22,7 +22,7 @@ fun OneToManyMatchEvent.fromDomainToCore() =
         startTime,
         endTime,
         (query as SubjectLocalDataSource.Query).asCoreMatchPool(count),
-        CoreMatcher.SIM_AFIS, // TODO: implement Matcher in fingerprint module
+        matcher.fromDomainToCore(),
         result?.map { it.fromDomainToCore() }
     )
 

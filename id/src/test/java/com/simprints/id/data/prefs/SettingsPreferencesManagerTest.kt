@@ -3,6 +3,8 @@ package com.simprints.id.data.prefs
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.JsonSyntaxException
+import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_DEFAULT
+import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_KEY
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
@@ -58,15 +60,15 @@ class SettingsPreferencesManagerTest {
     @Test
     fun fetchingOverridableRemoteConfigPrimitive_worksAndBecomesOverridden() {
         val originalValue = settingsPreferencesManager.language
-        Assert.assertEquals(SettingsPreferencesManagerImpl.LANGUAGE_DEFAULT, originalValue)
+        Assert.assertEquals(SHARED_PREFS_LANGUAGE_DEFAULT, originalValue)
 
-        settingsPreferencesManager.language = SettingsPreferencesManagerImpl.LANGUAGE_DEFAULT + "q"
+        settingsPreferencesManager.language = SHARED_PREFS_LANGUAGE_DEFAULT + "q"
 
         val newValue = settingsPreferencesManager.language
 
         Assert.assertNotEquals(originalValue, newValue)
 
-        verify(exactly = 1) { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.LANGUAGE_KEY) }
+        verify(exactly = 1) { remoteConfigSpy.getString(SHARED_PREFS_LANGUAGE_KEY) }
     }
 
     @Test

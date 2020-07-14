@@ -30,17 +30,17 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
                                sessionRepository: SessionRepository,
                                consentRequired: Boolean,
                                locationRequired: Boolean,
+                               private val modalities: List<Modality>,
                                projectId: String,
                                deviceId: String) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper,
-        sessionRepository, consentRequired, locationRequired, projectId, deviceId) {
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired, modalities, projectId, deviceId) {
 
     override val steps: MutableList<Step> = mutableListOf()
 
-    override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
+    override fun startFlow(appRequest: AppRequest) {
         require(appRequest is AppIdentifyRequest)
-        addModalityConfigurationSteps(modalities)
         addSetupStep()
+        addModalityConfigurationSteps(modalities)
         addCoreConsentStepIfRequired(ConsentType.VERIFY)
         steps.addAll(buildStepsList(modalities))
     }
