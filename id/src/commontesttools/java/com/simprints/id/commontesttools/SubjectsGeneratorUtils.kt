@@ -67,9 +67,7 @@ object SubjectsGeneratorUtils {
         return FingerprintSample(commonFingerprint.fingerIdentifier, commonFingerprint.template, commonFingerprint.templateQualityScore)
     }
 
-    fun getRandomFaceSample() =
-        FaceSample(Random.nextBytes(20))
-
+    fun getRandomFaceSample() = FaceSample(Random.nextBytes(64))
 
     private fun getRandomTime(minutesOffset: Int = 60): Date {
         return Calendar.getInstance().apply {

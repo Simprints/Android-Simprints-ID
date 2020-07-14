@@ -32,7 +32,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -108,6 +107,11 @@ class SessionRemoteDataSourceImplAndroidTest {
                 addConsentEvent()
                 addEnrolmentEvent()
                 addFingerprintCaptureEvent()
+                addFaceCaptureEvent()
+                addFaceCaptureConfirmationEvent()
+                addFaceCaptureRetryEvent()
+                addFaceFallbackCaptureEvent()
+                addFaceOnboardingCompleteEvent()
                 addGuidSelectionEvent()
                 addIntentParsingEvent()
                 addInvalidIntentEvent()
@@ -225,6 +229,55 @@ class SessionRemoteDataSourceImplAndroidTest {
         }
     }
 
+    private fun SessionEvents.addFaceCaptureEvent() {
+        FaceCaptureEvent.Result.values().forEachIndexed { index, result ->
+            val template = EncodingUtils.byteArrayToBase64(
+                SubjectsGeneratorUtils.getRandomFaceSample().template
+            )
+
+            val face = FaceCaptureEvent.Face(30f, 40f, 100f, template)
+
+            val event = FaceCaptureEvent(
+                DEFAULT_TIME,
+                DEFAULT_TIME + 100,
+                index + 1,
+                0f,
+                result,
+                false,
+                face
+            )
+
+            addEvent(event)
+        }
+    }
+
+    private fun SessionEvents.addFaceCaptureConfirmationEvent() {
+        FaceCaptureConfirmationEvent.Result.values().forEach { result ->
+            val event = FaceCaptureConfirmationEvent(
+                DEFAULT_TIME,
+                DEFAULT_TIME + 100,
+                result
+            )
+
+            addEvent(event)
+        }
+    }
+
+    private fun SessionEvents.addFaceCaptureRetryEvent() {
+        val event = FaceCaptureRetryEvent(DEFAULT_TIME, DEFAULT_TIME + 100)
+        addEvent(event)
+    }
+
+    private fun SessionEvents.addFaceFallbackCaptureEvent() {
+        val event = FaceFallbackCaptureEvent(DEFAULT_TIME, DEFAULT_TIME + 100)
+        addEvent(event)
+    }
+
+    private fun SessionEvents.addFaceOnboardingCompleteEvent() {
+        val event = FaceOnboardingCompleteEvent(DEFAULT_TIME, DEFAULT_TIME + 100)
+        addEvent(event)
+    }
+
     private fun SessionEvents.addGuidSelectionEvent() {
         addEvent(GuidSelectionEvent(DEFAULT_TIME, RANDOM_GUID))
     }
@@ -340,4 +393,5 @@ class SessionRemoteDataSourceImplAndroidTest {
         addEvent(VerificationCalloutEvent(DEFAULT_TIME, "project_id", "user_id", "module_id", RANDOM_GUID, "metadata"))
         addEvent(EnrolmentLastBiometricsCalloutEvent(DEFAULT_TIME, "project_id", "user_id", "module_id", "metadata", RANDOM_GUID))
     }
+
 }
