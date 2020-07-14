@@ -149,4 +149,8 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
         }
     }
 
+    override fun enablePreference(preference: Preference) {
+        preference.isEnabled = true
+    }
+
 }

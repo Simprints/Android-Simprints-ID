@@ -8,15 +8,20 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.widget.TextView
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.db.subjects_sync.down.local.SubjectsDownSyncOperationLocalDataSource
+import com.simprints.id.secure.models.SecurityState
+import com.simprints.id.secure.securitystate.SecurityStateProcessor
+import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState.*
 import kotlinx.android.synthetic.main.activity_debug.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -24,6 +29,8 @@ class DebugActivity : BaseSplitActivity() {
 
     @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
     @Inject lateinit var subjectsDownSyncOperationLocalDataSource: SubjectsDownSyncOperationLocalDataSource
+    @Inject lateinit var securityStateRepository: SecurityStateRepository
+    @Inject lateinit var securityStateProcessor: SecurityStateProcessor
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(this)
@@ -67,6 +74,14 @@ class DebugActivity : BaseSplitActivity() {
 
             subjectsDownSyncOperationLocalDataSource.deleteAll()
         }
+
+        securityStateCompromised.setOnClickListener {
+            setSecurityStatus(SecurityState.Status.COMPROMISED)
+        }
+
+        securityStateProjectEnded.setOnClickListener {
+            setSecurityStatus(SecurityState.Status.PROJECT_ENDED)
+        }
     }
 
     private fun getRandomColor(seed: String): String {
@@ -92,6 +107,19 @@ class DebugActivity : BaseSplitActivity() {
             this.all { it is Succeeded } -> DebugActivitySyncState.SUCCESS
             else -> DebugActivitySyncState.FAILED
         }
+
+    private fun setSecurityStatus(status: SecurityState.Status) {
+        lifecycleScope.launch {
+            with(securityStateRepository.securityStatusChannel) {
+                if (!isClosedForSend) {
+                    send(status)
+                    securityStateProcessor.processSecurityState(
+                        SecurityState("device-id", status)
+                    )
+                }
+            }
+        }
+    }
 
     enum class DebugActivitySyncState {
         RUNNING,

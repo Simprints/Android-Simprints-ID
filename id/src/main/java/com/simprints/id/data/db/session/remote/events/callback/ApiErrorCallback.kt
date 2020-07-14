@@ -40,4 +40,6 @@ fun ErrorCallbackEvent.Reason.fromDomainToApi() =
         FACE_LICENSE_INVALID -> ApiErrorCallback.ApiReason.FACE_LICENSE_INVALID
         SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD -> ApiErrorCallback.ApiReason.UNEXPECTED_ERROR
         SETUP_MODALITY_DOWNLOAD_CANCELLED -> ApiErrorCallback.ApiReason.UNEXPECTED_ERROR
+        FINGERPRINT_CONFIGURATION_ERROR -> ApiErrorCallback.ApiReason.UNEXPECTED_ERROR
+        FACE_CONFIGURATION_ERROR -> ApiErrorCallback.ApiReason.UNEXPECTED_ERROR
     }

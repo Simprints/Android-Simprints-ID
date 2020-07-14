@@ -24,7 +24,9 @@ class ErrorCallbackEvent(startTime: Long,
         LOGIN_NOT_COMPLETE,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
         FACE_LICENSE_MISSING,
-        FACE_LICENSE_INVALID;
+        FACE_LICENSE_INVALID,
+        FINGERPRINT_CONFIGURATION_ERROR,
+        FACE_CONFIGURATION_ERROR;
 
         companion object {
             fun fromAppResponseErrorReasonToEventReason(appResponseErrorReason: AppErrorResponse.Reason) =
@@ -40,6 +42,8 @@ class ErrorCallbackEvent(startTime: Long,
                     AppErrorResponse.Reason.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
                     AppErrorResponse.Reason.SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD -> SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD
                     AppErrorResponse.Reason.SETUP_MODALITY_DOWNLOAD_CANCELLED -> SETUP_MODALITY_DOWNLOAD_CANCELLED
+                    AppErrorResponse.Reason.FINGERPRINT_CONFIGURATION_ERROR -> FINGERPRINT_CONFIGURATION_ERROR
+                    AppErrorResponse.Reason.FACE_CONFIGURATION_ERROR -> FACE_CONFIGURATION_ERROR
                 }
         }
     }

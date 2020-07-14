@@ -17,7 +17,7 @@ class AndroidTestConfig<T : Any>(
     private val dataModule: TestDataModule? = null,
     private val preferencesModule: TestPreferencesModule? = null,
     private val syncModule: TestSyncModule? = null,
-    private val loginModule: TestLoginModule? = null
+    private val securityModule: TestSecurityModule? = null
 ) {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
@@ -36,7 +36,7 @@ class AndroidTestConfig<T : Any>(
         .dataModule(dataModule ?: TestDataModule())
         .preferencesModule(preferencesModule ?: TestPreferencesModule())
         .syncModule(syncModule ?: TestSyncModule())
-        .loginModule(loginModule ?: TestLoginModule())
+        .securityModule(securityModule ?: TestSecurityModule())
 
     private fun initRxIdler() = also {
         RxJavaPlugins.setInitComputationSchedulerHandler(Rx2Idler.create("RxJava 2.x Computation Scheduler"))

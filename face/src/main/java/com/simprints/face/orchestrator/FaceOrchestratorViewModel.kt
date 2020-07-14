@@ -10,8 +10,10 @@ import com.simprints.face.controllers.core.crashreport.FaceCrashReportTrigger.UI
 import com.simprints.face.data.moduleapi.face.DomainToFaceResponse
 import com.simprints.face.data.moduleapi.face.FaceToDomainRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
+import com.simprints.face.data.moduleapi.face.requests.FaceConfigurationRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
+import com.simprints.face.data.moduleapi.face.responses.FaceConfigurationResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorReason
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceResponse
@@ -38,6 +40,14 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
         when (request) {
             is FaceCaptureRequest -> startCapture.send(request)
             is FaceMatchRequest -> startMatching.send(request)
+            is FaceConfigurationRequest -> {
+                // STOPSHIP
+                flowFinished.send(
+                    DomainToFaceResponse.fromDomainToFaceResponse(
+                        FaceConfigurationResponse()
+                    )
+                )
+            }
         }
         faceRequest = request
     }
@@ -73,7 +83,7 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
             UI,
             message = "License is missing"
         )
-        errorEvent.send(ErrorType.LicenseMissing)
+        errorEvent.send(ErrorType.LICENSE_MISSING)
     }
 
     fun invalidLicense() {
@@ -83,7 +93,7 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
             UI,
             message = "License is invalid"
         )
-        errorEvent.send(ErrorType.LicenseInvalid)
+        errorEvent.send(ErrorType.LICENSE_INVALID)
     }
 
 }
