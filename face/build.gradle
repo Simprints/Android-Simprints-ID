@@ -99,6 +99,7 @@ dependencies {
     implementation deps.retrofit.core
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
+    implementation deps.retrofit.converterScalars
 
     // Android X
     androidTestImplementation deps.testing.androidx.core_testing
