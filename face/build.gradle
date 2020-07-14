@@ -109,6 +109,9 @@ dependencies {
     androidTestImplementation deps.testing.androidx.rules
     androidTestUtil deps.testing.androidx.orchestrator
 
+    androidTestImplementation deps.testing.mockk.android
+    androidTestImplementation deps.testing.truth
+
     // Espresso
     androidTestImplementation deps.testing.espresso.core
     androidTestImplementation deps.testing.espresso.intents
