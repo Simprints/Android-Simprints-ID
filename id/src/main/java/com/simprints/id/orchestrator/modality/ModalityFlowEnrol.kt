@@ -29,15 +29,17 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
                             sessionRepository: SessionRepository,
                             consentRequired: Boolean,
                             locationRequired: Boolean,
-                            private val isEnrolmentPlus: Boolean,
+                            private val modalities: List<Modality>,
+                            projectId: String,
+                            deviceId: String,
                             private val matchGroup: GROUP) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired) {
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceEnrolProcessor, timeHelper, sessionRepository, consentRequired, locationRequired, modalities, projectId, deviceId) {
 
-    override fun startFlow(appRequest: AppRequest,
-                           modalities: List<Modality>) {
+    override fun startFlow(appRequest: AppRequest) {
+
         require(appRequest is AppEnrolRequest)
-        addModalityConfigurationSteps(modalities)
         addSetupStep()
+        addModalityConfigurationSteps(modalities)
         addCoreConsentStepIfRequired(ENROL)
         steps.addAll(buildStepsList(modalities))
     }
@@ -66,7 +68,7 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
             }
             else -> throw IllegalStateException("Invalid result from intent")
         }
-        completeAllStepsIfExitFormHappened(requestCode, resultCode, data)
+        completeAllStepsIfExitFormOrErrorHappened(requestCode, resultCode, data)
 
         val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
         return stepForRequest?.apply { setResult(result) }.also {

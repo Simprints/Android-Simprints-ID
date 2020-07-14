@@ -27,7 +27,6 @@ import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
-import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.tools.livedata.postEvent
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
@@ -42,8 +41,7 @@ class ConnectScannerViewModel(
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val preferencesManager: FingerprintPreferencesManager,
     private val analyticsManager: FingerprintAnalyticsManager,
-    private val nfcManager: NfcManager,
-    private val serialNumberConverter: SerialNumberConverter) : ViewModel() {
+    private val nfcManager: NfcManager) : ViewModel() {
 
     lateinit var connectMode: ConnectScannerTaskRequest.ConnectMode
 
@@ -150,10 +148,10 @@ class ConnectScannerViewModel(
         when (e) {
             is BluetoothNotEnabledException ->
                 connectScannerIssue.postEvent(ConnectScannerIssue.BluetoothOff)
-            is ScannerNotPairedException, is MultipleScannersPairedException ->
+            is ScannerNotPairedException, is MultiplePossibleScannersPairedException ->
                 connectScannerIssue.postEvent(determineAppropriateScannerIssueForPairing())
             is ScannerDisconnectedException, is UnknownScannerIssueException ->
-                scannerManager.lastPairedScannerId?.let { showScannerErrorDialogWithScannerId.postEvent(it) }
+                scannerManager.currentScannerId?.let { showScannerErrorDialogWithScannerId.postEvent(it) }
             is OtaAvailableException ->
                 connectScannerIssue.postEvent(ConnectScannerIssue.Ota(OtaFragmentRequest(e.availableOtas)))
             is BluetoothNotSupportedException ->
@@ -182,12 +180,10 @@ class ConnectScannerViewModel(
     private fun handleSetupFinished() {
         progress.postValue(computeProgress(7))
         message.postValue(R.string.connect_scanner_finished)
-        preferencesManager.lastScannerUsed = scannerManager.lastPairedMacAddress?.let {
-            serialNumberConverter.convertMacAddressToSerialNumber(it)
-        } ?: ""
+        preferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
         preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.computeMasterVersion().toString()
-        analyticsManager.logScannerProperties(scannerManager.lastPairedMacAddress
-            ?: "", scannerManager.lastPairedScannerId ?: "")
+        analyticsManager.logScannerProperties(scannerManager.currentMacAddress
+            ?: "", scannerManager.currentScannerId ?: "")
         scannerConnected.postEvent(true)
     }
 
@@ -225,8 +221,8 @@ class ConnectScannerViewModel(
                 ScannerConnectionEvent(
                     timeHelper.now(),
                     ScannerConnectionEvent.ScannerInfo(
-                        lastPairedScannerId ?: "",
-                        lastPairedMacAddress ?: "",
+                        currentScannerId ?: "",
+                        currentMacAddress ?: "",
                         ScannerConnectionEvent.ScannerGeneration.get(onScanner { versionInformation().generation }),
                         null)))
         }

@@ -3,8 +3,6 @@ package com.simprints.face.di
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.LiveFeedbackFragmentViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
-import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
-import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelperImpl
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManagerImpl
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
@@ -35,14 +33,32 @@ import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
+import java.util.concurrent.atomic.AtomicInteger
 
+/**
+ * Consider this flow:
+ * - consumers starts at 0
+ * - Setup callout: OrchestratorActivity.onCreate() , Koin modules created, consumers + 1 → 1 (The Koin modules are now loaded)
+ * - Then, Normal callout (e.g. match) begins before previous on destroy: OrchestratorActivity.onCreate(), consumers + 1 → 2
+ * - Setup callout now destroys shortly after like you described: OrchestratorActivity.onDestroy(), consumers - 1 → 1 (Koin modules still loaded)
+ * - Normal callout finishes as usual after the work is done: OrchestratorActivity.onDestroy(), consumers - 1 → 0 (the Koin modules are now unloaded)
+ *
+ * This means we don’t need to worry about this mis-ordering during the flow - the unload only happens when the counter reaches 0.
+ * If you call `acquire…` and `release…` every activity, this is additionally helpful for situations where the Orchestrator
+ * activity is destroyed while it’s in the background because of low memory.
+ */
 object KoinInjector {
+    private val consumers = AtomicInteger(0)
     private var koinModule: Module? = null
 
     private fun Scope.appComponent() =
         (androidApplication() as Application).component
 
+    /**
+     * Call this on the first point of contact of your modality (usually onCreate() of OrchestratorActivity)
+     */
     fun acquireFaceKoinModules() {
+        consumers.incrementAndGet()
         if (koinModule == null) {
             val module = buildKoinModule()
             loadKoinModules(module)
@@ -50,10 +66,15 @@ object KoinInjector {
         }
     }
 
+    /**
+     * Call this on the last point of contact of your modality, usually onDestroy()
+     */
     fun releaseFaceKoinModules() {
-        koinModule?.let {
-            unloadKoinModules(it)
-            koinModule = null
+        if (consumers.decrementAndGet() == 0) {
+            koinModule?.let {
+                unloadKoinModules(it)
+                koinModule = null
+            }
         }
     }
 
@@ -65,7 +86,6 @@ object KoinInjector {
         }
 
     private fun Module.defineBuildersForFaceManagers() {
-        factory<FaceAndroidResourcesHelper> { FaceAndroidResourcesHelperImpl(get()) }
         factory<FacePreferencesManager> { FacePreferencesManagerImpl(get()) }
         factory<FaceImageManager> { FaceImageManagerImpl(get(), get()) }
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }

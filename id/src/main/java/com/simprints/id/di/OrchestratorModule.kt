@@ -1,11 +1,13 @@
 package com.simprints.id.di
 
+import android.content.Context
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
@@ -24,6 +26,8 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.device.DeviceManager
+import com.simprints.id.tools.extensions.deviceId
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
@@ -84,7 +88,9 @@ class OrchestratorModule {
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
         sessionRepository: SessionRepository,
-        preferenceManager: PreferencesManager
+        preferenceManager: PreferencesManager,
+        loginInfoManager: LoginInfoManager,
+        ctx: Context
     ): ModalityFlow =
         ModalityFlowEnrolImpl(
             fingerprintStepProcessor,
@@ -94,6 +100,9 @@ class OrchestratorModule {
             sessionRepository,
             preferenceManager.consentRequired,
             preferenceManager.locationPermissionRequired,
+            preferenceManager.modalities,
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            ctx.deviceId
             preferenceManager.enrolmentPlus,
             preferenceManager.matchGroup
         )
@@ -106,7 +115,9 @@ class OrchestratorModule {
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
         sessionRepository: SessionRepository,
-        preferenceManager: PreferencesManager
+        preferenceManager: PreferencesManager,
+        loginInfoManager: LoginInfoManager,
+        ctx: Context
     ): ModalityFlow =
         ModalityFlowVerifyImpl(
             fingerprintStepProcessor,
@@ -115,7 +126,10 @@ class OrchestratorModule {
             timeHelper,
             sessionRepository,
             preferenceManager.consentRequired,
-            preferenceManager.locationPermissionRequired
+            preferenceManager.locationPermissionRequired,
+            preferenceManager.modalities,
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            ctx.deviceId
         )
 
     @Provides
@@ -126,7 +140,9 @@ class OrchestratorModule {
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
         prefs: PreferencesManager,
-        sessionRepository: SessionRepository
+        sessionRepository: SessionRepository,
+        loginInfoManager: LoginInfoManager,
+        ctx: Context
     ): ModalityFlow =
         ModalityFlowIdentifyImpl(
             fingerprintStepProcessor,
@@ -136,7 +152,10 @@ class OrchestratorModule {
             timeHelper,
             sessionRepository,
             prefs.consentRequired,
-            prefs.locationPermissionRequired
+            prefs.locationPermissionRequired,
+            prefs.modalities,
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            ctx.deviceId
         )
 
     // Orchestration

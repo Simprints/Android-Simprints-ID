@@ -13,12 +13,10 @@ import com.otaliastudios.cameraview.frame.FrameProcessor
 import com.simprints.core.tools.extentions.setCheckedWithLeftDrawable
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
-import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
 import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
 import com.simprints.uicomponents.models.Size
 import kotlinx.android.synthetic.main.fragment_live_feedback.*
-import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -28,7 +26,6 @@ import com.simprints.uicomponents.R as UCR
 class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FrameProcessor {
     private val mainVm: FaceCaptureViewModel by sharedViewModel()
     private val vm: LiveFeedbackFragmentViewModel by viewModel { parametersOf(mainVm) }
-    private val androidResourcesHelper: FaceAndroidResourcesHelper by inject()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -40,10 +37,8 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
     }
 
     private fun setTextInLayout() {
-        with(androidResourcesHelper) {
-            capture_title.text = getString(R.string.title_confirmation)
-            capture_feedback_txt_title.text = getString(R.string.capture_title_previewing)
-        }
+        capture_title.text = getString(R.string.title_confirmation)
+        capture_feedback_txt_title.text = getString(R.string.capture_title_previewing)
     }
 
     private fun bindViewModel() {
@@ -137,23 +132,23 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
     private fun renderCapturingNotStarted() {
         capture_overlay.drawSemiTransparentTarget()
         capture_title.text =
-            androidResourcesHelper.getString(R.string.title_preparation)
+            getString(R.string.title_preparation)
         capture_feedback_txt_title.text =
-            androidResourcesHelper.getString(R.string.capture_prep_begin_btn)
+            getString(R.string.capture_prep_begin_btn)
         toggleCaptureButtons(false)
     }
 
     private fun renderCapturing() {
         renderCapturingStateColors()
         capture_progress.isVisible = true
-        capture_title.text = androidResourcesHelper.getString(R.string.title_capturing)
+        capture_title.text = getString(R.string.title_capturing)
         capture_feedback_txt_title.text =
-            androidResourcesHelper.getString(R.string.capture_prep_begin_btn_capturing)
+            getString(R.string.capture_prep_begin_btn_capturing)
         toggleCaptureButtons(false)
     }
 
     private fun renderValidFace() {
-        capture_feedback_txt_title.text = androidResourcesHelper.getString(R.string.capture_ready)
+        capture_feedback_txt_title.text = getString(R.string.capture_ready)
         capture_feedback_txt_explanation.text = null
 
         capture_feedback_txt_title.setCheckedWithLeftDrawable(
@@ -164,10 +159,9 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
     }
 
     private fun renderValidCapturingFace() {
-        with(androidResourcesHelper) {
-            capture_feedback_txt_title.text = getString(R.string.capture_prep_begin_btn_capturing)
-            capture_feedback_txt_explanation.text = getString(R.string.capture_hold)
-        }
+
+        capture_feedback_txt_title.text = getString(R.string.capture_prep_begin_btn_capturing)
+        capture_feedback_txt_explanation.text = getString(R.string.capture_hold)
 
         capture_feedback_txt_title.setCheckedWithLeftDrawable(
             true,
@@ -178,10 +172,8 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
     }
 
     private fun renderFaceTooFar() {
-        with(androidResourcesHelper) {
-            capture_feedback_txt_title.text = getString(R.string.capture_title_face_too_far)
-            capture_feedback_txt_explanation.text = getString(R.string.capture_error_face_too_far)
-        }
+        capture_feedback_txt_title.text = getString(R.string.capture_title_face_too_far)
+        capture_feedback_txt_explanation.text = getString(R.string.capture_error_face_too_far)
 
         capture_feedback_txt_title.setCheckedWithLeftDrawable(false)
         toggleCaptureButtons(false)
@@ -190,10 +182,8 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
     }
 
     private fun renderFaceTooClose() {
-        with(androidResourcesHelper) {
-            capture_feedback_txt_title.text = getString(R.string.capture_title_too_close)
-            capture_feedback_txt_explanation.text = getString(R.string.capture_error_face_too_close)
-        }
+        capture_feedback_txt_title.text = getString(R.string.capture_title_too_close)
+        capture_feedback_txt_explanation.text = getString(R.string.capture_error_face_too_close)
 
         capture_feedback_txt_title.setCheckedWithLeftDrawable(false)
         toggleCaptureButtons(false)
@@ -202,10 +192,8 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
     }
 
     private fun renderNoFace() {
-        with(androidResourcesHelper) {
-            capture_feedback_txt_title.text = getString(R.string.capture_title_no_face)
-            capture_feedback_txt_explanation.text = getString(R.string.capture_error_no_face)
-        }
+        capture_feedback_txt_title.text = getString(R.string.capture_title_no_face)
+        capture_feedback_txt_explanation.text = getString(R.string.capture_error_no_face)
 
         capture_feedback_txt_title.setCheckedWithLeftDrawable(false)
         toggleCaptureButtons(false)
@@ -214,10 +202,8 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
     }
 
     private fun renderFaceNotStraight() {
-        with(androidResourcesHelper) {
-            capture_feedback_txt_title.text = getString(R.string.capture_title_look_straight)
-            capture_feedback_txt_explanation.text = getString(R.string.capture_error_look_straight)
-        }
+        capture_feedback_txt_title.text = getString(R.string.capture_title_look_straight)
+        capture_feedback_txt_explanation.text = getString(R.string.capture_error_look_straight)
 
         capture_feedback_txt_title.setCheckedWithLeftDrawable(false)
         toggleCaptureButtons(false)

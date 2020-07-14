@@ -43,6 +43,6 @@ class ModalityFlowFactoryImplTest {
     }
 
     private fun verifyModalityFlowStarted(modalityFlow: ModalityFlow) {
-        verify(exactly = 1) { modalityFlow.startFlow(any(), any()) }
+        verify(exactly = 1) { modalityFlow.startFlow(any()) }
     }
 }

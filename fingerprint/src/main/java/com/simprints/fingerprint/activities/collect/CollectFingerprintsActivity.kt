@@ -25,7 +25,6 @@ import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningWithImage
 import com.simprints.fingerprint.activities.collect.tryagainsplash.SplashScreenActivity
 import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
@@ -43,7 +42,6 @@ import org.koin.android.viewmodel.ext.android.viewModel
 
 class CollectFingerprintsActivity : FingerprintActivity() {
 
-    private val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
     private val masterFlowManager: MasterFlowManager by inject()
 
     private val vm: CollectFingerprintsViewModel by viewModel()
@@ -79,9 +77,9 @@ class CollectFingerprintsActivity : FingerprintActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.show()
         supportActionBar?.title = when (masterFlowManager.getCurrentAction()) {
-            Action.ENROL -> androidResourcesHelper.getString(R.string.register_title)
-            Action.IDENTIFY -> androidResourcesHelper.getString(R.string.identify_title)
-            Action.VERIFY -> androidResourcesHelper.getString(R.string.verify_title)
+            Action.ENROL -> getString(R.string.register_title)
+            Action.IDENTIFY -> getString(R.string.identify_title)
+            Action.VERIFY -> getString(R.string.verify_title)
         }
     }
 
@@ -97,10 +95,9 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun initMissingFingerButton() {
-        with(androidResourcesHelper) {
-            missingFingerText.text = getString(R.string.missing_finger)
-            missingFingerText.paintFlags = missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-        }
+
+        missingFingerText.text = getString(R.string.missing_finger)
+        missingFingerText.paintFlags = missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         missingFingerText.setOnClickListener {
             vm.logUiMessageForCrashReport("Missing finger text clicked")
             vm.handleMissingFingerButtonPressed()
@@ -132,7 +129,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
         }
 
         vm.vibrate.activityObserveEventWith { Vibrate.vibrate(this) }
-        vm.noFingersScannedToast.activityObserveEventWith { showToast(androidResourcesHelper.getString(R.string.no_fingers_scanned)) }
+        vm.noFingersScannedToast.activityObserveEventWith { showToast(getString(R.string.no_fingers_scanned)) }
         vm.launchAlert.activityObserveEventWith { launchAlert(this, it) }
         vm.launchReconnect.activityObserveEventWith { launchConnectScannerActivityForReconnect() }
         vm.finishWithFingerprints.activityObserveEventWith { setResultAndFinishSuccess(it) }
@@ -144,7 +141,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     private fun CollectFingerprintsState.updateScanButton() {
         with(currentFingerState()) {
-            scan_button.text = androidResourcesHelper.getString(buttonTextId(isAskingRescan))
+            scan_button.text = getString(buttonTextId(isAskingRescan))
             scan_button.setTextColor(resources.getColor(buttonTextColour(), null))
             scan_button.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
         }
@@ -178,10 +175,10 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private fun CollectFingerprintsState.listenForConfirmDialog() {
         confirmDialog = if (isShowingConfirmDialog && confirmDialog == null) {
             val mapOfScannedFingers = fingerStates.associate { fingerState ->
-                androidResourcesHelper.getString(fingerState.id.nameTextId()) to
+                getString(fingerState.id.nameTextId()) to
                     (fingerState is Collected && fingerState.scanResult.isGoodScan())
             }
-            ConfirmFingerprintsDialog(this@CollectFingerprintsActivity, androidResourcesHelper, mapOfScannedFingers,
+            ConfirmFingerprintsDialog(this@CollectFingerprintsActivity, mapOfScannedFingers,
                 callbackConfirm = {
                     vm.logUiMessageForCrashReport("Confirm fingerprints clicked")
                     vm.handleConfirmFingerprintsAndContinue()

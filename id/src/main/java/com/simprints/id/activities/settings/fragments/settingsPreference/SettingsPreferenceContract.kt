@@ -4,7 +4,6 @@ import android.preference.Preference
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 
-
 interface SettingsPreferenceContract {
 
     interface  View: BaseView<Presenter> {
@@ -36,6 +35,8 @@ interface SettingsPreferenceContract {
         fun openSyncInfoActivity()
 
         fun clearActivityStackAndRelaunchApp()
+
+        fun enablePreference(preference: Preference)
     }
 
     interface Presenter : BasePresenter

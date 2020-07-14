@@ -13,12 +13,6 @@ class AndroidBluetoothDevice(private val device: BluetoothDevice) : ComponentBlu
 
     override fun createBond(): Boolean = device.createBond()
 
-    override fun removeBond(): Boolean {
-        // This method can only be access via reflection
-        val method = BluetoothDevice::class.java.getMethod("removeBond")
-        return method.invoke(device) as Boolean
-    }
-
     override fun createRfcommSocketToServiceRecord(uuid: UUID): ComponentBluetoothSocket =
         AndroidBluetoothSocket(device.createRfcommSocketToServiceRecord(uuid))
 

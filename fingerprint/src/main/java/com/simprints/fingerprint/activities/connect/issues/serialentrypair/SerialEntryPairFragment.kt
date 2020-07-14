@@ -14,9 +14,9 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
@@ -34,19 +34,19 @@ class SerialEntryPairFragment : FingerprintFragment() {
 
     private val scannerPairingManager: ScannerPairingManager by inject()
     private val serialNumberConverter: SerialNumberConverter by inject()
-    private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
     private val timeHelper: FingerprintTimeHelper by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
+    private val preferencesManager: FingerprintPreferencesManager by inject()
 
     private val bluetoothPairStateChangeReceiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
-        onPairSuccess = ::checkIfNowBondedToSingleScannerThenProceed,
+        onPairSuccess = ::checkIfNowBondedToChosenScannerThenProceed,
         onPairFailed = ::handlePairingAttemptFailed
     )
 
     // Sometimes the BOND_BONDED state is never sent, so we need to check after a timeout whether the devices are paired
     private val handler = Handler()
     private val determineWhetherPairingWasSuccessful = Runnable {
-        checkIfNowBondedToSingleScannerThenProceed()
+        checkIfNowBondedToChosenScannerThenProceed()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -69,12 +69,10 @@ class SerialEntryPairFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        with(resourceHelper) {
-            serialEntryOkButton.text = getString(R.string.serial_entry_ok)
-            serialEntryPairInstructionsTextView.text = getString(R.string.enter_scanner_number)
-            serialEntryPairTitleTextView.text = getString(R.string.serial_entry_pair_title)
-            serialEntryPairInstructionsDetailTextView.text = getString(R.string.enter_scanner_number_detail)
-        }
+        serialEntryOkButton.text = getString(R.string.serial_entry_ok)
+        serialEntryPairInstructionsTextView.text = getString(R.string.enter_scanner_number)
+        serialEntryPairTitleTextView.text = getString(R.string.serial_entry_pair_title)
+        serialEntryPairInstructionsDetailTextView.text = getString(R.string.enter_scanner_number_detail)
     }
 
     private fun setupDoneButtonForEditText() {
@@ -116,12 +114,14 @@ class SerialEntryPairFragment : FingerprintFragment() {
             val serialNumber = scannerPairingManager.interpretEnteredTextAsSerialNumber(serialEntryEditText.text.toString())
             viewModel.startPairing(serialNumber)
         } catch (e: NumberFormatException) {
-            context?.showToast(resourceHelper.getString(R.string.serial_entry_pair_toast_invalid))
+            context?.showToast(getString(R.string.serial_entry_pair_toast_invalid))
         }
     }
 
-    private fun checkIfNowBondedToSingleScannerThenProceed() {
-        if (scannerPairingManager.isOnlyPairedToOneScanner()) {
+    private fun checkIfNowBondedToChosenScannerThenProceed() {
+        val macAddress = viewModel.awaitingToPairToMacAddress.value?.peekContent()
+        if (macAddress!= null && scannerPairingManager.isAddressPaired(macAddress)) {
+            preferencesManager.lastScannerUsed = serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
             retryConnectAndFinishFragment()
         } else {
             handlePairingAttemptFailed()
@@ -134,8 +134,8 @@ class SerialEntryPairFragment : FingerprintFragment() {
             serialEntryPairProgressBar.visibility = View.INVISIBLE
             serialEntryOkButton.visibility = View.VISIBLE
             serialEntryPairInstructionsDetailTextView.visibility = View.INVISIBLE
-            serialEntryPairInstructionsTextView.text = resourceHelper.getString(R.string.serial_entry_pair_failed,
-                arrayOf(serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())))
+            serialEntryPairInstructionsTextView.text = String.format(getString(R.string.serial_entry_pair_failed),
+                serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent()))
         }
     }
 

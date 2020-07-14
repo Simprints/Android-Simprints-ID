@@ -1,13 +1,14 @@
 package com.simprints.id.orchestrator.steps.core
 
 import android.content.Intent
-import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
+import com.simprints.id.domain.modality.Modality
+import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 
 interface CoreStepProcessor {
 
-    fun buildStepSetup(permissions: List<SetupPermission>): Step
+    fun buildStepSetup(modalities: List<Modality>, permissions: List<SetupPermission>): Step
 
     fun buildStepConsent(consentType: ConsentType): Step
 
