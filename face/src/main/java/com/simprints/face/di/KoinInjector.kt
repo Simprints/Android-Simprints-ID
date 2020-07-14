@@ -151,7 +151,7 @@ object KoinInjector {
         }
         viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM, get()) }
 
-        viewModel { ConfigurationViewModel() }
+        viewModel { ConfigurationViewModel(get()) }
     }
 
     private fun Module.defineBuildersForRemote() {

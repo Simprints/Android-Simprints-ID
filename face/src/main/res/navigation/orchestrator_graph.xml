@@ -34,10 +34,10 @@
         android:name="com.simprints.face.configuration.ConfigurationFragment"
         android:label="ConfigurationFragment" >
         <argument
-            android:name="deviceId"
+            android:name="projectId"
             app:argType="string" />
         <argument
-            android:name="projectId"
+            android:name="deviceId"
             app:argType="string" />
     </fragment>
 </navigation>
