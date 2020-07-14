@@ -132,10 +132,10 @@
         </activity>
         <activity
             android:name=".activities.settings.syncinformation.SyncInformationActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
         <activity android:name=".activities.setup.SetupActivity"
-            android:theme="@style/AppTheme.Launcher"
             android:screenOrientation="portrait" />
 
         <meta-data

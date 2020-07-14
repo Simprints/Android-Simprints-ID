@@ -14,7 +14,6 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -28,7 +27,6 @@ class BluetoothOffFragment : FingerprintFragment() {
 
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
     private val bluetoothAdapter: ComponentBluetoothAdapter by inject()
-    private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
     private val timeHelper: FingerprintTimeHelper by inject()
 
@@ -61,10 +59,8 @@ class BluetoothOffFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        with(resourceHelper) {
-            turnOnBluetoothButton.text = getString(R.string.turn_on_bluetooth)
-            bluetoothOffTitleTextView.text = getString(R.string.bluetooth_off_title)
-        }
+        turnOnBluetoothButton.text = getString(R.string.turn_on_bluetooth)
+        bluetoothOffTitleTextView.text = getString(R.string.bluetooth_off_title)
     }
 
     override fun onStart() {
@@ -88,14 +84,14 @@ class BluetoothOffFragment : FingerprintFragment() {
     }
 
     private fun handleCouldNotEnable() {
-        context?.showToast(resourceHelper.getString(R.string.bluetooth_off_toast_error))
+        context?.showToast(getString(R.string.bluetooth_off_toast_error))
     }
 
     private fun handleBluetoothEnabled() {
         turnOnBluetoothProgressBar.visibility = View.INVISIBLE
         turnOnBluetoothButton.visibility = View.VISIBLE
         turnOnBluetoothButton.isEnabled = false
-        turnOnBluetoothButton.text = resourceHelper.getString(R.string.bluetooth_on)
+        turnOnBluetoothButton.text = getString(R.string.bluetooth_on)
         turnOnBluetoothButton.setBackgroundColor(resources.getColor(R.color.simprints_green, null))
         Handler().postDelayed({ retryConnectAndFinishFragment() }, FINISHED_TIME_DELAY_MS)
     }

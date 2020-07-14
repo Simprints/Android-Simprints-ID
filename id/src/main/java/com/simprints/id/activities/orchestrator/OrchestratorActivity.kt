@@ -2,9 +2,9 @@ package com.simprints.id.activities.orchestrator
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -16,16 +16,14 @@ import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.Companion.BUNDLE_KEY as APP_REQUEST_BUNDLE_KEY
 
-class OrchestratorActivity : AppCompatActivity() {
+class OrchestratorActivity : BaseSplitActivity() {
 
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var orchestratorViewModelFactory: OrchestratorViewModelFactory
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
