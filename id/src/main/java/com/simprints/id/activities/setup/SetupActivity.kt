@@ -91,7 +91,7 @@ class SetupActivity: BaseSplitActivity() {
                 is RequiresUserConfirmationToDownload -> requestUserConfirmationDoDownloadModalities(it.state)
                 is Downloading -> {
                     updateUiForDownloadProgress(it.bytesDownloaded, it.totalBytesToDownload)
-                    cancelSlowDownloadTimerAndScheduleNewForSlowDownloadUi()
+                    rescheduleTimerForSlowDownloadUI()
                 }
                 ModalitiesInstalling -> updateUiForModalitiesInstalling()
                 ModalitiesInstalled -> updateUiForModalitiesInstalledAndAskPermissions()
@@ -187,7 +187,7 @@ class SetupActivity: BaseSplitActivity() {
         setupLogo.isVisible = false
     }
 
-    private fun cancelSlowDownloadTimerAndScheduleNewForSlowDownloadUi() {
+    private fun rescheduleTimerForSlowDownloadUI() {
         slowDownloadTimer?.cancel()
         slowDownloadTimer = Timer().schedule(SLOW_DOWNLOAD_DELAY_THRESHOLD) {
             updateUiForDownloadTakingLonger()
