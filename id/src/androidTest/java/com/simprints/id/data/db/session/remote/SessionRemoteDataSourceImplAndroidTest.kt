@@ -238,7 +238,7 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     private fun SessionEvents.addInvalidIntentEvent() {
-        addEvent(InvalidIntentEvent(DEFAULT_TIME, "some_action", emptyMap()))
+        addEvent(InvalidIntentEvent(DEFAULT_TIME, "some_action", mapOf("wrong_field" to "wrong_value")))
     }
 
     private fun SessionEvents.addOneToManyMatchEvent() {
