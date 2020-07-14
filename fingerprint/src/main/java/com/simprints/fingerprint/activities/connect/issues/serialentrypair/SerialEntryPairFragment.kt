@@ -17,6 +17,7 @@ import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
@@ -37,16 +38,17 @@ class SerialEntryPairFragment : FingerprintFragment() {
     private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
     private val timeHelper: FingerprintTimeHelper by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
+    private val preferencesManager: FingerprintPreferencesManager by inject()
 
     private val bluetoothPairStateChangeReceiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
-        onPairSuccess = ::checkIfNowBondedToSingleScannerThenProceed,
+        onPairSuccess = ::checkIfNowBondedToChosenScannerThenProceed,
         onPairFailed = ::handlePairingAttemptFailed
     )
 
     // Sometimes the BOND_BONDED state is never sent, so we need to check after a timeout whether the devices are paired
     private val handler = Handler()
     private val determineWhetherPairingWasSuccessful = Runnable {
-        checkIfNowBondedToSingleScannerThenProceed()
+        checkIfNowBondedToChosenScannerThenProceed()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -120,8 +122,10 @@ class SerialEntryPairFragment : FingerprintFragment() {
         }
     }
 
-    private fun checkIfNowBondedToSingleScannerThenProceed() {
-        if (scannerPairingManager.isOnlyPairedToOneScanner()) {
+    private fun checkIfNowBondedToChosenScannerThenProceed() {
+        val macAddress = viewModel.awaitingToPairToMacAddress.value?.peekContent()
+        if (macAddress!= null && scannerPairingManager.isAddressPaired(macAddress)) {
+            preferencesManager.lastScannerUsed = serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
             retryConnectAndFinishFragment()
         } else {
             handlePairingAttemptFailed()

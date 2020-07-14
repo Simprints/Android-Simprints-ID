@@ -3,11 +3,18 @@ package com.simprints.fingerprint.scanner.pairing
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
+import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
+import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
+import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
-import java.util.regex.Pattern
 
-class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdapter) {
+class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdapter,
+                            private val preferencesManager: FingerprintPreferencesManager,
+                            private val scannerGenerationDeterminer: ScannerGenerationDeterminer,
+                            private val serialNumberConverter: SerialNumberConverter) {
 
     /**
      * Turns user entered text into a valid serial number, e.g. "003456" -> "SP003456"
@@ -21,33 +28,58 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
         return SERIAL_PREFIX + number.toString(10).padStart(6, '0')
     }
 
-    /**
-     * Un-pairs all other devices that follow Simprints' MAC address format, and begins pairing to
-     * the given address
-     */
-    fun pairOnlyToDevice(address: String) {
+    fun startPairingToDevice(address: String) {
         val device = bluetoothAdapter.getRemoteDevice(address)
-
-        bluetoothAdapter.getBondedDevices().forEach {
-            if (isScannerAddress(it.address) && it.address != device.address) {
-                it.removeBond()
-            }
-        }
-
         device.createBond()
     }
 
-    fun getPairedScannerAddresses(): List<String> =
+    /**
+     * @throws ScannerNotPairedException
+     * @throws MultiplePossibleScannersPairedException
+     */
+    fun getPairedScannerAddressToUse(): String {
+        val validPairedScanners = getPairedScannerAddresses().filter { isScannerGenerationValidForProject(it) }
+        return when (validPairedScanners.size) {
+            0 -> throw ScannerNotPairedException()
+            1 -> validPairedScanners.first()
+            else -> deduceScannerFromLastScannerUsed(validPairedScanners)
+        }
+    }
+
+    private fun isScannerGenerationValidForProject(address: String): Boolean =
+        preferencesManager.scannerGenerations.contains(
+            scannerGenerationDeterminer.determineScannerGenerationFromSerialNumber(
+                serialNumberConverter.convertMacAddressToSerialNumber(address)
+            ))
+
+    private fun deduceScannerFromLastScannerUsed(pairedScanners: List<String>): String {
+        val lastSerialNumberUsed = preferencesManager.lastScannerUsed
+        if (isScannerSerialNumber(lastSerialNumberUsed)) {
+            val lastAddressUsed = serialNumberConverter.convertSerialNumberToMacAddress(lastSerialNumberUsed)
+            if (pairedScanners.contains(lastAddressUsed)) {
+                return lastAddressUsed
+            } else {
+                throw MultiplePossibleScannersPairedException()
+            }
+        } else {
+            throw MultiplePossibleScannersPairedException()
+        }
+    }
+
+    private fun getPairedScannerAddresses(): List<String> =
         bluetoothAdapter
             .getBondedDevices()
             .map { it.address }
             .filter { isScannerAddress(it) }
 
-    fun isOnlyPairedToOneScanner(): Boolean =
-        getPairedScannerAddresses().count() == 1
+    fun isAddressPaired(address: String): Boolean =
+        getPairedScannerAddresses().contains(address)
 
     fun isScannerAddress(macAddress: String): Boolean =
-        SCANNER_ADDRESS_REGEX.matcher(macAddress).matches()
+        SCANNER_ADDRESS_REGEX.matches(macAddress)
+
+    private fun isScannerSerialNumber(serialNumber: String): Boolean =
+        SERIAL_NUMBER_REGEX.matches(serialNumber)
 
     fun bluetoothPairStateChangeReceiver(onPairSuccess: () -> Unit, onPairFailed: () -> Unit): BroadcastReceiver =
         object : BroadcastReceiver() {
@@ -70,8 +102,9 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
 
     companion object {
         private const val MAC_ADDRESS_PREFIX = "F0:AC:D7:C"
-        private val SCANNER_ADDRESS_REGEX = Pattern.compile("$MAC_ADDRESS_PREFIX\\p{XDigit}:\\p{XDigit}{2}:\\p{XDigit}{2}")
+        private val SCANNER_ADDRESS_REGEX = Regex("""$MAC_ADDRESS_PREFIX[0-9A-F]:[0-9A-F]{2}:[0-9A-F]{2}""")
         private const val SERIAL_PREFIX = "SP"
+        private val SERIAL_NUMBER_REGEX = Regex("""^$SERIAL_PREFIX[0-9]{6}$""")
 
         private val IS_DIGITS_ONLY_REGEX = Regex("""^[0-9]+$""")
     }
