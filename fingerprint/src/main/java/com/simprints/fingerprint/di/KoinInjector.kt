@@ -117,7 +117,7 @@ object KoinInjector {
 
 
     private fun Module.defineBuildersForFingerprintManagers() {
-        factory<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
+        single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
         factory<FingerprintAnalyticsManager> { FingerprintAnalyticsManagerImpl(get()) }
         factory<FingerprintSessionEventsManager> { FingerprintSessionEventsManagerImpl(get()) }
         factory<FingerprintCrashReportManager> { FingerprintCrashReportManagerImpl(get()) }
@@ -142,7 +142,7 @@ object KoinInjector {
 
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
-        single { ScannerPairingManager(get()) }
+        single { ScannerPairingManager(get(), get(), get(), get()) }
         single { ScannerInitialSetupHelper(get(), get(), get()) }
         single { ConnectionHelper(get()) }
         single { CypressOtaHelper(get(), get()) }
@@ -183,7 +183,7 @@ object KoinInjector {
         }
 
         viewModel { OrchestratorViewModel(get(), get(), get()) }
-        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel { CollectFingerprintsViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
