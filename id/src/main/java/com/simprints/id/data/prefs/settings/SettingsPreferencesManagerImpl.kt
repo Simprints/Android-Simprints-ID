@@ -221,7 +221,7 @@ open class SettingsPreferencesManagerImpl(
     /**
      * Flag for v1 of Enrolment+
      */
-    override var enrolmentPlus: Boolean
+    override var isEnrolmentPlus: Boolean
         by RemoteConfigPrimitivePreference(
             prefs,
             remoteConfigWrapper,

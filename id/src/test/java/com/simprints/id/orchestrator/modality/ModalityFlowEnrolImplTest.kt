@@ -3,6 +3,7 @@ package com.simprints.id.orchestrator.modality
 import android.app.Activity
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
@@ -39,6 +40,7 @@ class ModalityFlowEnrolImplTest {
         const val NUMBER_STEPS_FACE_WITHOUT_CONSENT = 3
         const val NUMBER_STEPS_FINGER_WITHOUT_CONSENT = 2 // TODO : Change back to 3 once fingerprint implements configuration request
         const val NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT = 4 // TODO : Change back to 5 once fingerprint implements configuration request
+        const val PROJECT_ID = "projectId"
     }
 
     private lateinit var modalityFlowEnrol: ModalityFlowEnrolImpl
@@ -181,7 +183,7 @@ class ModalityFlowEnrolImplTest {
     @Test
     fun enrolmentPlusForFinger_shouldAddMatchStepAfterCapture() = runBlockingTest {
         val fingerprintCaptureResponse = mockk<FingerprintCaptureResponse>()
-        buildModalityFlowEnrol(consentRequired = false, isEnrolmentPlus = true)
+        buildModalityFlowEnrol(consentRequired = false, modalities = listOf(FINGER), isEnrolmentPlus = true)
         val appRequest = buildAppEnrolRequest()
         every { fingerprintStepProcessor.processResult(any(), any(), any()) } returns fingerprintCaptureResponse
 
@@ -193,7 +195,7 @@ class ModalityFlowEnrolImplTest {
     @Test
     fun enrolmentPlusForFace_shouldAddMatchStepAfterCapture() = runBlockingTest {
         val faceCaptureResponse = mockk<FaceCaptureResponse>()
-        buildModalityFlowEnrol(consentRequired = false, isEnrolmentPlus = true)
+        buildModalityFlowEnrol(consentRequired = false, modalities = listOf(FACE), isEnrolmentPlus = true)
         val appRequest = buildAppEnrolRequest()
         every { faceStepProcessor.processResult(any(), any(), any()) } returns faceCaptureResponse
 
@@ -203,10 +205,14 @@ class ModalityFlowEnrolImplTest {
     }
 
     private fun buildAppEnrolRequest() =
-        AppEnrolRequest("projectId", "userId", "moduleId", "metadata")
+        AppEnrolRequest(PROJECT_ID, "userId", "moduleId", "metadata")
 
-    private fun buildModalityFlowEnrol(consentRequired: Boolean, isEnrolmentPlus: Boolean = false) {
+    private fun buildModalityFlowEnrol(consentRequired: Boolean,
+                                       modalities: List<Modality>,
+                                       isEnrolmentPlus: Boolean = false) {
         modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired = true, isEnrolmentPlus = isEnrolmentPlus, matchGroup = GROUP.GLOBAL)
+            coreStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired = true,
+            modalities = modalities, projectId = PROJECT_ID, deviceId = "deviceId",
+            isEnrolmentPlus = isEnrolmentPlus, matchGroup = GROUP.GLOBAL)
     }
 }
