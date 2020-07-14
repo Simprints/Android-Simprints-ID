@@ -1,21 +1,30 @@
 package com.simprints.id.orchestrator.modality
 
+import android.app.Activity
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.enrolAppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CONSENT_ACTIVITY_NAME
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.SETUP_ACTIVITY_NAME
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.tools.TimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl.Companion.ACTIVITY_CLASS_NAME as FACE_ACTIVITY_NAME
@@ -31,6 +40,7 @@ class ModalityFlowEnrolImplTest {
         const val NUMBER_STEPS_FACE_WITHOUT_CONSENT = 3
         const val NUMBER_STEPS_FINGER_WITHOUT_CONSENT = 2 // TODO : Change back to 3 once fingerprint implements configuration request
         const val NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT = 4 // TODO : Change back to 5 once fingerprint implements configuration request
+        const val PROJECT_ID = "projectId"
     }
 
     private lateinit var modalityFlowEnrol: ModalityFlowEnrolImpl
@@ -170,9 +180,39 @@ class ModalityFlowEnrolImplTest {
         }
     }
 
-    private fun buildModalityFlowEnrol(consentRequired: Boolean, modalities: List<Modality>) {
+    @Test
+    fun enrolmentPlusForFinger_shouldAddMatchStepAfterCapture() = runBlockingTest {
+        val fingerprintCaptureResponse = mockk<FingerprintCaptureResponse>()
+        buildModalityFlowEnrol(consentRequired = false, modalities = listOf(FINGER), isEnrolmentPlus = true)
+        val appRequest = buildAppEnrolRequest()
+        every { fingerprintStepProcessor.processResult(any(), any(), any()) } returns fingerprintCaptureResponse
+
+        modalityFlowEnrol.handleIntentResult(appRequest, FingerprintRequestCode.CAPTURE.value, Activity.RESULT_OK, mockk())
+
+        verify(exactly = 1) { fingerprintStepProcessor.buildStepToMatch(any(), any()) }
+    }
+
+    @Test
+    fun enrolmentPlusForFace_shouldAddMatchStepAfterCapture() = runBlockingTest {
+        val faceCaptureResponse = mockk<FaceCaptureResponse>()
+        buildModalityFlowEnrol(consentRequired = false, modalities = listOf(FACE), isEnrolmentPlus = true)
+        val appRequest = buildAppEnrolRequest()
+        every { faceStepProcessor.processResult(any(), any(), any()) } returns faceCaptureResponse
+
+        modalityFlowEnrol.handleIntentResult(appRequest, FaceRequestCode.CAPTURE.value, Activity.RESULT_OK, mockk())
+
+        verify(exactly = 1) { faceStepProcessor.buildStepMatch(any(), any()) }
+    }
+
+    private fun buildAppEnrolRequest() =
+        AppEnrolRequest(PROJECT_ID, "userId", "moduleId", "metadata")
+
+    private fun buildModalityFlowEnrol(consentRequired: Boolean,
+                                       modalities: List<Modality>,
+                                       isEnrolmentPlus: Boolean = false) {
         modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, timeHelper, sessionRepository, consentRequired, true,
-            modalities, "projectId", "deviceId")
+            coreStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired = true,
+            modalities = modalities, projectId = PROJECT_ID, deviceId = "deviceId",
+            isEnrolmentPlus = isEnrolmentPlus, matchGroup = GROUP.GLOBAL)
     }
 }
