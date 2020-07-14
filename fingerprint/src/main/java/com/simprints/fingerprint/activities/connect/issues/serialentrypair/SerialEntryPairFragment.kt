@@ -14,7 +14,6 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
@@ -35,7 +34,6 @@ class SerialEntryPairFragment : FingerprintFragment() {
 
     private val scannerPairingManager: ScannerPairingManager by inject()
     private val serialNumberConverter: SerialNumberConverter by inject()
-    private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
     private val timeHelper: FingerprintTimeHelper by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
     private val preferencesManager: FingerprintPreferencesManager by inject()
@@ -71,12 +69,10 @@ class SerialEntryPairFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        with(resourceHelper) {
-            serialEntryOkButton.text = getString(R.string.serial_entry_ok)
-            serialEntryPairInstructionsTextView.text = getString(R.string.enter_scanner_number)
-            serialEntryPairTitleTextView.text = getString(R.string.serial_entry_pair_title)
-            serialEntryPairInstructionsDetailTextView.text = getString(R.string.enter_scanner_number_detail)
-        }
+        serialEntryOkButton.text = getString(R.string.serial_entry_ok)
+        serialEntryPairInstructionsTextView.text = getString(R.string.enter_scanner_number)
+        serialEntryPairTitleTextView.text = getString(R.string.serial_entry_pair_title)
+        serialEntryPairInstructionsDetailTextView.text = getString(R.string.enter_scanner_number_detail)
     }
 
     private fun setupDoneButtonForEditText() {
@@ -118,7 +114,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
             val serialNumber = scannerPairingManager.interpretEnteredTextAsSerialNumber(serialEntryEditText.text.toString())
             viewModel.startPairing(serialNumber)
         } catch (e: NumberFormatException) {
-            context?.showToast(resourceHelper.getString(R.string.serial_entry_pair_toast_invalid))
+            context?.showToast(getString(R.string.serial_entry_pair_toast_invalid))
         }
     }
 
@@ -138,8 +134,8 @@ class SerialEntryPairFragment : FingerprintFragment() {
             serialEntryPairProgressBar.visibility = View.INVISIBLE
             serialEntryOkButton.visibility = View.VISIBLE
             serialEntryPairInstructionsDetailTextView.visibility = View.INVISIBLE
-            serialEntryPairInstructionsTextView.text = resourceHelper.getString(R.string.serial_entry_pair_failed,
-                arrayOf(serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())))
+            serialEntryPairInstructionsTextView.text = String.format(getString(R.string.serial_entry_pair_failed),
+                serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent()))
         }
     }
 
