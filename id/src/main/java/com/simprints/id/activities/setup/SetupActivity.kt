@@ -193,7 +193,7 @@ class SetupActivity: BaseSplitActivity() {
     private fun rescheduleTimerForSlowDownloadUI() {
         slowDownloadTimer?.cancel()
         slowDownloadTimer = Timer().schedule(SLOW_DOWNLOAD_DELAY_THRESHOLD) {
-            updateUiForDownloadTakingLonger()
+            runOnUiThread { updateUiForDownloadTakingLonger() }
         }
     }
 
