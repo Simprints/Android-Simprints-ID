@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.face.R
 import com.simprints.face.models.RankOneInitializer
@@ -25,9 +26,11 @@ class ConfigurationFragment : Fragment(R.layout.configuration_fragment) {
 
     private fun observeViewModel() {
         viewModel.licenseRetrieved.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-            mainVm.configurationFinished(
-                RankOneInitializer.tryInitWithLicense(requireActivity(), it.orEmpty())
-            )
+            mainVm.configurationFinished(RankOneInitializer.tryInitWithLicense(requireActivity(), it))
+        })
+
+        viewModel.configurationFailed.observe(viewLifecycleOwner, LiveDataEventObserver {
+            mainVm.configurationFinished(false)
         })
     }
 }
