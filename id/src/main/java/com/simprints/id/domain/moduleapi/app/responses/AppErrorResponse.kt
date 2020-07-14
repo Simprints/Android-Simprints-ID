@@ -20,7 +20,9 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         SETUP_MODALITY_DOWNLOAD_CANCELLED,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
         FACE_LICENSE_MISSING,
-        FACE_LICENSE_INVALID;
+        FACE_LICENSE_INVALID,
+        FINGERPRINT_CONFIGURATION_ERROR,
+        FACE_CONFIGURATION_ERROR;
 
         companion object {
             fun fromDomainAlertTypeToAppErrorType(alertType: AlertType) =

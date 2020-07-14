@@ -17,7 +17,6 @@ import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.dashboard.cards.daily_activity.displayer.DashboardDailyActivityCardDisplayer
 import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncConnecting
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
@@ -145,7 +144,7 @@ class DashboardActivity : BaseSplitActivity() {
     }
 
     private fun observeForSyncCardState() {
-        viewModel.syncCardStateLiveData.observe(this, Observer<DashboardSyncCardState> {
+        viewModel.syncCardStateLiveData.observe(this, Observer {
             syncCardDisplayer.displayState(it)
         })
 
@@ -186,6 +185,7 @@ class DashboardActivity : BaseSplitActivity() {
     override fun onResume() {
         super.onResume()
         loadDailyActivity()
+
         lifecycleScope.launch {
             stopTickerToCheckIfSyncIsRequired()
             syncAgainTicker = ticker(
@@ -197,10 +197,10 @@ class DashboardActivity : BaseSplitActivity() {
                     viewModel.syncIfRequired()
                 }
             }
-        }
 
-        lifecycleScope.launch {
-            syncCardDisplayer.startTickerToUpdateLastSyncText()
+            lifecycleScope.launch {
+                syncCardDisplayer.startTickerToUpdateLastSyncText()
+            }
         }
     }
 
@@ -224,12 +224,13 @@ class DashboardActivity : BaseSplitActivity() {
         }
 
         if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
-            startCheckLoginActivityAndFinish()
+            startRequestLoginActivityAndFinish()
         }
     }
 
-    private fun startCheckLoginActivityAndFinish() {
+    private fun startRequestLoginActivityAndFinish() {
         startActivity(Intent(this, RequestLoginActivity::class.java))
         finish()
     }
+
 }

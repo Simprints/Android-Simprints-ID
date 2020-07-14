@@ -38,6 +38,8 @@ object DomainToModuleApiAppResponse {
             FACE_LICENSE_INVALID -> IAppErrorReason.FACE_LICENSE_INVALID
             SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD -> IAppErrorReason.SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD
             SETUP_MODALITY_DOWNLOAD_CANCELLED -> IAppErrorReason.SETUP_MODALITY_DOWNLOAD_CANCELLED
+            FINGERPRINT_CONFIGURATION_ERROR -> IAppErrorReason.FINGERPRINT_CONFIGURATION_ERROR
+            FACE_CONFIGURATION_ERROR -> IAppErrorReason.FACE_CONFIGURATION_ERROR
         }
 
     private fun fromDomainToModuleApiAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)

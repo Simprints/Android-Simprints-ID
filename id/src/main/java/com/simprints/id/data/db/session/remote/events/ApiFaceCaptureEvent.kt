@@ -5,7 +5,9 @@ import com.simprints.id.data.db.session.domain.models.events.FaceCaptureEvent
 
 @Keep
 class ApiFaceCaptureEvent(
+    val id: String,
     val relativeStartTime: Long,
+    val relativeEndTime: Long,
     val attemptNb: Int,
     val qualityThreshold: Float,
     val result: ApiResult,
@@ -38,7 +40,9 @@ class ApiFaceCaptureEvent(
     }
 
     constructor(faceCaptureEvent: FaceCaptureEvent) : this(
+        faceCaptureEvent.id,
         faceCaptureEvent.relativeStartTime ?: 0,
+        faceCaptureEvent.relativeEndTime ?: 0,
         faceCaptureEvent.attemptNb,
         faceCaptureEvent.qualityThreshold,
         faceCaptureEvent.result.fromDomainToApi(),

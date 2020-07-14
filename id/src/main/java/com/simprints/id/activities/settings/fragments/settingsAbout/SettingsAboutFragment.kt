@@ -116,6 +116,10 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
         }
     }
 
+    override fun enablePreference(preference: Preference) {
+        preference.isEnabled = true
+    }
+
     internal fun buildConfirmationDialogForLogout(): AlertDialog =
         AlertDialog.Builder(activity)
             .setTitle(getString(R.string.confirmation_logout_title))

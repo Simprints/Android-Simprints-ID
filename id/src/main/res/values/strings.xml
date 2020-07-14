@@ -291,6 +291,7 @@
     <string name="dashboard_sync_card_try_again_button">Try again</string>
     <string name="enrol_last_biometrics_success">Successful enrolment</string>
     <!-- endregion -->
+    <string name="toast_login_failed">Login failed. Please contact your supervisor.</string>
 
     <!--SetupActivity-->
     <string name="modality_starting_download">Starting download…</string>

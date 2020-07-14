@@ -4,18 +4,18 @@ import com.simprints.face.error.ErrorType
 import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType
 
 enum class FaceAlertType {
-    FACE_INVALID_LICENSE,
-    FACE_MISSING_LICENSE;
+    FACE_LICENSE_INVALID,
+    FACE_LICENSE_MISSING;
 
     fun fromDomainToCore(): AlertScreenEventType = when (this) {
-        FACE_INVALID_LICENSE -> AlertScreenEventType.FACE_INVALID_LICENSE
-        FACE_MISSING_LICENSE -> AlertScreenEventType.FACE_MISSING_LICENSE
+        FACE_LICENSE_INVALID -> AlertScreenEventType.FACE_LICENSE_INVALID
+        FACE_LICENSE_MISSING -> AlertScreenEventType.FACE_LICENSE_MISSING
     }
 
     companion object {
         fun fromErrorType(errorType: ErrorType): FaceAlertType = when (errorType) {
-            ErrorType.LicenseMissing -> FACE_MISSING_LICENSE
-            ErrorType.LicenseInvalid -> FACE_INVALID_LICENSE
+            ErrorType.LICENSE_MISSING -> FACE_LICENSE_MISSING
+            ErrorType.LICENSE_INVALID -> FACE_LICENSE_INVALID
         }
     }
 }

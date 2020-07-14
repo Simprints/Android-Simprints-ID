@@ -183,10 +183,14 @@ class LoginActivity : BaseSplitActivity() {
                 projectId, projectIdFromIntent
             )
 
+        val isSecurityStatusRunning = loginActivityHelper.isSecurityStatusRunning()
+
         if (!areMandatoryCredentialsPresent)
             handleMissingCredentials()
         else if (!areSuppliedProjectIdAndProjectIdFromIntentEqual)
             handleProjectIdMismatch()
+        else if (!isSecurityStatusRunning)
+            handleCompromisedDeviceOrProjectEnded()
         else
             viewModel.signIn(userId, projectId, projectSecret, deviceId)
     }
@@ -199,6 +203,11 @@ class LoginActivity : BaseSplitActivity() {
     private fun handleProjectIdMismatch() {
         progressDialog.dismiss()
         showToast(R.string.login_project_id_intent_mismatch)
+    }
+
+    private fun handleCompromisedDeviceOrProjectEnded() {
+        progressDialog.dismiss()
+        showToast(androidResourcesHelper, R.string.toast_login_failed)
     }
 
     private fun handleSignInSuccess() {

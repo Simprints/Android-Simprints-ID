@@ -64,6 +64,15 @@ internal class ImageRepositoryImplTest {
         verify(exactly = 5) { localDataSource.decryptImage(any()) }
     }
 
+    @Test
+    fun shouldDeleteStoredImages() {
+        configureLocalImageFiles(numberOfValidFiles = 5, includeInvalidFile = false)
+
+        repository.deleteStoredImages()
+
+        verify(exactly = 5) { localDataSource.deleteImage(any()) }
+    }
+
     private fun initialiseMocks() {
         val validImage = mockValidImage()
         val invalidImage = mockInvalidImage()

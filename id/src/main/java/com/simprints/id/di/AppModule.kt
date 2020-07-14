@@ -23,7 +23,6 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.SessionRepositoryImpl
@@ -55,6 +54,7 @@ import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.BaseUrlProviderImpl
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
@@ -63,16 +63,11 @@ import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.cache.StepEncoderImpl
-import com.simprints.id.secure.BaseUrlProviderImpl
-import com.simprints.id.secure.SignerManager
-import com.simprints.id.secure.SignerManagerImpl
-import com.simprints.id.services.GuidSelectionManager
-import com.simprints.id.services.GuidSelectionManagerImpl
-import com.simprints.id.services.scheduledSync.SyncManager
+import com.simprints.id.services.guidselection.GuidSelectionManager
+import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.tools.*
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
@@ -107,24 +102,7 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSignerManager(
-        projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager,
-        subjectsSyncManager: SubjectsSyncManager,
-        syncManager: SyncManager
-    ): SignerManager = SignerManagerImpl(
-        projectRepository,
-        remoteDbManager,
-        loginInfoManager,
-        preferencesManager,
-        subjectsSyncManager,
-        syncManager
-    )
-
-    @Provides
-    @Singleton
+    @Suppress("MissingPermission")
     fun provideFirebaseAnalytics(app: Application): FirebaseAnalytics =
         FirebaseAnalytics.getInstance(app).apply {
             setMinimumSessionDuration(0)
@@ -202,7 +180,12 @@ open class AppModule {
         remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider,
         gson: Gson
-    ): SimApiClientFactory = SimApiClientFactoryImpl(baseUrlProvider, ctx.deviceId, remoteDbManager, gson)
+    ): SimApiClientFactory = SimApiClientFactoryImpl(
+        baseUrlProvider,
+        ctx.deviceId,
+        remoteDbManager,
+        gson
+    )
 
     @Provides
     @Singleton
@@ -330,11 +313,10 @@ open class AppModule {
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository
-    ) =
-        SyncInformationViewModelFactory(
-            personRepository, subjectLocalDataSource, preferencesManager,
-            loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository
-        )
+    ) = SyncInformationViewModelFactory(
+        personRepository, subjectLocalDataSource, preferencesManager,
+        loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository
+    )
 
     @Provides
     open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =
