@@ -20,8 +20,8 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
                          private val serialNumberConverter: SerialNumberConverter) : ScannerManager {
 
     override var scanner: ScannerWrapper? = null
-    override var lastPairedScannerId: String? = null
-    override var lastPairedMacAddress: String? = null
+    override var currentScannerId: String? = null
+    override var currentMacAddress: String? = null
 
     override fun <T> onScanner(method: ScannerWrapper.() -> T): T =
         delegateToScannerOrThrow(method)
@@ -39,17 +39,16 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
         scanner?.method() ?: throw NullScannerException()
 
     override fun initScanner(): Completable = Completable.create {
-        val pairedScanners = pairingManager.getPairedScannerAddresses()
-        when {
-            pairedScanners.isEmpty() -> it.onError(ScannerNotPairedException())
-            pairedScanners.size > 1 -> it.onError(MultipleScannersPairedException())
-            else -> {
-                val macAddress = pairedScanners[0]
-                scanner = scannerFactory.create(macAddress)
-                lastPairedMacAddress = macAddress
-                lastPairedScannerId = serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
-                it.onComplete()
-            }
+        try {
+            val macAddress = pairingManager.getPairedScannerAddressToUse()
+            scanner = scannerFactory.create(macAddress)
+            currentMacAddress = macAddress
+            currentScannerId = serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
+            it.onComplete()
+        } catch (e: ScannerNotPairedException) {
+            it.onError(e)
+        } catch (e: MultiplePossibleScannersPairedException) {
+            it.onError(e)
         }
     }
 
@@ -67,7 +66,7 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
         when (e) {
             is BluetoothNotEnabledException -> FingerprintAlert.BLUETOOTH_NOT_ENABLED
             is BluetoothNotSupportedException -> FingerprintAlert.BLUETOOTH_NOT_SUPPORTED
-            is MultipleScannersPairedException -> FingerprintAlert.MULTIPLE_PAIRED_SCANNERS
+            is MultiplePossibleScannersPairedException -> FingerprintAlert.MULTIPLE_PAIRED_SCANNERS
             is ScannerLowBatteryException -> FingerprintAlert.LOW_BATTERY
             is ScannerNotPairedException -> FingerprintAlert.NOT_PAIRED
             is ScannerDisconnectedException -> FingerprintAlert.DISCONNECTED

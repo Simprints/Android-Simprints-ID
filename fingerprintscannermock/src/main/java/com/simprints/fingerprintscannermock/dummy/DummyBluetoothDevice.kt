@@ -15,8 +15,6 @@ class DummyBluetoothDevice(
 
     override fun createBond(): Boolean = true
 
-    override fun removeBond(): Boolean = true
-
     override fun createRfcommSocketToServiceRecord(uuid: UUID): ComponentBluetoothSocket =
         throw UnsupportedOperationException("DummyBluetoothDevice::createRfcommSocketToServiceRecord")
 
