@@ -1,24 +1,19 @@
 package com.simprints.id.activities.setup
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.play.core.ktx.requestSessionStates
 import com.google.android.play.core.splitinstall.SplitInstallManager
-import com.google.android.play.core.splitinstall.SplitInstallSessionState
-import com.google.android.play.core.splitinstall.model.SplitInstallErrorCode.NO_ERROR
-import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.DOWNLOADING
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.testtools.common.livedata.testObserver
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

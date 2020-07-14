@@ -72,8 +72,8 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER_VERIFY)
-            verifyStepWasAdded(get(0), FACE_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
             verifyStepWasAdded(get(2), FETCH_GUID_ACTIVITY_NAME)
             verifyStepWasAdded(get(3), CONSENT_ACTIVITY_NAME)
             verifyStepWasAdded(get(4), FACE_ACTIVITY_NAME)
@@ -102,9 +102,9 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY)
-            verifyStepWasAdded(get(0), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
 //            verifyStepWasAdded(get(1), FINGERPRINT_ACTIVITY_NAME) // TODO : Uncomment once fingerprint implements configuration request
-            verifyStepWasAdded(get(1), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
             verifyStepWasAdded(get(2), FETCH_GUID_ACTIVITY_NAME)
             verifyStepWasAdded(get(3), CONSENT_ACTIVITY_NAME)
             verifyStepWasAdded(get(4), FACE_ACTIVITY_NAME)
@@ -120,8 +120,8 @@ class ModalityFlowVerifyImplTest {
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY)
 //            verifyStepWasAdded(get(0), FINGERPRINT_ACTIVITY_NAME) // TODO : Uncomment once fingerprint implements configuration request
-            verifyStepWasAdded(get(0), FACE_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
             verifyStepWasAdded(get(2), FETCH_GUID_ACTIVITY_NAME)
             verifyStepWasAdded(get(3), CONSENT_ACTIVITY_NAME)
             verifyStepWasAdded(get(4), FINGERPRINT_ACTIVITY_NAME)
@@ -136,8 +136,8 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER_VERIFY_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(0), FACE_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
             verifyStepWasAdded(get(2), FETCH_GUID_ACTIVITY_NAME)
             verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
         }
@@ -164,9 +164,9 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(0), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
 //            verifyStepWasAdded(get(1), FINGERPRINT_ACTIVITY_NAME) // TODO : Uncomment once fingerprint implements configuration request
-            verifyStepWasAdded(get(1), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
             verifyStepWasAdded(get(2), FETCH_GUID_ACTIVITY_NAME)
             verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
             verifyStepWasAdded(get(4), FINGERPRINT_ACTIVITY_NAME)
@@ -181,8 +181,8 @@ class ModalityFlowVerifyImplTest {
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY_WITHOUT_CONSENT)
 //            verifyStepWasAdded(get(0), FINGERPRINT_ACTIVITY_NAME) // TODO : Uncomment once fingerprint implements configuration request
-            verifyStepWasAdded(get(0), FACE_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(0), SETUP_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
             verifyStepWasAdded(get(2), FETCH_GUID_ACTIVITY_NAME)
             verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
             verifyStepWasAdded(get(4), FACE_ACTIVITY_NAME)

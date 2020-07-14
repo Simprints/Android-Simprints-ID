@@ -112,9 +112,9 @@ class ModalityFlowEnrolImplTest {
         verify(exactly = 1) { faceStepProcessor.buildCaptureStep() }
 
         with(modalityFlowEnrol.steps) {
-            assertThat(get(0).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(0).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
 //            assertThat(get(1).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME) // TODO : Uncomment once fingerprint implements configuration request
-            assertThat(get(1).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
+            assertThat(get(1).activityName).isEqualTo(FACE_ACTIVITY_NAME)
             assertThat(get(2).activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
             assertThat(get(3).activityName).isEqualTo(FACE_ACTIVITY_NAME)
         }
@@ -130,8 +130,8 @@ class ModalityFlowEnrolImplTest {
 
         with(modalityFlowEnrol.steps) {
 //            assertThat(get(0).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME) // TODO : Uncomment once fingerprint implements configuration request
-            assertThat(get(0).activityName).isEqualTo(FACE_ACTIVITY_NAME)
-            assertThat(get(1).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
+            assertThat(get(0).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
+            assertThat(get(1).activityName).isEqualTo(FACE_ACTIVITY_NAME)
             assertThat(get(2).activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
             assertThat(get(3).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
         }
@@ -147,9 +147,9 @@ class ModalityFlowEnrolImplTest {
         verify(exactly = 1) { faceStepProcessor.buildCaptureStep() }
 
         with(modalityFlowEnrol.steps) {
-            assertThat(get(0).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(0).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
 //            assertThat(get(1).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME) // TODO : Uncomment once fingerprint implements configuration request
-            assertThat(get(1).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
+            assertThat(get(1).activityName).isEqualTo(FACE_ACTIVITY_NAME)
             assertThat(get(2).activityName).isEqualTo(FACE_ACTIVITY_NAME)
         }
     }
@@ -164,8 +164,8 @@ class ModalityFlowEnrolImplTest {
 
         with(modalityFlowEnrol.steps) {
 //            assertThat(get(0).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME) // TODO : Uncomment once fingerprint implements configuration request
-            assertThat(get(0).activityName).isEqualTo(FACE_ACTIVITY_NAME)
-            assertThat(get(1).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
+            assertThat(get(0).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
+            assertThat(get(1).activityName).isEqualTo(FACE_ACTIVITY_NAME)
             assertThat(get(2).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
         }
     }
