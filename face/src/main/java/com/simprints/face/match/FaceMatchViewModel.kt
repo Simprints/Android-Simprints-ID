@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.extentions.concurrentMap
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
@@ -39,7 +38,7 @@ class FaceMatchViewModel(
     private val crashReportManager: FaceCrashReportManager,
     private val faceSessionEventsManager: FaceSessionEventsManager,
     private val faceTimeHelper: FaceTimeHelper,
-    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
     companion object {
         const val returnCount = 10
