@@ -36,7 +36,7 @@ class SecurityStateSchedulerImpl(context: Context) : SecurityStateScheduler {
 
     private companion object {
         const val WORK_NAME = "security-status-check-work"
-        const val REPEAT_INTERVAL = 30L
+        const val REPEAT_INTERVAL = 15L
     }
 
 }

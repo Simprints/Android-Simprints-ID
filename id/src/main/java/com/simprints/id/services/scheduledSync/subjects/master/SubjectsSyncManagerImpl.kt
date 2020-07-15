@@ -22,7 +22,7 @@ class SubjectsSyncManagerImpl(private val ctx: Context,
                               private val subjectsSyncCache: SubjectsSyncCache) : SubjectsSyncManager {
 
     companion object {
-        const val SYNC_REPEAT_INTERVAL = 60L
+        const val SYNC_REPEAT_INTERVAL = 15L
         val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
     }
 
