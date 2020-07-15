@@ -19,7 +19,7 @@ class LicenseRepositoryImpl(
             }
         }
 
-    override fun getLicenseFlow(projectId: String, deviceId: String): Flow<LicenseState> = flow {
+    override fun getLicenseStateFlow(projectId: String, deviceId: String): Flow<LicenseState> = flow {
         emit(LicenseState.Started)
 
         val license = licenseLocalDataSource.getLicense()
