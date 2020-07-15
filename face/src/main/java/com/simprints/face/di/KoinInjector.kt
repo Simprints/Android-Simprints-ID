@@ -23,6 +23,8 @@ import com.simprints.face.controllers.core.timehelper.FaceTimeHelperImpl
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.detection.rankone.RankOneFaceDetector
 import com.simprints.face.exitform.ExitFormViewModel
+import com.simprints.face.initializers.RankOneInitializer
+import com.simprints.face.initializers.SdkInitializer
 import com.simprints.face.license.data.local.LicenseLocalDataSource
 import com.simprints.face.license.data.local.LicenseLocalDataSourceImpl
 import com.simprints.face.license.data.remote.LicenseRemoteDataSource
@@ -116,6 +118,7 @@ object KoinInjector {
         factory<LicenseLocalDataSource> { LicenseLocalDataSourceImpl(androidContext()) }
         factory<LicenseRemoteDataSource> { LicenseRemoteDataSourceImpl(get()) }
         factory<LicenseRepository> { LicenseRepositoryImpl(get(), get()) }
+        factory<SdkInitializer> { RankOneInitializer() }
     }
 
     private fun Module.defineBuildersForViewModels() {

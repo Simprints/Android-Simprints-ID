@@ -6,9 +6,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.face.R
-import com.simprints.face.models.RankOneInitializer
+import com.simprints.face.initializers.SdkInitializer
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import kotlinx.android.synthetic.main.configuration_fragment.*
+import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -16,6 +17,7 @@ class ConfigurationFragment : Fragment(R.layout.configuration_fragment) {
     private val mainVm: FaceOrchestratorViewModel by sharedViewModel()
     private val viewModel: ConfigurationViewModel by viewModel()
     private val args: ConfigurationFragmentArgs by navArgs()
+    private val sdkInitializer: SdkInitializer by inject()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -43,7 +45,7 @@ class ConfigurationFragment : Fragment(R.layout.configuration_fragment) {
     }
 
     private fun renderFinishedWithSuccess(license: String) {
-        mainVm.configurationFinished(RankOneInitializer.tryInitWithLicense(requireActivity(), license))
+        mainVm.configurationFinished(sdkInitializer.tryInitWithLicense(requireActivity(), license))
     }
 
     private fun renderFinishedWithError() {
