@@ -121,7 +121,7 @@ object KoinInjector {
         factory<FaceMatcher> { RankOneFaceMatcher() }
         factory<LicenseLocalDataSource> { LicenseLocalDataSourceImpl(androidContext()) }
         factory<LicenseRemoteDataSource> { LicenseRemoteDataSourceImpl(get()) }
-        factory<LicenseRepository> { LicenseRepositoryImpl(get(), get(), get()) }
+        factory<LicenseRepository> { LicenseRepositoryImpl(get(), get()) }
     }
 
     private fun Module.defineBuildersForViewModels() {
