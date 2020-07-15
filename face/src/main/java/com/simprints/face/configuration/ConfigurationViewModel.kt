@@ -20,7 +20,7 @@ class ConfigurationViewModel(
     val configurationState: MutableLiveData<LiveDataEventWithContent<ConfigurationState>> = MutableLiveData()
 
     fun retrieveLicense(projectId: String, deviceId: String) = viewModelScope.launch {
-        licenseRepository.getLicenseStateFlow(projectId, deviceId)
+        licenseRepository.getLicenseStates(projectId, deviceId)
             .flowOn(dispatcherProvider.io())
             .map { it.toConfigurationState() }
             .collect { configurationState.send(it) }
