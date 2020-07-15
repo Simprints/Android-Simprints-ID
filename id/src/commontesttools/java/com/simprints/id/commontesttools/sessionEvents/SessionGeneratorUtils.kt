@@ -22,7 +22,7 @@ fun createFakeSession(timeHelper: TimeHelper? = null,
         device = Device(deviceId = "device_id"),
         startTime = startTime,
         databaseInfo = databaseInfo,
-        modalities = listOf(Modality.FINGER)
+        modalities = listOf(Modality.FINGER, Modality.FACE)
     ).apply {
         relativeEndTime = fakeRelativeEndTime
     }
