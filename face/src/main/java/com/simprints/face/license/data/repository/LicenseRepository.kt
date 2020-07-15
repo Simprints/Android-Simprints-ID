@@ -4,5 +4,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface LicenseRepository {
     suspend fun getLicense(projectId: String, deviceId: String): String?
-    fun getLicenseFlow(projectId: String, deviceId: String): Flow<LicenseState>
+    fun getLicenseStateFlow(projectId: String, deviceId: String): Flow<LicenseState>
 }

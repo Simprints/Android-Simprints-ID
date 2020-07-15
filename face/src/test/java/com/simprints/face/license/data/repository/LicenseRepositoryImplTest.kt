@@ -71,7 +71,7 @@ class LicenseRepositoryImplTest {
         every { licenseLocalDataSource.getLicense() } returns license
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseFlow("invalidProject", "deviceId")
+        licenseRepositoryImpl.getLicenseStateFlow("invalidProject", "deviceId")
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -86,7 +86,7 @@ class LicenseRepositoryImplTest {
         every { licenseLocalDataSource.getLicense() } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseFlow("validProject", "deviceId")
+        licenseRepositoryImpl.getLicenseStateFlow("validProject", "deviceId")
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -102,7 +102,7 @@ class LicenseRepositoryImplTest {
         every { licenseLocalDataSource.getLicense() } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseFlow("invalidProject", "deviceId")
+        licenseRepositoryImpl.getLicenseStateFlow("invalidProject", "deviceId")
             .toCollection(licenseStates)
 
         with(licenseStates) {
