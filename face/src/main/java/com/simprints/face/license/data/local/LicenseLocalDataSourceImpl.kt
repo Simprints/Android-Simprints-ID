@@ -28,7 +28,7 @@ class LicenseLocalDataSourceImpl(val context: Context) : LicenseLocalDataSource 
         return try {
             getEncryptedFile(file).openFileOutput().use { it.write(license.toByteArray()) }
         } catch (t: Throwable) {
-            t.printStackTrace()
+            Timber.e(t)
         }
     }
 
@@ -48,15 +48,13 @@ class LicenseLocalDataSourceImpl(val context: Context) : LicenseLocalDataSource 
         null
     }
 
-    private fun getFileFromStorage(): String? {
+    private fun getFileFromStorage(): String? = try {
         val file = File(licensePath)
         val encryptedFile = getEncryptedFile(file)
-        return try {
-            encryptedFile.openFileInput().use { String(it.readBytes()) }
-        } catch (t: Throwable) {
-            t.printStackTrace()
-            null
-        }
+        encryptedFile.openFileInput().use { String(it.readBytes()) }
+    } catch (t: Throwable) {
+        Timber.e(t)
+        null
     }
 
     private fun getEncryptedFile(file: File): EncryptedFile =
