@@ -1,10 +1,10 @@
-package com.simprints.face.models
+package com.simprints.face.initializers
 
 import android.app.Activity
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.roc_embedded_error
 
-object RankOneInitializer {
+class RankOneInitializer : SdkInitializer {
     /**
      * This will try to load ROC library from jniLibs and then initialize using the [license].
      *
@@ -13,7 +13,7 @@ object RankOneInitializer {
      *
      * @return true if initializing was successful, false otherwise
      */
-    fun tryInitWithLicense(activity: Activity, license: String): Boolean {
+    override fun tryInitWithLicense(activity: Activity, license: String): Boolean {
         try {
             System.loadLibrary("_roc_embedded")
         } catch (t: Throwable) {

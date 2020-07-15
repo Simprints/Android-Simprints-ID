@@ -1,8 +1,11 @@
 package com.simprints.face.di
 
+import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.LiveFeedbackFragmentViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
+import com.simprints.face.configuration.ConfigurationViewModel
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManagerImpl
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
@@ -20,6 +23,15 @@ import com.simprints.face.controllers.core.timehelper.FaceTimeHelperImpl
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.detection.rankone.RankOneFaceDetector
 import com.simprints.face.exitform.ExitFormViewModel
+import com.simprints.face.initializers.RankOneInitializer
+import com.simprints.face.initializers.SdkInitializer
+import com.simprints.face.license.data.local.LicenseLocalDataSource
+import com.simprints.face.license.data.local.LicenseLocalDataSourceImpl
+import com.simprints.face.license.data.remote.LicenseRemoteDataSource
+import com.simprints.face.license.data.remote.LicenseRemoteDataSourceImpl
+import com.simprints.face.license.data.remote.NetworkComponentsFactory
+import com.simprints.face.license.data.repository.LicenseRepository
+import com.simprints.face.license.data.repository.LicenseRepositoryImpl
 import com.simprints.face.match.FaceMatchViewModel
 import com.simprints.face.match.FaceMatcher
 import com.simprints.face.match.rankone.RankOneFaceMatcher
@@ -27,6 +39,7 @@ import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.id.Application
 import com.simprints.uicomponents.imageTools.LibYuvJni
 import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
@@ -83,6 +96,7 @@ object KoinInjector {
             defineBuildersForFaceManagers()
             defineBuildersForDomainClasses()
             defineBuildersForViewModels()
+            defineBuildersForRemote()
         }
 
     private fun Module.defineBuildersForFaceManagers() {
@@ -93,6 +107,7 @@ object KoinInjector {
         factory<FaceCrashReportManager> { FaceCrashReportManagerImpl(get()) }
         factory<FaceTimeHelper> { FaceTimeHelperImpl(get()) }
         factory<FaceSessionEventsManager> { FaceSessionEventsManagerImpl(get()) }
+        factory<DispatcherProvider> { DefaultDispatcherProvider() }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
@@ -100,6 +115,10 @@ object KoinInjector {
         factory { FrameProcessor(get()) }
         factory { LibYuvJni() }
         factory<FaceMatcher> { RankOneFaceMatcher() }
+        factory<LicenseLocalDataSource> { LicenseLocalDataSourceImpl(androidContext()) }
+        factory<LicenseRemoteDataSource> { LicenseRemoteDataSourceImpl(get()) }
+        factory<LicenseRepository> { LicenseRepositoryImpl(get(), get()) }
+        factory<SdkInitializer> { RankOneInitializer() }
     }
 
     private fun Module.defineBuildersForViewModels() {
@@ -111,6 +130,7 @@ object KoinInjector {
                 get(),
                 get(),
                 get<FacePreferencesManager>().faceMatchThreshold,
+                get(),
                 get(),
                 get(),
                 get()
@@ -128,5 +148,11 @@ object KoinInjector {
             )
         }
         viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM, get()) }
+
+        viewModel { ConfigurationViewModel(get(), get()) }
+    }
+
+    private fun Module.defineBuildersForRemote() {
+        factory { NetworkComponentsFactory.getLicenseServer() }
     }
 }

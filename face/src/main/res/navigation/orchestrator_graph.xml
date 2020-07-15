@@ -13,6 +13,11 @@
             app:destination="@id/errorFragment"
             app:popUpTo="@id/orchestrator_graph"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_blankFragment_to_configurationFragment"
+            app:destination="@id/configurationFragment"
+            app:popUpTo="@id/orchestrator_graph"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -22,5 +27,17 @@
         <argument
             android:name="errorType"
             app:argType="com.simprints.face.error.ErrorType" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/configurationFragment"
+        android:name="com.simprints.face.configuration.ConfigurationFragment"
+        android:label="ConfigurationFragment" >
+        <argument
+            android:name="projectId"
+            app:argType="string" />
+        <argument
+            android:name="deviceId"
+            app:argType="string" />
     </fragment>
 </navigation>

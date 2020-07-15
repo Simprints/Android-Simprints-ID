@@ -67,4 +67,8 @@
     <string name="error_licence_missing_title">License missing</string>
     <string name="error_licence_missing_message">Face license is missing, please contact your system administrator</string>
     <string name="error_licence_missing_button">Close</string>
+
+    <!--  Configuration screens  -->
+    <string name="face_configuration_started">Configuring face modality</string>
+    <string name="face_configuration_downloading">Downloading necessary files</string>
 </resources>
