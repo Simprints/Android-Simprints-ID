@@ -5,6 +5,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.data.db.common.RemoteDbManager
@@ -32,7 +35,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -96,7 +98,6 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     @Test
-    @Ignore("Wait until cloud implements camera events")
     fun closeSession_withAllEvents_shouldGetUploaded() {
         runBlocking {
             val session = createClosedSessions(1).first().apply {
@@ -109,6 +110,11 @@ class SessionRemoteDataSourceImplAndroidTest {
                 addConsentEvent()
                 addEnrolmentEvent()
                 addFingerprintCaptureEvent()
+                addFaceCaptureEvent()
+                addFaceCaptureConfirmationEvent()
+                addFaceCaptureRetryEvent()
+                addFaceFallbackCaptureEvent()
+                addFaceOnboardingCompleteEvent()
                 addGuidSelectionEvent()
                 addIntentParsingEvent()
                 addInvalidIntentEvent()
@@ -226,6 +232,55 @@ class SessionRemoteDataSourceImplAndroidTest {
         }
     }
 
+    private fun SessionEvents.addFaceCaptureEvent() {
+        FaceCaptureEvent.Result.values().forEachIndexed { index, result ->
+            val template = EncodingUtils.byteArrayToBase64(
+                SubjectsGeneratorUtils.getRandomFaceSample().template
+            )
+
+            val face = FaceCaptureEvent.Face(30f, 40f, 100f, template)
+
+            val event = FaceCaptureEvent(
+                DEFAULT_TIME,
+                DEFAULT_TIME + 100,
+                index + 1,
+                0f,
+                result,
+                false,
+                face
+            )
+
+            addEvent(event)
+        }
+    }
+
+    private fun SessionEvents.addFaceCaptureConfirmationEvent() {
+        FaceCaptureConfirmationEvent.Result.values().forEach { result ->
+            val event = FaceCaptureConfirmationEvent(
+                DEFAULT_TIME,
+                DEFAULT_TIME + 100,
+                result
+            )
+
+            addEvent(event)
+        }
+    }
+
+    private fun SessionEvents.addFaceCaptureRetryEvent() {
+        val event = FaceCaptureRetryEvent(DEFAULT_TIME, DEFAULT_TIME + 100)
+        addEvent(event)
+    }
+
+    private fun SessionEvents.addFaceFallbackCaptureEvent() {
+        val event = FaceFallbackCaptureEvent(DEFAULT_TIME, DEFAULT_TIME + 100)
+        addEvent(event)
+    }
+
+    private fun SessionEvents.addFaceOnboardingCompleteEvent() {
+        val event = FaceOnboardingCompleteEvent(DEFAULT_TIME, DEFAULT_TIME + 100)
+        addEvent(event)
+    }
+
     private fun SessionEvents.addGuidSelectionEvent() {
         addEvent(GuidSelectionEvent(DEFAULT_TIME, RANDOM_GUID))
     }
@@ -237,7 +292,7 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     private fun SessionEvents.addInvalidIntentEvent() {
-        addEvent(InvalidIntentEvent(DEFAULT_TIME, "some_action", emptyMap()))
+        addEvent(InvalidIntentEvent(DEFAULT_TIME, "some_action", mapOf("wrong_field" to "wrong_value")))
     }
 
     private fun SessionEvents.addOneToManyMatchEvent() {
@@ -335,10 +390,11 @@ class SessionRemoteDataSourceImplAndroidTest {
     }
 
     private fun SessionEvents.addCalloutEvent() {
-        addEvent(EnrolmentCalloutEvent(DEFAULT_TIME, "project_id", "user_id", "module_id", "metadata"))
-        addEvent(ConfirmationCalloutEvent(DEFAULT_TIME, "projectId", RANDOM_GUID, RANDOM_GUID))
-        addEvent(IdentificationCalloutEvent(DEFAULT_TIME, "project_id", "user_id", "module_id", "metadata"))
-        addEvent(VerificationCalloutEvent(DEFAULT_TIME, "project_id", "user_id", "module_id", RANDOM_GUID, "metadata"))
-        addEvent(EnrolmentLastBiometricsCalloutEvent(DEFAULT_TIME, "project_id", "user_id", "module_id", "metadata", RANDOM_GUID))
+        addEvent(EnrolmentCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata"))
+        addEvent(ConfirmationCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, RANDOM_GUID, RANDOM_GUID))
+        addEvent(IdentificationCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata"))
+        addEvent(VerificationCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, RANDOM_GUID, "metadata"))
+        addEvent(EnrolmentLastBiometricsCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata", RANDOM_GUID))
     }
+
 }
