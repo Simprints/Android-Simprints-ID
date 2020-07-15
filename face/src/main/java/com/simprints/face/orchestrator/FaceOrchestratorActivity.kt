@@ -6,14 +6,11 @@ import android.os.Bundle
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.core.tools.whenNonNull
-import com.simprints.core.tools.whenNull
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureActivity
 import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.face.match.FaceMatchActivity
-import com.simprints.face.models.RankOneInitializer
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -31,23 +28,7 @@ class FaceOrchestratorActivity : BaseSplitActivity() {
 
         observeViewModel()
 
-        getRankOneLicense()
-            .whenNull { viewModel.missingLicense() }
-            .whenNonNull { tryInitWithLicense(this, iFaceRequest) }
-    }
-
-    private fun tryInitWithLicense(rankOneLicense: String, iFaceRequest: IFaceRequest) {
-        if (RankOneInitializer.tryInitWithLicense(this, rankOneLicense)) {
-            viewModel.start(iFaceRequest)
-        } else {
-            viewModel.invalidLicense()
-        }
-    }
-
-    private fun getRankOneLicense(): String? = try {
-        String(assets.open("ROC.lic").readBytes())
-    } catch (t: Throwable) {
-        null
+        viewModel.start(iFaceRequest)
     }
 
     override fun onDestroy() {
@@ -70,6 +51,15 @@ class FaceOrchestratorActivity : BaseSplitActivity() {
         viewModel.errorEvent.observe(this, LiveDataEventWithContentObserver {
             findNavController(R.id.orchestrator_host_fragment)
                 .navigate(BlankFragmentDirections.actionBlankFragmentToErrorFragment(it))
+        })
+        viewModel.startConfiguration.observe(this, LiveDataEventWithContentObserver {
+            findNavController(R.id.orchestrator_host_fragment)
+                .navigate(
+                    BlankFragmentDirections.actionBlankFragmentToConfigurationFragment(
+                        it.projectId,
+                        it.deviceId
+                    )
+                )
         })
     }
 
