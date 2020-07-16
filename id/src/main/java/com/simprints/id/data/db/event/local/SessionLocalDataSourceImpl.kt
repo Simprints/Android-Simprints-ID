@@ -5,8 +5,8 @@ import android.os.Build
 import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.events.ArtificialTerminationEvent
 import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.Event.EventLabel.ProjectId
-import com.simprints.id.data.db.event.domain.events.Event.EventLabel.SessionId
+import com.simprints.id.data.db.event.domain.events.EventLabel.ProjectIdLabel
+import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.events.EventPayloadType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.events.getSessionLabelIfExists
 import com.simprints.id.data.db.event.domain.events.session.DatabaseInfo
@@ -104,9 +104,9 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
     override suspend fun insertOrUpdate(event: Event) =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                val sessionId = event.getSessionLabelIfExists()
-                if (sessionId != null) {
-                    val eventsInTheSameSession = load(EventQuery(sessionId = sessionId.labelValue)).toList()
+                val sessionIdLabel = event.getSessionLabelIfExists()
+                if (sessionIdLabel != null) {
+                    val eventsInTheSameSession = load(EventQuery(sessionId = sessionIdLabel.sessionId)).toList()
                     sessionEventsValidators.forEach {
                         it.validate(eventsInTheSameSession, event)
                     }
@@ -144,8 +144,8 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
 
     fun EventQuery.filter(event: Event) =
         with(this) {
-            projectId?.let { event.labels.any { it == ProjectId(projectId) } } ?: false ||
-                sessionId?.let { event.labels.any { it == SessionId(sessionId) } } ?: false ||
+            projectId?.let { event.labels.any { it == ProjectIdLabel(projectId) } } ?: false ||
+                sessionId?.let { event.labels.any { it == SessionIdLabel(sessionId) } } ?: false ||
                 eventPayloadType?.let { event.payload.type == it } ?: false ||
                 id?.let { event.id == it } ?: false ||
                 startTime?.let { event.payload.createdAt in it } ?: false ||

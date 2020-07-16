@@ -2,7 +2,7 @@ package com.simprints.id.data.db.event.domain.events.subject
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.Event.EventLabel.*
+import com.simprints.id.data.db.event.domain.events.EventLabel.*
 import com.simprints.id.data.db.event.domain.events.EventPayload
 import com.simprints.id.data.db.event.domain.events.EventPayloadType
 import com.simprints.id.domain.modality.Modes
@@ -19,7 +19,7 @@ class EnrolmentRecordCreationEvent(
     biometricReferences: List<BiometricReference>
 ) : Event(
     UUID.randomUUID().toString(),
-    mutableListOf(ProjectId(projectId), ModuleId(listOf(moduleId)), AttendantId(attendantId), Mode(modes)),
+    mutableListOf(ProjectIdLabel(projectId), ModuleIdsLabel(listOf(moduleId)), AttendantIdLabel(attendantId), Mode(modes)),
     EnrolmentRecordCreationPayload(createdAt, DEFAULT_EVENT_VERSION, subjectId, projectId, moduleId, attendantId, biometricReferences)) {
 
     class EnrolmentRecordCreationPayload(

@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.event.domain.events
 
 import androidx.annotation.Keep
+import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import java.util.*
 
@@ -16,7 +17,7 @@ class FingerprintCaptureEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     id,
-    mutableListOf(EventLabel.SessionId(sessionId)),
+    mutableListOf(SessionIdLabel(sessionId)),
     FingerprintCapturePayload(createdAt, DEFAULT_EVENT_VERSION, endTime, finger, qualityThreshold, result, fingerprint, id)) {
 
     @Keep
