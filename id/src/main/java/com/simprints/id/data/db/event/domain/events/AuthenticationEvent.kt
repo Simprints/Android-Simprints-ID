@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.domain.events
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.UserInfo
+import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
 import java.util.*
 
 @Keep
@@ -14,7 +15,7 @@ class AuthenticationEvent(
     sessionId: String = UUID.randomUUID().toString()
 ) : Event(
     UUID.randomUUID().toString(),
-    mutableListOf(EventLabel.SessionId(sessionId)),
+    mutableListOf(SessionIdLabel(sessionId)),
     AuthenticationPayload(createdAt, DEFAULT_EVENT_VERSION, endTime, userInfo, result)) {
 
 

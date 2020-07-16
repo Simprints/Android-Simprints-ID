@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.event.domain.events
 
 import androidx.annotation.Keep
+import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
 import java.util.*
 
 @Keep
@@ -12,7 +13,7 @@ class OneToOneMatchEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
-    mutableListOf(EventLabel.SessionId(sessionId)),
+    mutableListOf(SessionIdLabel(sessionId)),
     OneToOneMatchPayload(createdAt, DEFAULT_EVENT_VERSION, endTime, candidateId, result)) {
 
     @Keep

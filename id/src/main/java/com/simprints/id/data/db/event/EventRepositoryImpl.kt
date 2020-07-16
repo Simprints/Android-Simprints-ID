@@ -2,7 +2,7 @@ package com.simprints.id.data.db.event
 
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.Event.EventLabel.SessionId
+import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.events.EventPayloadType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.SessionLocalDataSource
@@ -45,7 +45,7 @@ open class EventRepositoryImpl(
             reportExceptionIfNeeded {
                 val session = sessionLocalDataSource.getCurrentSessionCaptureEvent()
                 session?.let {
-                    event.labels.add(SessionId(session.id))
+                    event.labels.add(SessionIdLabel(session.id))
                     sessionLocalDataSource.insertOrUpdate(event)
                 } ?: Throwable("Missing open session")
             }

@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.event.domain.events
 
+import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
 import io.realm.internal.Keep
 import java.util.*
 
@@ -10,7 +11,7 @@ class IntentParsingEvent(
     sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
 ) : Event(
     UUID.randomUUID().toString(),
-    mutableListOf(EventLabel.SessionId(sessionId)),
+    mutableListOf(SessionIdLabel(sessionId)),
     IntentParsingPayload(createdAt, DEFAULT_EVENT_VERSION, integration)) {
 
     @Keep

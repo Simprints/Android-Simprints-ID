@@ -5,8 +5,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.Event.EventLabel
-import com.simprints.id.data.db.event.domain.events.Event.EventLabel.*
+import com.simprints.id.data.db.event.domain.events.EventLabel
 import com.simprints.id.data.db.event.domain.events.EventPayloadType
 import java.util.*
 
@@ -63,12 +62,4 @@ fun Event.fromDomainToDb() =
     DbEvent(id, labels.map { it.fromDomainToDb() }, payload.type, JsonHelper.toJson(this))
 
 fun EventLabel.fromDomainToDb() =
-    when(this) {
-        is ProjectId -> DbEventLabel(this.javaClass.simpleName, JsonHelper.toJson(this))
-        is SubjectId -> DbEventLabel(this.javaClass.simpleName, JsonHelper.toJson(this))
-        is AttendantId -> DbEventLabel(this.javaClass.simpleName, JsonHelper.toJson(this))
-        is ModuleId -> DbEventLabel(this.javaClass.simpleName, JsonHelper.toJson(this))
-        is Mode -> DbEventLabel(this.javaClass.simpleName, JsonHelper.toJson(this))
-        is SessionId -> DbEventLabel(this.javaClass.simpleName, JsonHelper.toJson(this))
-        is DeviceId -> DbEventLabel(this.javaClass.simpleName, JsonHelper.toJson(this))
-    }
+    DbEventLabel(this.key.name, JsonHelper.toJson(this))

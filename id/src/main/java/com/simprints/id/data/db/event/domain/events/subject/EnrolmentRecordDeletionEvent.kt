@@ -2,7 +2,7 @@ package com.simprints.id.data.db.event.domain.events.subject
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.Event.EventLabel.*
+import com.simprints.id.data.db.event.domain.events.EventLabel.*
 import com.simprints.id.data.db.event.domain.events.EventPayload
 import com.simprints.id.data.db.event.domain.events.EventPayloadType
 import java.util.*
@@ -16,7 +16,7 @@ class EnrolmentRecordDeletionEvent(
     attendantId: String
 ) : Event(
     UUID.randomUUID().toString(),
-    mutableListOf(ProjectId(projectId), ModuleId(listOf(moduleId)), AttendantId(attendantId)),
+    mutableListOf(ProjectIdLabel(projectId), ModuleIdsLabel(listOf(moduleId)), AttendantIdLabel(attendantId)),
     EnrolmentRecordDeletionPayload(createdAt, DEFAULT_EVENT_VERSION, subjectId, projectId, moduleId, attendantId)) {
 
     class EnrolmentRecordDeletionPayload(

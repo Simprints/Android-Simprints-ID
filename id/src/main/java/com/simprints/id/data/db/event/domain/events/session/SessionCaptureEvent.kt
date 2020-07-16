@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.domain.events.session
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
+import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.events.EventPayload
 import com.simprints.id.data.db.event.domain.events.EventPayloadType
 import java.util.*
@@ -21,7 +22,7 @@ open class SessionCaptureEvent(createdAt: Long,
                                analyticsId: String? = null) :
     Event(
         UUID.randomUUID().toString(),
-        mutableListOf(EventLabel.SessionId(id)),
+        mutableListOf(SessionIdLabel(id)),
         SessionCapturePayload(
             createdAt,
             endTime,
