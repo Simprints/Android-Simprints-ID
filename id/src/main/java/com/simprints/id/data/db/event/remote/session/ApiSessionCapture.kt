@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.event.remote.session
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.AuthorizationEvent
 import com.simprints.id.data.db.event.domain.events.session.Location
 import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent.SessionCapturePayload
@@ -40,7 +39,7 @@ class ApiSessionCapture(domainEvent: SessionCaptureEvent) :
             domainPayload.language,
             domainPayload.device.fromDomainToApi(),
             domainPayload.id,
-            domainPayload.endTime,
+            domainPayload.endedAt ?: 0,
             domainPayload.uploadTime,
             domainPayload.databaseInfo.fromDomainToApi(),
             domainPayload.location.fromDomainToApi(),

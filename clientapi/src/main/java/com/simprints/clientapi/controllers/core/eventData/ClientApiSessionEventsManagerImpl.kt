@@ -22,7 +22,7 @@ class ClientApiSessionEventsManagerImpl(private val coreEventRepository: EventRe
 
         inBackground { coreEventRepository.addEvent(IntentParsingEvent(timeHelper.now(), integration.fromDomainToCore())) }
 
-        return coreEventRepository.getCurrentSession().id
+        return coreEventRepository.getCurrentCaptureSessionEvent().id
     }
 
     override suspend fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert) {
@@ -41,10 +41,10 @@ class ClientApiSessionEventsManagerImpl(private val coreEventRepository: EventRe
         inBackground { coreEventRepository.addEvent(InvalidIntentEvent(timeHelper.now(), action, extras)) }
     }
 
-    override suspend fun getCurrentSessionId(): String = coreEventRepository.getCurrentSession().id
+    override suspend fun getCurrentSessionId(): String = coreEventRepository.getCurrentCaptureSessionEvent().id
 
     override suspend fun isCurrentSessionAnIdentification(): Boolean {
-        val sessionId = coreEventRepository.getCurrentSession()
+        val sessionId = coreEventRepository.getCurrentCaptureSessionEvent()
         //coreEventRepository..getEvents().filterIsInstance(IdentificationCalloutEvent::class.java).isNotEmpty()
         return false //STOPSHIP
     }

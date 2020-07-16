@@ -9,13 +9,14 @@ import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilder
+import com.simprints.id.data.db.event.local.EventRoomDao
 import com.simprints.id.data.db.event.local.SessionLocalDataSource
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
+import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
+import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
@@ -30,8 +31,8 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
@@ -166,7 +167,7 @@ class TestAppModule(
         ctx: Context,
         secureDataManager: SecureLocalDbKeyProvider,
         timeHelper: TimeHelper,
-        sessionRealmConfigBuilder: SessionRealmConfigBuilder,
+        roomDao: EventRoomDao,
         sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
     ): SessionLocalDataSource =
         sessionEventsLocalDbManagerRule.resolveDependency {
@@ -174,7 +175,7 @@ class TestAppModule(
                 ctx,
                 secureDataManager,
                 timeHelper,
-                sessionRealmConfigBuilder,
+                roomDao,
                 sessionEventValidatorsBuilder
             )
         }

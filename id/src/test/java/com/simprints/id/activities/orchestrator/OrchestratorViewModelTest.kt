@@ -61,7 +61,7 @@ class OrchestratorViewModelTest {
 
     private fun configureMocks() {
         every { domainToModuleApiConverter.fromDomainModuleApiAppResponse(any()) } returns mockk()
-        coEvery { eventRepositoryMock.getCurrentSession() } returns fakeSession
+        coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns fakeSession
         every { orchestratorManagerMock.appResponse } returns liveDataAppResponse
         every { orchestratorManagerMock.ongoingStep } returns liveDataNextIntent
     }

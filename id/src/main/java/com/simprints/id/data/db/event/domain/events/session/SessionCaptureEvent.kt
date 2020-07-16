@@ -24,6 +24,7 @@ open class SessionCaptureEvent(createdAt: Long,
         mutableListOf(EventLabel.SessionId(id)),
         SessionCapturePayload(
             createdAt,
+            endTime,
             DEFAULT_EVENT_VERSION,
             id,
             projectId,
@@ -33,7 +34,6 @@ open class SessionCaptureEvent(createdAt: Long,
             device,
             databaseInfo,
             uploadTime,
-            endTime,
             location,
             analyticsId)) {
 
@@ -46,6 +46,7 @@ open class SessionCaptureEvent(createdAt: Long,
     @Keep
     class SessionCapturePayload(
         createdAt: Long,
+        endedAt: Long,
         eventVersion: Int,
         val id: String = UUID.randomUUID().toString(),
         var projectId: String,
@@ -54,9 +55,8 @@ open class SessionCaptureEvent(createdAt: Long,
         val language: String,
         val device: Device,
         val databaseInfo: DatabaseInfo,
-        val endTime: Long,
         val uploadTime: Long,
         var location: Location? = null,
         var analyticsId: String? = null
-    ) : EventPayload(EventPayloadType.SESSION_CAPTURE, eventVersion, createdAt)
+    ) : EventPayload(EventPayloadType.SESSION_CAPTURE, eventVersion, createdAt, endedAt)
 }

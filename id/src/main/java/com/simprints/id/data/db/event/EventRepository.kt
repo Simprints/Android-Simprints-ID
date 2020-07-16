@@ -7,11 +7,14 @@ import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 interface EventRepository {
 
     suspend fun createSession(libSimprintsVersionName: String)
-    suspend fun getCurrentSession(): SessionCaptureEvent
+
+    suspend fun load(): List<Event>
+    suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent
+
     suspend fun updateCurrentSession(updateBlock: suspend (SessionCaptureEvent) -> Unit)
     suspend fun updateSession(sessionId: String, updateBlock: suspend (SessionCaptureEvent) -> Unit)
-    suspend fun load(): List<Event>
 
+    suspend fun addEventToCurrentSession(event: Event)
     suspend fun addEvent(event: Event)
 
     suspend fun signOut()

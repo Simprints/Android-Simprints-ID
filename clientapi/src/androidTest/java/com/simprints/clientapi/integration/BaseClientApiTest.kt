@@ -64,7 +64,7 @@ open class BaseClientApiTest : KoinTest {
         val sessionMock = mockk<SessionCaptureEvent>(relaxed = true)
         every { sessionMock.id } returns ""
         val repo = mockk<EventRepository>(relaxed = true)
-        coEvery { repo.getCurrentSession() } returns sessionMock
+        coEvery { repo.getCurrentCaptureSessionEvent() } returns sessionMock
         return repo
     }
 

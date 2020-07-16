@@ -5,24 +5,22 @@ import android.os.Build
 import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.events.ArtificialTerminationEvent
 import com.simprints.id.data.db.event.domain.events.Event
+import com.simprints.id.data.db.event.domain.events.Event.EventLabel.ProjectId
+import com.simprints.id.data.db.event.domain.events.Event.EventLabel.SessionId
 import com.simprints.id.data.db.event.domain.events.EventPayloadType.SESSION_CAPTURE
-import com.simprints.id.data.db.event.domain.events.EventQuery
-import com.simprints.id.data.db.event.domain.events.EventQuery.byDate
-import com.simprints.id.data.db.event.domain.events.EventQuery.byType
 import com.simprints.id.data.db.event.domain.events.getSessionLabelIfExists
 import com.simprints.id.data.db.event.domain.events.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.events.session.Device
 import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidator
+import com.simprints.id.data.db.event.local.SessionLocalDataSource.EventQuery
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.safe.session.SessionDataSourceException
 import com.simprints.id.tools.TimeHelper
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
@@ -47,11 +45,10 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
     override suspend fun create(appVersionName: String,
                                 libSimprintsVersionName: String,
                                 language: String,
-                                deviceId: String) {
+                                deviceId: String): String =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
                 closeAnyOpenSession()
-
                 val count = roomDao.count()
                 val sessionCaptureEvent = SessionCaptureEvent(
                     timeHelper.now(),
@@ -68,35 +65,21 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
 
                 roomDao.insertOrUpdate(sessionCaptureEvent.fromDomainToDb())
                 Timber.d("Session created ${sessionCaptureEvent.id}")
+                sessionCaptureEvent.id
             }
         }
-    }
 
-    override suspend fun currentSessionId(): String? =
-        wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
-                val currentSessionCaptureEvent =
-                    roomDao.loadByType(SESSION_CAPTURE)
-                        .map { it.fromDbToDomain() }
-                        .filterIsInstance<SessionCaptureEvent>()
-                        .firstOrNull { (it.payload as SessionCapturePayload).endTime > 0 }
-
-                currentSessionCaptureEvent?.id
-            }
-        }
+    override suspend fun getCurrentSessionCaptureEvent() =
+        load(EventQuery(eventPayloadType = SESSION_CAPTURE, endTime = LongRange(0, 0))).first() as SessionCaptureEvent
 
     override suspend fun load(query: EventQuery): Flow<Event> =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                when (query) {
-                    is byType -> {
-                        roomDao.loadByType(query.type)
-                    }
-                    is byDate -> {
-                        roomDao.load().filter { it.addedAt.time < query.startedBefore }
-                    } //StopShip
-                    else -> throw Throwable("s")
-                }.map { it.fromDbToDomain() }.asFlow()
+                roomDao.load()
+                    .map { it.fromDbToDomain() }
+                    .filter { query.filter(it) }
+                    .sortedByDescending { it.payload.createdAt }
+                    .asFlow()
             }
         }
 
@@ -104,16 +87,16 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
     override suspend fun count(query: EventQuery): Int =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                //StopShip: query
-                roomDao.count()
+                load(query).toList().size
             }
         }
 
     override suspend fun delete(query: EventQuery) {
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                //StopShip: query
-                roomDao.count()
+                load(query).collect {
+                    roomDao.delete(it.fromDomainToDb())
+                }
             }
         }
     }
@@ -123,7 +106,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
             withContext(Dispatchers.IO) {
                 val sessionId = event.getSessionLabelIfExists()
                 if (sessionId != null) {
-                    val eventsInTheSameSession = roomDao.loadBySessionId(sessionId.labelValue).map { it.fromDbToDomain() }
+                    val eventsInTheSameSession = load(EventQuery(sessionId = sessionId.labelValue)).toList()
                     sessionEventsValidators.forEach {
                         it.validate(eventsInTheSameSession, event)
                     }
@@ -134,11 +117,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
 
     private suspend fun closeAnyOpenSession() {
         wrapSuspendExceptionIfNeeded {
-            val openSessionIds = roomDao.loadByType(SESSION_CAPTURE)
-                .map { it.fromDbToDomain() }
-                .filterIsInstance<SessionCaptureEvent>()
-                .filter { (it.payload as SessionCapturePayload).endTime == 0L }
-                .map { it.id }
+            val openSessionIds = load(EventQuery(eventPayloadType = SESSION_CAPTURE, endTime = LongRange(0, 0))).map { it.id }
 
             openSessionIds.onEach { sessionId ->
                 val artificialTerminationEvent = ArtificialTerminationEvent(
@@ -151,14 +130,6 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         }
     }
 
-    private fun <T> wrapExceptionIfNeeded(block: () -> T): T =
-        try {
-            block()
-        } catch (t: Throwable) {
-            Timber.d(t)
-            throw SessionDataSourceException(t)
-        }
-
     private suspend fun <T> wrapSuspendExceptionIfNeeded(block: suspend () -> T): T =
         try {
             block()
@@ -169,5 +140,15 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
             } else {
                 SessionDataSourceException(t)
             }
+        }
+
+    fun EventQuery.filter(event: Event) =
+        with(this) {
+            projectId?.let { event.labels.any { it == ProjectId(projectId) } } ?: false ||
+                sessionId?.let { event.labels.any { it == SessionId(sessionId) } } ?: false ||
+                eventPayloadType?.let { event.payload.type == it } ?: false ||
+                id?.let { event.id == it } ?: false ||
+                startTime?.let { event.payload.createdAt in it } ?: false ||
+                endTime?.let { event.payload.endedAt in it } ?: false
         }
 }

@@ -231,7 +231,7 @@ open class AppModule {
     @Provides
     open fun provideEventRoomDao(ctx: Context): EventRoomDao =
         EventRoomDatabase.getDatabase(ctx).eventDao
-
+    
     @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(
