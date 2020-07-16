@@ -26,7 +26,7 @@ class FingerprintImageManagerImpl(private val coreImageRepository: ImageReposito
 
     private suspend fun determinePath(captureEventId: String, fileExtension: String): CorePath? =
         try {
-            val currentSession = coreEventRepository.getCurrentSession()
+            val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
 
             val projectId = (currentSession.payload as SessionCapturePayload).projectId
             val sessionId = currentSession.id

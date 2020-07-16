@@ -38,6 +38,7 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import io.mockk.every
 import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -78,7 +79,7 @@ class AlertActivityTest {
         launchAlertActivity()
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
-        verify(atLeast = 1) { eventEventManagerMock.addEventToCurrentSessionInBackground(any<AlertScreenEvent>()) }
+        verify(atLeast = 1) { runBlocking { eventEventManagerMock.addEvent(any<AlertScreenEvent>()) } }
     }
 
     @Test

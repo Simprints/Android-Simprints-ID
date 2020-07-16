@@ -234,7 +234,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         ignoreException {
             val analyticsId = analyticsManager.getAnalyticsId()
             val signedInProject = loginInfoManager.getSignedInProjectIdOrEmpty()
-            val currentSessionEvent = eventRepository.getCurrentSession()
+            val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
             if (signedInProject.isNotEmpty()) {
                 (currentSessionEvent.payload as SessionCapturePayload).projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
@@ -260,7 +260,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @SuppressLint("CheckResult")
     private suspend fun setSessionIdCrashlyticsKey() {
         ignoreException {
-            crashReportManager.setSessionIdCrashlyticsKey(eventRepository.getCurrentSession().id)
+            crashReportManager.setSessionIdCrashlyticsKey(eventRepository.getCurrentCaptureSessionEvent().id)
         }
     }
 }

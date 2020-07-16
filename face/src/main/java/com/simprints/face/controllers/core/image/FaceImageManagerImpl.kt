@@ -26,7 +26,7 @@ class FaceImageManagerImpl(private val coreImageRepository: ImageRepository,
 
     private suspend fun determinePath(captureEventId: String): CorePath? =
         try {
-            val currentSession = coreEventRepository.getCurrentSession()
+            val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
 
             val projectId = (currentSession.payload as SessionCapturePayload).projectId
             val sessionId = currentSession.id

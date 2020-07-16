@@ -40,7 +40,7 @@ class OrchestratorViewModel(
     }
 
     private suspend fun getCurrentSessionId(): String =
-        eventRepository.getCurrentSession().id
+        eventRepository.getCurrentCaptureSessionEvent().id
 
 
     fun onModalStepRequestDone(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?) {

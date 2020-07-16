@@ -7,7 +7,7 @@ import com.simprints.id.data.db.event.local.models.DbEvent
 @Dao
 interface EventRoomDao {
 
-    @Query("select * from DbEvent where labels order by addedAt desc")
+    @Query("select * from DbEvent order by addedAt desc")
     suspend fun load(): List<DbEvent>
 
     @Query("select * from DbEvent where type=:type order by addedAt desc")
@@ -25,17 +25,39 @@ interface EventRoomDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdate(dbEvent: DbEvent)
 
+//    @RawQuery
+//    suspend fun load(query: SupportSQLiteQuery): List<DbEvent>
 //
-//    @Query("select * from DbSubjectsDownSyncOperation")
-//    suspend fun getDownSyncOperationsAll(): List<DbSubjectsDownSyncOperation>
-//
-//    @Query("select * from DbSubjectsDownSyncOperation")
-//    fun getDownSyncOperation(): List<DbSubjectsDownSyncOperation>
-//
-//    @Insert(onConflict = OnConflictStrategy.REPLACE)
-//    suspend fun insertOrReplaceDownSyncOperation(dbSubjectsDownSyncOperation: DbSubjectsDownSyncOperation)
-//
-//    @Query("delete from DbSubjectsDownSyncOperation")
-//    fun deleteAll()
-
+//    @RawQuery
+//    suspend fun count(query: SupportSQLiteQuery): Int
 }
+
+//fun EventQuery.toSupportSQLiteQuery() {
+//    String.format("select * from DbEvent where labels order by addedAt desc")
+//
+//    val conditions = mutableListOf<String>()
+//    if(id.isNullOrBlank()) {
+//        conditions += "id=$id AND"
+//    }
+//
+//    if(eventPayloadType != null) {
+//        conditions += "type=$eventPayloadType AND"
+//    }
+//
+//    if(projectId != null) {
+//        conditions += "labels LIKE '%$projectId%'"
+//    }
+//
+//    if(sessionId != null) {
+//        conditions += "labels LIKE '%$sessionId%'"
+//    }
+//
+//    if(startTime != null) {
+//        conditions += "sta LIKE '%$sessionId%'"
+//    }
+//
+//    if(endTime != null) {
+//        conditions += "labels LIKE '%$sessionId%'"
+//    }
+//
+//}

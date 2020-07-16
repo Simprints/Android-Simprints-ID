@@ -2,29 +2,34 @@ package com.simprints.id.data.db.event.controllers.local
 
 import com.google.common.truth.Truth
 import com.simprints.id.data.db.event.domain.events.*
-import com.simprints.id.data.db.event.local.models.DbDatabaseInfo
-import com.simprints.id.data.db.event.local.models.DbDevice
-import com.simprints.id.data.db.event.local.models.DbEvent
-import com.simprints.id.data.db.event.local.models.DbLocation
+import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload
+import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
+import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
+import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload
+import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.Result.AUTHORIZED
+import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.Result.NOT_AUTHORIZED
 import io.realm.Realm
 import junit.framework.TestCase.*
 
 fun verifyEventsForFailedSignedIdFollowedBySucceedSignIn(events: List<Event>) {
 
     events.filterIsInstance(AuthorizationEvent::class.java).let {
-        assertEquals(it.first().result, AuthorizationEvent.Result.NOT_AUTHORIZED)
-        assertTrue(it.first().userInfo?.userId.isNullOrEmpty())
-        assertTrue(it.first().userInfo?.projectId.isNullOrEmpty())
+        with(it.first().payload as AuthorizationPayload) {
+            assertEquals(result, NOT_AUTHORIZED)
+            assertTrue(userInfo?.userId.isNullOrEmpty())
+            assertTrue(userInfo?.projectId.isNullOrEmpty())
+        }
 
-        assertEquals(it[1].result, AuthorizationEvent.Result.AUTHORIZED)
-        assertFalse(it[1].userInfo?.userId.isNullOrEmpty())
-        assertFalse(it[1].userInfo?.projectId.isNullOrEmpty())
+        val secondPayload = it[1].payload as AuthorizationPayload
+        assertEquals(secondPayload.result, AUTHORIZED)
+        assertFalse(secondPayload.userInfo?.userId.isNullOrEmpty())
+        assertFalse(secondPayload.userInfo?.projectId.isNullOrEmpty())
     }
 
     events.filterIsInstance(AuthenticationEvent::class.java).let { list ->
-        assertEquals(list.first().result, AuthenticationEvent.Result.BAD_CREDENTIALS)
-        assertEquals(list[1].result, AuthenticationEvent.Result.AUTHENTICATED)
-        list.forEach {
+        assertEquals((list.first().payload as AuthenticationPayload).result, BAD_CREDENTIALS)
+        assertEquals((list[1].payload as AuthenticationPayload).result, AUTHENTICATED)
+        list.map { it.payload as AuthenticationPayload }.forEach {
             assertTrue(it.userInfo.userId.isNotEmpty())
             assertTrue(it.userInfo.projectId.isNotEmpty())
         }
@@ -60,7 +65,6 @@ fun verifyEventsAfterEnrolment(events: List<Event>, realmForDataEvent: Realm) {
     ).map { it.canonicalName }
 
     Truth.assertThat(events.map { it.javaClass.canonicalName }).containsExactlyElementsIn(expectedEvents)
-    checkDbHasOnlyTheExpectedInfo(realmForDataEvent, expectedEvents.size)
 }
 
 // TODO : Fix ColloutEvent, CallbackEvent for Session
@@ -82,7 +86,6 @@ fun verifyEventsAfterVerification(events: List<Event>, realmForDataEvent: Realm)
     ).map { it.canonicalName }
 
     Truth.assertThat(events.map { it.javaClass.canonicalName }).containsExactlyElementsIn(expectedEvents)
-    checkDbHasOnlyTheExpectedInfo(realmForDataEvent, expectedEvents.size)
 }
 
 // TODO : Fix ColloutEvent, CallbackEvent for Session
@@ -103,19 +106,8 @@ fun verifyEventsAfterIdentification(events: List<Event>, realmForDataEvent: Real
     ).map { it.canonicalName }
 
     Truth.assertThat(events.map { it.javaClass.canonicalName }).containsExactlyElementsIn(expectedEvents)
-    checkDbHasOnlyTheExpectedInfo(realmForDataEvent, expectedEvents.size)
 }
 
-fun checkDbHasOnlyTheExpectedInfo(realmForDataEvent: Realm, nEvents: Int) {
-    with(realmForDataEvent) {
-        realmForDataEvent.executeTransaction {
-            assertEquals(nEvents, where(DbEvent::class.java).findAll().size)
-            assertEquals(1, where(DbDatabaseInfo::class.java).findAll().size)
-            assertEquals(1, where(DbDevice::class.java).findAll().size)
-            Truth.assertThat(where(DbLocation::class.java).findAll().size).isIn(arrayListOf(0, 1))
-        }
-    }
-}
 
 //fun verifySessionIsOpen(sessionEvents: SessionEvents) {
 //    assertNotNull(sessionEvents)

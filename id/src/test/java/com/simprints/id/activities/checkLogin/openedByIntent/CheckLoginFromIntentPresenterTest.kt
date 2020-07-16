@@ -58,7 +58,7 @@ class CheckLoginFromIntentPresenterTest {
                 coEvery { crashReportManager.setSessionIdCrashlyticsKey(any()) } just Runs
 
                 eventRepository = mockk(relaxed = true)
-                coEvery { eventRepository.getCurrentSession() } returns createFakeSession()
+                coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createFakeSession()
             }
 
             checkLoginFromIntentPresenter.setup()
@@ -169,7 +169,7 @@ class CheckLoginFromIntentPresenterTest {
                 every { crashReportManager.setSessionIdCrashlyticsKey(any()) } just runs
 
                 eventRepository = mockk(relaxed = true)
-                coEvery { eventRepository.getCurrentSession() } returns createFakeSession()
+                coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createFakeSession()
 
                 analyticsManager = mockk()
                 coEvery { analyticsManager.getAnalyticsId() } returns "analyticsId"

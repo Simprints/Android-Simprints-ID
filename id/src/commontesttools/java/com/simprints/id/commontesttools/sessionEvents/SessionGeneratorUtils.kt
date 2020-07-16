@@ -19,10 +19,9 @@ fun createFakeSession(timeHelper: TimeHelper? = null,
         libVersionName = "some_version",
         language = "en",
         device = Device(deviceId = "device_id"),
-        startTime = startTime,
-        databaseInfo = databaseInfo).apply {
-        relativeEndTime = fakeRelativeEndTime
-    }
+        createdAt = startTime,
+        endTime = fakeRelativeEndTime,
+        databaseInfo = databaseInfo)
 
 fun createFakeOpenSession(timeHelper: TimeHelper,
                           projectId: String = "some_project",
@@ -37,6 +36,4 @@ fun createFakeOpenSessionButExpired(timeHelper: TimeHelper,
 fun createFakeClosedSession(timeHelper: TimeHelper,
                             projectId: String = "some_project",
                             id: String = UUID.randomUUID().toString()) =
-    createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(1000)).apply {
-        relativeEndTime = timeRelativeToStartTime(timeHelper.now())
-    }
+    createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(1000), fakeRelativeEndTime = timeHelper.nowMinus(1000))
