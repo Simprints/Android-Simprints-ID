@@ -18,13 +18,5 @@ abstract class BaseSplitActivity : AppCompatActivity() {
         val languageCtx = LanguageHelper.getLanguageConfigurationContext(newBase)
         super.attachBaseContext(languageCtx)
         SplitCompat.installActivity(this)
-        try {
-            SplitInstallHelper.loadLibrary(newBase, "yuv")
-            SplitInstallHelper.loadLibrary(newBase, "yuvjni")
-            SplitInstallHelper.loadLibrary(newBase, "roc_embedded")
-            SplitInstallHelper.loadLibrary(newBase, "_roc_embedded")
-        } catch (t: Throwable) {
-            Timber.e(t)
-        }
     }
 }
