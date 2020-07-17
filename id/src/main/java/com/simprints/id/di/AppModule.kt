@@ -257,8 +257,13 @@ open class AppModule {
     @Provides
     fun provideModuleRepository(
         preferencesManager: PreferencesManager,
-        crashReportManager: CrashReportManager
-    ): ModuleRepository = ModuleRepositoryImpl(preferencesManager, crashReportManager)
+        crashReportManager: CrashReportManager,
+        subjectLocalDataSource: SubjectLocalDataSource
+    ): ModuleRepository = ModuleRepositoryImpl(
+        preferencesManager,
+        crashReportManager,
+        subjectLocalDataSource
+    )
 
     @Provides
     open fun provideGuidSelectionManager(
