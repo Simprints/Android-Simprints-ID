@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.local
 
 import androidx.room.*
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.data.db.event.domain.events.EventType
 import com.simprints.id.data.db.event.local.models.DbEvent
 
 @Dao
@@ -11,7 +11,7 @@ interface EventRoomDao {
     suspend fun load(): List<DbEvent>
 
     @Query("select * from DbEvent where type=:type order by addedAt desc")
-    suspend fun loadByType(type: EventPayloadType): List<DbEvent>
+    suspend fun loadByType(type: EventType): List<DbEvent>
 
     @Query("select * from DbEvent where labels LIKE :sessionId")
     suspend fun loadBySessionId(sessionId: String): List<DbEvent>

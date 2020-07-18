@@ -2,8 +2,8 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
-import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
+import com.simprints.id.data.db.event.domain.events.EventType
+import com.simprints.id.data.db.event.domain.events.EventType.*
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.ALERT_SCREEN_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.ARTIFICIAL_TERMINATION_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.AUTHENTICATION_SERIALISED
@@ -94,7 +94,7 @@ private object SerialisedApiNames {
 }
 
 
-fun EventPayloadType.fromDomainToApi() = when (this) {
+fun EventType.fromDomainToApi() = when (this) {
     ENROLMENT_RECORD_CREATION -> ApiEventPayloadType.ENROLMENT_RECORD_CREATION
     ENROLMENT_RECORD_DELETION -> ApiEventPayloadType.ENROLMENT_RECORD_DELETION
     ARTIFICIAL_TERMINATION -> TODO()
@@ -135,9 +135,9 @@ fun EventPayloadType.fromDomainToApi() = when (this) {
 
 fun ApiEventPayloadType.fromApiToDomain() =
     when (this) {
-        ApiEventPayloadType.ENROLMENT_RECORD_CREATION -> EventPayloadType.ENROLMENT_RECORD_CREATION
-        ApiEventPayloadType.ENROLMENT_RECORD_DELETION -> EventPayloadType.ENROLMENT_RECORD_DELETION
-        ApiEventPayloadType.ENROLMENT_RECORD_MOVE -> EventPayloadType.ENROLMENT_RECORD_MOVE
+        ApiEventPayloadType.ENROLMENT_RECORD_CREATION -> EventType.ENROLMENT_RECORD_CREATION
+        ApiEventPayloadType.ENROLMENT_RECORD_DELETION -> EventType.ENROLMENT_RECORD_DELETION
+        ApiEventPayloadType.ENROLMENT_RECORD_MOVE -> EventType.ENROLMENT_RECORD_MOVE
         ApiEventPayloadType.ARTIFICIAL_TERMINATION -> TODO()
         ApiEventPayloadType.AUTHENTICATION -> TODO()
         ApiEventPayloadType.CONSENT -> TODO()

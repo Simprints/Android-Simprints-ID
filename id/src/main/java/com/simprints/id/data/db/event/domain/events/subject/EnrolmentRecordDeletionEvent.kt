@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.EventLabel.*
 import com.simprints.id.data.db.event.domain.events.EventPayload
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.data.db.event.domain.events.EventType
 import java.util.*
 
 @Keep
@@ -26,5 +26,5 @@ class EnrolmentRecordDeletionEvent(
         val projectId: String,
         val moduleId: String,
         val attendantId: String
-    ) : EventPayload(EventPayloadType.ENROLMENT_RECORD_DELETION, eventVersion, createdAt)
+    ) : EventPayload(EventType.ENROLMENT_RECORD_DELETION, eventVersion, createdAt)
 }

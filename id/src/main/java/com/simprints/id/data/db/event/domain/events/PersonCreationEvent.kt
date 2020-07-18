@@ -25,7 +25,7 @@ class PersonCreationEvent(
         creationTime: Long,
         version: Int,
         val fingerprintCaptureIds: List<String>
-    ) : EventPayload(EventPayloadType.PERSON_CREATION, version, creationTime)
+    ) : EventPayload(EventType.PERSON_CREATION, version, creationTime)
 
     companion object {
         fun build(timeHelper: TimeHelper,

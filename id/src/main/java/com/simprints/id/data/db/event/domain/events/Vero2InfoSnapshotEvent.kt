@@ -21,7 +21,7 @@ class Vero2InfoSnapshotEvent(
     class Vero2InfoSnapshotPayload(createdAt: Long,
                                    eventVersion: Int,
                                    val version: Vero2Version,
-                                   val battery: BatteryInfo) : EventPayload(EventPayloadType.VERO_2_INFO_SNAPSHOT, eventVersion, createdAt) {
+                                   val battery: BatteryInfo) : EventPayload(EventType.VERO_2_INFO_SNAPSHOT, eventVersion, createdAt) {
 
         @Keep
         class Vero2Version(

@@ -23,7 +23,7 @@ class OneToManyMatchEvent(
         val endTime: Long,
         val pool: MatchPool,
         val result: List<MatchEntry>?
-    ) : EventPayload(EventPayloadType.ONE_TO_MANY_MATCH, eventVersion, createdAt) {
+    ) : EventPayload(EventType.ONE_TO_MANY_MATCH, eventVersion, createdAt) {
 
         @Keep
         class MatchPool(val type: MatchPoolType, val count: Int)

@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.events.EventPayload
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.data.db.event.domain.events.EventType
 import java.util.*
 
 @Keep
@@ -26,6 +26,6 @@ class EnrolmentCalloutEvent(
                                   val projectId: String,
                                   val userId: String,
                                   val moduleId: String,
-                                  val metadata: String?) : EventPayload(EventPayloadType.CALLOUT_ENROLMENT, eventVersion, createdAt)
+                                  val metadata: String?) : EventPayload(EventType.CALLOUT_ENROLMENT, eventVersion, createdAt)
 
 }

@@ -23,7 +23,7 @@ class ConnectivitySnapshotEvent(
         eventVersion: Int,
         val networkType: String,
         val connections: List<SimNetworkUtils.Connection>
-    ) : EventPayload(EventPayloadType.CONNECTIVITY_SNAPSHOT, eventVersion, createdAt) {
+    ) : EventPayload(EventType.CONNECTIVITY_SNAPSHOT, eventVersion, createdAt) {
 
         companion object {
             fun buildEvent(simNetworkUtils: SimNetworkUtils,

@@ -22,7 +22,7 @@ class RefusalEvent(
                          eventVersion: Int,
                          val endTime: Long,
                          val reason: Answer,
-                         val otherText: String) : EventPayload(EventPayloadType.REFUSAL, eventVersion, createdAt) {
+                         val otherText: String) : EventPayload(EventType.REFUSAL, eventVersion, createdAt) {
 
         @Keep
         enum class Answer {

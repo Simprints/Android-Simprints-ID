@@ -30,7 +30,7 @@ class FingerprintCaptureEvent(
         val result: Result,
         val fingerprint: Fingerprint?,
         val id: String
-    ) : EventPayload(EventPayloadType.FINGERPRINT_CAPTURE, eventVersion, createdAt) {
+    ) : EventPayload(EventType.FINGERPRINT_CAPTURE, eventVersion, createdAt) {
 
         @Keep
         class Fingerprint(val finger: FingerIdentifier, val quality: Int, val template: String)

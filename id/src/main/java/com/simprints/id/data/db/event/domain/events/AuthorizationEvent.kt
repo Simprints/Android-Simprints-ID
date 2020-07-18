@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.Result
 import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.UserInfo
 import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
-import com.simprints.id.data.db.event.domain.events.EventPayloadType.AUTHORIZATION
+import com.simprints.id.data.db.event.domain.events.EventType.AUTHORIZATION
 import java.util.*
 
 @Keep

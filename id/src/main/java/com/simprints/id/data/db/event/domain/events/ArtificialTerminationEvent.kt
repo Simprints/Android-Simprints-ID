@@ -20,7 +20,7 @@ class ArtificialTerminationEvent(
         createdAt: Long,
         eventVersion: Int,
         val reason: Reason
-    ) : EventPayload(EventPayloadType.ARTIFICIAL_TERMINATION, eventVersion, createdAt) {
+    ) : EventPayload(EventType.ARTIFICIAL_TERMINATION, eventVersion, createdAt) {
 
         @Keep
         enum class Reason {

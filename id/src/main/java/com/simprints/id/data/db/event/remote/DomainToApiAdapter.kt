@@ -2,7 +2,7 @@ package com.simprints.id.data.db.event.remote
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.*
-import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
+import com.simprints.id.data.db.event.domain.events.EventType.*
 import com.simprints.id.data.db.event.domain.events.callback.*
 import com.simprints.id.data.db.event.domain.events.callout.*
 import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent

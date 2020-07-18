@@ -18,5 +18,5 @@ class EnrolmentEvent(
     @Keep
     class EnrolmentPayload(createdAt: Long,
                            eventVersion: Int,
-                           val personId: String) : EventPayload(EventPayloadType.ENROLMENT, eventVersion, createdAt)
+                           val personId: String) : EventPayload(EventType.ENROLMENT, eventVersion, createdAt)
 }

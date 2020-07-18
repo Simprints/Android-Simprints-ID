@@ -17,5 +17,5 @@ class CompletionCheckEvent(
     @Keep
     class CompletionCheckPayload(createdAt: Long,
                                  eventVersion: Int,
-                                 val completed: Boolean) : EventPayload(EventPayloadType.COMPLETION_CHECK, eventVersion, createdAt)
+                                 val completed: Boolean) : EventPayload(EventType.COMPLETION_CHECK, eventVersion, createdAt)
 }

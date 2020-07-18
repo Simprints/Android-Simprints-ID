@@ -7,13 +7,14 @@ import com.simprints.id.data.db.event.domain.events.ArtificialTerminationEvent
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.EventLabel.ProjectIdLabel
 import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
-import com.simprints.id.data.db.event.domain.events.EventPayloadType.SESSION_CAPTURE
+import com.simprints.id.data.db.event.domain.events.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.events.getSessionLabelIfExists
 import com.simprints.id.data.db.event.domain.events.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.events.session.Device
 import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidator
 import com.simprints.id.data.db.event.local.SessionLocalDataSource.EventQuery
+import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
@@ -70,7 +71,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         }
 
     override suspend fun getCurrentSessionCaptureEvent() =
-        load(EventQuery(eventPayloadType = SESSION_CAPTURE, endTime = LongRange(0, 0))).first() as SessionCaptureEvent
+        load(EventQuery(eventType = SESSION_CAPTURE, endTime = LongRange(0, 0))).first() as SessionCaptureEvent
 
     override suspend fun load(query: EventQuery): Flow<Event> =
         wrapSuspendExceptionIfNeeded {
@@ -117,7 +118,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
 
     private suspend fun closeAnyOpenSession() {
         wrapSuspendExceptionIfNeeded {
-            val openSessionIds = load(EventQuery(eventPayloadType = SESSION_CAPTURE, endTime = LongRange(0, 0))).map { it.id }
+            val openSessionIds = load(EventQuery(eventType = SESSION_CAPTURE, endTime = LongRange(0, 0))).map { it.id }
 
             openSessionIds.onEach { sessionId ->
                 val artificialTerminationEvent = ArtificialTerminationEvent(
@@ -146,7 +147,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
         with(this) {
             projectId?.let { event.labels.any { it == ProjectIdLabel(projectId) } } ?: false ||
                 sessionId?.let { event.labels.any { it == SessionIdLabel(sessionId) } } ?: false ||
-                eventPayloadType?.let { event.payload.type == it } ?: false ||
+                eventType?.let { event.payload.type == it } ?: false ||
                 id?.let { event.id == it } ?: false ||
                 startTime?.let { event.payload.createdAt in it } ?: false ||
                 endTime?.let { event.payload.endedAt in it } ?: false

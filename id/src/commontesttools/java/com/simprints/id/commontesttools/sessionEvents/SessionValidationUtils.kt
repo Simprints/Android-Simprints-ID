@@ -3,7 +3,7 @@ package com.simprints.id.commontesttools.sessionEvents
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.data.db.event.domain.events.EventType
 import com.simprints.id.data.db.event.remote.events.ApiAlertScreenEvent.ApiAlertScreenPayload
 import com.simprints.id.data.db.event.remote.events.ApiArtificialTerminationEvent.ApiArtificialTerminationPayload
 import com.simprints.id.data.db.event.remote.events.ApiAuthenticationEvent.ApiAuthenticationPayload
@@ -370,38 +370,38 @@ fun validateScannerFirmwareUpdateEventApiModel(json: JsonObject) {
 fun validateEvent(json: JsonObject) {
     val type = json.get("type").asString
 
-    when (EventPayloadType.valueOf(type)) {
-        EventPayloadType.REFUSAL -> validateRefusalEventApiModel(json)
-        EventPayloadType.CONSENT -> validateConsentEventApiModel(json)
-        EventPayloadType.ENROLMENT -> validateEnrolmentEventApiModel(json)
-        EventPayloadType.ALERT_SCREEN -> validateAlertScreenEventApiModel(json)
-        EventPayloadType.CANDIDATE_READ -> validateCandidateReadEventApiModel(json)
-        EventPayloadType.AUTHORIZATION -> validateAuthorizationEventApiModel(json)
-        EventPayloadType.GUID_SELECTION -> validateGuidSelectionEventApiModel(json)
-        EventPayloadType.AUTHENTICATION -> validateAuthenticationEventApiModel(json)
-        EventPayloadType.ONE_TO_ONE_MATCH -> validateOneToManyMatchEventApiModel(json)
-        EventPayloadType.PERSON_CREATION -> validatePersonCreationEvent(json)
-        EventPayloadType.ONE_TO_MANY_MATCH -> validateOneToManyMatchEventApiModel(json)
-        EventPayloadType.SCANNER_CONNECTION -> validateScannerConnectionEventApiModel(json)
-        EventPayloadType.FINGERPRINT_CAPTURE -> validateFingerprintCaptureEventApiModel(json)
-        EventPayloadType.CONNECTIVITY_SNAPSHOT -> validateConnectivitySnapshotEventApiModel(json)
-        EventPayloadType.ARTIFICIAL_TERMINATION -> validateArtificialTerminationEventApiModel(json)
-        EventPayloadType.INVALID_INTENT -> validateInvalidEventApiModel(json)
-        EventPayloadType.SUSPICIOUS_INTENT -> validateSuspiciousIntentEventApiModel(json)
-        EventPayloadType.CALLBACK_REFUSAL,
-        EventPayloadType.CALLBACK_ENROLMENT,
-        EventPayloadType.CALLBACK_IDENTIFICATION,
-        EventPayloadType.CALLBACK_CONFIRMATION,
-        EventPayloadType.CALLBACK_VERIFICATION -> validateCallbackEventApiModel(json)
-        EventPayloadType.CALLOUT_ENROLMENT,
-        EventPayloadType.CALLOUT_CONFIRMATION,
-        EventPayloadType.CALLOUT_VERIFICATION,
-        EventPayloadType.CALLBACK_ERROR,
-        EventPayloadType.INTENT_PARSING,
-        EventPayloadType.COMPLETION_CHECK,
-        EventPayloadType.CALLOUT_IDENTIFICATION -> validateCalloutEventApiModel(json)
-        EventPayloadType.VERO_2_INFO_SNAPSHOT -> validateVero2InfoSnapshotEventApiModel(json)
-        EventPayloadType.SCANNER_FIRMWARE_UPDATE -> validateScannerFirmwareUpdateEventApiModel(json)
+    when (EventType.valueOf(type)) {
+        EventType.REFUSAL -> validateRefusalEventApiModel(json)
+        EventType.CONSENT -> validateConsentEventApiModel(json)
+        EventType.ENROLMENT -> validateEnrolmentEventApiModel(json)
+        EventType.ALERT_SCREEN -> validateAlertScreenEventApiModel(json)
+        EventType.CANDIDATE_READ -> validateCandidateReadEventApiModel(json)
+        EventType.AUTHORIZATION -> validateAuthorizationEventApiModel(json)
+        EventType.GUID_SELECTION -> validateGuidSelectionEventApiModel(json)
+        EventType.AUTHENTICATION -> validateAuthenticationEventApiModel(json)
+        EventType.ONE_TO_ONE_MATCH -> validateOneToManyMatchEventApiModel(json)
+        EventType.PERSON_CREATION -> validatePersonCreationEvent(json)
+        EventType.ONE_TO_MANY_MATCH -> validateOneToManyMatchEventApiModel(json)
+        EventType.SCANNER_CONNECTION -> validateScannerConnectionEventApiModel(json)
+        EventType.FINGERPRINT_CAPTURE -> validateFingerprintCaptureEventApiModel(json)
+        EventType.CONNECTIVITY_SNAPSHOT -> validateConnectivitySnapshotEventApiModel(json)
+        EventType.ARTIFICIAL_TERMINATION -> validateArtificialTerminationEventApiModel(json)
+        EventType.INVALID_INTENT -> validateInvalidEventApiModel(json)
+        EventType.SUSPICIOUS_INTENT -> validateSuspiciousIntentEventApiModel(json)
+        EventType.CALLBACK_REFUSAL,
+        EventType.CALLBACK_ENROLMENT,
+        EventType.CALLBACK_IDENTIFICATION,
+        EventType.CALLBACK_CONFIRMATION,
+        EventType.CALLBACK_VERIFICATION -> validateCallbackEventApiModel(json)
+        EventType.CALLOUT_ENROLMENT,
+        EventType.CALLOUT_CONFIRMATION,
+        EventType.CALLOUT_VERIFICATION,
+        EventType.CALLBACK_ERROR,
+        EventType.INTENT_PARSING,
+        EventType.COMPLETION_CHECK,
+        EventType.CALLOUT_IDENTIFICATION -> validateCalloutEventApiModel(json)
+        EventType.VERO_2_INFO_SNAPSHOT -> validateVero2InfoSnapshotEventApiModel(json)
+        EventType.SCANNER_FIRMWARE_UPDATE -> validateScannerFirmwareUpdateEventApiModel(json)
     }
 }
 

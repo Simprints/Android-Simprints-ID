@@ -23,5 +23,5 @@ class OneToOneMatchEvent(
         val endTime: Long,
         val candidateId: String,
         val result: MatchEntry?
-    ) : EventPayload(EventPayloadType.ONE_TO_ONE_MATCH, eventVersion, createdAt)
+    ) : EventPayload(EventType.ONE_TO_ONE_MATCH, eventVersion, createdAt)
 }

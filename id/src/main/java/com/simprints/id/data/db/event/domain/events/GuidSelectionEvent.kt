@@ -17,6 +17,6 @@ class GuidSelectionEvent(
     @Keep
     class GuidSelectionPayload(creationTime: Long,
                                eventVersion: Int,
-                               val selectedId: String) : EventPayload(EventPayloadType.GUID_SELECTION, eventVersion, creationTime)
+                               val selectedId: String) : EventPayload(EventType.GUID_SELECTION, eventVersion, creationTime)
 
 }

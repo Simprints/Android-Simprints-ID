@@ -19,5 +19,5 @@ class SuspiciousIntentEvent(
         createdAt: Long,
         eventVersion: Int,
         val unexpectedExtras: Map<String, Any?>
-    ) : EventPayload(EventPayloadType.SUSPICIOUS_INTENT, eventVersion, createdAt)
+    ) : EventPayload(EventType.SUSPICIOUS_INTENT, eventVersion, createdAt)
 }

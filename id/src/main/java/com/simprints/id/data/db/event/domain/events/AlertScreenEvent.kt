@@ -20,7 +20,7 @@ class AlertScreenEvent(
         createdAt: Long,
         version: Int,
         val alertType: AlertScreenEventType
-    ) : EventPayload(EventPayloadType.ALERT_SCREEN, version, createdAt) {
+    ) : EventPayload(EventType.ALERT_SCREEN, version, createdAt) {
 
         enum class AlertScreenEventType {
             DIFFERENT_PROJECT_ID,
