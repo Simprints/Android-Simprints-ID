@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.events.EventPayload
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.data.db.event.domain.events.EventType
 import java.util.*
 
 @Keep
@@ -22,6 +22,6 @@ class RefusalCallbackEvent(
     class RefusalCallbackPayload(createdAt: Long,
                                  eventVersion: Int,
                                  val reason: String,
-                                 val extra: String) : EventPayload(EventPayloadType.CALLBACK_REFUSAL, eventVersion, createdAt)
+                                 val extra: String) : EventPayload(EventType.CALLBACK_REFUSAL, eventVersion, createdAt)
 
 }

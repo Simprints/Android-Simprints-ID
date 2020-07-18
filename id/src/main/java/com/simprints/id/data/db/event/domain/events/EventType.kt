@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.event.domain.events
 
-enum class EventPayloadType {
+enum class EventType {
     SESSION_CAPTURE,
     ENROLMENT_RECORD_CREATION,
     ENROLMENT_RECORD_DELETION,

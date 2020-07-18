@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.domain.validators
 
 import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
+import com.simprints.id.data.db.event.domain.events.EventType.*
 import com.simprints.id.data.db.event.domain.events.GuidSelectionEvent
 import com.simprints.id.exceptions.safe.session.validator.GuidSelectEventValidatorException
 

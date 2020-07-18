@@ -20,7 +20,7 @@ fun EventLabel.fromDomainToApi(): Pair<String, List<String>> =
         SUBJECT_ID -> "subjectId" to (this as SubjectIdLabel).values
         ATTENDANT_ID -> "attendantId" to (this as AttendantIdLabel).values
         MODULE_IDS -> "moduleId" to (this as ModuleIdsLabel).values
-        MODES -> "mode" to (this as Mode).values
+        MODES -> "mode" to (this as ModuleIdsLabel).values
         SESSION_ID -> "sessionId" to (this as SessionIdLabel).values
         DEVICE_ID -> "deviceId" to (this as DeviceIdLabel).values
     }

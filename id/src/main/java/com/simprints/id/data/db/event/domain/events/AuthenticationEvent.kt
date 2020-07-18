@@ -26,7 +26,7 @@ class AuthenticationEvent(
         val endTime: Long,
         val userInfo: UserInfo,
         val result: Result
-    ) : EventPayload(EventPayloadType.AUTHENTICATION, eventVersion, createdAt) {
+    ) : EventPayload(EventType.AUTHENTICATION, eventVersion, createdAt) {
 
         @Keep
         class UserInfo(val projectId: String, val userId: String)

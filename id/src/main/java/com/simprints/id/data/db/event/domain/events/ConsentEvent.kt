@@ -22,7 +22,7 @@ class ConsentEvent(
                          eventVersion: Int,
                          val endTime: Long,
                          val consentType: Type,
-                         var result: Result) : EventPayload(EventPayloadType.CONSENT, eventVersion, createdAt) {
+                         var result: Result) : EventPayload(EventType.CONSENT, eventVersion, createdAt) {
 
         @Keep
         enum class Type {

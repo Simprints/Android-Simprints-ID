@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.events.EventPayload
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.data.db.event.domain.events.EventType
 import java.util.*
 
 @Keep
@@ -30,5 +30,5 @@ class VerificationCalloutEvent(
         val moduleId: String,
         val verifyGuid: String,
         val metadata: String
-    ) : EventPayload(EventPayloadType.CALLOUT_VERIFICATION, eventVersion, createdAt)
+    ) : EventPayload(EventType.CALLOUT_VERIFICATION, eventVersion, createdAt)
 }

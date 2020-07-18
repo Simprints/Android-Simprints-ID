@@ -26,7 +26,7 @@ class CandidateReadEvent(
         val candidateId: String,
         val localResult: LocalResult,
         val remoteResult: RemoteResult?
-    ) : EventPayload(EventPayloadType.CANDIDATE_READ, eventVersion, createdAt) {
+    ) : EventPayload(EventType.CANDIDATE_READ, eventVersion, createdAt) {
 
         @Keep
         enum class LocalResult {

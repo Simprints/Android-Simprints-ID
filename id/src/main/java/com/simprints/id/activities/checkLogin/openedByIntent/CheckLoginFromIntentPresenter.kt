@@ -208,8 +208,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         ignoreException {
             eventRepository.updateCurrentSession { currentSessionEvent ->
                 val peopleInDb = subjectLocalDataSource.count()
-                (currentSessionEvent.payload as SessionCapturePayload).projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-                currentSessionEvent.payload.databaseInfo.recordCount = peopleInDb
+                val payload = (currentSessionEvent.payload as SessionCapturePayload)
+                payload.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+                payload.databaseInfo.recordCount = peopleInDb
 
                 eventRepository.addEvent(currentSessionEvent)
                 eventRepository.addEvent(buildAuthorizationEvent(Result.AUTHORIZED))

@@ -2,7 +2,7 @@ package com.simprints.id.data.db.event.domain.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
-import com.simprints.id.data.db.event.domain.events.EventPayloadType.INVALID_INTENT
+import com.simprints.id.data.db.event.domain.events.EventType.INVALID_INTENT
 import java.util.*
 
 @Keep

@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.events.EventPayload
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.data.db.event.domain.events.EventType
 import java.util.*
 
 @Keep
@@ -25,5 +25,5 @@ class ConfirmationCalloutEvent(
         val projectId: String,
         val selectedGuid: String,
         val sessionId: String
-    ) : EventPayload(EventPayloadType.CALLOUT_CONFIRMATION, eventVersion, createdAt)
+    ) : EventPayload(EventType.CALLOUT_CONFIRMATION, eventVersion, createdAt)
 }

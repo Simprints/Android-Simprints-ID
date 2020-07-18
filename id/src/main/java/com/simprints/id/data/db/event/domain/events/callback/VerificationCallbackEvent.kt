@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.events.EventPayload
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.data.db.event.domain.events.EventType
 import java.util.*
 
 @Keep
@@ -22,5 +22,5 @@ class VerificationCallbackEvent(
         createdAt: Long,
         eventVersion: Int,
         val score: CallbackComparisonScore
-    ) : EventPayload(EventPayloadType.CALLBACK_VERIFICATION, eventVersion, createdAt)
+    ) : EventPayload(EventType.CALLBACK_VERIFICATION, eventVersion, createdAt)
 }

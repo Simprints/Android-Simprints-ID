@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.events.EventPayload
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.data.db.event.domain.events.EventType
 import java.util.*
 
 @Keep
@@ -27,6 +27,6 @@ class EnrolmentLastBiometricsCalloutEvent(
                                                 val userId: String,
                                                 val moduleId: String,
                                                 val metadata: String?,
-                                                val sessionId: String) : EventPayload(EventPayloadType.CALLOUT_LAST_BIOMETRICS, eventVersion, createdAt)
+                                                val sessionId: String) : EventPayload(EventType.CALLOUT_LAST_BIOMETRICS, eventVersion, createdAt)
 
 }

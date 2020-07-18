@@ -3,7 +3,7 @@ package com.simprints.id.data.db.event
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
-import com.simprints.id.data.db.event.domain.events.EventPayloadType.SESSION_CAPTURE
+import com.simprints.id.data.db.event.domain.events.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.SessionLocalDataSource
 import com.simprints.id.data.db.event.local.SessionLocalDataSource.EventQuery
@@ -122,7 +122,7 @@ open class EventRepositoryImpl(
     override suspend fun load(): List<Event> = sessionLocalDataSource.load().toList()
 
     override suspend fun signOut() {
-        sessionLocalDataSource.load(EventQuery(eventPayloadType = SESSION_CAPTURE, endTime = LongRange(0, 0))).collect {
+        sessionLocalDataSource.load(EventQuery(eventType = SESSION_CAPTURE, endTime = LongRange(0, 0))).collect {
             sessionLocalDataSource.delete(EventQuery(sessionId = it.id))
         }
         sessionEventsSyncManager.cancelSyncWorkers()

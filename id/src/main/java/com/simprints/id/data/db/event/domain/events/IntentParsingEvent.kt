@@ -19,7 +19,7 @@ class IntentParsingEvent(
         createdAt: Long,
         eventVersion: Int,
         val integration: IntegrationInfo
-    ) : EventPayload(EventPayloadType.INTENT_PARSING, eventVersion, createdAt) {
+    ) : EventPayload(EventType.INTENT_PARSING, eventVersion, createdAt) {
 
         @Keep
         enum class IntegrationInfo {

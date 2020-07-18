@@ -18,7 +18,7 @@ class ScannerConnectionEvent(
     @Keep
     class ScannerConnectionPayload(createdAt: Long,
                                    eventVersion: Int,
-                                   val scannerInfo: ScannerInfo) : EventPayload(EventPayloadType.SCANNER_CONNECTION, eventVersion, createdAt) {
+                                   val scannerInfo: ScannerInfo) : EventPayload(EventType.SCANNER_CONNECTION, eventVersion, createdAt) {
 
         @Keep
         class ScannerInfo(val scannerId: String,

@@ -25,6 +25,6 @@ class ScannerFirmwareUpdateEvent(
                                        val chip: String,
                                        val targetAppVersion: String,
                                        var failureReason: String? = null)
-        : EventPayload(EventPayloadType.SCANNER_FIRMWARE_UPDATE, eventVersion, createdAt)
+        : EventPayload(EventType.SCANNER_FIRMWARE_UPDATE, eventVersion, createdAt)
 
 }

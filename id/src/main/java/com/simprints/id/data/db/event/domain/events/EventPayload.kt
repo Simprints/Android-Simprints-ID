@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.event.domain.events
 
 abstract class EventPayload(
-    val type: EventPayloadType,
-    val eventVersion: Int,
-    val createdAt: Long,
-    val endedAt: Long? = null
+    open val type: EventType,
+    open val eventVersion: Int,
+    open val createdAt: Long,
+    open val endedAt: Long = 0
 )

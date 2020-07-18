@@ -1,14 +1,14 @@
 package com.simprints.id.data.db.event.local
 
 import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.data.db.event.domain.events.EventType
 import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
 import kotlinx.coroutines.flow.Flow
 
 interface SessionLocalDataSource {
 
     data class EventQuery(val id: String? = null,
-                          val eventPayloadType: EventPayloadType? = null,
+                          val eventType: EventType? = null,
                           val projectId: String? = null,
                           val sessionId: String? = null,
                           val startTime: LongRange? = null,

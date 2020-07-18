@@ -3,7 +3,7 @@ package com.simprints.id.data.db.event.domain.events.subject
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.events.Event
 import com.simprints.id.data.db.event.domain.events.EventPayload
-import com.simprints.id.data.db.event.domain.events.EventPayloadType
+import com.simprints.id.data.db.event.domain.events.EventType
 import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
 import java.util.*
@@ -23,5 +23,5 @@ class EnrolmentRecordMoveEvent(
         eventVersion: Int,
         val enrolmentRecordCreation: EnrolmentRecordCreationPayload?,
         val enrolmentRecordDeletion: EnrolmentRecordDeletionPayload
-    ) : EventPayload(EventPayloadType.ENROLMENT_RECORD_MOVE, eventVersion, createdAt)
+    ) : EventPayload(EventType.ENROLMENT_RECORD_MOVE, eventVersion, createdAt)
 }

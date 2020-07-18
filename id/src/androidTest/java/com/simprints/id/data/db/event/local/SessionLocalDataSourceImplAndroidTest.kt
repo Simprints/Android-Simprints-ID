@@ -26,7 +26,7 @@ import java.io.IOException
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class SessionLocalDataSourceImplTest {
+class SessionLocalDataSourceImplAndroidTest {
 
     private lateinit var db: EventRoomDatabase
     private lateinit var eventDao: EventRoomDao
