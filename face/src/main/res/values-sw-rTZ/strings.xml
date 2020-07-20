@@ -2,7 +2,7 @@
 <resources>
     <string name="title_confirmation">Kuhakiki</string>
     <string name="capture_title_howto">Unaskani vipi sura</string>
-    <string name="capture_title_previewing">Maandalizi ya kuskani</string>
+    <string name="capture_title_previewing">Inaandaa kuskani</string>
     <string name="capture_title_looks_good">Skani iko tayari</string>
     <string name="capture_error_no_face">Hakikisha sura imejaa kwenye duara</string>
     <string name="capture_error_face_too_far">Sogea karibu</string>
@@ -28,4 +28,27 @@
     <string name="capture_title_too_close">Karibu sana</string>
     <string name="capture_title_face_too_far">Mbali sana</string>
     <string name="matching_x_records">Inalinganisha na %s taarifa zilizohifadhiwa</string>
+    <string name="title_capturing">Picha ya hapohapo</string>
+    <string name="btn_recapture">Piga tena</string>
+    <string name="face_match_please_wait">Tafadhali subiri tunapoendelea na utambulisho</string>
+    <string name="face_match_loading_candidates">Inapakia wateja...</string>
+    <string name="face_match_matching_candidates">Inafananisha mteja</string>
+    <string name="face_match_matched_candidates_one">Inalinganisha kwa mteja %d</string>
+    <string name="face_match_matched_candidates_other">Inalinganisha kwa mteja %d</string>
+    <string name="face_match_returned_results_one">Matokeo yamerudi %d</string>
+    <string name="face_match_returned_results_other">Matokeo yamerudi %d</string>
+    <string name="face_match_tier1or2_matches_zero">Hakuna inazofanana nayo vizuri sana</string>
+    <string name="face_match_tier1or2_matches_one">%d inafanana vizuri</string>
+    <string name="face_match_tier1or2_matches_other">%d inafananisha vizuri sana</string>
+    <string name="face_match_tier3_matches_zero">Hakuna inazofanana nayo vizuri</string>
+    <string name="face_match_tier3_matches_one">%d inayofanana nayo vizuri</string>
+    <string name="face_match_tier3_matches_other">%d inayofanana nazo vizuri</string>
+    <string name="face_match_tier4_matches_zero">Hakuna zinazofanana nayo</string>
+    <string name="face_match_tier4_matches_one">"%d inayofanana "</string>
+    <string name="face_match_tier4_matches_other">"%d inayofanana "</string>
+    <string name="error_licence_invalid_title">Leseni batili</string>
+    <string name="error_licence_invalid_message">Leseni ya uchukuaji wa picha ya sura ni batili, tafadhali wasiliana na msimazi wa mfumo huu</string>
+    <string name="error_licence_invalid_button">Funga</string>
+    <string name="error_licence_missing_title">Leseni haipo</string>
+    <string name="error_licence_missing_button">Funga</string>
 </resources>
