@@ -203,5 +203,11 @@
     <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
     <string name="enrol_last_biometrics_success">স্ক্যানার আপডেট করা প্রয়োজন</string>
     <string name="enrol_last_biometrics_alert_title">সেভ করা যায়নি</string>
+    <string name="modality_installation_offline_title">মোডালিটি ডাউনলোডে সমস্যা হচ্ছে</string>
+    <string name="feature_not_downloaded_title">সিমপ্রিন্টস ডাউনলোড অসম্পূর্ণ</string>
+    <string name="modality_installation_offline">"আপনার ওয়াই-ফাই অথবা ফোন ইন্টারনেট চালু আছে কিনা দেখুন। ডাউনলোড সম্পূর্ণ করতে সেটিংস থেকে ইন্টারনেট চালু করুন। "</string>
+    <string name="feature_not_downloaded">সিমপ্রিন্টস ব্যবহার করতে %1$s ডাউনলোড করুন।</string>
+    <string name="modality_download_taking_longer">ডাউলোড</string>
+    <string name="fingerprint_feature_alert">আঙ্গুলের ছাপ এর বৈশিষ্ট্য</string>
 
 </resources>
