@@ -1,13 +1,13 @@
 package com.simprints.id.data.db.event.controllers.local
 
 import com.google.common.truth.Truth
-import com.simprints.id.data.db.event.domain.events.*
-import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload
-import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
-import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
-import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload
-import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.Result.AUTHORIZED
-import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.Result.NOT_AUTHORIZED
+import com.simprints.id.data.db.event.domain.models.*
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.Result.AUTHORIZED
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.Result.NOT_AUTHORIZED
 import io.realm.Realm
 import junit.framework.TestCase.*
 

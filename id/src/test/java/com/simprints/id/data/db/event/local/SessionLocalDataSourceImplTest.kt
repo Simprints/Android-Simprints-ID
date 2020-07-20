@@ -8,9 +8,9 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.id.data.db.event.EventRepositoryImpl
-import com.simprints.id.data.db.event.domain.events.session.DatabaseInfo
-import com.simprints.id.data.db.event.domain.events.session.Device
-import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
+import com.simprints.id.data.db.event.domain.models.session.Device
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.orchestrator.SOME_GUID

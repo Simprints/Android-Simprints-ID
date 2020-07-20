@@ -1,14 +1,14 @@
 package com.simprints.id.data.db.event.remote
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.*
-import com.simprints.id.data.db.event.domain.events.EventType.*
-import com.simprints.id.data.db.event.domain.events.callback.*
-import com.simprints.id.data.db.event.domain.events.callout.*
-import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordCreationEvent
-import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordDeletionEvent
-import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordMoveEvent
+import com.simprints.id.data.db.event.domain.models.*
+import com.simprints.id.data.db.event.domain.models.EventType.*
+import com.simprints.id.data.db.event.domain.models.callback.*
+import com.simprints.id.data.db.event.domain.models.callout.*
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.id.data.db.event.remote.events.*
 import com.simprints.id.data.db.event.remote.events.callback.ApiCallbackEvent
 import com.simprints.id.data.db.event.remote.events.callout.ApiCalloutEvent

@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.event.remote.session
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.session.Location
-import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent.SessionCapturePayload
+import com.simprints.id.data.db.event.domain.models.session.Location
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.db.event.remote.events.ApiEvent
 import com.simprints.id.data.db.event.remote.events.ApiEventPayload
 import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType

@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.ScannerFirmwareUpdateEvent
-import com.simprints.id.data.db.event.domain.events.ScannerFirmwareUpdateEvent.ScannerFirmwareUpdatePayload
+import com.simprints.id.data.db.event.domain.models.ScannerFirmwareUpdateEvent
+import com.simprints.id.data.db.event.domain.models.ScannerFirmwareUpdateEvent.ScannerFirmwareUpdatePayload
 
 @Keep
 class ApiScannerFirmwareUpdateEvent(domainEvent: ScannerFirmwareUpdateEvent) :

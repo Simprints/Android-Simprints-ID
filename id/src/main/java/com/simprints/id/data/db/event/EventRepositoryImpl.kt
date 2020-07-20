@@ -1,10 +1,10 @@
 package com.simprints.id.data.db.event
 
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.EventLabel.SessionIdLabel
-import com.simprints.id.data.db.event.domain.events.EventType.SESSION_CAPTURE
-import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.SessionLocalDataSource
 import com.simprints.id.data.db.event.local.SessionLocalDataSource.EventQuery
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource

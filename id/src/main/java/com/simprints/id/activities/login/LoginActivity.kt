@@ -20,8 +20,8 @@ import com.simprints.id.activities.qrcapture.QrCaptureActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.event.domain.events.AuthenticationEvent
-import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.Result
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest

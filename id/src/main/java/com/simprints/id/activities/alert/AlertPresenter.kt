@@ -6,7 +6,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.events.AlertScreenEvent
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.Result
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.secure.AuthenticationHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

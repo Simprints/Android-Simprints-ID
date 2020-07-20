@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.event.remote.events.subject
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordMoveEvent
-import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload
 import com.simprints.id.data.db.event.remote.events.ApiEvent
 import com.simprints.id.data.db.event.remote.events.ApiEventPayload
 import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType

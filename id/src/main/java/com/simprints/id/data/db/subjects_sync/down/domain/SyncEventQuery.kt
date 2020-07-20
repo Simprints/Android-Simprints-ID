@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.subjects_sync.down.domain
 
-import com.simprints.id.data.db.event.domain.events.EventType
+import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.domain.modality.Modes
 
 data class SyncEventQuery(val projectId: String,

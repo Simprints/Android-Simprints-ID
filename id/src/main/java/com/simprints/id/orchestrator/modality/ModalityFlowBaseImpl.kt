@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.events.PersonCreationEvent
+import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse

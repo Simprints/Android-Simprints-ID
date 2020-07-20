@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.remote.events.subject
 
-import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordDeletionEvent
-import com.simprints.id.data.db.event.domain.events.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.event.remote.events.ApiEvent
 import com.simprints.id.data.db.event.remote.events.ApiEventPayload
 import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType

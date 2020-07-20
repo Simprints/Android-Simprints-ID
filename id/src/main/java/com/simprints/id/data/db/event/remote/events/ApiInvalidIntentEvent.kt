@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.InvalidIntentEvent
-import com.simprints.id.data.db.event.domain.events.InvalidIntentEvent.InvalidIntentPayload
+import com.simprints.id.data.db.event.domain.models.InvalidIntentEvent
+import com.simprints.id.data.db.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
 
 @Keep
 class ApiInvalidIntentEvent(domainEvent: InvalidIntentEvent) :

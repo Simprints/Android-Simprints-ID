@@ -10,8 +10,8 @@ import com.google.android.gms.location.LocationRequest
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.events.session.Location
-import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent.SessionCapturePayload
+import com.simprints.id.data.db.event.domain.models.session.Location
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
 import com.simprints.id.domain.moduleapi.core.requests.SetupRequest
 import com.simprints.id.domain.moduleapi.core.response.SetupResponse

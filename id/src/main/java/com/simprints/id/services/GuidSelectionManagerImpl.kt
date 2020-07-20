@@ -4,7 +4,7 @@ import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.events.GuidSelectionEvent
+import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest

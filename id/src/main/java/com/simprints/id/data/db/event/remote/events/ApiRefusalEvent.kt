@@ -1,10 +1,10 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.RefusalEvent
-import com.simprints.id.data.db.event.domain.events.RefusalEvent.RefusalPayload
-import com.simprints.id.data.db.event.domain.events.RefusalEvent.RefusalPayload.Answer
-import com.simprints.id.data.db.event.domain.events.RefusalEvent.RefusalPayload.Answer.*
+import com.simprints.id.data.db.event.domain.models.RefusalEvent
+import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload
+import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload.Answer
+import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload.Answer.*
 import com.simprints.id.data.db.event.remote.events.ApiRefusalEvent.ApiRefusalPayload.ApiAnswer
 
 @Keep

@@ -1,11 +1,10 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.AuthorizationEvent
-import com.simprints.id.data.db.event.domain.events.CandidateReadEvent
-import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload
-import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.LocalResult
-import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.RemoteResult
+import com.simprints.id.data.db.event.domain.models.CandidateReadEvent
+import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload
+import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
+import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
 import com.simprints.id.data.db.event.remote.events.ApiCandidateReadEvent.ApiCandidateReadPayload.ApiLocalResult
 import com.simprints.id.data.db.event.remote.events.ApiCandidateReadEvent.ApiCandidateReadPayload.ApiRemoteResult
 import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.CANDIDATE_READ

@@ -3,8 +3,8 @@ package com.simprints.fingerprint.controllers.core.eventData.model
 import androidx.annotation.Keep
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import com.simprints.id.data.db.event.domain.events.AlertScreenEvent as CoreAlertScreenEvent
-import com.simprints.id.data.db.event.domain.events.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent as CoreAlertScreenEvent
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
 @Keep
 class AlertScreenEvent(startTime: Long,

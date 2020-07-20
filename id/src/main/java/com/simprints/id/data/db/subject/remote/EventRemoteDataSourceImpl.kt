@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.subject.remote
 
 import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.event.domain.events.Event
+import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.remote.events.ApiEvents
 import com.simprints.id.data.db.event.remote.events.fromApiToDomain
 import com.simprints.id.data.db.event.remote.events.fromDomainToApi
