@@ -42,7 +42,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var subjectLocalDataSource: SubjectLocalDataSource
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
-    internal lateinit var appRequest: AppRequest
+    private val appRequest: AppRequest by lazy {
+        view.parseRequest()
+    }
 
     init {
         component.inject(this)
@@ -51,7 +53,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     override suspend fun setup() {
         try {
             addAnalyticsInfoAndProjectId()
-            parseAppRequest()
             extractSessionParametersOrThrow()
             addCalloutAndConnectivityEventsInSession(appRequest)
             setLastUser()
@@ -62,10 +63,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             view.openAlertActivityForError(AlertType.UNEXPECTED_ERROR)
             setupFailed = true
         }
-    }
-
-    private fun parseAppRequest() {
-        appRequest = view.parseRequest()
     }
 
     internal suspend fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
