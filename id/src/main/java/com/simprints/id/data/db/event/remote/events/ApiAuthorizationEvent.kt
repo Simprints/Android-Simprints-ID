@@ -1,11 +1,11 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.AuthorizationEvent
-import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload
-import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.Result.AUTHORIZED
-import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.Result.NOT_AUTHORIZED
-import com.simprints.id.data.db.event.domain.events.AuthorizationEvent.AuthorizationPayload.UserInfo
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.Result.AUTHORIZED
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.Result.NOT_AUTHORIZED
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
 import com.simprints.id.data.db.event.remote.events.ApiAuthorizationEvent.ApiAuthorizationPayload.ApiResult
 
 @Keep

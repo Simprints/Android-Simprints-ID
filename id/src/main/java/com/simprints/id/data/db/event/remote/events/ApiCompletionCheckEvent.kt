@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.CompletionCheckEvent
-import com.simprints.id.data.db.event.domain.events.CompletionCheckEvent.CompletionCheckPayload
+import com.simprints.id.data.db.event.domain.models.CompletionCheckEvent
+import com.simprints.id.data.db.event.domain.models.CompletionCheckEvent.CompletionCheckPayload
 
 @Keep
 class ApiCompletionCheckEvent(domainEvent: CompletionCheckEvent) :

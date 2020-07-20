@@ -2,9 +2,9 @@ package com.simprints.id.data.db.subject.domain
 
 import android.os.Parcelable
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.id.data.db.event.domain.events.subject.BiometricReference
-import com.simprints.id.data.db.event.domain.events.subject.FaceReference
-import com.simprints.id.data.db.event.domain.events.subject.FaceTemplate
+import com.simprints.id.data.db.event.domain.models.subject.BiometricReference
+import com.simprints.id.data.db.event.domain.models.subject.FaceReference
+import com.simprints.id.data.db.event.domain.models.subject.FaceTemplate
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import java.util.*

@@ -1,10 +1,10 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.EventLabel
-import com.simprints.id.data.db.event.domain.events.EventLabel.*
-import com.simprints.id.data.db.event.domain.events.EventLabel.EventLabelKey.*
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.EventLabel
+import com.simprints.id.data.db.event.domain.models.EventLabel.*
+import com.simprints.id.data.db.event.domain.models.EventLabel.EventLabelKey.*
 
 @Keep
 class ApiEvents(val events: List<ApiEvent>)

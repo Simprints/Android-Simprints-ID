@@ -15,10 +15,10 @@ import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.events.ConsentEvent
-import com.simprints.id.data.db.event.domain.events.ConsentEvent.ConsentPayload.Result
-import com.simprints.id.data.db.event.domain.events.ConsentEvent.ConsentPayload.Type
-import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent.SessionCapturePayload
+import com.simprints.id.data.db.event.domain.models.ConsentEvent
+import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Result
+import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Type
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.exitformhandler.ExitFormHelper

@@ -2,8 +2,8 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
-import com.simprints.id.data.db.event.domain.events.EventType
-import com.simprints.id.data.db.event.domain.events.EventType.*
+import com.simprints.id.data.db.event.domain.models.EventType
+import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.ALERT_SCREEN_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.ARTIFICIAL_TERMINATION_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.AUTHENTICATION_SERIALISED

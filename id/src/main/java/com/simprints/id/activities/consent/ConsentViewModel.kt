@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.consent.shortconsent.ConsentRepository
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.events.ConsentEvent
+import com.simprints.id.data.db.event.domain.models.ConsentEvent
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 
 class ConsentViewModel(askConsentRequest: AskConsentRequest,

@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.OneToOneMatchEvent
-import com.simprints.id.data.db.event.domain.events.OneToOneMatchEvent.OneToOneMatchPayload
+import com.simprints.id.data.db.event.domain.models.OneToOneMatchEvent
+import com.simprints.id.data.db.event.domain.models.OneToOneMatchEvent.OneToOneMatchPayload
 
 @Keep
 class ApiOneToOneMatchEvent(domainEvent: OneToOneMatchEvent) :

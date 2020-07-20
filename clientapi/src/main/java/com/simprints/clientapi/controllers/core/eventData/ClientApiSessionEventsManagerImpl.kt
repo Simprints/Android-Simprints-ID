@@ -6,10 +6,10 @@ import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.events.*
+import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.libsimprints.BuildConfig
 import kotlinx.coroutines.runBlocking
-import com.simprints.id.data.db.event.domain.events.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
 class ClientApiSessionEventsManagerImpl(private val coreEventRepository: EventRepository,
                                         private val timeHelper: ClientApiTimeHelper) :

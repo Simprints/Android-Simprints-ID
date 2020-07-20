@@ -7,9 +7,9 @@ import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.events.CandidateReadEvent
-import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.LocalResult
-import com.simprints.id.data.db.event.domain.events.CandidateReadEvent.CandidateReadPayload.RemoteResult
+import com.simprints.id.data.db.event.domain.models.CandidateReadEvent
+import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
+import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager

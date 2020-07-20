@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.event.remote
 
-import com.simprints.id.data.db.event.domain.events.Event
+import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory

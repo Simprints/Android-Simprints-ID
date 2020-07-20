@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent
-import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent.OneToManyMatchPayload
-import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
+import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent
+import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
+import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
 
 @Keep
 class ApiOneToManyMatchEvent(domainEvent: OneToManyMatchEvent) :

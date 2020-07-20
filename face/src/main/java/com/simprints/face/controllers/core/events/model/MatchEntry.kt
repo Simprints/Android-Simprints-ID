@@ -1,7 +1,7 @@
 package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.MatchEntry as MatchEntryCore
+import com.simprints.id.data.db.event.domain.models.MatchEntry as MatchEntryCore
 
 @Keep
 class MatchEntry(val candidateId: String, val score: Float) {

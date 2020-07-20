@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.AuthenticationEvent
-import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload
-import com.simprints.id.data.db.event.domain.events.AuthenticationEvent.AuthenticationPayload.Result.*
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
 import com.simprints.id.data.db.event.remote.events.ApiAuthenticationEvent.ApiAuthenticationPayload.ApiResult
 
 @Keep

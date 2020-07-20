@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.event
 
 import com.simprints.id.Application
-import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 
 interface EventRepository {
 

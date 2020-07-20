@@ -1,11 +1,11 @@
 package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.events.ConsentEvent
-import com.simprints.id.data.db.event.domain.events.ConsentEvent.ConsentPayload
-import com.simprints.id.data.db.event.domain.events.ConsentEvent.ConsentPayload.Result.*
-import com.simprints.id.data.db.event.domain.events.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
-import com.simprints.id.data.db.event.domain.events.ConsentEvent.ConsentPayload.Type.PARENTAL
+import com.simprints.id.data.db.event.domain.models.ConsentEvent
+import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
+import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Result.*
+import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
+import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Type.PARENTAL
 import com.simprints.id.data.db.event.remote.events.ApiConsentEvent.ApiConsentPayload.ApiResult
 import com.simprints.id.data.db.event.remote.events.ApiConsentEvent.ApiConsentPayload.ApiType
 

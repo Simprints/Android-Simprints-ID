@@ -3,9 +3,9 @@ package com.simprints.fingerprint.controllers.core.eventData.model
 import androidx.annotation.Keep
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import java.io.Serializable
-import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent as CoreOneToManyMatchEvent
-import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool as CoreMatchPool
-import com.simprints.id.data.db.event.domain.events.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType as CoreMatchPoolType
+import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent as CoreOneToManyMatchEvent
+import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool as CoreMatchPool
+import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType as CoreMatchPoolType
 
 @Keep
 class OneToManyMatchEvent(

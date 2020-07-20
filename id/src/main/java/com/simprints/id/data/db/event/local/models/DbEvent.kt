@@ -5,9 +5,9 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import com.beust.klaxon.Klaxon
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.event.domain.events.Event
-import com.simprints.id.data.db.event.domain.events.EventLabel
-import com.simprints.id.data.db.event.domain.events.EventType
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.EventLabel
+import com.simprints.id.data.db.event.domain.models.EventType
 import java.util.*
 
 data class DbEventLabel(val type: String,
