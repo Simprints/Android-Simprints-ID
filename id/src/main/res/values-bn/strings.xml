@@ -209,5 +209,8 @@
     <string name="feature_not_downloaded">সিমপ্রিন্টস ব্যবহার করতে %1$s ডাউনলোড করুন।</string>
     <string name="modality_download_taking_longer">ডাউলোড</string>
     <string name="fingerprint_feature_alert">আঙ্গুলের ছাপ এর বৈশিষ্ট্য</string>
+    <string name="modality_starting_download">ডাউনলোড শুরু করুন</string>
+    <string name="modality_downloading">"ডাউনলোড হচ্ছে "</string>
+    <string name="modality_installing">ইন্সটল হচ্ছে</string>
 
 </resources>
