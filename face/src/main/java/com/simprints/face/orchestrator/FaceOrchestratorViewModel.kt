@@ -92,12 +92,17 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
     }
 
     fun configurationFinished(isSuccess: Boolean) {
-        val response = if (isSuccess)
-            FaceConfigurationResponse()
-        else
-            FaceErrorResponse(FaceErrorReason.CONFIGURATION_ERROR)
-
-        flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(response))
+        if (isSuccess) {
+            flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(FaceConfigurationResponse()))
+        } else {
+            Timber.d("Configuration error")
+            crashReportManager.logMessageForCrashReport(
+                FACE_LICENSE,
+                UI,
+                message = "Error with configuration download"
+            )
+            errorEvent.send(ErrorType.CONFIGURATION_ERROR)
+        }
     }
 
 }
