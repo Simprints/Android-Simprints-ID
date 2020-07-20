@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.face.OrchestratorGraphDirections
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureActivity
 import com.simprints.face.di.KoinInjector
@@ -50,7 +51,7 @@ class FaceOrchestratorActivity : BaseSplitActivity() {
         })
         viewModel.errorEvent.observe(this, LiveDataEventWithContentObserver {
             findNavController(R.id.orchestrator_host_fragment)
-                .navigate(BlankFragmentDirections.actionBlankFragmentToErrorFragment(it))
+                .navigate(OrchestratorGraphDirections.actionGlobalErrorFragment(it))
         })
         viewModel.startConfiguration.observe(this, LiveDataEventWithContentObserver {
             findNavController(R.id.orchestrator_host_fragment)
