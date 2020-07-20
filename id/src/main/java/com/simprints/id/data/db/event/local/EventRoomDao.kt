@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.local
 
 import androidx.room.*
-import com.simprints.id.data.db.event.domain.events.EventType
+import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.local.models.DbEvent
 
 @Dao
