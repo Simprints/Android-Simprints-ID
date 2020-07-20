@@ -151,5 +151,8 @@
     <string name="feature_not_downloaded">Ili kutumia Simprints tafadhali endelea na upakue %1$s</string>
     <string name="modality_download_taking_longer">Inachukua muda mrefu kupakua zaidi ya ulivotegemea</string>
     <string name="fingerprint_feature_alert">Alama ya kidole</string>
+    <string name="modality_starting_download">Anza kupakua</string>
+    <string name="modality_downloading">Inapakua… %1$s</string>
+    <string name="modality_installing">Inaingiza...</string>
 
 </resources>
