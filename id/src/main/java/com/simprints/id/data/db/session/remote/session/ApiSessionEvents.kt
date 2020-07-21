@@ -18,7 +18,8 @@ open class ApiSessionEvents(var appVersionName: String,
                             var relativeUploadTime: Long = 0,
                             var databaseInfo: ApiDatabaseInfo,
                             var location: ApiLocation? = null,
-                            var analyticsId: String? = null) {
+                            var analyticsId: String? = null,
+                            var modalities: List<ApiModality> = emptyList()) {
 
 
     constructor(sessionDomain: SessionEvents) :
@@ -35,5 +36,6 @@ open class ApiSessionEvents(var appVersionName: String,
             sessionDomain.relativeUploadTime,
             ApiDatabaseInfo(sessionDomain.databaseInfo),
             sessionDomain.location?.let { ApiLocation(it) },
-            sessionDomain.analyticsId)
+            sessionDomain.analyticsId,
+            sessionDomain.modalities.map { it.fromDomainToApi() })
 }
