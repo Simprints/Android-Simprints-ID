@@ -168,6 +168,7 @@ class SetupActivity: BaseSplitActivity() {
         with(modalityDownloadProgressBar) {
             isIndeterminate = true
             isVisible = true
+
         }
         setupLogo.isVisible = false
     }
