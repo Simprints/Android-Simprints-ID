@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class ConfigurationViewModel(
     private val licenseRepository: LicenseRepository,
@@ -24,6 +25,11 @@ class ConfigurationViewModel(
             .flowOn(dispatcherProvider.io())
             .map { it.toConfigurationState() }
             .collect { configurationState.send(it) }
+    }
+
+    fun deleteInvalidLicense() {
+        Timber.d("License is invalid, deleting it")
+        licenseRepository.deleteCachedLicense()
     }
 
     private fun LicenseState.toConfigurationState(): ConfigurationState =
