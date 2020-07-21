@@ -4,15 +4,16 @@
     android:id="@+id/orchestrator_graph"
     app:startDestination="@id/blankFragment">
 
+    <action
+        android:id="@+id/action_global_errorFragment"
+        app:destination="@id/errorFragment"
+        app:popUpTo="@id/orchestrator_graph"
+        app:popUpToInclusive="true" />
+
     <fragment
         android:id="@+id/blankFragment"
         android:name="com.simprints.face.orchestrator.BlankFragment"
         android:label="BlankFragment">
-        <action
-            android:id="@+id/action_blankFragment_to_errorFragment"
-            app:destination="@id/errorFragment"
-            app:popUpTo="@id/orchestrator_graph"
-            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_blankFragment_to_configurationFragment"
             app:destination="@id/configurationFragment"
@@ -32,7 +33,7 @@
     <fragment
         android:id="@+id/configurationFragment"
         android:name="com.simprints.face.configuration.ConfigurationFragment"
-        android:label="ConfigurationFragment" >
+        android:label="ConfigurationFragment">
         <argument
             android:name="projectId"
             app:argType="string" />
