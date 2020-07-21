@@ -48,6 +48,14 @@ class LicenseLocalDataSourceImpl(val context: Context) : LicenseLocalDataSource 
         null
     }
 
+    override fun deleteCachedLicense() {
+        try {
+            File(licensePath).delete()
+        } catch (t: Throwable) {
+            Timber.e(t)
+        }
+    }
+
     private fun getFileFromStorage(): String? = try {
         val file = File(licensePath)
         val encryptedFile = getEncryptedFile(file)
