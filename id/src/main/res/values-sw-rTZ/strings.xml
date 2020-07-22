@@ -145,5 +145,14 @@
     <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
     <string name="enrol_last_biometrics_success">Kosa la kiufundi limetokea (intenti ya Simprints sio sahihi), tafadhali wasiliana na msimamizi wako wa programu</string>
     <string name="enrol_last_biometrics_alert_title">Imeshindwa kuhifadhi</string>
+    <string name="modality_installation_offline_title">Kosa katika njia ya kupakua</string>
+    <string name="feature_not_downloaded_title">Upakuaji wa Simprints haujakamilika</string>
+    <string name="modality_installation_offline">Angalia Wi-Fi au data ya simu imewashwa kwenye mipangilio ili kukamilisha kupakua</string>
+    <string name="feature_not_downloaded">Ili kutumia Simprints tafadhali endelea na upakue %1$s</string>
+    <string name="modality_download_taking_longer">Inachukua muda mrefu kupakua zaidi ya ulivotegemea</string>
+    <string name="fingerprint_feature_alert">Alama ya kidole</string>
+    <string name="modality_starting_download">Anza kupakua</string>
+    <string name="modality_downloading">Inapakua… %1$s</string>
+    <string name="modality_installing">Inaingiza...</string>
 
 </resources>

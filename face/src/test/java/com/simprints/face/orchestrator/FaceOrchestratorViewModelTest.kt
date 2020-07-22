@@ -14,10 +14,7 @@ import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.error.ErrorType
 import com.simprints.moduleapi.face.requests.IFaceCaptureRequest
-import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
-import com.simprints.moduleapi.face.responses.IFaceErrorReason
-import com.simprints.moduleapi.face.responses.IFaceErrorResponse
-import com.simprints.moduleapi.face.responses.IFaceMatchResponse
+import com.simprints.moduleapi.face.responses.*
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.every
 import io.mockk.mockk
@@ -69,6 +66,15 @@ class FaceOrchestratorViewModelTest {
     }
 
     @Test
+    fun `return the correct configuration response on finish`() {
+        viewModel.configurationFinished(true)
+
+        viewModel.flowFinished.value?.let { liveData ->
+            assertThat(liveData.peekContent()).isInstanceOf(IFaceConfigurationResponse::class.java)
+        }
+    }
+
+    @Test
     fun `route user to invalid license flow if needed`() {
         viewModel.invalidLicense()
         assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LICENSE_INVALID)
@@ -87,6 +93,17 @@ class FaceOrchestratorViewModelTest {
         viewModel.flowFinished.value?.peekContent()?.let { response ->
             assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
             assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.LICENSE_MISSING)
+        }
+    }
+
+    @Test
+    fun `route user to configuration error flow if needed`() {
+        viewModel.configurationFinished(false)
+        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.CONFIGURATION_ERROR)
+        viewModel.finishWithError(ErrorType.CONFIGURATION_ERROR)
+        viewModel.flowFinished.value?.peekContent()?.let { response ->
+            assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
+            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.FACE_CONFIGURATION_ERROR)
         }
     }
 
