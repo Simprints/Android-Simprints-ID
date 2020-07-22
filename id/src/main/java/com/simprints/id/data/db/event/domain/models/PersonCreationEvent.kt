@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+import com.simprints.id.data.db.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.tools.TimeHelper
@@ -16,7 +17,8 @@ class PersonCreationEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     mutableListOf(SessionIdLabel(sessionId)),
-    PersonCreationPayload(startTime, DEFAULT_EVENT_VERSION, fingerprintCaptureIds)) {
+    PersonCreationPayload(startTime, EVENT_VERSION, fingerprintCaptureIds),
+    PERSON_CREATION) {
 
 
     // At the end of the sequence of capture, we build a Person object used either for enrolment or verification/identification
@@ -25,7 +27,7 @@ class PersonCreationEvent(
         creationTime: Long,
         version: Int,
         val fingerprintCaptureIds: List<String>
-    ) : EventPayload(EventType.PERSON_CREATION, version, creationTime)
+    ) : EventPayload(PERSON_CREATION, version, creationTime)
 
     companion object {
         fun build(timeHelper: TimeHelper,
@@ -50,5 +52,8 @@ class PersonCreationEvent(
 //                    }
 //                }
 //                .map { it.id }
+
+            const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+
     }
 }

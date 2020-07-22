@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+import com.simprints.id.data.db.event.domain.models.EventType.REFUSAL
 import java.util.*
 
 @Keep
@@ -14,15 +15,16 @@ class RefusalEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     mutableListOf(SessionIdLabel(sessionId)),
-    RefusalPayload(createdAt, DEFAULT_EVENT_VERSION, endTime, reason, otherText)) {
+    RefusalPayload(createdAt, EVENT_VERSION, endTime, reason, otherText),
+    REFUSAL) {
 
 
     @Keep
     class RefusalPayload(createdAt: Long,
                          eventVersion: Int,
-                         val endTime: Long,
+                         endTime: Long,
                          val reason: Answer,
-                         val otherText: String) : EventPayload(EventType.REFUSAL, eventVersion, createdAt) {
+                         val otherText: String) : EventPayload(REFUSAL, eventVersion, createdAt, endTime) {
 
         @Keep
         enum class Answer {
@@ -34,5 +36,9 @@ class RefusalEvent(
             REFUSED_YOUNG,
             OTHER
         }
+    }
+
+    companion object {
+        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
     }
 }

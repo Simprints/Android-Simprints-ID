@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+import com.simprints.id.data.db.event.domain.models.EventType.AUTHENTICATION
 import java.util.*
 
 @Keep
@@ -16,17 +17,18 @@ class AuthenticationEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     mutableListOf(SessionIdLabel(sessionId)),
-    AuthenticationPayload(createdAt, DEFAULT_EVENT_VERSION, endTime, userInfo, result)) {
+    AuthenticationPayload(createdAt, EVENT_VERSION, endTime, userInfo, result),
+    AUTHENTICATION) {
 
 
     @Keep
     class AuthenticationPayload(
         createdAt: Long,
         eventVersion: Int,
-        val endTime: Long,
+        endTimeAt: Long,
         val userInfo: UserInfo,
         val result: Result
-    ) : EventPayload(EventType.AUTHENTICATION, eventVersion, createdAt) {
+    ) : EventPayload(AUTHENTICATION, eventVersion, createdAt, endTimeAt) {
 
         @Keep
         class UserInfo(val projectId: String, val userId: String)
@@ -40,5 +42,9 @@ class AuthenticationEvent(
             SAFETYNET_INVALID_CLAIM,
             UNKNOWN
         }
+    }
+
+    companion object {
+        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
     }
 }

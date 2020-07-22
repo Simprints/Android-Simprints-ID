@@ -22,7 +22,7 @@ class ApiScannerFirmwareUpdateEvent(domainEvent: ScannerFirmwareUpdateEvent) :
         constructor(domainPayload: ScannerFirmwareUpdatePayload) :
             this(domainPayload.createdAt,
                 domainPayload.eventVersion,
-                domainPayload.endTime,
+                domainPayload.endedAt,
                 domainPayload.chip,
                 domainPayload.targetAppVersion,
                 domainPayload.failureReason)

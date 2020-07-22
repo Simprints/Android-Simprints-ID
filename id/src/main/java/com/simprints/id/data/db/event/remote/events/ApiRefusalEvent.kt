@@ -35,7 +35,7 @@ class ApiRefusalEvent(domainEvent: RefusalEvent) :
         constructor(domainPayload: RefusalPayload) : this(
             domainPayload.createdAt,
             domainPayload.eventVersion,
-            domainPayload.endTime,
+            domainPayload.endedAt,
             domainPayload.reason.toApiRefusalEventAnswer(),
             domainPayload.otherText)
     }

@@ -35,7 +35,7 @@ class ApiOneToManyMatchEvent(domainEvent: OneToManyMatchEvent) :
         constructor(domainPayload: OneToManyMatchPayload) :
             this(domainPayload.createdAt,
                 domainPayload.eventVersion,
-                domainPayload.endTime,
+                domainPayload.endedAt,
                 ApiMatchPool(domainPayload.pool),
                 domainPayload.result?.map { ApiMatchEntry(it) })
     }

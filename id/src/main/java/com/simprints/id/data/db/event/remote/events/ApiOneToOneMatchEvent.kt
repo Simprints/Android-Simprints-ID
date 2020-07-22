@@ -21,7 +21,7 @@ class ApiOneToOneMatchEvent(domainEvent: OneToOneMatchEvent) :
         constructor(domainPayload: OneToOneMatchPayload) :
             this(domainPayload.createdAt,
                 domainPayload.eventVersion,
-                domainPayload.endTime,
+                domainPayload.endedAt,
                 domainPayload.candidateId,
                 domainPayload.result?.let { ApiMatchEntry(it) })
     }

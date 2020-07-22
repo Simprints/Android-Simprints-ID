@@ -39,7 +39,7 @@ class ApiAuthenticationEvent(domainEvent: AuthenticationEvent) :
         constructor(domainPayload: AuthenticationPayload) :
             this(domainPayload.createdAt,
                 domainPayload.eventVersion,
-                domainPayload.endTime,
+                domainPayload.endedAt,
                 ApiUserInfo(domainPayload.userInfo),
                 domainPayload.result.fromDomainToApi())
     }
