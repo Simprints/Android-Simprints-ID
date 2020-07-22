@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventPayload
-import com.simprints.id.data.db.event.domain.models.EventType
+import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_ENROLMENT
 import java.util.*
 
 @Keep
@@ -18,7 +18,8 @@ class EnrolmentCalloutEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     mutableListOf(SessionIdLabel(sessionId)),
-    EnrolmentCalloutPayload(createdAt, DEFAULT_EVENT_VERSION, projectId, userId, moduleId, metadata)) {
+    EnrolmentCalloutPayload(createdAt, EVENT_VERSION, projectId, userId, moduleId, metadata),
+    CALLOUT_ENROLMENT) {
 
     @Keep
     class EnrolmentCalloutPayload(createdAt: Long,
@@ -26,6 +27,10 @@ class EnrolmentCalloutEvent(
                                   val projectId: String,
                                   val userId: String,
                                   val moduleId: String,
-                                  val metadata: String?) : EventPayload(EventType.CALLOUT_ENROLMENT, eventVersion, createdAt)
+                                  val metadata: String?) : EventPayload(CALLOUT_ENROLMENT, eventVersion, createdAt)
+
+    companion object {
+        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+    }
 
 }
