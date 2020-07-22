@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+import com.simprints.id.data.db.event.domain.models.EventType.ALERT_SCREEN
 import java.util.*
 
 
@@ -13,14 +14,15 @@ class AlertScreenEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     mutableListOf(SessionIdLabel(sessionId)),
-    AlertScreenPayload(createdAt, DEFAULT_EVENT_VERSION, alertType)) {
+    AlertScreenPayload(createdAt, DEFAULT_EVENT_VERSION, alertType),
+    ALERT_SCREEN) {
 
     @Keep
     class AlertScreenPayload(
         createdAt: Long,
         version: Int,
         val alertType: AlertScreenEventType
-    ) : EventPayload(EventType.ALERT_SCREEN, version, createdAt) {
+    ) : EventPayload(ALERT_SCREEN, version, createdAt) {
 
         enum class AlertScreenEventType {
             DIFFERENT_PROJECT_ID,
@@ -52,5 +54,9 @@ class AlertScreenEvent(
             ENROLMENT_LAST_BIOMETRICS_FAILED,
             INVALID_STATE_FOR_INTENT_ACTION
         }
+    }
+
+    companion object {
+        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
     }
 }

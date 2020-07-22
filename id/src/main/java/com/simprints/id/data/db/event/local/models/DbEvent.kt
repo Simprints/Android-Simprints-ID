@@ -22,6 +22,7 @@ data class DbEvent(
     val addedAt: Date = Date()
 ) {
     class Converters {
+
         @TypeConverter
         fun fromEventLabelToString(labels: List<EventLabel>): String =
             JsonHelper.toJson(labels)

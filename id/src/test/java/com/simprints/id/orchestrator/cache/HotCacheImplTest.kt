@@ -12,7 +12,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
-import com.simprints.id.orchestrator.SOME_GUID
+import com.simprints.id.orchestrator.SOME_GUID1
 import com.simprints.id.orchestrator.steps.Step
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,7 +46,7 @@ class HotCacheImplTest : AutoCloseKoinTest() {
             DEFAULT_USER_ID,
             DEFAULT_MODULE_ID,
             DEFAULT_METADATA,
-            SOME_GUID
+            SOME_GUID1
         )
 
         hotCache.appRequest = appRequest

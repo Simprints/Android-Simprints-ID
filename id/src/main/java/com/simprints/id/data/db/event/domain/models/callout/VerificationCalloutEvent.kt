@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventPayload
-import com.simprints.id.data.db.event.domain.models.EventType
+import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_VERIFICATION
 import java.util.*
 
 @Keep
@@ -19,7 +19,8 @@ class VerificationCalloutEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     mutableListOf(SessionIdLabel(sessionId)),
-    VerificationCalloutPayload(createdAt, DEFAULT_EVENT_VERSION, projectId, userId, moduleId, verifyGuid, metadata)) {
+    VerificationCalloutPayload(createdAt, EVENT_VERSION, projectId, userId, moduleId, verifyGuid, metadata),
+    CALLOUT_VERIFICATION) {
 
     @Keep
     class VerificationCalloutPayload(
@@ -30,5 +31,9 @@ class VerificationCalloutEvent(
         val moduleId: String,
         val verifyGuid: String,
         val metadata: String
-    ) : EventPayload(EventType.CALLOUT_VERIFICATION, eventVersion, createdAt)
+    ) : EventPayload(CALLOUT_VERIFICATION, eventVersion, createdAt)
+
+    companion object {
+        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+    }
 }

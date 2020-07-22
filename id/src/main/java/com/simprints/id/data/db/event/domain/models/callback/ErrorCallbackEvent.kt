@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventPayload
-import com.simprints.id.data.db.event.domain.models.EventType
+import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_ERROR
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import java.util.*
 
@@ -16,12 +16,13 @@ class ErrorCallbackEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     mutableListOf(SessionIdLabel(sessionId)),
-    ErrorCallbackPayload(createdAt, DEFAULT_EVENT_VERSION, reason)) {
+    ErrorCallbackPayload(createdAt, EVENT_VERSION, reason),
+    CALLBACK_ERROR) {
 
     @Keep
     class ErrorCallbackPayload(createdAt: Long,
                                eventVersion: Int,
-                               val reason: Reason) : EventPayload(EventType.CALLBACK_ERROR, eventVersion, createdAt) {
+                               val reason: Reason) : EventPayload(CALLBACK_ERROR, eventVersion, createdAt) {
 
         enum class Reason {
             DIFFERENT_PROJECT_ID_SIGNED_IN,
@@ -45,5 +46,9 @@ class ErrorCallbackEvent(
                     }
             }
         }
+    }
+
+    companion object {
+        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
     }
 }

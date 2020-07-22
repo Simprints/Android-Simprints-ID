@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabel.*
 import com.simprints.id.data.db.event.domain.models.EventPayload
-import com.simprints.id.data.db.event.domain.models.EventType
+import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.domain.modality.Modes
 import java.util.*
 
@@ -20,7 +20,8 @@ class EnrolmentRecordCreationEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     mutableListOf(ProjectIdLabel(projectId), ModuleIdsLabel(listOf(moduleId)), AttendantIdLabel(attendantId), ModesLabel(modes)),
-    EnrolmentRecordCreationPayload(createdAt, DEFAULT_EVENT_VERSION, subjectId, projectId, moduleId, attendantId, biometricReferences)) {
+    EnrolmentRecordCreationPayload(createdAt, EVENT_VERSION, subjectId, projectId, moduleId, attendantId, biometricReferences),
+    ENROLMENT_RECORD_CREATION) {
 
     class EnrolmentRecordCreationPayload(
         createdAt: Long,
@@ -30,6 +31,10 @@ class EnrolmentRecordCreationEvent(
         val moduleId: String,
         val attendantId: String,
         val biometricReferences: List<BiometricReference>
-    ) : EventPayload(EventType.ENROLMENT_RECORD_CREATION, eventVersion, createdAt)
+    ) : EventPayload(ENROLMENT_RECORD_CREATION, eventVersion, createdAt)
 // startTime and relativeStartTime are not used for Pokodex events
+
+    companion object {
+        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+    }
 }

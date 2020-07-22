@@ -1,19 +1,12 @@
 package com.simprints.id.data.db.event.local
 
 import android.content.Context
-import android.os.Build
-import android.os.Build.VERSION
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.simprints.id.data.db.event.EventRepositoryImpl
-import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
-import com.simprints.id.data.db.event.domain.models.session.Device
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
-import com.simprints.id.data.db.event.local.models.fromDomainToDb
-import com.simprints.id.orchestrator.SOME_GUID
 import com.simprints.id.tools.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.RelaxedMockK
@@ -49,28 +42,14 @@ class SessionLocalDataSourceImplTest {
     fun create_session() {
         runBlocking {
             val sessionId = eventLocalDataSource.create(APP_VERSION_NAME, LIB_VERSION_NAME, LANGUAGE, DEVICE_ID)
-            val deviceId = randomGuid
-            eventDao.insertOrUpdate(
-                SessionCaptureEvent(
-                    timeHelper.now(),
-                    UUID.randomUUID().toString(),
-                    EventRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN,
-                    APP_VERSION_NAME,
-                    LIB_VERSION_NAME,
-                    LANGUAGE,
-                    Device(
-                        VERSION.SDK_INT.toString(),
-                        Build.MANUFACTURER + "_" + Build.MODEL,
-                        deviceId,
-                        SOME_GUID),
-                    DatabaseInfo(0)).fromDomainToDb())
+
+            eventDao.loadBySessionId(sessionId)
 
             val sessionEvent = eventDao.load().first()
-            val sessionPayload = (sessionEvent.fromDbToDomain() as SessionCaptureEvent).payload
+            val sessionPayload = sessionEvent.fromDbToDomain().payload as SessionCapturePayload
             Truth.assertThat(sessionPayload.appVersionName).isEqualTo(APP_VERSION_NAME)
             Truth.assertThat(sessionPayload.libVersionName).isEqualTo(LIB_VERSION_NAME)
             Truth.assertThat(sessionPayload.language).isEqualTo(LANGUAGE)
-            Truth.assertThat(sessionPayload.device.deviceId).isEqualTo(deviceId)
         }
     }
 
