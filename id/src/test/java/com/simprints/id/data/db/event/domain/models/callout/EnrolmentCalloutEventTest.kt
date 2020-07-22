@@ -7,6 +7,8 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.data.db.event.domain.models.CREATED_AT
+import com.simprints.id.data.db.event.domain.models.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_ENROLMENT
 import com.simprints.id.data.db.event.domain.models.callout.EnrolmentCalloutEvent.Companion.EVENT_VERSION
@@ -18,13 +20,13 @@ class EnrolmentCalloutEventTest {
     @Test
     fun create_EnrolmentCalloutEvent() {
 
-        val event = EnrolmentCalloutEvent(0, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, GUID1)
+        val event = EnrolmentCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, GUID1)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).containsExactly(SessionIdLabel(GUID1))
         assertThat(event.type).isEqualTo(CALLOUT_ENROLMENT)
         with(event.payload as EnrolmentCalloutPayload) {
-            assertThat(createdAt).isEqualTo(0)
-            assertThat(endedAt).isEqualTo(0)
+            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(CALLOUT_ENROLMENT)
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)

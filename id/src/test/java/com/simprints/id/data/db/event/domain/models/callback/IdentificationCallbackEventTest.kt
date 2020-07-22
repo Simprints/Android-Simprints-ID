@@ -1,6 +1,8 @@
 package com.simprints.id.data.db.event.domain.models.callback
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.data.db.event.domain.models.CREATED_AT
+import com.simprints.id.data.db.event.domain.models.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_IDENTIFICATION
 import com.simprints.id.data.db.event.domain.models.callback.IdentificationCallbackEvent.Companion.EVENT_VERSION
@@ -15,13 +17,13 @@ class IdentificationCallbackEventTest {
     fun create_IdentificationCallbackEvent() {
         val comparisonScore = CallbackComparisonScore(SOME_GUID1, 1, TIER_1)
 
-        val event = IdentificationCallbackEvent(1, SOME_GUID1, listOf(comparisonScore))
+        val event = IdentificationCallbackEvent(CREATED_AT, SOME_GUID1, listOf(comparisonScore))
         assertThat(event.id).isNotNull()
         assertThat(event.labels).containsExactly(SessionIdLabel(SOME_GUID1))
         assertThat(event.type).isEqualTo(CALLBACK_IDENTIFICATION)
         with(event.payload as IdentificationCallbackPayload) {
-            assertThat(createdAt).isEqualTo(1)
-            assertThat(endedAt).isEqualTo(0)
+            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(CALLBACK_IDENTIFICATION)
             assertThat(scores).containsExactly(comparisonScore)

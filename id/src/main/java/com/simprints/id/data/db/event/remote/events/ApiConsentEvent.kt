@@ -36,7 +36,7 @@ class ApiConsentEvent(domainEvent: ConsentEvent) :
         constructor(domainPayload: ConsentPayload) :
             this(domainPayload.createdAt,
                 domainPayload.eventVersion,
-                domainPayload.endTime,
+                domainPayload.endedAt,
                 domainPayload.consentType.fromDomainToApi(),
                 domainPayload.result.fromDomainToApi())
     }

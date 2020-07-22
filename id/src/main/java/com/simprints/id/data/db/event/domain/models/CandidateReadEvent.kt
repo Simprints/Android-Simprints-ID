@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+import com.simprints.id.data.db.event.domain.models.EventType.CANDIDATE_READ
 import java.util.*
 
 @Keep
@@ -15,18 +16,19 @@ class CandidateReadEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     mutableListOf(SessionIdLabel(sessionId)),
-    CandidateReadPayload(createdAt, DEFAULT_EVENT_VERSION, endTime, candidateId, localResult, remoteResult)) {
+    CandidateReadPayload(createdAt, EVENT_VERSION, endTime, candidateId, localResult, remoteResult),
+    CANDIDATE_READ) {
 
 
     @Keep
     class CandidateReadPayload(
         createdAt: Long,
         eventVersion: Int,
-        val endTime: Long,
+        endTimeAt: Long,
         val candidateId: String,
         val localResult: LocalResult,
         val remoteResult: RemoteResult?
-    ) : EventPayload(EventType.CANDIDATE_READ, eventVersion, createdAt) {
+    ) : EventPayload(CANDIDATE_READ, eventVersion, createdAt, endTimeAt) {
 
         @Keep
         enum class LocalResult {
@@ -37,5 +39,9 @@ class CandidateReadEvent(
         enum class RemoteResult {
             FOUND, NOT_FOUND
         }
+    }
+
+    companion object {
+        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
     }
 }

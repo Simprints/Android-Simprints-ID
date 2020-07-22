@@ -16,7 +16,8 @@ class AuthorizationEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     mutableListOf(SessionIdLabel(sessionId)),
-    AuthorizationPayload(createdAt, DEFAULT_EVENT_VERSION, result, userInfo)) {
+    AuthorizationPayload(createdAt, EVENT_VERSION, result, userInfo),
+    AUTHORIZATION) {
 
     @Keep
     class AuthorizationPayload(createdAt: Long,
@@ -31,5 +32,9 @@ class AuthorizationEvent(
 
         @Keep
         class UserInfo(val projectId: String, val userId: String)
+    }
+
+    companion object {
+        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
     }
 }

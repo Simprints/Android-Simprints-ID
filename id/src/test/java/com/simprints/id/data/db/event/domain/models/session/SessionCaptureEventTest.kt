@@ -3,6 +3,8 @@ package com.simprints.id.data.db.event.domain.models.session
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.data.db.event.domain.models.CREATED_AT
+import com.simprints.id.data.db.event.domain.models.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.Companion.EVENT_VERSION
@@ -25,7 +27,7 @@ class SessionCaptureEventTest {
         val databaseInfo = DatabaseInfo(2)
 
         val event = SessionCaptureEvent(
-            1,
+            CREATED_AT,
             SOME_GUID1,
             DEFAULT_PROJECT_ID,
             appVersionName,
@@ -38,8 +40,8 @@ class SessionCaptureEventTest {
         assertThat(event.labels).containsExactly(SessionIdLabel(SOME_GUID1))
         assertThat(event.type).isEqualTo(SESSION_CAPTURE)
         with(event.payload as SessionCapturePayload) {
-            assertThat(createdAt).isEqualTo(1)
-            assertThat(endedAt).isEqualTo(0)
+            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(SESSION_CAPTURE)
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)

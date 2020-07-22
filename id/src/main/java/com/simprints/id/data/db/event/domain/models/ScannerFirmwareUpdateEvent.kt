@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+import com.simprints.id.data.db.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
 import java.util.*
 
 @Keep
@@ -15,16 +16,20 @@ class ScannerFirmwareUpdateEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     mutableListOf(SessionIdLabel(sessionId)),
-    ScannerFirmwareUpdatePayload(createdAt, DEFAULT_EVENT_VERSION, endTime, chip, targetAppVersion, failureReason)) {
+    ScannerFirmwareUpdatePayload(createdAt, EVENT_VERSION, endTime, chip, targetAppVersion, failureReason),
+    SCANNER_FIRMWARE_UPDATE) {
 
 
     @Keep
     class ScannerFirmwareUpdatePayload(createdAt: Long,
                                        eventVersion: Int,
-                                       val endTime: Long,
+                                       endTimeAt: Long,
                                        val chip: String,
                                        val targetAppVersion: String,
                                        var failureReason: String? = null)
-        : EventPayload(EventType.SCANNER_FIRMWARE_UPDATE, eventVersion, createdAt)
+        : EventPayload(SCANNER_FIRMWARE_UPDATE, eventVersion, createdAt, endTimeAt)
 
+    companion object {
+        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+    }
 }

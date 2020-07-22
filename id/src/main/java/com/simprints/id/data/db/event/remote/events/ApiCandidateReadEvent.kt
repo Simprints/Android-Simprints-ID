@@ -37,7 +37,7 @@ class ApiCandidateReadEvent(domainEvent: CandidateReadEvent) :
         constructor(domainPayload: CandidateReadPayload) :
             this(domainPayload.createdAt,
                 domainPayload.eventVersion,
-                domainPayload.endTime,
+                domainPayload.endedAt,
                 domainPayload.candidateId,
                 domainPayload.localResult.fromDomainToApi(),
                 domainPayload.remoteResult?.fromDomainToApi())

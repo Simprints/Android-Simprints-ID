@@ -14,7 +14,8 @@ class InvalidIntentEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     mutableListOf(SessionIdLabel(sessionId)),
-    InvalidIntentPayload(creationTime, DEFAULT_EVENT_VERSION, action, extras)) {
+    InvalidIntentPayload(creationTime, EVENT_VERSION, action, extras),
+    INVALID_INTENT) {
 
 
     @Keep
@@ -23,4 +24,7 @@ class InvalidIntentEvent(
                                val action: String,
                                val extras: Map<String, Any?>) : EventPayload(INVALID_INTENT, eventVersion, createdAt)
 
+    companion object {
+        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+    }
 }

@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT
 import java.util.*
 
 @Keep
@@ -12,11 +13,16 @@ class EnrolmentEvent(
 ) : Event(
     UUID.randomUUID().toString(),
     mutableListOf(SessionIdLabel(sessionId)),
-    EnrolmentPayload(createdAt, DEFAULT_EVENT_VERSION, personId)) {
+    EnrolmentPayload(createdAt, EVENT_VERSION, personId),
+    ENROLMENT) {
 
 
     @Keep
     class EnrolmentPayload(createdAt: Long,
                            eventVersion: Int,
-                           val personId: String) : EventPayload(EventType.ENROLMENT, eventVersion, createdAt)
+                           val personId: String) : EventPayload(ENROLMENT, eventVersion, createdAt)
+
+    companion object {
+        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+    }
 }

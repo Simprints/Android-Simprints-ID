@@ -45,7 +45,7 @@ class ApiFingerprintCaptureEvent(domainEvent: FingerprintCaptureEvent) :
             this(domainPayload.id,
                 domainPayload.createdAt,
                 domainPayload.eventVersion,
-                domainPayload.endTime,
+                domainPayload.endedAt,
                 domainPayload.qualityThreshold,
                 domainPayload.finger.fromDomainToApi(),
                 domainPayload.result.fromDomainToApi(),
