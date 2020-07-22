@@ -462,7 +462,7 @@ class SessionEventsAdapterFactoryTest {
             Device("28", "phone", "device_id"),
             0,
             DatabaseInfo(0, 0),
-            listOf(Modality.FINGER)
+            listOf(Modality.FINGER, Modality.FACE)
         )
         session.addEvent(
             AlertScreenEvent(
