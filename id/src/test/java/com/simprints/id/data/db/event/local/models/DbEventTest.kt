@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.local.models
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.callback.*
 import com.simprints.id.data.db.event.domain.models.callout.*
+import com.simprints.id.data.db.event.domain.models.face.*
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import org.junit.Test
 
@@ -94,6 +95,46 @@ class DbEventTest {
         val transformed = original.fromDomainToDb()
 
         verifyVerificationCalloutEvents(original, transformed.fromDbToDomain() as VerificationCalloutEvent)
+    }
+
+    @Test
+    fun convert_FaceCaptureConfirmationEvent() {
+        val original = createFaceCaptureConfirmationEvent()
+        val transformed = original.fromDomainToDb()
+
+        verifyFaceCaptureConfirmationEvents(original, transformed.fromDbToDomain() as FaceCaptureConfirmationEvent)
+    }
+
+    @Test
+    fun convert_FaceCaptureEvent() {
+        val original = createFaceCaptureEvent()
+        val transformed = original.fromDomainToDb()
+
+        verifyFaceCaptureEvents(original, transformed.fromDbToDomain() as FaceCaptureEvent)
+    }
+
+    @Test
+    fun convert_FaceCaptureRetryEvent() {
+        val original = createFaceCaptureRetryEvent()
+        val transformed = original.fromDomainToDb()
+
+        verifyFaceCaptureRetryEvents(original, transformed.fromDbToDomain() as FaceCaptureRetryEvent)
+    }
+
+    @Test
+    fun convert_FaceFallbackCaptureEvent() {
+        val original = createFaceFallbackCaptureEvent()
+        val transformed = original.fromDomainToDb()
+
+        verifyFaceFallbackCaptureEvents(original, transformed.fromDbToDomain() as FaceFallbackCaptureEvent)
+    }
+
+    @Test
+    fun convert_FaceOnboardingCompleteEvent() {
+        val original = createFaceOnboardingCompleteEvent()
+        val transformed = original.fromDomainToDb()
+
+        verifyFaceOnboardingCompleteEvents(original, transformed.fromDbToDomain() as FaceOnboardingCompleteEvent)
     }
 
     @Test

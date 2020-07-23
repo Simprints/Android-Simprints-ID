@@ -7,7 +7,6 @@ import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.FACE_CAPTURE
-import com.simprints.id.data.db.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
 import java.util.*
 
@@ -32,7 +31,7 @@ class FaceCaptureEvent(
         UUID.randomUUID().toString(),
         mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
         FaceCapturePayload(startTime, endTime, EVENT_VERSION, attemptNb, qualityThreshold, result, isFallback, face),
-        FACE_CAPTURE_CONFIRMATION)
+        FACE_CAPTURE)
 
 
     @Keep

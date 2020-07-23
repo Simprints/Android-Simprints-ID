@@ -63,7 +63,7 @@ class EventAdapter : TypeAdapter<Event> {
             CALLBACK_IDENTIFICATION -> IdentificationCallbackEvent::class
             CALLBACK_ENROLMENT -> EnrolmentCallbackEvent::class
             CALLBACK_REFUSAL -> RefusalCallbackEvent::class
-            CALLBACK_VERIFICATION -> VerificationCalloutEvent::class
+            CALLBACK_VERIFICATION -> VerificationCallbackEvent::class
             CALLBACK_ERROR -> ErrorCallbackEvent::class
             SUSPICIOUS_INTENT -> SuspiciousIntentEvent::class
             INTENT_PARSING -> IntentParsingEvent::class

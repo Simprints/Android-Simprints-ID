@@ -35,6 +35,10 @@ import com.simprints.id.data.db.event.domain.models.callback.*
 import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
 import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.DIFFERENT_PROJECT_ID_SIGNED_IN
 import com.simprints.id.data.db.event.domain.models.callout.*
+import com.simprints.id.data.db.event.domain.models.face.*
+import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
+import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
+import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result.VALID
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
@@ -165,6 +169,55 @@ fun verifyVerificationCalloutEvents(event1: VerificationCalloutEvent, event2: Ve
     assertThat(payload1.userId).isEqualTo(payload2.userId)
     assertThat(payload1.moduleId).isEqualTo(payload2.moduleId)
     assertThat(payload1.metadata).isEqualTo(payload2.metadata)
+}
+
+fun createFaceCaptureConfirmationEvent() = FaceCaptureConfirmationEvent(CREATED_AT, ENDED_AT, CONTINUE, SOME_GUID1)
+fun verifyFaceCaptureConfirmationEvents(event1: FaceCaptureConfirmationEvent, event2: FaceCaptureConfirmationEvent) {
+    val payload1 = event1.payload
+    val payload2 = event2.payload
+    verifyEvents(event1, event2)
+    verifyPayloads(payload1, payload2)
+    assertThat(payload1.result).isEqualTo(payload2.result)
+}
+
+fun createFaceCaptureEvent(): FaceCaptureEvent {
+    val faceArg = Face(0F, 1F, 2F, "")
+    return FaceCaptureEvent(CREATED_AT, ENDED_AT, 0, 1F, VALID, true, faceArg, SOME_GUID1)
+}
+fun verifyFaceCaptureEvents(event1: FaceCaptureEvent, event2: FaceCaptureEvent) {
+    val payload1 = event1.payload
+    val payload2 = event2.payload
+    verifyEvents(event1, event2)
+    verifyPayloads(payload1, payload2)
+    assertThat(payload1.attemptNb).isEqualTo(payload2.attemptNb)
+    assertThat(payload1.qualityThreshold).isEqualTo(payload2.qualityThreshold)
+    assertThat(payload1.result).isEqualTo(payload2.result)
+    assertThat(payload1.isFallback).isEqualTo(payload2.isFallback)
+    assertThat(payload1.face).isEqualTo(payload2.face)
+}
+
+fun createFaceFallbackCaptureEvent() = FaceFallbackCaptureEvent(CREATED_AT, ENDED_AT, SOME_GUID1)
+fun verifyFaceFallbackCaptureEvents(event1: FaceFallbackCaptureEvent, event2: FaceFallbackCaptureEvent) {
+    val payload1 = event1.payload
+    val payload2 = event2.payload
+    verifyEvents(event1, event2)
+    verifyPayloads(payload1, payload2)
+}
+
+fun createFaceCaptureRetryEvent() = FaceCaptureRetryEvent(CREATED_AT, ENDED_AT, SOME_GUID1)
+fun verifyFaceCaptureRetryEvents(event1: FaceCaptureRetryEvent, event2: FaceCaptureRetryEvent) {
+    val payload1 = event1.payload
+    val payload2 = event2.payload
+    verifyEvents(event1, event2)
+    verifyPayloads(payload1, payload2)
+}
+
+fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(CREATED_AT, ENDED_AT, SOME_GUID1)
+fun verifyFaceOnboardingCompleteEvents(event1: FaceOnboardingCompleteEvent, event2: FaceOnboardingCompleteEvent) {
+    val payload1 = event1.payload
+    val payload2 = event2.payload
+    verifyEvents(event1, event2)
+    verifyPayloads(payload1, payload2)
 }
 
 fun createSessionCaptureEvent() =
@@ -411,6 +464,7 @@ fun createVero2InfoSnapshotEvent(): Vero2InfoSnapshotEvent {
     val batteryInfo = BatteryInfo(0, 1, 2, 3)
     return Vero2InfoSnapshotEvent(CREATED_AT, vero2Version, batteryInfo)
 }
+
 fun verifyVero2InfoSnapshotEvents(event1: Vero2InfoSnapshotEvent, event2: Vero2InfoSnapshotEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
