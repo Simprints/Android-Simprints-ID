@@ -28,7 +28,7 @@ class OdkConfirmationResponseTest : BaseOdkClientApiTest() {
         with(scenario.result) {
             Truth.assertThat(resultCode).isEqualTo(Activity.RESULT_OK)
             resultData.extras?.let {
-                Truth.assertThat(it.getBoolean(ODK_BIOMETRICS_COMPLETE_KEY)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
+                Truth.assertThat(it.getBoolean(ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
             } ?: throw Exception("No bundle found")
         }
     }
