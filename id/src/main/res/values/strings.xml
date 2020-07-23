@@ -4,6 +4,8 @@
     <!-- Dynamic module names -->
     <string name="title_face" translatable="false">Face</string>
     <string name="title_fingerprint" translatable="false">Fingerprint</string>
+    <string name="module_feature_finger" translatable="false">fingerprint</string>
+    <string name="module_feature_face" translatable="false">face</string>
 
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- App Name -->
@@ -298,8 +300,5 @@
     <string name="modality_downloading">Downloading… %1$s</string>
     <string name="modality_installing">Installing…</string>
     <string name="modality_download_taking_longer">Download taking longer than expected…</string>
-
-    <string name="module_feature_finger" translatable="false">fingerprint</string>
-    <string name="module_feature_face" translatable="false">face</string>
 
 </resources>

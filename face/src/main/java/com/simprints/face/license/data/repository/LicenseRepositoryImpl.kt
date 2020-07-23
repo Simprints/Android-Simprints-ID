@@ -23,4 +23,8 @@ class LicenseRepositoryImpl(
             emit(LicenseState.FinishedWithSuccess(license))
         }
     }
+
+    override fun deleteCachedLicense() {
+        licenseLocalDataSource.deleteCachedLicense()
+    }
 }

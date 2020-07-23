@@ -45,7 +45,12 @@ class ConfigurationFragment : Fragment(R.layout.configuration_fragment) {
     }
 
     private fun renderFinishedWithSuccess(license: String) {
-        mainVm.configurationFinished(sdkInitializer.tryInitWithLicense(requireActivity(), license))
+        if (sdkInitializer.tryInitWithLicense(requireActivity(), license)) {
+            mainVm.configurationFinished(true)
+        } else {
+            viewModel.deleteInvalidLicense()
+            mainVm.invalidLicense()
+        }
     }
 
     private fun renderFinishedWithError() {

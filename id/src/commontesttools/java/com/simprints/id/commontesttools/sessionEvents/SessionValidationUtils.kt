@@ -468,6 +468,11 @@ fun validateSessionEventsApiModel(json: JsonObject) {
         countFields += 1
     }
 
+    if (json.has("modalities")) {
+        assertThat(json.get("modalities").asJsonArray).isNotEmpty()
+        countFields += 1
+    }
+
     val events = json.get("events").asJsonArray
     events.forEach { validateEvent(it.asJsonObject) }
 
