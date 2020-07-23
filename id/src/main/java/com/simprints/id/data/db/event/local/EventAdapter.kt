@@ -2,8 +2,6 @@ package com.simprints.id.data.db.event.local
 
 import com.beust.klaxon.TypeAdapter
 import com.simprints.id.data.db.event.domain.models.*
-import com.simprints.id.data.db.event.domain.models.EventLabel.*
-import com.simprints.id.data.db.event.domain.models.EventLabel.EventLabelKey.*
 import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.domain.models.callback.*
 import com.simprints.id.data.db.event.domain.models.callout.*
@@ -13,22 +11,6 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreat
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
 import kotlin.reflect.KClass
-
-class EventLabelAdapter : TypeAdapter<EventLabel> {
-    override fun classFor(eventLabelKey: Any): KClass<out EventLabel> {
-        val eventLabelName = eventLabelKey as String
-        val eventLabel = EventLabelKey.valueOf(eventLabelName)
-        return when (eventLabel) {
-            PROJECT_ID -> ProjectIdLabel::class
-            SUBJECT_ID -> SubjectIdLabel::class
-            ATTENDANT_ID -> AttendantIdLabel::class
-            MODULE_IDS -> ModuleIdsLabel::class
-            MODES -> ModesLabel::class
-            SESSION_ID -> SessionIdLabel::class
-            DEVICE_ID -> DeviceIdLabel::class
-        }
-    }
-}
 
 class EventAdapter : TypeAdapter<Event> {
     override fun classFor(type: Any): KClass<out Event> {

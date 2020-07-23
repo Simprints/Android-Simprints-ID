@@ -1,14 +1,14 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.GUID_SELECTION
 import java.util.*
 
 @Keep
 class GuidSelectionEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: GuidSelectionPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -16,10 +16,10 @@ class GuidSelectionEvent(
     constructor(
         createdAt: Long,
         selectedId: String,
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf(SessionIdLabel(sessionId)),
+        labels,
         GuidSelectionPayload(createdAt, EVENT_VERSION, selectedId),
         GUID_SELECTION)
 

@@ -17,7 +17,7 @@ import com.simprints.id.data.db.event.remote.events.fromDomainToApi
 class ApiCallbackEvent(domainEvent: Event) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
+        domainEvent.labels.fromDomainToApi(),
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep

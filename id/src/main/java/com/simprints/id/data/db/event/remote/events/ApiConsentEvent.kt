@@ -13,7 +13,7 @@ import com.simprints.id.data.db.event.remote.events.ApiConsentEvent.ApiConsentPa
 class ApiConsentEvent(domainEvent: ConsentEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
+        domainEvent.labels.fromDomainToApi(),
         domainEvent.payload.fromDomainToApi()) {
 
 

@@ -1,14 +1,14 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
 import java.util.*
 
 @Keep
 class ScannerFirmwareUpdateEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: ScannerFirmwareUpdatePayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -18,10 +18,10 @@ class ScannerFirmwareUpdateEvent(
                 chip: String,
                 targetAppVersion: String,
                 failureReason: String? = null,
-                sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+                labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        labels,
         ScannerFirmwareUpdatePayload(createdAt, EVENT_VERSION, endTime, chip, targetAppVersion, failureReason),
         SCANNER_FIRMWARE_UPDATE)
 

@@ -1,14 +1,14 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.SCANNER_CONNECTION
 import java.util.*
 
 @Keep
 class ScannerConnectionEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: ScannerConnectionPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -16,10 +16,10 @@ class ScannerConnectionEvent(
     constructor(
         createdAt: Long,
         scannerInfo: ScannerConnectionPayload.ScannerInfo,
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf(SessionIdLabel(sessionId)),
+        labels,
         ScannerConnectionPayload(createdAt, EVENT_VERSION, scannerInfo),
         SCANNER_CONNECTION)
 

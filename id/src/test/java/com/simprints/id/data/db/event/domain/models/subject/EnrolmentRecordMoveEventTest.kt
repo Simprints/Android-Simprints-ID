@@ -5,6 +5,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.event.domain.models.CREATED_AT
 import com.simprints.id.data.db.event.domain.models.DEFAULT_ENDED_AT
+import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_MOVE
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
@@ -21,16 +22,13 @@ class EnrolmentRecordMoveEventTest {
 
     @Test
     fun create_EnrolmentRecordMoveEvent() {
+        val labels = EventLabels(sessionId = SOME_GUID1)
         val creation = createCreationPayload()
         val deletion = createDeletionPayload()
-        val event = EnrolmentRecordMoveEvent(CREATED_AT, creation, deletion)
+        val event = EnrolmentRecordMoveEvent(CREATED_AT, creation, deletion,labels)
 
         assertThat(event.id).isNotNull()
-//        assertThat(event.labels).containsExactly(
-//            ProjectIdLabel(DEFAULT_PROJECT_ID),
-//            ModuleIdsLabel(listOf(DEFAULT_MODULE_ID)),
-//            AttendantIdLabel(SOME_GUID2)
-//        )
+        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(ENROLMENT_RECORD_MOVE)
         with(event.payload as EnrolmentRecordMovePayload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

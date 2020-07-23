@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.remote.events.ApiFingerprintCaptureEvent.A
 class ApiFingerprintCaptureEvent(domainEvent: FingerprintCaptureEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
+        domainEvent.labels.fromDomainToApi(),
         domainEvent.payload.fromDomainToApi()) {
 
 

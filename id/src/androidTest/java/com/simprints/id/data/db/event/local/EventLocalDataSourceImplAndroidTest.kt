@@ -26,11 +26,11 @@ import java.io.IOException
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class SessionLocalDataSourceImplAndroidTest {
+class EventLocalDataSourceImplAndroidTest {
 
     private lateinit var db: EventRoomDatabase
-    private lateinit var eventDao: EventRoomDao
-    private lateinit var eventLocalDataSource: SessionLocalDataSource
+    private lateinit var eventDao: DbEventRoomDao
+    private lateinit var eventLocalDataSource: EventLocalDataSource
 
     @RelaxedMockK lateinit var timeHelper: TimeHelper
 
@@ -41,7 +41,7 @@ class SessionLocalDataSourceImplAndroidTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(context, EventRoomDatabase::class.java).build()
         eventDao = db.eventDao
-        eventLocalDataSource = SessionLocalDataSourceImpl(context, mockk(), timeHelper, eventDao, emptyArray())
+        eventLocalDataSource = EventLocalDataSourceImpl(context, mockk(), timeHelper, eventDao, emptyArray())
     }
 
     @Test

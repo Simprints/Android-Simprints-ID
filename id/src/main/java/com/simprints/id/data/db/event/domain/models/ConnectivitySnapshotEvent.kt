@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -10,7 +10,7 @@ import java.util.*
 @Keep
 class ConnectivitySnapshotEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: ConnectivitySnapshotPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -19,10 +19,10 @@ class ConnectivitySnapshotEvent(
         createdAt: Long,
         networkType: String,
         connections: List<SimNetworkUtils.Connection>,
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        labels,
         ConnectivitySnapshotPayload(createdAt, EVENT_VERSION, networkType, connections),
         CONNECTIVITY_SNAPSHOT)
 

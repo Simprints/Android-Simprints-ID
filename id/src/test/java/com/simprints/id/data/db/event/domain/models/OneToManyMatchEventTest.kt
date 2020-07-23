@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.ONE_TO_MANY_MATCH
 import com.simprints.id.data.db.event.domain.models.Matcher.RANK_ONE
 import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.Companion.EVENT_VERSION
@@ -14,14 +14,13 @@ class OneToManyMatchEventTest {
 
     @Test
     fun create_OneToManyMatchEvent() {
+        val labels = EventLabels(sessionId = SOME_GUID1)
         val poolArg = MatchPool(PROJECT, 100)
         val resultArg = listOf(MatchEntry(SOME_GUID1, 0F))
-        val event = OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, RANK_ONE, resultArg, SOME_GUID1)
+        val event = OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, RANK_ONE, resultArg, labels)
 
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).containsExactly(
-            SessionIdLabel(SOME_GUID1)
-        )
+        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(ONE_TO_MANY_MATCH)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

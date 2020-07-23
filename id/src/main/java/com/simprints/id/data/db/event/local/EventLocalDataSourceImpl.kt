@@ -5,15 +5,12 @@ import android.os.Build
 import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabel.ProjectIdLabel
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.id.data.db.event.domain.models.getSessionLabelIfExists
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidator
-import com.simprints.id.data.db.event.local.SessionLocalDataSource.EventQuery
+import com.simprints.id.data.db.event.local.EventLocalDataSource.EventQuery
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.data.secure.LocalDbKey
@@ -26,11 +23,11 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
 
-open class SessionLocalDataSourceImpl(private val appContext: Context,
-                                      private val secureDataManager: SecureLocalDbKeyProvider,
-                                      private val timeHelper: TimeHelper,
-                                      private val roomDao: EventRoomDao,
-                                      private val sessionEventsValidators: Array<SessionEventValidator>) : SessionLocalDataSource {
+open class EventLocalDataSourceImpl(private val appContext: Context,
+                                    private val secureDataManager: SecureLocalDbKeyProvider,
+                                    private val timeHelper: TimeHelper,
+                                    private val roomDao: DbEventRoomDao,
+                                    private val sessionEventsValidators: Array<SessionEventValidator>) : EventLocalDataSource {
     companion object {
         const val PROJECT_ID = "projectId"
         const val END_TIME = "relativeEndTime"
@@ -105,9 +102,8 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
     override suspend fun insertOrUpdate(event: Event) =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                val sessionIdLabel = event.getSessionLabelIfExists()
-                if (sessionIdLabel != null) {
-                    val eventsInTheSameSession = load(EventQuery(sessionId = sessionIdLabel.sessionId)).toList()
+                event.labels.sessionId?.let {
+                    val eventsInTheSameSession = load(EventQuery(sessionId = it)).toList()
                     sessionEventsValidators.forEach {
                         it.validate(eventsInTheSameSession, event)
                     }
@@ -123,8 +119,7 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
             openSessionIds.onEach { sessionId ->
                 val artificialTerminationEvent = ArtificialTerminationEvent(
                     timeHelper.now(),
-                    ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION,
-                    sessionId
+                    ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
                 )
                 insertOrUpdate(artificialTerminationEvent)
             }
@@ -145,9 +140,9 @@ open class SessionLocalDataSourceImpl(private val appContext: Context,
 
     fun EventQuery.filter(event: Event) =
         with(this) {
-            projectId?.let { event.labels.any { it == ProjectIdLabel(projectId) } } ?: false ||
-                sessionId?.let { event.labels.any { it == SessionIdLabel(sessionId) } } ?: false ||
-                eventType?.let { event.payload.type == it } ?: false ||
+            projectId?.let { event.labels.projectId == it } ?: false ||
+                sessionId?.let { event.labels.sessionId == it } ?: false ||
+                eventType?.let { event.type == it } ?: false ||
                 id?.let { event.id == it } ?: false ||
                 startTime?.let { event.payload.createdAt in it } ?: false ||
                 endTime?.let { event.payload.endedAt in it } ?: false

@@ -2,8 +2,8 @@ package com.simprints.id.data.db.event.domain.models.callback
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabel
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+import com.simprints.id.data.db.event.domain.models.EventLabels
+
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_IDENTIFICATION
@@ -12,16 +12,17 @@ import java.util.*
 @Keep
 class IdentificationCallbackEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: IdentificationCallbackPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
 
     constructor(createdAt: Long,
                 sessionId: String,
-                scores: List<CallbackComparisonScore>) : this(
+                scores: List<CallbackComparisonScore>,
+                labels: EventLabels = EventLabels()) : this(
         UUID.randomUUID().toString(),
-        mutableListOf(SessionIdLabel(sessionId)),
+        labels,
         IdentificationCallbackPayload(createdAt, EVENT_VERSION, sessionId, scores),
         CALLBACK_IDENTIFICATION)
 

@@ -2,8 +2,8 @@ package com.simprints.id.data.db.event.domain.models.callout
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabel
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+import com.simprints.id.data.db.event.domain.models.EventLabels
+
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
@@ -11,10 +11,10 @@ import java.util.*
 
 @Keep
 class EnrolmentLastBiometricsCalloutEvent(
-    override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
-    override val payload: EnrolmentLastBiometricsCalloutPayload,
-    override val type: EventType
+        override val id: String = UUID.randomUUID().toString(),
+        override var labels: EventLabels,
+        override val payload: EnrolmentLastBiometricsCalloutPayload,
+        override val type: EventType
 ) : Event(id, labels, payload, type) {
 
     constructor(
@@ -23,10 +23,11 @@ class EnrolmentLastBiometricsCalloutEvent(
         userId: String,
         moduleId: String,
         metadata: String?,
-        sessionId: String
+        sessionId: String,
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf(SessionIdLabel(sessionId)),
+        labels,
         EnrolmentLastBiometricsCalloutPayload(createdAt, EVENT_VERSION, projectId, userId, moduleId, metadata, sessionId),
         CALLOUT_LAST_BIOMETRICS)
 

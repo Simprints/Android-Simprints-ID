@@ -5,7 +5,7 @@ import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.local.models.DbEvent
 
 @Dao
-interface EventRoomDao {
+interface DbEventRoomDao {
 
     @Query("select * from DbEvent order by addedAt desc")
     suspend fun load(): List<DbEvent>
@@ -13,7 +13,7 @@ interface EventRoomDao {
     @Query("select * from DbEvent where type=:type order by addedAt desc")
     suspend fun loadByType(type: EventType): List<DbEvent>
 
-    @Query("select * from DbEvent where labels LIKE :sessionId")
+    @Query("select * from DbEvent where sessionId LIKE :sessionId")
     suspend fun loadBySessionId(sessionId: String): List<DbEvent>
 
     @Query("select count(id) from DbEvent")

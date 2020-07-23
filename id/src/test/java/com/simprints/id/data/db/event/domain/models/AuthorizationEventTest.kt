@@ -7,7 +7,7 @@ import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.Authoriza
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.Companion.EVENT_VERSION
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.AUTHORIZATION
 import com.simprints.id.orchestrator.SOME_GUID1
 import org.junit.Test
@@ -16,13 +16,11 @@ class AuthorizationEventTest {
 
     @Test
     fun create_AuthorizationEvent() {
-
+        val labels = EventLabels(sessionId = SOME_GUID1)
         val userInfo = UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID)
-        val event = AuthorizationEvent(CREATED_AT, AUTHORIZED, userInfo, SOME_GUID1)
+        val event = AuthorizationEvent(CREATED_AT, AUTHORIZED, userInfo, labels)
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).containsExactly(
-            SessionIdLabel(SOME_GUID1)
-        )
+        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(AUTHORIZATION)
         with(event.payload as AuthorizationPayload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

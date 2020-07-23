@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.INTENT_PARSING
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload
@@ -13,12 +13,11 @@ class IntentParsingEventTest {
 
     @Test
     fun create_IntentParsingEvent() {
-        val event = IntentParsingEvent(CREATED_AT, COMMCARE, SOME_GUID1)
+        val labels = EventLabels(sessionId = SOME_GUID1)
+        val event = IntentParsingEvent(CREATED_AT, COMMCARE, labels)
 
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).containsExactly(
-            SessionIdLabel(SOME_GUID1)
-        )
+        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(INTENT_PARSING)
         with(event.payload as IntentParsingPayload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

@@ -1,14 +1,14 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.ARTIFICIAL_TERMINATION
 import java.util.*
 
 @Keep
 class ArtificialTerminationEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: ArtificialTerminationPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -16,10 +16,10 @@ class ArtificialTerminationEvent(
     constructor(
         createdAt: Long,
         reason: ArtificialTerminationPayload.Reason,
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()//StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf(SessionIdLabel(sessionId)),
+        labels,
         ArtificialTerminationPayload(createdAt, EVENT_VERSION, reason),
         ARTIFICIAL_TERMINATION)
 

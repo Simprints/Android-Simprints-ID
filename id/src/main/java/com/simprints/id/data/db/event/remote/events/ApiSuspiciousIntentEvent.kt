@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.domain.models.SuspiciousIntentEvent.Suspic
 class ApiSuspiciousIntentEvent(domainEvent: SuspiciousIntentEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
+        domainEvent.labels.fromDomainToApi(),
         domainEvent.payload.fromDomainToApi()) {
 
 

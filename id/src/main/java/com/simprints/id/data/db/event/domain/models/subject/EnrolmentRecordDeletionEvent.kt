@@ -2,8 +2,7 @@ package com.simprints.id.data.db.event.domain.models.subject
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabel
-import com.simprints.id.data.db.event.domain.models.EventLabel.*
+import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
@@ -12,7 +11,7 @@ import java.util.*
 @Keep
 class EnrolmentRecordDeletionEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: EnrolmentRecordDeletionPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -22,10 +21,11 @@ class EnrolmentRecordDeletionEvent(
         subjectId: String,
         projectId: String,
         moduleId: String,
-        attendantId: String
+        attendantId: String,
+        labels: EventLabels = EventLabels() //StopShip
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf(ProjectIdLabel(projectId), ModuleIdsLabel(listOf(moduleId)), AttendantIdLabel(attendantId)),
+        labels,
         EnrolmentRecordDeletionPayload(createdAt, EVENT_VERSION, subjectId, projectId, moduleId, attendantId),
         ENROLMENT_RECORD_DELETION)
 

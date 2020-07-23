@@ -2,7 +2,7 @@ package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.ALERT_SCREEN
 import java.util.*
 
@@ -10,7 +10,7 @@ import java.util.*
 @Keep
 class AlertScreenEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: AlertScreenPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -18,10 +18,10 @@ class AlertScreenEvent(
     constructor(
         createdAt: Long,
         alertType: AlertScreenEventType,
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels() //StopShip
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf(SessionIdLabel(sessionId)),
+        labels,
         AlertScreenPayload(createdAt, DEFAULT_EVENT_VERSION, alertType),
         ALERT_SCREEN)
 

@@ -2,11 +2,11 @@ package com.simprints.id.data.db.event
 
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.local.SessionLocalDataSource
-import com.simprints.id.data.db.event.local.SessionLocalDataSource.EventQuery
+import com.simprints.id.data.db.event.local.EventLocalDataSource
+import com.simprints.id.data.db.event.local.EventLocalDataSource.EventQuery
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
@@ -22,7 +22,7 @@ open class EventRepositoryImpl(
     private val appVersionName: String,
     private val projectId: String,
     private val sessionEventsSyncManager: SessionEventsSyncManager,
-    private val sessionLocalDataSource: SessionLocalDataSource,
+    private val eventLocalDataSource: EventLocalDataSource,
     private val sessionRemoteDataSource: SessionRemoteDataSource,
     private val preferencesManager: PreferencesManager,
     private val crashReportManager: CrashReportManager,
@@ -36,17 +36,17 @@ open class EventRepositoryImpl(
 
     override suspend fun createSession(libSimprintsVersionName: String) {
         reportExceptionIfNeeded {
-            sessionLocalDataSource.create(appVersionName, libSimprintsVersionName, preferencesManager.language, deviceId)
+            eventLocalDataSource.create(appVersionName, libSimprintsVersionName, preferencesManager.language, deviceId)
         }
     }
 
     override suspend fun addEventToCurrentSession(event: Event) {
         ignoreException {
             reportExceptionIfNeeded {
-                val session = sessionLocalDataSource.getCurrentSessionCaptureEvent()
+                val session = eventLocalDataSource.getCurrentSessionCaptureEvent()
                 session?.let {
-                    event.labels.add(SessionIdLabel(session.id))
-                    sessionLocalDataSource.insertOrUpdate(event)
+                    event.labels = event.labels.copy(sessionId = session.id)
+                    eventLocalDataSource.insertOrUpdate(event)
                 } ?: Throwable("Missing open session")
             }
         }
@@ -55,7 +55,7 @@ open class EventRepositoryImpl(
     override suspend fun addEvent(event: Event) {
         ignoreException {
             reportExceptionIfNeeded {
-                sessionLocalDataSource.insertOrUpdate(event)
+                eventLocalDataSource.insertOrUpdate(event)
             }
         }
     }
@@ -109,21 +109,21 @@ open class EventRepositoryImpl(
     }
 
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent =
-        sessionLocalDataSource.getCurrentSessionCaptureEvent()
+        eventLocalDataSource.getCurrentSessionCaptureEvent()
 
     override suspend fun updateSession(sessionId: String, updateBlock: suspend (SessionCaptureEvent) -> Unit) {
         reportExceptionIfNeeded {
-            val sessionCaptureEvent = sessionLocalDataSource.load(EventQuery(sessionId = sessionId)).first()
+            val sessionCaptureEvent = eventLocalDataSource.load(EventQuery(sessionId = sessionId)).first()
             updateBlock(sessionCaptureEvent as SessionCaptureEvent)
-            sessionLocalDataSource.insertOrUpdate(sessionCaptureEvent)
+            eventLocalDataSource.insertOrUpdate(sessionCaptureEvent)
         }
     }
 
-    override suspend fun load(): List<Event> = sessionLocalDataSource.load().toList()
+    override suspend fun load(): List<Event> = eventLocalDataSource.load().toList()
 
     override suspend fun signOut() {
-        sessionLocalDataSource.load(EventQuery(eventType = SESSION_CAPTURE, endTime = LongRange(0, 0))).collect {
-            sessionLocalDataSource.delete(EventQuery(sessionId = it.id))
+        eventLocalDataSource.load(EventQuery(eventType = SESSION_CAPTURE, endTime = LongRange(0, 0))).collect {
+            eventLocalDataSource.delete(EventQuery(sessionId = it.id))
         }
         sessionEventsSyncManager.cancelSyncWorkers()
     }

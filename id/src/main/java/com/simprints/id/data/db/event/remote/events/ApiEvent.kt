@@ -2,9 +2,8 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabel
-import com.simprints.id.data.db.event.domain.models.EventLabel.*
-import com.simprints.id.data.db.event.domain.models.EventLabel.EventLabelKey.*
+import com.simprints.id.data.db.event.domain.models.EventLabels
+import okhttp3.internal.toImmutableMap
 
 @Keep
 class ApiEvents(val events: List<ApiEvent>)
@@ -14,16 +13,17 @@ open class ApiEvent(val id: String,
                     val labels: Map<String, List<String>>,
                     val payload: ApiEventPayload)
 
-fun EventLabel.fromDomainToApi(): Pair<String, List<String>> =
-    when (this.key) {
-        PROJECT_ID -> "projectId" to (this as ProjectIdLabel).values
-        SUBJECT_ID -> "subjectId" to (this as SubjectIdLabel).values
-        ATTENDANT_ID -> "attendantId" to (this as AttendantIdLabel).values
-        MODULE_IDS -> "moduleId" to (this as ModuleIdsLabel).values
-        MODES -> "mode" to (this as ModuleIdsLabel).values
-        SESSION_ID -> "sessionId" to (this as SessionIdLabel).values
-        DEVICE_ID -> "deviceId" to (this as DeviceIdLabel).values
-    }
+fun EventLabels.fromDomainToApi(): Map<String, List<String>> {
+    val api = mutableMapOf<String, List<String>>()
+    projectId?.let { api.put("projectId", listOf(it)) }
+    subjectId?.let { api.put("subjectId", listOf(it)) }
+    attendantId?.let { api.put("attendantId", listOf(it)) }
+    moduleIds?.let { api.put("moduleIds", it) }
+    mode?.let { api.put("mode", it.map { it.name }) }
+    sessionId?.let { api.put("sessionId", listOf(it)) }
+    deviceId?.let { api.put("deviceId", listOf(it)) }
+    return api.toImmutableMap()
+}
 
 fun Event.fromDomainToApi() =
-    ApiEvent(id, labels.map { it.fromDomainToApi() }.toMap(), payload.fromDomainToApi())
+    ApiEvent(id, labels.fromDomainToApi(), payload.fromDomainToApi())

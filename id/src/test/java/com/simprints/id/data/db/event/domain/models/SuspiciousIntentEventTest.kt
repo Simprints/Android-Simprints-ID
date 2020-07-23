@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.SUSPICIOUS_INTENT
 import com.simprints.id.data.db.event.domain.models.SuspiciousIntentEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.SuspiciousIntentEvent.SuspiciousIntentPayload
@@ -12,13 +12,12 @@ class SuspiciousIntentEventTest {
 
     @Test
     fun create_SuspiciousIntentEvent() {
+        val labels = EventLabels(sessionId = SOME_GUID1)
         val extrasArg = mapOf("extra_key" to "value")
-        val event = SuspiciousIntentEvent(CREATED_AT, extrasArg, SOME_GUID1)
+        val event = SuspiciousIntentEvent(CREATED_AT, extrasArg, labels)
 
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).containsExactly(
-            SessionIdLabel(SOME_GUID1)
-        )
+        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(SUSPICIOUS_INTENT)
         with(event.payload as SuspiciousIntentPayload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

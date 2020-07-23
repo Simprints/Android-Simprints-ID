@@ -2,7 +2,8 @@ package com.simprints.id.data.db.event.domain.models.callback
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.event.domain.models.CREATED_AT
 import com.simprints.id.data.db.event.domain.models.DEFAULT_ENDED_AT
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+import com.simprints.id.data.db.event.domain.models.EventLabels
+
 import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_REFUSAL
 import com.simprints.id.data.db.event.domain.models.callback.RefusalCallbackEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.callback.RefusalCallbackEvent.RefusalCallbackPayload
@@ -13,9 +14,10 @@ class RefusalCallbackEventTest {
 
     @Test
     fun create_RefusalCallbackEvent() {
-        val event = RefusalCallbackEvent(CREATED_AT, "some_reason", "some_extra", SOME_GUID1)
+        val labels = EventLabels(sessionId = SOME_GUID1)
+        val event = RefusalCallbackEvent(CREATED_AT, "some_reason", "some_extra", labels)
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).containsExactly(SessionIdLabel(SOME_GUID1))
+        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLBACK_REFUSAL)
         with(event.payload as RefusalCallbackPayload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

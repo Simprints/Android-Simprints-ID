@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.FINGERPRINT_CAPTURE
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import java.util.*
@@ -9,7 +9,7 @@ import java.util.*
 @Keep
 class FingerprintCaptureEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: FingerprintCapturePayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -22,10 +22,10 @@ class FingerprintCaptureEvent(
         result: FingerprintCapturePayload.Result,
         fingerprint: FingerprintCapturePayload.Fingerprint?,
         id: String = UUID.randomUUID().toString(),
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
     ) : this(
         id,
-        mutableListOf(SessionIdLabel(sessionId)),
+        labels,
         FingerprintCapturePayload(createdAt, EVENT_VERSION, endTime, finger, qualityThreshold, result, fingerprint, id),
         FINGERPRINT_CAPTURE)
 

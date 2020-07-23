@@ -3,14 +3,14 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.AUTHENTICATION
 import java.util.*
 
 @Keep
 class AuthenticationEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: AuthenticationPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -20,10 +20,10 @@ class AuthenticationEvent(
         endTime: Long,
         userInfo: UserInfo,
         result: Result,
-        sessionId: String = UUID.randomUUID().toString()
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        labels,
         AuthenticationPayload(createdAt, EVENT_VERSION, endTime, userInfo, result),
         AUTHENTICATION)
 

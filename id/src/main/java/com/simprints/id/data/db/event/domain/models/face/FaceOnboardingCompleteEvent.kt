@@ -2,8 +2,8 @@ package com.simprints.id.data.db.event.domain.models.face
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabel
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+import com.simprints.id.data.db.event.domain.models.EventLabels
+
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
@@ -13,7 +13,7 @@ import java.util.*
 @Keep
 class FaceOnboardingCompleteEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: FaceOnboardingCompletePayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -21,10 +21,10 @@ class FaceOnboardingCompleteEvent(
     constructor(
         startTime: Long,
         endTime: Long,
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()//StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        labels,
         FaceOnboardingCompletePayload(startTime, endTime, EVENT_VERSION),
         FACE_ONBOARDING_COMPLETE)
 
