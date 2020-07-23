@@ -20,7 +20,6 @@ import org.koin.core.parameter.parametersOf
 class OdkActivity : RequestActivity(), OdkContract.View {
 
     companion object {
-        private const val ODK_REGISTRATION_ID_KEY = "odk-registration-id"
         private const val ODK_GUIDS_KEY = "odk-guids"
         private const val ODK_BIOMETRICS_COMPLETE_CHECK_KEY = "odk-biometrics-complete"
         private const val ODK_CONFIDENCES_KEY = "odk-confidences"
@@ -28,6 +27,18 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_SESSION_ID = "odk-session-id"
         private const val ODK_EXIT_REASON = "odk-exit-reason"
         private const val ODK_EXIT_EXTRA = "odk-exit-extra"
+
+        private const val ODK_REGISTRATION_ID_KEY = "odk-registration-id"
+        private const val ODK_REGISTER_BIOMETRICS_COMPLETE = "odk-register-biometrics-complete"
+        private const val ODK_REGISTER_SESSION_ID = "odk-register-session-id"
+
+        private const val ODK_IDENTIFY_BIOMETRICS_COMPLETE = "odk-identify-biometrics-complete"
+        private const val ODK_IDENTIFY_SESSION_ID = "odk-identify-session-id"
+
+        private const val ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE = "odk-confirm-identity-biometrics-complete"
+
+        private const val ODK_VERIFY_BIOMETRICS_COMPLETE = "odk-verify-biometrics-complete"
+        private const val ODK_VERIFY_SESSION_ID = "odk-verify-session-id"
     }
 
     //For some reason, Survey CTO sends the callback field in the callout Intent.
@@ -41,7 +52,15 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         ODK_TIERS_KEY,
         ODK_SESSION_ID,
         ODK_EXIT_REASON,
-        ODK_EXIT_EXTRA
+        ODK_EXIT_EXTRA,
+        ODK_REGISTRATION_ID_KEY,
+        ODK_REGISTER_BIOMETRICS_COMPLETE,
+        ODK_REGISTER_SESSION_ID,
+        ODK_IDENTIFY_BIOMETRICS_COMPLETE,
+        ODK_IDENTIFY_SESSION_ID,
+        ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE,
+        ODK_VERIFY_BIOMETRICS_COMPLETE,
+        ODK_VERIFY_SESSION_ID
     )
 
     private val action: OdkAction
@@ -69,8 +88,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
 
     override fun returnRegistration(registrationId: String, sessionId: String, flowCompletedCheck: Boolean) = Intent().let {
         it.putExtra(ODK_REGISTRATION_ID_KEY, registrationId)
-        it.putExtra(ODK_SESSION_ID, sessionId)
-        it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
+        it.putExtra(ODK_REGISTER_SESSION_ID, sessionId)
+        it.putExtra(ODK_REGISTER_BIOMETRICS_COMPLETE, flowCompletedCheck)
 
         sendOkResult(it)
     }
@@ -83,8 +102,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         it.putExtra(ODK_GUIDS_KEY, idList)
         it.putExtra(ODK_CONFIDENCES_KEY, confidenceList)
         it.putExtra(ODK_TIERS_KEY, tierList)
-        it.putExtra(ODK_SESSION_ID, sessionId)
-        it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
+        it.putExtra(ODK_IDENTIFY_SESSION_ID, sessionId)
+        it.putExtra(ODK_IDENTIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
 
         sendOkResult(it)
     }
@@ -93,8 +112,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         it.putExtra(ODK_GUIDS_KEY, id)
         it.putExtra(ODK_CONFIDENCES_KEY, confidence)
         it.putExtra(ODK_TIERS_KEY, tier)
-        it.putExtra(ODK_SESSION_ID, sessionId)
-        it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
+        it.putExtra(ODK_VERIFY_SESSION_ID, sessionId)
+        it.putExtra(ODK_VERIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
 
         sendOkResult(it)
     }
@@ -109,7 +128,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     }
 
     override fun returnConfirmation(flowCompletedCheck: Boolean, sessionId: String) = Intent().let {
-        it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
+        it.putExtra(ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE, flowCompletedCheck)
         it.putExtra(ODK_SESSION_ID, sessionId)
         sendOkResult(it)
     }
