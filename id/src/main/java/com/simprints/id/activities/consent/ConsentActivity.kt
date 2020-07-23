@@ -9,29 +9,31 @@ import android.view.View
 import android.widget.TabHost
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.ConsentEvent
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.models.ConsentEvent
+import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
+import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
+import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Result.DECLINED
+import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Type
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality
+import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.exitformhandler.ExitFormHelper
+import com.simprints.id.orchestrator.steps.core.CoreRequestCode
+import com.simprints.id.orchestrator.steps.core.CoreResponseCode
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.response.AskConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.ConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.id.exitformhandler.ExitFormHelper
-import com.simprints.id.orchestrator.steps.core.CoreRequestCode
-import com.simprints.id.orchestrator.steps.core.CoreResponseCode
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.TimeHelper
 import kotlinx.android.synthetic.main.activity_consent.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ConsentActivity : BaseSplitActivity() {
@@ -45,7 +47,7 @@ class ConsentActivity : BaseSplitActivity() {
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var exitFormHelper: ExitFormHelper
-    @Inject lateinit var sessionRepository: SessionRepository
+    @Inject lateinit var eventRepository: EventRepository
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
 
@@ -59,7 +61,8 @@ class ConsentActivity : BaseSplitActivity() {
 
         startConsentEventTime = timeHelper.now()
 
-        askConsentRequestReceived = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
+        askConsentRequestReceived = intent.extras?.getParcelable(CORE_STEP_BUNDLE)
+            ?: throw InvalidAppRequest()
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(ConsentViewModel::class.java)
 
@@ -137,7 +140,7 @@ class ConsentActivity : BaseSplitActivity() {
     }
 
     fun handleConsentAcceptClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.ACCEPTED))
+        viewModel.addConsentEvent(buildConsentEventForResult(ACCEPTED))
         setResult(CoreResponseCode.CONSENT.value, Intent().apply {
             putExtra(CORE_STEP_BUNDLE, AskConsentResponse(ConsentResponse.ACCEPTED))
         })
@@ -145,7 +148,7 @@ class ConsentActivity : BaseSplitActivity() {
     }
 
     fun handleConsentDeclineClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.DECLINED))
+        viewModel.addConsentEvent(buildConsentEventForResult(DECLINED))
         startExitFormActivity()
     }
 
@@ -153,12 +156,12 @@ class ConsentActivity : BaseSplitActivity() {
         startPrivacyNoticeActivity()
     }
 
-    private fun buildConsentEventForResult(consentResult: ConsentEvent.Result) =
+    private fun buildConsentEventForResult(consentResult: ConsentPayload.Result) =
         ConsentEvent(startConsentEventTime, timeHelper.now(), getCurrentConsentTab(), consentResult)
 
     private fun getCurrentConsentTab() = when (tabHost.currentTabTag) {
-        GENERAL_CONSENT_TAB_TAG -> ConsentEvent.Type.INDIVIDUAL
-        PARENTAL_CONSENT_TAB_TAG -> ConsentEvent.Type.PARENTAL
+        GENERAL_CONSENT_TAB_TAG -> Type.INDIVIDUAL
+        PARENTAL_CONSENT_TAB_TAG -> Type.PARENTAL
         else -> throw IllegalStateException("Invalid consent tab selected")
     }
 
@@ -187,9 +190,9 @@ class ConsentActivity : BaseSplitActivity() {
     }
 
     private fun deleteLocationInfoFromSession() {
-        CoroutineScope(Dispatchers.Main).launch {
-            sessionRepository.updateCurrentSession {
-                it.location = null
+        inBackground {
+            eventRepository.updateCurrentSession {
+                it.payload.location = null
             }
         }
     }
