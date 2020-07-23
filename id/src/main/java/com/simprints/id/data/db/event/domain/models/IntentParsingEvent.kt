@@ -1,25 +1,25 @@
 package com.simprints.id.data.db.event.domain.models
 
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.INTENT_PARSING
 import io.realm.internal.Keep
 import java.util.*
 
 @androidx.annotation.Keep
 class IntentParsingEvent(
-    override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
-    override val payload: IntentParsingPayload,
-    override val type: EventType
+        override val id: String = UUID.randomUUID().toString(),
+        override var labels: EventLabels,
+        override val payload: IntentParsingPayload,
+        override val type: EventType
 ) : Event(id, labels, payload, type) {
 
     constructor(
         createdAt: Long,
         integration: IntentParsingPayload.IntegrationInfo,
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf(SessionIdLabel(sessionId)),
+        labels,
         IntentParsingPayload(createdAt, EVENT_VERSION, integration),
         INTENT_PARSING)
 

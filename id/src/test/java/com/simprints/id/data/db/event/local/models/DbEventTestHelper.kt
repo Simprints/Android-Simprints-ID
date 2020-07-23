@@ -48,8 +48,9 @@ import com.simprints.id.orchestrator.SOME_GUID1
 import com.simprints.id.orchestrator.SOME_GUID2
 import com.simprints.id.tools.utils.SimNetworkUtils.Connection
 import java.util.*
+val eventLabels = EventLabels(sessionId = SOME_GUID1)
 
-fun createConfirmationCallbackEvent() = ConfirmationCallbackEvent(CREATED_AT, true, SOME_GUID1)
+fun createConfirmationCallbackEvent() = ConfirmationCallbackEvent(CREATED_AT, true, eventLabels)
 fun verifyConfirmationCallbackEvents(event1: ConfirmationCallbackEvent, event2: ConfirmationCallbackEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -58,7 +59,7 @@ fun verifyConfirmationCallbackEvents(event1: ConfirmationCallbackEvent, event2: 
     assertThat(payload1.identificationOutcome).isEqualTo(payload2.identificationOutcome)
 }
 
-fun createEnrolmentCallbackEvent() = EnrolmentCallbackEvent(CREATED_AT, SOME_GUID1, SOME_GUID1)
+fun createEnrolmentCallbackEvent() = EnrolmentCallbackEvent(CREATED_AT, SOME_GUID1, eventLabels)
 fun verifyEnrolmentCallbackEvents(event1: EnrolmentCallbackEvent, event2: EnrolmentCallbackEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -67,7 +68,7 @@ fun verifyEnrolmentCallbackEvents(event1: EnrolmentCallbackEvent, event2: Enrolm
     assertThat(payload1.guid).isEqualTo(payload2.guid)
 }
 
-fun createErrorCallbackEvent() = ErrorCallbackEvent(CREATED_AT, DIFFERENT_PROJECT_ID_SIGNED_IN, SOME_GUID1)
+fun createErrorCallbackEvent() = ErrorCallbackEvent(CREATED_AT, DIFFERENT_PROJECT_ID_SIGNED_IN, eventLabels)
 fun verifyErrorCallbackEvents(event1: ErrorCallbackEvent, event2: ErrorCallbackEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload as ErrorCallbackPayload
@@ -90,7 +91,7 @@ fun verifyIdentificationCallbackEvents(event1: IdentificationCallbackEvent, even
     assertThat(payload1.scores).containsAllIn(payload2.scores)
 }
 
-fun createRefusalCallbackEvent() = RefusalCallbackEvent(CREATED_AT, "some_reason", "extra", SOME_GUID1)
+fun createRefusalCallbackEvent() = RefusalCallbackEvent(CREATED_AT, "some_reason", "extra", eventLabels)
 fun verifyRefusalCallbackEvents(event1: RefusalCallbackEvent, event2: RefusalCallbackEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -102,7 +103,7 @@ fun verifyRefusalCallbackEvents(event1: RefusalCallbackEvent, event2: RefusalCal
 
 fun createVerificationCallbackEvent(): VerificationCallbackEvent {
     val comparisonScore = CallbackComparisonScore(SOME_GUID1, 1, TIER_1)
-    return VerificationCallbackEvent(CREATED_AT, comparisonScore, SOME_GUID1)
+    return VerificationCallbackEvent(CREATED_AT, comparisonScore)
 }
 
 fun verifyVerificationCallbackEvents(event1: VerificationCallbackEvent, event2: VerificationCallbackEvent) {
@@ -113,7 +114,7 @@ fun verifyVerificationCallbackEvents(event1: VerificationCallbackEvent, event2: 
     assertThat(payload1.score).isEqualTo(payload2.score)
 }
 
-fun createConfirmationCalloutEvent() = ConfirmationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, SOME_GUID1, SOME_GUID2)
+fun createConfirmationCalloutEvent() = ConfirmationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, SOME_GUID1, SOME_GUID2, eventLabels)
 fun verifyConfirmationCalloutEvents(event1: ConfirmationCalloutEvent, event2: ConfirmationCalloutEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -123,7 +124,7 @@ fun verifyConfirmationCalloutEvents(event1: ConfirmationCalloutEvent, event2: Co
     assertThat(payload1.sessionId).isEqualTo(payload2.sessionId)
 }
 
-fun createEnrolmentCalloutEvent() = EnrolmentCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, SOME_GUID1)
+fun createEnrolmentCalloutEvent() = EnrolmentCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, eventLabels)
 fun verifyEnrolmentCalloutEvents(event1: EnrolmentCalloutEvent, event2: EnrolmentCalloutEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -135,7 +136,7 @@ fun verifyEnrolmentCalloutEvents(event1: EnrolmentCalloutEvent, event2: Enrolmen
     assertThat(payload1.metadata).isEqualTo(payload2.metadata)
 }
 
-fun createIdentificationCalloutEvent() = IdentificationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, SOME_GUID1)
+fun createIdentificationCalloutEvent() = IdentificationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, eventLabels)
 fun verifyIdentificationCalloutEvents(event1: IdentificationCalloutEvent, event2: IdentificationCalloutEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -147,7 +148,7 @@ fun verifyIdentificationCalloutEvents(event1: IdentificationCalloutEvent, event2
     assertThat(payload1.metadata).isEqualTo(payload2.metadata)
 }
 
-fun createLastBiometricsEnrolmentCalloutEvent() = EnrolmentLastBiometricsCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, SOME_GUID1)
+fun createLastBiometricsEnrolmentCalloutEvent() = EnrolmentLastBiometricsCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, SOME_GUID2, eventLabels)
 fun verifyEnrolmentLastBiometricsCalloutEvents(event1: EnrolmentLastBiometricsCalloutEvent, event2: EnrolmentLastBiometricsCalloutEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -159,7 +160,7 @@ fun verifyEnrolmentLastBiometricsCalloutEvents(event1: EnrolmentLastBiometricsCa
     assertThat(payload1.metadata).isEqualTo(payload2.metadata)
 }
 
-fun createVerificationCalloutEvent() = VerificationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, SOME_GUID1)
+fun createVerificationCalloutEvent() = VerificationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, SOME_GUID2, eventLabels)
 fun verifyVerificationCalloutEvents(event1: VerificationCalloutEvent, event2: VerificationCalloutEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -171,7 +172,7 @@ fun verifyVerificationCalloutEvents(event1: VerificationCalloutEvent, event2: Ve
     assertThat(payload1.metadata).isEqualTo(payload2.metadata)
 }
 
-fun createFaceCaptureConfirmationEvent() = FaceCaptureConfirmationEvent(CREATED_AT, ENDED_AT, CONTINUE, SOME_GUID1)
+fun createFaceCaptureConfirmationEvent() = FaceCaptureConfirmationEvent(CREATED_AT, ENDED_AT, CONTINUE, eventLabels)
 fun verifyFaceCaptureConfirmationEvents(event1: FaceCaptureConfirmationEvent, event2: FaceCaptureConfirmationEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -182,7 +183,7 @@ fun verifyFaceCaptureConfirmationEvents(event1: FaceCaptureConfirmationEvent, ev
 
 fun createFaceCaptureEvent(): FaceCaptureEvent {
     val faceArg = Face(0F, 1F, 2F, "")
-    return FaceCaptureEvent(CREATED_AT, ENDED_AT, 0, 1F, VALID, true, faceArg, SOME_GUID1)
+    return FaceCaptureEvent(CREATED_AT, ENDED_AT, 0, 1F, VALID, true, faceArg)
 }
 fun verifyFaceCaptureEvents(event1: FaceCaptureEvent, event2: FaceCaptureEvent) {
     val payload1 = event1.payload
@@ -196,7 +197,7 @@ fun verifyFaceCaptureEvents(event1: FaceCaptureEvent, event2: FaceCaptureEvent) 
     assertThat(payload1.face).isEqualTo(payload2.face)
 }
 
-fun createFaceFallbackCaptureEvent() = FaceFallbackCaptureEvent(CREATED_AT, ENDED_AT, SOME_GUID1)
+fun createFaceFallbackCaptureEvent() = FaceFallbackCaptureEvent(CREATED_AT, ENDED_AT, eventLabels)
 fun verifyFaceFallbackCaptureEvents(event1: FaceFallbackCaptureEvent, event2: FaceFallbackCaptureEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -204,7 +205,7 @@ fun verifyFaceFallbackCaptureEvents(event1: FaceFallbackCaptureEvent, event2: Fa
     verifyPayloads(payload1, payload2)
 }
 
-fun createFaceCaptureRetryEvent() = FaceCaptureRetryEvent(CREATED_AT, ENDED_AT, SOME_GUID1)
+fun createFaceCaptureRetryEvent() = FaceCaptureRetryEvent(CREATED_AT, ENDED_AT, eventLabels)
 fun verifyFaceCaptureRetryEvents(event1: FaceCaptureRetryEvent, event2: FaceCaptureRetryEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -212,7 +213,7 @@ fun verifyFaceCaptureRetryEvents(event1: FaceCaptureRetryEvent, event2: FaceCapt
     verifyPayloads(payload1, payload2)
 }
 
-fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(CREATED_AT, ENDED_AT, SOME_GUID1)
+fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(CREATED_AT, ENDED_AT, eventLabels)
 fun verifyFaceOnboardingCompleteEvents(event1: FaceOnboardingCompleteEvent, event2: FaceOnboardingCompleteEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -251,7 +252,7 @@ fun verifySessionCaptureEvents(event1: SessionCaptureEvent, event2: SessionCaptu
     assertThat(payload1.location).isEqualTo(payload2.location)
 }
 
-fun createAlertScreenEvent() = AlertScreenEvent(CREATED_AT, BLUETOOTH_NOT_ENABLED, SOME_GUID1)
+fun createAlertScreenEvent() = AlertScreenEvent(CREATED_AT, BLUETOOTH_NOT_ENABLED, eventLabels)
 fun verifyAlertScreenEvents(event1: AlertScreenEvent, event2: AlertScreenEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -260,7 +261,7 @@ fun verifyAlertScreenEvents(event1: AlertScreenEvent, event2: AlertScreenEvent) 
     assertThat(payload1.alertType).isEqualTo(payload2.alertType)
 }
 
-fun createArtificialTerminationEvent() = ArtificialTerminationEvent(CREATED_AT, NEW_SESSION, SOME_GUID1)
+fun createArtificialTerminationEvent() = ArtificialTerminationEvent(CREATED_AT, NEW_SESSION, eventLabels)
 fun verifyArtificialTerminationEvents(event1: ArtificialTerminationEvent, event2: ArtificialTerminationEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -269,7 +270,7 @@ fun verifyArtificialTerminationEvents(event1: ArtificialTerminationEvent, event2
     assertThat(payload1.reason).isEqualTo(payload2.reason)
 }
 
-fun createAuthenticationEvent() = AuthenticationEvent(CREATED_AT, ENDED_AT, UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID), AUTHENTICATED, SOME_GUID1)
+fun createAuthenticationEvent() = AuthenticationEvent(CREATED_AT, ENDED_AT, UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID), AUTHENTICATED, eventLabels)
 fun verifyAuthenticationEvents(event1: AuthenticationEvent, event2: AuthenticationEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -279,7 +280,7 @@ fun verifyAuthenticationEvents(event1: AuthenticationEvent, event2: Authenticati
     assertThat(payload1.result).isEqualTo(payload2.result)
 }
 
-fun createAuthorizationEvent() = AuthorizationEvent(CREATED_AT, AUTHORIZED, AuthorizationPayload.UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID), SOME_GUID1)
+fun createAuthorizationEvent() = AuthorizationEvent(CREATED_AT, AUTHORIZED, AuthorizationPayload.UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID), eventLabels)
 fun verifyAuthorizationEvents(event1: AuthorizationEvent, event2: AuthorizationEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -289,7 +290,7 @@ fun verifyAuthorizationEvents(event1: AuthorizationEvent, event2: AuthorizationE
     assertThat(payload1.result).isEqualTo(payload2.result)
 }
 
-fun createCandidateReadEvent() = CandidateReadEvent(CREATED_AT, ENDED_AT, SOME_GUID1, FOUND, NOT_FOUND, SOME_GUID1)
+fun createCandidateReadEvent() = CandidateReadEvent(CREATED_AT, ENDED_AT, SOME_GUID1, FOUND, NOT_FOUND, eventLabels)
 fun verifyCandidateReadEvents(event1: CandidateReadEvent, event2: CandidateReadEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -300,7 +301,7 @@ fun verifyCandidateReadEvents(event1: CandidateReadEvent, event2: CandidateReadE
     assertThat(payload1.remoteResult).isEqualTo(payload2.remoteResult)
 }
 
-fun createCompletionCheckEvent() = CompletionCheckEvent(CREATED_AT, true, SOME_GUID1)
+fun createCompletionCheckEvent() = CompletionCheckEvent(CREATED_AT, true, eventLabels)
 fun verifyCompletionCheckEvents(event1: CompletionCheckEvent, event2: CompletionCheckEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -309,7 +310,7 @@ fun verifyCompletionCheckEvents(event1: CompletionCheckEvent, event2: Completion
     assertThat(payload1.completed).isEqualTo(payload2.completed)
 }
 
-fun createConnectivitySnapshotEvent() = ConnectivitySnapshotEvent(CREATED_AT, "wifi", listOf(Connection("GPRS", CONNECTED)))
+fun createConnectivitySnapshotEvent() = ConnectivitySnapshotEvent(CREATED_AT, "wifi", listOf(Connection("GPRS", CONNECTED)), eventLabels)
 fun verifyConnectivitySnapshotEvents(event1: ConnectivitySnapshotEvent, event2: ConnectivitySnapshotEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -319,7 +320,7 @@ fun verifyConnectivitySnapshotEvents(event1: ConnectivitySnapshotEvent, event2: 
     assertThat(payload1.connections).containsAllIn(payload2.connections)
 }
 
-fun createConsentEvent() = ConsentEvent(CREATED_AT, ENDED_AT, INDIVIDUAL, ACCEPTED, SOME_GUID1)
+fun createConsentEvent() = ConsentEvent(CREATED_AT, ENDED_AT, INDIVIDUAL, ACCEPTED, eventLabels)
 fun verifyConsentEvents(event1: ConsentEvent, event2: ConsentEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -329,7 +330,7 @@ fun verifyConsentEvents(event1: ConsentEvent, event2: ConsentEvent) {
     assertThat(payload1.result).isEqualTo(payload2.result)
 }
 
-fun createEnrolmentEvent() = EnrolmentEvent(CREATED_AT, SOME_GUID1, SOME_GUID2)
+fun createEnrolmentEvent() = EnrolmentEvent(CREATED_AT, SOME_GUID1, eventLabels)
 fun verifyEnrolmentEvents(event1: EnrolmentEvent, event2: EnrolmentEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -340,7 +341,7 @@ fun verifyEnrolmentEvents(event1: EnrolmentEvent, event2: EnrolmentEvent) {
 
 fun createFingerprintCaptureEvent(): FingerprintCaptureEvent {
     val fingerprint = Fingerprint(LEFT_THUMB, 8, "template")
-    return FingerprintCaptureEvent(CREATED_AT, ENDED_AT, LEFT_THUMB, 10, BAD_QUALITY, fingerprint, SOME_GUID1, SOME_GUID1)
+    return FingerprintCaptureEvent(CREATED_AT, ENDED_AT, LEFT_THUMB, 10, BAD_QUALITY, fingerprint, SOME_GUID1)
 }
 
 fun verifyFingerprintCaptureEvents(event1: FingerprintCaptureEvent, event2: FingerprintCaptureEvent) {
@@ -354,7 +355,7 @@ fun verifyFingerprintCaptureEvents(event1: FingerprintCaptureEvent, event2: Fing
     assertThat(payload1.fingerprint).isEqualTo(payload2.fingerprint)
 }
 
-fun createGuidSelectionEvent() = GuidSelectionEvent(CREATED_AT, SOME_GUID1, SOME_GUID2)
+fun createGuidSelectionEvent() = GuidSelectionEvent(CREATED_AT, SOME_GUID1, eventLabels)
 fun verifyGuidSelectionEvents(event1: GuidSelectionEvent, event2: GuidSelectionEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -363,7 +364,7 @@ fun verifyGuidSelectionEvents(event1: GuidSelectionEvent, event2: GuidSelectionE
     assertThat(payload1.selectedId).isEqualTo(payload2.selectedId)
 }
 
-fun createIntentParsingEvent() = IntentParsingEvent(CREATED_AT, COMMCARE, SOME_GUID2)
+fun createIntentParsingEvent() = IntentParsingEvent(CREATED_AT, COMMCARE, eventLabels)
 fun verifyIntentParsingEvents(event1: IntentParsingEvent, event2: IntentParsingEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -372,7 +373,7 @@ fun verifyIntentParsingEvents(event1: IntentParsingEvent, event2: IntentParsingE
     assertThat(payload1.integration).isEqualTo(payload2.integration)
 }
 
-fun createInvalidIntentEvent() = InvalidIntentEvent(CREATED_AT, "action", mapOf("extra_key" to "extra_value"), SOME_GUID2)
+fun createInvalidIntentEvent() = InvalidIntentEvent(CREATED_AT, "action", mapOf("extra_key" to "extra_value"), eventLabels)
 fun verifyInvalidIntentEvents(event1: InvalidIntentEvent, event2: InvalidIntentEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -385,7 +386,7 @@ fun verifyInvalidIntentEvents(event1: InvalidIntentEvent, event2: InvalidIntentE
 fun createOneToManyMatchEvent(): OneToManyMatchEvent {
     val poolArg = MatchPool(PROJECT, 100)
     val resultArg = listOf(MatchEntry(SOME_GUID1, 0F))
-    return OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, RANK_ONE, resultArg, SOME_GUID1)
+    return OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, RANK_ONE, resultArg)
 }
 
 fun verifyOneToManyMatchEvents(event1: OneToManyMatchEvent, event2: OneToManyMatchEvent) {
@@ -399,7 +400,7 @@ fun verifyOneToManyMatchEvents(event1: OneToManyMatchEvent, event2: OneToManyMat
 
 fun createOneToOneMatchEvent(): OneToOneMatchEvent {
     val matchEntry = MatchEntry(SOME_GUID1, 10F)
-    return OneToOneMatchEvent(CREATED_AT, ENDED_AT, SOME_GUID1, RANK_ONE, matchEntry, SOME_GUID1)
+    return OneToOneMatchEvent(CREATED_AT, ENDED_AT, SOME_GUID1, RANK_ONE, matchEntry)
 }
 
 fun verifyOneToOneMatchEvents(event1: OneToOneMatchEvent, event2: OneToOneMatchEvent) {
@@ -411,7 +412,7 @@ fun verifyOneToOneMatchEvents(event1: OneToOneMatchEvent, event2: OneToOneMatchE
     assertThat(payload1.result).isEqualTo(payload2.result)
 }
 
-fun createPersonCreationEvent() = PersonCreationEvent(CREATED_AT, listOf(SOME_GUID1, SOME_GUID2), listOf(SOME_GUID1, SOME_GUID2), SOME_GUID2)
+fun createPersonCreationEvent() = PersonCreationEvent(CREATED_AT, listOf(SOME_GUID1, SOME_GUID2), listOf(SOME_GUID1, SOME_GUID2), eventLabels)
 fun verifyPersonCreationEvents(event1: PersonCreationEvent, event2: PersonCreationEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -420,7 +421,7 @@ fun verifyPersonCreationEvents(event1: PersonCreationEvent, event2: PersonCreati
     assertThat(payload1.fingerprintCaptureIds).containsAllIn(payload2.fingerprintCaptureIds)
 }
 
-fun createRefusalEvent() = RefusalEvent(CREATED_AT, ENDED_AT, OTHER, "other_text", SOME_GUID2)
+fun createRefusalEvent() = RefusalEvent(CREATED_AT, ENDED_AT, OTHER, "other_text", eventLabels)
 fun verifyRefusalEvents(event1: RefusalEvent, event2: RefusalEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -430,7 +431,7 @@ fun verifyRefusalEvents(event1: RefusalEvent, event2: RefusalEvent) {
     assertThat(payload1.otherText).isEqualTo(payload2.otherText)
 }
 
-fun createScannerConnectionEvent() = ScannerConnectionEvent(CREATED_AT, ScannerInfo("scanner_id", "macaddress", VERO_1, "version"), SOME_GUID2)
+fun createScannerConnectionEvent() = ScannerConnectionEvent(CREATED_AT, ScannerInfo("scanner_id", "macaddress", VERO_1, "version"), eventLabels)
 fun verifyScannerConnectionEvents(event1: ScannerConnectionEvent, event2: ScannerConnectionEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -439,7 +440,7 @@ fun verifyScannerConnectionEvents(event1: ScannerConnectionEvent, event2: Scanne
     assertThat(payload1.scannerInfo).isEqualTo(payload2.scannerInfo)
 }
 
-fun createScannerFirmwareUpdateEvent() = ScannerFirmwareUpdateEvent(CREATED_AT, ENDED_AT, "chip", "targetAppVersion", "error", SOME_GUID1)
+fun createScannerFirmwareUpdateEvent() = ScannerFirmwareUpdateEvent(CREATED_AT, ENDED_AT, "chip", "targetAppVersion", "error", eventLabels)
 fun verifyScannerFirmwareUpdateEvents(event1: ScannerFirmwareUpdateEvent, event2: ScannerFirmwareUpdateEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -450,7 +451,7 @@ fun verifyScannerFirmwareUpdateEvents(event1: ScannerFirmwareUpdateEvent, event2
     assertThat(payload1.failureReason).isEqualTo(payload2.failureReason)
 }
 
-fun createSuspiciousIntentEvent() = SuspiciousIntentEvent(CREATED_AT, mapOf("extra_key" to "extra_value"), SOME_GUID1)
+fun createSuspiciousIntentEvent() = SuspiciousIntentEvent(CREATED_AT, mapOf("extra_key" to "extra_value"), eventLabels)
 fun verifySuspiciousIntentEvents(event1: SuspiciousIntentEvent, event2: SuspiciousIntentEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload

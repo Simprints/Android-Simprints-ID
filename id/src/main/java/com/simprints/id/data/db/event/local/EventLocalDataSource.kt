@@ -5,7 +5,7 @@ import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import kotlinx.coroutines.flow.Flow
 
-interface SessionLocalDataSource {
+interface EventLocalDataSource {
 
     data class EventQuery(val id: String? = null,
                           val eventType: EventType? = null,

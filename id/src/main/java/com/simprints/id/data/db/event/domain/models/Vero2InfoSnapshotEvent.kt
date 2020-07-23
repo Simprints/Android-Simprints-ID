@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
@@ -10,7 +9,7 @@ import java.util.*
 @Keep
 class Vero2InfoSnapshotEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: Vero2InfoSnapshotPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -19,10 +18,10 @@ class Vero2InfoSnapshotEvent(
         createdAt: Long,
         version: Vero2Version,
         battery: BatteryInfo,
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        labels,
         Vero2InfoSnapshotPayload(createdAt, EVENT_VERSION, version, battery),
         VERO_2_INFO_SNAPSHOT)
 

@@ -7,7 +7,7 @@ import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.Authenti
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.Companion.EVENT_VERSION
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.AUTHENTICATION
 import com.simprints.id.orchestrator.SOME_GUID1
 import org.junit.Test
@@ -16,13 +16,11 @@ class AuthenticationEventTest {
 
     @Test
     fun create_AuthenticationEvent() {
-
+        val labels = EventLabels(sessionId = SOME_GUID1)
         val userInfo = UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID)
-        val event = AuthenticationEvent(CREATED_AT, ENDED_AT, userInfo, AUTHENTICATED, SOME_GUID1)
+        val event = AuthenticationEvent(CREATED_AT, ENDED_AT, userInfo, AUTHENTICATED, labels)
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).containsExactly(
-            SessionIdLabel(SOME_GUID1)
-        )
+        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(AUTHENTICATION)
         with(event.payload as AuthenticationPayload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

@@ -1,14 +1,14 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.ONE_TO_MANY_MATCH
 import java.util.*
 
 @Keep
 class OneToManyMatchEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: OneToManyMatchPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -19,10 +19,10 @@ class OneToManyMatchEvent(
         pool: OneToManyMatchPayload.MatchPool,
         matcher: Matcher,
         result: List<MatchEntry>?,
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        labels,
         OneToManyMatchPayload(createdAt, EVENT_VERSION, endTime, pool, matcher, result),
         ONE_TO_MANY_MATCH)
 

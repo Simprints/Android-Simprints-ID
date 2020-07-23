@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2
 class ApiVero2InfoSnapshotEvent(domainEvent: Vero2InfoSnapshotEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
+        domainEvent.labels.fromDomainToApi(),
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep

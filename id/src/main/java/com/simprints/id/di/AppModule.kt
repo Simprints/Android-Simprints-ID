@@ -27,10 +27,10 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilder
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilderImpl
-import com.simprints.id.data.db.event.local.EventRoomDao
+import com.simprints.id.data.db.event.local.DbEventRoomDao
 import com.simprints.id.data.db.event.local.EventRoomDatabase
-import com.simprints.id.data.db.event.local.SessionLocalDataSource
-import com.simprints.id.data.db.event.local.SessionLocalDataSourceImpl
+import com.simprints.id.data.db.event.local.EventLocalDataSource
+import com.simprints.id.data.db.event.local.EventLocalDataSourceImpl
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSourceImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -197,7 +197,7 @@ open class AppModule {
         SessionEventValidatorsBuilderImpl()
 
     @Provides
-    open fun provideEventRoomDao(ctx: Context): EventRoomDao =
+    open fun provideEventRoomDao(ctx: Context): DbEventRoomDao =
         EventRoomDatabase.getDatabase(ctx).eventDao
     
     @Provides
@@ -206,10 +206,10 @@ open class AppModule {
         ctx: Context,
         secureDataManager: SecureLocalDbKeyProvider,
         timeHelper: TimeHelper,
-        roomDao: EventRoomDao,
+        roomDao: DbEventRoomDao,
         sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
-    ): SessionLocalDataSource =
-        SessionLocalDataSourceImpl(ctx, secureDataManager, timeHelper, roomDao, sessionEventValidatorsBuilder.build())
+    ): EventLocalDataSource =
+        EventLocalDataSourceImpl(ctx, secureDataManager, timeHelper, roomDao, sessionEventValidatorsBuilder.build())
 
     @Provides
     @Singleton
@@ -224,7 +224,7 @@ open class AppModule {
     open fun provideSessionEventsManager(
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
-        sessionLocalDataSource: SessionLocalDataSource,
+        eventLocalDataSource: EventLocalDataSource,
         sessionRemoteDataSource: SessionRemoteDataSource,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
@@ -236,7 +236,7 @@ open class AppModule {
             ctx.packageVersionName,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             sessionEventsSyncManager,
-            sessionLocalDataSource,
+            eventLocalDataSource,
             sessionRemoteDataSource,
             preferencesManager,
             crashReportManager,

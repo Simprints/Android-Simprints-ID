@@ -1,14 +1,14 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.CONSENT
 import java.util.*
 
 @Keep
 class ConsentEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: ConsentPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -18,10 +18,10 @@ class ConsentEvent(
         endTime: Long,
         consentType: ConsentPayload.Type,
         result: ConsentPayload.Result,
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        labels,
         ConsentPayload(createdAt, EVENT_VERSION, endTime, consentType, result),
         CONSENT)
 

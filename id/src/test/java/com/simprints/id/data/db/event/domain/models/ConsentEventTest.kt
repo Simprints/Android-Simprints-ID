@@ -5,7 +5,7 @@ import com.simprints.id.data.db.event.domain.models.ConsentEvent.Companion.EVENT
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.CONSENT
 import com.simprints.id.orchestrator.SOME_GUID1
 import org.junit.Test
@@ -14,12 +14,10 @@ class ConsentEventTest {
 
     @Test
     fun create_ConsentEvent() {
-
-        val event = ConsentEvent(CREATED_AT, ENDED_AT, INDIVIDUAL, ACCEPTED, SOME_GUID1)
+        val labels = EventLabels(sessionId = SOME_GUID1)
+        val event = ConsentEvent(CREATED_AT, ENDED_AT, INDIVIDUAL, ACCEPTED, labels)
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).containsExactly(
-            SessionIdLabel(SOME_GUID1)
-        )
+        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CONSENT)
         with(event.payload as ConsentPayload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

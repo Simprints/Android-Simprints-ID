@@ -11,10 +11,9 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilder
-import com.simprints.id.data.db.event.local.EventRoomDao
-import com.simprints.id.data.db.event.local.SessionLocalDataSource
+import com.simprints.id.data.db.event.local.DbEventRoomDao
+import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
-import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -29,10 +28,7 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.secure.SignerManager
-import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
@@ -125,7 +121,7 @@ class TestAppModule(
     override fun provideSessionEventsManager(
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
-        sessionLocalDataSource: SessionLocalDataSource,
+        eventLocalDataSource: EventLocalDataSource,
         sessionRemoteDataSource: SessionRemoteDataSource,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
@@ -135,7 +131,7 @@ class TestAppModule(
         super.provideSessionEventsManager(
             ctx,
             sessionEventsSyncManager,
-            sessionLocalDataSource,
+            eventLocalDataSource,
             sessionRemoteDataSource,
             preferencesManager,
             loginInfoManager,
@@ -148,9 +144,9 @@ class TestAppModule(
         ctx: Context,
         secureDataManager: SecureLocalDbKeyProvider,
         timeHelper: TimeHelper,
-        roomDao: EventRoomDao,
+        roomDao: DbEventRoomDao,
         sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
-    ): SessionLocalDataSource =
+    ): EventLocalDataSource =
         sessionEventsLocalDbManagerRule.resolveDependency {
             super.provideSessionEventsLocalDbManager(
                 ctx,

@@ -1,14 +1,13 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventType.REFUSAL
 import java.util.*
 
 @Keep
 class RefusalEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: RefusalPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -18,10 +17,10 @@ class RefusalEvent(
         endTime: Long,
         reason: RefusalPayload.Answer,
         otherText: String,
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        labels,
         RefusalPayload(createdAt, EVENT_VERSION, endTime, reason, otherText),
         REFUSAL)
 

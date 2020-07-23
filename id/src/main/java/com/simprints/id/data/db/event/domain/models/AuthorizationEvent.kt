@@ -3,14 +3,14 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+
 import com.simprints.id.data.db.event.domain.models.EventType.AUTHORIZATION
 import java.util.*
 
 @Keep
 class AuthorizationEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: AuthorizationPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -19,10 +19,10 @@ class AuthorizationEvent(
         createdAt: Long,
         result: AuthorizationResult,
         userInfo: UserInfo?,
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        labels,
         AuthorizationPayload(createdAt, EVENT_VERSION, result, userInfo),
         AUTHORIZATION)
 

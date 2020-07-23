@@ -1,35 +1,28 @@
 package com.simprints.id.data.db.event.local.models
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import com.beust.klaxon.Klaxon
+import com.google.gson.reflect.TypeToken
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabel
+import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType
+import com.simprints.id.domain.modality.Modes
 import java.util.*
-
-data class DbEventLabel(val type: String,
-                        val eventLabelJson: String)
 
 @Entity
 data class DbEvent(
     @PrimaryKey var id: String,
-    var labels: List<DbEventLabel>,
+
+    @Embedded var labels: EventLabels,
     val type: EventType,
     var eventJson: String,
     val addedAt: Date = Date()
 ) {
     class Converters {
-
-        @TypeConverter
-        fun fromEventLabelToString(labels: List<EventLabel>): String =
-            JsonHelper.toJson(labels)
-
-        @TypeConverter
-        fun fromStringToEventLabel(jsonEventLabel: String): List<EventLabel> =
-            JsonHelper.fromJson(jsonEventLabel)
 
         @TypeConverter
         fun fromEventPayloadTypeToString(type: EventType): String =
@@ -39,14 +32,26 @@ data class DbEvent(
         fun fromStringToEventPayloadType(name: String): EventType =
             EventType.valueOf(name)
 
-        @TypeConverter
-        fun fromDbEventLabelToString(eventLabel: List<DbEventLabel>): String =
-            JsonHelper.toJson(eventLabel)
 
         @TypeConverter
-        fun fromStringToDbEventLabel(jsonEventLabel: String): List<DbEventLabel> =
-            JsonHelper.fromJson(jsonEventLabel)
+        fun fromListofStringToString(list: List<String>): String =
+            JsonHelper.toJson(list)
 
+        @TypeConverter
+        fun fromStringToListOfString(jsonList: String): List<String> {
+            val type = object : TypeToken<List<String>>() {}.type
+            return JsonHelper.gson.fromJson(jsonList, type)
+        }
+
+        @TypeConverter
+        fun fromListOfModesToString(list: List<Modes>): String =
+            JsonHelper.toJson(list)
+
+        @TypeConverter
+        fun fromStringToListOfModes(jsonList: String): List<Modes> {
+            val type = object : TypeToken<List<Modes>>() {}.type
+            return JsonHelper.gson.fromJson(jsonList, type)
+        }
 
         @TypeConverter
         fun toDate(dateLong: Long): Date {
@@ -67,13 +72,10 @@ data class DbEvent(
 fun Event.fromDomainToDb(): DbEvent =
     DbEvent(
         id,
-        labels.map { it.fromDomainToDb() },
+        labels,
         payload.type,
         Klaxon().toJsonString(this)
     )
 
 fun DbEvent.fromDbToDomain(): Event =
     Klaxon().parse<Event>(eventJson) as Event
-
-fun EventLabel.fromDomainToDb() =
-    DbEventLabel(this.key.name, JsonHelper.toJson(this))

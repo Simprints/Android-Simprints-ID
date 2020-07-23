@@ -2,7 +2,6 @@ package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.subject.domain.FaceSample
@@ -13,7 +12,7 @@ import java.util.*
 @Keep
 class PersonCreationEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: PersonCreationPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -22,10 +21,10 @@ class PersonCreationEvent(
         startTime: Long,
         fingerprintCaptureIds: List<String>,
         faceCaptureIds: List<String>,
-        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        labels,
         PersonCreationPayload(startTime, EVENT_VERSION, fingerprintCaptureIds, faceCaptureIds),
         PERSON_CREATION)
 

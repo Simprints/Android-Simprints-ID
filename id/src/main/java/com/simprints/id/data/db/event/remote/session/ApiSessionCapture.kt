@@ -14,7 +14,7 @@ import java.util.*
 class ApiSessionCapture(domainEvent: SessionCaptureEvent) :
     ApiEvent(
         domainEvent.id,
-        domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
+        domainEvent.labels.fromDomainToApi(),
         domainEvent.payload.fromDomainToApi()) {
 
     @Keep

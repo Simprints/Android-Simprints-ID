@@ -2,8 +2,7 @@ package com.simprints.id.data.db.event.domain.models.subject
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabel
-import com.simprints.id.data.db.event.domain.models.EventLabel.*
+import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
@@ -13,7 +12,7 @@ import java.util.*
 @Keep
 class EnrolmentRecordCreationEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: EnrolmentRecordCreationPayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -25,10 +24,11 @@ class EnrolmentRecordCreationEvent(
         moduleId: String,
         attendantId: String,
         modes: List<Modes>,
-        biometricReferences: List<BiometricReference>
+        biometricReferences: List<BiometricReference>,
+        labels: EventLabels = EventLabels() //StopShip
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf(ProjectIdLabel(projectId), ModuleIdsLabel(listOf(moduleId)), AttendantIdLabel(attendantId), ModesLabel(modes)),
+        labels,
         EnrolmentRecordCreationPayload(createdAt, EVENT_VERSION, subjectId, projectId, moduleId, attendantId, biometricReferences),
         ENROLMENT_RECORD_CREATION)
 

@@ -15,7 +15,7 @@ class ApiFaceCaptureEvent(
     val domainEvent: FaceCaptureEvent
 ) : ApiEvent(
     domainEvent.id,
-    domainEvent.labels.map { it.fromDomainToApi() }.toMap(),
+    domainEvent.labels.fromDomainToApi(),
     domainEvent.payload.fromDomainToApi()) {
 
     @Keep

@@ -2,8 +2,8 @@ package com.simprints.id.data.db.event.domain.models.session
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabel
-import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
+import com.simprints.id.data.db.event.domain.models.EventLabels
+
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
@@ -12,7 +12,7 @@ import java.util.*
 @Keep
 open class SessionCaptureEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override val labels: MutableList<EventLabel>,
+    override var labels: EventLabels,
     override val payload: SessionCapturePayload,
     override val type: EventType
 ) : Event(id, labels, payload, type) {
@@ -28,10 +28,11 @@ open class SessionCaptureEvent(
                 uploadTime: Long = 0,
                 endTime: Long = 0,
                 location: Location? = null,
-                analyticsId: String? = null) :
+                analyticsId: String? = null,
+                labels: EventLabels = EventLabels()) : //StopShip
         this(
             id,
-            mutableListOf(SessionIdLabel(id)),
+            labels,
             SessionCapturePayload(
                 createdAt,
                 endTime,
