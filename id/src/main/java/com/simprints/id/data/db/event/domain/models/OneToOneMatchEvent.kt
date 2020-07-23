@@ -7,25 +7,32 @@ import java.util.*
 
 @Keep
 class OneToOneMatchEvent(
-    createdAt: Long,
-    endTime: Long,
-    candidateId: String,
-    result: MatchEntry?,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    OneToOneMatchPayload(createdAt, EVENT_VERSION, endTime, candidateId, result),
-    ONE_TO_ONE_MATCH) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: OneToOneMatchPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        createdAt: Long,
+        endTime: Long,
+        candidateId: String,
+        result: MatchEntry?,
+        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        OneToOneMatchPayload(createdAt, EVENT_VERSION, endTime, candidateId, result),
+        ONE_TO_ONE_MATCH)
 
     @Keep
     class OneToOneMatchPayload(
-        createdAt: Long,
-        eventVersion: Int,
-        endTimeAt: Long,
+        override val createdAt: Long,
+        override val eventVersion: Int,
+        override val endedAt: Long,
         val candidateId: String,
         val result: MatchEntry?
-    ) : EventPayload(ONE_TO_ONE_MATCH, eventVersion, createdAt, endTimeAt)
+    ) : EventPayload(ONE_TO_ONE_MATCH, eventVersion, createdAt, endedAt)
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

@@ -6,7 +6,7 @@ import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.Result
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.callout.*
@@ -164,7 +164,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
         // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
         if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest && appRequest !is AppEnrolLastBiometricsRequest) {
-            inBackground { eventRepository.addEvent(buildAuthorizationEvent(Result.NOT_AUTHORIZED)) }
+            inBackground { eventRepository.addEvent(buildAuthorizationEvent(AuthorizationResult.NOT_AUTHORIZED)) }
 
             loginAlreadyTried.set(true)
             view.openLoginActivity(appRequest)
@@ -213,7 +213,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 payload.databaseInfo.recordCount = peopleInDb
 
                 eventRepository.addEvent(currentSessionEvent)
-                eventRepository.addEvent(buildAuthorizationEvent(Result.AUTHORIZED))
+                eventRepository.addEvent(buildAuthorizationEvent(AuthorizationResult.AUTHORIZED))
             }
         }
 
@@ -246,11 +246,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     }
 
-    private fun buildAuthorizationEvent(result: Result) =
+    private fun buildAuthorizationEvent(result: AuthorizationResult) =
         AuthorizationEvent(
             timeHelper.now(),
             result,
-            if (result == Result.AUTHORIZED) {
+            if (result == AuthorizationResult.AUTHORIZED) {
                 UserInfo(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
             } else {
                 null

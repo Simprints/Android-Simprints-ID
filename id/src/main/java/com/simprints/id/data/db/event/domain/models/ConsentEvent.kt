@@ -7,24 +7,31 @@ import java.util.*
 
 @Keep
 class ConsentEvent(
-    createdAt: Long,
-    endTime: Long,
-    consentType: ConsentPayload.Type,
-    result: ConsentPayload.Result,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    ConsentPayload(createdAt, EVENT_VERSION, endTime, consentType, result),
-    CONSENT) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: ConsentPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        createdAt: Long,
+        endTime: Long,
+        consentType: ConsentPayload.Type,
+        result: ConsentPayload.Result,
+        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        ConsentPayload(createdAt, EVENT_VERSION, endTime, consentType, result),
+        CONSENT)
 
 
     @Keep
-    class ConsentPayload(createdAt: Long,
-                         eventVersion: Int,
-                         endTimeAt: Long,
+    class ConsentPayload(override val createdAt: Long,
+                         override val eventVersion: Int,
+                         override val endedAt: Long,
                          val consentType: Type,
-                         var result: Result) : EventPayload(CONSENT, eventVersion, createdAt, endTimeAt) {
+                         var result: Result) : EventPayload(CONSENT, eventVersion, createdAt, endedAt) {
 
         @Keep
         enum class Type {

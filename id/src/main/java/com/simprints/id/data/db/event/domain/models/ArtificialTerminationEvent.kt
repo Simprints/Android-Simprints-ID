@@ -7,14 +7,21 @@ import java.util.*
 
 @Keep
 class ArtificialTerminationEvent(
-    createdAt: Long,
-    reason: ArtificialTerminationPayload.Reason,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    ArtificialTerminationPayload(createdAt, EVENT_VERSION, reason),
-    ARTIFICIAL_TERMINATION) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: ArtificialTerminationPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        createdAt: Long,
+        reason: ArtificialTerminationPayload.Reason,
+        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf(SessionIdLabel(sessionId)),
+        ArtificialTerminationPayload(createdAt, EVENT_VERSION, reason),
+        ARTIFICIAL_TERMINATION)
 
 
     @Keep

@@ -16,6 +16,8 @@ data class DbEventLabel(val type: String,
 @Entity
 data class DbEvent(
     @PrimaryKey var id: String,
+    val projectId:String,
+    val sessionId:String,
     var labels: List<DbEventLabel>,
     val type: EventType,
     var eventJson: String,
@@ -65,7 +67,13 @@ data class DbEvent(
 }
 
 fun Event.fromDomainToDb(): DbEvent =
-    DbEvent(id, labels.map { it.fromDomainToDb() }, payload.type,  Klaxon().toJsonString(this))
+    DbEvent(
+        id,
+        labels.sess
+        labels.map { it.fromDomainToDb() },
+        payload.type,
+        Klaxon().toJsonString(this)
+    )
 
 fun DbEvent.fromDbToDomain(): Event =
     Klaxon().parse<Event>(eventJson) as Event

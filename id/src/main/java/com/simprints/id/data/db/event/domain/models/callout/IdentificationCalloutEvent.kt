@@ -2,24 +2,33 @@ package com.simprints.id.data.db.event.domain.models.callout
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.EventLabel
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventPayload
+import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_IDENTIFICATION
 import java.util.*
 
 @Keep
 class IdentificationCalloutEvent(
-    createdAt: Long,
-    projectId: String,
-    userId: String,
-    moduleId: String,
-    metadata: String?,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    IdentificationCalloutPayload(createdAt, EVENT_VERSION, projectId, userId, moduleId, metadata),
-    CALLOUT_IDENTIFICATION) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: IdentificationCalloutPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        createdAt: Long,
+        projectId: String,
+        userId: String,
+        moduleId: String,
+        metadata: String?,
+        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf(SessionIdLabel(sessionId)),
+        IdentificationCalloutPayload(createdAt, EVENT_VERSION, projectId, userId, moduleId, metadata),
+        CALLOUT_IDENTIFICATION)
 
     @Keep
     class IdentificationCalloutPayload(

@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventType.ALERT_SCREEN
 import java.util.*
@@ -8,21 +9,28 @@ import java.util.*
 
 @Keep
 class AlertScreenEvent(
-    createdAt: Long,
-    alertType: AlertScreenPayload.AlertScreenEventType,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    AlertScreenPayload(createdAt, DEFAULT_EVENT_VERSION, alertType),
-    ALERT_SCREEN) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: AlertScreenPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        createdAt: Long,
+        alertType: AlertScreenEventType,
+        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf(SessionIdLabel(sessionId)),
+        AlertScreenPayload(createdAt, DEFAULT_EVENT_VERSION, alertType),
+        ALERT_SCREEN)
 
     @Keep
     class AlertScreenPayload(
-        createdAt: Long,
-        version: Int,
+        override val createdAt: Long,
+        override val eventVersion: Int,
         val alertType: AlertScreenEventType
-    ) : EventPayload(ALERT_SCREEN, version, createdAt) {
+    ) : EventPayload(ALERT_SCREEN, eventVersion, createdAt) {
 
         enum class AlertScreenEventType {
             DIFFERENT_PROJECT_ID,

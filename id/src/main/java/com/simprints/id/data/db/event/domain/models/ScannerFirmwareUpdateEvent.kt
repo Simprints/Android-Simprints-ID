@@ -7,27 +7,33 @@ import java.util.*
 
 @Keep
 class ScannerFirmwareUpdateEvent(
-    createdAt: Long,
-    endTime: Long,
-    chip: String,
-    targetAppVersion: String,
-    failureReason: String? = null,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    ScannerFirmwareUpdatePayload(createdAt, EVENT_VERSION, endTime, chip, targetAppVersion, failureReason),
-    SCANNER_FIRMWARE_UPDATE) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: ScannerFirmwareUpdatePayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(createdAt: Long,
+                endTime: Long,
+                chip: String,
+                targetAppVersion: String,
+                failureReason: String? = null,
+                sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        ScannerFirmwareUpdatePayload(createdAt, EVENT_VERSION, endTime, chip, targetAppVersion, failureReason),
+        SCANNER_FIRMWARE_UPDATE)
 
 
     @Keep
-    class ScannerFirmwareUpdatePayload(createdAt: Long,
-                                       eventVersion: Int,
-                                       endTimeAt: Long,
+    class ScannerFirmwareUpdatePayload(override val createdAt: Long,
+                                       override val eventVersion: Int,
+                                       override val endedAt: Long,
                                        val chip: String,
                                        val targetAppVersion: String,
                                        var failureReason: String? = null)
-        : EventPayload(SCANNER_FIRMWARE_UPDATE, eventVersion, createdAt, endTimeAt)
+        : EventPayload(SCANNER_FIRMWARE_UPDATE, eventVersion, createdAt, endedAt)
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

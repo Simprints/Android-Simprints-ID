@@ -11,23 +11,30 @@ import java.util.*
 
 @Keep
 class PersonCreationEvent(
-    startTime: Long,
-    fingerprintCaptureIds: List<String>,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    PersonCreationPayload(startTime, EVENT_VERSION, fingerprintCaptureIds),
-    PERSON_CREATION) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: PersonCreationPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        startTime: Long,
+        fingerprintCaptureIds: List<String>,
+        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf(SessionIdLabel(sessionId)),
+        PersonCreationPayload(startTime, EVENT_VERSION, fingerprintCaptureIds),
+        PERSON_CREATION)
 
 
     // At the end of the sequence of capture, we build a Person object used either for enrolment or verification/identification
     @Keep
     class PersonCreationPayload(
-        creationTime: Long,
-        version: Int,
+        override val createdAt: Long,
+        override val eventVersion: Int,
         val fingerprintCaptureIds: List<String>
-    ) : EventPayload(PERSON_CREATION, version, creationTime)
+    ) : EventPayload(PERSON_CREATION, eventVersion, createdAt)
 
     companion object {
         fun build(timeHelper: TimeHelper,
@@ -53,7 +60,7 @@ class PersonCreationEvent(
 //                }
 //                .map { it.id }
 
-            const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
 
     }
 }

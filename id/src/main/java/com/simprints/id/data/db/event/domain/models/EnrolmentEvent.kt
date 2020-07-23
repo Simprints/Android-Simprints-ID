@@ -7,14 +7,21 @@ import java.util.*
 
 @Keep
 class EnrolmentEvent(
-    createdAt: Long,
-    personId: String,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    EnrolmentPayload(createdAt, EVENT_VERSION, personId),
-    ENROLMENT) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: EnrolmentPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        createdAt: Long,
+        personId: String,
+        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        EnrolmentPayload(createdAt, EVENT_VERSION, personId),
+        ENROLMENT)
 
 
     @Keep
