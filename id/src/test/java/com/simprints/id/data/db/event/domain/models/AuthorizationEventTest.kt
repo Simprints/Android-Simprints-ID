@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.Result.AUTHORIZED
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel

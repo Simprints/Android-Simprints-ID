@@ -5,7 +5,7 @@ import androidx.annotation.Keep
 import java.util.*
 
 @Keep
-open class Device(
+data class Device(
     var androidSdkVersion: String = Build.VERSION.SDK_INT.toString(),
     var deviceModel: String = Build.MANUFACTURER + "_" + Build.MODEL,
     var deviceId: String = "",

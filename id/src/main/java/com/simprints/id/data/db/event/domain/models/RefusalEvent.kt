@@ -7,24 +7,31 @@ import java.util.*
 
 @Keep
 class RefusalEvent(
-    createdAt: Long,
-    endTime: Long,
-    reason: RefusalPayload.Answer,
-    otherText: String,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    RefusalPayload(createdAt, EVENT_VERSION, endTime, reason, otherText),
-    REFUSAL) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: RefusalPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        createdAt: Long,
+        endTime: Long,
+        reason: RefusalPayload.Answer,
+        otherText: String,
+        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        RefusalPayload(createdAt, EVENT_VERSION, endTime, reason, otherText),
+        REFUSAL)
 
 
     @Keep
-    class RefusalPayload(createdAt: Long,
-                         eventVersion: Int,
-                         endTime: Long,
+    class RefusalPayload(override val createdAt: Long,
+                         override val eventVersion: Int,
+                         override val endedAt: Long,
                          val reason: Answer,
-                         val otherText: String) : EventPayload(REFUSAL, eventVersion, createdAt, endTime) {
+                         val otherText: String) : EventPayload(REFUSAL, eventVersion, createdAt, endedAt) {
 
         @Keep
         enum class Answer {

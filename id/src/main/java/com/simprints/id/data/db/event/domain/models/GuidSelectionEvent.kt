@@ -7,19 +7,26 @@ import java.util.*
 
 @Keep
 class GuidSelectionEvent(
-    createdAt: Long,
-    selectedId: String,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    GuidSelectionPayload(createdAt, EVENT_VERSION, selectedId),
-    GUID_SELECTION) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: GuidSelectionPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        createdAt: Long,
+        selectedId: String,
+        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf(SessionIdLabel(sessionId)),
+        GuidSelectionPayload(createdAt, EVENT_VERSION, selectedId),
+        GUID_SELECTION)
 
     @Keep
-    class GuidSelectionPayload(creationTime: Long,
-                               eventVersion: Int,
-                               val selectedId: String) : EventPayload(GUID_SELECTION, eventVersion, creationTime)
+    class GuidSelectionPayload(override val createdAt: Long,
+                               override val eventVersion: Int,
+                               val selectedId: String) : EventPayload(GUID_SELECTION, eventVersion, createdAt)
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

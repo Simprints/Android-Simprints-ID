@@ -7,15 +7,22 @@ import java.util.*
 
 @Keep
 class InvalidIntentEvent(
-    val creationTime: Long,
-    val action: String,
-    val extras: Map<String, Any?>,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    InvalidIntentPayload(creationTime, EVENT_VERSION, action, extras),
-    INVALID_INTENT) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: InvalidIntentPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        creationTime: Long,
+        action: String,
+        extras: Map<String, Any?>,
+        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        InvalidIntentPayload(creationTime, EVENT_VERSION, action, extras),
+        INVALID_INTENT)
 
 
     @Keep

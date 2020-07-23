@@ -6,8 +6,8 @@ import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.Authenti
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.Result.AUTHORIZED
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.Result.NOT_AUTHORIZED
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.NOT_AUTHORIZED
 import io.realm.Realm
 import junit.framework.TestCase.*
 

@@ -9,29 +9,36 @@ import java.util.*
 
 @Keep
 class AuthenticationEvent(
-    createdAt: Long,
-    endTime: Long,
-    userInfo: UserInfo,
-    result: Result,
-    sessionId: String = UUID.randomUUID().toString()
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    AuthenticationPayload(createdAt, EVENT_VERSION, endTime, userInfo, result),
-    AUTHENTICATION) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: AuthenticationPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        createdAt: Long,
+        endTime: Long,
+        userInfo: UserInfo,
+        result: Result,
+        sessionId: String = UUID.randomUUID().toString()
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        AuthenticationPayload(createdAt, EVENT_VERSION, endTime, userInfo, result),
+        AUTHENTICATION)
 
 
     @Keep
     class AuthenticationPayload(
-        createdAt: Long,
-        eventVersion: Int,
-        endTimeAt: Long,
+        override val createdAt: Long,
+        override val eventVersion: Int,
+        override val endedAt: Long,
         val userInfo: UserInfo,
         val result: Result
-    ) : EventPayload(AUTHENTICATION, eventVersion, createdAt, endTimeAt) {
+    ) : EventPayload(AUTHENTICATION, eventVersion, createdAt, endedAt) {
 
         @Keep
-        class UserInfo(val projectId: String, val userId: String)
+        data class UserInfo(val projectId: String, val userId: String)
 
         enum class Result {
             AUTHENTICATED,

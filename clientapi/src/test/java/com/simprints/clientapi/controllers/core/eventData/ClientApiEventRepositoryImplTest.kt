@@ -95,8 +95,8 @@ class ClientApiEventRepositoryImplTest {
             coVerify(exactly = 1) {
                 coreEventEventsMgrMock.addEvent(withArg {
                     Truth.assertThat(it).isInstanceOf(InvalidIntentEvent::class.java)
-                    Truth.assertThat((it as InvalidIntentEvent).action).isEqualTo(action)
-                    Truth.assertThat(it.extras).isEqualTo(wrongKey)
+                    Truth.assertThat((it as InvalidIntentEvent).payload.action).isEqualTo(action)
+                    Truth.assertThat(it.payload.extras).isEqualTo(wrongKey)
                 })
             }
         }

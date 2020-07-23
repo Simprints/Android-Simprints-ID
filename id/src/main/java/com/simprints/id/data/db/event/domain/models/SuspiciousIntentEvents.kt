@@ -7,14 +7,21 @@ import java.util.*
 
 @Keep
 class SuspiciousIntentEvent(
-    createdAt: Long,
-    unexpectedExtras: Map<String, Any?>,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    SuspiciousIntentPayload(createdAt, EVENT_VERSION, unexpectedExtras),
-    SUSPICIOUS_INTENT) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: SuspiciousIntentPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        createdAt: Long,
+        unexpectedExtras: Map<String, Any?>,
+        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf(SessionIdLabel(sessionId)),
+        SuspiciousIntentPayload(createdAt, EVENT_VERSION, unexpectedExtras),
+        SUSPICIOUS_INTENT)
 
     @Keep
     class SuspiciousIntentPayload(

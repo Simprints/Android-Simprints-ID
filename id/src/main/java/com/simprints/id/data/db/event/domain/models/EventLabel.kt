@@ -1,8 +1,22 @@
 package com.simprints.id.data.db.event.domain.models
 
+import com.beust.klaxon.TypeFor
 import com.simprints.id.data.db.event.domain.models.EventLabel.EventLabelKey.*
+import com.simprints.id.data.db.event.local.EventLabelAdapter
 import com.simprints.id.domain.modality.Modes
 
+//@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonTypeInfo(
+//    use = JsonTypeInfo.Id.NAME,
+//    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+//    property = "key",
+//    visible = true)
+//@JsonSubTypes(
+//    JsonSubTypes.Type(value = ProjectIdLabel::class, name = "PROJECT_ID"),
+//    JsonSubTypes.Type(value = SubjectIdLabel::class, name = "SUBJECT_ID"),
+//    JsonSubTypes.Type(value = SessionIdLabel::class, name = "SESSION_ID")
+//)
+@TypeFor(field = "key", adapter = EventLabelAdapter::class)
 abstract class EventLabel(val key: EventLabelKey, val values: List<String>) {
 
     enum class EventLabelKey(val key: String) {

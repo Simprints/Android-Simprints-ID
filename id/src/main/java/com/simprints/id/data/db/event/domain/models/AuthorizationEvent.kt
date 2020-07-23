@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.Result
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventType.AUTHORIZATION
@@ -9,29 +9,36 @@ import java.util.*
 
 @Keep
 class AuthorizationEvent(
-    createdAt: Long,
-    result: Result,
-    userInfo: UserInfo?,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    AuthorizationPayload(createdAt, EVENT_VERSION, result, userInfo),
-    AUTHORIZATION) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: AuthorizationPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        createdAt: Long,
+        result: AuthorizationResult,
+        userInfo: UserInfo?,
+        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        AuthorizationPayload(createdAt, EVENT_VERSION, result, userInfo),
+        AUTHORIZATION)
 
     @Keep
-    class AuthorizationPayload(createdAt: Long,
-                               eventVersion: Int,
-                               val result: Result,
+    class AuthorizationPayload(override val createdAt: Long,
+                               override val eventVersion: Int,
+                               val result: AuthorizationResult,
                                val userInfo: UserInfo?) : EventPayload(AUTHORIZATION, eventVersion, createdAt) {
 
         @Keep
-        enum class Result {
+        enum class AuthorizationResult {
             AUTHORIZED, NOT_AUTHORIZED
         }
 
         @Keep
-        class UserInfo(val projectId: String, val userId: String)
+        data class UserInfo(val projectId: String, val userId: String)
     }
 
     companion object {

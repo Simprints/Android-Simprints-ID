@@ -9,20 +9,27 @@ import java.util.*
 
 @Keep
 class ConnectivitySnapshotEvent(
-    createdAt: Long,
-    networkType: String,
-    connections: List<SimNetworkUtils.Connection>,
-    sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
-) : Event(
-    UUID.randomUUID().toString(),
-    mutableListOf(SessionIdLabel(sessionId)),
-    ConnectivitySnapshotPayload(createdAt, EVENT_VERSION, networkType, connections),
-    CONNECTIVITY_SNAPSHOT) {
+    override val id: String = UUID.randomUUID().toString(),
+    override val labels: MutableList<EventLabel>,
+    override val payload: ConnectivitySnapshotPayload,
+    override val type: EventType
+) : Event(id, labels, payload, type) {
+
+    constructor(
+        createdAt: Long,
+        networkType: String,
+        connections: List<SimNetworkUtils.Connection>,
+        sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
+    ) : this(
+        UUID.randomUUID().toString(),
+        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        ConnectivitySnapshotPayload(createdAt, EVENT_VERSION, networkType, connections),
+        CONNECTIVITY_SNAPSHOT)
 
     @Keep
     class ConnectivitySnapshotPayload(
-        createdAt: Long,
-        eventVersion: Int,
+        override val createdAt: Long,
+        override val eventVersion: Int,
         val networkType: String,
         val connections: List<SimNetworkUtils.Connection>
     ) : EventPayload(CONNECTIVITY_SNAPSHOT, eventVersion, createdAt) {
