@@ -19,14 +19,21 @@ enum class ErrorType(
     LICENSE_MISSING(
         R.string.error_licence_missing_title,
         R.string.error_licence_missing_message,
-        R.string.error_licence_missing_button,
+        R.string.error_close_button,
         IDR.color.simprints_grey,
         UIR.drawable.ic_exclamation_92dp
     ),
     LICENSE_INVALID(
         R.string.error_licence_invalid_title,
         R.string.error_licence_invalid_message,
-        R.string.error_licence_invalid_button,
+        R.string.error_close_button,
+        IDR.color.simprints_grey,
+        UIR.drawable.ic_exclamation_92dp
+    ),
+    CONFIGURATION_ERROR(
+        R.string.error_configuration_error_title,
+        R.string.error_configuration_error_message,
+        R.string.error_close_button,
         IDR.color.simprints_grey,
         UIR.drawable.ic_exclamation_92dp
     )
