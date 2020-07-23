@@ -12,9 +12,9 @@ import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResu
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
+import com.simprints.face.error.ErrorType
 import com.simprints.moduleapi.face.requests.IFaceCaptureRequest
-import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
-import com.simprints.moduleapi.face.responses.IFaceMatchResponse
+import com.simprints.moduleapi.face.responses.*
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.every
 import io.mockk.mockk
@@ -66,15 +66,45 @@ class FaceOrchestratorViewModelTest {
     }
 
     @Test
+    fun `return the correct configuration response on finish`() {
+        viewModel.configurationFinished(true)
+
+        viewModel.flowFinished.value?.let { liveData ->
+            assertThat(liveData.peekContent()).isInstanceOf(IFaceConfigurationResponse::class.java)
+        }
+    }
+
+    @Test
     fun `route user to invalid license flow if needed`() {
         viewModel.invalidLicense()
-        assertThat(viewModel.invalidLicenseEvent.value).isNotNull()
+        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LICENSE_INVALID)
+        viewModel.finishWithError(ErrorType.LICENSE_INVALID)
+        viewModel.flowFinished.value?.peekContent()?.let { response ->
+            assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
+            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.LICENSE_INVALID)
+        }
     }
 
     @Test
     fun `route user to missing license flow if needed`() {
         viewModel.missingLicense()
-        assertThat(viewModel.missingLicenseEvent.value).isNotNull()
+        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.LICENSE_MISSING)
+        viewModel.finishWithError(ErrorType.LICENSE_MISSING)
+        viewModel.flowFinished.value?.peekContent()?.let { response ->
+            assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
+            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.LICENSE_MISSING)
+        }
+    }
+
+    @Test
+    fun `route user to configuration error flow if needed`() {
+        viewModel.configurationFinished(false)
+        assertThat(viewModel.errorEvent.value?.peekContent()).isEqualTo(ErrorType.CONFIGURATION_ERROR)
+        viewModel.finishWithError(ErrorType.CONFIGURATION_ERROR)
+        viewModel.flowFinished.value?.peekContent()?.let { response ->
+            assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
+            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.FACE_CONFIGURATION_ERROR)
+        }
     }
 
     private fun generateCaptureRequest(captures: Int) = mockk<IFaceCaptureRequest> {

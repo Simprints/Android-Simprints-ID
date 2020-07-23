@@ -160,7 +160,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
 
     override fun handleNotSignedInUser() {
-
         // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
         // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
         if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest && appRequest !is AppEnrolLastBiometricsRequest) {
@@ -193,6 +192,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     @SuppressLint("CheckResult")
     override suspend fun handleSignedInUser() {
+        super.handleSignedInUser()
         /** Hack to support multiple users: If all login checks success, then we consider
          *  the userId in the Intent as new signed User
          *  Because we move ConfirmIdentity behind the login check, some integration

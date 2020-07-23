@@ -37,10 +37,16 @@ class ErrorCallbackEvent(
             DIFFERENT_PROJECT_ID_SIGNED_IN,
             DIFFERENT_USER_ID_SIGNED_IN,
             GUID_NOT_FOUND_ONLINE,
+            SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD,
+            SETUP_MODALITY_DOWNLOAD_CANCELLED,
             UNEXPECTED_ERROR,
             BLUETOOTH_NOT_SUPPORTED,
             LOGIN_NOT_COMPLETE,
-            ENROLMENT_LAST_BIOMETRICS_FAILED;
+            ENROLMENT_LAST_BIOMETRICS_FAILED,
+            FACE_LICENSE_MISSING,
+            FACE_LICENSE_INVALID,
+            FINGERPRINT_CONFIGURATION_ERROR,
+            FACE_CONFIGURATION_ERROR;
 
             companion object {
                 fun fromAppResponseErrorReasonToEventReason(appResponseErrorReason: AppErrorResponse.Reason) =
@@ -52,6 +58,12 @@ class ErrorCallbackEvent(
                         AppErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                         AppErrorResponse.Reason.LOGIN_NOT_COMPLETE -> LOGIN_NOT_COMPLETE
                         AppErrorResponse.Reason.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
+                        AppErrorResponse.Reason.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
+                        AppErrorResponse.Reason.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
+                        AppErrorResponse.Reason.SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD -> SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD
+                        AppErrorResponse.Reason.SETUP_MODALITY_DOWNLOAD_CANCELLED -> SETUP_MODALITY_DOWNLOAD_CANCELLED
+                        AppErrorResponse.Reason.FINGERPRINT_CONFIGURATION_ERROR -> FINGERPRINT_CONFIGURATION_ERROR
+                        AppErrorResponse.Reason.FACE_CONFIGURATION_ERROR -> FACE_CONFIGURATION_ERROR
                     }
             }
         }

@@ -25,26 +25,5 @@ fun EventLabel.fromDomainToApi(): Pair<String, List<String>> =
         DEVICE_ID -> "deviceId" to (this as DeviceIdLabel).values
     }
 
-
-//
-//fun ApiEvent.fromApiToDomainOrNullIfNoBiometricReferences() = try {
-//    val payload = payload.fromApiToDomain()
-//    payload?.let {
-//        Event(id, EventLabel.fromApiToDomain(labels), it)
-//    }
-//} catch (t: Throwable) {
-//    throw IllegalStateException("Did not get all the labels from cloud")
-//}
-//
-//
-//fun ApiEventPayload.fromApiToDomain(): EventPayload? = when (this) {
-//    is ApiEnrolmentRecordCreationPayload -> this.fromApiToDomainOrNullIfNoBiometricReferences()
-//    is ApiEnrolmentRecordDeletionPayload -> this.fromApiToDomainDeletion()
-//    is ApiEnrolmentRecordMovePayload -> this.fromApiToDomainAndNullForCreationIfBiometricRefsAreNull()
-//    else -> throw IllegalStateException("Invalid payload type for events")
-//}
-//
-//fun Events.fromDomainToApi() = ApiEvents(events.map { it.fromDomainToApi() })
-//
 fun Event.fromDomainToApi() =
     ApiEvent(id, labels.map { it.fromDomainToApi() }.toMap(), payload.fromDomainToApi())

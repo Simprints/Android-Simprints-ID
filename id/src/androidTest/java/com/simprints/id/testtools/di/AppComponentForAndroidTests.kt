@@ -18,7 +18,7 @@ import javax.inject.Singleton
         AppModule::class,
         PreferencesModule::class,
         SerializerModule::class,
-        LoginModule::class,
+        SecurityModule::class,
         DataModule::class,
         SyncModule::class,
         DashboardActivityModule::class
@@ -38,7 +38,7 @@ interface AppComponentForAndroidTests : AppComponent {
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun syncModule(syncModule: SyncModule): Builder
         fun dashboardActivityModule(dashboardActivityModule: DashboardActivityModule): Builder
-        fun loginModule(loginModule: LoginModule): Builder
+        fun securityModule(securityModule: SecurityModule): Builder
 
         fun build(): AppComponentForAndroidTests
     }

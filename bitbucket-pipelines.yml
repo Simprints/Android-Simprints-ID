@@ -152,6 +152,7 @@ definitions:
         ######################################################################
         -   step: &run-all-android-tests
                 name: "Run android tests"
+                max-time: 60
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud

@@ -14,5 +14,6 @@ enum class CrashReportTag {
     LONG_CONSENT,
     ALERT,
     REFUSAL,
-    SAFE_EXCEPTION
+    SAFE_EXCEPTION,
+    ID_SETUP
 }

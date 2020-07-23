@@ -18,4 +18,7 @@ interface FingerprintStepProcessor {
     fun processResult(requestCode: Int,
                       resultCode: Int,
                       data: Intent?): Step.Result?
+
+    fun buildConfigurationStep(): Step
+
 }

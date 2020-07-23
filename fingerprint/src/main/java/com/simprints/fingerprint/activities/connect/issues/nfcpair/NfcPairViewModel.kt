@@ -33,7 +33,7 @@ class NfcPairViewModel(
     }
 
     fun startPairing(macAddress: String) {
-        scannerPairingManager.pairOnlyToDevice(macAddress)
+        scannerPairingManager.startPairingToDevice(macAddress)
         awaitingToPairToMacAddress.postEvent(macAddress)
     }
 }

@@ -42,7 +42,7 @@ class OdkVerifyResponseTest : BaseOdkClientApiTest() {
             assertThat(it.getString(ODK_GUIDS_KEY)).isEqualTo(appVerifyResponse.matchResult.guid)
             assertThat(it.getString(ODK_CONFIDENCES_KEY)).isEqualTo(appVerifyResponse.matchResult.confidence.toString())
             assertThat(it.getString(ODK_TIERS_KEY)).isEqualTo(appVerifyResponse.matchResult.tier.name)
-            assertThat(it.getBoolean(ODK_BIOMETRICS_COMPLETE_KEY)).isEqualTo(BaseClientApiTest.RETURN_FOR_FLOW_COMPLETED)
+            assertThat(it.getBoolean(ODK_VERIFY_BIOMETRICS_COMPLETE)).isEqualTo(BaseClientApiTest.RETURN_FOR_FLOW_COMPLETED)
         } ?: throw Exception("No bundle found")
     }
 }

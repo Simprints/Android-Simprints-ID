@@ -5,10 +5,10 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.TabHost
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.ModuleSelectionActivity
@@ -21,13 +21,11 @@ import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDo
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.ON
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
-import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_sync_information.*
 import javax.inject.Inject
 
-class SyncInformationActivity : AppCompatActivity() {
+class SyncInformationActivity : BaseSplitActivity() {
 
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var viewModelFactory: SyncInformationViewModelFactory
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
@@ -43,7 +41,7 @@ class SyncInformationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
 
-        title = androidResourcesHelper.getString(R.string.title_activity_sync_information)
+        title = getString(R.string.title_activity_sync_information)
         setContentView(R.layout.activity_sync_information)
 
         viewModel = ViewModelProvider(this, viewModelFactory)
@@ -69,15 +67,15 @@ class SyncInformationActivity : AppCompatActivity() {
 
     private fun setTextInLayout() {
         moduleSelectionButton.text =
-            androidResourcesHelper.getString(R.string.select_modules_button_title)
+            getString(R.string.select_modules_button_title)
         recordsToUploadText.text =
-            androidResourcesHelper.getString(R.string.sync_info_records_to_upload)
+            getString(R.string.sync_info_records_to_upload)
         recordsToDownloadText.text =
-            androidResourcesHelper.getString(R.string.sync_info_records_to_download)
+            getString(R.string.sync_info_records_to_download)
         recordsToDeleteText.text =
-            androidResourcesHelper.getString(R.string.sync_info_records_to_delete)
+            getString(R.string.sync_info_records_to_delete)
         totalRecordsOnDeviceText.text =
-            androidResourcesHelper.getString(R.string.sync_info_total_records_on_device)
+            getString(R.string.sync_info_total_records_on_device)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -91,10 +89,10 @@ class SyncInformationActivity : AppCompatActivity() {
     }
 
     private fun clearValues() {
-        recordsToUploadCount.text = androidResourcesHelper.getString(R.string.empty)
-        recordsToDownloadCount.text = androidResourcesHelper.getString(R.string.empty)
-        totalRecordsCount.text = androidResourcesHelper.getString(R.string.empty)
-        recordsToDeleteCount.text = androidResourcesHelper.getString(R.string.empty)
+        recordsToUploadCount.text = getString(R.string.empty)
+        recordsToDownloadCount.text = getString(R.string.empty)
+        totalRecordsCount.text = getString(R.string.empty)
+        recordsToDeleteCount.text = getString(R.string.empty)
     }
 
     private fun setFocusOnDefaultModulesTab() {
@@ -135,11 +133,11 @@ class SyncInformationActivity : AppCompatActivity() {
         modulesTabHost.setup()
 
         selectedModulesTabSpec = modulesTabHost.newTabSpec(SELECTED_MODULES_TAB_TAG)
-            .setIndicator(androidResourcesHelper.getString(R.string.sync_info_selected_modules))
+            .setIndicator(getString(R.string.sync_info_selected_modules))
             .setContent(R.id.selectedModulesView)
 
         unselectedModulesTabSpec = modulesTabHost.newTabSpec(UNSELECTED_MODULES_TAB_TAG)
-            .setIndicator(androidResourcesHelper.getString(R.string.sync_info_unselected_modules))
+            .setIndicator(getString(R.string.sync_info_unselected_modules))
             .setContent(R.id.unselectedModulesView)
 
         modulesTabHost.addTab(selectedModulesTabSpec)
@@ -205,7 +203,7 @@ class SyncInformationActivity : AppCompatActivity() {
     private fun setupProgressOverlay() {
         progressOverlayBackground.setOnTouchListener { _, _ -> true }
         progress_sync_overlay.setOnTouchListener { _, _ -> true }
-        progress_sync_overlay.text = androidResourcesHelper.getString(R.string.progress_sync_overlay)
+        progress_sync_overlay.text = getString(R.string.progress_sync_overlay)
         progressBar.setOnTouchListener { _, _ -> true }
     }
 
@@ -228,7 +226,7 @@ class SyncInformationActivity : AppCompatActivity() {
         }
 
         val totalRecordsEntry =
-            ModuleCount(androidResourcesHelper.getString(R.string.sync_info_total_records),
+            ModuleCount(getString(R.string.sync_info_total_records),
                 moduleCounts.sumBy { it.count })
         moduleCountsArray.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)
 

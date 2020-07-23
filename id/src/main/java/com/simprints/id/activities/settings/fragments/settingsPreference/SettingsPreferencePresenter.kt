@@ -3,15 +3,16 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.preference.ListPreference
 import android.preference.MultiSelectListPreference
 import android.preference.Preference
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.SyncManager
 import javax.inject.Inject
-
 
 class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.View,
                                   component: AppComponent) :
@@ -28,6 +29,24 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     override fun start() {
         configureAvailableLanguageEntriesFromProjectLanguages()
         loadPreferenceValuesAndBindThemToChangeListeners()
+        enableSettingsBasedOnModalities()
+    }
+
+    private fun enableSettingsBasedOnModalities() {
+        preferencesManager.modalities.forEach {
+            when (it) {
+                Modality.FINGER -> enableFingerprintSettings()
+                Modality.FACE -> enableFaceSettings()
+            }
+        }
+    }
+
+    private fun enableFingerprintSettings() {
+        view.enablePreference(view.getPreferenceForDefaultFingers())
+    }
+
+    private fun enableFaceSettings() {
+        // No face-specific settings yet
     }
 
     private fun configureAvailableLanguageEntriesFromProjectLanguages() {

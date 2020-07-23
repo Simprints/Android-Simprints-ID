@@ -18,6 +18,11 @@ import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.ENROLMENT
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.ENROLMENT_RECORD_DELETION_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.ENROLMENT_RECORD_MOVE_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.ENROLMENT_SERIALISED
+import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.FACE_CAPTURE_CONFIRMATION_SERIALISED
+import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.FACE_CAPTURE_RETRY_SERIALISED
+import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.FACE_CAPTURE_SERIALISED
+import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.FACE_FALLBACK_CAPTURE_SERIALISED
+import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.FACE_ONBOARDING_COMPLETE_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.FINGERPRINT_CAPTURE_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.GUID_SELECTION_SERIALISED
 import com.simprints.id.data.db.event.remote.events.SerialisedApiNames.INTENT_PARSING_SERIALISED
@@ -60,7 +65,13 @@ enum class ApiEventPayloadType(val apiName: String) {
     @SerializedName(SUSPICIOUS_INTENT_SERIALISED) SUSPICIOUS_INTENT(SUSPICIOUS_INTENT_SERIALISED),
     @SerializedName(INTENT_PARSING_SERIALISED) INTENT_PARSING(INTENT_PARSING_SERIALISED),
     @SerializedName(COMPLETION_CHECK_SERIALISED) COMPLETION_CHECK(COMPLETION_CHECK_SERIALISED),
-    @SerializedName(SESSION_CAPTURE_SERIALISED) SESSION_CAPTURE(SESSION_CAPTURE_SERIALISED)
+    @SerializedName(SESSION_CAPTURE_SERIALISED) SESSION_CAPTURE(SESSION_CAPTURE_SERIALISED),
+    @SerializedName(FACE_ONBOARDING_COMPLETE_SERIALISED) FACE_ONBOARDING_COMPLETE(FACE_ONBOARDING_COMPLETE_SERIALISED),
+    @SerializedName(FACE_FALLBACK_CAPTURE_SERIALISED) FACE_FALLBACK_CAPTURE(FACE_FALLBACK_CAPTURE_SERIALISED),
+    @SerializedName(FACE_CAPTURE_SERIALISED) FACE_CAPTURE(FACE_CAPTURE_SERIALISED),
+    @SerializedName(FACE_CAPTURE_CONFIRMATION_SERIALISED) FACE_CAPTURE_CONFIRMATION(FACE_CAPTURE_CONFIRMATION_SERIALISED),
+    @SerializedName(FACE_CAPTURE_RETRY_SERIALISED) FACE_CAPTURE_RETRY(FACE_CAPTURE_RETRY_SERIALISED)
+
 }
 
 private object SerialisedApiNames {
@@ -91,6 +102,11 @@ private object SerialisedApiNames {
     const val INTENT_PARSING_SERIALISED = "IntentParsing"
     const val COMPLETION_CHECK_SERIALISED = "CompletionCheck"
     const val SESSION_CAPTURE_SERIALISED = "SessionCapture"
+    const val FACE_ONBOARDING_COMPLETE_SERIALISED = "FaceOnboardingComplete"
+    const val FACE_FALLBACK_CAPTURE_SERIALISED = "FaceFallbackCapture"
+    const val FACE_CAPTURE_SERIALISED = "FaceCapture"
+    const val FACE_CAPTURE_CONFIRMATION_SERIALISED = "FaceCaptureConfirmation"
+    const val FACE_CAPTURE_RETRY_SERIALISED = "FaceCaptureRetry"
 }
 
 
@@ -131,13 +147,18 @@ fun EventType.fromDomainToApi() = when (this) {
     CALLBACK_CONFIRMATION -> TODO()
     SESSION_CAPTURE -> TODO()
     ENROLMENT_RECORD_MOVE -> TODO()
+    FACE_ONBOARDING_COMPLETE -> TODO()
+    FACE_FALLBACK_CAPTURE -> TODO()
+    FACE_CAPTURE -> TODO()
+    FACE_CAPTURE_CONFIRMATION -> TODO()
+    FACE_CAPTURE_RETRY -> TODO()
 }
 
 fun ApiEventPayloadType.fromApiToDomain() =
     when (this) {
-        ApiEventPayloadType.ENROLMENT_RECORD_CREATION -> EventType.ENROLMENT_RECORD_CREATION
-        ApiEventPayloadType.ENROLMENT_RECORD_DELETION -> EventType.ENROLMENT_RECORD_DELETION
-        ApiEventPayloadType.ENROLMENT_RECORD_MOVE -> EventType.ENROLMENT_RECORD_MOVE
+        ApiEventPayloadType.ENROLMENT_RECORD_CREATION -> ENROLMENT_RECORD_CREATION
+        ApiEventPayloadType.ENROLMENT_RECORD_DELETION -> ENROLMENT_RECORD_DELETION
+        ApiEventPayloadType.ENROLMENT_RECORD_MOVE -> ENROLMENT_RECORD_MOVE
         ApiEventPayloadType.ARTIFICIAL_TERMINATION -> TODO()
         ApiEventPayloadType.AUTHENTICATION -> TODO()
         ApiEventPayloadType.CONSENT -> TODO()
@@ -162,4 +183,9 @@ fun ApiEventPayloadType.fromApiToDomain() =
         ApiEventPayloadType.INTENT_PARSING -> TODO()
         ApiEventPayloadType.COMPLETION_CHECK -> TODO()
         ApiEventPayloadType.SESSION_CAPTURE -> TODO()
+        ApiEventPayloadType.FACE_ONBOARDING_COMPLETE -> TODO()
+        ApiEventPayloadType.FACE_FALLBACK_CAPTURE -> TODO()
+        ApiEventPayloadType.FACE_CAPTURE -> TODO()
+        ApiEventPayloadType.FACE_CAPTURE_CONFIRMATION -> TODO()
+        ApiEventPayloadType.FACE_CAPTURE_RETRY -> TODO()
     }

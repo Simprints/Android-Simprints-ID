@@ -11,8 +11,12 @@ import com.simprints.id.domain.alert.AlertType.*
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
+import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.tools.TimeHelper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,6 +32,7 @@ abstract class CheckLoginPresenter(
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider
     @Inject lateinit var syncManager: SyncManager
+    @Inject lateinit var securityStateRepository: SecurityStateRepository
 
     init {
         component.inject(this)
@@ -55,7 +60,15 @@ abstract class CheckLoginPresenter(
         }
     }
 
-    abstract suspend fun handleSignedInUser()
+    protected open suspend fun handleSignedInUser() {
+        CoroutineScope(Dispatchers.Main).launch {
+            for (status in securityStateRepository.securityStatusChannel) {
+                if (status.isCompromisedOrProjectEnded())
+                    handleNotSignedInUser()
+            }
+        }
+    }
+
     abstract fun handleNotSignedInUser()
 
     /**

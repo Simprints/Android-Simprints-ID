@@ -61,7 +61,9 @@ class ApiAlertScreenEvent(domainEvent: AlertScreenEvent) :
             INVALID_SESSION_ID,
             INVALID_USER_ID,
             INVALID_VERIFY_ID,
-            SAFETYNET_ERROR;
+            SAFETYNET_ERROR,
+            FACE_LICENSE_INVALID,
+            FACE_LICENSE_MISSING;
         }
     }
 }
@@ -96,4 +98,6 @@ fun AlertScreenEventType.fromDomainToApi(): ApiAlertScreenEventType =
         AlertScreenEventType.SAFETYNET_ERROR -> SAFETYNET_ERROR
         AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
         AlertScreenEventType.INVALID_STATE_FOR_INTENT_ACTION -> INVALID_STATE_FOR_INTENT_ACTION
+        AlertScreenEventType.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
+        AlertScreenEventType.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
     }

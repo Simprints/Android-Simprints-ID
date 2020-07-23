@@ -65,7 +65,7 @@ class SetupActivityTest {
 
     @Test
     fun launchSetupActivityWithLocationPermissions_shouldAddLocationToSession() {
-        val request = SetupRequest(listOf(SetupPermission.LOCATION))
+        val request = SetupRequest(listOf(Modality.FINGER, Modality.FACE), listOf(SetupPermission.LOCATION))
         val intent = Intent().apply {
             setClassName(ApplicationProvider.getApplicationContext<android.app.Application>().packageName,
                 SetupActivity::class.qualifiedName!!)

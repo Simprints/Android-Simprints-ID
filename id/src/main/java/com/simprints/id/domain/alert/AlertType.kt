@@ -9,6 +9,8 @@ enum class AlertType(val modalities: List<Modality>? = null) {
     ENROLMENT_LAST_BIOMETRICS_FAILED,
     DIFFERENT_PROJECT_ID_SIGNED_IN,
     DIFFERENT_USER_ID_SIGNED_IN,
+    OFFLINE_DURING_SETUP,
+    SETUP_MODALITY_DOWNLOAD_CANCELLED,
     SAFETYNET_ERROR,
     UNEXPECTED_ERROR
 }
@@ -21,4 +23,8 @@ fun AlertType.fromAlertToAlertTypeEvent() = when (this) {
     AlertType.GUID_NOT_FOUND_ONLINE -> AlertScreenEventType.GUID_NOT_FOUND_ONLINE
     AlertType.GUID_NOT_FOUND_OFFLINE -> AlertScreenEventType.GUID_NOT_FOUND_OFFLINE
     AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED -> AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED
+
+    //Will be added in the event as a part of the new events architecture
+    AlertType.OFFLINE_DURING_SETUP -> null
+    AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED -> null
 }

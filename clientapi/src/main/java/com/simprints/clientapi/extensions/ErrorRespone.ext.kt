@@ -21,5 +21,11 @@ internal fun ErrorResponse.isFlowCompletedWithCurrentError(): Boolean =
         ErrorResponse.Reason.ENROLMENT_LAST_BIOMETRICS_FAILED,
         ErrorResponse.Reason.GUID_NOT_FOUND_ONLINE -> Constants.RETURN_FOR_FLOW_COMPLETED
         ErrorResponse.Reason.LOGIN_NOT_COMPLETE,
-        ErrorResponse.Reason.ROOTED_DEVICE -> Constants.RETURN_FOR_FLOW_NOT_COMPLETED
+        ErrorResponse.Reason.ROOTED_DEVICE,
+        ErrorResponse.Reason.FACE_LICENSE_MISSING,
+        ErrorResponse.Reason.SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD,
+        ErrorResponse.Reason.SETUP_MODALITY_DOWNLOAD_CANCELLED,
+        ErrorResponse.Reason.FACE_LICENSE_INVALID,
+        ErrorResponse.Reason.FINGERPRINT_CONFIGURATION_ERROR,
+        ErrorResponse.Reason.FACE_CONFIGURATION_ERROR -> Constants.RETURN_FOR_FLOW_NOT_COMPLETED
     }
