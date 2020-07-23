@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
@@ -33,7 +33,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
                                private val modalities: List<Modality>,
                                projectId: String,
                                deviceId: String) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired, modalities, projectId, deviceId) {
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, eventRepository, consentRequired, locationRequired, modalities, projectId, deviceId) {
 
     override fun startFlow(appRequest: AppRequest) {
         require(appRequest is AppIdentifyRequest)

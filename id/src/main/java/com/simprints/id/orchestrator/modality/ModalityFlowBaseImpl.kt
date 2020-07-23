@@ -3,8 +3,11 @@ package com.simprints.id.orchestrator.modality
 import android.content.Intent
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
+import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
-import com.simprints.id.domain.moduleapi.core.requests.SetupPermission
+import com.simprints.id.domain.modality.Modality
+import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintErrorResponse
@@ -142,16 +145,15 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     private suspend fun addPersonCreationEventForFingerprintSamples(fingerprintSamples: List<FingerprintSample>) {
         ignoreException {
             val currentCaptureSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
-            eventRepository.addEvent(PersonCreationEvent.build(timeHelper, currentCaptureSessionEvent, fingerprintSamples))
+            eventRepository.addEvent(PersonCreationEvent.build(timeHelper, currentCaptureSessionEvent, fingerprintSamples, null))
         }
     }
 
     private suspend fun addPersonCreationEventForFaceSamples(faceSamples: List<FaceSample>) {
         ignoreException {
-            sessionRepository.updateCurrentSession {
-                val event = PersonCreationEvent.build(timeHelper, it, fingerprintSamples = null, faceSamples = faceSamples)
-                it.addEvent(event)
-            }
+            val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
+            val event = PersonCreationEvent.build(timeHelper, currentSessionEvent, fingerprintSamples = null, faceSamples = faceSamples)
+            eventRepository.addEvent(event)
         }
     }
 }

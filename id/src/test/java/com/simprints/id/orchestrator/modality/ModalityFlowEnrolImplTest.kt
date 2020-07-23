@@ -2,10 +2,11 @@ package com.simprints.id.orchestrator.modality
 
 import android.app.Activity
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.Modality.*
+import com.simprints.id.domain.modality.Modality.FACE
+import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -211,7 +212,7 @@ class ModalityFlowEnrolImplTest {
                                        modalities: List<Modality>,
                                        isEnrolmentPlus: Boolean = false) {
         modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired = true,
+            coreStepProcessor, timeHelper, eventRepository, consentRequired, locationRequired = true,
             modalities = modalities, projectId = PROJECT_ID, deviceId = "deviceId",
             isEnrolmentPlus = isEnrolmentPlus, matchGroup = GROUP.GLOBAL)
     }
