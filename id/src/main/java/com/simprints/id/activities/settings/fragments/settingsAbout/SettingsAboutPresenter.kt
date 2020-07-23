@@ -5,12 +5,11 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.secure.SignerManager
-import com.simprints.id.services.scheduledSync.SyncManager
 import javax.inject.Inject
 
 class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
@@ -19,12 +18,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var signerManager: SignerManager
-    @Inject lateinit var syncManager: SyncManager
-    @Inject lateinit var eventEventManager: EventRepository
     @Inject lateinit var recentEventsManager: RecentEventsPreferencesManager
-    @Inject lateinit var baseUrlProvider: BaseUrlProvider
-    @Inject lateinit var longConsentRepository: LongConsentRepository
-    @Inject lateinit var remoteConfigWrapper: RemoteConfigWrapper
 
     init {
         component.inject(this)
@@ -32,6 +26,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
 
     override fun start() {
         loadPreferenceValuesAndBindThemToChangeListeners()
+        enableSettingsBasedOnModalities()
     }
 
     private fun loadPreferenceValuesAndBindThemToChangeListeners() {
@@ -40,6 +35,23 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
         loadValueAndBindChangeListener(view.getScannerVersionPreference())
         loadValueAndBindChangeListener(view.getDeviceIdPreference())
         loadValueAndBindChangeListener(view.getLogoutPreference())
+    }
+
+    private fun enableSettingsBasedOnModalities() {
+        preferencesManager.modalities.forEach {
+            when (it) {
+                Modality.FINGER -> enableFingerprintSettings()
+                Modality.FACE -> enableFaceSettings()
+            }
+        }
+    }
+
+    private fun enableFingerprintSettings() {
+        view.enablePreference(view.getScannerVersionPreference())
+    }
+
+    private fun enableFaceSettings() {
+        // No face-specific settings yet
     }
 
     internal fun loadValueAndBindChangeListener(preference: Preference) {
@@ -90,12 +102,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
 
     override suspend fun logout() {
         signerManager.signOut()
-        syncManager.cancelBackgroundSyncs()
-        longConsentRepository.deleteLongConsents()
-        eventEventManager.signOut()
-        baseUrlProvider.resetApiBaseUrl()
-        remoteConfigWrapper.clearRemoteConfig()
-        
         view.finishSettings()
     }
+
 }

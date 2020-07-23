@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils.getRandomPeople
 import com.simprints.id.data.db.RealmTestsBase
+import com.simprints.id.data.db.subject.domain.FaceIdentity
 import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
@@ -35,6 +36,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
     private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>()
 
     @Before
+    @FlowPreview
     fun setup() {
         realm = Realm.getInstance(config)
         every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
@@ -43,8 +45,8 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         subjectLocalDataSource = SubjectLocalDataSourceImpl(testContext, secureLocalDbKeyProviderMock, loginInfoManagerMock)
     }
 
-    @FlowPreview
     @Test
+    @FlowPreview
     fun changeLocalDbKey_shouldNotAllowedToUseFirstRealm() {
         saveFakePerson(realm, getFakePerson())
         val countNewRealm = runBlocking { subjectLocalDataSource.count() }
@@ -151,9 +153,21 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         }
     }
 
-    private fun verifyIdentity(subject: DbSubject, fingerprintIdentity: FingerprintIdentity) {
-        assertThat(fingerprintIdentity.fingerprints.count()).isEqualTo(subject.fingerprintSamples.count())
-        assertThat(fingerprintIdentity.patientId).isEqualTo(subject.subjectId)
+    @Test
+    fun givenManyPeopleSaved_loadWithSerializableShouldReturnFaceRecords() = runBlocking {
+        val fakePerson1 = getFakePerson()
+        val fakePerson2 = getFakePerson()
+        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson1.fromDbToDomain()))
+        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson2.fromDbToDomain()))
+
+        val faceIdentityDataSource = (subjectLocalDataSource as FaceIdentityLocalDataSource)
+        val faceRecords = faceIdentityDataSource.loadFaceIdentities(SubjectLocalDataSource.Query()).toList()
+        realm.executeTransaction {
+            with(faceRecords) {
+                verifyIdentity(fakePerson1, get(0))
+                verifyIdentity(fakePerson2, get(1))
+            }
+        }
     }
 
     @Test
@@ -209,4 +223,40 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val people = subjectLocalDataSource.load(SubjectLocalDataSource.Query(toSync = false)).toList()
         assertThat(people.size).isEqualTo(0)
     }
+
+    @Test
+    fun shouldDeleteSubject() = runBlocking {
+        val subject1 = getFakePerson()
+        val subject2 = getFakePerson()
+        saveFakePerson(realm, subject1)
+        saveFakePerson(realm, subject2)
+
+        subjectLocalDataSource.delete(
+            listOf(SubjectLocalDataSource.Query(subjectId = subject1.subjectId))
+        )
+
+        val peopleCount = subjectLocalDataSource.count()
+        assertThat(peopleCount).isEqualTo(1)
+    }
+
+    @Test
+    fun shouldDeleteAllSubjects() = runBlocking {
+        saveFakePeople(realm, getRandomPeople(5))
+
+        subjectLocalDataSource.deleteAll()
+
+        val peopleCount = subjectLocalDataSource.count()
+        assertThat(peopleCount).isEqualTo(0)
+    }
+
+    private fun verifyIdentity(subject: DbSubject, fingerprintIdentity: FingerprintIdentity) {
+        assertThat(fingerprintIdentity.fingerprints.count()).isEqualTo(subject.fingerprintSamples.count())
+        assertThat(fingerprintIdentity.patientId).isEqualTo(subject.subjectId)
+    }
+
+    private fun verifyIdentity(subject: DbSubject, faceIdentity: FaceIdentity) {
+        assertThat(faceIdentity.faces.count()).isEqualTo(subject.faceSamples.count())
+        assertThat(faceIdentity.personId).isEqualTo(subject.subjectId)
+    }
+
 }

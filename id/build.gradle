@@ -20,8 +20,8 @@ android {
         minSdkVersion config.min_sdk
         targetSdkVersion 29
         vectorDrawables.useSupportLibrary = true
-        versionName "2020.2.1"
-        versionCode 239
+        versionName "2020.3.0-rc5"
+        versionCode 246
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -158,7 +158,7 @@ dependencies {
     implementation deps.androidx.ui.cardview
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
-    implementation deps.androidx.security
+    api deps.androidx.security
     implementation deps.androidx.camerax.camera2
     implementation deps.androidx.camerax.lifecycle
     implementation deps.androidx.camerax.view
@@ -218,6 +218,8 @@ dependencies {
     api deps.koin.core
     api deps.koin.android
     api deps.koin.viewmodel
+    api deps.playcore.core
+    api deps.playcore.core_ktx
 
     // ######################################################
     //                      Unit test

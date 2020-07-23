@@ -83,36 +83,17 @@ class TestAppModule(
 
     override fun provideLoginInfoManager(
         improvedSharedPreferences: ImprovedSharedPreferences
-    ): LoginInfoManager =
-        loginInfoManagerRule.resolveDependency {
-            super.provideLoginInfoManager(
-                improvedSharedPreferences
-            )
-        }
+    ): LoginInfoManager = loginInfoManagerRule.resolveDependency {
+        super.provideLoginInfoManager(
+            improvedSharedPreferences
+        )
+    }
 
     override fun provideRandomGenerator(): RandomGenerator =
         randomGeneratorRule.resolveDependency { super.provideRandomGenerator() }
 
     override fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager =
         remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager(loginInfoManager) }
-
-    override fun provideSignerManager(
-            projectRepository: ProjectRepository,
-            remoteDbManager: RemoteDbManager,
-            loginInfoManager: LoginInfoManager,
-            preferencesManager: PreferencesManager,
-            subjectsSyncManager: SubjectsSyncManager,
-            syncManager: SyncManager
-    ): SignerManager = dbManagerRule.resolveDependency {
-        super.provideSignerManager(
-            projectRepository,
-            remoteDbManager,
-            loginInfoManager,
-            preferencesManager,
-            subjectsSyncManager,
-            syncManager
-        )
-    }
 
     override fun provideSecureLocalDbKeyProvider(
         builder: EncryptedSharedPreferencesBuilder,

@@ -276,6 +276,7 @@ fun validateOneToManyMatchEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("ONE_TO_MANY_MATCH")
     assertThat(json.get("relativeStartTime").asLong)
     assertThat(json.get("relativeEndTime").asLong)
+    assertThat(json.get("matcher").asString).isAnyOf("SIM_AFIS", "RANK_ONE")
     with(json.get("pool").asJsonObject) {
         assertThat(get("type").asString).isAnyOf("PROJECT", "MODULE", "USER")
         assertThat(get("count").asInt)
@@ -285,7 +286,7 @@ fun validateOneToManyMatchEventApiModel(json: JsonObject) {
     matchEntries.forEach {
         validateMatchEntryApiModel(it.asJsonObject)
     }
-    assertThat(json.size()).isEqualTo(5)
+    assertThat(json.size()).isEqualTo(6)
 }
 
 fun validateOneToOneMatchEventApiModel(json: JsonObject) {
@@ -293,10 +294,11 @@ fun validateOneToOneMatchEventApiModel(json: JsonObject) {
     assertThat(json.get("relativeStartTime").asLong)
     assertThat(json.get("relativeEndTime").asLong)
     assertThat(json.get("candidateId").asString.isGuid()).isTrue()
+    assertThat(json.get("matcher").asString).isAnyOf("SIM_AFIS", "RANK_ONE")
     with(json.get("result").asJsonObject) {
         validateMatchEntryApiModel(this)
     }
-    assertThat(json.size()).isEqualTo(5)
+    assertThat(json.size()).isEqualTo(6)
 }
 
 fun validatePersonCreationEvent(json: JsonObject) {
@@ -463,6 +465,11 @@ fun validateSessionEventsApiModel(json: JsonObject) {
 
     if (json.has("location")) {
         with(json.get("location").asJsonObject) { validateLocationApiModel(this) }
+        countFields += 1
+    }
+
+    if (json.has("modalities")) {
+        assertThat(json.get("modalities").asJsonArray).isNotEmpty()
         countFields += 1
     }
 

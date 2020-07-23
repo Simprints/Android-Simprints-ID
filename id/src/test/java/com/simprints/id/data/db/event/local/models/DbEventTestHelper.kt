@@ -23,6 +23,7 @@ import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.
 import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
 import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
+import com.simprints.id.data.db.event.domain.models.Matcher.RANK_ONE
 import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
 import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT
 import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload.Answer.OTHER
@@ -331,7 +332,7 @@ fun verifyInvalidIntentEvents(event1: InvalidIntentEvent, event2: InvalidIntentE
 fun createOneToManyMatchEvent(): OneToManyMatchEvent {
     val poolArg = MatchPool(PROJECT, 100)
     val resultArg = listOf(MatchEntry(SOME_GUID1, 0F))
-    return OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, resultArg, SOME_GUID1)
+    return OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, RANK_ONE, resultArg, SOME_GUID1)
 }
 
 fun verifyOneToManyMatchEvents(event1: OneToManyMatchEvent, event2: OneToManyMatchEvent) {
@@ -345,7 +346,7 @@ fun verifyOneToManyMatchEvents(event1: OneToManyMatchEvent, event2: OneToManyMat
 
 fun createOneToOneMatchEvent(): OneToOneMatchEvent {
     val matchEntry = MatchEntry(SOME_GUID1, 10F)
-    return OneToOneMatchEvent(CREATED_AT, ENDED_AT, SOME_GUID1, matchEntry, SOME_GUID1)
+    return OneToOneMatchEvent(CREATED_AT, ENDED_AT, SOME_GUID1, RANK_ONE, matchEntry, SOME_GUID1)
 }
 
 fun verifyOneToOneMatchEvents(event1: OneToOneMatchEvent, event2: OneToOneMatchEvent) {
@@ -357,7 +358,7 @@ fun verifyOneToOneMatchEvents(event1: OneToOneMatchEvent, event2: OneToOneMatchE
     assertThat(payload1.result).isEqualTo(payload2.result)
 }
 
-fun createPersonCreationEvent() = PersonCreationEvent(CREATED_AT, listOf(SOME_GUID1, SOME_GUID2), SOME_GUID2)
+fun createPersonCreationEvent() = PersonCreationEvent(CREATED_AT, listOf(SOME_GUID1, SOME_GUID2), listOf(SOME_GUID1, SOME_GUID2), SOME_GUID2)
 fun verifyPersonCreationEvents(event1: PersonCreationEvent, event2: PersonCreationEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload

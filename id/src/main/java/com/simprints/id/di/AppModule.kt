@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
@@ -15,16 +14,13 @@ import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
+import com.simprints.id.activities.setup.SetupViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSource
-import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSourceImpl
-import com.simprints.id.data.consent.shortconsent.ConsentRepository
-import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.EventRepository
@@ -37,7 +33,6 @@ import com.simprints.id.data.db.event.local.SessionLocalDataSource
 import com.simprints.id.data.db.event.local.SessionLocalDataSourceImpl
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSourceImpl
-import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
@@ -46,7 +41,6 @@ import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeReposito
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -60,6 +54,7 @@ import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.BaseUrlProviderImpl
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
@@ -68,16 +63,11 @@ import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.cache.StepEncoderImpl
-import com.simprints.id.secure.BaseUrlProviderImpl
-import com.simprints.id.secure.SignerManager
-import com.simprints.id.secure.SignerManagerImpl
-import com.simprints.id.services.GuidSelectionManager
-import com.simprints.id.services.GuidSelectionManagerImpl
-import com.simprints.id.services.scheduledSync.SyncManager
+import com.simprints.id.services.guidselection.GuidSelectionManager
+import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.tools.*
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
@@ -112,24 +102,7 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSignerManager(
-        projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager,
-        subjectsSyncManager: SubjectsSyncManager,
-        syncManager: SyncManager
-    ): SignerManager = SignerManagerImpl(
-        projectRepository,
-        remoteDbManager,
-        loginInfoManager,
-        preferencesManager,
-        subjectsSyncManager,
-        syncManager
-    )
-
-    @Provides
-    @Singleton
+    @Suppress("MissingPermission")
     fun provideFirebaseAnalytics(app: Application): FirebaseAnalytics =
         FirebaseAnalytics.getInstance(app).apply {
             setMinimumSessionDuration(0)
@@ -207,24 +180,19 @@ open class AppModule {
         remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider,
         gson: Gson
-    ): SimApiClientFactory = SimApiClientFactoryImpl(baseUrlProvider, ctx.deviceId, remoteDbManager, gson)
+    ): SimApiClientFactory = SimApiClientFactoryImpl(
+        baseUrlProvider,
+        ctx.deviceId,
+        remoteDbManager,
+        gson
+    )
 
     @Provides
     @Singleton
     fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
 
-    @Provides
-    fun provideAndroidResourcesHelper(
-        ctx: Context,
-        preferencesManager: PreferencesManager
-    ): AndroidResourcesHelper {
-        val contextWithSpecificLanguage =
-            LanguageHelper.contextWithSpecificLanguage(ctx, preferencesManager.language)
-        return AndroidResourcesHelperImpl(contextWithSpecificLanguage)
-    }
 
     @Provides
-    @Singleton
     open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsBuilder =
         SessionEventValidatorsBuilderImpl()
 
@@ -316,33 +284,8 @@ open class AppModule {
     ): ImageUpSyncScheduler = ImageUpSyncSchedulerImpl(context)
 
     @Provides
-    open fun getConsentDataManager(
-        prefs: ImprovedSharedPreferences,
-        remoteConfigWrapper: RemoteConfigWrapper
-    ): ConsentLocalDataSource =
-        ConsentLocalDataSourceImpl(prefs, remoteConfigWrapper)
-
-    @Provides
-    open fun provideConsentTextManager(
-        context: Context,
-        consentLocalDataSource: ConsentLocalDataSource,
-        crashReportManager: CrashReportManager,
-        preferencesManager: PreferencesManager,
-        androidResourcesHelper: AndroidResourcesHelper
-    ): ConsentRepository =
-        ConsentRepositoryImpl(
-            consentLocalDataSource, crashReportManager, preferencesManager.programName,
-            preferencesManager.organizationName, androidResourcesHelper,
-            preferencesManager.modalities
-        )
-
-    @Provides
-    open fun provideConsentViewModelFactory(
-        consentTextManager: ConsentRepository,
-        eventRepository: EventRepository,
-        timeHelper: TimeHelper
-    ) =
-        ConsentViewModelFactory(consentTextManager, eventRepository)
+    open fun provideConsentViewModelFactory(eventRepository: EventRepository) =
+        ConsentViewModelFactory(eventRepository)
 
     @Provides
     open fun provideCoreExitFormViewModelFactory(eventRepository: EventRepository) =
@@ -369,11 +312,10 @@ open class AppModule {
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository
-    ) =
-        SyncInformationViewModelFactory(
-            personRepository, subjectLocalDataSource, preferencesManager,
-            loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository
-        )
+    ) = SyncInformationViewModelFactory(
+        personRepository, subjectLocalDataSource, preferencesManager,
+        loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository
+    )
 
     @Provides
     open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =
@@ -447,5 +389,12 @@ open class AppModule {
         enrolmentHelper: EnrolmentHelper,
         timeHelper: TimeHelper
     ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper)
+
+    @ExperimentalCoroutinesApi
+    @Provides
+    open fun provideSetupViewModelFactory(
+        deviceManager: DeviceManager,
+        crashReportManager: CrashReportManager
+    ) = SetupViewModelFactory(deviceManager, crashReportManager)
 }
 

@@ -17,12 +17,13 @@ class OneToManyMatchEvent(
         createdAt: Long,
         endTime: Long,
         pool: OneToManyMatchPayload.MatchPool,
+        matcher: Matcher,
         result: List<MatchEntry>?,
         sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
         mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
-        OneToManyMatchPayload(createdAt, EVENT_VERSION, endTime, pool, result),
+        OneToManyMatchPayload(createdAt, EVENT_VERSION, endTime, pool, matcher, result),
         ONE_TO_MANY_MATCH)
 
     @Keep
@@ -31,6 +32,7 @@ class OneToManyMatchEvent(
         override val eventVersion: Int,
         override val endedAt: Long,
         val pool: MatchPool,
+        val matcher: Matcher,
         val result: List<MatchEntry>?
     ) : EventPayload(ONE_TO_MANY_MATCH, eventVersion, createdAt, endedAt) {
 

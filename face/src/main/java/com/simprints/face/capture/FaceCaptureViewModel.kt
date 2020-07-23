@@ -37,10 +37,10 @@ class FaceCaptureViewModel(
     val finishFlowWithExitFormEvent: MutableLiveData<LiveDataEventWithContent<FaceExitFormResponse>> =
         MutableLiveData()
 
-    private var retriesUsed: Int = 0
+    var attemptNumber: Int = 0
 
     val canRetry: Boolean
-        get() = retriesUsed++ < maxRetries
+        get() = attemptNumber++ < maxRetries
 
     var samplesToCapture = 1
 
@@ -54,7 +54,6 @@ class FaceCaptureViewModel(
 
     fun flowFinished() {
         saveFaceDetections()
-        // TODO: add analytics for FlowFinished(SUCCESS) and EndSession
 
         val results = faceDetections.mapIndexed { index, detection ->
             FaceCaptureResult(index, detection.toFaceSample())
@@ -84,7 +83,6 @@ class FaceCaptureViewModel(
     }
 
     fun recapture() {
-        // TODO: add analytics for FlowFinished(RECAPTURE)
         crashReportManager.logMessageForCrashReport(
             FACE_CAPTURE,
             UI,
@@ -99,19 +97,15 @@ class FaceCaptureViewModel(
     }
 
     private fun retryFlow() {
-        // TODO: add analytics for FlowFinished(RETRY)
         faceDetections = listOf()
         retryFlowEvent.send()
     }
 
-    // TODO: should have a better understanding on what to do after failed all retries
     private fun finishFlowWithFailedRetries() {
-        // TODO: add analytics for FlowFinished(RETRY_FAIL)
         flowFinished()
     }
 
     private fun startNewAnalyticsSession() {
-        // TODO: add analytics for StartSession
         crashReportManager.logMessageForCrashReport(
             FACE_CAPTURE,
             UI,
@@ -125,13 +119,8 @@ class FaceCaptureViewModel(
             UI,
             message = "Saving captures to disk"
         )
-        // TODO: send the correct captureEventId once we can get it
-        faceDetections.forEachIndexed { index, faceDetection ->
-            saveImage(
-                faceDetection,
-                index.toString()
-            )
-        }
+
+        faceDetections.forEach { saveImage(it, it.id) }
     }
 
     private fun saveImage(faceDetection: FaceDetection, captureEventId: String) {

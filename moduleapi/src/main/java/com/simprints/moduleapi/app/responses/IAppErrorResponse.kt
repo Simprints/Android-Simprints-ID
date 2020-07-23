@@ -1,6 +1,6 @@
 package com.simprints.moduleapi.app.responses
 
-interface IAppErrorResponse: IAppResponse {
+interface IAppErrorResponse : IAppResponse {
     val reason: IAppErrorReason
 }
 
@@ -10,7 +10,13 @@ enum class IAppErrorReason {
     GUID_NOT_FOUND_ONLINE,
     BLUETOOTH_NOT_SUPPORTED,
     LOGIN_NOT_COMPLETE,
+    SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD,
+    SETUP_MODALITY_DOWNLOAD_CANCELLED,
     UNEXPECTED_ERROR,
     ROOTED_DEVICE,
-    ENROLMENT_LAST_BIOMETRICS_FAILED
+    ENROLMENT_LAST_BIOMETRICS_FAILED,
+    FACE_LICENSE_MISSING,
+    FACE_LICENSE_INVALID,
+    FINGERPRINT_CONFIGURATION_ERROR,
+    FACE_CONFIGURATION_ERROR
 }

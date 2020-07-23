@@ -5,10 +5,11 @@
     package="com.simprints.face">
 
     <dist:module
-        dist:instant="false"
-        dist:onDemand="true"
-        dist:title="@string/title_face">
+        dist:title="@string/module_feature_face">
         <dist:fusing dist:include="true" />
+        <dist:delivery>
+            <dist:on-demand />
+        </dist:delivery>
     </dist:module>
 
     <application

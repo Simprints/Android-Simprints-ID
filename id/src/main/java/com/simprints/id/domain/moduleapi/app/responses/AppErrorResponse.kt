@@ -16,7 +16,13 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         LOGIN_NOT_COMPLETE,
         BLUETOOTH_NOT_SUPPORTED,
         GUID_NOT_FOUND_ONLINE,
-        ENROLMENT_LAST_BIOMETRICS_FAILED;
+        SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD,
+        SETUP_MODALITY_DOWNLOAD_CANCELLED,
+        ENROLMENT_LAST_BIOMETRICS_FAILED,
+        FACE_LICENSE_MISSING,
+        FACE_LICENSE_INVALID,
+        FINGERPRINT_CONFIGURATION_ERROR,
+        FACE_CONFIGURATION_ERROR;
 
         companion object {
             fun fromDomainAlertTypeToAppErrorType(alertType: AlertType) =
@@ -29,6 +35,10 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                     AlertType.GUID_NOT_FOUND_OFFLINE ->
                         throw Throwable("No ErrorType associated. GUID_NOT_FOUND_OFFLINE should return a ExitForm, not a Error Response.")
                     AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
+
+
+                    AlertType.OFFLINE_DURING_SETUP -> SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD
+                    AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED -> SETUP_MODALITY_DOWNLOAD_CANCELLED
                 }
         }
     }

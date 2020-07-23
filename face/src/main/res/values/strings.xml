@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="face_capture_preview">Face Capture Preview</string>
-
     <string name="capture_title_howto">How to scan a face</string>
     <string name="capture_title_previewing">Preparing to scan</string>
     <string name="capture_title_looks_good">Scan is ready!</string>
@@ -61,4 +59,17 @@
     <string name="face_match_tier4_matches_zero">No matches</string>
     <string name="face_match_tier4_matches_one">%d match</string>
     <string name="face_match_tier4_matches_other">%d matches</string>
+
+    <!--  Error screens  -->
+    <string name="error_licence_invalid_title">License invalid</string>
+    <string name="error_licence_invalid_message">Face license is invalid, please contact your system administrator</string>
+    <string name="error_close_button">Close</string>
+    <string name="error_licence_missing_title">License missing</string>
+    <string name="error_licence_missing_message">Face license is missing, please contact your system administrator</string>
+    <string name="error_configuration_error_title">Configuration error</string>
+    <string name="error_configuration_error_message">There was an error while configuring face modality, please contact your system administrator</string>
+
+    <!--  Configuration screens  -->
+    <string name="face_configuration_started">Configuring face modality</string>
+    <string name="face_configuration_downloading">Downloading necessary files</string>
 </resources>

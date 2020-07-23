@@ -11,7 +11,6 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -22,7 +21,6 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 class ScannerOffFragment : FingerprintFragment() {
 
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
-    private val resourceHelper: FingerprintAndroidResourcesHelper by inject()
     private val timeHelper: FingerprintTimeHelper by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
 
@@ -41,11 +39,9 @@ class ScannerOffFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        with(resourceHelper) {
-            tryAgainButton.text = getString(R.string.try_again_label)
-            scannerOffInstructionsTextView.text = getString(R.string.scanner_off_instructions)
-            scannerOffTitleTextView.text = getString(R.string.scanner_off_title)
-        }
+        tryAgainButton.text = getString(R.string.try_again_label)
+        scannerOffInstructionsTextView.text = getString(R.string.scanner_off_instructions)
+        scannerOffTitleTextView.text = getString(R.string.scanner_off_title)
     }
 
     private fun initRetryConnectBehaviour() {
@@ -61,7 +57,7 @@ class ScannerOffFragment : FingerprintFragment() {
     private fun initCouldNotConnectTextView() {
         connectScannerViewModel.showScannerErrorDialogWithScannerId.value?.let { scannerIdEvent ->
             couldNotConnectTextView.paintFlags = couldNotConnectTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-            couldNotConnectTextView.text = resourceHelper.getString(R.string.not_my_scanner, arrayOf(scannerIdEvent.peekContent()))
+            couldNotConnectTextView.text = String.format(getString(R.string.not_my_scanner), scannerIdEvent.peekContent())
             couldNotConnectTextView.setOnClickListener { connectScannerViewModel.handleIncorrectScanner() }
             couldNotConnectTextView.visibility = View.VISIBLE
         }
@@ -86,7 +82,7 @@ class ScannerOffFragment : FingerprintFragment() {
         couldNotConnectTextView.visibility = View.INVISIBLE
         tryAgainButton.visibility = View.VISIBLE
         tryAgainButton.isEnabled = false
-        tryAgainButton.text = resourceHelper.getString(R.string.scanner_on)
+        tryAgainButton.text = getString(R.string.scanner_on)
         tryAgainButton.setBackgroundColor(resources.getColor(R.color.simprints_green, null))
         Handler().postDelayed({ connectScannerViewModel.finishConnectActivity() }, FINISHED_TIME_DELAY_MS)
     }

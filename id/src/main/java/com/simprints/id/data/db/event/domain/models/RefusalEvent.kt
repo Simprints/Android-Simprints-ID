@@ -39,6 +39,7 @@ class RefusalEvent(
             REFUSED_DATA_CONCERNS,
             REFUSED_PERMISSION,
             SCANNER_NOT_WORKING,
+            APP_NOT_WORKING,
             REFUSED_NOT_PRESENT,
             REFUSED_YOUNG,
             OTHER

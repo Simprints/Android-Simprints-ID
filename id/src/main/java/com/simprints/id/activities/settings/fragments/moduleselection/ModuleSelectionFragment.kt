@@ -24,7 +24,6 @@ import com.simprints.id.activities.settings.fragments.moduleselection.tools.Modu
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
@@ -38,7 +37,6 @@ class ModuleSelectionFragment(
 ) : Fragment(R.layout.fragment_module_selection), ModuleSelectionListener, ChipClickListener {
 
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var viewModelFactory: ModuleViewModelFactory
     @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
 
@@ -62,9 +60,9 @@ class ModuleSelectionFragment(
     }
 
     private fun configureTextViews() {
-        txtSelectedModules.text = androidResourcesHelper.getString(R.string.selected_modules)
-        txtNoModulesSelected.text = androidResourcesHelper.getString(R.string.no_modules_selected)
-        txtNoResults.text = androidResourcesHelper.getString(R.string.no_results)
+        txtSelectedModules.text = getString(R.string.selected_modules)
+        txtNoModulesSelected.text = getString(R.string.no_modules_selected)
+        txtNoResults.text = getString(R.string.no_results)
     }
 
     override fun onModuleSelected(module: Module) {
@@ -113,7 +111,7 @@ class ModuleSelectionFragment(
 
     private fun configureSearchView() {
         configureSearchViewEditText()
-        searchView.queryHint = androidResourcesHelper.getString(R.string.hint_search_modules)
+        searchView.queryHint = getString(R.string.hint_search_modules)
         val queryListener = ModuleSelectionQueryListener(modules.getUnselected())
         searchView.setOnQueryTextListener(queryListener)
         observeSearchResults(queryListener)
@@ -189,7 +187,7 @@ class ModuleSelectionFragment(
     }
 
     private fun notifyNoModulesSelected() {
-        activity?.showToast(androidResourcesHelper, R.string.settings_no_modules_toast)
+        activity?.showToast(R.string.settings_no_modules_toast)
     }
 
     fun showModuleSelectionDialogIfNecessary() {
@@ -211,12 +209,12 @@ class ModuleSelectionFragment(
 
     private fun buildConfirmModuleSelectionDialog() =
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(androidResourcesHelper.getString(R.string.confirm_module_selection_title))
+            .setTitle(getString(R.string.confirm_module_selection_title))
             .setMessage(getModulesSelectedTextForDialog())
             .setCancelable(false)
-            .setPositiveButton(androidResourcesHelper.getString(R.string.confirm_module_selection_yes))
+            .setPositiveButton(getString(R.string.confirm_module_selection_yes))
             { _, _ -> handleModulesConfirmClick() }
-            .setNegativeButton(androidResourcesHelper.getString(R.string.confirm_module_selection_cancel))
+            .setNegativeButton(getString(R.string.confirm_module_selection_cancel))
             { _, _ -> handleModuleSelectionCancelClick() }
             .create()
 
@@ -239,7 +237,7 @@ class ModuleSelectionFragment(
     private fun notifyTooManyModulesSelected(maxAllowed: Int) {
         Toast.makeText(
             application,
-            androidResourcesHelper.getString(R.string.settings_too_many_modules_toast, arrayOf(maxAllowed)),
+            String.format(getString(R.string.settings_too_many_modules_toast), maxAllowed),
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -278,5 +276,4 @@ class ModuleSelectionFragment(
             // The safe call above is necessary only when the 'up' action bar button is clicked
         }
     }
-
 }

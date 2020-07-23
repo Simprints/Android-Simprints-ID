@@ -9,7 +9,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.id.data.exitform.FaceExitFormReason
 import com.simprints.id.data.exitform.FingerprintExitFormReason
-import com.simprints.id.domain.moduleapi.core.response.SetupResponse
+import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
@@ -125,7 +125,7 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     @Test
     fun stepProcessor_shouldProcessResultFromSetup() {
         val setupData = Intent().apply {
-            putExtra(CORE_STEP_BUNDLE, SetupResponse())
+            putExtra(CORE_STEP_BUNDLE, SetupResponse(true))
         }
 
         val result = coreStepProcessor.processResult(setupData)

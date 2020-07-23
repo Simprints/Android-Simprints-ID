@@ -60,7 +60,9 @@ class AlertScreenEvent(
             INVALID_VERIFY_ID,
             SAFETYNET_ERROR,
             ENROLMENT_LAST_BIOMETRICS_FAILED,
-            INVALID_STATE_FOR_INTENT_ACTION
+            INVALID_STATE_FOR_INTENT_ACTION,
+            FACE_LICENSE_INVALID,
+            FACE_LICENSE_MISSING
         }
     }
 

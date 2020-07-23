@@ -7,6 +7,7 @@ import com.simprints.id.data.db.event.domain.models.EventLabel.EventLabelKey.*
 import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.domain.models.callback.*
 import com.simprints.id.data.db.event.domain.models.callout.*
+import com.simprints.id.data.db.event.domain.models.face.*
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
@@ -30,8 +31,8 @@ class EventLabelAdapter : TypeAdapter<EventLabel> {
 }
 
 class EventAdapter : TypeAdapter<Event> {
-    override fun classFor(type: Any): KClass<out Event> =
-        when (EventType.valueOf(type as String)) {
+    override fun classFor(type: Any): KClass<out Event> {
+        return when (EventType.valueOf(type as String)) {
             SESSION_CAPTURE -> SessionCaptureEvent::class
             ENROLMENT_RECORD_CREATION -> EnrolmentRecordCreationEvent::class
             ENROLMENT_RECORD_DELETION -> EnrolmentRecordDeletionEvent::class
@@ -68,5 +69,11 @@ class EventAdapter : TypeAdapter<Event> {
             INTENT_PARSING -> IntentParsingEvent::class
             COMPLETION_CHECK -> CompletionCheckEvent::class
             CALLBACK_CONFIRMATION -> ConfirmationCallbackEvent::class
+            FACE_ONBOARDING_COMPLETE -> FaceOnboardingCompleteEvent::class
+            FACE_FALLBACK_CAPTURE -> FaceFallbackCaptureEvent::class
+            FACE_CAPTURE -> FaceCaptureEvent::class
+            FACE_CAPTURE_CONFIRMATION -> FaceCaptureConfirmationEvent::class
+            FACE_CAPTURE_RETRY -> FaceCaptureRetryEvent::class
         }
+    }
 }

@@ -129,59 +129,7 @@ class SettingsAboutPresenterTest {
         coVerify { presenter.signerManager.signOut() }
     }
 
-    @Test
-    fun presenterLogout_backgroundSyncWorkersAreCancelled() = runBlockingTest {
-        mockDepsForLogout(presenter)
-
-        presenter.logout()
-
-        coVerify { presenter.syncManager.cancelBackgroundSyncs() }
-    }
-
-    @Test
-    fun presenterLogout_longConsentsAreDeleted() = runBlockingTest {
-        mockDepsForLogout(presenter)
-
-        presenter.logout()
-
-        verify(exactly = 1) { presenter.longConsentRepository.deleteLongConsents() }
-    }
-
-    @Test
-    fun presenterLogout_sessionsManagerSignsOut() = runBlockingTest {
-        mockDepsForLogout(presenter)
-
-        presenter.logout()
-
-        coVerify(exactly = 1) { presenter.eventEventManager.signOut() }
-    }
-
-    @Test
-    fun presenterLogout_apiBaseUrlIsReset() = runBlockingTest {
-        mockDepsForLogout(presenter)
-
-        presenter.logout()
-
-        verify { presenter.baseUrlProvider.resetApiBaseUrl() }
-    }
-
-    @Test
-    fun presenterLogout_clearRemoteConfig() = runBlockingTest {
-        mockDepsForLogout(presenter)
-
-        presenter.logout()
-
-        coVerify { presenter.remoteConfigWrapper.clearRemoteConfig() }
-    }
-
     private fun mockDepsForLogout(presenter: SettingsAboutPresenter) {
-        with(presenter) {
-            signerManager = mockk(relaxed = true)
-            syncManager = mockk(relaxed = true)
-            longConsentRepository = mockk(relaxed = true)
-            eventEventManager = mockk(relaxed = true)
-            baseUrlProvider = mockk()
-            remoteConfigWrapper = mockk(relaxed = true)
-        }
+        presenter.signerManager = mockk(relaxed = true)
     }
 }

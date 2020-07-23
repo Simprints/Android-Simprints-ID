@@ -5,6 +5,7 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.db.event.domain.models.EventLabel.SessionIdLabel
 import com.simprints.id.data.db.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.tools.TimeHelper
 import java.util.*
@@ -20,11 +21,12 @@ class PersonCreationEvent(
     constructor(
         startTime: Long,
         fingerprintCaptureIds: List<String>,
+        faceCaptureIds: List<String>,
         sessionId: String = UUID.randomUUID().toString() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
-        mutableListOf(SessionIdLabel(sessionId)),
-        PersonCreationPayload(startTime, EVENT_VERSION, fingerprintCaptureIds),
+        mutableListOf<EventLabel>(SessionIdLabel(sessionId)),
+        PersonCreationPayload(startTime, EVENT_VERSION, fingerprintCaptureIds, faceCaptureIds),
         PERSON_CREATION)
 
 
@@ -33,32 +35,51 @@ class PersonCreationEvent(
     class PersonCreationPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        val fingerprintCaptureIds: List<String>
+        val fingerprintCaptureIds: List<String>,
+        val faceCaptureIds: List<String>
     ) : EventPayload(PERSON_CREATION, eventVersion, createdAt)
 
     companion object {
-        fun build(timeHelper: TimeHelper,
-                  currentSession: SessionCaptureEvent,
-                  fingerprintSamples: List<FingerprintSample>) =
-            PersonCreationEvent(
-                timeHelper.now(),
-                extractCaptureEventIdsBasedOnPersonTemplate(currentSession, fingerprintSamples.map { EncodingUtils.byteArrayToBase64(it.template) })
+        fun build(
+            timeHelper: TimeHelper,
+            currentSession: SessionCaptureEvent,
+            fingerprintSamples: List<FingerprintSample>?,
+            faceSamples: List<FaceSample>?
+        ) = PersonCreationEvent(
+            startTime = timeHelper.now(),
+            fingerprintCaptureIds = extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
+                currentSession,
+                fingerprintSamples?.map { EncodingUtils.byteArrayToBase64(it.template) }
+            ),
+            faceCaptureIds = extractFaceCaptureEventIdsBasedOnPersonTemplate(
+                currentSession,
+                faceSamples?.map { EncodingUtils.byteArrayToBase64(it.template) }
             )
+        )
 
+        //STOPSHIP
         // It extracts CaptureEvents Ids with the templates used to create the "Person" object for
         // identification, verification, enrolment.
-        private fun extractCaptureEventIdsBasedOnPersonTemplate(sessionEvent: SessionCaptureEvent, personTemplates: List<String>): List<String> =
-            emptyList() //StopShip
-//            sessionEvent.getEvents()
-//                .filter {
-//                    if (it.payload is FingerprintCaptureEvent.FingerprintCapturePayload) {
-//                        val payload = it.payload
-//                        payload.fingerprint?.template in personTemplates && payload.result != FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
-//                    } else {
-//                        false
-//                    }
-//                }
-//                .map { it.id }
+        private fun extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
+            sessionEvents: SessionCaptureEvent,
+            personTemplates: List<String>?
+        ): List<String> = emptyList()
+//            sessionEvents.getEvents()
+//            .filterIsInstance(FingerprintCaptureEvent::class.java)
+//            .filter {
+//                personTemplates?.contains(it.fingerprint?.template) ?: false
+//                    && it.result != FingerprintCaptureEvent.Result.SKIPPED
+//            }.map { it.id }
+
+        private fun extractFaceCaptureEventIdsBasedOnPersonTemplate(
+            sessionEvents: SessionCaptureEvent,
+            personTemplates: List<String>?
+        ): List<String> = emptyList()
+//            sessionEvents.getEvents()
+//            .filterIsInstance(FaceCaptureEvent::class.java)
+//            .filter {
+//                personTemplates?.contains(it.face?.template) ?: false
+//            }.map { it.id }
 
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION
 

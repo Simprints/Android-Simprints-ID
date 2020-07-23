@@ -44,6 +44,7 @@ def androidx = [
         preference      : "androidx.preference:preference:1.1.0-alpha03",
         viewpager2      : "androidx.viewpager2:viewpager2:1.0.0"
     ],
+    //Do not update - proguard issue https://github.com/google/tink/issues/361#issuecomment-634880080
     security  : ['androidx.security:security-crypto:1.0.0-alpha02'],
     camerax   : [
         core     : "androidx.camera:camera-core:$androidx_camerax_version",
@@ -74,6 +75,11 @@ def playservices = [
     safetynet: "com.google.android.gms:play-services-safetynet:$playservices_version"
 ]
 
+def playcore = [
+    core    : "com.google.android.play:core:1.7.3",
+    core_ktx: "com.google.android.play:core-ktx:1.7.0"
+]
+
 def firebase = [
     core         : "com.google.firebase:firebase-core:17.2.3",
     auth         : "com.google.firebase:firebase-auth:19.2.0",
@@ -88,17 +94,18 @@ def firebase = [
 def retrofit_version = "2.7.1"
 def okttp_version = "4.2.2"
 def retrofit = [
-    core         : "com.squareup.retrofit2:retrofit:$retrofit_version",
-    adapter      : "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version",
-    convertergson: "com.squareup.retrofit2:converter-gson:$retrofit_version",
-    logging      : "com.squareup.okhttp3:logging-interceptor:$okttp_version",
-    okhttp       : "com.squareup.okhttp3:okhttp:$okttp_version",
+    core            : "com.squareup.retrofit2:retrofit:$retrofit_version",
+    adapter         : "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version",
+    convertergson   : "com.squareup.retrofit2:converter-gson:$retrofit_version",
+    converterScalars: "com.squareup.retrofit2:converter-scalars:$retrofit_version",
+    logging         : "com.squareup.okhttp3:logging-interceptor:$okttp_version",
+    okhttp          : "com.squareup.okhttp3:okhttp:$okttp_version",
 ]
 
 def gson_version = "2.8.5"
 def gson = [
-    core    : "com.google.code.gson:gson:$gson_version",
-    extras  : "org.danilopianini:gson-extras:0.2.1"
+    core  : "com.google.code.gson:gson:$gson_version",
+    extras: "org.danilopianini:gson-extras:0.2.1"
 ]
 
 def timber = [
@@ -212,6 +219,7 @@ ext.deps = [
     support        : support,
     arch_components: arch_components,
     playservices   : playservices,
+    playcore       : playcore,
     firebase       : firebase,
     retrofit       : retrofit,
     gson           : gson,

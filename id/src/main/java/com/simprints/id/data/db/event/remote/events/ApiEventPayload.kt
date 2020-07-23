@@ -35,6 +35,11 @@ import com.simprints.id.data.db.event.domain.models.callout.EnrolmentCalloutEven
 import com.simprints.id.data.db.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
 import com.simprints.id.data.db.event.domain.models.callout.IdentificationCalloutEvent.IdentificationCalloutPayload
 import com.simprints.id.data.db.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
+import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
+import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
+import com.simprints.id.data.db.event.domain.models.face.FaceCaptureRetryEvent.FaceCaptureRetryPayload
+import com.simprints.id.data.db.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
+import com.simprints.id.data.db.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
@@ -62,6 +67,11 @@ import com.simprints.id.data.db.event.remote.events.ApiSuspiciousIntentEvent.Api
 import com.simprints.id.data.db.event.remote.events.ApiVero2InfoSnapshotEvent.ApiVero2InfoSnapshotPayload
 import com.simprints.id.data.db.event.remote.events.callback.ApiCallbackEvent.ApiCallbackPayload
 import com.simprints.id.data.db.event.remote.events.callout.ApiCalloutEvent.ApiCalloutPayload
+import com.simprints.id.data.db.event.remote.events.face.ApiFaceCaptureConfirmationEvent.ApiFaceCaptureConfirmationPayload
+import com.simprints.id.data.db.event.remote.events.face.ApiFaceCaptureEvent.ApiFaceCapturePayload
+import com.simprints.id.data.db.event.remote.events.face.ApiFaceCaptureRetryEvent.ApiFaceCaptureRetryPayload
+import com.simprints.id.data.db.event.remote.events.face.ApiFaceFallbackCaptureEvent.ApiFaceFallbackCapturePayload
+import com.simprints.id.data.db.event.remote.events.face.ApiFaceOnboardingCompleteEvent.ApiFaceOnboardingCompletePayload
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationEvent.ApiEnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionEvent.ApiEnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMoveEvent.ApiEnrolmentRecordMovePayload
@@ -74,7 +84,7 @@ abstract class ApiEventPayload(
     val createdAt: Long
 )
 
-fun EventPayload.fromDomainToApi() =
+fun EventPayload.fromDomainToApi(): ApiEventPayload =
     when (this.type) {
         ENROLMENT_RECORD_CREATION -> ApiEnrolmentRecordCreationPayload(this as EnrolmentRecordCreationPayload)
         ENROLMENT_RECORD_DELETION -> ApiEnrolmentRecordDeletionPayload(this as EnrolmentRecordDeletionPayload)
@@ -112,4 +122,9 @@ fun EventPayload.fromDomainToApi() =
         INTENT_PARSING -> ApiIntentParsingPayload(this as IntentParsingPayload)
         COMPLETION_CHECK -> ApiCompletionCheckPayload(this as CompletionCheckPayload)
         SESSION_CAPTURE -> ApiSessionCapturePayload(this as SessionCapturePayload)
+        FACE_ONBOARDING_COMPLETE -> ApiFaceOnboardingCompletePayload(this as FaceOnboardingCompletePayload)
+        FACE_FALLBACK_CAPTURE -> ApiFaceFallbackCapturePayload(this as FaceFallbackCapturePayload)
+        FACE_CAPTURE -> ApiFaceCapturePayload(this as FaceCapturePayload)
+        FACE_CAPTURE_CONFIRMATION -> ApiFaceCaptureConfirmationPayload(this as FaceCaptureConfirmationPayload)
+        FACE_CAPTURE_RETRY -> ApiFaceCaptureRetryPayload(this as FaceCaptureRetryPayload)
     }

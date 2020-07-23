@@ -1,6 +1,7 @@
 apply plugin: 'com.android.dynamic-feature'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: "androidx.navigation.safeargs.kotlin"
 
 sonarqube {
     properties {
@@ -89,10 +90,16 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':id')
     implementation project(':uicomponents')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     implementation deps.cameraView
     implementation deps.circleImageView
+
+    // Retrofit
+    implementation deps.retrofit.core
+    implementation deps.retrofit.logging
+    implementation deps.retrofit.okhttp
+    implementation deps.retrofit.converterScalars
 
     // Android X
     androidTestImplementation deps.testing.androidx.core_testing
@@ -102,6 +109,9 @@ dependencies {
     androidTestImplementation deps.testing.androidx.runner
     androidTestImplementation deps.testing.androidx.rules
     androidTestUtil deps.testing.androidx.orchestrator
+
+    androidTestImplementation deps.testing.mockk.android
+    androidTestImplementation deps.testing.truth
 
     // Espresso
     androidTestImplementation deps.testing.espresso.core

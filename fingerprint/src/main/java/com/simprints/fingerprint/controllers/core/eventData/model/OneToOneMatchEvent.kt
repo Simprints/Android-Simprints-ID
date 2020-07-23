@@ -11,6 +11,7 @@ class OneToOneMatchEvent(
     startTime: Long,
     endTime: Long,
     val query: Serializable,
+    val matcher: Matcher,
     val result: MatchEntry?
 ) : Event(EventType.ONE_TO_ONE_MATCH, startTime, endTime)
 
@@ -19,6 +20,7 @@ fun OneToOneMatchEvent.fromDomainToCore() =
         startTime,
         endTime,
         (query as SubjectLocalDataSource.Query).extractVerifyId(),
+        matcher.fromDomainToCore(),
         result?.fromDomainToCore()
     )
 

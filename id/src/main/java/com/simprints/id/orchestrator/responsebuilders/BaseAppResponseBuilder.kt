@@ -5,16 +5,14 @@ import com.simprints.id.domain.moduleapi.app.responses.AppRefusalFormResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormAnswer
 import com.simprints.id.domain.moduleapi.app.responses.entities.fromDomainToModuleApi
+import com.simprints.id.domain.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintErrorResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppRefusalFormReason
 import com.simprints.id.domain.moduleapi.fingerprint.responses.toAppErrorReason
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
+import com.simprints.id.orchestrator.steps.core.response.*
 
 abstract class BaseAppResponseBuilder : AppResponseBuilder {
 
@@ -35,6 +33,9 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
             results.any { it is FingerprintErrorResponse } -> {
                 buildAppErrorResponse(results.find { it is FingerprintErrorResponse } as FingerprintErrorResponse)
             }
+            results.any { it is FaceErrorResponse } -> {
+                buildAppErrorResponse(results.find { it is FaceErrorResponse } as FaceErrorResponse)
+            }
             results.any { it is FingerprintRefusalFormResponse } -> {
                 buildAppRefusalResponse(results.find { it is FingerprintRefusalFormResponse } as FingerprintRefusalFormResponse)
             }
@@ -43,6 +44,9 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
             }
             results.any { it is FetchGUIDResponse } -> {
                 buildAppErrorResponse(results.find { it is FetchGUIDResponse } as FetchGUIDResponse)
+            }
+            results.any { it is SetupResponse } -> {
+                buildAppErrorResponse(results.find { it is SetupResponse } as SetupResponse)
             }
             else -> {
                 null
@@ -65,9 +69,19 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
     private fun buildAppErrorResponse(fingerprintErrorResponse: FingerprintErrorResponse) =
         AppErrorResponse(fingerprintErrorResponse.fingerprintErrorReason.toAppErrorReason())
 
+    private fun buildAppErrorResponse(faceErrorResponse: FaceErrorResponse) =
+        AppErrorResponse(faceErrorResponse.faceErrorReason.toAppErrorReason())
+
     private fun buildAppErrorResponse(fetchGUIDResponse: FetchGUIDResponse) =
         if (!fetchGUIDResponse.isGuidFound) {
             AppErrorResponse(AppErrorResponse.Reason.GUID_NOT_FOUND_ONLINE)
+        } else {
+            null
+        }
+
+    private fun buildAppErrorResponse(setupResponse: SetupResponse) =
+        if(!setupResponse.isSetupComplete) {
+            AppErrorResponse(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE)
         } else {
             null
         }

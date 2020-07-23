@@ -13,6 +13,7 @@ class OneToManyMatchEvent(
     endTime: Long,
     val query: Serializable,
     val count: Int,
+    val matcher: Matcher,
     val result: List<MatchEntry>?
 ) : Event(EventType.ONE_TO_MANY_MATCH, startTime, endTime)
 
@@ -21,6 +22,7 @@ fun OneToManyMatchEvent.fromDomainToCore() =
         startTime,
         endTime,
         (query as SubjectLocalDataSource.Query).asCoreMatchPool(count),
+        matcher.fromDomainToCore(),
         result?.map { it.fromDomainToCore() }
     )
 

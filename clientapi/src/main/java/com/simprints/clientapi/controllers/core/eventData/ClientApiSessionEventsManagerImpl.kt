@@ -43,11 +43,11 @@ class ClientApiSessionEventsManagerImpl(private val coreEventRepository: EventRe
 
     override suspend fun getCurrentSessionId(): String = coreEventRepository.getCurrentCaptureSessionEvent().id
 
-    override suspend fun isCurrentSessionAnIdentification(): Boolean {
-        val sessionId = coreEventRepository.getCurrentCaptureSessionEvent()
-        //coreEventRepository..getEvents().filterIsInstance(IdentificationCalloutEvent::class.java).isNotEmpty()
-        return false //STOPSHIP
-    }
+    override suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean =
+        true //STOPSHIP
+//        coreEventRepository.getCurrentCaptureSessionEvent().getEvents().any {
+//            it is IdentificationCalloutEvent || it is EnrolmentCalloutEvent
+//        }
 }
 
 fun ClientApiAlert.fromAlertToAlertTypeEvent(): CoreAlertScreenEventType =
