@@ -8,9 +8,12 @@ import kotlinx.coroutines.flow.Flow
 interface EventLocalDataSource {
 
     data class EventQuery(val id: String? = null,
-                          val eventType: EventType? = null,
+                          val type: EventType? = null,
                           val projectId: String? = null,
+                          val subjectId: String? = null,
+                          val attendantId: String? = null,
                           val sessionId: String? = null,
+                          val deviceId: String? = null,
                           val startTime: LongRange? = null,
                           val endTime: LongRange? = null)
 
@@ -22,7 +25,9 @@ interface EventLocalDataSource {
     suspend fun count(query: EventQuery = EventQuery()): Int
     suspend fun load(query: EventQuery = EventQuery()): Flow<Event>
     suspend fun delete(query: EventQuery = EventQuery())
+
     suspend fun insertOrUpdate(event: Event)
+    suspend fun insertOrUpdateInCurrentSession(event: Event)
 
     suspend fun getCurrentSessionCaptureEvent(): SessionCaptureEvent
 }

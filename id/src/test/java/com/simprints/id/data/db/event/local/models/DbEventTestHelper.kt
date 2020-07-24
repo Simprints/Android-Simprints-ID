@@ -2,13 +2,11 @@ package com.simprints.id.data.db.event.local.models
 
 import android.net.NetworkInfo.DetailedState.CONNECTED
 import android.os.Build
-import android.os.Build.VERSION
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_METADATA
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
@@ -41,13 +39,14 @@ import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCa
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result.VALID
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
+import com.simprints.id.data.db.event.domain.models.session.Location
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
 import com.simprints.id.orchestrator.SOME_GUID1
 import com.simprints.id.orchestrator.SOME_GUID2
 import com.simprints.id.tools.utils.SimNetworkUtils.Connection
-import java.util.*
+
 val eventLabels = EventLabels(sessionId = SOME_GUID1)
 
 fun createConfirmationCallbackEvent() = ConfirmationCallbackEvent(CREATED_AT, true, eventLabels)
@@ -185,6 +184,7 @@ fun createFaceCaptureEvent(): FaceCaptureEvent {
     val faceArg = Face(0F, 1F, 2F, "")
     return FaceCaptureEvent(CREATED_AT, ENDED_AT, 0, 1F, VALID, true, faceArg)
 }
+
 fun verifyFaceCaptureEvents(event1: FaceCaptureEvent, event2: FaceCaptureEvent) {
     val payload1 = event1.payload
     val payload2 = event2.payload
@@ -221,19 +221,28 @@ fun verifyFaceOnboardingCompleteEvents(event1: FaceOnboardingCompleteEvent, even
     verifyPayloads(payload1, payload2)
 }
 
-fun createSessionCaptureEvent() =
-    SessionCaptureEvent(
+fun createSessionCaptureEvent(): SessionCaptureEvent {
+    val deviceArg = Device(
+        Build.VERSION.SDK_INT.toString(),
+        Build.MANUFACTURER + "_" + Build.MODEL,
+        SOME_GUID1)
+
+    return SessionCaptureEvent(
         CREATED_AT,
-        UUID.randomUUID().toString(),
-        EventRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN,
+        SOME_GUID1,
+        DEFAULT_PROJECT_ID,
         "appVersionName",
-        "libVersionName",
+        "libSimprintsVersionName",
         "EN",
-        Device(
-            VERSION.SDK_INT.toString(),
-            Build.MANUFACTURER + "_" + Build.MODEL,
-            SOME_GUID1),
-        DatabaseInfo(0))
+        deviceArg,
+        DatabaseInfo(2),
+        ENDED_AT,
+        ENDED_AT,
+        Location(0.0, 0.0),
+        SOME_GUID1,
+        EventLabels(sessionId = SOME_GUID1)
+    )
+}
 
 fun verifySessionCaptureEvents(event1: SessionCaptureEvent, event2: SessionCaptureEvent) {
     val payload1 = event1.payload

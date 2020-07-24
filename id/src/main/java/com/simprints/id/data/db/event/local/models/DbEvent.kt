@@ -16,11 +16,11 @@ import java.util.*
 @Entity
 data class DbEvent(
     @PrimaryKey var id: String,
-
     @Embedded var labels: EventLabels,
     val type: EventType,
     var eventJson: String,
-    val addedAt: Date = Date()
+    val addedAt: Long,
+    val endedAt: Long
 ) {
     class Converters {
 
@@ -34,7 +34,8 @@ data class DbEvent(
 
 
         @TypeConverter
-        fun fromListofStringToString(list: List<String>): String =
+        fun fromListOfStringToString(list: List<String>
+        ): String =
             JsonHelper.toJson(list)
 
         @TypeConverter
@@ -74,7 +75,9 @@ fun Event.fromDomainToDb(): DbEvent =
         id,
         labels,
         payload.type,
-        Klaxon().toJsonString(this)
+        Klaxon().toJsonString(this),
+        payload.createdAt,
+        payload.endedAt
     )
 
 fun DbEvent.fromDbToDomain(): Event =
