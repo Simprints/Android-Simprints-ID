@@ -1,15 +1,12 @@
 package com.simprints.id.data.db.event.local
 
 import android.content.Context
-import android.os.Build
 import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
-import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidator
 import com.simprints.id.data.db.event.local.EventLocalDataSource.EventQuery
@@ -23,7 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.*
 
 open class EventLocalDataSourceImpl(private val appContext: Context,
                                     private val secureDataManager: SecureLocalDbKeyProvider,
@@ -33,32 +29,16 @@ open class EventLocalDataSourceImpl(private val appContext: Context,
                                     private val roomDao: DbEventRoomDao,
                                     private val sessionEventsValidators: Array<SessionEventValidator>) : EventLocalDataSource {
 
-    override suspend fun create(appVersionName: String,
-                                libSimprintsVersionName: String,
-                                language: String,
-                                deviceId: String): String =
+    override suspend fun create(event: SessionCaptureEvent) {
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
                 closeAnyOpenSession()
-                val count = roomDao.count()
-                val sessionCaptureEvent = SessionCaptureEvent(
-                    timeHelper.now(),
-                    UUID.randomUUID().toString(),
-                    EventRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN,
-                    appVersionName,
-                    libSimprintsVersionName,
-                    language,
-                    Device(
-                        Build.VERSION.SDK_INT.toString(),
-                        Build.MANUFACTURER + "_" + Build.MODEL,
-                        deviceId),
-                    DatabaseInfo(count))
-
-                roomDao.insertOrUpdate(sessionCaptureEvent.fromDomainToDb())
-                Timber.d("Session created ${sessionCaptureEvent.id}")
-                sessionCaptureEvent.id
+                roomDao.insertOrUpdate(event.fromDomainToDb())
+                Timber.d("Session created ${event.id}")
+                event.id
             }
         }
+    }
 
     override suspend fun getCurrentSessionCaptureEvent() =
         load(EventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).first() as SessionCaptureEvent
@@ -142,6 +122,7 @@ open class EventLocalDataSourceImpl(private val appContext: Context,
     }
 
     private fun getLabelsForAnyEvent(): EventLabels {
+        //STOPSHIP: enforce the right labels in each event
         var projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
         if (projectId.isNullOrEmpty()) {
             projectId = EventRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN

@@ -35,7 +35,7 @@ class EventLocalDataSourceImplTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(context, EventRoomDatabase::class.java).build()
         eventDao = db.eventDao
-        eventLocalDataSource = EventLocalDataSourceImpl(context, mockk(), timeHelper, eventDao, emptyArray())
+        eventLocalDataSource = EventLocalDataSourceImpl(context, mockk(), mockk(), mockk(), timeHelper, eventDao, emptyArray())
     }
 
     @Test
@@ -43,7 +43,7 @@ class EventLocalDataSourceImplTest {
         runBlocking {
             val sessionId = eventLocalDataSource.create(APP_VERSION_NAME, LIB_VERSION_NAME, LANGUAGE, DEVICE_ID)
 
-            eventDao.loadBySessionId(sessionId)
+            eventDao.load(sessionId = sessionId)
 
             val sessionEvent = eventDao.load().first()
             val sessionPayload = sessionEvent.fromDbToDomain().payload as SessionCapturePayload

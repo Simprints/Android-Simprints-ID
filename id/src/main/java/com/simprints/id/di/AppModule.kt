@@ -28,9 +28,9 @@ import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilder
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilderImpl
 import com.simprints.id.data.db.event.local.DbEventRoomDao
-import com.simprints.id.data.db.event.local.EventRoomDatabase
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.EventLocalDataSourceImpl
+import com.simprints.id.data.db.event.local.EventRoomDatabase
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSourceImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -207,9 +207,10 @@ open class AppModule {
         secureDataManager: SecureLocalDbKeyProvider,
         timeHelper: TimeHelper,
         roomDao: DbEventRoomDao,
-        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
+        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder,
+        loginInfoManager: LoginInfoManager
     ): EventLocalDataSource =
-        EventLocalDataSourceImpl(ctx, secureDataManager, timeHelper, roomDao, sessionEventValidatorsBuilder.build())
+        EventLocalDataSourceImpl(ctx, secureDataManager,loginInfoManager, ctx.deviceId, timeHelper, roomDao, sessionEventValidatorsBuilder.build())
 
     @Provides
     @Singleton

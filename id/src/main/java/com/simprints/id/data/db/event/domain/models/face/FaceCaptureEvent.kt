@@ -37,7 +37,7 @@ class FaceCaptureEvent(
     @Keep
     class FaceCapturePayload(
         override val createdAt: Long,
-        override val endedAt: Long,
+        override var endedAt: Long,
         override val eventVersion: Int,
         val attemptNb: Int,
         val qualityThreshold: Float,

@@ -30,7 +30,7 @@ class FaceCaptureRetryEvent(
     @Keep
     class FaceCaptureRetryPayload(
         override val createdAt: Long,
-        override val endedAt: Long,
+        override var endedAt: Long,
         override val eventVersion: Int
     ) : EventPayload(FACE_CAPTURE_RETRY, eventVersion, createdAt, endedAt)
 

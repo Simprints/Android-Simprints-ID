@@ -145,7 +145,8 @@ class TestAppModule(
         secureDataManager: SecureLocalDbKeyProvider,
         timeHelper: TimeHelper,
         roomDao: DbEventRoomDao,
-        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
+        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder,
+        loginInfoManager: LoginInfoManager
     ): EventLocalDataSource =
         sessionEventsLocalDbManagerRule.resolveDependency {
             super.provideSessionEventsLocalDbManager(
@@ -153,7 +154,8 @@ class TestAppModule(
                 secureDataManager,
                 timeHelper,
                 roomDao,
-                sessionEventValidatorsBuilder
+                sessionEventValidatorsBuilder,
+                loginInfoManager
             )
         }
 

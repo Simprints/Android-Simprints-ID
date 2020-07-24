@@ -29,7 +29,7 @@ class ConsentEvent(
     @Keep
     class ConsentPayload(override val createdAt: Long,
                          override val eventVersion: Int,
-                         override val endedAt: Long,
+                         override var endedAt: Long,
                          val consentType: Type,
                          var result: Result) : EventPayload(CONSENT, eventVersion, createdAt, endedAt) {
 
