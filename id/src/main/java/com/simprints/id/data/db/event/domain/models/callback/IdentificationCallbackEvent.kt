@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_IDENTIFIC
 import java.util.*
 
 @Keep
-class IdentificationCallbackEvent(
+data class IdentificationCallbackEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: IdentificationCallbackPayload,
@@ -27,9 +27,9 @@ class IdentificationCallbackEvent(
         CALLBACK_IDENTIFICATION)
 
     @Keep
-    class IdentificationCallbackPayload(
-        createdAt: Long,
-        eventVersion: Int,
+    data class IdentificationCallbackPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
         val sessionId: String,
         val scores: List<CallbackComparisonScore>
     ) : EventPayload(CALLBACK_IDENTIFICATION, eventVersion, createdAt)

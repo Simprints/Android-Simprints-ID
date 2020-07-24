@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.AUTHORIZATION
 import java.util.*
 
 @Keep
-class AuthorizationEvent(
+data class AuthorizationEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: AuthorizationPayload,
@@ -27,10 +27,10 @@ class AuthorizationEvent(
         AUTHORIZATION)
 
     @Keep
-    class AuthorizationPayload(override val createdAt: Long,
-                               override val eventVersion: Int,
-                               val result: AuthorizationResult,
-                               val userInfo: UserInfo?) : EventPayload(AUTHORIZATION, eventVersion, createdAt) {
+    data class AuthorizationPayload(override val createdAt: Long,
+                                    override val eventVersion: Int,
+                                    val result: AuthorizationResult,
+                                    val userInfo: UserInfo?) : EventPayload(AUTHORIZATION, eventVersion, createdAt) {
 
         @Keep
         enum class AuthorizationResult {

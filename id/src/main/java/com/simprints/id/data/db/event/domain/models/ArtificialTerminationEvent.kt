@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.ARTIFICIAL_TERMINA
 import java.util.*
 
 @Keep
-class ArtificialTerminationEvent(
+data class ArtificialTerminationEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: ArtificialTerminationPayload,
@@ -25,9 +25,9 @@ class ArtificialTerminationEvent(
 
 
     @Keep
-    class ArtificialTerminationPayload(
-        createdAt: Long,
-        eventVersion: Int,
+    data class ArtificialTerminationPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
         val reason: Reason
     ) : EventPayload(ARTIFICIAL_TERMINATION, eventVersion, createdAt) {
 

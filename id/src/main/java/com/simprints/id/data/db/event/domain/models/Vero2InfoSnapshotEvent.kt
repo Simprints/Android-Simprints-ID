@@ -7,7 +7,7 @@ import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2
 import java.util.*
 
 @Keep
-class Vero2InfoSnapshotEvent(
+data class Vero2InfoSnapshotEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: Vero2InfoSnapshotPayload,
@@ -26,10 +26,11 @@ class Vero2InfoSnapshotEvent(
         VERO_2_INFO_SNAPSHOT)
 
     @Keep
-    class Vero2InfoSnapshotPayload(createdAt: Long,
-                                   eventVersion: Int,
-                                   val version: Vero2Version,
-                                   val battery: BatteryInfo) : EventPayload(VERO_2_INFO_SNAPSHOT, eventVersion, createdAt) {
+    data class Vero2InfoSnapshotPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
+        val version: Vero2Version,
+        val battery: BatteryInfo) : EventPayload(VERO_2_INFO_SNAPSHOT, eventVersion, createdAt) {
 
         @Keep
         data class Vero2Version(

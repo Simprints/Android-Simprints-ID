@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.CANDIDATE_READ
 import java.util.*
 
 @Keep
-class CandidateReadEvent(
+data class CandidateReadEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: CandidateReadPayload,
@@ -28,7 +28,7 @@ class CandidateReadEvent(
 
 
     @Keep
-    class CandidateReadPayload(
+    data class CandidateReadPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
         override var endedAt: Long,

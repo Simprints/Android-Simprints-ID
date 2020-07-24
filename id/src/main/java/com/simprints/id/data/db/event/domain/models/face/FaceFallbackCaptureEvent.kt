@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.FACE_FALLBACK_CAPT
 import java.util.*
 
 @Keep
-class FaceFallbackCaptureEvent(
+data class FaceFallbackCaptureEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: FaceFallbackCapturePayload,
@@ -28,7 +28,7 @@ class FaceFallbackCaptureEvent(
         FACE_FALLBACK_CAPTURE)
 
     @Keep
-    class FaceFallbackCapturePayload(
+    data class FaceFallbackCapturePayload(
         override val createdAt: Long,
         override var endedAt: Long,
         override val eventVersion: Int

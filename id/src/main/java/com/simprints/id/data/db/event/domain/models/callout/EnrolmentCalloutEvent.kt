@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_ENROLMENT
 import java.util.*
 
 @Keep
-class EnrolmentCalloutEvent(
+data class EnrolmentCalloutEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: EnrolmentCalloutPayload,
@@ -31,12 +31,13 @@ class EnrolmentCalloutEvent(
         CALLOUT_ENROLMENT)
 
     @Keep
-    class EnrolmentCalloutPayload(createdAt: Long,
-                                  eventVersion: Int,
-                                  val projectId: String,
-                                  val userId: String,
-                                  val moduleId: String,
-                                  val metadata: String?) : EventPayload(CALLOUT_ENROLMENT, eventVersion, createdAt)
+    data class EnrolmentCalloutPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
+        val projectId: String,
+        val userId: String,
+        val moduleId: String,
+        val metadata: String?) : EventPayload(CALLOUT_ENROLMENT, eventVersion, createdAt)
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

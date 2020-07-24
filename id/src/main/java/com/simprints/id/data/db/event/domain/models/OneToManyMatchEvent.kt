@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.ONE_TO_MANY_MATCH
 import java.util.*
 
 @Keep
-class OneToManyMatchEvent(
+data class OneToManyMatchEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: OneToManyMatchPayload,
@@ -27,7 +27,7 @@ class OneToManyMatchEvent(
         ONE_TO_MANY_MATCH)
 
     @Keep
-    class OneToManyMatchPayload(
+    data class OneToManyMatchPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
         override var endedAt: Long,

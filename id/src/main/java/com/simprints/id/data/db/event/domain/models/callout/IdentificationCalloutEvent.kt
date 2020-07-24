@@ -10,11 +10,11 @@ import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_IDENTIFICA
 import java.util.*
 
 @Keep
-class IdentificationCalloutEvent(
-        override val id: String = UUID.randomUUID().toString(),
-        override var labels: EventLabels,
-        override val payload: IdentificationCalloutPayload,
-        override val type: EventType
+data class IdentificationCalloutEvent(
+    override val id: String = UUID.randomUUID().toString(),
+    override var labels: EventLabels,
+    override val payload: IdentificationCalloutPayload,
+    override val type: EventType
 ) : Event(id, labels, payload, type) {
 
     constructor(
@@ -31,9 +31,9 @@ class IdentificationCalloutEvent(
         CALLOUT_IDENTIFICATION)
 
     @Keep
-    class IdentificationCalloutPayload(
-        createdAt: Long,
-        eventVersion: Int,
+    data class IdentificationCalloutPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
         val projectId: String,
         val userId: String,
         val moduleId: String,

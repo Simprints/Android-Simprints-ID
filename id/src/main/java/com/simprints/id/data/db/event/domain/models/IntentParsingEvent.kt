@@ -6,11 +6,11 @@ import io.realm.internal.Keep
 import java.util.*
 
 @androidx.annotation.Keep
-class IntentParsingEvent(
-        override val id: String = UUID.randomUUID().toString(),
-        override var labels: EventLabels,
-        override val payload: IntentParsingPayload,
-        override val type: EventType
+data class IntentParsingEvent(
+    override val id: String = UUID.randomUUID().toString(),
+    override var labels: EventLabels,
+    override val payload: IntentParsingPayload,
+    override val type: EventType
 ) : Event(id, labels, payload, type) {
 
     constructor(
@@ -24,9 +24,9 @@ class IntentParsingEvent(
         INTENT_PARSING)
 
     @Keep
-    class IntentParsingPayload(
-        createdAt: Long,
-        eventVersion: Int,
+    data class IntentParsingPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
         val integration: IntegrationInfo
     ) : EventPayload(INTENT_PARSING, eventVersion, createdAt) {
 

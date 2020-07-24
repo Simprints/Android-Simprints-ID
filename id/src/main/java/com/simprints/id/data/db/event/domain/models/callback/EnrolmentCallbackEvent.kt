@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_ENROLMENT
 import java.util.*
 
 @Keep
-class EnrolmentCallbackEvent(
+data class EnrolmentCallbackEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: EnrolmentCallbackPayload,
@@ -24,9 +24,10 @@ class EnrolmentCallbackEvent(
         EnrolmentCallbackPayload(createdAt, EVENT_VERSION, guid),
         CALLBACK_ENROLMENT)
 
-    class EnrolmentCallbackPayload(createdAt: Long,
-                                   eventVersion: Int,
-                                   val guid: String) : EventPayload(CALLBACK_ENROLMENT, eventVersion, createdAt)
+    data class EnrolmentCallbackPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
+        val guid: String) : EventPayload(CALLBACK_ENROLMENT, eventVersion, createdAt)
 
 
     companion object {

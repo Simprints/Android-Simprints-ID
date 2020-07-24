@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.CONSENT
 import java.util.*
 
 @Keep
-class ConsentEvent(
+data class ConsentEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: ConsentPayload,
@@ -27,11 +27,11 @@ class ConsentEvent(
 
 
     @Keep
-    class ConsentPayload(override val createdAt: Long,
-                         override val eventVersion: Int,
-                         override var endedAt: Long,
-                         val consentType: Type,
-                         var result: Result) : EventPayload(CONSENT, eventVersion, createdAt, endedAt) {
+    data class ConsentPayload(override val createdAt: Long,
+                              override val eventVersion: Int,
+                              override var endedAt: Long,
+                              val consentType: Type,
+                              var result: Result) : EventPayload(CONSENT, eventVersion, createdAt, endedAt) {
 
         @Keep
         enum class Type {

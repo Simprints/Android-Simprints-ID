@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.SCANNER_FIRMWARE_U
 import java.util.*
 
 @Keep
-class ScannerFirmwareUpdateEvent(
+data class ScannerFirmwareUpdateEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: ScannerFirmwareUpdatePayload,
@@ -27,12 +27,12 @@ class ScannerFirmwareUpdateEvent(
 
 
     @Keep
-    class ScannerFirmwareUpdatePayload(override val createdAt: Long,
-                                       override val eventVersion: Int,
-                                       override var endedAt: Long,
-                                       val chip: String,
-                                       val targetAppVersion: String,
-                                       var failureReason: String? = null)
+    data class ScannerFirmwareUpdatePayload(override val createdAt: Long,
+                                            override val eventVersion: Int,
+                                            override var endedAt: Long,
+                                            val chip: String,
+                                            val targetAppVersion: String,
+                                            var failureReason: String? = null)
         : EventPayload(SCANNER_FIRMWARE_UPDATE, eventVersion, createdAt, endedAt)
 
     companion object {

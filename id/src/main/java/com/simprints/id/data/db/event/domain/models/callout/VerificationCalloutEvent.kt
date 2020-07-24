@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_VERIFICATI
 import java.util.*
 
 @Keep
-class VerificationCalloutEvent(
+data class VerificationCalloutEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: VerificationCalloutPayload,
@@ -32,9 +32,9 @@ class VerificationCalloutEvent(
         CALLOUT_VERIFICATION)
 
     @Keep
-    class VerificationCalloutPayload(
-        createdAt: Long,
-        eventVersion: Int,
+    data class VerificationCalloutPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
         val projectId: String,
         val userId: String,
         val moduleId: String,

@@ -196,6 +196,8 @@ dependencies {
     api deps.firebase.crashlytics
 
     implementation 'com.beust:klaxon:5.2'
+    implementation "net.zetetic:android-database-sqlcipher:4.4.0"
+    implementation "androidx.sqlite:sqlite:2.1.0"
 
     api deps.gson.core
     api deps.gson.extras

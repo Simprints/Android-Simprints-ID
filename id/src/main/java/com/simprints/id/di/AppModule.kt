@@ -27,10 +27,10 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilder
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilderImpl
-import com.simprints.id.data.db.event.local.DbEventRoomDao
+import com.simprints.id.data.db.event.local.DbEventDatabaseFactory
+import com.simprints.id.data.db.event.local.DbEventDatabaseFactoryImpl
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.EventLocalDataSourceImpl
-import com.simprints.id.data.db.event.local.EventRoomDatabase
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSourceImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -197,20 +197,21 @@ open class AppModule {
         SessionEventValidatorsBuilderImpl()
 
     @Provides
-    open fun provideEventRoomDao(ctx: Context): DbEventRoomDao =
-        EventRoomDatabase.getDatabase(ctx).eventDao
-    
+    open fun provideDbEventDatabaseFactory(ctx: Context,
+                                            secureDataManager: SecureLocalDbKeyProvider): DbEventDatabaseFactory =
+        DbEventDatabaseFactoryImpl(ctx, secureDataManager)
+
     @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(
         ctx: Context,
         secureDataManager: SecureLocalDbKeyProvider,
         timeHelper: TimeHelper,
-        roomDao: DbEventRoomDao,
+        dbFactory: DbEventDatabaseFactory,
         sessionEventValidatorsBuilder: SessionEventValidatorsBuilder,
         loginInfoManager: LoginInfoManager
     ): EventLocalDataSource =
-        EventLocalDataSourceImpl(ctx, secureDataManager,loginInfoManager, ctx.deviceId, timeHelper, roomDao, sessionEventValidatorsBuilder.build())
+        EventLocalDataSourceImpl(dbFactory, loginInfoManager, ctx.deviceId, timeHelper, sessionEventValidatorsBuilder.build())
 
     @Provides
     @Singleton

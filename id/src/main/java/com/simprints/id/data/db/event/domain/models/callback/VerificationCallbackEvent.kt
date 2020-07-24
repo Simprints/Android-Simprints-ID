@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_VERIFICAT
 import java.util.*
 
 @Keep
-class VerificationCallbackEvent(
+data class VerificationCallbackEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: VerificationCallbackPayload,
@@ -28,7 +28,7 @@ class VerificationCallbackEvent(
         CALLBACK_VERIFICATION)
 
     @Keep
-    class VerificationCallbackPayload(
+    data class VerificationCallbackPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
         val score: CallbackComparisonScore

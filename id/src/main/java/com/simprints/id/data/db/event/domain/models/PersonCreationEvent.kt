@@ -10,7 +10,7 @@ import com.simprints.id.tools.TimeHelper
 import java.util.*
 
 @Keep
-class PersonCreationEvent(
+data class PersonCreationEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: PersonCreationPayload,
@@ -31,7 +31,7 @@ class PersonCreationEvent(
 
     // At the end of the sequence of capture, we build a Person object used either for enrolment or verification/identification
     @Keep
-    class PersonCreationPayload(
+    data class PersonCreationPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
         val fingerprintCaptureIds: List<String>,

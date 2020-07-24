@@ -7,7 +7,7 @@ import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import java.util.*
 
 @Keep
-class FingerprintCaptureEvent(
+data class FingerprintCaptureEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: FingerprintCapturePayload,
@@ -30,7 +30,7 @@ class FingerprintCaptureEvent(
         FINGERPRINT_CAPTURE)
 
     @Keep
-    class FingerprintCapturePayload(
+    data class FingerprintCapturePayload(
         override val createdAt: Long,
         override val eventVersion: Int,
         override var endedAt: Long,

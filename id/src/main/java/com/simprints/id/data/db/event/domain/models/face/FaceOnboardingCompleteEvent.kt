@@ -11,7 +11,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.FACE_ONBOARDING_CO
 import java.util.*
 
 @Keep
-class FaceOnboardingCompleteEvent(
+data class FaceOnboardingCompleteEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: FaceOnboardingCompletePayload,
@@ -29,7 +29,7 @@ class FaceOnboardingCompleteEvent(
         FACE_ONBOARDING_COMPLETE)
 
     @Keep
-    class FaceOnboardingCompletePayload(
+    data class FaceOnboardingCompletePayload(
         override val createdAt: Long,
         override var endedAt: Long,
         override val eventVersion: Int

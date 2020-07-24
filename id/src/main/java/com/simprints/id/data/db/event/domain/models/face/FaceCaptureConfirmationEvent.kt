@@ -11,7 +11,7 @@ import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmation
 import java.util.*
 
 @Keep
-class FaceCaptureConfirmationEvent(
+data class FaceCaptureConfirmationEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: FaceCaptureConfirmationPayload,
@@ -31,7 +31,7 @@ class FaceCaptureConfirmationEvent(
 
 
     @Keep
-    class FaceCaptureConfirmationPayload(
+    data class FaceCaptureConfirmationPayload(
         override val createdAt: Long,
         override var endedAt: Long,
         override val eventVersion: Int,

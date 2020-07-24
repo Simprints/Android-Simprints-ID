@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_CONFIRMATI
 import java.util.*
 
 @Keep
-class ConfirmationCalloutEvent(
+data class ConfirmationCalloutEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: ConfirmationCalloutPayload,
@@ -30,9 +30,9 @@ class ConfirmationCalloutEvent(
         CALLOUT_CONFIRMATION)
 
     @Keep
-    class ConfirmationCalloutPayload(
-        createdAt: Long,
-        eventVersion: Int,
+    data class ConfirmationCalloutPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
         val projectId: String,
         val selectedGuid: String,
         val sessionId: String
