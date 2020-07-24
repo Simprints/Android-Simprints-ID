@@ -17,10 +17,7 @@ interface EventLocalDataSource {
                           val startTime: LongRange? = null,
                           val endTime: LongRange? = null)
 
-    suspend fun create(appVersionName: String,
-                       libSimprintsVersionName: String,
-                       language: String,
-                       deviceId: String): String
+    suspend fun create(event: SessionCaptureEvent)
 
     suspend fun count(query: EventQuery = EventQuery()): Int
     suspend fun load(query: EventQuery = EventQuery()): Flow<Event>

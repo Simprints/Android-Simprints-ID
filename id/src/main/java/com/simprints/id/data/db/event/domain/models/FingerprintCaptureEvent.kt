@@ -33,7 +33,7 @@ class FingerprintCaptureEvent(
     class FingerprintCapturePayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        override val endedAt: Long,
+        override var endedAt: Long,
         val finger: FingerIdentifier,
         val qualityThreshold: Int,
         val result: Result,

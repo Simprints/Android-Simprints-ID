@@ -33,7 +33,7 @@ class FaceCaptureConfirmationEvent(
     @Keep
     class FaceCaptureConfirmationPayload(
         override val createdAt: Long,
-        override val endedAt: Long,
+        override var endedAt: Long,
         override val eventVersion: Int,
         val result: Result
     ) : EventPayload(FACE_CAPTURE_CONFIRMATION, eventVersion, createdAt, endedAt) {

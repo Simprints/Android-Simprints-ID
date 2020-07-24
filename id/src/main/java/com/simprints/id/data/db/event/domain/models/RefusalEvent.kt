@@ -28,7 +28,7 @@ class RefusalEvent(
     @Keep
     class RefusalPayload(override val createdAt: Long,
                          override val eventVersion: Int,
-                         override val endedAt: Long,
+                         override var endedAt: Long,
                          val reason: Answer,
                          val otherText: String) : EventPayload(REFUSAL, eventVersion, createdAt, endedAt) {
 

@@ -30,7 +30,7 @@ class FaceFallbackCaptureEvent(
     @Keep
     class FaceFallbackCapturePayload(
         override val createdAt: Long,
-        override val endedAt: Long,
+        override var endedAt: Long,
         override val eventVersion: Int
     ) : EventPayload(FACE_FALLBACK_CAPTURE, eventVersion, createdAt, endedAt)
 

@@ -32,7 +32,7 @@ class AuthenticationEvent(
     class AuthenticationPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        override val endedAt: Long,
+        override var endedAt: Long,
         val userInfo: UserInfo,
         val result: Result
     ) : EventPayload(AUTHENTICATION, eventVersion, createdAt, endedAt) {

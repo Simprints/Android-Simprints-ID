@@ -30,7 +30,7 @@ class OneToManyMatchEvent(
     class OneToManyMatchPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        override val endedAt: Long,
+        override var endedAt: Long,
         val pool: MatchPool,
         val matcher: Matcher,
         val result: List<MatchEntry>?

@@ -1,9 +1,13 @@
 package com.simprints.id.data.db.event
 
+import android.os.Build
+import android.os.Build.VERSION
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.models.Event
 
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
+import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.EventLocalDataSource.EventQuery
@@ -15,6 +19,7 @@ import com.simprints.id.tools.ignoreException
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
+import java.util.*
 
 // Class to manage the current activeSession
 open class EventRepositoryImpl(
@@ -36,7 +41,21 @@ open class EventRepositoryImpl(
 
     override suspend fun createSession(libSimprintsVersionName: String) {
         reportExceptionIfNeeded {
-            eventLocalDataSource.create(appVersionName, libSimprintsVersionName, preferencesManager.language, deviceId)
+            val count = eventLocalDataSource.count()
+            val sessionCaptureEvent = SessionCaptureEvent(
+                timeHelper.now(),
+                UUID.randomUUID().toString(),
+                PROJECT_ID_FOR_NOT_SIGNED_IN,
+                appVersionName,
+                libSimprintsVersionName,
+                preferencesManager.language,
+                Device(
+                    VERSION.SDK_INT.toString(),
+                    Build.MANUFACTURER + "_" + Build.MODEL,
+                    deviceId),
+                DatabaseInfo(count))
+
+            eventLocalDataSource.create(sessionCaptureEvent)
         }
     }
 

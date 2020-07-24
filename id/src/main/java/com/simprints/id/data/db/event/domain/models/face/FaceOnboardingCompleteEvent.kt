@@ -31,7 +31,7 @@ class FaceOnboardingCompleteEvent(
     @Keep
     class FaceOnboardingCompletePayload(
         override val createdAt: Long,
-        override val endedAt: Long,
+        override var endedAt: Long,
         override val eventVersion: Int
     ) : EventPayload(FACE_FALLBACK_CAPTURE, eventVersion, createdAt, endedAt)
 

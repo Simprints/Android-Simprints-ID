@@ -29,7 +29,7 @@ class ScannerFirmwareUpdateEvent(
     @Keep
     class ScannerFirmwareUpdatePayload(override val createdAt: Long,
                                        override val eventVersion: Int,
-                                       override val endedAt: Long,
+                                       override var endedAt: Long,
                                        val chip: String,
                                        val targetAppVersion: String,
                                        var failureReason: String? = null)

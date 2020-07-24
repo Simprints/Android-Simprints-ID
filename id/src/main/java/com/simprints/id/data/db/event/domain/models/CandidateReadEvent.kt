@@ -31,7 +31,7 @@ class CandidateReadEvent(
     class CandidateReadPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        override val endedAt: Long,
+        override var endedAt: Long,
         val candidateId: String,
         val localResult: LocalResult,
         val remoteResult: RemoteResult?
