@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.FACE_CAPTURE_RETRY
 import java.util.*
 
 @Keep
-class FaceCaptureRetryEvent(
+data class FaceCaptureRetryEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: FaceCaptureRetryPayload,
@@ -28,7 +28,7 @@ class FaceCaptureRetryEvent(
         FACE_CAPTURE_RETRY)
 
     @Keep
-    class FaceCaptureRetryPayload(
+    data class FaceCaptureRetryPayload(
         override val createdAt: Long,
         override var endedAt: Long,
         override val eventVersion: Int

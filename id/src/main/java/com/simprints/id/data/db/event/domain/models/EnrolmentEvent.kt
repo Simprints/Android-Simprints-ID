@@ -6,11 +6,11 @@ import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT
 import java.util.*
 
 @Keep
-class EnrolmentEvent(
-        override val id: String = UUID.randomUUID().toString(),
-        override var labels: EventLabels,
-        override val payload: EnrolmentPayload,
-        override val type: EventType
+data class EnrolmentEvent(
+    override val id: String = UUID.randomUUID().toString(),
+    override var labels: EventLabels,
+    override val payload: EnrolmentPayload,
+    override val type: EventType
 ) : Event(id, labels, payload, type) {
 
     constructor(
@@ -25,9 +25,10 @@ class EnrolmentEvent(
 
 
     @Keep
-    class EnrolmentPayload(createdAt: Long,
-                           eventVersion: Int,
-                           val personId: String) : EventPayload(ENROLMENT, eventVersion, createdAt)
+    data class EnrolmentPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
+        val personId: String) : EventPayload(ENROLMENT, eventVersion, createdAt)
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

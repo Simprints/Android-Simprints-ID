@@ -8,7 +8,7 @@ import java.util.*
 
 
 @Keep
-class AlertScreenEvent(
+data class AlertScreenEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: AlertScreenPayload,
@@ -26,7 +26,7 @@ class AlertScreenEvent(
         ALERT_SCREEN)
 
     @Keep
-    class AlertScreenPayload(
+    data class AlertScreenPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
         val alertType: AlertScreenEventType

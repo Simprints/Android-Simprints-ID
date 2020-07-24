@@ -11,7 +11,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilder
-import com.simprints.id.data.db.event.local.DbEventRoomDao
+import com.simprints.id.data.db.event.local.DbEventDatabaseFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -144,7 +144,7 @@ class TestAppModule(
         ctx: Context,
         secureDataManager: SecureLocalDbKeyProvider,
         timeHelper: TimeHelper,
-        roomDao: DbEventRoomDao,
+        dbFactory: DbEventDatabaseFactory,
         sessionEventValidatorsBuilder: SessionEventValidatorsBuilder,
         loginInfoManager: LoginInfoManager
     ): EventLocalDataSource =
@@ -153,7 +153,7 @@ class TestAppModule(
                 ctx,
                 secureDataManager,
                 timeHelper,
-                roomDao,
+                dbFactory,
                 sessionEventValidatorsBuilder,
                 loginInfoManager
             )

@@ -1,10 +1,6 @@
 package com.simprints.id.data.db.event.local.models
 
-import com.simprints.id.data.db.event.domain.models.*
-import com.simprints.id.data.db.event.domain.models.callback.*
-import com.simprints.id.data.db.event.domain.models.callout.*
-import com.simprints.id.data.db.event.domain.models.face.*
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class DbEventTest {
@@ -12,304 +8,303 @@ class DbEventTest {
     @Test
     fun convert_ConfirmationCallbackEvent() {
         val original = createConfirmationCallbackEvent()
-        val transformed = original.fromDomainToDb()
-
-        verifyConfirmationCallbackEvents(original, transformed.fromDbToDomain() as ConfirmationCallbackEvent)
+        val transformed = original.fromDomainToDb().fromDbToDomain()
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_EnrolmentCallbackEvent() {
         val original = createEnrolmentCallbackEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyEnrolmentCallbackEvents(original, transformed.fromDbToDomain() as EnrolmentCallbackEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_ErrorCallbackEvent() {
         val original = createErrorCallbackEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyErrorCallbackEvents(original, transformed.fromDbToDomain() as ErrorCallbackEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_IdentificationCallbackEvent() {
         val original = createIdentificationCallbackEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyIdentificationCallbackEvents(original, transformed.fromDbToDomain() as IdentificationCallbackEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_RefusalCallbackEvent() {
         val original = createRefusalCallbackEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyRefusalCallbackEvents(original, transformed.fromDbToDomain() as RefusalCallbackEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_VerificationCallbackEvent() {
         val original = createVerificationCallbackEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyVerificationCallbackEvents(original, transformed.fromDbToDomain() as VerificationCallbackEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_ConfirmationCalloutEvent() {
         val original = createConfirmationCalloutEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyConfirmationCalloutEvents(original, transformed.fromDbToDomain() as ConfirmationCalloutEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_EnrolmentCalloutEvent() {
         val original = createEnrolmentCalloutEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyEnrolmentCalloutEvents(original, transformed.fromDbToDomain() as EnrolmentCalloutEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_EnrolmentLastBiometricsCalloutEvent() {
         val original = createLastBiometricsEnrolmentCalloutEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyEnrolmentLastBiometricsCalloutEvents(original, transformed.fromDbToDomain() as EnrolmentLastBiometricsCalloutEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_IdentificationCalloutEvent() {
         val original = createIdentificationCalloutEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyIdentificationCalloutEvents(original, transformed.fromDbToDomain() as IdentificationCalloutEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_VerificationCalloutEvent() {
         val original = createVerificationCalloutEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyVerificationCalloutEvents(original, transformed.fromDbToDomain() as VerificationCalloutEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_FaceCaptureConfirmationEvent() {
         val original = createFaceCaptureConfirmationEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyFaceCaptureConfirmationEvents(original, transformed.fromDbToDomain() as FaceCaptureConfirmationEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_FaceCaptureEvent() {
         val original = createFaceCaptureEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyFaceCaptureEvents(original, transformed.fromDbToDomain() as FaceCaptureEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_FaceCaptureRetryEvent() {
         val original = createFaceCaptureRetryEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyFaceCaptureRetryEvents(original, transformed.fromDbToDomain() as FaceCaptureRetryEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_FaceFallbackCaptureEvent() {
         val original = createFaceFallbackCaptureEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyFaceFallbackCaptureEvents(original, transformed.fromDbToDomain() as FaceFallbackCaptureEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_FaceOnboardingCompleteEvent() {
         val original = createFaceOnboardingCompleteEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyFaceOnboardingCompleteEvents(original, transformed.fromDbToDomain() as FaceOnboardingCompleteEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_SessionCaptureEvent() {
         val original = createSessionCaptureEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = (original.fromDomainToDb().fromDbToDomain())
 
-        verifySessionCaptureEvents(original, transformed.fromDbToDomain() as SessionCaptureEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_AlertScreenEvent() {
         val original = createAlertScreenEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyAlertScreenEvents(original, transformed.fromDbToDomain() as AlertScreenEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_ArtificialTerminationEvent() {
         val original = createArtificialTerminationEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyArtificialTerminationEvents(original, transformed.fromDbToDomain() as ArtificialTerminationEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_AuthenticationEvent() {
         val original = createAuthenticationEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyAuthenticationEvents(original, transformed.fromDbToDomain() as AuthenticationEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_AuthorizationEvent() {
         val original = createAuthorizationEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyAuthorizationEvents(original, transformed.fromDbToDomain() as AuthorizationEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_CandidateReadEvent() {
         val original = createCandidateReadEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyCandidateReadEvents(original, transformed.fromDbToDomain() as CandidateReadEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_CompletionCheckEvent() {
         val original = createCompletionCheckEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyCompletionCheckEvents(original, transformed.fromDbToDomain() as CompletionCheckEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_ConnectivitySnapshotEvent() {
         val original = createConnectivitySnapshotEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyConnectivitySnapshotEvents(original, transformed.fromDbToDomain() as ConnectivitySnapshotEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_ConsentEvent() {
         val original = createConsentEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyConsentEvents(original, transformed.fromDbToDomain() as ConsentEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_EnrolmentEvent() {
         val original = createEnrolmentEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyEnrolmentEvents(original, transformed.fromDbToDomain() as EnrolmentEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_FingerprintCaptureEvent() {
         val original = createFingerprintCaptureEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyFingerprintCaptureEvents(original, transformed.fromDbToDomain() as FingerprintCaptureEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_GuidSelectionEvent() {
         val original = createGuidSelectionEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyGuidSelectionEvents(original, transformed.fromDbToDomain() as GuidSelectionEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun covert_IntentParsingEvent() {
         val original = createIntentParsingEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyIntentParsingEvents(original, transformed.fromDbToDomain() as IntentParsingEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_InvalidIntentEvent() {
         val original = createInvalidIntentEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyInvalidIntentEvents(original, transformed.fromDbToDomain() as InvalidIntentEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_OneToManyMatchEvent() {
         val original = createOneToManyMatchEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyOneToManyMatchEvents(original, transformed.fromDbToDomain() as OneToManyMatchEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_OneToOneMatchEvent() {
         val original = createOneToOneMatchEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyOneToOneMatchEvents(original, transformed.fromDbToDomain() as OneToOneMatchEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_PersonCreationEvent() {
         val original = createPersonCreationEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyPersonCreationEvents(original, transformed.fromDbToDomain() as PersonCreationEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_RefusalEvent() {
         val original = createRefusalEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyRefusalEvents(original, transformed.fromDbToDomain() as RefusalEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_ScannerConnectionEvent() {
         val original = createScannerConnectionEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyScannerConnectionEvents(original, transformed.fromDbToDomain() as ScannerConnectionEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_ScannerFirmwareUpdateEvent() {
         val original = createScannerFirmwareUpdateEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyScannerFirmwareUpdateEvents(original, transformed.fromDbToDomain() as ScannerFirmwareUpdateEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_SuspiciousIntentEvent() {
         val original = createSuspiciousIntentEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifySuspiciousIntentEvents(original, transformed.fromDbToDomain() as SuspiciousIntentEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 
     @Test
     fun convert_Vero2InfoSnapshotEvent() {
         val original = createVero2InfoSnapshotEvent()
-        val transformed = original.fromDomainToDb()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        verifyVero2InfoSnapshotEvents(original, transformed.fromDbToDomain() as Vero2InfoSnapshotEvent)
+        assertThat(original).isEqualTo(transformed)
     }
 }

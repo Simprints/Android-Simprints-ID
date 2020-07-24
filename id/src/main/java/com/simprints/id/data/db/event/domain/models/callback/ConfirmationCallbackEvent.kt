@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_CONFIRMAT
 import java.util.*
 
 @Keep
-class ConfirmationCallbackEvent(
+data class ConfirmationCallbackEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels = EventLabels(),
     override val payload: ConfirmationCallbackPayload,
@@ -26,9 +26,10 @@ class ConfirmationCallbackEvent(
         ConfirmationCallbackPayload(createdAt, EVENT_VERSION, identificationOutcome),
         CALLBACK_CONFIRMATION)
 
-    class ConfirmationCallbackPayload(createdAt: Long,
-                                      eventVersion: Int,
-                                      val identificationOutcome: Boolean)
+    data class ConfirmationCallbackPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
+        val identificationOutcome: Boolean)
         : EventPayload(CALLBACK_CONFIRMATION, eventVersion, createdAt)
 
     companion object {

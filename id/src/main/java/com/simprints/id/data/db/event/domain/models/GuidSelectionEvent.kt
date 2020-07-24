@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.GUID_SELECTION
 import java.util.*
 
 @Keep
-class GuidSelectionEvent(
+data class GuidSelectionEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: GuidSelectionPayload,
@@ -24,9 +24,9 @@ class GuidSelectionEvent(
         GUID_SELECTION)
 
     @Keep
-    class GuidSelectionPayload(override val createdAt: Long,
-                               override val eventVersion: Int,
-                               val selectedId: String) : EventPayload(GUID_SELECTION, eventVersion, createdAt)
+    data class GuidSelectionPayload(override val createdAt: Long,
+                                    override val eventVersion: Int,
+                                    val selectedId: String) : EventPayload(GUID_SELECTION, eventVersion, createdAt)
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

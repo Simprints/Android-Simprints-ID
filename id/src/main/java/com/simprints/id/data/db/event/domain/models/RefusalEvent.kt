@@ -5,7 +5,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.REFUSAL
 import java.util.*
 
 @Keep
-class RefusalEvent(
+data class RefusalEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: RefusalPayload,
@@ -26,11 +26,11 @@ class RefusalEvent(
 
 
     @Keep
-    class RefusalPayload(override val createdAt: Long,
-                         override val eventVersion: Int,
-                         override var endedAt: Long,
-                         val reason: Answer,
-                         val otherText: String) : EventPayload(REFUSAL, eventVersion, createdAt, endedAt) {
+    data class RefusalPayload(override val createdAt: Long,
+                              override val eventVersion: Int,
+                              override var endedAt: Long,
+                              val reason: Answer,
+                              val otherText: String) : EventPayload(REFUSAL, eventVersion, createdAt, endedAt) {
 
         @Keep
         enum class Answer {

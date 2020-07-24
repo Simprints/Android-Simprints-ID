@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.SUSPICIOUS_INTENT
 import java.util.*
 
 @Keep
-class SuspiciousIntentEvent(
+data class SuspiciousIntentEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: SuspiciousIntentPayload,
@@ -24,9 +24,9 @@ class SuspiciousIntentEvent(
         SUSPICIOUS_INTENT)
 
     @Keep
-    class SuspiciousIntentPayload(
-        createdAt: Long,
-        eventVersion: Int,
+    data class SuspiciousIntentPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
         val unexpectedExtras: Map<String, Any?>
     ) : EventPayload(SUSPICIOUS_INTENT, eventVersion, createdAt)
 

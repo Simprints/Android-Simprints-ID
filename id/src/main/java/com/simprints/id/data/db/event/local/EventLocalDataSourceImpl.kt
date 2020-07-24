@@ -1,6 +1,5 @@
 package com.simprints.id.data.db.event.local
 
-import android.content.Context
 import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
@@ -13,7 +12,6 @@ import com.simprints.id.data.db.event.local.EventLocalDataSource.EventQuery
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.safe.session.SessionDataSourceException
 import com.simprints.id.tools.TimeHelper
 import kotlinx.coroutines.Dispatchers
@@ -21,13 +19,15 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-open class EventLocalDataSourceImpl(private val appContext: Context,
-                                    private val secureDataManager: SecureLocalDbKeyProvider,
+open class EventLocalDataSourceImpl(private val dbEventDatabaseFactory: DbEventDatabaseFactory,
                                     private val loginInfoManager: LoginInfoManager,
                                     private val deviceId: String,
                                     private val timeHelper: TimeHelper,
-                                    private val roomDao: DbEventRoomDao,
                                     private val sessionEventsValidators: Array<SessionEventValidator>) : EventLocalDataSource {
+
+    private val roomDao by lazy {
+        dbEventDatabaseFactory.build().eventDao
+    }
 
     override suspend fun create(event: SessionCaptureEvent) {
         wrapSuspendExceptionIfNeeded {

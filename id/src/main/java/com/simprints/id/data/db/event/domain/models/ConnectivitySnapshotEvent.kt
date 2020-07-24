@@ -8,7 +8,7 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import java.util.*
 
 @Keep
-class ConnectivitySnapshotEvent(
+data class ConnectivitySnapshotEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: ConnectivitySnapshotPayload,
@@ -27,7 +27,7 @@ class ConnectivitySnapshotEvent(
         CONNECTIVITY_SNAPSHOT)
 
     @Keep
-    class ConnectivitySnapshotPayload(
+    data class ConnectivitySnapshotPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
         val networkType: String,

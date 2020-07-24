@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.SCANNER_CONNECTION
 import java.util.*
 
 @Keep
-class ScannerConnectionEvent(
+data class ScannerConnectionEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: ScannerConnectionPayload,
@@ -25,9 +25,10 @@ class ScannerConnectionEvent(
 
 
     @Keep
-    class ScannerConnectionPayload(createdAt: Long,
-                                   eventVersion: Int,
-                                   val scannerInfo: ScannerInfo) : EventPayload(SCANNER_CONNECTION, eventVersion, createdAt) {
+    data class ScannerConnectionPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
+        val scannerInfo: ScannerInfo) : EventPayload(SCANNER_CONNECTION, eventVersion, createdAt) {
 
         @Keep
         data class ScannerInfo(val scannerId: String,

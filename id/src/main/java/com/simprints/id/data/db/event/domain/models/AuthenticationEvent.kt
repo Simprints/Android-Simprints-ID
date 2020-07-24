@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.AUTHENTICATION
 import java.util.*
 
 @Keep
-class AuthenticationEvent(
+data class AuthenticationEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: AuthenticationPayload,
@@ -29,7 +29,7 @@ class AuthenticationEvent(
 
 
     @Keep
-    class AuthenticationPayload(
+    data class AuthenticationPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
         override var endedAt: Long,

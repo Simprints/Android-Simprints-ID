@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import java.util.*
 
 @Keep
-open class SessionCaptureEvent(
+data class SessionCaptureEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: SessionCapturePayload,
@@ -50,10 +50,10 @@ open class SessionCaptureEvent(
             SESSION_CAPTURE)
 
     @Keep
-    class SessionCapturePayload(
-        createdAt: Long,
-        endedAt: Long,
-        eventVersion: Int,
+    data class SessionCapturePayload(
+        override val createdAt: Long,
+        override var endedAt: Long,
+        override val eventVersion: Int,
         val id: String = UUID.randomUUID().toString(),
         var projectId: String,
         val appVersionName: String,

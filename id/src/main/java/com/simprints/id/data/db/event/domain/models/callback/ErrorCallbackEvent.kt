@@ -11,7 +11,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import java.util.*
 
 @Keep
-class ErrorCallbackEvent(
+data class ErrorCallbackEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: ErrorCallbackPayload,
@@ -29,9 +29,10 @@ class ErrorCallbackEvent(
         CALLBACK_ERROR)
 
     @Keep
-    class ErrorCallbackPayload(createdAt: Long,
-                               eventVersion: Int,
-                               val reason: Reason) : EventPayload(CALLBACK_ERROR, eventVersion, createdAt) {
+    data class ErrorCallbackPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
+        val reason: Reason) : EventPayload(CALLBACK_ERROR, eventVersion, createdAt) {
 
         enum class Reason {
             DIFFERENT_PROJECT_ID_SIGNED_IN,
