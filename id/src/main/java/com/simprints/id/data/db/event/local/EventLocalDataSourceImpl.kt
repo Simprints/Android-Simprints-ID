@@ -4,7 +4,9 @@ import android.content.Context
 import android.os.Build
 import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
+import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
@@ -13,7 +15,7 @@ import com.simprints.id.data.db.event.domain.validators.SessionEventValidator
 import com.simprints.id.data.db.event.local.EventLocalDataSource.EventQuery
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
-import com.simprints.id.data.secure.LocalDbKey
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.safe.session.SessionDataSourceException
 import com.simprints.id.tools.TimeHelper
@@ -25,20 +27,11 @@ import java.util.*
 
 open class EventLocalDataSourceImpl(private val appContext: Context,
                                     private val secureDataManager: SecureLocalDbKeyProvider,
+                                    private val loginInfoManager: LoginInfoManager,
+                                    private val deviceId: String,
                                     private val timeHelper: TimeHelper,
                                     private val roomDao: DbEventRoomDao,
                                     private val sessionEventsValidators: Array<SessionEventValidator>) : EventLocalDataSource {
-    companion object {
-        const val PROJECT_ID = "projectId"
-        const val END_TIME = "relativeEndTime"
-        const val START_TIME = "startTime"
-        const val SESSION_ID = "id"
-        const val TYPE = "type"
-
-        const val SESSIONS_REALM_DB_FILE_NAME = "event_data"
-    }
-
-    private var localDbKey: LocalDbKey? = null
 
     override suspend fun create(appVersionName: String,
                                 libSimprintsVersionName: String,
@@ -68,16 +61,18 @@ open class EventLocalDataSourceImpl(private val appContext: Context,
         }
 
     override suspend fun getCurrentSessionCaptureEvent() =
-        load(EventQuery(eventType = SESSION_CAPTURE, endTime = LongRange(0, 0))).first() as SessionCaptureEvent
+        load(EventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).first() as SessionCaptureEvent
 
     override suspend fun load(query: EventQuery): Flow<Event> =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                roomDao.load()
-                    .map { it.fromDbToDomain() }
-                    .filter { query.filter(it) }
-                    .sortedByDescending { it.payload.createdAt }
-                    .asFlow()
+                with(query) {
+                    roomDao.load(
+                        id, type, projectId, subjectId, attendantId, sessionId, deviceId,
+                        startTime?.first, startTime?.endInclusive, endTime?.first, endTime?.endInclusive)
+                        .map { it.fromDbToDomain() }
+                        .asFlow()
+                }
             }
         }
 
@@ -85,15 +80,21 @@ open class EventLocalDataSourceImpl(private val appContext: Context,
     override suspend fun count(query: EventQuery): Int =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                load(query).toList().size
+                with(query) {
+                    roomDao.count(
+                        id, type, projectId, subjectId, attendantId, sessionId, deviceId,
+                        startTime?.first, startTime?.endInclusive, endTime?.first, endTime?.endInclusive)
+                }
             }
         }
 
     override suspend fun delete(query: EventQuery) {
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                load(query).collect {
-                    roomDao.delete(it.fromDomainToDb())
+                with(query) {
+                    roomDao.delete(
+                        id, type, projectId, subjectId, attendantId, sessionId, deviceId,
+                        startTime?.first, startTime?.endInclusive, endTime?.first, endTime?.endInclusive)
                 }
             }
         }
@@ -102,28 +103,50 @@ open class EventLocalDataSourceImpl(private val appContext: Context,
     override suspend fun insertOrUpdate(event: Event) =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                event.labels.sessionId?.let {
-                    val eventsInTheSameSession = load(EventQuery(sessionId = it)).toList()
-                    sessionEventsValidators.forEach {
-                        it.validate(eventsInTheSameSession, event)
-                    }
-                }
+                event.labels = getLabelsForAnyEvent()
                 roomDao.insertOrUpdate(event.fromDomainToDb())
             }
         }
 
-    private suspend fun closeAnyOpenSession() {
+    override suspend fun insertOrUpdateInCurrentSession(event: Event) {
         wrapSuspendExceptionIfNeeded {
-            val openSessionIds = load(EventQuery(eventType = SESSION_CAPTURE, endTime = LongRange(0, 0))).map { it.id }
+            withContext(Dispatchers.IO) {
+                val currentSession = getCurrentSessionCaptureEvent()
+                val currentSessionsEvents = load(EventQuery(sessionId = currentSession.id)).toList()
+                sessionEventsValidators.forEach {
+                    it.validate(currentSessionsEvents, event)
+                }
 
-            openSessionIds.onEach { sessionId ->
-                val artificialTerminationEvent = ArtificialTerminationEvent(
-                    timeHelper.now(),
-                    ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-                )
-                insertOrUpdate(artificialTerminationEvent)
+                event.labels = getLabelsForAnyEvent().copy(sessionId = currentSession.id)
+                roomDao.insertOrUpdate(event.fromDomainToDb())
             }
         }
+    }
+
+    private suspend fun closeAnyOpenSession() {
+        wrapSuspendExceptionIfNeeded {
+            val openSessions = load(EventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0)))
+
+            openSessions.onEach { session ->
+                val artificialTerminationEvent = ArtificialTerminationEvent(
+                    timeHelper.now(),
+                    NEW_SESSION
+                )
+                artificialTerminationEvent.labels = getLabelsForAnyEvent().copy(sessionId = session.id)
+                roomDao.insertOrUpdate(artificialTerminationEvent.fromDomainToDb())
+
+                session.payload.endedAt = timeHelper.now()
+                roomDao.insertOrUpdate(session.fromDomainToDb())
+            }
+        }
+    }
+
+    private fun getLabelsForAnyEvent(): EventLabels {
+        var projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        if (projectId.isNullOrEmpty()) {
+            projectId = EventRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN
+        }
+        return EventLabels(deviceId = deviceId, projectId = projectId)
     }
 
     private suspend fun <T> wrapSuspendExceptionIfNeeded(block: suspend () -> T): T =
@@ -136,15 +159,5 @@ open class EventLocalDataSourceImpl(private val appContext: Context,
             } else {
                 SessionDataSourceException(t)
             }
-        }
-
-    fun EventQuery.filter(event: Event) =
-        with(this) {
-            projectId?.let { event.labels.projectId == it } ?: false ||
-                sessionId?.let { event.labels.sessionId == it } ?: false ||
-                eventType?.let { event.type == it } ?: false ||
-                id?.let { event.id == it } ?: false ||
-                startTime?.let { event.payload.createdAt in it } ?: false ||
-                endTime?.let { event.payload.endedAt in it } ?: false
         }
 }

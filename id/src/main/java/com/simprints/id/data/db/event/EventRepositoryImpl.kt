@@ -122,7 +122,7 @@ open class EventRepositoryImpl(
     override suspend fun load(): List<Event> = eventLocalDataSource.load().toList()
 
     override suspend fun signOut() {
-        eventLocalDataSource.load(EventQuery(eventType = SESSION_CAPTURE, endTime = LongRange(0, 0))).collect {
+        eventLocalDataSource.load(EventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).collect {
             eventLocalDataSource.delete(EventQuery(sessionId = it.id))
         }
         sessionEventsSyncManager.cancelSyncWorkers()
