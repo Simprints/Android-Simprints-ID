@@ -15,7 +15,6 @@ class SessionCaptureEventTest {
 
     @Test
     fun create_SessionCaptureEvent() {
-        val labelsArg = EventLabels(sessionId = SOME_GUID1)
         val appVersionNameArg = "appVersionName"
         val libSimprintsVersionNameArg = "libSimprintsVersionName"
         val languageArg = "language"
@@ -29,7 +28,6 @@ class SessionCaptureEventTest {
 
         val event = SessionCaptureEvent(
             CREATED_AT,
-            SOME_GUID1,
             DEFAULT_PROJECT_ID,
             appVersionNameArg,
             libSimprintsVersionNameArg,
@@ -39,12 +37,10 @@ class SessionCaptureEventTest {
             ENDED_AT,
             ENDED_AT,
             locationArg,
-            SOME_GUID1,
-            labelsArg
-        )
+            SOME_GUID1)
 
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).isEqualTo(labelsArg)
+        assertThat(event.labels).isEqualTo(EventLabels(event.id))
         assertThat(event.type).isEqualTo(SESSION_CAPTURE)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
