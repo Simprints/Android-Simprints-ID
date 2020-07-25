@@ -10,7 +10,10 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID_2
 import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
-import com.simprints.id.data.db.event.domain.models.*
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
+import com.simprints.id.data.db.event.domain.models.CREATED_AT_RANGE
+import com.simprints.id.data.db.event.domain.models.ENDED_AT_RANGE
+import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.ARTIFICIAL_TERMINATION
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
@@ -30,7 +33,6 @@ import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.apache.maven.wagon.events.SessionEvent
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
