@@ -229,7 +229,6 @@ fun createSessionCaptureEvent(): SessionCaptureEvent {
 
     return SessionCaptureEvent(
         CREATED_AT,
-        SOME_GUID1,
         DEFAULT_PROJECT_ID,
         "appVersionName",
         "libSimprintsVersionName",
@@ -238,9 +237,7 @@ fun createSessionCaptureEvent(): SessionCaptureEvent {
         DatabaseInfo(2),
         ENDED_AT,
         ENDED_AT,
-        Location(0.0, 0.0),
-        SOME_GUID1,
-        EventLabels(sessionId = SOME_GUID1)
+        Location(0.0, 0.0)
     )
 }
 

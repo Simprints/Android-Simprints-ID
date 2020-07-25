@@ -18,7 +18,6 @@ data class SessionCaptureEvent(
 ) : Event(id, labels, payload, type) {
 
     constructor(createdAt: Long,
-                id: String = UUID.randomUUID().toString(),
                 projectId: String,
                 appVersionName: String,
                 libVersionName: String = "",
@@ -29,7 +28,8 @@ data class SessionCaptureEvent(
                 endTime: Long = 0,
                 location: Location? = null,
                 analyticsId: String? = null,
-                labels: EventLabels = EventLabels()) : //StopShip
+                id: String = UUID.randomUUID().toString(),
+                labels: EventLabels = EventLabels(sessionId = id)) : //StopShip
         this(
             id,
             labels,

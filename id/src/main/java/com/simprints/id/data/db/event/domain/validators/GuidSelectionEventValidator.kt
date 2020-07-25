@@ -5,7 +5,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent
 import com.simprints.id.exceptions.safe.session.validator.GuidSelectEventValidatorException
 
-class GuidSelectionEventValidator : SessionEventValidator {
+class GuidSelectionEventValidator : EventValidator {
 
     override fun validate(currentEvents: List<Event>, eventToAdd: Event) {
         val currentSession = currentEvents.firstOrNull { it.payload.type == SESSION_CAPTURE }

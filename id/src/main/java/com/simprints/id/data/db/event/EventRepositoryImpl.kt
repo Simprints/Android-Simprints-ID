@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.Build.VERSION
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.models.Event
-
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
@@ -19,7 +18,6 @@ import com.simprints.id.tools.ignoreException
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
-import java.util.*
 
 // Class to manage the current activeSession
 open class EventRepositoryImpl(
@@ -44,7 +42,6 @@ open class EventRepositoryImpl(
             val count = eventLocalDataSource.count()
             val sessionCaptureEvent = SessionCaptureEvent(
                 timeHelper.now(),
-                UUID.randomUUID().toString(),
                 PROJECT_ID_FOR_NOT_SIGNED_IN,
                 appVersionName,
                 libSimprintsVersionName,

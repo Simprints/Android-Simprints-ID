@@ -7,7 +7,7 @@ import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.domain.validators.SessionEventValidator
+import com.simprints.id.data.db.event.domain.validators.EventValidator
 import com.simprints.id.data.db.event.local.EventLocalDataSource.EventQuery
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
@@ -23,7 +23,7 @@ open class EventLocalDataSourceImpl(private val dbEventDatabaseFactory: DbEventD
                                     private val loginInfoManager: LoginInfoManager,
                                     private val deviceId: String,
                                     private val timeHelper: TimeHelper,
-                                    private val sessionEventsValidators: Array<SessionEventValidator>) : EventLocalDataSource {
+                                    private val eventsValidators: Array<EventValidator>) : EventLocalDataSource {
 
     private val roomDao by lazy {
         dbEventDatabaseFactory.build().eventDao
@@ -34,8 +34,9 @@ open class EventLocalDataSourceImpl(private val dbEventDatabaseFactory: DbEventD
             withContext(Dispatchers.IO) {
                 closeAnyOpenSession()
                 roomDao.insertOrUpdate(event.fromDomainToDb())
-                Timber.d("Session created ${event.id}")
                 event.id
+            }.also {
+                Timber.d("Session created ${event.id}")
             }
         }
     }
@@ -49,7 +50,7 @@ open class EventLocalDataSourceImpl(private val dbEventDatabaseFactory: DbEventD
                 with(query) {
                     roomDao.load(
                         id, type, projectId, subjectId, attendantId, sessionId, deviceId,
-                        startTime?.first, startTime?.endInclusive, endTime?.first, endTime?.endInclusive)
+                        startTime?.first, startTime?.last, endTime?.first, endTime?.last)
                         .map { it.fromDbToDomain() }
                         .asFlow()
                 }
@@ -63,7 +64,7 @@ open class EventLocalDataSourceImpl(private val dbEventDatabaseFactory: DbEventD
                 with(query) {
                     roomDao.count(
                         id, type, projectId, subjectId, attendantId, sessionId, deviceId,
-                        startTime?.first, startTime?.endInclusive, endTime?.first, endTime?.endInclusive)
+                        startTime?.first, startTime?.endInclusive, endTime?.first, endTime?.last)
                 }
             }
         }
@@ -74,7 +75,7 @@ open class EventLocalDataSourceImpl(private val dbEventDatabaseFactory: DbEventD
                 with(query) {
                     roomDao.delete(
                         id, type, projectId, subjectId, attendantId, sessionId, deviceId,
-                        startTime?.first, startTime?.endInclusive, endTime?.first, endTime?.endInclusive)
+                        startTime?.first, startTime?.endInclusive, endTime?.first, endTime?.last)
                 }
             }
         }
@@ -83,7 +84,7 @@ open class EventLocalDataSourceImpl(private val dbEventDatabaseFactory: DbEventD
     override suspend fun insertOrUpdate(event: Event) =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                event.labels = getLabelsForAnyEvent()
+                event.labels = event.labels.appendLabelsForAllEvents()
                 roomDao.insertOrUpdate(event.fromDomainToDb())
             }
         }
@@ -93,11 +94,12 @@ open class EventLocalDataSourceImpl(private val dbEventDatabaseFactory: DbEventD
             withContext(Dispatchers.IO) {
                 val currentSession = getCurrentSessionCaptureEvent()
                 val currentSessionsEvents = load(EventQuery(sessionId = currentSession.id)).toList()
-                sessionEventsValidators.forEach {
+                eventsValidators.forEach {
                     it.validate(currentSessionsEvents, event)
+                    //StopShip: Add session validator to have only one open session
                 }
 
-                event.labels = getLabelsForAnyEvent().copy(sessionId = currentSession.id)
+                event.labels = event.labels.appendLabelsForAllEvents().appendSessionId(currentSession.id)
                 roomDao.insertOrUpdate(event.fromDomainToDb())
             }
         }
@@ -107,12 +109,12 @@ open class EventLocalDataSourceImpl(private val dbEventDatabaseFactory: DbEventD
         wrapSuspendExceptionIfNeeded {
             val openSessions = load(EventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0)))
 
-            openSessions.onEach { session ->
+            openSessions.collect { session ->
                 val artificialTerminationEvent = ArtificialTerminationEvent(
                     timeHelper.now(),
                     NEW_SESSION
                 )
-                artificialTerminationEvent.labels = getLabelsForAnyEvent().copy(sessionId = session.id)
+                artificialTerminationEvent.labels = artificialTerminationEvent.labels.appendLabelsForAllEvents().appendSessionId(session.id)
                 roomDao.insertOrUpdate(artificialTerminationEvent.fromDomainToDb())
 
                 session.payload.endedAt = timeHelper.now()
@@ -121,14 +123,20 @@ open class EventLocalDataSourceImpl(private val dbEventDatabaseFactory: DbEventD
         }
     }
 
-    private fun getLabelsForAnyEvent(): EventLabels {
+    private fun EventLabels.appendLabelsForAllEvents() =
+        this.appendProjectIdLabel().appendDeviceIdLabel()
+
+    private fun EventLabels.appendProjectIdLabel(): EventLabels {
         //STOPSHIP: enforce the right labels in each event
         var projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
         if (projectId.isNullOrEmpty()) {
             projectId = EventRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN
         }
-        return EventLabels(deviceId = deviceId, projectId = projectId)
+        return this.copy(projectId = projectId)
     }
+
+    private fun EventLabels.appendDeviceIdLabel(): EventLabels = this.copy(deviceId = this@EventLocalDataSourceImpl.deviceId)
+    private fun EventLabels.appendSessionId(sessionId: String): EventLabels = this.copy(sessionId = sessionId)
 
     private suspend fun <T> wrapSuspendExceptionIfNeeded(block: suspend () -> T): T =
         try {
