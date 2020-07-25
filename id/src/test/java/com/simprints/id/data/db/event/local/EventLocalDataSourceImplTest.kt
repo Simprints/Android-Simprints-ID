@@ -10,7 +10,11 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID_2
 import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
-import com.simprints.id.data.db.event.domain.models.*
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
+import com.simprints.id.data.db.event.domain.models.CREATED_AT_RANGE
+import com.simprints.id.data.db.event.domain.models.ENDED_AT_RANGE
+import com.simprints.id.data.db.event.domain.models.EventLabels
+import com.simprints.id.data.db.event.domain.models.EventType.ALERT_SCREEN
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.EventValidator
@@ -29,7 +33,6 @@ import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.apache.maven.wagon.events.SessionEvent
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -89,8 +92,8 @@ class EventLocalDataSourceImplTest {
             eventLocalDataSource.create(newSession)
 
             val eventAssociatedToCloseSession = eventDao.load(sessionId = oldOpenSession.id)
-            assertThat(eventAssociatedToCloseSession.firstOrNull()).isInstanceOf(SessionEvent::class.java)
-            assertThat(eventAssociatedToCloseSession[1]).isInstanceOf(ArtificialTerminationEvent::class.java)
+            assertThat(eventAssociatedToCloseSession.firstOrNull()?.type).isEqualTo(SESSION_CAPTURE)
+            assertThat(eventAssociatedToCloseSession[1].type).isEqualTo(ALERT_SCREEN)
         }
     }
 
@@ -168,9 +171,7 @@ class EventLocalDataSourceImplTest {
             eventLocalDataSource.insertOrUpdate(event)
             val storedEvent = eventLocalDataSource.load(EventQuery(id = event.id)).first()
 
-            coVerify {
-                assertThat(storedEvent.labels).isEqualTo(EventLabels(projectId = PROJECT_ID_FOR_NOT_SIGNED_IN, deviceId = DEVICE_ID))
-            }
+            assertThat(storedEvent.labels).isEqualTo(EventLabels(projectId = PROJECT_ID_FOR_NOT_SIGNED_IN, deviceId = DEVICE_ID))
         }
     }
 
@@ -184,9 +185,7 @@ class EventLocalDataSourceImplTest {
             eventLocalDataSource.insertOrUpdate(event)
             val storedEvent = eventLocalDataSource.load(EventQuery(id = event.id)).first()
 
-            coVerify {
-                assertThat(storedEvent.labels).isEqualTo(EventLabels(projectId = DEFAULT_PROJECT_ID, deviceId = DEVICE_ID))
-            }
+            assertThat(storedEvent.labels).isEqualTo(EventLabels(projectId = DEFAULT_PROJECT_ID, deviceId = DEVICE_ID))
         }
     }
 
