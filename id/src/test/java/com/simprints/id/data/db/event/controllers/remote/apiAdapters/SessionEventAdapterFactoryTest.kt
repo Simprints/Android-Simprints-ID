@@ -31,7 +31,7 @@
 //import org.junit.runner.RunWith
 //import org.robolectric.annotation.Config
 //import java.util.*
-// TOFIX
+// StopShip: to fix once the event remote data source is sorted
 //@RunWith(AndroidJUnit4::class)
 //@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 //class SessionEventAdapterFactoryTest {

@@ -50,6 +50,7 @@
 //import org.junit.runner.RunWith
 //import java.util.*
 //
+// StopShip: it will get fixed when the event remote data source is implemented.
 //@RunWith(AndroidJUnit4::class)
 //class SessionRemoteDataSourceImplAndroidTest {
 //

@@ -61,6 +61,8 @@
 //import org.junit.runner.RunWith
 //import javax.inject.Inject
 //
+//
+// StopShip: it will get fixed when the event remote data source is implemented.
 //@RunWith(AndroidJUnit4::class)
 //@ExperimentalCoroutinesApi
 //class SubjectsSyncIntegrationTest {

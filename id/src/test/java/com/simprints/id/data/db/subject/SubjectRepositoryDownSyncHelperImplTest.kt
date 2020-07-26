@@ -35,7 +35,7 @@
 //import java.io.InputStream
 //import kotlin.math.ceil
 //
-//TOFIX
+// StopShip: to fix once the event remote data source is sorted
 //@ExperimentalCoroutinesApi
 //@RunWith(AndroidJUnit4::class)
 //class SubjectRepositoryDownSyncHelperImplTest {

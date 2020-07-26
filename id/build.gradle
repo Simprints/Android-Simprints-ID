@@ -195,10 +195,6 @@ dependencies {
     api deps.firebase.mlkit_barcode
     api deps.firebase.crashlytics
 
-    implementation 'com.beust:klaxon:5.2'
-    implementation "net.zetetic:android-database-sqlcipher:4.4.0"
-    implementation "androidx.sqlite:sqlite:2.1.0"
-
     api deps.gson.core
     api deps.gson.extras
     api deps.timber.core
@@ -222,6 +218,9 @@ dependencies {
     api deps.koin.viewmodel
     api deps.playcore.core
     api deps.playcore.core_ktx
+    api deps.androidx.sqlite
+    api deps.sqlcipher.core
+    implementation deps.klaxon.core
 
     // ######################################################
     //                      Unit test
