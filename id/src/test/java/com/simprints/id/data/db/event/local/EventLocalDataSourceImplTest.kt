@@ -24,11 +24,9 @@ import com.simprints.id.data.db.event.local.models.createSessionCaptureEvent
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.exceptions.safe.session.SessionDataSourceException
 import com.simprints.id.orchestrator.SOME_GUID1
 import com.simprints.id.orchestrator.SOME_GUID2
 import com.simprints.id.tools.TimeHelper
-import io.kotlintest.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.flow.first
@@ -165,9 +163,7 @@ class EventLocalDataSourceImplTest {
     fun insertNewEvent_notSignedIn() {
         runBlocking {
             mockNotSignedId()
-            val event = createSessionCaptureEvent().let {
-                it.copy(labels = EventLabels())
-            }
+            val event = createSessionCaptureEvent().copy(labels = EventLabels())
             eventLocalDataSource.insertOrUpdate(event)
             val storedEvent = eventLocalDataSource.load(EventQuery(id = event.id)).first()
 
@@ -179,9 +175,7 @@ class EventLocalDataSourceImplTest {
     fun insertNewEvent_signedIn() {
         runBlocking {
             mockSignedId()
-            val event = createSessionCaptureEvent().let {
-                it.copy(labels = EventLabels())
-            }
+            val event = createSessionCaptureEvent().copy(labels = EventLabels())
             eventLocalDataSource.insertOrUpdate(event)
             val storedEvent = eventLocalDataSource.load(EventQuery(id = event.id)).first()
 
@@ -209,7 +203,7 @@ class EventLocalDataSourceImplTest {
         runBlocking {
             mockSignedId()
             val session = createSessionCaptureEvent().openSession()
-            val eventInSession = createAlertScreenEvent().let { it.copy(labels = EventLabels(sessionId = session.id)) }
+            val eventInSession = createAlertScreenEvent().copy(labels = EventLabels(sessionId = session.id))
             eventLocalDataSource.insertOrUpdate(session)
             eventLocalDataSource.insertOrUpdate(eventInSession)
 
@@ -219,21 +213,6 @@ class EventLocalDataSourceImplTest {
             validators.forEach {
                 verify { it.validate(listOf(session, eventInSession), newEvent) }
             }
-        }
-    }
-
-    @Test
-    fun insertANewSessionToCurrentSession_throwException() {
-        runBlocking {
-            mockSignedId()
-            val session = createSessionCaptureEvent().openSession()
-            val newSession = createSessionCaptureEvent().removeLabels()
-            eventLocalDataSource.insertOrUpdate(session)
-
-            shouldThrow<SessionDataSourceException> {
-                eventLocalDataSource.insertOrUpdateInCurrentSession(newSession)
-            }
-            assertThat(eventLocalDataSource.count()).isEqualTo(1)
         }
     }
 

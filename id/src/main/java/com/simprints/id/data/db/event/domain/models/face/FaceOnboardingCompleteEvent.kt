@@ -3,10 +3,8 @@ package com.simprints.id.data.db.event.domain.models.face
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabels
-
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
-import com.simprints.id.data.db.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
 import com.simprints.id.data.db.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
 import java.util.*
 
@@ -33,7 +31,7 @@ data class FaceOnboardingCompleteEvent(
         override val createdAt: Long,
         override var endedAt: Long,
         override val eventVersion: Int
-    ) : EventPayload(FACE_FALLBACK_CAPTURE, eventVersion, createdAt, endedAt)
+    ) : EventPayload(FACE_ONBOARDING_COMPLETE, eventVersion, createdAt, endedAt)
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION
