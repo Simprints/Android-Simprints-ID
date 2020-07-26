@@ -40,7 +40,7 @@ class SessionCaptureEventTest {
             SOME_GUID1)
 
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).isEqualTo(EventLabels(event.id))
+        assertThat(event.labels).isEqualTo(EventLabels(sessionId = event.id))
         assertThat(event.type).isEqualTo(SESSION_CAPTURE)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

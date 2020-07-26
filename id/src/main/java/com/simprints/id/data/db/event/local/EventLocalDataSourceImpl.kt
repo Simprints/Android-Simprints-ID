@@ -96,7 +96,6 @@ open class EventLocalDataSourceImpl(private val dbEventDatabaseFactory: DbEventD
                 val currentSessionsEvents = load(EventQuery(sessionId = currentSession.id)).toList()
                 eventsValidators.forEach {
                     it.validate(currentSessionsEvents, event)
-                    //StopShip: Add session validator to have only one open session
                 }
 
                 event.labels = event.labels.appendLabelsForAllEvents().appendSessionId(currentSession.id)
@@ -127,7 +126,6 @@ open class EventLocalDataSourceImpl(private val dbEventDatabaseFactory: DbEventD
         this.appendProjectIdLabel().appendDeviceIdLabel()
 
     private fun EventLabels.appendProjectIdLabel(): EventLabels {
-        //STOPSHIP: enforce the right labels in each event
         var projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
         if (projectId.isNullOrEmpty()) {
             projectId = EventRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN
