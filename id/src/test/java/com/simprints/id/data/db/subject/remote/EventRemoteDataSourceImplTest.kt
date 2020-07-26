@@ -27,7 +27,8 @@
 //import org.junit.Before
 //import org.junit.Test
 //import org.junit.runner.RunWith
-//TOFIX
+
+// StopShip: to fix once the event remote data source is sorted
 //@RunWith(AndroidJUnit4::class)
 //class EventRemoteDataSourceImplTest {
 //

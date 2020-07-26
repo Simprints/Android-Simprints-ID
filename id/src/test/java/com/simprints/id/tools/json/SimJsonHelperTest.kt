@@ -7,7 +7,8 @@
 //import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMovePayload
 //import com.simprints.id.data.db.event.remote.events.ApiEvent
 //import org.junit.Test
-//TOFIX
+
+// StopShip: to fix once the event remote data source is sorted
 //class SimJsonHelperTest {
 //
 //    companion object {

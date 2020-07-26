@@ -64,6 +64,7 @@ dependencies {
     implementation deps.androidx.security
     implementation deps.dagger.javax
     implementation deps.firebase.storage
+    implementation deps.klaxon.core
 
     api deps.playcore.core
     api deps.playcore.core_ktx

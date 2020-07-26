@@ -30,7 +30,8 @@
 //import org.junit.Test
 //import org.junit.runner.RunWith
 //import java.util.*
-//TOFIX
+
+// StopShip: to fix once the event remote data source is sorted
 //@RunWith(AndroidJUnit4::class)
 //@ExperimentalCoroutinesApi
 //class SubjectRepositoryUpSyncHelperImplTest {

@@ -1,16 +1,10 @@
 package com.simprints.id.data.db.event.remote.events.face
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.RECAPTURE
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureRetryEvent
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureRetryEvent.FaceCaptureRetryPayload
-import com.simprints.id.data.db.event.remote.events.ApiAlertScreenEvent.ApiAlertScreenPayload.ApiAlertScreenEventType
 import com.simprints.id.data.db.event.remote.events.ApiEvent
 import com.simprints.id.data.db.event.remote.events.ApiEventPayload
-import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.ALERT_SCREEN
 import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.FACE_CAPTURE_RETRY
 import com.simprints.id.data.db.event.remote.events.fromDomainToApi
 

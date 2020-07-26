@@ -3,7 +3,8 @@
 //import com.google.common.truth.Truth.assertThat
 //import com.simprints.id.data.db.event.domain.events.callback.ErrorCallbackEvent
 //import org.junit.Test
-// TOFIX
+
+// StopShip: to fix once the event remote data source is sorted
 //class ApiErrorCallbackTest {
 //
 //    @Test

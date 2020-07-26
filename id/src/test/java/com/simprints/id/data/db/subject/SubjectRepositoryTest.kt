@@ -36,7 +36,8 @@
 //import org.junit.runner.RunWith
 //import org.koin.core.context.stopKoin
 //import java.io.InputStream
-//TOFIX
+
+// StopShip: to fix once the event remote data source is sorted
 //@ExperimentalCoroutinesApi
 //@RunWith(AndroidJUnit4::class)
 //class SubjectRepositoryTest {

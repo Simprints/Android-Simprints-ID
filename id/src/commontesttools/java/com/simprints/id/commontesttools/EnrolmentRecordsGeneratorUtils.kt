@@ -6,6 +6,7 @@
 //import com.simprints.id.domain.modality.Modes
 //import java.util.*
 //
+// StopShip: it will get fixed when the event remote datasource gets fixed.
 //object EnrolmentRecordsGeneratorUtils {
 //    fun getRandomEnrolmentEvents(nEvents: Int,
 //                                 projectId: String,

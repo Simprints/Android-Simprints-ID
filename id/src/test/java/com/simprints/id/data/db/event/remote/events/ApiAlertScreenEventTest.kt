@@ -4,7 +4,8 @@
 //import com.simprints.id.data.db.event.domain.events.AlertScreenEvent
 //import com.simprints.id.data.db.event.remote.events.ApiAlertScreenEvent.ApiAlertScreenEvent.Companion.fromDomainToApi
 //import org.junit.Test
-// TOFIX
+
+// StopShip: to fix once the event remote data source is sorted
 //class ApiAlertScreenEventTest {
 //
 //    @Test
