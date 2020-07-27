@@ -34,7 +34,6 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
             withContext(Dispatchers.IO) {
                 closeAnyOpenSession()
                 roomDao.insertOrUpdate(event.fromDomainToDb())
-                event.id
             }.also {
                 Timber.d("Session created ${event.id}")
             }
@@ -84,6 +83,8 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
     override suspend fun insertOrUpdate(event: Event) =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
+
+                // For any new event, deviceId and projectId labels are added
                 event.labels = event.labels.appendLabelsForAllEvents()
                 roomDao.insertOrUpdate(event.fromDomainToDb())
             }
@@ -98,6 +99,7 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
                     it.validate(currentSessionsEvents, event)
                 }
 
+                // a sessionId label is added along with device and projectId labels
                 event.labels = event.labels.appendLabelsForAllEvents().appendSessionId(currentSession.id)
                 roomDao.insertOrUpdate(event.fromDomainToDb())
             }
