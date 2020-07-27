@@ -2,8 +2,10 @@ package com.simprints.id.activities.settings.fragments.moduleselection
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.model.Module
+import kotlinx.coroutines.launch
 
 class ModuleViewModel(private val repository: ModuleRepository) : ViewModel() {
 
@@ -16,7 +18,9 @@ class ModuleViewModel(private val repository: ModuleRepository) : ViewModel() {
     }
 
     fun saveModules(modules: List<Module>) {
-        repository.saveModules(modules)
+        viewModelScope.launch {
+            repository.saveModules(modules)
+        }
     }
 
     fun resetModules() {
