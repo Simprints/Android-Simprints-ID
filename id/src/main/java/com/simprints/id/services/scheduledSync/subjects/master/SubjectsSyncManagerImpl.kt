@@ -23,7 +23,7 @@ class SubjectsSyncManagerImpl(private val ctx: Context,
                               private val subjectsSyncCache: SubjectsSyncCache) : SubjectsSyncManager {
 
     companion object {
-        const val SYNC_REPEAT_INTERVAL = BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL
+        const val SYNC_REPEAT_INTERVAL = BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL_MINUTES
         val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
     }
 
