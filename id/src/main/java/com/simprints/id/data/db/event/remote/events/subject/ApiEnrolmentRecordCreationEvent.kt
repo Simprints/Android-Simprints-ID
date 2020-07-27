@@ -3,10 +3,12 @@ package com.simprints.id.data.db.event.remote.events.subject
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
+import com.simprints.id.data.db.event.domain.models.subject.fromApiToDomain
 import com.simprints.id.data.db.event.remote.events.ApiEvent
 import com.simprints.id.data.db.event.remote.events.ApiEventPayload
 import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType
 import com.simprints.id.data.db.event.remote.events.fromDomainToApi
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationEvent.ApiEnrolmentRecordCreationPayload
 
 @Keep
 class ApiEnrolmentRecordCreationEvent(domainEvent: EnrolmentRecordCreationEvent) :
@@ -31,6 +33,17 @@ class ApiEnrolmentRecordCreationEvent(domainEvent: EnrolmentRecordCreationEvent)
                 payload.attendantId, payload.biometricReferences.map { it.fromDomainToApi() })
     }
 }
+
+fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() =
+    EnrolmentRecordCreationPayload(
+        createdAt ?: 0,
+        version,
+        subjectId,
+        projectId,
+        moduleId,
+        attendantId,
+        biometricReferences?.map { it.fromApiToDomain() } ?: emptyList()
+    )
 
 /* For GDPR, we might have to remove biometric references for some creation events,
 which would mean that we would get a response from the backend without biometric references,

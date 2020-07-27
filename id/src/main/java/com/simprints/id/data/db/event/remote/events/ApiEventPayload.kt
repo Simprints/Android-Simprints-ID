@@ -80,8 +80,8 @@ import com.simprints.id.data.db.event.remote.session.ApiSessionCapture.ApiSessio
 @Keep
 abstract class ApiEventPayload(
     val type: ApiEventPayloadType,
-    val version: Int, //TODO: "relativeStartTime" to change
-    val createdAt: Long
+    val version: Int,
+    val createdAt: Long?
 )
 
 fun EventPayload.fromDomainToApi(): ApiEventPayload =

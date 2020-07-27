@@ -2,28 +2,38 @@ package com.simprints.id.data.db.event.remote.events
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabels
-import okhttp3.internal.toImmutableMap
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
+import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.*
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationEvent.ApiEnrolmentRecordCreationPayload
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionEvent.ApiEnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMoveEvent.ApiEnrolmentRecordMovePayload
+import com.simprints.id.data.db.event.remote.events.subject.fromApiToDomain
 
 @Keep
 class ApiEvents(val events: List<ApiEvent>)
 
 @Keep
 open class ApiEvent(val id: String,
-                    val labels: Map<String, List<String>>,
+                    val labels: ApiEventLabels,
                     val payload: ApiEventPayload)
-
-fun EventLabels.fromDomainToApi(): Map<String, List<String>> {
-    val api = mutableMapOf<String, List<String>>()
-    projectId?.let { api.put("projectId", listOf(it)) }
-    subjectId?.let { api.put("subjectId", listOf(it)) }
-    attendantId?.let { api.put("attendantId", listOf(it)) }
-    moduleIds?.let { api.put("moduleIds", it) }
-    mode?.let { api.put("mode", it.map { it.name }) }
-    sessionId?.let { api.put("sessionId", listOf(it)) }
-    deviceId?.let { api.put("deviceId", listOf(it)) }
-    return api.toImmutableMap()
-}
 
 fun Event.fromDomainToApi() =
     ApiEvent(id, labels.fromDomainToApi(), payload.fromDomainToApi())
+
+fun ApiEvent.fromApiToDomain() =
+    when (payload.type) {
+        ENROLMENT_RECORD_CREATION -> EnrolmentRecordCreationEvent(id, labels.fromApiToDomain(), (payload as ApiEnrolmentRecordCreationPayload).fromApiToDomain(), payload.type.fromApiToDomain())
+        ENROLMENT_RECORD_DELETION -> EnrolmentRecordDeletionEvent(id, labels.fromApiToDomain(), (payload as ApiEnrolmentRecordDeletionPayload).fromApiToDomain(), payload.type.fromApiToDomain())
+        ENROLMENT_RECORD_MOVE -> EnrolmentRecordMoveEvent(id, labels.fromApiToDomain(), (payload as ApiEnrolmentRecordMovePayload).fromApiToDomain(), payload.type.fromApiToDomain())
+        CALLOUT, CALLBACK, ARTIFICIAL_TERMINATION,
+        AUTHENTICATION, CONSENT, ENROLMENT, AUTHORIZATION,
+        FINGERPRINT_CAPTURE, ONE_TO_ONE_MATCH, ONE_TO_MANY_MATCH,
+        PERSON_CREATION, ALERT_SCREEN, GUID_SELECTION, CONNECTIVITY_SNAPSHOT,
+        REFUSAL, CANDIDATE_READ, SCANNER_CONNECTION, VERO_2_INFO_SNAPSHOT,
+        SCANNER_FIRMWARE_UPDATE, INVALID_INTENT, SUSPICIOUS_INTENT,
+        INTENT_PARSING, COMPLETION_CHECK, SESSION_CAPTURE,
+        FACE_ONBOARDING_COMPLETE, FACE_FALLBACK_CAPTURE, FACE_CAPTURE,
+        FACE_CAPTURE_CONFIRMATION, FACE_CAPTURE_RETRY -> throw UnsupportedOperationException("Impossible to convert ${payload.type} fromApiToDomain")
+    }
