@@ -11,7 +11,7 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDelet
 import java.util.*
 
 @Keep
-class EnrolmentRecordMoveEvent(
+data class EnrolmentRecordMoveEvent(
         override val id: String = UUID.randomUUID().toString(),
         override var labels: EventLabels,
         override val payload: EnrolmentRecordMovePayload,
@@ -29,9 +29,9 @@ class EnrolmentRecordMoveEvent(
         EnrolmentRecordMovePayload(createdAt, DEFAULT_EVENT_VERSION, enrolmentRecordCreation, enrolmentRecordDeletion),
         ENROLMENT_RECORD_MOVE)
 
-    class EnrolmentRecordMovePayload(
-        createdAt: Long,
-        eventVersion: Int,
+    data class EnrolmentRecordMovePayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
         val enrolmentRecordCreation: EnrolmentRecordCreationPayload?,
         val enrolmentRecordDeletion: EnrolmentRecordDeletionPayload
     ) : EventPayload(ENROLMENT_RECORD_MOVE, eventVersion, createdAt)

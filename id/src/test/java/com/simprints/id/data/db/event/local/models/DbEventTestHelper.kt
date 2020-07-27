@@ -39,7 +39,11 @@ import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.Location
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.models.subject.*
+import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
+import com.simprints.id.domain.modality.Modes.FACE
+import com.simprints.id.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
 import com.simprints.id.orchestrator.SOME_GUID1
 import com.simprints.id.orchestrator.SOME_GUID2
@@ -107,6 +111,19 @@ fun createSessionCaptureEvent(): SessionCaptureEvent {
         Location(0.0, 0.0)
     )
 }
+
+
+private fun buildFakeBiometricReferences(): List<BiometricReference> {
+    val fingerprintReference = FingerprintReference(listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
+    val faceReference = FaceReference(listOf(FaceTemplate("some_template")))
+    return listOf(fingerprintReference, faceReference)
+}
+
+fun createEnrolmentRecordCreationEvent() = EnrolmentRecordCreationEvent(CREATED_AT, SOME_GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(), eventLabels)
+
+fun createEnrolmentRecordDeletionEvent() = EnrolmentRecordDeletionEvent(CREATED_AT, SOME_GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, eventLabels)
+
+fun createEnrolmentRecordMoveEvent() = EnrolmentRecordMoveEvent(CREATED_AT, createEnrolmentRecordCreationEvent().payload, createEnrolmentRecordDeletionEvent().payload, eventLabels)
 
 fun createAlertScreenEvent() = AlertScreenEvent(CREATED_AT, BLUETOOTH_NOT_ENABLED, eventLabels)
 

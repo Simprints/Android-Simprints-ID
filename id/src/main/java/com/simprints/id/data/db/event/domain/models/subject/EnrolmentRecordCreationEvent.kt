@@ -10,7 +10,7 @@ import com.simprints.id.domain.modality.Modes
 import java.util.*
 
 @Keep
-class EnrolmentRecordCreationEvent(
+data class EnrolmentRecordCreationEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: EnrolmentRecordCreationPayload,
@@ -32,16 +32,15 @@ class EnrolmentRecordCreationEvent(
         EnrolmentRecordCreationPayload(createdAt, EVENT_VERSION, subjectId, projectId, moduleId, attendantId, biometricReferences),
         ENROLMENT_RECORD_CREATION)
 
-    class EnrolmentRecordCreationPayload(
-        createdAt: Long,
-        eventVersion: Int,
+    data class EnrolmentRecordCreationPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
         val subjectId: String,
         val projectId: String,
         val moduleId: String,
         val attendantId: String,
         val biometricReferences: List<BiometricReference>
     ) : EventPayload(ENROLMENT_RECORD_CREATION, eventVersion, createdAt)
-// startTime and relativeStartTime are not used for Pokodex events
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_D
 import java.util.*
 
 @Keep
-class EnrolmentRecordDeletionEvent(
+data class EnrolmentRecordDeletionEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: EnrolmentRecordDeletionPayload,
@@ -29,9 +29,9 @@ class EnrolmentRecordDeletionEvent(
         EnrolmentRecordDeletionPayload(createdAt, EVENT_VERSION, subjectId, projectId, moduleId, attendantId),
         ENROLMENT_RECORD_DELETION)
 
-    class EnrolmentRecordDeletionPayload(
-        createdAt: Long,
-        eventVersion: Int,
+    data class EnrolmentRecordDeletionPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
         val subjectId: String,
         val projectId: String,
         val moduleId: String,
