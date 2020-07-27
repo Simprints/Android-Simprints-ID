@@ -9,6 +9,7 @@ import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType
 import com.simprints.id.data.db.event.remote.events.fromDomainToApi
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationEvent.ApiEnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionEvent.ApiEnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMoveEvent.ApiEnrolmentRecordMovePayload
 
 @io.realm.internal.Keep
 class ApiEnrolmentRecordMoveEvent(domainEvent: EnrolmentRecordMoveEvent) :
@@ -32,3 +33,11 @@ class ApiEnrolmentRecordMoveEvent(domainEvent: EnrolmentRecordMoveEvent) :
             payload.enrolmentRecordDeletion.fromDomainToApi() as ApiEnrolmentRecordDeletionPayload)
     }
 }
+
+fun ApiEnrolmentRecordMovePayload.fromApiToDomain() =
+    EnrolmentRecordMovePayload(
+        createdAt ?: 0,
+        version,
+        enrolmentRecordCreation?.fromApiToDomain(),
+        enrolmentRecordDeletion.fromApiToDomain()
+    )
