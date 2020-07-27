@@ -3,6 +3,7 @@ package com.simprints.id.services.scheduledSync.subjects.master
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
+import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
 import com.simprints.id.services.scheduledSync.subjects.common.*
@@ -22,7 +23,7 @@ class SubjectsSyncManagerImpl(private val ctx: Context,
                               private val subjectsSyncCache: SubjectsSyncCache) : SubjectsSyncManager {
 
     companion object {
-        const val SYNC_REPEAT_INTERVAL = 60L
+        const val SYNC_REPEAT_INTERVAL = BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL_MINUTES
         val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
     }
 
