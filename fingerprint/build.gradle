@@ -24,10 +24,16 @@ android {
     buildTypes {
         release {
             proguardFiles 'proguard-rules-dynamic-features.pro'
+            buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "1440L")
         }
 
         staging {
             initWith release
+            buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
+        }
+
+        debug {
+            buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
         }
     }
 
