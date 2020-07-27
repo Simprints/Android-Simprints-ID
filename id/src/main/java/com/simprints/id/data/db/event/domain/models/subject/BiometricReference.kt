@@ -1,9 +1,11 @@
 package com.simprints.id.data.db.event.domain.models.subject
 
+import com.beust.klaxon.TypeFor
 import com.simprints.id.data.db.event.remote.events.subject.ApiBiometricReference
 import com.simprints.id.data.db.event.remote.events.subject.ApiFaceReference
 import com.simprints.id.data.db.event.remote.events.subject.ApiFingerprintReference
 
+@TypeFor(field = "type", adapter = BiometricReferenceTypeAdapter::class)
 sealed class BiometricReference(val type: BiometricReferenceType)
 
 data class FaceReference(val templates: List<FaceTemplate>,

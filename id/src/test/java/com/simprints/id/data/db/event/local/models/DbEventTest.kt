@@ -141,6 +141,30 @@ class DbEventTest {
     }
 
     @Test
+    fun convert_EnrolmentRecordCreationEvent() {
+        val original = createEnrolmentRecordCreationEvent()
+        val transformed = (original.fromDomainToDb().fromDbToDomain())
+
+        assertThat(original).isEqualTo(transformed)
+    }
+
+    @Test
+    fun convert_EnrolmentRecordDeletionEvent() {
+        val original = createEnrolmentRecordDeletionEvent()
+        val transformed = (original.fromDomainToDb().fromDbToDomain())
+
+        assertThat(original).isEqualTo(transformed)
+    }
+
+    @Test
+    fun convert_EnrolmentRecordMoveEvent() {
+        val original = createEnrolmentRecordMoveEvent()
+        val transformed = (original.fromDomainToDb().fromDbToDomain())
+
+        assertThat(original).isEqualTo(transformed)
+    }
+
+    @Test
     fun convert_AlertScreenEvent() {
         val original = createAlertScreenEvent()
         val transformed = original.fromDomainToDb().fromDbToDomain()
