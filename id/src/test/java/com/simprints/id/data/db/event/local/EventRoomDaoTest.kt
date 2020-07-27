@@ -31,7 +31,7 @@ import org.junit.runner.RunWith
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-class DbEventRoomDaoTest {
+class EventRoomDaoTest {
 
     val event = DbEvent(SOME_GUID1,
         EventLabels(
@@ -46,7 +46,7 @@ class DbEventRoomDaoTest {
         SESSION_CAPTURE, "", CREATED_AT, ENDED_AT)
 
     private lateinit var db: EventRoomDatabase
-    private lateinit var eventDao: DbEventRoomDao
+    private lateinit var eventDao: EventRoomDao
 
     @RelaxedMockK lateinit var timeHelper: TimeHelper
 

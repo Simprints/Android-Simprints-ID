@@ -7,14 +7,14 @@ import net.sqlcipher.database.SQLiteDatabase.getBytes
 import net.sqlcipher.database.SupportFactory
 import timber.log.Timber
 
-interface DbEventDatabaseFactory {
+interface EventDatabaseFactory {
     fun build(): EventRoomDatabase
 }
 
 class DbEventDatabaseFactoryImpl(
     val ctx: Context,
     private val secureLocalDbKeyProvider: SecureLocalDbKeyProvider
-) : DbEventDatabaseFactory {
+) : EventDatabaseFactory {
 
     @OptIn(ExperimentalStdlibApi::class)
     override fun build(): EventRoomDatabase {

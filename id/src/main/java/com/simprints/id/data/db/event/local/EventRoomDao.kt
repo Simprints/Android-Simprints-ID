@@ -8,14 +8,8 @@ import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.local.models.DbEvent
 
 @Dao
-interface DbEventRoomDao {
-
-    @Query("""
-        select * from DbEvent where
-        (:id IS id)
-        """)
-    suspend fun loadById(id: String? = null): List<DbEvent>
-
+interface EventRoomDao {
+    
     @Query("""
         select * from DbEvent where
         (:id IS NULL OR :id = id) AND
