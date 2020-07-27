@@ -41,11 +41,11 @@ import java.io.IOException
 class EventLocalDataSourceImplTest {
 
     private lateinit var db: EventRoomDatabase
-    private lateinit var eventDao: DbEventRoomDao
+    private lateinit var eventDao: EventRoomDao
     private lateinit var eventLocalDataSource: EventLocalDataSource
 
     @RelaxedMockK lateinit var timeHelper: TimeHelper
-    @RelaxedMockK lateinit var dbEventDatabaseFactory: DbEventDatabaseFactory
+    @RelaxedMockK lateinit var eventDatabaseFactory: EventDatabaseFactory
     @RelaxedMockK lateinit var loginInfoManager: LoginInfoManager
     lateinit var validators: Array<EventValidator>
 
@@ -58,9 +58,9 @@ class EventLocalDataSourceImplTest {
         validators = arrayOf(mockk(), mockk())
 
         eventDao = db.eventDao
-        every { dbEventDatabaseFactory.build() } returns db
+        every { eventDatabaseFactory.build() } returns db
         every { timeHelper.now() } returns NOW
-        eventLocalDataSource = EventLocalDataSourceImpl(dbEventDatabaseFactory, loginInfoManager, DEVICE_ID, timeHelper, validators)
+        eventLocalDataSource = EventLocalDataSourceImpl(eventDatabaseFactory, loginInfoManager, DEVICE_ID, timeHelper, validators)
     }
 
     @Test
@@ -112,7 +112,7 @@ class EventLocalDataSourceImplTest {
     fun loadWithAQuery() {
         runBlocking {
             mockDaoLoadToMakeNothing()
-            eventLocalDataSource = EventLocalDataSourceImpl(dbEventDatabaseFactory, loginInfoManager, DEVICE_ID, timeHelper, emptyArray())
+            eventLocalDataSource = EventLocalDataSourceImpl(eventDatabaseFactory, loginInfoManager, DEVICE_ID, timeHelper, emptyArray())
             val eventQuery = createCompleteEventQuery()
 
             eventLocalDataSource.load(eventQuery)
@@ -127,7 +127,7 @@ class EventLocalDataSourceImplTest {
     fun countWithAQuery() {
         runBlocking {
             mockDaoLoadToMakeNothing()
-            eventLocalDataSource = EventLocalDataSourceImpl(dbEventDatabaseFactory, loginInfoManager, DEVICE_ID, timeHelper, emptyArray())
+            eventLocalDataSource = EventLocalDataSourceImpl(eventDatabaseFactory, loginInfoManager, DEVICE_ID, timeHelper, emptyArray())
             val eventQuery = createCompleteEventQuery()
 
             eventLocalDataSource.count(eventQuery)
@@ -144,7 +144,7 @@ class EventLocalDataSourceImplTest {
         runBlocking {
             mockDaoLoadToMakeNothing()
             mockNotSignedId()
-            eventLocalDataSource = EventLocalDataSourceImpl(dbEventDatabaseFactory, loginInfoManager, DEVICE_ID, timeHelper, emptyArray())
+            eventLocalDataSource = EventLocalDataSourceImpl(eventDatabaseFactory, loginInfoManager, DEVICE_ID, timeHelper, emptyArray())
             val eventQuery = createCompleteEventQuery()
 
             eventLocalDataSource.delete(eventQuery)
@@ -232,11 +232,11 @@ class EventLocalDataSourceImplTest {
     private fun mockDaoLoadToMakeNothing() {
         db = mockk(relaxed = true)
         eventDao = mockk(relaxed = true)
-        dbEventDatabaseFactory = mockk(relaxed = true)
+        eventDatabaseFactory = mockk(relaxed = true)
         coEvery { eventDao.load(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()) } returns emptyList()
         coEvery { eventDao.count(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()) } returns 0
         every { db.eventDao } returns eventDao
-        every { dbEventDatabaseFactory.build() } returns db
+        every { eventDatabaseFactory.build() } returns db
     }
 
     @After

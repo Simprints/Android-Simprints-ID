@@ -27,7 +27,7 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilder
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilderImpl
-import com.simprints.id.data.db.event.local.DbEventDatabaseFactory
+import com.simprints.id.data.db.event.local.EventDatabaseFactory
 import com.simprints.id.data.db.event.local.DbEventDatabaseFactoryImpl
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.EventLocalDataSourceImpl
@@ -198,7 +198,7 @@ open class AppModule {
 
     @Provides
     open fun provideDbEventDatabaseFactory(ctx: Context,
-                                            secureDataManager: SecureLocalDbKeyProvider): DbEventDatabaseFactory =
+                                            secureDataManager: SecureLocalDbKeyProvider): EventDatabaseFactory =
         DbEventDatabaseFactoryImpl(ctx, secureDataManager)
 
     @Provides
@@ -207,11 +207,11 @@ open class AppModule {
         ctx: Context,
         secureDataManager: SecureLocalDbKeyProvider,
         timeHelper: TimeHelper,
-        dbFactory: DbEventDatabaseFactory,
+        factory: EventDatabaseFactory,
         sessionEventValidatorsBuilder: SessionEventValidatorsBuilder,
         loginInfoManager: LoginInfoManager
     ): EventLocalDataSource =
-        EventLocalDataSourceImpl(dbFactory, loginInfoManager, ctx.deviceId, timeHelper, sessionEventValidatorsBuilder.build())
+        EventLocalDataSourceImpl(factory, loginInfoManager, ctx.deviceId, timeHelper, sessionEventValidatorsBuilder.build())
 
     @Provides
     @Singleton

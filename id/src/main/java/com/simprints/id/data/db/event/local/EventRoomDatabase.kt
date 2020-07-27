@@ -13,7 +13,7 @@ import com.simprints.id.data.db.event.local.models.DbEvent
 @Keep
 abstract class EventRoomDatabase : RoomDatabase() {
 
-    abstract val eventDao: DbEventRoomDao
+    abstract val eventDao: EventRoomDao
 
     companion object {
         private const val ROOM_DB_NAME = "events_room_db"

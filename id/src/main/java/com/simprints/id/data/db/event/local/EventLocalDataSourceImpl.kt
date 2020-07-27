@@ -19,14 +19,14 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-open class EventLocalDataSourceImpl(private val dbEventDatabaseFactory: DbEventDatabaseFactory,
+open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatabaseFactory,
                                     private val loginInfoManager: LoginInfoManager,
                                     private val deviceId: String,
                                     private val timeHelper: TimeHelper,
                                     private val eventsValidators: Array<EventValidator>) : EventLocalDataSource {
 
     private val roomDao by lazy {
-        dbEventDatabaseFactory.build().eventDao
+        eventDatabaseFactory.build().eventDao
     }
 
     override suspend fun create(event: SessionCaptureEvent) {

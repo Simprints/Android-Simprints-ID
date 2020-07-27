@@ -14,7 +14,7 @@ import kotlin.reflect.KClass
 
 class EventAdapter : TypeAdapter<Event> {
     override fun classFor(type: Any): KClass<out Event> {
-        return when (EventType.valueOf(type as String)) {
+        return when (valueOf(type as String)) {
             SESSION_CAPTURE -> SessionCaptureEvent::class
             ENROLMENT_RECORD_CREATION -> EnrolmentRecordCreationEvent::class
             ENROLMENT_RECORD_DELETION -> EnrolmentRecordDeletionEvent::class
