@@ -75,7 +75,7 @@ class SubjectRepositoryUpSyncHelperImpl(
     private fun createEventFromPerson(subject: Subject): Event =
         with(subject) {
             Event(
-                getRandomUuid(),
+                subjectId,
                 listOf(projectId),
                 listOf(subjectId),
                 listOf(attendantId),
