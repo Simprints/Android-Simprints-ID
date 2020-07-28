@@ -1,13 +1,19 @@
-//package com.simprints.id.data.db.event.remote.events
-//
-//import com.google.common.truth.Truth.assertThat
-//import com.simprints.id.data.db.event.domain.events.AlertScreenEvent
-//import com.simprints.id.data.db.event.remote.events.ApiAlertScreenEvent.ApiAlertScreenEvent.Companion.fromDomainToApi
-//import org.junit.Test
+package com.simprints.id.data.db.event.remote.events
 
-// StopShip: to fix once the event remote data source is sorted
-//class ApiAlertScreenEventTest {
-//
+import com.google.common.truth.Truth.assertThat
+import com.simprints.id.data.db.event.local.models.createAlertScreenEvent
+import org.junit.Test
+
+class ApiAlertScreenEventTest {
+
+    @Test
+    fun convert_AlertScreenEvent() {
+        val original = createAlertScreenEvent()
+        val transformed = original.fromDomainToApi().fromApiToDomain()
+
+        assertThat(original).isEqualTo(transformed)
+    }
+
 //    @Test
 //    fun differentProjectId_fromDomainToApi() {
 //        val domain = AlertScreenEvent.AlertScreenEventType.DIFFERENT_PROJECT_ID
@@ -167,5 +173,5 @@
 //
 //        assertThat(fromDomainToApi(domain)).isEqualTo(api)
 //    }
-//
-//}
+
+}

@@ -53,7 +53,7 @@
 //        projectId = projectId,
 //        moduleId = moduleId,
 //        attendantId = userId,
-//        biometricReferences = buildFakeBiometricReferences()
+//        biometricReferences = DEVICE_ID_LABEL_KEY()
 //    )
 //
 //    private fun buildFakeBiometricReferences(): List<BiometricReference> {

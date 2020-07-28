@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.simprints.id.data.db.event.domain.models.EventType
-import com.simprints.id.data.db.event.remote.events.ApiAlertScreenEvent.ApiAlertScreenPayload
+import com.simprints.id.data.db.event.remote.events.ApiAlertScreen.ApiAlertScreenPayload
 import com.simprints.id.data.db.event.remote.events.ApiArtificialTerminationEvent.ApiArtificialTerminationPayload
 import com.simprints.id.data.db.event.remote.events.ApiAuthenticationEvent.ApiAuthenticationPayload
 import com.simprints.id.data.db.event.remote.events.ApiRefusalEvent.ApiRefusalPayload
