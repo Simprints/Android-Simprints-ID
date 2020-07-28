@@ -75,7 +75,7 @@ class SubjectRepositoryUpSyncHelperImpl(
     private fun createEventFromPerson(subject: Subject): Event =
         with(subject) {
             Event(
-                getRandomUuid(),
+                subjectId,
                 listOf(projectId),
                 listOf(subjectId),
                 listOf(attendantId),
@@ -84,8 +84,6 @@ class SubjectRepositoryUpSyncHelperImpl(
                 createPayload(subject)
             )
         }
-
-    internal fun getRandomUuid() = UUID.randomUUID().toString()
 
     private fun createPayload(subject: Subject) =
         EnrolmentRecordCreationPayload(
