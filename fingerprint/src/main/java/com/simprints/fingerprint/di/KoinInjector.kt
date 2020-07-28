@@ -18,8 +18,6 @@ import com.simprints.fingerprint.activities.refusal.RefusalContract
 import com.simprints.fingerprint.activities.refusal.RefusalPresenter
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManagerImpl
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelperImpl
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManagerImpl
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -66,12 +64,27 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import java.util.concurrent.atomic.AtomicInteger
 
+/**
+ * Consider this flow:
+ * - consumers starts at 0
+ * - Setup callout: OrchestratorActivity.onCreate() , Koin modules created, consumers + 1 → 1 (The Koin modules are now loaded)
+ * - Then, Normal callout (e.g. match) begins before previous on destroy: OrchestratorActivity.onCreate(), consumers + 1 → 2
+ * - Setup callout now destroys shortly after like you described: OrchestratorActivity.onDestroy(), consumers - 1 → 1 (Koin modules still loaded)
+ * - Normal callout finishes as usual after the work is done: OrchestratorActivity.onDestroy(), consumers - 1 → 0 (the Koin modules are now unloaded)
+ *
+ * This means we don’t need to worry about this mis-ordering during the flow - the unload only happens when the counter reaches 0.
+ * If you call `acquire…` and `release…` every activity, this is additionally helpful for situations where the Orchestrator
+ * activity is destroyed while it’s in the background because of low memory.
+ */
 object KoinInjector {
 
     private val consumers = AtomicInteger(0)
 
     private var koinModule: Module? = null
 
+    /**
+     * Call this on the first point of contact of your modality (usually onCreate() of OrchestratorActivity)
+     */
     fun acquireFingerprintKoinModules() {
         consumers.incrementAndGet()
         if (koinModule == null) {
@@ -81,6 +94,9 @@ object KoinInjector {
         }
     }
 
+    /**
+     * Call this on the last point of contact of your modality, usually onDestroy()
+     */
     fun releaseFingerprintKoinModules() {
         if (consumers.decrementAndGet() == 0) {
             koinModule?.let {
@@ -99,13 +115,12 @@ object KoinInjector {
 
 
     private fun Module.defineBuildersForFingerprintManagers() {
-        factory<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
+        single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
         factory<FingerprintAnalyticsManager> { FingerprintAnalyticsManagerImpl(get()) }
         factory<FingerprintSessionEventsManager> { FingerprintSessionEventsManagerImpl(get()) }
         factory<FingerprintCrashReportManager> { FingerprintCrashReportManagerImpl(get()) }
         factory<FingerprintTimeHelper> { FingerprintTimeHelperImpl(get()) }
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
-        factory<FingerprintAndroidResourcesHelper> { FingerprintAndroidResourcesHelperImpl(get()) }
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
         factory<FingerprintImageManager> { FingerprintImageManagerImpl(get(), get()) }
         factory<FingerprintApiClientFactory> { FingerprintApiClientFactoryImpl(get()) }
@@ -124,13 +139,27 @@ object KoinInjector {
 
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
-        single { ScannerPairingManager(get()) }
+        single { ScannerPairingManager(get(), get(), get(), get()) }
         single { ScannerInitialSetupHelper(get(), get(), get()) }
         single { ConnectionHelper(get()) }
         single { CypressOtaHelper(get(), get()) }
         single { StmOtaHelper(get(), get()) }
         single { Un20OtaHelper(get(), get()) }
-        single<ScannerFactory> { ScannerFactoryImpl(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+        single<ScannerFactory> {
+            ScannerFactoryImpl(
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get()
+            )
+        }
         single<ScannerManager> { ScannerManagerImpl(get(), get(), get(), get()) }
 
         single<ComponentNfcAdapter> { AndroidNfcAdapter(NfcAdapter.getDefaultAdapter(get())) }
@@ -151,7 +180,7 @@ object KoinInjector {
         }
 
         viewModel { OrchestratorViewModel(get(), get(), get()) }
-        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel { CollectFingerprintsViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }

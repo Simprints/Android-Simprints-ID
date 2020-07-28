@@ -8,17 +8,21 @@ import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPoolType as CoreMatchPoolType
 
 @Keep
-class OneToManyMatchEvent(starTime: Long,
-                          endTime: Long,
-                          val query: Serializable,
-                          val count: Int,
-                          val result: List<MatchEntry>?) : Event(EventType.ONE_TO_MANY_MATCH, starTime, endTime)
+class OneToManyMatchEvent(
+    startTime: Long,
+    endTime: Long,
+    val query: Serializable,
+    val count: Int,
+    val matcher: Matcher,
+    val result: List<MatchEntry>?
+) : Event(EventType.ONE_TO_MANY_MATCH, startTime, endTime)
 
 fun OneToManyMatchEvent.fromDomainToCore() =
     CoreOneToManyMatchEvent(
         startTime,
         endTime,
         (query as SubjectLocalDataSource.Query).asCoreMatchPool(count),
+        matcher.fromDomainToCore(),
         result?.map { it.fromDomainToCore() }
     )
 

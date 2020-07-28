@@ -1,43 +1,50 @@
 package com.simprints.face.capture.confirmation
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
-import com.simprints.face.controllers.core.androidResources.FaceAndroidResourcesHelper
+import com.simprints.face.controllers.core.events.FaceSessionEventsManager
+import com.simprints.face.controllers.core.events.model.FaceCaptureConfirmationEvent
+import com.simprints.face.controllers.core.events.model.FaceCaptureConfirmationEvent.Result.CONTINUE
+import com.simprints.face.controllers.core.events.model.FaceCaptureConfirmationEvent.Result.RECAPTURE
+import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import kotlinx.android.synthetic.main.fragment_confirmation.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class ConfirmationFragment : Fragment() {
+class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
 
     private val mainVM: FaceCaptureViewModel by sharedViewModel()
-    private val androidResourcesHelper: FaceAndroidResourcesHelper by inject()
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_confirmation, container, false)
+    private val faceSessionEventsManager: FaceSessionEventsManager by inject()
+    private val faceTimeHelper: FaceTimeHelper by inject()
+    private val startTime = faceTimeHelper.now()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
-    }
-
-    private fun setTextInLayout() {
-        with(androidResourcesHelper) {
-            face_confirm_title.text = getString(R.string.title_confirmation)
-            confirmation_txt.text = getString(R.string.captured_successfully)
-            confirmation_btn.text = getString(R.string.btn_finish)
+        confirmation_img.setImageBitmap(mainVM.faceDetections.first().frame.toBitmap())
+        confirmation_btn.setOnClickListener {
+            sendConfirmationEvent(CONTINUE)
+            mainVM.flowFinished()
+        }
+        recapture_btn.setOnClickListener {
+            sendConfirmationEvent(RECAPTURE)
+            mainVM.recapture()
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        confirmation_img.setImageBitmap(mainVM.faceDetections.value?.first()?.frame?.toBitmap())
-        confirmation_btn.setOnClickListener { mainVM.flowFinished() }
+    private fun setTextInLayout() {
+        face_confirm_title.text = getString(R.string.title_confirmation)
+        confirmation_txt.text = getString(R.string.captured_successfully)
+        recapture_btn.text = getString(R.string.btn_recapture)
+        confirmation_btn.text = getString(R.string.btn_finish)
+    }
+
+    private fun sendConfirmationEvent(result: FaceCaptureConfirmationEvent.Result) {
+        faceSessionEventsManager.addEventInBackground(
+            FaceCaptureConfirmationEvent(startTime, faceTimeHelper.now(), result)
+        )
     }
 }

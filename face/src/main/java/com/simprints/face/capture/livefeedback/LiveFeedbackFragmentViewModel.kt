@@ -7,6 +7,9 @@ import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.tools.extentions.area
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
+import com.simprints.face.controllers.core.events.FaceSessionEventsManager
+import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
+import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
@@ -16,20 +19,26 @@ import com.simprints.uicomponents.models.FloatRange
 import com.simprints.uicomponents.models.PreviewFrame
 import com.simprints.uicomponents.models.Size
 import kotlinx.coroutines.channels.Channel
+import java.util.concurrent.atomic.AtomicBoolean
 
 class LiveFeedbackFragmentViewModel(
     private val mainVM: FaceCaptureViewModel,
     private val faceDetector: FaceDetector,
     private val frameProcessor: FrameProcessor,
-    private val qualityThreshold: Float
+    private val qualityThreshold: Float,
+    private val faceSessionEventsManager: FaceSessionEventsManager,
+    private val faceTimeHelper: FaceTimeHelper
 ) : ViewModel() {
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
         SymmetricTarget(VALID_ROLL_DELTA),
         FloatRange(0.25f, 0.5f)
     )
+    private val fallbackCaptureEventStartTime = faceTimeHelper.now()
+    private var shouldSendFallbackCaptureEvent: AtomicBoolean = AtomicBoolean(true)
 
-    val captures = mutableListOf<FaceDetection>()
+    lateinit var fallbackCapture: FaceDetection
+    val userCaptures = mutableListOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
@@ -40,16 +49,24 @@ class LiveFeedbackFragmentViewModel(
         faceRectF: RectF,
         size: Size
     ) {
+        val captureStartTime = faceTimeHelper.now()
         val previewFrame = frameProcessor.previewFrameFrom(frame, faceRectF, size, false)
 
         val potentialFace = faceDetector.analyze(previewFrame)
 
         val faceDetection = getFaceDetectionFromPotentialFace(potentialFace, previewFrame)
+        faceDetection.detectionStartTime = captureStartTime
+        faceDetection.detectionEndTime = faceTimeHelper.now()
 
-        if (capturingState.value == CapturingState.CAPTURING) {
-            captures += faceDetection
-            if (captures.size == mainVM.samplesToCapture) {
-                finishCapture()
+        when (capturingState.value) {
+            CapturingState.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
+            CapturingState.CAPTURING -> {
+                userCaptures += faceDetection
+                if (userCaptures.size == mainVM.samplesToCapture) {
+                    finishCapture()
+                }
+            }
+            else -> {//no-op
             }
         }
 
@@ -64,21 +81,25 @@ class LiveFeedbackFragmentViewModel(
         frameChannel.offer(frame)
     }
 
+    /**
+     * If any of the user captures are good, use them. If not, use the fallback capture.
+     */
     private fun finishCapture() {
-        val sortedQualifyingCaptures = captures
+        val sortedQualifyingCaptures = userCaptures
             .filter { it.hasValidStatus() && it.isAboveQualityThreshold(qualityThreshold) }
             .sortedByDescending { it.face?.quality }
+            .ifEmpty { listOf(fallbackCapture) }
 
+        sendAllCaptureEvents()
+
+        capturingState.value = CapturingState.FINISHED
         mainVM.captureFinished(sortedQualifyingCaptures)
-
-        if (sortedQualifyingCaptures.isEmpty()) {
-            capturingState.value = CapturingState.FINISHED_FAILED
-        } else {
-            capturingState.value = CapturingState.FINISHED
-        }
     }
 
-    private fun getFaceDetectionFromPotentialFace(potentialFace: Face?, previewFrame: PreviewFrame): FaceDetection {
+    private fun getFaceDetectionFromPotentialFace(
+        potentialFace: Face?,
+        previewFrame: PreviewFrame
+    ): FaceDetection {
         return if (potentialFace == null) {
             FaceDetection(previewFrame, potentialFace, FaceDetection.Status.NOFACE)
         } else {
@@ -117,12 +138,49 @@ class LiveFeedbackFragmentViewModel(
         }
     }
 
+    /**
+     * While the user has not started the capture flow, we save fallback images. If the capture doesn't
+     * get any good images, at least one good image will be saved
+     */
+    private fun updateFallbackCaptureIfValid(faceDetection: FaceDetection) {
+        if (faceDetection.hasValidStatus()) {
+            fallbackCapture = faceDetection.apply { isFallback = true }
+            createFirstFallbackCaptureEvent(faceDetection)
+        }
+    }
+
+    /**
+     * Send a fallback capture event only once
+     */
+    private fun createFirstFallbackCaptureEvent(faceDetection: FaceDetection) {
+        if (shouldSendFallbackCaptureEvent.getAndSet(false)) {
+            faceSessionEventsManager.addEventInBackground(
+                FaceFallbackCaptureEvent(
+                    fallbackCaptureEventStartTime,
+                    faceDetection.detectionEndTime
+                )
+            )
+        }
+    }
+
+    private fun sendCaptureEvent(faceDetection: FaceDetection) {
+        val faceCaptureEvent =
+            faceDetection.toFaceCaptureEvent(mainVM.attemptNumber, qualityThreshold)
+
+        faceSessionEventsManager.addEventInBackground(faceCaptureEvent)
+
+        faceDetection.id = faceCaptureEvent.id
+    }
+
+    private fun sendAllCaptureEvents() {
+        userCaptures.forEach { sendCaptureEvent(it) }
+        sendCaptureEvent(fallbackCapture)
+    }
+
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED, FINISHED_FAILED }
 
     companion object {
         private const val VALID_ROLL_DELTA = 15f
         private const val VALID_YAW_DELTA = 30f
-
-        private const val READY_STATE_LAG_MS = 500
     }
 }

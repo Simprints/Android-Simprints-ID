@@ -3,25 +3,25 @@ package com.simprints.face.orchestrator
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.simprints.core.livedata.LiveDataEventObserver
+import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.extentions.showToast
-import com.simprints.core.tools.whenNonNull
-import com.simprints.core.tools.whenNull
+import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.face.OrchestratorGraphDirections
+import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureActivity
 import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException
-import com.simprints.face.models.RankOneInitializer
+import com.simprints.face.match.FaceMatchActivity
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class FaceOrchestratorActivity : AppCompatActivity() {
+class FaceOrchestratorActivity : BaseSplitActivity() {
     private val viewModel: FaceOrchestratorViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_orchestrator)
         KoinInjector.acquireFaceKoinModules()
 
         val iFaceRequest: IFaceRequest = this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
@@ -29,23 +29,7 @@ class FaceOrchestratorActivity : AppCompatActivity() {
 
         observeViewModel()
 
-        getRankOneLicense()
-            .whenNull { viewModel.missingLicense() }
-            .whenNonNull { tryInitWithLicense(this, iFaceRequest) }
-    }
-
-    private fun tryInitWithLicense(rankOneLicense: String, iFaceRequest: IFaceRequest) {
-        if (RankOneInitializer.tryInitWithLicense(this, rankOneLicense)) {
-            viewModel.start(iFaceRequest)
-        } else {
-            viewModel.invalidLicense()
-        }
-    }
-
-    private fun getRankOneLicense(): String? = try {
-        String(assets.open("ROC.lic").readBytes())
-    } catch (t: Throwable) {
-        null
+        viewModel.start(iFaceRequest)
     }
 
     override fun onDestroy() {
@@ -55,37 +39,37 @@ class FaceOrchestratorActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         viewModel.startCapture.observe(this, LiveDataEventWithContentObserver {
-            val intent = Intent(this, FaceCaptureActivity::class.java)
-            intent.putExtra(IFaceRequest.BUNDLE_KEY, it)
-            startActivityForResult(intent, CAPTURE_REQUEST)
+            startActivityForResult(FaceCaptureActivity.getStartingIntent(this, it), CAPTURE_REQUEST)
         })
         viewModel.flowFinished.observe(this, LiveDataEventWithContentObserver {
             val intent = Intent().putExtra(IFaceResponse.BUNDLE_KEY, it)
             setResult(Activity.RESULT_OK, intent)
             finish()
         })
-        viewModel.startMatching.observe(this, LiveDataEventObserver {
-            viewModel.matchFinished()
+        viewModel.startMatching.observe(this, LiveDataEventWithContentObserver {
+            startActivityForResult(FaceMatchActivity.getStartingIntent(this, it), MATCH_REQUEST)
         })
-        viewModel.missingLicenseEvent.observe(this, LiveDataEventObserver {
-            // TODO: this is temporary, should route user the an error screen
-            showToast("RankOne license is missing")
-            setResult(Activity.RESULT_CANCELED)
-            finish()
+        viewModel.errorEvent.observe(this, LiveDataEventWithContentObserver {
+            findNavController(R.id.orchestrator_host_fragment)
+                .navigate(OrchestratorGraphDirections.actionGlobalErrorFragment(it))
         })
-        viewModel.invalidLicenseEvent.observe(this, LiveDataEventObserver {
-            // TODO: this is temporary, should route user the an error screen
-            showToast("RankOne license is invalid")
-            setResult(Activity.RESULT_CANCELED)
-            finish()
+        viewModel.startConfiguration.observe(this, LiveDataEventWithContentObserver {
+            findNavController(R.id.orchestrator_host_fragment)
+                .navigate(
+                    BlankFragmentDirections.actionBlankFragmentToConfigurationFragment(
+                        it.projectId,
+                        it.deviceId
+                    )
+                )
         })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == CAPTURE_REQUEST) {
-                viewModel.captureFinished(data?.getParcelableExtra(IFaceResponse.BUNDLE_KEY))
+            when (requestCode) {
+                CAPTURE_REQUEST -> viewModel.captureFinished(data?.getParcelableExtra(IFaceResponse.BUNDLE_KEY))
+                MATCH_REQUEST -> viewModel.matchFinished(data?.getParcelableExtra(IFaceResponse.BUNDLE_KEY))
             }
         } else {
             setResult(Activity.RESULT_CANCELED)
@@ -95,5 +79,6 @@ class FaceOrchestratorActivity : AppCompatActivity() {
 
     companion object {
         const val CAPTURE_REQUEST = 100
+        const val MATCH_REQUEST = 101
     }
 }

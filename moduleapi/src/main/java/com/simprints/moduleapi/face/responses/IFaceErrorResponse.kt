@@ -1,9 +1,12 @@
 package com.simprints.moduleapi.face.responses
 
-interface IFaceErrorResponse {
-    val error: IFaceErrorReason
+interface IFaceErrorResponse : IFaceResponse {
+    val reason: IFaceErrorReason
 }
 
 enum class IFaceErrorReason {
-    UNEXPECTED_ERROR
+    UNEXPECTED_ERROR,
+    LICENSE_MISSING,
+    LICENSE_INVALID,
+    FACE_CONFIGURATION_ERROR
 }

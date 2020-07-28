@@ -6,10 +6,14 @@ enum class CrashReportTag {
     SYNC,
     SESSION,
     FINGER_CAPTURE,
+    FACE_CAPTURE,
     MATCHING,
+    FACE_MATCHING,
+    FACE_LICENSE,
     SETTINGS,
     LONG_CONSENT,
     ALERT,
     REFUSAL,
-    SAFE_EXCEPTION
+    SAFE_EXCEPTION,
+    ID_SETUP
 }

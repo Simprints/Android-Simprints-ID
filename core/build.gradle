@@ -65,10 +65,14 @@ dependencies {
     implementation deps.dagger.javax
     implementation deps.firebase.storage
 
+    api deps.playcore.core
+    api deps.playcore.core_ktx
+
     testImplementation deps.testing.truth
     testImplementation 'junit:junit:4.12'
     testImplementation deps.testing.mockk.core
     testImplementation deps.testing.coroutines_test
+    testImplementation project(':testtools')
 
     androidTestImplementation deps.testing.androidx.core_testing
     androidTestImplementation deps.testing.androidx.monitor

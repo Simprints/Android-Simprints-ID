@@ -10,4 +10,6 @@ enum class FaceResponseType {
     CAPTURE,
     MATCH,
     EXIT_FORM,
+    ERROR,
+    CONFIGURATION
 }

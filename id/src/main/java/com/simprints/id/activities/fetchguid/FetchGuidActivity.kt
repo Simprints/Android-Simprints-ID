@@ -3,9 +3,9 @@ package com.simprints.id.activities.fetchguid
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
@@ -24,7 +24,7 @@ import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.
 import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
 import javax.inject.Inject
 
-class FetchGuidActivity : AppCompatActivity() {
+class FetchGuidActivity : BaseSplitActivity() {
 
     private lateinit var fetchGuidRequest: FetchGUIDRequest
     private lateinit var viewModel: FetchGuidViewModel

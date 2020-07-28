@@ -3,9 +3,9 @@ package com.simprints.id.data.db.session.domain.models.events
 import androidx.annotation.Keep
 
 @Keep
-class AuthorizationEvent(starTime: Long,
+class AuthorizationEvent(startTime: Long,
                          val result: Result,
-                         val userInfo: UserInfo?) : Event(EventType.AUTHORIZATION, starTime) {
+                         val userInfo: UserInfo?) : Event(EventType.AUTHORIZATION, startTime) {
 
     @Keep
     enum class Result {

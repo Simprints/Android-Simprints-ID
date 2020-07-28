@@ -1,8 +1,8 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -29,15 +29,17 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
                                timeHelper: TimeHelper,
                                sessionRepository: SessionRepository,
                                consentRequired: Boolean,
-                               locationRequired: Boolean) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired) {
+                               locationRequired: Boolean,
+                               private val modalities: List<Modality>,
+                               projectId: String,
+                               deviceId: String) :
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired, modalities, projectId, deviceId) {
 
-    override val steps: MutableList<Step> = mutableListOf()
-
-    override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
+    override fun startFlow(appRequest: AppRequest) {
         require(appRequest is AppIdentifyRequest)
         addSetupStep()
-        addCoreConsentStepIfRequired(ConsentType.VERIFY)
+        addModalityConfigurationSteps(modalities)
+        addCoreConsentStepIfRequired(ConsentType.IDENTIFY)
         steps.addAll(buildStepsList(modalities))
     }
 
@@ -56,40 +58,54 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
         require(appRequest is AppIdentifyRequest)
         val result = when {
             isCoreResult(requestCode) -> coreStepProcessor.processResult(data)
-            isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data)
-            isFaceResult(requestCode) -> faceStepProcessor.processResult(requestCode, resultCode, data)
+            isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data).also {
+                addEventIfFingerprintCaptureResponse(it)
+            }
+            isFaceResult(requestCode) -> faceStepProcessor.processResult(requestCode, resultCode, data).also {
+                addEventIfFaceCaptureResponse(it)
+            }
             else -> throw IllegalStateException("Invalid result from intent")
         }
 
-        completeAllStepsIfExitFormHappened(requestCode, resultCode, data)
+        completeAllStepsIfExitFormOrErrorHappened(requestCode, resultCode, data)
 
         val stepRequested = steps.firstOrNull { it.requestCode == requestCode }
         stepRequested?.setResult(result)
 
         return stepRequested.also {
-            buildQueryAndAddMatchingStepIfRequired(result, appRequest)
+            with(appRequest) {
+                buildQueryAndAddMatchingStepIfRequired(result, projectId, userId, moduleId)
+            }
         }
     }
 
-    private suspend fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, appRequest: AppIdentifyRequest) {
+    private suspend fun addEventIfFingerprintCaptureResponse(it: Step.Result?) {
+        if (it is FingerprintCaptureResponse) {
+            extractFingerprintAndAddPersonCreationEvent(it)
+        }
+    }
+
+    private suspend fun addEventIfFaceCaptureResponse(response: Step.Result?) {
+        if (response is FaceCaptureResponse)
+            extractFaceAndAddPersonCreationEvent(response)
+    }
+
+    private fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, projectId: String, userId: String, moduleId: String) {
         if (result is FingerprintCaptureResponse) {
-            val query = buildQuery(appRequest, matchGroup)
+            val query = buildQuery(projectId, userId, moduleId, matchGroup)
             addMatchingStepForFinger(result.captureResult.mapNotNull { it.sample }, query)
-            extractFingerprintAndAddPersonCreationEvent(result)
         } else if (result is FaceCaptureResponse) {
-            val query = buildQuery(appRequest, matchGroup)
+            val query = buildQuery(projectId, userId, moduleId, matchGroup)
             addMatchingStepForFace(result.capturingResult.mapNotNull { it.result }, query)
         }
     }
 
-    private fun buildQuery(appRequest: AppIdentifyRequest, matchGroup: GROUP): Query =
-        with(appRequest) {
+    private fun buildQuery(projectId: String, userId: String, moduleId: String, matchGroup: GROUP): Query =
             when (matchGroup) {
                 GROUP.GLOBAL -> Query(projectId)
                 GROUP.USER -> Query(projectId, attendantId = userId)
                 GROUP.MODULE -> Query(projectId, moduleId = moduleId)
             }
-        }
 
     private fun addMatchingStepForFinger(probeSamples: List<FingerprintCaptureSample>, query: Query) {
         steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query))

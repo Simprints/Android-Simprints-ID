@@ -2,8 +2,8 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
@@ -31,12 +31,16 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
                              timeHelper: TimeHelper,
                              sessionRepository: SessionRepository,
                              consentRequired: Boolean,
-                             locationRequired: Boolean) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired) {
+                             locationRequired: Boolean,
+                             private val modalities: List<Modality>,
+                             projectId: String,
+                             deviceId: String) :
+ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired, modalities, projectId, deviceId) {
 
-    override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
+    override fun startFlow(appRequest: AppRequest) {
         require(appRequest is AppVerifyRequest)
         addSetupStep()
+        addModalityConfigurationSteps(modalities)
         addCoreFetchGuidStep(appRequest.projectId, appRequest.verifyGuid)
         addCoreConsentStepIfRequired(VERIFY)
 
@@ -71,7 +75,7 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
             else -> throw IllegalStateException("Invalid result from intent")
         }
 
-        completeAllStepsIfExitFormHappened(requestCode, resultCode, data)
+        completeAllStepsIfExitFormOrErrorHappened(requestCode, resultCode, data)
 
         val stepRequested = steps.firstOrNull { it.requestCode == requestCode }
         stepRequested?.setResult(result)
@@ -89,6 +93,7 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
         } else if (result is FaceCaptureResponse) {
             val query = Query(subjectId = appRequest.verifyGuid)
             addMatchingStepForFace(result.capturingResult.mapNotNull { it.result }, query)
+            extractFaceAndAddPersonCreationEvent(result)
         }
     }
 
@@ -101,10 +106,8 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
     }
 
     private fun completeAllStepsIfFetchGuidResponseAndFailed(result: Step.Result?) {
-        if (result is FetchGUIDResponse) {
-            if (!result.isGuidFound) {
-                steps.forEach { it.setStatus(Step.Status.COMPLETED) }
-            }
+        if (result is FetchGUIDResponse && !result.isGuidFound) {
+            steps.forEach { it.setStatus(Step.Status.COMPLETED) }
         }
     }
 }

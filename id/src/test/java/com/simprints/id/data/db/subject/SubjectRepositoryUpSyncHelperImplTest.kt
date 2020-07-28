@@ -66,7 +66,6 @@ class SubjectRepositoryUpSyncHelperImplTest {
         subjectRepositoryUpSyncHelper = spyk(SubjectRepositoryUpSyncHelperImpl(loginInfoManager,
             subjectLocalDataSource, eventRemoteDataSource, subjectsUpSyncScopeRepository, modalities))
         setupBatchSize()
-        mockHelperToGenerateSameUuidForEvents()
     }
 
     @Test
@@ -161,10 +160,6 @@ class SubjectRepositoryUpSyncHelperImplTest {
         every { subjectRepositoryUpSyncHelper.batchSize } returns batchSize
     }
 
-    private fun mockHelperToGenerateSameUuidForEvents() {
-        every { subjectRepositoryUpSyncHelper.getRandomUuid() } returns "random_uuid"
-    }
-
     private fun testSuccessfulUpSync(
         localQueryResults: Array<List<Subject>>,
         expectedUploadBatches: Array<Events>,
@@ -193,7 +188,7 @@ class SubjectRepositoryUpSyncHelperImplTest {
     private fun createEventFromSubject(subject: Subject): Event =
         with(subject) {
             Event(
-                "random_uuid",
+                subjectId,
                 listOf(projectId),
                 listOf(subjectId),
                 listOf(attendantId),

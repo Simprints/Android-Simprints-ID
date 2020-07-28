@@ -5,8 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult
@@ -17,7 +17,6 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.exitform.FingerprintExitFormReason
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
-import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
@@ -26,14 +25,13 @@ import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 import javax.inject.Inject
 
-class FingerprintExitFormActivity : AppCompatActivity() {
+class FingerprintExitFormActivity : BaseSplitActivity() {
 
     private lateinit var viewModel: FingerprintExitFormViewModel
 
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var fingerprintExitFormViewModelFactory: FingerprintExitFormViewModelFactory
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     private var fingerprintExitFormStartTime: Long = 0
     private var fingerprintExitFormReason = FingerprintExitFormReason.OTHER
@@ -64,19 +62,17 @@ class FingerprintExitFormActivity : AppCompatActivity() {
     }
 
     private fun setTextInLayout() {
-        with(androidResourcesHelper) {
-            whySkipFingerprintText.text = getString(R.string.why_did_you_skip_fingerprinting)
-            fingerprintRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
-            fingerprintRbDataConcerns.text = getString(R.string.refusal_data_concerns)
-            fingerprintRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
-            fingerprintRbAppNotWorking.text = getString(R.string.refusal_app_not_working)
-            fingerprintRbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
-            fingerprintRbTooYoung.text = getString(R.string.refusal_too_young)
-            fingerprintRbOther.text = getString(R.string.refusal_other)
-            fingerprintExitFormText.hint = getString(R.string.hint_other_reason)
-            fingerprintBtSubmitExitForm.text = getString(R.string.button_submit)
-            fingerprintBtGoBack.text = getString(R.string.button_scan_prints)
-        }
+        whySkipFingerprintText.text = getString(R.string.why_did_you_skip_fingerprinting)
+        fingerprintRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
+        fingerprintRbDataConcerns.text = getString(R.string.refusal_data_concerns)
+        fingerprintRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
+        fingerprintRbAppNotWorking.text = getString(R.string.refusal_app_not_working)
+        fingerprintRbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
+        fingerprintRbTooYoung.text = getString(R.string.refusal_too_young)
+        fingerprintRbOther.text = getString(R.string.refusal_other)
+        fingerprintExitFormText.hint = getString(R.string.hint_other_reason)
+        fingerprintBtSubmitExitForm.text = getString(R.string.button_submit)
+        fingerprintBtGoBack.text = getString(R.string.button_scan_prints)
     }
 
     private fun setRadioGroupListener() {
@@ -192,9 +188,9 @@ class FingerprintExitFormActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if (fingerprintBtSubmitExitForm.isEnabled) {
-            showToast(androidResourcesHelper, R.string.refusal_toast_submit)
+            showToast(R.string.refusal_toast_submit)
         } else {
-            showToast(androidResourcesHelper, R.string.refusal_toast_select_option_submit)
+            showToast(R.string.refusal_toast_select_option_submit)
         }
     }
 

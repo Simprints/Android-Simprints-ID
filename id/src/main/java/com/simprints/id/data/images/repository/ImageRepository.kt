@@ -16,7 +16,7 @@ interface ImageRepository {
      * @param relativePath
      *        the path of the image within the images root folder, including file name
      * @return a reference to the newly stored image, if successful, otherwise null
-     * @see [com.simprints.core.images.local.ImageLocalDataSource.encryptAndStoreImage]
+     * @see [com.simprints.id.data.images.local.ImageLocalDataSource.encryptAndStoreImage]
      */
     fun storeImageSecurely(imageBytes: ByteArray, relativePath: Path): SecuredImageRef?
 
@@ -26,5 +26,10 @@ interface ImageRepository {
      * @return true if all images have been successfully uploaded and deleted from the device
      */
     suspend fun uploadStoredImagesAndDelete(): Boolean
+
+    /**
+     * Deletes all images stored on the device
+     */
+    fun deleteStoredImages()
 
 }

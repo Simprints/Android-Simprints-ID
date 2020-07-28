@@ -2,6 +2,8 @@ package com.simprints.id.data.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_FILE_NAME
+import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_MODE
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl.Companion.SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER
@@ -13,11 +15,6 @@ class PreferencesManagerImpl(settings: SettingsPreferencesManager,
     : PreferencesManager,
     SettingsPreferencesManager by settings,
     RecentEventsPreferencesManager by lastEvents {
-
-    companion object {
-        const val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"
-        const val PREF_MODE = Context.MODE_PRIVATE
-    }
 
     val prefs: SharedPreferences = context.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
 
