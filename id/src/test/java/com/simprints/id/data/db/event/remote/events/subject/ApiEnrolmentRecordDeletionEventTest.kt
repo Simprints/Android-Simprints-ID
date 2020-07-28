@@ -7,6 +7,7 @@ import com.simprints.id.data.db.event.remote.events.fromDomainToApi
 import org.junit.Test
 
 class ApiEnrolmentRecordDeletionEventTest {
+
     @Test
     fun convert_EnrolmentRecordDeletionEvent() {
         val original = createEnrolmentRecordDeletionEvent()
