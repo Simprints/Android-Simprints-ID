@@ -5,7 +5,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.sessionEvents.*
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.session.domain.models.events.*
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPool
 import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPoolType
@@ -20,6 +19,8 @@ import com.simprints.id.data.db.session.remote.session.ApiDatabaseInfo
 import com.simprints.id.data.db.session.remote.session.ApiDevice
 import com.simprints.id.data.db.session.remote.session.ApiLocation
 import com.simprints.id.data.db.session.remote.session.ApiSessionEvents
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.testtools.TestApplication
@@ -321,6 +322,7 @@ class SessionEventsAdapterFactoryTest {
             10,
             10,
             MatchPool(MatchPoolType.MODULE, 10),
+            Matcher.SIM_AFIS,
             listOf(MatchEntry(UUID.randomUUID().toString(), 10F))
         )
         val apiEvent = ApiOneToManyMatchEvent(event)
@@ -335,6 +337,7 @@ class SessionEventsAdapterFactoryTest {
             10,
             10,
             UUID.randomUUID().toString(),
+            Matcher.SIM_AFIS,
             MatchEntry(UUID.randomUUID().toString(), 10F)
         )
         val apiEvent = ApiOneToOneMatchEvent(event)
@@ -347,7 +350,8 @@ class SessionEventsAdapterFactoryTest {
     fun validate_personCreationEventApiModel() {
         val event = PersonCreationEvent(
             10,
-            listOf(UUID.randomUUID().toString())
+            listOf(UUID.randomUUID().toString()),
+            null
         )
         val apiEvent = ApiPersonCreationEvent(event)
 
@@ -457,7 +461,8 @@ class SessionEventsAdapterFactoryTest {
             "en",
             Device("28", "phone", "device_id"),
             0,
-            DatabaseInfo(0, 0)
+            DatabaseInfo(0, 0),
+            listOf(Modality.FINGER, Modality.FACE)
         )
         session.addEvent(
             AlertScreenEvent(

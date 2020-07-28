@@ -15,7 +15,6 @@ import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
@@ -24,7 +23,6 @@ import org.koin.core.parameter.parametersOf
 
 class AlertActivity : FingerprintActivity(), AlertContract.View {
 
-    val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
     private lateinit var alertType: FingerprintAlert
     override val viewPresenter: AlertContract.Presenter by inject { parametersOf(this, alertType) }
 
@@ -65,7 +63,7 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
     }
 
     override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) {
-        alertTitle.text = androidResourcesHelper.getString(stringRes)
+        alertTitle.text = getString(stringRes)
     }
 
     override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) = alertImage.setImageResource(drawableId)
@@ -78,13 +76,13 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
     }
 
     override fun setAlertMessageWithStringRes(@StringRes stringRes: Int) {
-        message.text = androidResourcesHelper.getString(stringRes)
+        message.text = getString(stringRes)
     }
 
     override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
         if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {
             alertLeftButton?.visibility = View.VISIBLE
-            alertLeftButton?.text = androidResourcesHelper.getString(leftButtonAction.buttonText)
+            alertLeftButton?.text = getString(leftButtonAction.buttonText)
             alertLeftButton?.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
         }
     }
@@ -92,7 +90,7 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
     override fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction) {
         if (rightButtonAction !is AlertActivityViewModel.ButtonAction.None) {
             alertRightButton?.visibility = View.VISIBLE
-            alertRightButton?.text = androidResourcesHelper.getString(rightButtonAction.buttonText)
+            alertRightButton?.text = getString(rightButtonAction.buttonText)
             alertRightButton?.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }
         }
     }

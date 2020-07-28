@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/orchestrator_graph"
+    app:startDestination="@id/blankFragment">
+
+    <action
+        android:id="@+id/action_global_errorFragment"
+        app:destination="@id/errorFragment"
+        app:popUpTo="@id/orchestrator_graph"
+        app:popUpToInclusive="true" />
+
+    <fragment
+        android:id="@+id/blankFragment"
+        android:name="com.simprints.face.orchestrator.BlankFragment"
+        android:label="BlankFragment">
+        <action
+            android:id="@+id/action_blankFragment_to_configurationFragment"
+            app:destination="@id/configurationFragment"
+            app:popUpTo="@id/orchestrator_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/errorFragment"
+        android:name="com.simprints.face.error.ErrorFragment"
+        android:label="ErrorFragment">
+        <argument
+            android:name="errorType"
+            app:argType="com.simprints.face.error.ErrorType" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/configurationFragment"
+        android:name="com.simprints.face.configuration.ConfigurationFragment"
+        android:label="ConfigurationFragment">
+        <argument
+            android:name="projectId"
+            app:argType="string" />
+        <argument
+            android:name="deviceId"
+            app:argType="string" />
+    </fragment>
+</navigation>

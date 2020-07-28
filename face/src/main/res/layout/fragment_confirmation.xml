@@ -54,15 +54,30 @@
         app:layout_constraintTop_toBottomOf="@id/confirmation_img" />
 
     <Button
+        android:id="@+id/recapture_btn"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/confirmation_btn_bg"
+        android:text="@string/btn_recapture"
+        android:textColor="@color/capture_blue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/confirmation_btn"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
         android:id="@+id/confirmation_btn"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_margin="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/confirmation_btn_bg"
         android:text="@string/btn_finish"
         android:textColor="@color/capture_blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/recapture_btn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

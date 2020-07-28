@@ -3,8 +3,10 @@ package com.simprints.id.data.db.session.domain.models.events
 import androidx.annotation.Keep
 
 @Keep
-class AlertScreenEvent(starTime: Long,
-                       val alertType: AlertScreenEventType) : Event(EventType.ALERT_SCREEN, starTime) {
+class AlertScreenEvent(
+    startTime: Long,
+    val alertType: AlertScreenEventType
+) : Event(EventType.ALERT_SCREEN, startTime) {
 
     enum class AlertScreenEventType {
         DIFFERENT_PROJECT_ID,
@@ -34,6 +36,8 @@ class AlertScreenEvent(starTime: Long,
         INVALID_VERIFY_ID,
         SAFETYNET_ERROR,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
-        INVALID_STATE_FOR_INTENT_ACTION
+        INVALID_STATE_FOR_INTENT_ACTION,
+        FACE_LICENSE_INVALID,
+        FACE_LICENSE_MISSING
     }
 }

@@ -23,6 +23,12 @@ open class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: Shared
         }
     }
 
+    /**
+     * If you need to open the database using Realm Studio, you can use the following method to
+     * decrypt the key.
+     *
+     * BigInteger(1, Base64.decode(key, Base64.DEFAULT)).toString(16)
+     */
     override fun getLocalDbKeyOrThrow(projectId: String): LocalDbKey {
         try {
             val key = readRealmKeyFromSharedPrefs(projectId)

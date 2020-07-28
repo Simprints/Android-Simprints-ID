@@ -7,10 +7,12 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
+import com.simprints.id.domain.moduleapi.face.requests.FaceConfigurationRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.MATCH
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CONFIGURATION
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.testtools.TestApplication
@@ -50,9 +52,10 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
             every { this@with.logoExists } returns true
             every { this@with.organizationName } returns "some_org"
             every { this@with.programName } returns "some_name"
+            every { this@with.faceNbOfFramesCaptured } returns 2
         }
 
-        faceStepProcess = FaceStepProcessorImpl(faceRequestFactory)
+        faceStepProcess = FaceStepProcessorImpl(faceRequestFactory, preferencesManagerMock)
 
 
         mockFromModuleApiToDomainExt()
@@ -88,6 +91,13 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
     }
 
     @Test
+    fun stepProcessorShouldBuildRightStepForConfiguration() {
+        val step = faceStepProcess.buildConfigurationStep("projectId", "deviceId")
+
+        verifyFaceIntent<FaceConfigurationRequest>(step, CONFIGURATION.value)
+    }
+
+    @Test
     fun stepProcessorShouldProcessFaceEnrolResult() {
         faceStepProcess.processResult(CAPTURE.value, Activity.RESULT_OK, result)
 
@@ -104,6 +114,13 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
     @Test
     fun stepProcessorShouldProcessFaceVerifyResult() {
         faceStepProcess.processResult(MATCH.value, Activity.RESULT_OK, result)
+
+        verify(exactly = 1) { iFaceResponseMock.fromModuleApiToDomain() }
+    }
+
+    @Test
+    fun stepProcessorShouldProcessConfigurationResult() {
+        faceStepProcess.processResult(CONFIGURATION.value, Activity.RESULT_OK, result)
 
         verify(exactly = 1) { iFaceResponseMock.fromModuleApiToDomain() }
     }

@@ -3,6 +3,7 @@ package com.simprints.id.commontesttools.sessionEvents
 import com.simprints.id.data.db.session.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.session.domain.models.session.Device
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.tools.TimeHelper
 import java.util.*
 
@@ -20,7 +21,9 @@ fun createFakeSession(timeHelper: TimeHelper? = null,
         language = "en",
         device = Device(deviceId = "device_id"),
         startTime = startTime,
-        databaseInfo = databaseInfo).apply {
+        databaseInfo = databaseInfo,
+        modalities = listOf(Modality.FINGER, Modality.FACE)
+    ).apply {
         relativeEndTime = fakeRelativeEndTime
     }
 

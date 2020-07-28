@@ -12,13 +12,13 @@ import com.simprints.id.data.db.session.domain.models.events.FingerprintCaptureE
 
 @Keep
 class FingerprintCaptureEvent(
-    starTime: Long,
+    startTime: Long,
     endTime: Long,
     val finger: FingerIdentifier,
     val qualityThreshold: Int,
     val result: Result,
     val fingerprint: Fingerprint?
-) : Event(EventType.FINGERPRINT_CAPTURE, starTime, endTime) {
+) : Event(EventType.FINGERPRINT_CAPTURE, startTime, endTime) {
 
     @Keep
     class Fingerprint(

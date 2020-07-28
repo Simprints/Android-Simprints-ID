@@ -26,10 +26,15 @@ interface SettingsPreferencesManager {
 
     var programName: String
     var organizationName: String
+    var parentalConsentExists: Boolean
+    var generalConsentOptionsJson: String
+    var parentalConsentOptionsJson: String
 
     var logoExists: Boolean
     var consentRequired: Boolean
     var locationPermissionRequired: Boolean
+
+    var isEnrolmentPlus: Boolean
 
     var modalities: List<Modality>
     var subjectsDownSyncSetting: SubjectsDownSyncSetting
@@ -42,6 +47,8 @@ interface SettingsPreferencesManager {
 
     var faceMaxRetries: Int
     var faceQualityThreshold: Float
+    var faceNbOfFramesCaptured: Int
+    var faceMatchThreshold: Float
 
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T

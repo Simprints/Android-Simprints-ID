@@ -12,7 +12,8 @@ import com.simprints.id.tools.TimeHelper
 
 class AppResponseFactoryImpl(
     private val enrolmentHelper: EnrolmentHelper,
-    private val timeHelper: TimeHelper
+    private val timeHelper: TimeHelper,
+    private val isEnrolmentPlus: Boolean
 ) : AppResponseFactory {
 
     override suspend fun buildAppResponse(modalities: List<Modality>,
@@ -24,7 +25,13 @@ class AppResponseFactoryImpl(
          * are placeholders for when we will introduce the FaceModality
          */
         when (appRequest) {
-            is AppEnrolRequest -> AppResponseBuilderForEnrol(enrolmentHelper, timeHelper)
+            is AppEnrolRequest -> {
+                if (isEnrolmentPlus){
+                    AppResponseBuilderForIdentify()
+                } else {
+                    AppResponseBuilderForEnrol(enrolmentHelper, timeHelper)
+                }
+            }
             is AppIdentifyRequest -> AppResponseBuilderForIdentify()
             is AppVerifyRequest -> AppResponseBuilderForVerify()
             is AppConfirmIdentityRequest -> AppResponseBuilderForConfirmIdentity()

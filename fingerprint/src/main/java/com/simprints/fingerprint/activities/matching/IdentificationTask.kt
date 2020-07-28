@@ -9,6 +9,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
+import com.simprints.fingerprint.controllers.core.eventData.model.Matcher
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToManyMatchEvent
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -77,6 +78,7 @@ class IdentificationTask(private val viewModel: MatchingViewModel,
                 timeHelper.now(),
                 matchingRequest.queryForCandidates,
                 candidateSize,
+                Matcher.SIM_AFIS,
                 topCandidates.map { MatchEntry(it.guid, it.confidence) }))
     }
 

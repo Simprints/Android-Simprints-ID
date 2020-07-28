@@ -8,6 +8,7 @@ import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
 import com.simprints.uicomponents.models.PreviewFrame
 import kotlinx.coroutines.delay
+import kotlin.random.Random
 
 class MockFaceDetector : FaceDetector {
     private val mockDelay = 200L
@@ -25,7 +26,7 @@ class MockFaceDetector : FaceDetector {
             0f,
             0f,
             0f,
-            ByteArray(0)
+            Random.Default.nextBytes(100)
         )
     }
 
@@ -39,7 +40,7 @@ class MockFaceDetector : FaceDetector {
             0f,
             0f,
             0f,
-            ByteArray(0)
+            Random.Default.nextBytes(100)
         )
     }
 
