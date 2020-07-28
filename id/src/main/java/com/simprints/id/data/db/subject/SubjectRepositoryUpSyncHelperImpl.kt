@@ -85,8 +85,6 @@ class SubjectRepositoryUpSyncHelperImpl(
             )
         }
 
-    internal fun getRandomUuid() = UUID.randomUUID().toString()
-
     private fun createPayload(subject: Subject) =
         EnrolmentRecordCreationPayload(
             subjectId = subject.subjectId,
