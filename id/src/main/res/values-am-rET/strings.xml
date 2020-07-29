@@ -104,7 +104,7 @@
     <string name="confirm_module_selection_title">ሞጁል ተመርጧል</string>
     <string name="confirm_module_selection_yes">ማረጋገጥ</string>
     <string name="dashboard_card_activity">የየዕለት ተግባር: %1$s</string>
-    <string name="dashboard_card_current_user">አሁን ያለ ተጠቃሚ: 1%1$s</string>
+    <string name="dashboard_card_current_user">አሁን ያለ ተጠቃሚ: %1$s</string>
     <string name="dashboard_card_scanner_used">እስካነር ይጠቀሙ: %1$s</string>
     <string name="dashboard_sync_card_complete">ሲንክ ማድረጉ ተጠናቋል</string>
     <string name="dashboard_sync_card_connecting">በመገኛኘት ላይ ነው</string>
