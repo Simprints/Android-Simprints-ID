@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 
 import com.simprints.id.data.db.event.domain.models.EventType.ALERT_SCREEN
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 
@@ -13,7 +14,7 @@ data class AlertScreenEvent(
     override var labels: EventLabels,
     override val payload: AlertScreenPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -29,8 +30,10 @@ data class AlertScreenEvent(
     data class AlertScreenPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        val alertType: AlertScreenEventType
-    ) : EventPayload(ALERT_SCREEN, eventVersion, createdAt) {
+        val alertType: AlertScreenEventType,
+        override val type: EventType = ALERT_SCREEN,
+        override val endedAt: Long = 0
+    ) : EventPayload() {
 
         enum class AlertScreenEventType {
             DIFFERENT_PROJECT_ID,

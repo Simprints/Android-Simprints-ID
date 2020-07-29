@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 
 import com.simprints.id.data.db.event.domain.models.EventType.ONE_TO_ONE_MATCH
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -11,7 +12,7 @@ data class OneToOneMatchEvent(
     override var labels: EventLabels,
     override val payload: OneToOneMatchPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -33,8 +34,9 @@ data class OneToOneMatchEvent(
         override var endedAt: Long,
         val candidateId: String,
         val matcher: Matcher,
-        val result: MatchEntry?
-    ) : EventPayload(ONE_TO_ONE_MATCH, eventVersion, createdAt, endedAt)
+        val result: MatchEntry?,
+        override val type: EventType = ONE_TO_ONE_MATCH
+    ) : EventPayload()
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

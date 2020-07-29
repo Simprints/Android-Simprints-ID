@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.domain.models
 
 
 import com.simprints.id.data.db.event.domain.models.EventType.INTENT_PARSING
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import io.realm.internal.Keep
 import java.util.*
 
@@ -11,7 +12,7 @@ data class IntentParsingEvent(
     override var labels: EventLabels,
     override val payload: IntentParsingPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -27,8 +28,10 @@ data class IntentParsingEvent(
     data class IntentParsingPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        val integration: IntegrationInfo
-    ) : EventPayload(INTENT_PARSING, eventVersion, createdAt) {
+        val integration: IntegrationInfo,
+        override val type: EventType = INTENT_PARSING,
+        override val endedAt: Long = 0
+    ) : EventPayload() {
 
         @Keep
         enum class IntegrationInfo {

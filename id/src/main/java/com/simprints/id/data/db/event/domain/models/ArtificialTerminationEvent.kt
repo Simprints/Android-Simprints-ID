@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 
 import com.simprints.id.data.db.event.domain.models.EventType.ARTIFICIAL_TERMINATION
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -11,7 +12,7 @@ data class ArtificialTerminationEvent(
     override var labels: EventLabels,
     override val payload: ArtificialTerminationPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -28,8 +29,10 @@ data class ArtificialTerminationEvent(
     data class ArtificialTerminationPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        val reason: Reason
-    ) : EventPayload(ARTIFICIAL_TERMINATION, eventVersion, createdAt) {
+        val reason: Reason,
+        override val type: EventType = ARTIFICIAL_TERMINATION,
+        override val endedAt: Long = 0
+    ) : EventPayload() {
 
         @Keep
         enum class Reason {

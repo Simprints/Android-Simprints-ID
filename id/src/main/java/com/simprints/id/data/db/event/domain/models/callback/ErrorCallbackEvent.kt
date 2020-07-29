@@ -7,6 +7,7 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_ERROR
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import java.util.*
 
@@ -16,7 +17,7 @@ data class ErrorCallbackEvent(
     override var labels: EventLabels,
     override val payload: ErrorCallbackPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -32,7 +33,9 @@ data class ErrorCallbackEvent(
     data class ErrorCallbackPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        val reason: Reason) : EventPayload(CALLBACK_ERROR, eventVersion, createdAt) {
+        val reason: Reason,
+        override val type: EventType = CALLBACK_ERROR,
+        override val endedAt: Long = 0) : EventPayload() {
 
         enum class Reason {
             DIFFERENT_PROJECT_ID_SIGNED_IN,

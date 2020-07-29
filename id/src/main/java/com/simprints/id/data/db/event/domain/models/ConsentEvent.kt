@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 
 import com.simprints.id.data.db.event.domain.models.EventType.CONSENT
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -11,7 +12,7 @@ data class ConsentEvent(
     override var labels: EventLabels,
     override val payload: ConsentPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -31,7 +32,8 @@ data class ConsentEvent(
                               override val eventVersion: Int,
                               override var endedAt: Long,
                               val consentType: Type,
-                              var result: Result) : EventPayload(CONSENT, eventVersion, createdAt, endedAt) {
+                              var result: Result,
+                              override val type: EventType = CONSENT) : EventPayload() {
 
         @Keep
         enum class Type {

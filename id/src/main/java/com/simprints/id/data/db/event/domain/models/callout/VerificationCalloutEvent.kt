@@ -7,6 +7,7 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_VERIFICATION
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -15,7 +16,7 @@ data class VerificationCalloutEvent(
     override var labels: EventLabels,
     override val payload: VerificationCalloutPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -39,8 +40,10 @@ data class VerificationCalloutEvent(
         val userId: String,
         val moduleId: String,
         val verifyGuid: String,
-        val metadata: String
-    ) : EventPayload(CALLOUT_VERIFICATION, eventVersion, createdAt)
+        val metadata: String,
+        override val type: EventType = CALLOUT_VERIFICATION,
+        override val endedAt: Long = 0
+    ) : EventPayload()
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION
