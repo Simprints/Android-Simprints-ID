@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 
 import com.simprints.id.data.db.event.domain.models.EventType.SCANNER_CONNECTION
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -11,7 +12,7 @@ data class ScannerConnectionEvent(
     override var labels: EventLabels,
     override val payload: ScannerConnectionPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -28,7 +29,9 @@ data class ScannerConnectionEvent(
     data class ScannerConnectionPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        val scannerInfo: ScannerInfo) : EventPayload(SCANNER_CONNECTION, eventVersion, createdAt) {
+        val scannerInfo: ScannerInfo,
+        override val type: EventType = SCANNER_CONNECTION,
+        override val endedAt: Long = 0) : EventPayload() {
 
         @Keep
         data class ScannerInfo(val scannerId: String,

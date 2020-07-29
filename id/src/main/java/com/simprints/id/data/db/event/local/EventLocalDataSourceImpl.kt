@@ -108,7 +108,7 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
 
     private suspend fun closeAnyOpenSession() {
         wrapSuspendExceptionIfNeeded {
-            val openSessions = load(EventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0)))
+            val openSessions = load(EventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).map { it as SessionCaptureEvent }
 
             openSessions.collect { session ->
                 val artificialTerminationEvent = ArtificialTerminationEvent(

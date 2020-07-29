@@ -7,6 +7,7 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_IDENTIFICATION
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -15,7 +16,7 @@ data class IdentificationCallbackEvent(
     override var labels: EventLabels,
     override val payload: IdentificationCallbackPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(createdAt: Long,
                 sessionId: String,
@@ -31,8 +32,10 @@ data class IdentificationCallbackEvent(
         override val createdAt: Long,
         override val eventVersion: Int,
         val sessionId: String,
-        val scores: List<CallbackComparisonScore>
-    ) : EventPayload(CALLBACK_IDENTIFICATION, eventVersion, createdAt)
+        val scores: List<CallbackComparisonScore>,
+        override val type: EventType = CALLBACK_IDENTIFICATION,
+        override val endedAt: Long = 0
+    ) : EventPayload()
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

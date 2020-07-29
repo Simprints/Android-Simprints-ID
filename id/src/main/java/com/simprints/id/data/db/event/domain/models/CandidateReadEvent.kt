@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-
 import com.simprints.id.data.db.event.domain.models.EventType.CANDIDATE_READ
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -11,7 +11,7 @@ data class CandidateReadEvent(
     override var labels: EventLabels,
     override val payload: CandidateReadPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -34,8 +34,9 @@ data class CandidateReadEvent(
         override var endedAt: Long,
         val candidateId: String,
         val localResult: LocalResult,
-        val remoteResult: RemoteResult?
-    ) : EventPayload(CANDIDATE_READ, eventVersion, createdAt, endedAt) {
+        val remoteResult: RemoteResult?,
+        override val type: EventType = CANDIDATE_READ
+    ) : EventPayload() {
 
         @Keep
         enum class LocalResult {

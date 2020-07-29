@@ -8,6 +8,7 @@ import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -16,7 +17,7 @@ data class FaceCaptureEvent(
     override var labels: EventLabels,
     override val payload: FaceCapturePayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         startTime: Long,
@@ -43,8 +44,9 @@ data class FaceCaptureEvent(
         val qualityThreshold: Float,
         val result: Result,
         val isFallback: Boolean,
-        val face: Face?
-    ) : EventPayload(FACE_CAPTURE, eventVersion, createdAt, endedAt) {
+        val face: Face?,
+        override val type: EventType = FACE_CAPTURE
+    ) : EventPayload() {
 
         @Keep
         data class Face(

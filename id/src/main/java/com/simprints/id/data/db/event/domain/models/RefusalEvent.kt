@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.EventType.REFUSAL
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -10,7 +11,7 @@ data class RefusalEvent(
     override var labels: EventLabels,
     override val payload: RefusalPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -30,7 +31,8 @@ data class RefusalEvent(
                               override val eventVersion: Int,
                               override var endedAt: Long,
                               val reason: Answer,
-                              val otherText: String) : EventPayload(REFUSAL, eventVersion, createdAt, endedAt) {
+                              val otherText: String,
+                              override val type: EventType = REFUSAL) : EventPayload() {
 
         @Keep
         enum class Answer {

@@ -8,6 +8,7 @@ import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -16,7 +17,7 @@ data class FaceCaptureConfirmationEvent(
     override var labels: EventLabels,
     override val payload: FaceCaptureConfirmationPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         startTime: Long,
@@ -35,8 +36,9 @@ data class FaceCaptureConfirmationEvent(
         override val createdAt: Long,
         override var endedAt: Long,
         override val eventVersion: Int,
-        val result: Result
-    ) : EventPayload(FACE_CAPTURE_CONFIRMATION, eventVersion, createdAt, endedAt) {
+        val result: Result,
+        override val type: EventType = FACE_CAPTURE_CONFIRMATION
+    ) : EventPayload() {
 
         enum class Result {
             CONTINUE,
