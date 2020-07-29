@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 
 import com.simprints.id.data.db.event.domain.models.EventType.ONE_TO_MANY_MATCH
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -11,7 +12,7 @@ data class OneToManyMatchEvent(
     override var labels: EventLabels,
     override val payload: OneToManyMatchPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -33,8 +34,9 @@ data class OneToManyMatchEvent(
         override var endedAt: Long,
         val pool: MatchPool,
         val matcher: Matcher,
-        val result: List<MatchEntry>?
-    ) : EventPayload(ONE_TO_MANY_MATCH, eventVersion, createdAt, endedAt) {
+        val result: List<MatchEntry>?,
+        override val type: EventType = ONE_TO_MANY_MATCH
+    ) : EventPayload() {
 
         @Keep
         data class MatchPool(val type: MatchPoolType, val count: Int)

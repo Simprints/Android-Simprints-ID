@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 
 import com.simprints.id.data.db.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import java.util.*
@@ -13,7 +14,7 @@ data class ConnectivitySnapshotEvent(
     override var labels: EventLabels,
     override val payload: ConnectivitySnapshotPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -31,8 +32,10 @@ data class ConnectivitySnapshotEvent(
         override val createdAt: Long,
         override val eventVersion: Int,
         val networkType: String,
-        val connections: List<SimNetworkUtils.Connection>
-    ) : EventPayload(CONNECTIVITY_SNAPSHOT, eventVersion, createdAt) {
+        val connections: List<SimNetworkUtils.Connection>,
+        override val type: EventType = CONNECTIVITY_SNAPSHOT,
+        override val endedAt: Long = 0
+    ) : EventPayload() {
 
         companion object {
             fun buildEvent(simNetworkUtils: SimNetworkUtils,

@@ -3,8 +3,8 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
-
 import com.simprints.id.data.db.event.domain.models.EventType.AUTHORIZATION
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -13,7 +13,7 @@ data class AuthorizationEvent(
     override var labels: EventLabels,
     override val payload: AuthorizationPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -30,7 +30,9 @@ data class AuthorizationEvent(
     data class AuthorizationPayload(override val createdAt: Long,
                                     override val eventVersion: Int,
                                     val result: AuthorizationResult,
-                                    val userInfo: UserInfo?) : EventPayload(AUTHORIZATION, eventVersion, createdAt) {
+                                    val userInfo: UserInfo?,
+                                    override val type: EventType = AUTHORIZATION,
+                                    override val endedAt: Long = 0) : EventPayload() {
 
         @Keep
         enum class AuthorizationResult {

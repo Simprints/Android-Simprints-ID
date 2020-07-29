@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -12,7 +13,7 @@ data class Vero2InfoSnapshotEvent(
     override var labels: EventLabels,
     override val payload: Vero2InfoSnapshotPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -30,7 +31,9 @@ data class Vero2InfoSnapshotEvent(
         override val createdAt: Long,
         override val eventVersion: Int,
         val version: Vero2Version,
-        val battery: BatteryInfo) : EventPayload(VERO_2_INFO_SNAPSHOT, eventVersion, createdAt) {
+        val battery: BatteryInfo,
+        override val type: EventType = VERO_2_INFO_SNAPSHOT,
+        override val endedAt: Long = 0) : EventPayload() {
 
         @Keep
         data class Vero2Version(

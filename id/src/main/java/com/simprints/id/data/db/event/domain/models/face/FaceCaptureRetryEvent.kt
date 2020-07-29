@@ -7,6 +7,7 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.FACE_CAPTURE_RETRY
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -15,7 +16,7 @@ data class FaceCaptureRetryEvent(
     override var labels: EventLabels,
     override val payload: FaceCaptureRetryPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         startTime: Long,
@@ -31,8 +32,9 @@ data class FaceCaptureRetryEvent(
     data class FaceCaptureRetryPayload(
         override val createdAt: Long,
         override var endedAt: Long,
-        override val eventVersion: Int
-    ) : EventPayload(FACE_CAPTURE_RETRY, eventVersion, createdAt, endedAt)
+        override val eventVersion: Int,
+        override val type: EventType = FACE_CAPTURE_RETRY
+    ) : EventPayload()
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

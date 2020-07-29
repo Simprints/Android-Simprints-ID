@@ -7,6 +7,7 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -15,7 +16,7 @@ data class EnrolmentLastBiometricsCalloutEvent(
     override var labels: EventLabels,
     override val payload: EnrolmentLastBiometricsCalloutPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -39,7 +40,9 @@ data class EnrolmentLastBiometricsCalloutEvent(
         val userId: String,
         val moduleId: String,
         val metadata: String?,
-        val sessionId: String) : EventPayload(CALLOUT_LAST_BIOMETRICS, eventVersion, createdAt)
+        val sessionId: String,
+        override val type: EventType = CALLOUT_LAST_BIOMETRICS,
+        override val endedAt: Long = 0) : EventPayload()
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION
