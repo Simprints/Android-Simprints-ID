@@ -53,11 +53,6 @@ class FaceMatchViewModel(
         MutableLiveData()
 
     fun setupMatch(faceRequest: FaceMatchRequest) = viewModelScope.launch {
-        if (masterFlowManager.getCurrentAction() == Action.ENROL) {
-            matchState.value = MatchState.Error
-            return@launch
-        }
-
         val startTime = faceTimeHelper.now()
 
         val candidates = loadCandidates(faceRequest.queryForCandidates)
@@ -152,10 +147,10 @@ class FaceMatchViewModel(
         results: List<FaceMatchResult>
     ) {
         val matchEntries = results.map { MatchEntry(it.guid, it.confidence) }
-        val event = if (action == Action.IDENTIFY)
-            getOneToManyEvent(startTime, endTime, queryForCandidates, candidatesCount, matchEntries)
-        else
+        val event = if (action == Action.VERIFY)
             getOneToOneEvent(startTime, endTime, queryForCandidates, matchEntries.first())
+        else
+            getOneToManyEvent(startTime, endTime, queryForCandidates, candidatesCount, matchEntries)
 
         faceSessionEventsManager.addEventInBackground(event)
     }
