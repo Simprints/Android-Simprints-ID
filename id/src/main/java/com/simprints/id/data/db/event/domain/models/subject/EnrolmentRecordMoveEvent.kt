@@ -8,15 +8,16 @@ import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_MOVE
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
 data class EnrolmentRecordMoveEvent(
-        override val id: String = UUID.randomUUID().toString(),
-        override var labels: EventLabels,
-        override val payload: EnrolmentRecordMovePayload,
-        override val type: EventType
-) : Event(id, labels, payload, type) {
+    override val id: String = UUID.randomUUID().toString(),
+    override var labels: EventLabels,
+    override val payload: EnrolmentRecordMovePayload,
+    override val type: EventType
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -33,8 +34,10 @@ data class EnrolmentRecordMoveEvent(
         override val createdAt: Long,
         override val eventVersion: Int,
         val enrolmentRecordCreation: EnrolmentRecordCreationPayload?,
-        val enrolmentRecordDeletion: EnrolmentRecordDeletionPayload
-    ) : EventPayload(ENROLMENT_RECORD_MOVE, eventVersion, createdAt)
+        val enrolmentRecordDeletion: EnrolmentRecordDeletionPayload,
+        override val type: EventType = ENROLMENT_RECORD_MOVE,
+        override val endedAt: Long = 0
+    ) : EventPayload()
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

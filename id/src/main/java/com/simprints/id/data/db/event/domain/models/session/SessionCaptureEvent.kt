@@ -3,19 +3,19 @@ package com.simprints.id.data.db.event.domain.models.session
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabels
-
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
 data class SessionCaptureEvent(
     override val id: String = UUID.randomUUID().toString(),
+    override val type: EventType,
     override var labels: EventLabels,
-    override val payload: SessionCapturePayload,
-    override val type: EventType
-) : Event(id, labels, payload, type) {
+    override val payload: SessionCapturePayload
+) : Event() {
 
     constructor(createdAt: Long,
                 projectId: String,
@@ -32,6 +32,7 @@ data class SessionCaptureEvent(
                 labels: EventLabels = EventLabels(sessionId = id)) : //StopShip
         this(
             id,
+            SESSION_CAPTURE,
             labels,
             SessionCapturePayload(
                 createdAt,
@@ -46,8 +47,7 @@ data class SessionCaptureEvent(
                 databaseInfo,
                 uploadTime,
                 location,
-                analyticsId),
-            SESSION_CAPTURE)
+                analyticsId))
 
     @Keep
     data class SessionCapturePayload(
@@ -63,8 +63,9 @@ data class SessionCaptureEvent(
         val databaseInfo: DatabaseInfo,
         val uploadTime: Long,
         var location: Location? = null,
-        var analyticsId: String? = null
-    ) : EventPayload(SESSION_CAPTURE, eventVersion, createdAt, endedAt)
+        var analyticsId: String? = null,
+        override val type: EventType = SESSION_CAPTURE
+    ) : EventPayload()
 
     companion object {
         // When the sync starts, any open activeSession started GRACE_PERIOD ms

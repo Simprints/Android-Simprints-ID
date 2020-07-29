@@ -4,12 +4,10 @@ import androidx.annotation.Keep
 import com.google.gson.*
 import com.simprints.libsimprints.FingerIdentifier
 import java.util.*
-import com.beust.klaxon.Klaxon
 
 @Keep
 class JsonHelper {
     companion object {
-        val klaxon by lazy {  Klaxon() }
 
         val defaultBuilder by lazy {
             GsonBuilder().apply {

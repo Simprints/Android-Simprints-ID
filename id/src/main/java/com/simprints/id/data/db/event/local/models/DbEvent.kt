@@ -4,12 +4,13 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.gson.reflect.TypeToken
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.domain.modality.Modes
+import com.simprints.id.tools.json.SimJsonHelper
 
 @Entity
 data class DbEvent(
@@ -33,22 +34,22 @@ data class DbEvent(
 
         @TypeConverter
         fun fromListOfStringToString(list: List<String>): String =
-            JsonHelper.toJson(list)
+            SimJsonHelper.gson.toJson(list)
 
         @TypeConverter
         fun fromStringToListOfString(jsonList: String): List<String> {
             val type = object : TypeToken<List<String>>() {}.type
-            return JsonHelper.gson.fromJson(jsonList, type)
+            return SimJsonHelper.gson.fromJson(jsonList, type)
         }
 
         @TypeConverter
         fun fromListOfModesToString(list: List<Modes>): String =
-            JsonHelper.toJson(list)
+            SimJsonHelper.gson.toJson(list)
 
         @TypeConverter
         fun fromStringToListOfModes(jsonList: String): List<Modes> {
             val type = object : TypeToken<List<Modes>>() {}.type
-            return JsonHelper.gson.fromJson(jsonList, type)
+            return SimJsonHelper.gson.fromJson(jsonList, type)
         }
     }
 
@@ -62,10 +63,10 @@ fun Event.fromDomainToDb(): DbEvent =
         id,
         labels,
         payload.type,
-        JsonHelper.klaxon.toJsonString(this),
+        SimJsonHelper.jackson.writeValueAsString(this),
         payload.createdAt,
         payload.endedAt
     )
 
 fun DbEvent.fromDbToDomain(): Event =
-   JsonHelper.klaxon.parse<Event>(eventJson) as Event
+    SimJsonHelper.jackson.readValue(this.eventJson)

@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 
 import com.simprints.id.data.db.event.domain.models.EventType.GUID_SELECTION
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -11,7 +12,7 @@ data class GuidSelectionEvent(
     override var labels: EventLabels,
     override val payload: GuidSelectionPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -26,7 +27,9 @@ data class GuidSelectionEvent(
     @Keep
     data class GuidSelectionPayload(override val createdAt: Long,
                                     override val eventVersion: Int,
-                                    val selectedId: String) : EventPayload(GUID_SELECTION, eventVersion, createdAt)
+                                    val selectedId: String,
+                                    override val type: EventType = GUID_SELECTION,
+                                    override val endedAt: Long = 0) : EventPayload()
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

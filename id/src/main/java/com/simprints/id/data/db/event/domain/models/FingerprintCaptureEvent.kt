@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 
 import com.simprints.id.data.db.event.domain.models.EventType.FINGERPRINT_CAPTURE
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import java.util.*
 
@@ -12,7 +13,7 @@ data class FingerprintCaptureEvent(
     override var labels: EventLabels,
     override val payload: FingerprintCapturePayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -38,8 +39,9 @@ data class FingerprintCaptureEvent(
         val qualityThreshold: Int,
         val result: Result,
         val fingerprint: Fingerprint?,
-        val id: String
-    ) : EventPayload(FINGERPRINT_CAPTURE, eventVersion, createdAt, endedAt) {
+        val id: String,
+        override val type: EventType = FINGERPRINT_CAPTURE
+    ) : EventPayload() {
 
         @Keep
         data class Fingerprint(val finger: FingerIdentifier, val quality: Int, val template: String)

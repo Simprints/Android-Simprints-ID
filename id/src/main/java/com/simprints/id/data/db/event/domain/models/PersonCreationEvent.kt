@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.db.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.tools.TimeHelper
@@ -15,7 +16,7 @@ data class PersonCreationEvent(
     override var labels: EventLabels,
     override val payload: PersonCreationPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         startTime: Long,
@@ -35,8 +36,10 @@ data class PersonCreationEvent(
         override val createdAt: Long,
         override val eventVersion: Int,
         val fingerprintCaptureIds: List<String>,
-        val faceCaptureIds: List<String>
-    ) : EventPayload(PERSON_CREATION, eventVersion, createdAt)
+        val faceCaptureIds: List<String>,
+        override val type: EventType = PERSON_CREATION,
+        override val endedAt: Long = 0
+    ) : EventPayload()
 
     companion object {
         fun build(

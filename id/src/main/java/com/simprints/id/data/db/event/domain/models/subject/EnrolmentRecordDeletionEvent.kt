@@ -6,6 +6,7 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -14,7 +15,7 @@ data class EnrolmentRecordDeletionEvent(
     override var labels: EventLabels,
     override val payload: EnrolmentRecordDeletionPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -35,8 +36,10 @@ data class EnrolmentRecordDeletionEvent(
         val subjectId: String,
         val projectId: String,
         val moduleId: String,
-        val attendantId: String
-    ) : EventPayload(ENROLMENT_RECORD_DELETION, eventVersion, createdAt)
+        val attendantId: String,
+        override val type: EventType = ENROLMENT_RECORD_DELETION,
+        override val endedAt: Long = 0
+    ) : EventPayload()
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

@@ -20,6 +20,7 @@ buildscript {
     }
 
     dependencies {
+
         // CI Scanning
         classpath 'org.ow2.asm:asm:6.0'
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"

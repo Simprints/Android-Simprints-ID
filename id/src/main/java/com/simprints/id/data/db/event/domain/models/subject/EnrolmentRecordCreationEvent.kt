@@ -6,6 +6,7 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import com.simprints.id.domain.modality.Modes
 import java.util.*
 
@@ -15,7 +16,7 @@ data class EnrolmentRecordCreationEvent(
     override var labels: EventLabels,
     override val payload: EnrolmentRecordCreationPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -39,8 +40,10 @@ data class EnrolmentRecordCreationEvent(
         val projectId: String,
         val moduleId: String,
         val attendantId: String,
-        val biometricReferences: List<BiometricReference>
-    ) : EventPayload(ENROLMENT_RECORD_CREATION, eventVersion, createdAt)
+        val biometricReferences: List<BiometricReference>,
+        override val type: EventType = ENROLMENT_RECORD_CREATION,
+        override val endedAt: Long = 0
+    ) : EventPayload()
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

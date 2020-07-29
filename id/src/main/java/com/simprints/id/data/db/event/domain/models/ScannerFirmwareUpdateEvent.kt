@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 
 import com.simprints.id.data.db.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -11,7 +12,7 @@ data class ScannerFirmwareUpdateEvent(
     override var labels: EventLabels,
     override val payload: ScannerFirmwareUpdatePayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(createdAt: Long,
                 endTime: Long,
@@ -32,8 +33,8 @@ data class ScannerFirmwareUpdateEvent(
                                             override var endedAt: Long,
                                             val chip: String,
                                             val targetAppVersion: String,
-                                            var failureReason: String? = null)
-        : EventPayload(SCANNER_FIRMWARE_UPDATE, eventVersion, createdAt, endedAt)
+                                            var failureReason: String? = null,
+                                            override val type: EventType = SCANNER_FIRMWARE_UPDATE) : EventPayload()
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION

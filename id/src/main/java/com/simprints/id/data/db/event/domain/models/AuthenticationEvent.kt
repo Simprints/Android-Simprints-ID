@@ -5,6 +5,7 @@ import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.Authenti
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 
 import com.simprints.id.data.db.event.domain.models.EventType.AUTHENTICATION
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -13,7 +14,7 @@ data class AuthenticationEvent(
     override var labels: EventLabels,
     override val payload: AuthenticationPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -34,8 +35,9 @@ data class AuthenticationEvent(
         override val eventVersion: Int,
         override var endedAt: Long,
         val userInfo: UserInfo,
-        val result: Result
-    ) : EventPayload(AUTHENTICATION, eventVersion, createdAt, endedAt) {
+        val result: Result,
+        override val type: EventType = AUTHENTICATION
+    ) : EventPayload() {
 
         @Keep
         data class UserInfo(val projectId: String, val userId: String)

@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 
 import com.simprints.id.data.db.event.domain.models.EventType.COMPLETION_CHECK
+import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -11,7 +12,7 @@ data class CompletionCheckEvent(
     override var labels: EventLabels,
     override val payload: CompletionCheckPayload,
     override val type: EventType
-) : Event(id, labels, payload, type) {
+) : Event() {
 
     constructor(
         createdAt: Long,
@@ -27,7 +28,9 @@ data class CompletionCheckEvent(
     data class CompletionCheckPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        val completed: Boolean) : EventPayload(COMPLETION_CHECK, eventVersion, createdAt)
+        val completed: Boolean,
+        override val type: EventType = COMPLETION_CHECK,
+        override val endedAt: Long = 0) : EventPayload()
 
     companion object {
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION
