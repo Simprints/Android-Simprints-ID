@@ -14,6 +14,7 @@ import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.getStringPlural
 import com.simprints.face.R
+import com.simprints.face.base.FaceActivity
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.face.match.FaceMatchViewModel.MatchState.*
@@ -23,7 +24,7 @@ import kotlinx.android.synthetic.main.activity_face_match.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
 @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
-class FaceMatchActivity : BaseSplitActivity() {
+class FaceMatchActivity : FaceActivity() {
     private val vm: FaceMatchViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
