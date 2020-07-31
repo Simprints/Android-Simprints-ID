@@ -5,6 +5,7 @@ import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
+import com.simprints.id.data.prefs.settings.fingerprint.serializers.FingerprintsToCollectSerializer
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.ScannerGenerationsSerializer
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
@@ -84,4 +85,8 @@ class SerializerModule {
     @Named("ScannerGenerationsSerializer")
     fun provideScannerGenerationsSerializer(): Serializer<List<ScannerGeneration>> = ScannerGenerationsSerializer()
 
+    @Provides
+    @Singleton
+    @Named("FingerprintsToCollectSerializer")
+    fun provideFingerprintsToCollectSerializer(): Serializer<List<FingerIdentifier>> = FingerprintsToCollectSerializer()
 }

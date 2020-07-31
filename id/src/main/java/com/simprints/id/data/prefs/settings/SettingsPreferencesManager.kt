@@ -22,6 +22,7 @@ interface SettingsPreferencesManager {
     var syncGroup: GROUP
     var matchGroup: GROUP
     /** @throws JsonSyntaxException */
+    @Deprecated("Use fingerprintsToCollect instead")
     var fingerStatus: Map<FingerIdentifier, Boolean>
 
     var programName: String
@@ -39,6 +40,7 @@ interface SettingsPreferencesManager {
     var modalities: List<Modality>
     var subjectsDownSyncSetting: SubjectsDownSyncSetting
 
+    var fingerprintsToCollect: List<FingerIdentifier>
     var fingerImagesExist: Boolean
     var captureFingerprintStrategy: CaptureFingerprintStrategy
     var saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
