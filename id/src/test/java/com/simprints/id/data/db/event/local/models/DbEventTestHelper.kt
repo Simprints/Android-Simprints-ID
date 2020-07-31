@@ -40,6 +40,8 @@ import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.Location
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.models.subject.*
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
 import com.simprints.id.domain.modality.Modes.FACE
@@ -49,7 +51,7 @@ import com.simprints.id.orchestrator.SOME_GUID1
 import com.simprints.id.orchestrator.SOME_GUID2
 import com.simprints.id.tools.utils.SimNetworkUtils.Connection
 
-val eventLabels = EventLabels(sessionId = SOME_GUID1)
+val eventLabels = EventLabels(sessionId = SOME_GUID1, deviceId = SOME_GUID1, projectId = SOME_GUID1, subjectId = SOME_GUID1)
 
 fun createConfirmationCallbackEvent() = ConfirmationCallbackEvent(CREATED_AT, true, eventLabels)
 
@@ -59,14 +61,14 @@ fun createErrorCallbackEvent() = ErrorCallbackEvent(CREATED_AT, DIFFERENT_PROJEC
 
 fun createIdentificationCallbackEvent(): IdentificationCallbackEvent {
     val comparisonScore = CallbackComparisonScore(SOME_GUID1, 1, TIER_1)
-    return IdentificationCallbackEvent(CREATED_AT, SOME_GUID1, listOf(comparisonScore))
+    return IdentificationCallbackEvent(CREATED_AT, SOME_GUID1, listOf(comparisonScore), eventLabels)
 }
 
 fun createRefusalCallbackEvent() = RefusalCallbackEvent(CREATED_AT, "some_reason", "extra", eventLabels)
 
 fun createVerificationCallbackEvent(): VerificationCallbackEvent {
     val comparisonScore = CallbackComparisonScore(SOME_GUID1, 1, TIER_1)
-    return VerificationCallbackEvent(CREATED_AT, comparisonScore)
+    return VerificationCallbackEvent(CREATED_AT, comparisonScore, eventLabels)
 }
 
 fun createConfirmationCalloutEvent() = ConfirmationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, SOME_GUID1, SOME_GUID2, eventLabels)
@@ -83,7 +85,7 @@ fun createFaceCaptureConfirmationEvent() = FaceCaptureConfirmationEvent(CREATED_
 
 fun createFaceCaptureEvent(): FaceCaptureEvent {
     val faceArg = Face(0F, 1F, 2F, "")
-    return FaceCaptureEvent(CREATED_AT, ENDED_AT, 0, 1F, VALID, true, faceArg)
+    return FaceCaptureEvent(CREATED_AT, ENDED_AT, 0, 1F, VALID, true, faceArg, eventLabels)
 }
 
 fun createFaceFallbackCaptureEvent() = FaceFallbackCaptureEvent(CREATED_AT, ENDED_AT, eventLabels)
@@ -105,10 +107,11 @@ fun createSessionCaptureEvent(): SessionCaptureEvent {
         "libSimprintsVersionName",
         "EN",
         deviceArg,
-        DatabaseInfo(2),
+        DatabaseInfo(0, 2),
         ENDED_AT,
         ENDED_AT,
-        Location(0.0, 0.0)
+        Location(0.0, 0.0),
+        labels = EventLabels(deviceId = SOME_GUID1, projectId = SOME_GUID1)
     )
 }
 
@@ -123,7 +126,19 @@ fun createEnrolmentRecordCreationEvent() = EnrolmentRecordCreationEvent(CREATED_
 
 fun createEnrolmentRecordDeletionEvent() = EnrolmentRecordDeletionEvent(CREATED_AT, SOME_GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, eventLabels)
 
-fun createEnrolmentRecordMoveEvent() = EnrolmentRecordMoveEvent(CREATED_AT, createEnrolmentRecordCreationEvent().payload, createEnrolmentRecordDeletionEvent().payload, eventLabels)
+fun createEnrolmentRecordMoveEvent() =
+    EnrolmentRecordMoveEvent(
+        CREATED_AT,
+        EnrolmentRecordCreationInMove(SOME_GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, createBiometricReferences()),
+        EnrolmentRecordDeletionInMove(SOME_GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID),
+        eventLabels
+    )
+
+private fun createBiometricReferences(): List<BiometricReference> {
+    val fingerprintReference = FingerprintReference(listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
+    val faceReference = FaceReference(listOf(FaceTemplate("some_template")))
+    return listOf(fingerprintReference, faceReference)
+}
 
 fun createAlertScreenEvent() = AlertScreenEvent(CREATED_AT, BLUETOOTH_NOT_ENABLED, eventLabels)
 
@@ -145,7 +160,7 @@ fun createEnrolmentEvent() = EnrolmentEvent(CREATED_AT, SOME_GUID1, eventLabels)
 
 fun createFingerprintCaptureEvent(): FingerprintCaptureEvent {
     val fingerprint = Fingerprint(LEFT_THUMB, 8, "template")
-    return FingerprintCaptureEvent(CREATED_AT, ENDED_AT, LEFT_THUMB, 10, BAD_QUALITY, fingerprint, SOME_GUID1)
+    return FingerprintCaptureEvent(CREATED_AT, ENDED_AT, LEFT_THUMB, 10, BAD_QUALITY, fingerprint, SOME_GUID1, eventLabels)
 }
 
 fun createGuidSelectionEvent() = GuidSelectionEvent(CREATED_AT, SOME_GUID1, eventLabels)
@@ -157,12 +172,12 @@ fun createInvalidIntentEvent() = InvalidIntentEvent(CREATED_AT, "action", mapOf(
 fun createOneToManyMatchEvent(): OneToManyMatchEvent {
     val poolArg = MatchPool(PROJECT, 100)
     val resultArg = listOf(MatchEntry(SOME_GUID1, 0F))
-    return OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, RANK_ONE, resultArg)
+    return OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, RANK_ONE, resultArg, eventLabels)
 }
 
 fun createOneToOneMatchEvent(): OneToOneMatchEvent {
     val matchEntry = MatchEntry(SOME_GUID1, 10F)
-    return OneToOneMatchEvent(CREATED_AT, ENDED_AT, SOME_GUID1, RANK_ONE, matchEntry)
+    return OneToOneMatchEvent(CREATED_AT, ENDED_AT, SOME_GUID1, RANK_ONE, matchEntry, eventLabels)
 }
 
 fun createPersonCreationEvent() = PersonCreationEvent(CREATED_AT, listOf(SOME_GUID1, SOME_GUID2), listOf(SOME_GUID1, SOME_GUID2), eventLabels)
@@ -171,12 +186,13 @@ fun createRefusalEvent() = RefusalEvent(CREATED_AT, ENDED_AT, OTHER, "other_text
 
 fun createScannerConnectionEvent() = ScannerConnectionEvent(CREATED_AT, ScannerInfo("scanner_id", "macaddress", VERO_1, "version"), eventLabels)
 
-fun createScannerFirmwareUpdateEvent() = ScannerFirmwareUpdateEvent(CREATED_AT, ENDED_AT, "chip", "targetAppVersion", "error", eventLabels)
+fun createScannerFirmwareUpdateEvent() =
+    ScannerFirmwareUpdateEvent(CREATED_AT, ENDED_AT, "chip", "targetAppVersion", "error", eventLabels)
 
 fun createSuspiciousIntentEvent() = SuspiciousIntentEvent(CREATED_AT, mapOf("extra_key" to "extra_value"), eventLabels)
 
 fun createVero2InfoSnapshotEvent(): Vero2InfoSnapshotEvent {
     val vero2Version = Vero2Version(0, "cypressApp", "cypressApi", "stmApp", "stmApi", "un20App", "un20Api")
     val batteryInfo = BatteryInfo(0, 1, 2, 3)
-    return Vero2InfoSnapshotEvent(CREATED_AT, vero2Version, batteryInfo)
+    return Vero2InfoSnapshotEvent(CREATED_AT, vero2Version, batteryInfo, eventLabels)
 }

@@ -7,13 +7,13 @@ import com.simprints.id.data.db.event.remote.models.ApiFingerprintCapturePayload
 
 @Keep
 class ApiFingerprintCapturePayload(val id: String,
-                                   createdAt: Long,
-                                   eventVersion: Int,
+                                   override val relativeStartTime: Long,
+                                   override val version: Int,
                                    val relativeEndTime: Long,
                                    val qualityThreshold: Int,
                                    val finger: ApiFingerIdentifier,
                                    val result: ApiResult,
-                                   val fingerprint: ApiFingerprint?) : ApiEventPayload(ApiEventPayloadType.FINGERPRINT_CAPTURE, eventVersion, createdAt) {
+                                   val fingerprint: ApiFingerprint?) : ApiEventPayload(ApiEventPayloadType.FINGERPRINT_CAPTURE, version, relativeStartTime) {
 
     @Keep
     class ApiFingerprint(val finger: ApiFingerIdentifier, val quality: Int, val template: String) {

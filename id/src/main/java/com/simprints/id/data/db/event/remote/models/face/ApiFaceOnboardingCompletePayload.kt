@@ -6,9 +6,9 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayload
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FACE_ONBOARDING_COMPLETE
 
 @Keep
-class ApiFaceOnboardingCompletePayload(createdAt: Long,
-                                       val endedAt: Long,
-                                       version: Int) : ApiEventPayload(FACE_ONBOARDING_COMPLETE, version, createdAt) {
+class ApiFaceOnboardingCompletePayload(override val relativeStartTime: Long, //Not added on API yet
+                                       val relativeEndTime: Long,
+                                       override val version: Int) : ApiEventPayload(FACE_ONBOARDING_COMPLETE, version, relativeStartTime) {
 
     constructor(domainPayload: FaceOnboardingCompletePayload) : this(
         domainPayload.createdAt,

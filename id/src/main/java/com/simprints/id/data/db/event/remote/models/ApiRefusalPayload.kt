@@ -6,11 +6,11 @@ import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload.
 import com.simprints.id.data.db.event.remote.models.ApiRefusalPayload.ApiAnswer
 
 @Keep
-class ApiRefusalPayload(createdAt: Long,
-                        eventVersion: Int,
+class ApiRefusalPayload(override val relativeStartTime: Long,
+                        override val version: Int,
                         val relativeEndTime: Long,
                         val reason: ApiAnswer,
-                        val otherText: String) : ApiEventPayload(ApiEventPayloadType.REFUSAL, eventVersion, createdAt) {
+                        val otherText: String) : ApiEventPayload(ApiEventPayloadType.REFUSAL, version, relativeStartTime) {
 
     @Keep
     enum class ApiAnswer {

@@ -4,9 +4,9 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
 
 @Keep
-class ApiGuidSelectionPayload(createdAt: Long,
-                              eventVersion: Int,
-                              val selectedId: String) : ApiEventPayload(ApiEventPayloadType.GUID_SELECTION, eventVersion, createdAt) {
+class ApiGuidSelectionPayload(override val relativeStartTime: Long,
+                              override val version: Int,
+                              val selectedId: String) : ApiEventPayload(ApiEventPayloadType.GUID_SELECTION, version, relativeStartTime) {
 
     constructor(domainPayload: GuidSelectionPayload) :
         this(domainPayload.createdAt,

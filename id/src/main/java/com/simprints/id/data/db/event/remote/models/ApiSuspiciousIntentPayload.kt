@@ -4,9 +4,9 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.SuspiciousIntentEvent.SuspiciousIntentPayload
 
 @Keep
-class ApiSuspiciousIntentPayload(createdAt: Long,
-                                 eventVersion: Int,
-                                 val unexpectedExtras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.SUSPICIOUS_INTENT, eventVersion, createdAt) {
+class ApiSuspiciousIntentPayload(override val relativeStartTime: Long,
+                                 override val version: Int,
+                                 val unexpectedExtras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.SUSPICIOUS_INTENT, version, relativeStartTime) {
 
     constructor(domainPayload: SuspiciousIntentPayload) :
         this(domainPayload.createdAt,

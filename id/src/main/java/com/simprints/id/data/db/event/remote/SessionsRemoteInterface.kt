@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.event.remote
 
-import com.simprints.id.data.db.event.remote.models.session.ApiSessionCapture
+import com.simprints.id.data.db.event.remote.models.session.ApiSessionCapturePayload
 import com.simprints.id.network.SimRemoteInterface
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -10,5 +10,5 @@ interface SessionsRemoteInterface : SimRemoteInterface {
 
     @POST("projects/{projectId}/sessions")
     suspend fun uploadSessions(@Path("projectId") projectId: String,
-                               @Body sessionsJson: HashMap<String, Array<ApiSessionCapture>>)
+                               @Body sessionsJson: HashMap<String, Array<ApiSessionCapturePayload>>)
 }
