@@ -34,7 +34,8 @@ open class SettingsPreferencesManagerImpl(
     subjectsDownSyncSettingSerializer: Serializer<SubjectsDownSyncSetting>,
     captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
     saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
-    scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
+    scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
+    fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>
 ) : SettingsPreferencesManager {
 
     /**
@@ -250,6 +251,15 @@ open class SettingsPreferencesManagerImpl(
             subjectsDownSyncSettingSerializer
         )
 
+    override var fingerprintsToCollect: List<FingerIdentifier>
+        by OverridableRemoteConfigComplexPreference(
+            prefs,
+            remoteConfigWrapper,
+            FINGERPRINTS_FOR_COLLECTION_KEY,
+            FINGERPRINTS_FOR_COLLECTION_DEFAULT,
+            fingerprintsToCollectSerializer
+        )
+
     override var fingerImagesExist: Boolean
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -403,6 +413,9 @@ open class SettingsPreferencesManagerImpl(
 
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"
+
+        const val FINGERPRINTS_FOR_COLLECTION_KEY = "FingerprintsToCollect"
+        val FINGERPRINTS_FOR_COLLECTION_DEFAULT = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
 
         const val FINGER_IMAGES_EXIST_KEY = "FingerImagesExist"
         const val FINGER_IMAGES_EXIST_DEFAULT = true
