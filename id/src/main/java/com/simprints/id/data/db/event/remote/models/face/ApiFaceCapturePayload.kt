@@ -2,10 +2,10 @@ package com.simprints.id.data.db.event.remote.models.face
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
-import com.simprints.id.data.db.event.remote.events.ApiEventPayload
-import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.FACE_CAPTURE
-import com.simprints.id.data.db.event.remote.events.face.ApiFaceCapturePayload.ApiFace
-import com.simprints.id.data.db.event.remote.events.face.ApiFaceCapturePayload.ApiResult.*
+import com.simprints.id.data.db.event.remote.models.ApiEventPayload
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FACE_CAPTURE
+import com.simprints.id.data.db.event.remote.models.face.ApiFaceCapturePayload.ApiFace
+import com.simprints.id.data.db.event.remote.models.face.ApiFaceCapturePayload.ApiResult.*
 
 @Keep
 class ApiFaceCapturePayload(val id: String,

@@ -5,10 +5,10 @@ import com.simprints.id.data.db.event.domain.models.subject.BiometricReference
 import com.simprints.id.data.db.event.domain.models.subject.FaceTemplate
 import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier
 import com.simprints.id.data.db.event.domain.models.subject.FingerprintTemplate
-import com.simprints.id.data.db.event.remote.events.subject.ApiBiometricReferenceName.FACE_REFERENCE_SERIALISED
-import com.simprints.id.data.db.event.remote.events.subject.ApiBiometricReferenceName.FINGERPRINT_REFERENCE_SERIALISED
-import com.simprints.id.data.db.event.remote.events.subject.ApiBiometricReferenceType.FACE_REFERENCE
-import com.simprints.id.data.db.event.remote.events.subject.ApiBiometricReferenceType.FINGERPRINT_REFERENCE
+import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReferenceName.FACE_REFERENCE_SERIALISED
+import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReferenceName.FINGERPRINT_REFERENCE_SERIALISED
+import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReferenceType.FACE_REFERENCE
+import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReferenceType.FINGERPRINT_REFERENCE
 import com.simprints.id.data.db.event.domain.models.subject.FaceReference as DomainFaceReference
 import com.simprints.id.data.db.event.domain.models.subject.FingerprintReference as DomainFingerprintReference
 

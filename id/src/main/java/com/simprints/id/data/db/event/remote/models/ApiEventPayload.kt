@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.remote.models
 
-import androidx.annotation.Keep
-import com.beust.klaxon.TypeFor
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload
@@ -45,20 +45,52 @@ import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload
-import com.simprints.id.data.db.event.remote.events.callback.ApiCallbackPayload
-import com.simprints.id.data.db.event.remote.events.callout.ApiCalloutPayload
-import com.simprints.id.data.db.event.remote.events.face.*
-import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationPayload
-import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionPayload
-import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMovePayload
-import com.simprints.id.data.db.event.remote.events.session.ApiSessionCapture.ApiSessionCapturePayload
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.Companion
+import com.simprints.id.data.db.event.remote.models.callback.ApiCallbackPayload
+import com.simprints.id.data.db.event.remote.models.callout.ApiCalloutPayload
+import com.simprints.id.data.db.event.remote.models.face.*
+import com.simprints.id.data.db.event.remote.models.session.ApiSessionCapture.ApiSessionCapturePayload
+import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordCreationPayload
+import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMovePayload
 
-@Keep
-@TypeFor(field = "type", adapter = ApiEventPayloadAdapter::class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = ApiFaceCaptureConfirmationPayload::class, name = Companion.FACE_CAPTURE_CONFIRMATION_KEY),
+    JsonSubTypes.Type(value = ApiFaceCapturePayload::class, name = Companion.FACE_CAPTURE_KEY),
+    JsonSubTypes.Type(value = ApiFaceCaptureRetryPayload::class, name = Companion.FACE_CAPTURE_RETRY_KEY),
+    JsonSubTypes.Type(value = ApiFaceFallbackCapturePayload::class, name = Companion.FACE_FALLBACK_CAPTURE_KEY),
+    JsonSubTypes.Type(value = ApiFaceOnboardingCompletePayload::class, name = Companion.FACE_ONBOARDING_COMPLETE_KEY),
+    JsonSubTypes.Type(value = ApiSessionCapturePayload::class, name = Companion.SESSION_CAPTURE_KEY),
+    JsonSubTypes.Type(value = ApiEnrolmentRecordCreationPayload::class, name = Companion.ENROLMENT_RECORD_CREATION_KEY),
+    JsonSubTypes.Type(value = ApiEnrolmentRecordDeletionPayload::class, name = Companion.ENROLMENT_RECORD_DELETION_KEY),
+    JsonSubTypes.Type(value = ApiEnrolmentRecordMovePayload::class, name = Companion.ENROLMENT_RECORD_MOVE_KEY),
+    JsonSubTypes.Type(value = ApiAlertScreenPayload::class, name = Companion.ALERT_SCREEN_KEY),
+    JsonSubTypes.Type(value = ApiArtificialTerminationPayload::class, name = Companion.ARTIFICIAL_TERMINATION_KEY),
+    JsonSubTypes.Type(value = ApiAuthenticationPayload::class, name = Companion.AUTHENTICATION_KEY),
+    JsonSubTypes.Type(value = ApiAuthorizationPayload::class, name = Companion.AUTHORIZATION_KEY),
+    JsonSubTypes.Type(value = ApiCandidateReadPayload::class, name = Companion.CANDIDATE_READ_KEY),
+    JsonSubTypes.Type(value = ApiCompletionCheckPayload::class, name = Companion.COMPLETION_CHECK_KEY),
+    JsonSubTypes.Type(value = ApiConnectivitySnapshotPayload::class, name = Companion.CONNECTIVITY_SNAPSHOT_KEY),
+    JsonSubTypes.Type(value = ApiConsentPayload::class, name = Companion.CONSENT_KEY),
+    JsonSubTypes.Type(value = ApiEnrolmentPayload::class, name = Companion.ENROLMENT_KEY),
+    JsonSubTypes.Type(value = ApiFingerprintCapturePayload::class, name = Companion.FINGERPRINT_CAPTURE_KEY),
+    JsonSubTypes.Type(value = ApiGuidSelectionPayload::class, name = Companion.GUID_SELECTION_KEY),
+    JsonSubTypes.Type(value = ApiIntentParsingPayload::class, name = Companion.INTENT_PARSING_KEY),
+    JsonSubTypes.Type(value = ApiInvalidIntentPayload::class, name = Companion.INVALID_INTENT_KEY),
+    JsonSubTypes.Type(value = ApiOneToManyMatchPayload::class, name = Companion.ONE_TO_MANY_MATCH_KEY),
+    JsonSubTypes.Type(value = ApiOneToOneMatchPayload::class, name = Companion.ONE_TO_ONE_MATCH_KEY),
+    JsonSubTypes.Type(value = ApiPersonCreationPayload::class, name = Companion.PERSON_CREATION_KEY),
+    JsonSubTypes.Type(value = ApiRefusalPayload::class, name = Companion.REFUSAL_KEY),
+    JsonSubTypes.Type(value = ApiScannerConnectionPayload::class, name = Companion.SCANNER_CONNECTION_KEY),
+    JsonSubTypes.Type(value = ApiScannerFirmwareUpdatePayload::class, name = Companion.SCANNER_FIRMWARE_UPDATE_KEY),
+    JsonSubTypes.Type(value = ApiSuspiciousIntentPayload::class, name = Companion.SUSPICIOUS_INTENT_KEY),
+    JsonSubTypes.Type(value = ApiVero2InfoSnapshotPayload::class, name = Companion.VERO_2_INFO_SNAPSHOT_KEY)
+)
 abstract class ApiEventPayload(
     val type: ApiEventPayloadType,
     open val version: Int,
-    open val createdAt: Long?
+    open val relativeStartTime: Long
 )
 
 fun EventPayload.fromDomainToApi(): ApiEventPayload =
@@ -82,8 +114,17 @@ fun EventPayload.fromDomainToApi(): ApiEventPayload =
         CANDIDATE_READ -> ApiCandidateReadPayload(this as CandidateReadPayload)
         SCANNER_CONNECTION -> ApiScannerConnectionPayload(this as ScannerConnectionPayload)
         VERO_2_INFO_SNAPSHOT -> ApiVero2InfoSnapshotPayload(this as Vero2InfoSnapshotPayload)
-        SCANNER_FIRMWARE_UPDATE -> ApiScannerFirmwareUpdatePayload(this as ScannerFirmwareUpdatePayload)
         INVALID_INTENT -> ApiInvalidIntentPayload(this as InvalidIntentPayload)
+        SUSPICIOUS_INTENT -> ApiSuspiciousIntentPayload(this as SuspiciousIntentPayload)
+        INTENT_PARSING -> ApiIntentParsingPayload(this as IntentParsingPayload)
+        COMPLETION_CHECK -> ApiCompletionCheckPayload(this as CompletionCheckPayload)
+        SESSION_CAPTURE -> ApiSessionCapturePayload(this as SessionCapturePayload)
+        FACE_ONBOARDING_COMPLETE -> ApiFaceOnboardingCompletePayload(this as FaceOnboardingCompletePayload)
+        FACE_FALLBACK_CAPTURE -> ApiFaceFallbackCapturePayload(this as FaceFallbackCapturePayload)
+        FACE_CAPTURE -> ApiFaceCapturePayload(this as FaceCapturePayload)
+        FACE_CAPTURE_CONFIRMATION -> ApiFaceCaptureConfirmationPayload(this as FaceCaptureConfirmationPayload)
+        FACE_CAPTURE_RETRY -> ApiFaceCaptureRetryPayload(this as FaceCaptureRetryPayload)
+        SCANNER_FIRMWARE_UPDATE -> ApiScannerFirmwareUpdatePayload(this as ScannerFirmwareUpdatePayload)
         CALLOUT_CONFIRMATION -> ApiCalloutPayload(this as ConfirmationCalloutPayload)
         CALLOUT_IDENTIFICATION -> ApiCalloutPayload(this as IdentificationCalloutPayload)
         CALLOUT_ENROLMENT -> ApiCalloutPayload(this as EnrolmentCalloutPayload)
@@ -95,13 +136,4 @@ fun EventPayload.fromDomainToApi(): ApiEventPayload =
         CALLBACK_VERIFICATION -> ApiCallbackPayload(this as VerificationCallbackPayload)
         CALLBACK_ERROR -> ApiCallbackPayload(this as ErrorCallbackPayload)
         CALLBACK_CONFIRMATION -> ApiCallbackPayload(this as ConfirmationCallbackPayload)
-        SUSPICIOUS_INTENT -> ApiSuspiciousIntentPayload(this as SuspiciousIntentPayload)
-        INTENT_PARSING -> ApiIntentParsingPayload(this as IntentParsingPayload)
-        COMPLETION_CHECK -> ApiCompletionCheckPayload(this as CompletionCheckPayload)
-        SESSION_CAPTURE -> ApiSessionCapturePayload(this as SessionCapturePayload)
-        FACE_ONBOARDING_COMPLETE -> ApiFaceOnboardingCompletePayload(this as FaceOnboardingCompletePayload)
-        FACE_FALLBACK_CAPTURE -> ApiFaceFallbackCapturePayload(this as FaceFallbackCapturePayload)
-        FACE_CAPTURE -> ApiFaceCapturePayload(this as FaceCapturePayload)
-        FACE_CAPTURE_CONFIRMATION -> ApiFaceCaptureConfirmationPayload(this as FaceCaptureConfirmationPayload)
-        FACE_CAPTURE_RETRY -> ApiFaceCaptureRetryPayload(this as FaceCaptureRetryPayload)
     }

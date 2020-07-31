@@ -1,4 +1,4 @@
-//package com.simprints.id.data.db.event.remote.events.callback
+//package com.simprints.id.data.db.event.remote.models.callback
 //
 //import com.google.common.truth.Truth.assertThat
 //import com.simprints.id.data.db.event.domain.events.callback.ErrorCallbackEvent

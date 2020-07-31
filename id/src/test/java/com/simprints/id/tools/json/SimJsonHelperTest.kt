@@ -2,10 +2,10 @@
 //
 //import com.google.common.truth.Truth.assertThat
 //import com.google.gson.reflect.TypeToken
-//import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationPayload
-//import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionPayload
-//import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMovePayload
-//import com.simprints.id.data.db.event.remote.events.ApiEvent
+//import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordCreationPayload
+//import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload
+//import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMovePayload
+//import com.simprints.id.data.db.event.remote.models.ApiEvent
 //import org.junit.Test
 
 // StopShip: to fix once the event remote data source is sorted

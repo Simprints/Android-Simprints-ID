@@ -2,9 +2,9 @@ package com.simprints.id.data.db.subject.remote
 
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.remote.events.ApiEvents
-import com.simprints.id.data.db.event.remote.events.fromApiToDomain
-import com.simprints.id.data.db.event.remote.events.fromDomainToApi
+import com.simprints.id.data.db.event.remote.models.ApiEvents
+import com.simprints.id.data.db.event.remote.models.fromApiToDomain
+import com.simprints.id.data.db.event.remote.models.fromDomainToApi
 import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
@@ -21,7 +21,7 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
                 subjectId = subjectId,
                 modes = modes,
                 lastEventId = lastEventId,
-                eventType = types.map { it.apiName }
+                eventType = types.map { it.key }
             ).map { it.fromApiToDomain() }
         }
     }
@@ -35,7 +35,7 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
                 subjectId = subjectId,
                 modes = modes,
                 lastEventId = lastEventId,
-                eventType = types.map { it.apiName }
+                eventType = types.map { it.key }
             )
         }
     }.byteStream()

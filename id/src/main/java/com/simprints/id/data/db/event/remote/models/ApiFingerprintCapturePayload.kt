@@ -3,7 +3,7 @@ package com.simprints.id.data.db.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result.*
-import com.simprints.id.data.db.event.remote.events.ApiFingerprintCapturePayload.ApiResult
+import com.simprints.id.data.db.event.remote.models.ApiFingerprintCapturePayload.ApiResult
 
 @Keep
 class ApiFingerprintCapturePayload(val id: String,

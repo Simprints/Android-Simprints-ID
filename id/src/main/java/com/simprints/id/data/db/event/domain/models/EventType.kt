@@ -82,7 +82,6 @@ enum class EventType(private val key: String) {
         const val REFUSAL_KEY = "REFUSAL"
         const val CANDIDATE_READ_KEY = "CANDIDATE_READ"
         const val SCANNER_CONNECTION_KEY = "SCANNER_CONNECTION"
-        const val SCANNER_FIRMWARE_UPDATE = "SCANNER_FIRMWARE_UPDATE_KEY"
         const val SCANNER_FIRMWARE_UPDATE_KEY = "SCANNER_FIRMWARE_UPDATE"
         const val COMPLETION_CHECK_KEY = "COMPLETION_CHECK"
         const val SUSPICIOUS_INTENT_KEY = "SUSPICIOUS_INTENT"

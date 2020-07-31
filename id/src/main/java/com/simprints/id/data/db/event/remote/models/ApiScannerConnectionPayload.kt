@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.ScannerConnectionEvent.Scann
 import com.simprints.id.data.db.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
 import com.simprints.id.data.db.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_2
 import com.simprints.id.data.db.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
-import com.simprints.id.data.db.event.remote.events.ApiScannerConnectionPayload.ApiScannerGeneration
+import com.simprints.id.data.db.event.remote.models.ApiScannerConnectionPayload.ApiScannerGeneration
 
 @Keep
 class ApiScannerConnectionPayload(createdAt: Long,

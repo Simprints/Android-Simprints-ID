@@ -7,7 +7,7 @@ import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LO
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.SubjectsCount
 import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.id.data.db.event.remote.events.ApiEvent
+import com.simprints.id.data.db.event.remote.models.ApiEvent
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource

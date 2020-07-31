@@ -4,10 +4,10 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.session.Location
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
-import com.simprints.id.data.db.event.remote.events.ApiEvent
-import com.simprints.id.data.db.event.remote.events.ApiEventPayload
-import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType
-import com.simprints.id.data.db.event.remote.events.fromDomainToApi
+import com.simprints.id.data.db.event.remote.models.ApiEvent
+import com.simprints.id.data.db.event.remote.models.ApiEventPayload
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
+import com.simprints.id.data.db.event.remote.models.fromDomainToApi
 import java.util.*
 
 @Keep

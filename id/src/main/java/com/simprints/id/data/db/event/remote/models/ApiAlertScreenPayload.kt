@@ -3,15 +3,15 @@ package com.simprints.id.data.db.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
-import com.simprints.id.data.db.event.remote.events.ApiAlertScreenPayload.ApiAlertScreenEventType
-import com.simprints.id.data.db.event.remote.events.ApiAlertScreenPayload.ApiAlertScreenEventType.*
-import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.ALERT_SCREEN
+import com.simprints.id.data.db.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType
+import com.simprints.id.data.db.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.*
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.ALERT_SCREEN
 
 
 @Keep
-class ApiAlertScreenPayload(createdAt: Long,
-                            version: Int,
-                            val alertType: ApiAlertScreenEventType) : ApiEventPayload(ALERT_SCREEN, version, createdAt) {
+data class ApiAlertScreenPayload(override val relativeStartTime: Long,
+                                 override val version: Int,
+                                 val alertType: ApiAlertScreenEventType) : ApiEventPayload(ALERT_SCREEN, version, relativeStartTime) {
 
     constructor(domainPayload: AlertScreenPayload) :
         this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.alertType.fromDomainToApi())

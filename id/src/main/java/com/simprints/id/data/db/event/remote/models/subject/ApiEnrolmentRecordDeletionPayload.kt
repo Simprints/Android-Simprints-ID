@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.event.remote.models.subject
 
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
-import com.simprints.id.data.db.event.remote.events.ApiEventPayload
-import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType
+import com.simprints.id.data.db.event.remote.models.ApiEventPayload
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
 import io.realm.internal.Keep
 
 @Keep
@@ -22,7 +22,7 @@ class ApiEnrolmentRecordDeletionPayload(
 
 fun ApiEnrolmentRecordDeletionPayload.fromApiToDomain() =
     EnrolmentRecordDeletionPayload(
-        createdAt ?: 0,
+        relativeStartTime ?: 0,
         version,
         subjectId,
         projectId,

@@ -2,8 +2,8 @@ package com.simprints.id.data.db.event.remote.models.face
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureRetryEvent.FaceCaptureRetryPayload
-import com.simprints.id.data.db.event.remote.events.ApiEventPayload
-import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.FACE_CAPTURE_RETRY
+import com.simprints.id.data.db.event.remote.models.ApiEventPayload
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FACE_CAPTURE_RETRY
 
 @Keep
 class ApiFaceCaptureRetryPayload(createdAt: Long,

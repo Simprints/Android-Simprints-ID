@@ -6,14 +6,14 @@ import com.simprints.id.data.db.event.domain.models.callout.EnrolmentCalloutEven
 import com.simprints.id.data.db.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
 import com.simprints.id.data.db.event.domain.models.callout.IdentificationCalloutEvent.IdentificationCalloutPayload
 import com.simprints.id.data.db.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
-import com.simprints.id.data.db.event.remote.events.ApiEventPayload
-import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.CALLOUT
+import com.simprints.id.data.db.event.remote.models.ApiEventPayload
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.CALLOUT
 
 @Keep
 class ApiCalloutPayload(
-    override val createdAt: Long,
-    override val version: Int,
-    val callout: ApiCallout) : ApiEventPayload(CALLOUT, version, createdAt) {
+        override val relativeStartTime: Long,
+        override val version: Int,
+        val callout: ApiCallout) : ApiEventPayload(CALLOUT, version, relativeStartTime) {
 
     constructor(domainPayload: EnrolmentCalloutPayload) : this(
         domainPayload.createdAt,
@@ -60,4 +60,3 @@ class ApiCalloutPayload(
             domainPayload.metadata,
             domainPayload.sessionId))
 }
-
