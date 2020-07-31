@@ -2,6 +2,7 @@ package com.simprints.id.services.securitystate
 
 import android.content.Context
 import androidx.work.*
+import com.simprints.id.BuildConfig
 import java.util.concurrent.TimeUnit
 
 class SecurityStateSchedulerImpl(context: Context) : SecurityStateScheduler {
@@ -36,7 +37,7 @@ class SecurityStateSchedulerImpl(context: Context) : SecurityStateScheduler {
 
     private companion object {
         const val WORK_NAME = "security-status-check-work"
-        const val REPEAT_INTERVAL = 15L
+        const val REPEAT_INTERVAL = BuildConfig.SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES
     }
 
 }

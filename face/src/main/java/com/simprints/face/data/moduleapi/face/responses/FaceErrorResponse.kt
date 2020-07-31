@@ -32,6 +32,7 @@ enum class FaceErrorReason {
             when (errorType) {
                 ErrorType.LICENSE_MISSING -> LICENSE_MISSING
                 ErrorType.LICENSE_INVALID -> LICENSE_INVALID
+                ErrorType.CONFIGURATION_ERROR -> CONFIGURATION_ERROR
             }
     }
 }
