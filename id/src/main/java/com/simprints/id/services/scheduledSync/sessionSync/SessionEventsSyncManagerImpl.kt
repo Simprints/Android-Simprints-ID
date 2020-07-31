@@ -1,6 +1,7 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.work.*
+import com.simprints.id.BuildConfig
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -50,7 +51,7 @@ open class SessionEventsSyncManagerImpl(private val workManager: WorkManager) : 
         .build()
 
     companion object {
-        private const val SYNC_REPEAT_INTERVAL = 15L
+        private const val SYNC_REPEAT_INTERVAL = BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL_MINUTES
         private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
 
         internal const val MASTER_WORKER_VERSION = 1L

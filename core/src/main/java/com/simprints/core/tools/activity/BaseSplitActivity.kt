@@ -3,7 +3,9 @@ package com.simprints.core.tools.activity
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.play.core.splitcompat.SplitCompat
+import com.google.android.play.core.splitinstall.SplitInstallHelper
 import com.simprints.core.tools.utils.LanguageHelper
+import timber.log.Timber
 
 /**
  * This base activity unifies calls to attachBaseContext to make sure the correct language is set for
