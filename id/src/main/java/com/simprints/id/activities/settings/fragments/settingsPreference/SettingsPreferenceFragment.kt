@@ -129,6 +129,12 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
         Toast.makeText(activity, getString(R.string.settings_invalid_selection), Toast.LENGTH_LONG).show()
     }
 
+    override fun openFingerSelectionActivity() {
+        activity.runOnUiThreadIfStillRunning {
+            (activity as SettingsActivity).openFingerSelectionActivity()
+        }
+    }
+
     override fun openSettingAboutActivity() {
         activity.runOnUiThreadIfStillRunning {
             (activity as SettingsActivity).openSettingAboutActivity()
