@@ -7,10 +7,10 @@ import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2
 
 
 @Keep
-class ApiVero2InfoSnapshotPayload(createdAt: Long,
-                                  eventVersion: Int,
+class ApiVero2InfoSnapshotPayload(override val relativeStartTime: Long,
+                                  override val version: Int,
                                   val scannerVersion: ApiVero2Version,
-                                  val battery: ApiBatteryInfo) : ApiEventPayload(ApiEventPayloadType.VERO_2_INFO_SNAPSHOT, eventVersion, createdAt) {
+                                  val battery: ApiBatteryInfo) : ApiEventPayload(ApiEventPayloadType.VERO_2_INFO_SNAPSHOT, version, relativeStartTime) {
 
     @Keep
     class ApiVero2Version(val master: Long,

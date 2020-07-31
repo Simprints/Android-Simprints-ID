@@ -49,7 +49,7 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.Companio
 import com.simprints.id.data.db.event.remote.models.callback.ApiCallbackPayload
 import com.simprints.id.data.db.event.remote.models.callout.ApiCalloutPayload
 import com.simprints.id.data.db.event.remote.models.face.*
-import com.simprints.id.data.db.event.remote.models.session.ApiSessionCapture.ApiSessionCapturePayload
+import com.simprints.id.data.db.event.remote.models.session.ApiSessionCapturePayload
 import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMovePayload

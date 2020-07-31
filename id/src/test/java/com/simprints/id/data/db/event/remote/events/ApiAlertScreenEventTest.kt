@@ -1,20 +1,6 @@
 package com.simprints.id.data.db.event.remote.events
 
-import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.local.models.createAlertScreenEvent
-import com.simprints.id.data.db.event.remote.models.fromApiToDomain
-import com.simprints.id.data.db.event.remote.models.fromDomainToApi
-import org.junit.Test
-
 class ApiAlertScreenEventTest {
-
-    @Test
-    fun convert_AlertScreenEvent() {
-        val original = createAlertScreenEvent()
-        val transformed = original.fromDomainToApi().fromApiToDomain()
-
-        assertThat(original).isEqualTo(transformed)
-    }
 
 //    @Test
 //    fun differentProjectId_fromDomainToApi() {

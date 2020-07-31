@@ -47,7 +47,9 @@ data class SessionCaptureEvent(
                 databaseInfo,
                 uploadTime,
                 location,
-                analyticsId))
+                analyticsId)) {
+        this.labels = labels.copy(sessionId = id)
+    }
 
     @Keep
     data class SessionCapturePayload(

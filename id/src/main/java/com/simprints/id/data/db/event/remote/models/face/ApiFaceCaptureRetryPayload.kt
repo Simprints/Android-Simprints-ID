@@ -6,9 +6,9 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayload
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FACE_CAPTURE_RETRY
 
 @Keep
-class ApiFaceCaptureRetryPayload(createdAt: Long,
-                                 val endedAt: Long,
-                                 version: Int) : ApiEventPayload(FACE_CAPTURE_RETRY, version, createdAt) {
+class ApiFaceCaptureRetryPayload(override val relativeStartTime: Long, //Not added on API yet
+                                 val relativeEndTime: Long,
+                                 override val version: Int) : ApiEventPayload(FACE_CAPTURE_RETRY, version, relativeStartTime) {
 
     constructor(domainPayload: FaceCaptureRetryPayload) : this(
         domainPayload.createdAt,
