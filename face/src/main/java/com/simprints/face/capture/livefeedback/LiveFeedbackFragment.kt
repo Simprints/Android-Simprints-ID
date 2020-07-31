@@ -29,16 +29,10 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setTextInLayout()
         startCamera()
         bindViewModel()
         capture_feedback_txt_title.setOnClickListener { vm.startCapture() }
         capture_progress.max = mainVm.samplesToCapture
-    }
-
-    private fun setTextInLayout() {
-        capture_title.text = getString(R.string.title_confirmation)
-        capture_feedback_txt_title.text = getString(R.string.capture_title_previewing)
     }
 
     private fun bindViewModel() {
@@ -131,10 +125,8 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
 
     private fun renderCapturingNotStarted() {
         capture_overlay.drawSemiTransparentTarget()
-        capture_title.text =
-            getString(R.string.title_preparation)
-        capture_feedback_txt_title.text =
-            getString(R.string.capture_prep_begin_btn)
+        capture_title.text = getString(R.string.title_preparation)
+        capture_feedback_txt_title.text = getString(R.string.capture_title_previewing)
         toggleCaptureButtons(false)
     }
 
