@@ -3,8 +3,8 @@ package com.simprints.id.data.db.event.remote.models.subject
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.domain.models.subject.fromApiToDomain
-import com.simprints.id.data.db.event.remote.events.ApiEventPayload
-import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType
+import com.simprints.id.data.db.event.remote.models.ApiEventPayload
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
 
 @Keep
 class ApiEnrolmentRecordCreationPayload(
@@ -25,7 +25,7 @@ class ApiEnrolmentRecordCreationPayload(
 
 fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() =
     EnrolmentRecordCreationPayload(
-        createdAt ?: 0,
+        relativeStartTime ?: 0,
         version,
         subjectId,
         projectId,

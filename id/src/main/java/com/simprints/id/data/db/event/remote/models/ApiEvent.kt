@@ -5,11 +5,11 @@ import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
-import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.*
-import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationPayload
-import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionPayload
-import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMovePayload
-import com.simprints.id.data.db.event.remote.events.subject.fromApiToDomain
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
+import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordCreationPayload
+import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMovePayload
+import com.simprints.id.data.db.event.remote.models.subject.fromApiToDomain
 
 @Keep
 class ApiEvents(val events: List<ApiEvent>)

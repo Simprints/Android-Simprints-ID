@@ -4,17 +4,17 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
-import com.simprints.id.data.db.event.remote.events.ApiCandidateReadPayload.ApiLocalResult
-import com.simprints.id.data.db.event.remote.events.ApiCandidateReadPayload.ApiRemoteResult
-import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType.CANDIDATE_READ
+import com.simprints.id.data.db.event.remote.models.ApiCandidateReadPayload.ApiLocalResult
+import com.simprints.id.data.db.event.remote.models.ApiCandidateReadPayload.ApiRemoteResult
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.CANDIDATE_READ
 
 @Keep
-class ApiCandidateReadPayload(createdAt: Long,
-                              eventVersion: Int,
-                              val endedAt: Long,
+class ApiCandidateReadPayload(override val relativeStartTime: Long,
+                              override val version: Int,
+                              val relativeEndTime: Long,
                               val candidateId: String,
                               val localResult: ApiLocalResult,
-                              val remoteResult: ApiRemoteResult?) : ApiEventPayload(CANDIDATE_READ, eventVersion, createdAt) {
+                              val remoteResult: ApiRemoteResult?) : ApiEventPayload(CANDIDATE_READ, version, relativeStartTime) {
 
     @Keep
     enum class ApiLocalResult {

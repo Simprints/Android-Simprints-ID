@@ -5,12 +5,12 @@ import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.A
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.TIMED_OUT
-import com.simprints.id.data.db.event.remote.events.ApiArtificialTerminationPayload.ApiReason
+import com.simprints.id.data.db.event.remote.models.ApiArtificialTerminationPayload.ApiReason
 
 @Keep
-class ApiArtificialTerminationPayload(createdAt: Long,
-                                      version: Int,
-                                      val reason: ApiReason) : ApiEventPayload(ApiEventPayloadType.ARTIFICIAL_TERMINATION, version, createdAt) {
+class ApiArtificialTerminationPayload(override val relativeStartTime: Long,
+                                      override val version: Int,
+                                      val reason: ApiReason) : ApiEventPayload(ApiEventPayloadType.ARTIFICIAL_TERMINATION, version, relativeStartTime) {
 
     constructor(domainPayload: ArtificialTerminationPayload) :
         this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.reason.fromDomainToApi())

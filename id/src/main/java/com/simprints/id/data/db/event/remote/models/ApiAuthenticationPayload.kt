@@ -3,14 +3,14 @@ package com.simprints.id.data.db.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
-import com.simprints.id.data.db.event.remote.events.ApiAuthenticationPayload.ApiResult
+import com.simprints.id.data.db.event.remote.models.ApiAuthenticationPayload.ApiResult
 
 @Keep
-class ApiAuthenticationPayload(createdAt: Long,
-                               version: Int,
-                               val endedAt: Long,
+class ApiAuthenticationPayload(override val relativeStartTime: Long,
+                               override val version: Int,
+                               val relativeEndTime: Long,
                                val userInfo: ApiUserInfo,
-                               val result: ApiResult) : ApiEventPayload(ApiEventPayloadType.AUTHENTICATION, version, createdAt) {
+                               val result: ApiResult) : ApiEventPayload(ApiEventPayloadType.AUTHENTICATION, version, relativeStartTime) {
 
     @Keep
     class ApiUserInfo(val projectId: String, val userId: String) {

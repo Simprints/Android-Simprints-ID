@@ -3,7 +3,7 @@ package com.simprints.id.data.db.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload
 import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload.Answer.*
-import com.simprints.id.data.db.event.remote.events.ApiRefusalPayload.ApiAnswer
+import com.simprints.id.data.db.event.remote.models.ApiRefusalPayload.ApiAnswer
 
 @Keep
 class ApiRefusalPayload(createdAt: Long,

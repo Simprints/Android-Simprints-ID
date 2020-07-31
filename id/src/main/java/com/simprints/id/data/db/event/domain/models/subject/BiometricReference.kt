@@ -6,9 +6,9 @@ import com.simprints.id.data.db.event.domain.models.callback.ConfirmationCallbac
 import com.simprints.id.data.db.event.domain.models.callback.EnrolmentCallbackEvent.EnrolmentCallbackPayload
 import com.simprints.id.data.db.event.domain.models.subject.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
 import com.simprints.id.data.db.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
-import com.simprints.id.data.db.event.remote.events.subject.ApiBiometricReference
-import com.simprints.id.data.db.event.remote.events.subject.ApiFaceReference
-import com.simprints.id.data.db.event.remote.events.subject.ApiFingerprintReference
+import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReference
+import com.simprints.id.data.db.event.remote.models.subject.ApiFaceReference
+import com.simprints.id.data.db.event.remote.models.subject.ApiFingerprintReference
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(

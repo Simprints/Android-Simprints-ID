@@ -8,10 +8,10 @@
 //import com.simprints.id.data.db.common.models.EventCount
 //import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
 //import com.simprints.id.data.db.event.domain.events.Events
-//import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordCreationPayload
-//import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordDeletionPayload
-//import com.simprints.id.data.db.event.remote.events.subject.ApiEnrolmentRecordMovePayload
-//import com.simprints.id.data.db.event.remote.events.ApiEvent
+//import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordCreationPayload
+//import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload
+//import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMovePayload
+//import com.simprints.id.data.db.event.remote.models.ApiEvent
 //import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
 //import com.simprints.id.domain.modality.Modes
 //import com.simprints.id.network.*

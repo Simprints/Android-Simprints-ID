@@ -39,7 +39,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.Companion.ONE_TO_O
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.PERSON_CREATION_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.REFUSAL_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.SCANNER_CONNECTION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.SCANNER_FIRMWARE_UPDATE
+import com.simprints.id.data.db.event.domain.models.EventType.Companion.SCANNER_FIRMWARE_UPDATE_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.SESSION_CAPTURE_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.SUSPICIOUS_INTENT_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.VERO_2_INFO_SNAPSHOT_KEY
@@ -91,7 +91,7 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveE
     JsonSubTypes.Type(value = PersonCreationEvent::class, name = PERSON_CREATION_KEY),
     JsonSubTypes.Type(value = RefusalEvent::class, name = REFUSAL_KEY),
     JsonSubTypes.Type(value = ScannerConnectionEvent::class, name = SCANNER_CONNECTION_KEY),
-    JsonSubTypes.Type(value = ScannerFirmwareUpdateEvent::class, name = SCANNER_FIRMWARE_UPDATE),
+    JsonSubTypes.Type(value = ScannerFirmwareUpdateEvent::class, name = SCANNER_FIRMWARE_UPDATE_KEY),
     JsonSubTypes.Type(value = SuspiciousIntentEvent::class, name = SUSPICIOUS_INTENT_KEY),
     JsonSubTypes.Type(value = Vero2InfoSnapshotEvent::class, name = VERO_2_INFO_SNAPSHOT_KEY)
 )

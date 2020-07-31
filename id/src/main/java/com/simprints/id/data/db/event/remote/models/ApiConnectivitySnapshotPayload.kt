@@ -7,8 +7,8 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 
 @Keep
 class ApiConnectivitySnapshotPayload(
-    createdAt: Long,
-    eventVersion: Int,
+    override val relativeStartTime: Long,
+    override val version: Int,
     val networkType: String,
     val connections: List<ApiConnection>) : ApiEventPayload(ApiEventPayloadType.CONNECTIVITY_SNAPSHOT, eventVersion, createdAt) {
 

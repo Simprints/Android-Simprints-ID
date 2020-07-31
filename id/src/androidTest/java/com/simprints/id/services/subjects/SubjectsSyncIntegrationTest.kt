@@ -28,9 +28,9 @@
 //import com.simprints.id.data.db.event.domain.events.EventPayloadType.ENROLMENT_RECORD_CREATION
 //import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 //import com.simprints.id.data.db.subject.remote.EventRemoteInterface
-//import com.simprints.id.data.db.event.remote.events.ApiEventCount
-//import com.simprints.id.data.db.event.remote.events.ApiEvent
-//import com.simprints.id.data.db.event.remote.events.ApiEventPayloadType
+//import com.simprints.id.data.db.event.remote.models.ApiEventCount
+//import com.simprints.id.data.db.event.remote.models.ApiEvent
+//import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
 //import com.simprints.id.data.loginInfo.LoginInfoManager
 //import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 //import com.simprints.id.data.secure.SecureLocalDbKeyProvider

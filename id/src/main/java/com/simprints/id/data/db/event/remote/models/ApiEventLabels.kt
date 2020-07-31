@@ -2,13 +2,13 @@ package com.simprints.id.data.db.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.remote.events.ApiEventLabels.Companion.ATTENDANT_ID_LABEL_KEY
-import com.simprints.id.data.db.event.remote.events.ApiEventLabels.Companion.DEVICE_ID_LABEL_KEY
-import com.simprints.id.data.db.event.remote.events.ApiEventLabels.Companion.MODE_LABEL_KEY
-import com.simprints.id.data.db.event.remote.events.ApiEventLabels.Companion.MODULE_ID_LABEL_KEY
-import com.simprints.id.data.db.event.remote.events.ApiEventLabels.Companion.PROJECT_ID_LABEL_KEY
-import com.simprints.id.data.db.event.remote.events.ApiEventLabels.Companion.SESSION_ID_LABEL_KEY
-import com.simprints.id.data.db.event.remote.events.ApiEventLabels.Companion.SUBJECT_ID_LABEL_KEY
+import com.simprints.id.data.db.event.remote.models.ApiEventLabels.Companion.ATTENDANT_ID_LABEL_KEY
+import com.simprints.id.data.db.event.remote.models.ApiEventLabels.Companion.DEVICE_ID_LABEL_KEY
+import com.simprints.id.data.db.event.remote.models.ApiEventLabels.Companion.MODE_LABEL_KEY
+import com.simprints.id.data.db.event.remote.models.ApiEventLabels.Companion.MODULE_ID_LABEL_KEY
+import com.simprints.id.data.db.event.remote.models.ApiEventLabels.Companion.PROJECT_ID_LABEL_KEY
+import com.simprints.id.data.db.event.remote.models.ApiEventLabels.Companion.SESSION_ID_LABEL_KEY
+import com.simprints.id.data.db.event.remote.models.ApiEventLabels.Companion.SUBJECT_ID_LABEL_KEY
 import com.simprints.id.domain.modality.Modes
 
 @Keep

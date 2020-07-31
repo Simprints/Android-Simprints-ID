@@ -9,7 +9,7 @@
 //import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
 //import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 //import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
-//import com.simprints.id.data.db.event.remote.events.ApiEvent
+//import com.simprints.id.data.db.event.remote.models.ApiEvent
 //import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 //import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
 //import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationFactoryImpl

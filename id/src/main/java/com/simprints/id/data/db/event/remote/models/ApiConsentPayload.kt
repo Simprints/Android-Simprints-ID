@@ -5,8 +5,8 @@ import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Result.*
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Type.PARENTAL
-import com.simprints.id.data.db.event.remote.events.ApiConsentPayload.ApiResult
-import com.simprints.id.data.db.event.remote.events.ApiConsentPayload.ApiType
+import com.simprints.id.data.db.event.remote.models.ApiConsentPayload.ApiResult
+import com.simprints.id.data.db.event.remote.models.ApiConsentPayload.ApiType
 
 @Keep
 class ApiConsentPayload(createdAt: Long,

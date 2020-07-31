@@ -4,6 +4,9 @@ import com.google.common.truth.Truth
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.data.db.event.remote.models.ApiEventLabels
+import com.simprints.id.data.db.event.remote.models.fromApiToDomain
+import com.simprints.id.data.db.event.remote.models.fromDomainToApi
 import com.simprints.id.domain.modality.Modes.FACE
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.orchestrator.SOME_GUID1

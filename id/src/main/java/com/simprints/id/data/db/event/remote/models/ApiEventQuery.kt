@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.remote.models
 
-import com.simprints.id.data.db.event.remote.events.subject.ApiModes
-import com.simprints.id.data.db.event.remote.events.subject.fromDomainToApi
+import com.simprints.id.data.db.event.remote.models.subject.ApiModes
+import com.simprints.id.data.db.event.remote.models.subject.fromDomainToApi
 import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
 
 data class ApiEventQuery(val projectId: String,
