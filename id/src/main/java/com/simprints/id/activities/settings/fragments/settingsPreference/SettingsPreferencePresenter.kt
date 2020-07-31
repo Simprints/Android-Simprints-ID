@@ -96,8 +96,12 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             }
 
             view.getKeyForDefaultFingersPreference() -> {
-                loadDefaultFingersPreference(preference as MultiSelectListPreference)
-                preference.setChangeListener { value: HashSet<String> -> handleDefaultFingersChanged(preference, value) }
+//                loadDefaultFingersPreference(preference as MultiSelectListPreference) TODO : remove
+//                preference.setChangeListener { value: HashSet<String> -> handleDefaultFingersChanged(preference, value) }
+                preference.setOnPreferenceClickListener {
+                    view.openFingerSelectionActivity()
+                    true
+                }
             }
             view.getKeyForSyncInfoPreference() -> {
                 preference.setOnPreferenceClickListener {

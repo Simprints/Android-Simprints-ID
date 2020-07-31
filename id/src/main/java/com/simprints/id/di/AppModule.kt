@@ -12,6 +12,7 @@ import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
 import com.simprints.id.activities.qrcapture.tools.*
+import com.simprints.id.activities.settings.fingerselection.FingerSelectionViewModelFactory
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.activities.setup.SetupViewModelFactory
@@ -322,6 +323,9 @@ open class AppModule {
         personRepository, subjectLocalDataSource, preferencesManager,
         loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository
     )
+
+    @Provides
+    open fun provideFingerSelectionViewModelFactory() = FingerSelectionViewModelFactory()
 
     @Provides
     open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =
