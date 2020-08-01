@@ -18,11 +18,8 @@ import com.simprints.id.data.db.event.domain.models.EventType.ARTIFICIAL_TERMINA
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.EventValidator
-import com.simprints.id.data.db.event.local.EventLocalDataSource.EventQuery
-import com.simprints.id.data.db.event.local.models.createAlertScreenEvent
-import com.simprints.id.data.db.event.local.models.createSessionCaptureEvent
-import com.simprints.id.data.db.event.local.models.fromDbToDomain
-import com.simprints.id.data.db.event.local.models.fromDomainToDb
+import com.simprints.id.data.db.event.local.EventLocalDataSource.DbEventQuery
+import com.simprints.id.data.db.event.local.models.*
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.orchestrator.SOME_GUID1
 import com.simprints.id.orchestrator.SOME_GUID2
@@ -165,7 +162,7 @@ class EventLocalDataSourceImplTest {
             mockNotSignedId()
             val event = createSessionCaptureEvent().copy(labels = EventLabels())
             eventLocalDataSource.insertOrUpdate(event)
-            val storedEvent = eventLocalDataSource.load(EventQuery(id = event.id)).first()
+            val storedEvent = eventLocalDataSource.load(DbEventQuery(id = event.id)).first()
 
             assertThat(storedEvent.labels).isEqualTo(EventLabels(projectId = PROJECT_ID_FOR_NOT_SIGNED_IN, deviceId = DEVICE_ID))
         }
@@ -177,7 +174,7 @@ class EventLocalDataSourceImplTest {
             mockSignedId()
             val event = createSessionCaptureEvent().copy(labels = EventLabels())
             eventLocalDataSource.insertOrUpdate(event)
-            val storedEvent = eventLocalDataSource.load(EventQuery(id = event.id)).first()
+            val storedEvent = eventLocalDataSource.load(DbEventQuery(id = event.id)).first()
 
             assertThat(storedEvent.labels).isEqualTo(EventLabels(projectId = DEFAULT_PROJECT_ID, deviceId = DEVICE_ID))
         }
@@ -192,7 +189,7 @@ class EventLocalDataSourceImplTest {
             eventLocalDataSource.insertOrUpdate(session)
             eventLocalDataSource.insertOrUpdateInCurrentSession(event)
 
-            val storedEvent = eventLocalDataSource.load(EventQuery(id = event.id)).first()
+            val storedEvent = eventLocalDataSource.load(DbEventQuery(id = event.id)).first()
 
             assertThat(storedEvent.labels).isEqualTo(EventLabels(projectId = DEFAULT_PROJECT_ID, deviceId = DEVICE_ID, sessionId = session.id))
         }
@@ -217,7 +214,7 @@ class EventLocalDataSourceImplTest {
     }
 
     private fun createCompleteEventQuery() =
-        EventQuery(
+        DbEventQuery(
             ID,
             SESSION_CAPTURE,
             DEFAULT_PROJECT_ID,
