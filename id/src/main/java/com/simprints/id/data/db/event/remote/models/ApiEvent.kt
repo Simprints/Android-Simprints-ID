@@ -20,7 +20,7 @@ open class ApiEvent(val id: String,
                     val payload: ApiEventPayload)
 
 fun Event.fromDomainToApi() =
-    ApiEvent(id, labels.fromDomainToApi(), payload.fromDomainToApi())
+    ApiEvent(id, labels.fromDomainToApi(), payload.fromDomainToApi()) 
 
 fun ApiEvent.fromApiToDomain() =
     when (payload.type) {
