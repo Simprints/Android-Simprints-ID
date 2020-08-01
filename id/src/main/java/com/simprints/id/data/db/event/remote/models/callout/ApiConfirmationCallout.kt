@@ -4,4 +4,4 @@ import androidx.annotation.Keep
 
 @Keep
 class ApiConfirmationCallout(val selectedGuid: String,
-                             val sessionId: String): ApiCallout(ApiCalloutType.CONFIRMATION)
+                             val sessionId: String): ApiCallout(ApiCalloutType.Confirmation)

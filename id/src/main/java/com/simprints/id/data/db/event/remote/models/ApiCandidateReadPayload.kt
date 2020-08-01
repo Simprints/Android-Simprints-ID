@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.Candidate
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
 import com.simprints.id.data.db.event.remote.models.ApiCandidateReadPayload.ApiLocalResult
 import com.simprints.id.data.db.event.remote.models.ApiCandidateReadPayload.ApiRemoteResult
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.CANDIDATE_READ
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.CandidateRead
 
 @Keep
 class ApiCandidateReadPayload(override val relativeStartTime: Long,
@@ -14,7 +14,7 @@ class ApiCandidateReadPayload(override val relativeStartTime: Long,
                               val relativeEndTime: Long,
                               val candidateId: String,
                               val localResult: ApiLocalResult,
-                              val remoteResult: ApiRemoteResult?) : ApiEventPayload(CANDIDATE_READ, version, relativeStartTime) {
+                              val remoteResult: ApiRemoteResult?) : ApiEventPayload(CandidateRead, version, relativeStartTime) {
 
     @Keep
     enum class ApiLocalResult {

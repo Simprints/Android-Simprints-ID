@@ -7,4 +7,4 @@ class ApiEnrolmentLastBiometricsCallout(val projectId: String,
                                         val userId: String,
                                         val moduleId: String,
                                         val metadata: String?,
-                                        val sessionId: String) : ApiCallout(ApiCalloutType.ENROLMENT_LAST_BIOMETRICS)
+                                        val sessionId: String) : ApiCallout(ApiCalloutType.EnrolmentLastBiometrics)

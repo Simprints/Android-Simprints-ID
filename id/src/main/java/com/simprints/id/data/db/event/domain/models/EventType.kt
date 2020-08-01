@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.event.domain.models
 
-//Unused field - used to enforce adding a const when a new event is added
+//Unused key field - used to enforce adding a const when a new event is added. Required for Jackson in Event
 enum class EventType(private val key: String) {
     SESSION_CAPTURE(EventType.SESSION_CAPTURE_KEY),
     ENROLMENT_RECORD_CREATION(EventType.ENROLMENT_RECORD_CREATION_KEY),

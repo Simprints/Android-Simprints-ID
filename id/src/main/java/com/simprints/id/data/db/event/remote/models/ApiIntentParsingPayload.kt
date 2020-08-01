@@ -9,7 +9,7 @@ import io.realm.internal.Keep
 @Keep
 class ApiIntentParsingPayload(override val relativeStartTime: Long,
                               override val version: Int,
-                              val integration: ApiIntegrationInfo) : ApiEventPayload(ApiEventPayloadType.INTENT_PARSING, version, relativeStartTime) {
+                              val integration: ApiIntegrationInfo) : ApiEventPayload(ApiEventPayloadType.IntentParsing, version, relativeStartTime) {
 
     constructor(domainPayload: IntentParsingPayload) : this(
         domainPayload.createdAt,
