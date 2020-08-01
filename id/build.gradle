@@ -169,7 +169,7 @@ dependencies {
     implementation deps.playservices.safetynet
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter
-    implementation deps.retrofit.convertergson
+    implementation deps.retrofit.jackson
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
     implementation deps.rxjava2.android

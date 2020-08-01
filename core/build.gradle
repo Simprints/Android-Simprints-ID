@@ -57,8 +57,9 @@ dependencies {
     implementation deps.timber.core
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter
-    implementation deps.retrofit.convertergson
+    implementation deps.retrofit.jackson
     implementation deps.gson.extras
+    implementation deps.jackson.core
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
     implementation deps.androidx.security

@@ -101,6 +101,7 @@ def retrofit = [
     core            : "com.squareup.retrofit2:retrofit:$retrofit_version",
     adapter         : "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version",
     convertergson   : "com.squareup.retrofit2:converter-gson:$retrofit_version",
+    jackson         : "com.squareup.retrofit2:converter-jackson:$retrofit_version",
     converterScalars: "com.squareup.retrofit2:converter-scalars:$retrofit_version",
     logging         : "com.squareup.okhttp3:logging-interceptor:$okttp_version",
     okhttp          : "com.squareup.okhttp3:okhttp:$okttp_version",

@@ -2,6 +2,8 @@ package com.simprints.id.di
 
 import android.content.Context
 import androidx.work.WorkManager
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepositoryImpl
@@ -11,13 +13,14 @@ import com.simprints.id.data.db.subjects_sync.down.local.SubjectsDownSyncOperati
 import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepositoryImpl
 import com.simprints.id.data.db.subjects_sync.up.local.SubjectsUpSyncOperationLocalDataSource
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
+import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImpl
 import com.simprints.id.services.scheduledSync.subjects.down.controllers.SubjectsDownSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.subjects.down.controllers.SubjectsDownSyncWorkersBuilderImpl
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
@@ -34,8 +37,6 @@ import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsU
 import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutorImpl
 import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncWorkersBuilderImpl
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImpl
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -88,8 +89,9 @@ open class SyncModule {
     )
 
     @Provides
-    open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: SubjectsDownSyncScopeRepository): SubjectsDownSyncWorkersBuilder =
-        SubjectsDownSyncWorkersBuilderImpl(downSyncScopeRepository)
+    open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: SubjectsDownSyncScopeRepository,
+                                          jsonHelper: JsonHelper): SubjectsDownSyncWorkersBuilder =
+        SubjectsDownSyncWorkersBuilderImpl(downSyncScopeRepository, jsonHelper)
 
 
     @Provides

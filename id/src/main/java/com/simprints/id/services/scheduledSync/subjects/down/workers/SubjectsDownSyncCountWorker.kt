@@ -7,6 +7,8 @@ import androidx.work.WorkInfo.State.RUNNING
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.fasterxml.jackson.core.type.TypeReference
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.models.SubjectsCount
 import com.simprints.id.data.db.subject.SubjectRepository
@@ -19,7 +21,6 @@ import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSy
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerType.DOWNLOADER
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerType.UPLOADER
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.id.tools.json.SimJsonHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -40,6 +41,7 @@ class SubjectsDownSyncCountWorker(val context: Context, params: WorkerParameters
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var subjectRepository: SubjectRepository
     @Inject lateinit var downSyncScopeRepository: SubjectsDownSyncScopeRepository
+    @Inject lateinit var jsonHelper: JsonHelper
 
     override suspend fun doWork(): Result =
         withContext(Dispatchers.IO) {
@@ -59,7 +61,7 @@ class SubjectsDownSyncCountWorker(val context: Context, params: WorkerParameters
         return try {
 
             val downCount = getDownCount(downSyncScope)
-            val output = SimJsonHelper.gson.toJson(downCount)
+            val output = jsonHelper.toJson(downCount)
 
             success(workDataOf(OUTPUT_COUNT_WORKER_DOWN to output), output)
 
@@ -104,7 +106,7 @@ class SubjectsDownSyncCountWorker(val context: Context, params: WorkerParameters
 fun WorkInfo.getDownCountsFromOutput(): SubjectsCount? {
     val outputJson = this.outputData.getString(SubjectsDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN)
     return try {
-        SimJsonHelper.gson.fromJson(outputJson, SubjectsCount::class.java)
+        JsonHelper.jackson.readValue(outputJson, object : TypeReference<SubjectsCount>() {})
     } catch (t: Throwable) {
         null
     }

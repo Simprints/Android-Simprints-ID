@@ -10,6 +10,7 @@ import com.simprints.id.data.db.event.remote.models.face.ApiFaceCapturePayload.A
 @Keep
 class ApiFaceCapturePayload(val id: String,
                             override val relativeStartTime: Long,
+                            val relativeEndTime: Long,
                             override val version: Int,
                             val attemptNb: Int,
                             val qualityThreshold: Float,
@@ -18,8 +19,9 @@ class ApiFaceCapturePayload(val id: String,
                             val face: ApiFace?) : ApiEventPayload(FaceCapture,version, relativeStartTime) {
 
     constructor(domainPayload: FaceCapturePayload) : this(
-        "id", //STOPSHIP
+        domainPayload.id,
         domainPayload.createdAt,
+        domainPayload.endedAt,
         domainPayload.eventVersion,
         domainPayload.attemptNb,
         domainPayload.qualityThreshold,

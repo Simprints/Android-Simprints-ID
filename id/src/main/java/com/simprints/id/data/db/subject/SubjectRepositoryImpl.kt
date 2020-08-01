@@ -20,7 +20,6 @@ import com.simprints.id.data.db.event.remote.fromDomainToApi
 import com.simprints.id.data.db.event.remote.models.fromDomainToApi
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
-import com.simprints.id.tools.json.SimJsonHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.first
@@ -76,7 +75,7 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
 
         val apiEventsForSubject = ArrayList<ApiEvent>()
         while(reader.hasNext()) {
-            apiEventsForSubject.add(SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java))
+            //apiEventsForSubject.add(SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java))
         }
 
         //STOPSHIP
@@ -153,7 +152,7 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
     private fun buildEventQueryForSubjectFetch(projectId: String, subjectId: String) = ApiEventQuery(
             projectId = projectId,
             subjectId = subjectId,
-            modes = listOf(FINGERPRINT),
+            modes = listOf(FINGERPRINT).map { it.fromDomainToApi() },
             types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE).map { it.fromDomainToApi() }
     )
 }

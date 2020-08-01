@@ -6,7 +6,8 @@ import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSourceImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
-import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
+import com.simprints.id.data.db.event.remote.EventRemoteDataSource
+import com.simprints.id.data.db.event.remote.EventRemoteDataSourceImpl
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -14,11 +15,10 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSourceImpl
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.db.subject.*
+import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
-import com.simprints.id.data.db.event.remote.EventRemoteDataSource
-import com.simprints.id.data.db.event.remote.EventRemoteDataSourceImpl
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
 import com.simprints.id.data.images.repository.ImageRepository
@@ -40,7 +40,6 @@ import javax.inject.Singleton
 open class DataModule {
 
     @Provides
-    @Singleton
     open fun provideEventRemoteDataSource(
         simApiClientFactory: SimApiClientFactory
     ): EventRemoteDataSource = EventRemoteDataSourceImpl(simApiClientFactory)

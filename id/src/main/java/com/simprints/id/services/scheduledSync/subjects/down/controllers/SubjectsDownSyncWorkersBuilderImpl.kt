@@ -13,7 +13,8 @@ import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsS
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class SubjectsDownSyncWorkersBuilderImpl(val downSyncScopeRepository: SubjectsDownSyncScopeRepository) : SubjectsDownSyncWorkersBuilder {
+class SubjectsDownSyncWorkersBuilderImpl(val downSyncScopeRepository: SubjectsDownSyncScopeRepository,
+                                         private val jsonHelper: JsonHelper) : SubjectsDownSyncWorkersBuilder {
 
     private val downSyncScope: SubjectsDownSyncScope
         get() = downSyncScopeRepository.getDownSyncScope()
@@ -28,7 +29,7 @@ class SubjectsDownSyncWorkersBuilderImpl(val downSyncScopeRepository: SubjectsDo
                                      uniqueDownSyncID: String,
                                      downSyncOperation: SubjectsDownSyncOperation): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(SubjectsDownSyncDownloaderWorker::class.java)
-            .setInputData(workDataOf(INPUT_DOWN_SYNC_OPS to JsonHelper.gson.toJson(downSyncOperation)))
+            .setInputData(workDataOf(INPUT_DOWN_SYNC_OPS to jsonHelper.toJson(downSyncOperation)))
             .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
             .addCommonTagForDownloaders()
             .build() as OneTimeWorkRequest

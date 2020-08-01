@@ -14,7 +14,8 @@ data class ParentalConsentTextHelper(val parentalConsentOptionsJson: String,
                                      val programName: String,
                                      val organizationName: String,
                                      val modalities: List<Modality>,
-                                     val crashReportManager: CrashReportManager) {
+                                     val crashReportManager: CrashReportManager,
+                                     val jsonHelper: JsonHelper) {
 
     private val parentalConsentOptions by lazy {
         buildParentalConsentOptions()
@@ -111,7 +112,7 @@ data class ParentalConsentTextHelper(val parentalConsentOptionsJson: String,
     private fun isSingleModality() = modalities.size == 1
 
     private fun buildParentalConsentOptions() = try {
-        JsonHelper.gson.fromJson(parentalConsentOptionsJson, ParentalConsentOptions::class.java)
+        jsonHelper.fromJson<ParentalConsentOptions>(parentalConsentOptionsJson)
     } catch (e: JsonSyntaxException) {
         crashReportManager.logExceptionOrSafeException(Exception("Malformed Parental Consent Text Error", e))
         ParentalConsentOptions()

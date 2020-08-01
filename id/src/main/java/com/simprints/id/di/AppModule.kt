@@ -2,8 +2,8 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.gson.Gson
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
@@ -27,10 +27,11 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilder
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilderImpl
-import com.simprints.id.data.db.event.local.EventDatabaseFactory
 import com.simprints.id.data.db.event.local.DbEventDatabaseFactoryImpl
+import com.simprints.id.data.db.event.local.EventDatabaseFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.EventLocalDataSourceImpl
+import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
@@ -177,12 +178,12 @@ open class AppModule {
         ctx: Context,
         remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider,
-        gson: Gson
+        jacksonMapper: ObjectMapper
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
         remoteDbManager,
-        gson
+        jacksonMapper
     )
 
     @Provides
@@ -210,14 +211,6 @@ open class AppModule {
         loginInfoManager: LoginInfoManager
     ): EventLocalDataSource =
         EventLocalDataSourceImpl(factory, loginInfoManager, ctx.deviceId, timeHelper, sessionEventValidatorsBuilder.build())
-
-    @Provides
-    @Singleton
-    open fun provideSessionEventsRemoteDbManager(
-        simApiClientFactory: SimApiClientFactory
-    ): EventRemoteDataSource = EventRemoteDataSourceImpl(
-        simApiClientFactory
-    )
 
     @Provides
     @Singleton

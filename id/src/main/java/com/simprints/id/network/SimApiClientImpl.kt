@@ -1,6 +1,6 @@
 package com.simprints.id.network
 
-import com.google.gson.Gson
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.simprints.core.tools.coroutines.retryIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
@@ -11,14 +11,14 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.jackson.JacksonConverterFactory
 import kotlin.reflect.KClass
 
 open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<T>,
                                                     private val url: String,
                                                     private val deviceId: String,
                                                     private val authToken: String? = null,
-                                                    private val jsonAdapter: Gson = JsonHelper.gson) : SimApiClient<T> {
+                                                    private val jacksonMapper: ObjectMapper = JsonHelper.jackson) : SimApiClient<T> {
 
     override val api: T by lazy {
         retrofit.create(service.java)
@@ -27,7 +27,7 @@ open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<
     open val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create(jsonAdapter))
+            .addConverterFactory(JacksonConverterFactory.create(jacksonMapper))
             .baseUrl(url)
             .client(okHttpClientConfig.build()).build()
     }

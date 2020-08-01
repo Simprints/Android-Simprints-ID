@@ -7,10 +7,10 @@ import androidx.work.workDataOf
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.models.SubjectsCount
-import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
-import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncScope
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncScope
 import com.simprints.id.services.scheduledSync.subjects.common.SimCoroutineWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,6 +27,7 @@ class SubjectsUpSyncCountWorker(context: Context, params: WorkerParameters) : Si
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var personRepository: SubjectRepository
     @Inject lateinit var subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository
+    @Inject lateinit var jsonHelper: JsonHelper
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
@@ -43,10 +44,10 @@ class SubjectsUpSyncCountWorker(context: Context, params: WorkerParameters) : Si
 
     private suspend fun execute(upSyncScope: SubjectsUpSyncScope): Result {
         val upCount = getUpCount(upSyncScope)
-        val output = JsonHelper.gson.toJson(upCount)
+        val output = jsonHelper.toJson(upCount)
 
         return success(workDataOf(
-            OUTPUT_COUNT_WORKER_UP to JsonHelper.gson.toJson(upCount)), "Total to upload: $output")
+            OUTPUT_COUNT_WORKER_UP to jsonHelper.toJson(upCount)), "Total to upload: $output")
 
     }
 
@@ -57,5 +58,5 @@ class SubjectsUpSyncCountWorker(context: Context, params: WorkerParameters) : Si
 
 fun WorkInfo.getUpCountsFromOutput(): SubjectsCount? {
     val outputJson = this.outputData.getString(SubjectsUpSyncCountWorker.OUTPUT_COUNT_WORKER_UP)
-    return JsonHelper.gson.fromJson<SubjectsCount>(outputJson, SubjectsCount::class.java)
+    return JsonHelper.jackson.readValue(outputJson, SubjectsCount::class.java)
 }

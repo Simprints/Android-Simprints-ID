@@ -9,6 +9,8 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID_2
+import com.simprints.id.commontesttools.sessionEvents.createAlertScreenEvent
+import com.simprints.id.commontesttools.sessionEvents.createSessionCaptureEvent
 import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
 import com.simprints.id.data.db.event.domain.models.CREATED_AT_RANGE
@@ -18,7 +20,9 @@ import com.simprints.id.data.db.event.domain.models.EventType.ARTIFICIAL_TERMINA
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.EventValidator
-import com.simprints.id.data.db.event.local.models.*
+import com.simprints.id.data.db.event.local.models.DbEventQuery
+import com.simprints.id.data.db.event.local.models.fromDbToDomain
+import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.orchestrator.SOME_GUID1
 import com.simprints.id.orchestrator.SOME_GUID2
