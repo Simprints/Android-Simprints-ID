@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.EventLocalDataSource
-import com.simprints.id.data.db.event.local.EventLocalDataSource.EventQuery
+import com.simprints.id.data.db.event.local.models.DbEventQuery
 import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
@@ -129,7 +129,7 @@ open class EventRepositoryImpl(
 
     override suspend fun updateSession(sessionId: String, updateBlock: suspend (SessionCaptureEvent) -> Unit) {
         reportExceptionIfNeeded {
-            val sessionCaptureEvent = eventLocalDataSource.load(EventQuery(sessionId = sessionId)).first()
+            val sessionCaptureEvent = eventLocalDataSource.load(DbEventQuery(sessionId = sessionId)).first()
             updateBlock(sessionCaptureEvent as SessionCaptureEvent)
             eventLocalDataSource.insertOrUpdate(sessionCaptureEvent)
         }
@@ -138,8 +138,8 @@ open class EventRepositoryImpl(
     override suspend fun load(): List<Event> = eventLocalDataSource.load().toList()
 
     override suspend fun signOut() {
-        eventLocalDataSource.load(EventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).collect {
-            eventLocalDataSource.delete(EventQuery(sessionId = it.id))
+        eventLocalDataSource.load(DbEventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).collect {
+            eventLocalDataSource.delete(DbEventQuery(sessionId = it.id))
         }
         sessionEventsSyncManager.cancelSyncWorkers()
     }

@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.EventValidator
-import com.simprints.id.data.db.event.local.EventLocalDataSource.EventQuery
+import com.simprints.id.data.db.event.local.models.DbEventQuery
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -41,12 +41,12 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
     }
 
     override suspend fun getCurrentSessionCaptureEvent() =
-        load(EventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).first() as SessionCaptureEvent
+        load(DbEventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).first() as SessionCaptureEvent
 
-    override suspend fun load(query: EventQuery): Flow<Event> =
+    override suspend fun load(dbQuery: DbEventQuery): Flow<Event> =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                with(query) {
+                with(dbQuery) {
                     roomDao.load(
                         id, type, projectId, subjectId, attendantId, sessionId, deviceId,
                         startTime?.first, startTime?.last, endTime?.first, endTime?.last)
@@ -57,10 +57,10 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
         }
 
 
-    override suspend fun count(query: EventQuery): Int =
+    override suspend fun count(dbQuery: DbEventQuery): Int =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                with(query) {
+                with(dbQuery) {
                     roomDao.count(
                         id, type, projectId, subjectId, attendantId, sessionId, deviceId,
                         startTime?.first, startTime?.endInclusive, endTime?.first, endTime?.last)
@@ -68,10 +68,10 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
             }
         }
 
-    override suspend fun delete(query: EventQuery) {
+    override suspend fun delete(dbQuery: DbEventQuery) {
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
-                with(query) {
+                with(dbQuery) {
                     roomDao.delete(
                         id, type, projectId, subjectId, attendantId, sessionId, deviceId,
                         startTime?.first, startTime?.endInclusive, endTime?.first, endTime?.last)
@@ -94,7 +94,7 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
                 val currentSession = getCurrentSessionCaptureEvent()
-                val currentSessionsEvents = load(EventQuery(sessionId = currentSession.id)).toList()
+                val currentSessionsEvents = load(DbEventQuery(sessionId = currentSession.id)).toList()
                 eventsValidators.forEach {
                     it.validate(currentSessionsEvents, event)
                 }
@@ -108,7 +108,7 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
 
     private suspend fun closeAnyOpenSession() {
         wrapSuspendExceptionIfNeeded {
-            val openSessions = load(EventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).map { it as SessionCaptureEvent }
+            val openSessions = load(DbEventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).map { it as SessionCaptureEvent }
 
             openSessions.collect { session ->
                 val artificialTerminationEvent = ArtificialTerminationEvent(
