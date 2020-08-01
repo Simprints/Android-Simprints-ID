@@ -1,6 +1,8 @@
 package com.simprints.id.data.db.subject
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.google.gson.stream.JsonReader
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload
@@ -16,7 +18,6 @@ import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncProgre
 import com.simprints.id.data.db.event.remote.ApiEventQuery
 import com.simprints.id.services.scheduledSync.subjects.common.SYNC_LOG_TAG
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.json.SimJsonHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -87,7 +88,7 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
     private fun CoroutineScope.createChannelOfEvents(reader: JsonReader) =
         produce<ApiEvent>(capacity = 5 * BATCH_SIZE_FOR_DOWNLOADING) {
             while (reader.hasNext()) {
-                this.send(SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java))
+                //this.send(JsonHelper.jackson.readValue(reader, object : TypeReference<ApiEvent>() {}))
             }
         }
 
@@ -168,11 +169,11 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
 
     private fun getRecordsToBeDeletedFilteredByModule(eventRecordsToMove: List<EnrolmentRecordMovePayload>,
                                                       moduleId: String) =
-            eventRecordsToMove.map { it.enrolmentRecordDeletion }.filter { it.moduleId == moduleId }
+        eventRecordsToMove.map { it.enrolmentRecordDeletion }.filter { it.moduleId == moduleId }
 
     private fun getRecordsToBeSavedFilteredByModule(eventRecordsToMove: List<EnrolmentRecordMovePayload>,
                                                     moduleId: String) =
-            eventRecordsToMove.mapNotNull { it.enrolmentRecordCreation }.filter { it.moduleId == moduleId }
+        eventRecordsToMove.mapNotNull { it.enrolmentRecordCreation }.filter { it.moduleId == moduleId }
 
     private fun getRecordsToBeDeletedFilteredByUser(eventRecordsToMove: List<EnrolmentRecordMovePayload>,
                                                     attendantId: String) =

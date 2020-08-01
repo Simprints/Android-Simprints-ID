@@ -14,7 +14,8 @@ data class GeneralConsentTextHelper(val generalConsentOptionsJson: String,
                                     val programName: String,
                                     val organizationName: String,
                                     val modalities: List<Modality>,
-                                    val crashReportManager: CrashReportManager) {
+                                    val crashReportManager: CrashReportManager,
+                                    val jsonHelper: JsonHelper) {
 
     private val generalConsentOptions by lazy { buildGeneralConsentOptions() }
     //First argument in consent text should always be program name, second is modality specific access/use case text
@@ -107,7 +108,7 @@ data class GeneralConsentTextHelper(val generalConsentOptionsJson: String,
     private fun isSingleModality() = modalities.size == 1
 
     private fun buildGeneralConsentOptions() = try {
-        JsonHelper.gson.fromJson(generalConsentOptionsJson, GeneralConsentOptions::class.java)
+        jsonHelper.fromJson<GeneralConsentOptions>(generalConsentOptionsJson)
     } catch (e: JsonSyntaxException) {
         crashReportManager.logExceptionOrSafeException(Exception("Malformed General Consent Text Error", e))
         GeneralConsentOptions()

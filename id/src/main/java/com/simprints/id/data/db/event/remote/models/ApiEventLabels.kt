@@ -42,8 +42,8 @@ fun EventLabels.fromDomainToApi(): ApiEventLabels {
     projectId?.let { api.put(PROJECT_ID_LABEL_KEY, listOf(it)) }
     subjectId?.let { api.put(SUBJECT_ID_LABEL_KEY, listOf(it)) }
     attendantId?.let { api.put(ATTENDANT_ID_LABEL_KEY, listOf(it)) }
-    moduleIds.let { api.put(MODULE_ID_LABEL_KEY, it) }
-    mode.let { api.put(MODE_LABEL_KEY, it.map { it.name }) }
+    moduleIds?.let { api.put(MODULE_ID_LABEL_KEY, it) }
+    mode?.let { api.put(MODE_LABEL_KEY, it.map { it.name }) }
     sessionId?.let { api.put(SESSION_ID_LABEL_KEY, listOf(it)) }
     deviceId?.let { api.put(DEVICE_ID_LABEL_KEY, listOf(it)) }
     return api

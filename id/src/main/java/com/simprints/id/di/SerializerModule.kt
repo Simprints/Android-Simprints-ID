@@ -1,6 +1,7 @@
 package com.simprints.id.di
 
-import com.google.gson.Gson
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
@@ -9,7 +10,6 @@ import com.simprints.id.data.prefs.settings.fingerprint.serializers.ScannerGener
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
-import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.id.tools.serializers.*
 import dagger.Module
 import dagger.Provides
@@ -47,8 +47,11 @@ class SerializerModule {
     fun provideModalSerializer(): Serializer<List<Modality>> = ModalitiesListSerializer()
 
     @Provides
+    fun provideJsonHelper(): JsonHelper = JsonHelper()
+
+    @Provides
     @Singleton
-    fun provideGson(): Gson = SimJsonHelper.gson
+    fun provideJackson(): ObjectMapper = JsonHelper.jackson
 
     @Provides
     @Singleton
@@ -56,8 +59,8 @@ class SerializerModule {
     fun provideFingerIdToBooleanSerializer(
         @Named("FingerIdentifierSerializer") fingerIdentifierSerializer: Serializer<FingerIdentifier>,
         @Named("BooleanSerializer") booleanSerializer: Serializer<Boolean>,
-        gson: Gson
-    ): Serializer<Map<FingerIdentifier, Boolean>> = MapSerializer(fingerIdentifierSerializer, booleanSerializer, gson)
+        jsonHelper: JsonHelper
+    ): Serializer<Map<FingerIdentifier, Boolean>> = MapSerializer(fingerIdentifierSerializer, booleanSerializer, jsonHelper)
 
     @Provides
     @Singleton

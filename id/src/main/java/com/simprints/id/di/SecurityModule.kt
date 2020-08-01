@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
@@ -74,8 +75,9 @@ open class SecurityModule {
 
     @Provides
     open fun provideLoginActivityHelper(
-        securityStateRepository: SecurityStateRepository
-    ): LoginActivityHelper = LoginActivityHelperImpl(securityStateRepository)
+        securityStateRepository: SecurityStateRepository,
+        jsonHelper: JsonHelper
+    ): LoginActivityHelper = LoginActivityHelperImpl(securityStateRepository, jsonHelper)
 
     @Provides
     open fun provideLoginViewModelFactory(

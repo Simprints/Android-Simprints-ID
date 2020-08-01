@@ -6,9 +6,9 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
 import com.simprints.id.services.scheduledSync.subjects.common.SimCoroutineWorker
@@ -37,6 +37,7 @@ class SubjectsDownSyncDownloaderWorker(context: Context, params: WorkerParameter
     @Inject lateinit var downSyncScopeRepository: SubjectsDownSyncScopeRepository
     @Inject lateinit var subjectRepository: SubjectRepository
     @Inject lateinit var subjectsSyncCache: SubjectsSyncCache
+    @Inject lateinit var jsonHelper: JsonHelper
 
     internal var subjectsDownSyncDownloaderTask: SubjectsDownSyncDownloaderTask = SubjectsDownSyncDownloaderTaskImpl()
 
@@ -79,7 +80,7 @@ class SubjectsDownSyncDownloaderWorker(context: Context, params: WorkerParameter
 
     private suspend fun extractSubSyncScopeFromInput(): SubjectsDownSyncOperation {
         try {
-            val op = JsonHelper.gson.fromJson(jsonForOp, SubjectsDownSyncOperation::class.java)
+            val op = jsonHelper.fromJson<SubjectsDownSyncOperation>(jsonForOp)
             return downSyncScopeRepository.refreshDownSyncOperationFromDb(op) ?: op
         } catch (t: Throwable) {
             throw MalformedDownSyncOperationException()

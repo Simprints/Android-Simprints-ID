@@ -2,6 +2,7 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -68,10 +69,11 @@ class TestSecurityModule(
     }
 
     override fun provideLoginActivityHelper(
-        securityStateRepository: SecurityStateRepository
+        securityStateRepository: SecurityStateRepository,
+        jsonHelper: JsonHelper
     ): LoginActivityHelper {
         return loginActivityHelperRule.resolveDependency {
-            super.provideLoginActivityHelper(securityStateRepository)
+            super.provideLoginActivityHelper(securityStateRepository, jsonHelper)
         }
     }
 
