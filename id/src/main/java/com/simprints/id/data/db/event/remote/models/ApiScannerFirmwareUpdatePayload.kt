@@ -10,7 +10,7 @@ class ApiScannerFirmwareUpdatePayload(override val relativeStartTime: Long,
                                       val relativeEndTime: Long,
                                       val chip: String,
                                       val targetAppVersion: String,
-                                      val failureReason: String?) : ApiEventPayload(ApiEventPayloadType.SCANNER_FIRMWARE_UPDATE, version, relativeStartTime) {
+                                      val failureReason: String?) : ApiEventPayload(ApiEventPayloadType.ScannerFirmwareUpdate, version, relativeStartTime) {
 
     constructor(domainPayload: ScannerFirmwareUpdatePayload) :
         this(domainPayload.createdAt,

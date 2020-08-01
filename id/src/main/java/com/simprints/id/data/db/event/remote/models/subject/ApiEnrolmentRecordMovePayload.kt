@@ -14,7 +14,7 @@ class ApiEnrolmentRecordMovePayload(
     override val version: Int,
     val enrolmentRecordCreation: ApiEnrolmentRecordCreationInMove?,
     val enrolmentRecordDeletion: ApiEnrolmentRecordDeletionInMove
-) : ApiEventPayload(ApiEventPayloadType.ENROLMENT_RECORD_MOVE, version, relativeStartTime) {
+) : ApiEventPayload(ApiEventPayloadType.EnrolmentRecordMove, version, relativeStartTime) {
 
     data class ApiEnrolmentRecordDeletionInMove(
         val subjectId: String,

@@ -14,7 +14,7 @@ class ApiEnrolmentRecordDeletionPayload(
     val projectId: String,
     val moduleId: String,
     val attendantId: String
-) : ApiEventPayload(ApiEventPayloadType.ENROLMENT_RECORD_DELETION, version, relativeStartTime) {
+) : ApiEventPayload(ApiEventPayloadType.EnrolmentRecordDeletion, version, relativeStartTime) {
 
     constructor(payload: EnrolmentRecordDeletionPayload) :
         this(payload.createdAt, payload.eventVersion, payload.subjectId, payload.projectId, payload.moduleId, payload.attendantId)

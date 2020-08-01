@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent.GuidSelec
 @Keep
 class ApiGuidSelectionPayload(override val relativeStartTime: Long,
                               override val version: Int,
-                              val selectedId: String) : ApiEventPayload(ApiEventPayloadType.GUID_SELECTION, version, relativeStartTime) {
+                              val selectedId: String) : ApiEventPayload(ApiEventPayloadType.GuidSelection, version, relativeStartTime) {
 
     constructor(domainPayload: GuidSelectionPayload) :
         this(domainPayload.createdAt,

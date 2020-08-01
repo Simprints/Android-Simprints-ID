@@ -12,7 +12,7 @@ import com.simprints.id.data.db.event.remote.models.ApiAuthorizationPayload.ApiR
 class ApiAuthorizationPayload(override val relativeStartTime: Long,
                               override val version: Int,
                               val result: ApiResult,
-                              val userInfo: ApiUserInfo?) : ApiEventPayload(ApiEventPayloadType.AUTHORIZATION, version, relativeStartTime) {
+                              val userInfo: ApiUserInfo?) : ApiEventPayload(ApiEventPayloadType.Authorization, version, relativeStartTime) {
 
     @Keep
     class ApiUserInfo(val projectId: String, val userId: String) {
