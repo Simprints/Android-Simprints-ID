@@ -29,7 +29,7 @@ data class SessionCaptureEvent(
                 location: Location? = null,
                 analyticsId: String? = null,
                 id: String = UUID.randomUUID().toString(),
-                labels: EventLabels = EventLabels(sessionId = id)) : //StopShip
+                labels: EventLabels = EventLabels(sessionId = id)) :
         this(
             id,
             SESSION_CAPTURE,
@@ -48,6 +48,8 @@ data class SessionCaptureEvent(
                 uploadTime,
                 location,
                 analyticsId)) {
+
+        // Ensure that sessionId is equal to the id
         this.labels = labels.copy(sessionId = id)
     }
 
