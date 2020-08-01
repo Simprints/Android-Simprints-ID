@@ -17,8 +17,8 @@ import com.simprints.id.data.db.subject.*
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
-import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
-import com.simprints.id.data.db.subject.remote.EventRemoteDataSourceImpl
+import com.simprints.id.data.db.event.remote.EventRemoteDataSource
+import com.simprints.id.data.db.event.remote.EventRemoteDataSourceImpl
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
 import com.simprints.id.data.images.repository.ImageRepository
@@ -76,12 +76,12 @@ open class DataModule {
 
     @Provides
     open fun providePersonRepositoryUpSyncHelper(
-        loginInfoManager: LoginInfoManager,
-        subjectLocalDataSource: SubjectLocalDataSource,
-        eventRemoteDataSource: EventRemoteDataSource,
-        subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
-        preferencesManager: PreferencesManager,
-        subjectsSyncCache: SubjectsSyncCache): SubjectRepositoryUpSyncHelper =
+            loginInfoManager: LoginInfoManager,
+            subjectLocalDataSource: SubjectLocalDataSource,
+            eventRemoteDataSource: EventRemoteDataSource,
+            subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
+            preferencesManager: PreferencesManager,
+            subjectsSyncCache: SubjectsSyncCache): SubjectRepositoryUpSyncHelper =
         SubjectRepositoryUpSyncHelperImpl(loginInfoManager, subjectLocalDataSource, eventRemoteDataSource,
             subjectsUpSyncScopeRepository, preferencesManager.modalities)
 
@@ -94,12 +94,12 @@ open class DataModule {
 
     @Provides
     open fun providePersonRepository(
-        subjectLocalDataSource: SubjectLocalDataSource,
-        eventRemoteDataSource: EventRemoteDataSource,
-        subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
-        subjectsUpSyncExecutor: SubjectsUpSyncExecutor,
-        subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
-        subjectRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper
+            subjectLocalDataSource: SubjectLocalDataSource,
+            eventRemoteDataSource: EventRemoteDataSource,
+            subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
+            subjectsUpSyncExecutor: SubjectsUpSyncExecutor,
+            subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
+            subjectRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper
     ): SubjectRepository = SubjectRepositoryImpl(
         eventRemoteDataSource,
         subjectLocalDataSource,

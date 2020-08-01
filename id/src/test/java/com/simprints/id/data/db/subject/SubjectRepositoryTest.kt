@@ -17,7 +17,7 @@
 //import com.simprints.id.data.db.event.domain.events.EventPayloadType.ENROLMENT_RECORD_CREATION
 //import com.simprints.id.data.db.event.domain.events.subject.*
 //import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-//import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
+//import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 //import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 //import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
 //import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor

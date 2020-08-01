@@ -12,9 +12,6 @@ import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMo
 import com.simprints.id.data.db.event.remote.models.subject.fromApiToDomain
 
 @Keep
-class ApiEvents(val events: List<ApiEvent>)
-
-@Keep
 open class ApiEvent(val id: String,
                     val labels: ApiEventLabels,
                     val payload: ApiEventPayload)

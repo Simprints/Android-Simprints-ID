@@ -13,7 +13,6 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilder
 import com.simprints.id.data.db.event.local.EventDatabaseFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
-import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -122,7 +121,7 @@ class TestAppModule(
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
         eventLocalDataSource: EventLocalDataSource,
-        sessionRemoteDataSource: SessionRemoteDataSource,
+        eventRemoteDataSource: EventRemoteDataSource,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
@@ -132,7 +131,7 @@ class TestAppModule(
             ctx,
             sessionEventsSyncManager,
             eventLocalDataSource,
-            sessionRemoteDataSource,
+            eventRemoteDataSource,
             preferencesManager,
             loginInfoManager,
             timeHelper,
@@ -161,7 +160,7 @@ class TestAppModule(
 
     override fun provideSessionEventsRemoteDbManager(
         simApiClientFactory: SimApiClientFactory
-    ): SessionRemoteDataSource =
+    ): EventRemoteDataSource =
         sessionEventsRemoteDbManagerRule.resolveDependency {
             super.provideSessionEventsRemoteDbManager(
                 simApiClientFactory

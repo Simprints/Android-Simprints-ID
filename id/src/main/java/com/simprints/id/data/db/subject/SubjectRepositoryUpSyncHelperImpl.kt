@@ -7,7 +7,7 @@ import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
+import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperation
 import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncOperationResult
@@ -26,11 +26,11 @@ import timber.log.Timber
 import java.util.*
 
 class SubjectRepositoryUpSyncHelperImpl(
-    private val loginInfoManager: LoginInfoManager,
-    private val subjectLocalDataSource: SubjectLocalDataSource,
-    private val eventRemoteDataSource: EventRemoteDataSource,
-    private val subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
-    private val modalities: List<Modality>
+        private val loginInfoManager: LoginInfoManager,
+        private val subjectLocalDataSource: SubjectLocalDataSource,
+        private val eventRemoteDataSource: EventRemoteDataSource,
+        private val subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
+        private val modalities: List<Modality>
 ) : SubjectRepositoryUpSyncHelper {
 
     internal val batchSize by lazy { UPSYNC_BATCH_SIZE }

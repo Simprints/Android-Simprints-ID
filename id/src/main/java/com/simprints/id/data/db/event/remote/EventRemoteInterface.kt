@@ -1,8 +1,6 @@
-package com.simprints.id.data.db.subject.remote
+package com.simprints.id.data.db.event.remote
 
-import com.simprints.id.data.db.event.remote.models.subject.ApiModes
 import com.simprints.id.data.db.event.remote.models.ApiEventCount
-import com.simprints.id.data.db.event.remote.models.ApiEvents
 import com.simprints.id.network.SimRemoteInterface
 import okhttp3.ResponseBody
 import retrofit2.http.*
@@ -24,7 +22,7 @@ interface EventRemoteInterface : SimRemoteInterface {
     @POST("projects/{projectId}/events")
     suspend fun uploadEvents(
         @Path("projectId") projectId: String,
-        @Body events: ApiEvents
+        @Body events: ApiUploadEventsBody
     )
 
     @GET("projects/{projectId}/events")
@@ -36,4 +34,5 @@ interface EventRemoteInterface : SimRemoteInterface {
         @Query("l_mode") modes: List<ApiModes>,
         @Query("lastEventId") lastEventId: String?,
         @Query("type") eventType: List<String>): ResponseBody
+
 }

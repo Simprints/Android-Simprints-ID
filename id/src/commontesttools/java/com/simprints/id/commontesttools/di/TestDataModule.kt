@@ -11,7 +11,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.SubjectRepositoryDownSyncHelper
 import com.simprints.id.data.db.subject.SubjectRepositoryUpSyncHelper
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
+import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
 import com.simprints.id.data.images.repository.ImageRepository
@@ -76,12 +76,12 @@ class TestDataModule(
         }
 
     override fun providePersonRepositoryUpSyncHelper(
-        loginInfoManager: LoginInfoManager,
-        subjectLocalDataSource: SubjectLocalDataSource,
-        eventRemoteDataSource: EventRemoteDataSource,
-        subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
-        preferencesManager: PreferencesManager,
-        subjectsSyncCache: SubjectsSyncCache
+            loginInfoManager: LoginInfoManager,
+            subjectLocalDataSource: SubjectLocalDataSource,
+            eventRemoteDataSource: EventRemoteDataSource,
+            subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
+            preferencesManager: PreferencesManager,
+            subjectsSyncCache: SubjectsSyncCache
     ): SubjectRepositoryUpSyncHelper =
         personRepositoryUpSyncHelperRule.resolveDependency {
             super.providePersonRepositoryUpSyncHelper(
@@ -101,12 +101,12 @@ class TestDataModule(
 
 
     override fun providePersonRepository(
-        subjectLocalDataSource: SubjectLocalDataSource,
-        eventRemoteDataSource: EventRemoteDataSource,
-        subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
-        subjectsUpSyncExecutor: SubjectsUpSyncExecutor,
-        subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
-        subjectRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper
+            subjectLocalDataSource: SubjectLocalDataSource,
+            eventRemoteDataSource: EventRemoteDataSource,
+            subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
+            subjectsUpSyncExecutor: SubjectsUpSyncExecutor,
+            subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
+            subjectRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper
     ): SubjectRepository = personRepositoryRule.resolveDependency {
         super.providePersonRepository(
             subjectLocalDataSource,
