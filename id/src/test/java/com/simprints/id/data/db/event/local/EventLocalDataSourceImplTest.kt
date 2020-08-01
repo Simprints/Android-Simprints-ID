@@ -18,7 +18,6 @@ import com.simprints.id.data.db.event.domain.models.EventType.ARTIFICIAL_TERMINA
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.EventValidator
-import com.simprints.id.data.db.event.local.EventLocalDataSource.DbEventQuery
 import com.simprints.id.data.db.event.local.models.*
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.orchestrator.SOME_GUID1

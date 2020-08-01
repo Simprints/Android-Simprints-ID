@@ -13,7 +13,7 @@ class ApiFingerprintCapturePayload(val id: String,
                                    val qualityThreshold: Int,
                                    val finger: ApiFingerIdentifier,
                                    val result: ApiResult,
-                                   val fingerprint: ApiFingerprint?) : ApiEventPayload(ApiEventPayloadType.FINGERPRINT_CAPTURE, version, relativeStartTime) {
+                                   val fingerprint: ApiFingerprint?) : ApiEventPayload(ApiEventPayloadType.FingerprintCapture, version, relativeStartTime) {
 
     @Keep
     class ApiFingerprint(val finger: ApiFingerIdentifier, val quality: Int, val template: String) {

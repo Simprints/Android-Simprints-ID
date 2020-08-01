@@ -7,7 +7,7 @@ import com.simprints.id.data.db.event.domain.models.InvalidIntentEvent.InvalidIn
 class ApiInvalidIntentPayload(override val relativeStartTime: Long,
                               override val version: Int,
                               val action: String,
-                              val extras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.INVALID_INTENT, version, relativeStartTime) {
+                              val extras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.InvalidIntent, version, relativeStartTime) {
 
     constructor(domainPayload: InvalidIntentPayload) :
         this(domainPayload.createdAt,

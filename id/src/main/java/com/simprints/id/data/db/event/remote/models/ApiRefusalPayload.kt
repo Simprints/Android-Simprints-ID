@@ -10,7 +10,7 @@ class ApiRefusalPayload(override val relativeStartTime: Long,
                         override val version: Int,
                         val relativeEndTime: Long,
                         val reason: ApiAnswer,
-                        val otherText: String) : ApiEventPayload(ApiEventPayloadType.REFUSAL, version, relativeStartTime) {
+                        val otherText: String) : ApiEventPayload(ApiEventPayloadType.Refusal, version, relativeStartTime) {
 
     @Keep
     enum class ApiAnswer {

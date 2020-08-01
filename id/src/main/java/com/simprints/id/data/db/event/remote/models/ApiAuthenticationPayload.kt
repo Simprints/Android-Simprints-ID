@@ -10,7 +10,7 @@ class ApiAuthenticationPayload(override val relativeStartTime: Long,
                                override val version: Int,
                                val relativeEndTime: Long,
                                val userInfo: ApiUserInfo,
-                               val result: ApiResult) : ApiEventPayload(ApiEventPayloadType.AUTHENTICATION, version, relativeStartTime) {
+                               val result: ApiResult) : ApiEventPayload(ApiEventPayloadType.Authentication, version, relativeStartTime) {
 
     @Keep
     class ApiUserInfo(val projectId: String, val userId: String) {

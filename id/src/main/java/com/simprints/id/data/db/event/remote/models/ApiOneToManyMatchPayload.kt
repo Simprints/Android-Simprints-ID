@@ -12,7 +12,7 @@ class ApiOneToManyMatchPayload(override val relativeStartTime: Long,
                                val relativeEndTime: Long,
                                val pool: ApiMatchPool,
                                val matcher: ApiMatcher,
-                               val result: List<ApiMatchEntry>?) : ApiEventPayload(ApiEventPayloadType.ONE_TO_MANY_MATCH,version, relativeStartTime) {
+                               val result: List<ApiMatchEntry>?) : ApiEventPayload(ApiEventPayloadType.OneToManyMatch,version, relativeStartTime) {
 
     @Keep
     class ApiMatchPool(val type: ApiMatchPoolType, val count: Int) {

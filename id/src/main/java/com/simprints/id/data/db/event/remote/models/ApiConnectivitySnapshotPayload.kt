@@ -10,7 +10,7 @@ class ApiConnectivitySnapshotPayload(
     override val relativeStartTime: Long,
     override val version: Int,
     val networkType: String,
-    val connections: List<ApiConnection>) : ApiEventPayload(ApiEventPayloadType.CONNECTIVITY_SNAPSHOT, version, relativeStartTime) {
+    val connections: List<ApiConnection>) : ApiEventPayload(ApiEventPayloadType.ConnectivitySnapshot, version, relativeStartTime) {
 
     @Keep
     class ApiConnection(val type: String, val state: String) {
