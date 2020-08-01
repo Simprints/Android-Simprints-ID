@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.domain.models.callback.IdentificationCallb
 import com.simprints.id.data.db.event.domain.models.callback.RefusalCallbackEvent.RefusalCallbackPayload
 import com.simprints.id.data.db.event.domain.models.callback.VerificationCallbackEvent.VerificationCallbackPayload
 import com.simprints.id.data.db.event.remote.models.ApiEventPayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.CALLBACK
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.Callback
 import com.simprints.id.data.db.event.remote.models.callback.ApiCallbackType.*
 import com.simprints.id.data.db.event.remote.models.fromApiToDomain
 
@@ -18,7 +18,7 @@ class ApiCallbackPayload(
     override val relativeStartTime: Long,
     override val version: Int,
     val callback: ApiCallback
-) : ApiEventPayload(CALLBACK, version, relativeStartTime) {
+) : ApiEventPayload(Callback, version, relativeStartTime) {
 
     constructor(domainPayload: EnrolmentCallbackPayload) : this(
         domainPayload.createdAt,
@@ -55,10 +55,10 @@ class ApiCallbackPayload(
 
 fun ApiCallbackPayload.fromApiToDomain(): EventPayload =
     when (this.callback.type) {
-        ENROLMENT -> (callback as ApiEnrolmentCallback).let { EnrolmentCallbackPayload(relativeStartTime, version, it.guid, type.fromApiToDomain(), 0) }
-        IDENTIFICATION -> (callback as ApiIdentificationCallback).let { IdentificationCallbackPayload(relativeStartTime, version, it.sessionId, it.scores.map { it.fromApiToDomain() }) }
-        REFUSAL -> (callback as ApiRefusalCallback).let { RefusalCallbackPayload(relativeStartTime, version, it.reason, it.extra) }
-        VERIFICATION -> (callback as ApiVerificationCallback).let { VerificationCallbackPayload(relativeStartTime, version, it.score.fromApiToDomain()) }
-        ERROR -> (callback as ApiErrorCallback).let { ErrorCallbackPayload(relativeStartTime, version, it.reason.fromApiToDomain()) }
-        CONFIRMATION -> (callback as ApiConfirmationCallback).let { ConfirmationCallbackPayload(relativeStartTime, version, it.received) }
+        Enrolment -> (callback as ApiEnrolmentCallback).let { EnrolmentCallbackPayload(relativeStartTime, version, it.guid, type.fromApiToDomain(), 0) }
+        Identification -> (callback as ApiIdentificationCallback).let { IdentificationCallbackPayload(relativeStartTime, version, it.sessionId, it.scores.map { it.fromApiToDomain() }) }
+        Refusal -> (callback as ApiRefusalCallback).let { RefusalCallbackPayload(relativeStartTime, version, it.reason, it.extra) }
+        Verification -> (callback as ApiVerificationCallback).let { VerificationCallbackPayload(relativeStartTime, version, it.score.fromApiToDomain()) }
+        Error -> (callback as ApiErrorCallback).let { ErrorCallbackPayload(relativeStartTime, version, it.reason.fromApiToDomain()) }
+        Confirmation -> (callback as ApiConfirmationCallback).let { ConfirmationCallbackPayload(relativeStartTime, version, it.received) }
     }

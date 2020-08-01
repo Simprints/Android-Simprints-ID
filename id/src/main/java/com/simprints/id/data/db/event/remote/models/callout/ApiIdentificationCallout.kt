@@ -6,4 +6,4 @@ import androidx.annotation.Keep
 class ApiIdentificationCallout(val projectId: String,
                                val userId: String,
                                val moduleId: String,
-                               val metadata: String?): ApiCallout(ApiCalloutType.IDENTIFICATION)
+                               val metadata: String?): ApiCallout(ApiCalloutType.Identification)

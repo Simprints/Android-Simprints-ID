@@ -16,7 +16,7 @@ class ApiEnrolmentRecordCreationPayload(
     val moduleId: String,
     val attendantId: String,
     val biometricReferences: List<ApiBiometricReference>?
-) : ApiEventPayload(ApiEventPayloadType.ENROLMENT_RECORD_CREATION, version, relativeStartTime) {
+) : ApiEventPayload(ApiEventPayloadType.EnrolmentRecordCreation, version, relativeStartTime) {
 
     constructor(payload: EnrolmentRecordCreationPayload) :
         this(payload.createdAt, payload.eventVersion, payload.subjectId, payload.projectId, payload.moduleId,

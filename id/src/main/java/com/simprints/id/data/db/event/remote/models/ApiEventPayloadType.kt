@@ -1,43 +1,43 @@
 package com.simprints.id.data.db.event.remote.models
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.*
 
+//Unused key field - used to enforce adding a const when a new event is added. Required for Jackson in ApiEventPayload
 enum class ApiEventPayloadType(val key: String) {
 
-    @JsonProperty(ENROLMENT_RECORD_CREATION_KEY) ENROLMENT_RECORD_CREATION(ApiEventPayloadType.ENROLMENT_RECORD_CREATION_KEY),
-    @JsonProperty(ENROLMENT_RECORD_DELETION_KEY) ENROLMENT_RECORD_DELETION(ApiEventPayloadType.ENROLMENT_RECORD_DELETION_KEY),
-    @JsonProperty(ENROLMENT_RECORD_MOVE_KEY) ENROLMENT_RECORD_MOVE(ApiEventPayloadType.ENROLMENT_RECORD_MOVE_KEY),
-    @JsonProperty(CALLOUT_KEY) CALLOUT(ApiEventPayloadType.CALLOUT_KEY),
-    @JsonProperty(CALLBACK_KEY) CALLBACK(ApiEventPayloadType.CALLBACK_KEY),
-    @JsonProperty(ARTIFICIAL_TERMINATION_KEY) ARTIFICIAL_TERMINATION(ApiEventPayloadType.ARTIFICIAL_TERMINATION_KEY),
-    @JsonProperty(AUTHENTICATION_KEY) AUTHENTICATION(ApiEventPayloadType.AUTHENTICATION_KEY),
-    @JsonProperty(CONSENT_KEY) CONSENT(ApiEventPayloadType.CONSENT_KEY),
-    @JsonProperty(ENROLMENT_KEY) ENROLMENT(ApiEventPayloadType.ENROLMENT_KEY),
-    @JsonProperty(AUTHORIZATION_KEY) AUTHORIZATION(ApiEventPayloadType.AUTHORIZATION_KEY),
-    @JsonProperty(FINGERPRINT_CAPTURE_KEY) FINGERPRINT_CAPTURE(ApiEventPayloadType.FINGERPRINT_CAPTURE_KEY),
-    @JsonProperty(ONE_TO_ONE_MATCH_KEY) ONE_TO_ONE_MATCH(ApiEventPayloadType.ONE_TO_ONE_MATCH_KEY),
-    @JsonProperty(ONE_TO_MANY_MATCH_KEY) ONE_TO_MANY_MATCH(ApiEventPayloadType.ONE_TO_MANY_MATCH_KEY),
-    @JsonProperty(PERSON_CREATION_KEY) PERSON_CREATION(ApiEventPayloadType.PERSON_CREATION_KEY),
-    @JsonProperty(ALERT_SCREEN_KEY) ALERT_SCREEN(ApiEventPayloadType.ALERT_SCREEN_KEY),
-    @JsonProperty(GUID_SELECTION_KEY) GUID_SELECTION(ApiEventPayloadType.GUID_SELECTION_KEY),
-    @JsonProperty(CONNECTIVITY_SNAPSHOT_KEY) CONNECTIVITY_SNAPSHOT(ApiEventPayloadType.CONNECTIVITY_SNAPSHOT_KEY),
-    @JsonProperty(REFUSAL_KEY) REFUSAL(ApiEventPayloadType.REFUSAL_KEY),
-    @JsonProperty(CANDIDATE_READ_KEY) CANDIDATE_READ(ApiEventPayloadType.CANDIDATE_READ_KEY),
-    @JsonProperty(SCANNER_CONNECTION_KEY) SCANNER_CONNECTION(ApiEventPayloadType.SCANNER_CONNECTION_KEY),
-    @JsonProperty(VERO_2_INFO_SNAPSHOT_KEY) VERO_2_INFO_SNAPSHOT(ApiEventPayloadType.VERO_2_INFO_SNAPSHOT_KEY),
-    @JsonProperty(SCANNER_FIRMWARE_UPDATE_KEY) SCANNER_FIRMWARE_UPDATE(ApiEventPayloadType.SCANNER_FIRMWARE_UPDATE_KEY),
-    @JsonProperty(INVALID_INTENT_KEY) INVALID_INTENT(ApiEventPayloadType.INVALID_INTENT_KEY),
-    @JsonProperty(SUSPICIOUS_INTENT_KEY) SUSPICIOUS_INTENT(ApiEventPayloadType.SUSPICIOUS_INTENT_KEY),
-    @JsonProperty(INTENT_PARSING_KEY) INTENT_PARSING(ApiEventPayloadType.INTENT_PARSING_KEY),
-    @JsonProperty(COMPLETION_CHECK_KEY) COMPLETION_CHECK(ApiEventPayloadType.COMPLETION_CHECK_KEY),
-    @JsonProperty(SESSION_CAPTURE_KEY) SESSION_CAPTURE(ApiEventPayloadType.SESSION_CAPTURE_KEY),
-    @JsonProperty(FACE_ONBOARDING_COMPLETE_KEY) FACE_ONBOARDING_COMPLETE(ApiEventPayloadType.FACE_ONBOARDING_COMPLETE_KEY),
-    @JsonProperty(FACE_FALLBACK_CAPTURE_KEY) FACE_FALLBACK_CAPTURE(ApiEventPayloadType.FACE_FALLBACK_CAPTURE_KEY),
-    @JsonProperty(FACE_CAPTURE_KEY) FACE_CAPTURE(ApiEventPayloadType.FACE_CAPTURE_KEY),
-    @JsonProperty(FACE_CAPTURE_CONFIRMATION_KEY) FACE_CAPTURE_CONFIRMATION(ApiEventPayloadType.FACE_CAPTURE_CONFIRMATION_KEY),
-    @JsonProperty(FACE_CAPTURE_RETRY_KEY) FACE_CAPTURE_RETRY(ApiEventPayloadType.FACE_CAPTURE_RETRY_KEY);
+    EnrolmentRecordCreation(ApiEventPayloadType.ENROLMENT_RECORD_CREATION_KEY),
+    EnrolmentRecordDeletion(ApiEventPayloadType.ENROLMENT_RECORD_DELETION_KEY),
+    EnrolmentRecordMove(ApiEventPayloadType.ENROLMENT_RECORD_MOVE_KEY),
+    Callout(ApiEventPayloadType.CALLOUT_KEY),
+    Callback(ApiEventPayloadType.CALLBACK_KEY),
+    ArtificialTermination(ApiEventPayloadType.ARTIFICIAL_TERMINATION_KEY),
+    Authentication(ApiEventPayloadType.AUTHENTICATION_KEY),
+    Consent(ApiEventPayloadType.CONSENT_KEY),
+    Enrolment(ApiEventPayloadType.ENROLMENT_KEY),
+    Authorization(ApiEventPayloadType.AUTHORIZATION_KEY),
+    FingerprintCapture(ApiEventPayloadType.FINGERPRINT_CAPTURE_KEY),
+    OneToOneMatch(ApiEventPayloadType.ONE_TO_ONE_MATCH_KEY),
+    OneToManyMatch(ApiEventPayloadType.ONE_TO_MANY_MATCH_KEY),
+    PersonCreation(ApiEventPayloadType.PERSON_CREATION_KEY),
+    AlertScreen(ApiEventPayloadType.ALERT_SCREEN_KEY),
+    GuidSelection(ApiEventPayloadType.GUID_SELECTION_KEY),
+    ConnectivitySnapshot(ApiEventPayloadType.CONNECTIVITY_SNAPSHOT_KEY),
+    Refusal(ApiEventPayloadType.REFUSAL_KEY),
+    CandidateRead(ApiEventPayloadType.CANDIDATE_READ_KEY),
+    ScannerConnection(ApiEventPayloadType.SCANNER_CONNECTION_KEY),
+    Vero2InfoSnapshot(ApiEventPayloadType.VERO_2_INFO_SNAPSHOT_KEY),
+    ScannerFirmwareUpdate(ApiEventPayloadType.SCANNER_FIRMWARE_UPDATE_KEY),
+    InvalidIntent(ApiEventPayloadType.INVALID_INTENT_KEY),
+    SuspiciousIntent(ApiEventPayloadType.SUSPICIOUS_INTENT_KEY),
+    IntentParsing(ApiEventPayloadType.INTENT_PARSING_KEY),
+    CompletionCheck(ApiEventPayloadType.COMPLETION_CHECK_KEY),
+    SessionCapture(ApiEventPayloadType.SESSION_CAPTURE_KEY),
+    FaceOnboardingComplete(ApiEventPayloadType.FACE_ONBOARDING_COMPLETE_KEY),
+    FaceFallbackCapture(ApiEventPayloadType.FACE_FALLBACK_CAPTURE_KEY),
+    FaceCapture(ApiEventPayloadType.FACE_CAPTURE_KEY),
+    FaceCaptureConfirmation(ApiEventPayloadType.FACE_CAPTURE_CONFIRMATION_KEY),
+    FaceCaptureRetry(ApiEventPayloadType.FACE_CAPTURE_RETRY_KEY);
 
     companion object {
         const val ENROLMENT_RECORD_CREATION_KEY = "EnrolmentRecordCreation"
@@ -76,81 +76,81 @@ enum class ApiEventPayloadType(val key: String) {
 }
 
 fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
-    ENROLMENT_RECORD_CREATION -> ApiEventPayloadType.ENROLMENT_RECORD_CREATION
-    ENROLMENT_RECORD_DELETION -> ApiEventPayloadType.ENROLMENT_RECORD_DELETION
-    ARTIFICIAL_TERMINATION -> ApiEventPayloadType.ARTIFICIAL_TERMINATION
-    AUTHENTICATION -> ApiEventPayloadType.AUTHENTICATION
-    CONSENT -> ApiEventPayloadType.CONSENT
-    ENROLMENT -> ApiEventPayloadType.ENROLMENT
-    AUTHORIZATION -> ApiEventPayloadType.AUTHORIZATION
-    FINGERPRINT_CAPTURE -> ApiEventPayloadType.FINGERPRINT_CAPTURE
-    ONE_TO_ONE_MATCH -> ApiEventPayloadType.ONE_TO_MANY_MATCH
-    ONE_TO_MANY_MATCH -> ApiEventPayloadType.ONE_TO_MANY_MATCH
-    PERSON_CREATION -> ApiEventPayloadType.PERSON_CREATION
-    ALERT_SCREEN -> ApiEventPayloadType.ALERT_SCREEN
-    GUID_SELECTION -> ApiEventPayloadType.GUID_SELECTION
-    CONNECTIVITY_SNAPSHOT -> ApiEventPayloadType.CONNECTIVITY_SNAPSHOT
-    REFUSAL -> ApiEventPayloadType.REFUSAL
-    CANDIDATE_READ -> ApiEventPayloadType.CANDIDATE_READ
-    SCANNER_CONNECTION -> ApiEventPayloadType.SCANNER_CONNECTION
-    VERO_2_INFO_SNAPSHOT -> ApiEventPayloadType.VERO_2_INFO_SNAPSHOT
-    SCANNER_FIRMWARE_UPDATE -> ApiEventPayloadType.SCANNER_FIRMWARE_UPDATE
-    INVALID_INTENT -> ApiEventPayloadType.INVALID_INTENT
+    ENROLMENT_RECORD_CREATION -> ApiEventPayloadType.EnrolmentRecordCreation
+    ENROLMENT_RECORD_DELETION -> ApiEventPayloadType.EnrolmentRecordDeletion
+    ARTIFICIAL_TERMINATION -> ApiEventPayloadType.ArtificialTermination
+    AUTHENTICATION -> ApiEventPayloadType.Authentication
+    CONSENT -> ApiEventPayloadType.Consent
+    ENROLMENT -> ApiEventPayloadType.Enrolment
+    AUTHORIZATION -> ApiEventPayloadType.Authorization
+    FINGERPRINT_CAPTURE -> ApiEventPayloadType.FingerprintCapture
+    ONE_TO_ONE_MATCH -> ApiEventPayloadType.OneToManyMatch
+    ONE_TO_MANY_MATCH -> ApiEventPayloadType.OneToManyMatch
+    PERSON_CREATION -> ApiEventPayloadType.PersonCreation
+    ALERT_SCREEN -> ApiEventPayloadType.AlertScreen
+    GUID_SELECTION -> ApiEventPayloadType.GuidSelection
+    CONNECTIVITY_SNAPSHOT -> ApiEventPayloadType.ConnectivitySnapshot
+    REFUSAL -> ApiEventPayloadType.Refusal
+    CANDIDATE_READ -> ApiEventPayloadType.CandidateRead
+    SCANNER_CONNECTION -> ApiEventPayloadType.ScannerConnection
+    VERO_2_INFO_SNAPSHOT -> ApiEventPayloadType.Vero2InfoSnapshot
+    SCANNER_FIRMWARE_UPDATE -> ApiEventPayloadType.ScannerFirmwareUpdate
+    INVALID_INTENT -> ApiEventPayloadType.InvalidIntent
     CALLOUT_CONFIRMATION,
     CALLOUT_IDENTIFICATION,
     CALLOUT_ENROLMENT,
     CALLOUT_VERIFICATION,
-    CALLOUT_LAST_BIOMETRICS -> ApiEventPayloadType.CALLOUT
+    CALLOUT_LAST_BIOMETRICS -> ApiEventPayloadType.Callout
     CALLBACK_IDENTIFICATION,
     CALLBACK_ENROLMENT,
     CALLBACK_REFUSAL,
     CALLBACK_VERIFICATION,
     CALLBACK_CONFIRMATION,
-    CALLBACK_ERROR -> ApiEventPayloadType.CALLBACK
-    SUSPICIOUS_INTENT -> ApiEventPayloadType.SUSPICIOUS_INTENT
-    INTENT_PARSING -> ApiEventPayloadType.INTENT_PARSING
-    COMPLETION_CHECK -> ApiEventPayloadType.COMPLETION_CHECK
-    SESSION_CAPTURE -> ApiEventPayloadType.SESSION_CAPTURE
-    ENROLMENT_RECORD_MOVE -> ApiEventPayloadType.ENROLMENT_RECORD_MOVE
-    FACE_ONBOARDING_COMPLETE -> ApiEventPayloadType.FACE_ONBOARDING_COMPLETE
-    FACE_FALLBACK_CAPTURE -> ApiEventPayloadType.FACE_FALLBACK_CAPTURE
-    FACE_CAPTURE -> ApiEventPayloadType.FACE_CAPTURE
-    FACE_CAPTURE_CONFIRMATION -> ApiEventPayloadType.FACE_CAPTURE_CONFIRMATION
-    FACE_CAPTURE_RETRY -> ApiEventPayloadType.FACE_CAPTURE_RETRY
+    CALLBACK_ERROR -> ApiEventPayloadType.Callback
+    SUSPICIOUS_INTENT -> ApiEventPayloadType.SuspiciousIntent
+    INTENT_PARSING -> ApiEventPayloadType.IntentParsing
+    COMPLETION_CHECK -> ApiEventPayloadType.CompletionCheck
+    SESSION_CAPTURE -> ApiEventPayloadType.SessionCapture
+    ENROLMENT_RECORD_MOVE -> ApiEventPayloadType.EnrolmentRecordMove
+    FACE_ONBOARDING_COMPLETE -> ApiEventPayloadType.FaceOnboardingComplete
+    FACE_FALLBACK_CAPTURE -> ApiEventPayloadType.FaceFallbackCapture
+    FACE_CAPTURE -> ApiEventPayloadType.FaceCapture
+    FACE_CAPTURE_CONFIRMATION -> ApiEventPayloadType.FaceCaptureConfirmation
+    FACE_CAPTURE_RETRY -> ApiEventPayloadType.FaceCaptureRetry
 }
 
 
 fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
-    ApiEventPayloadType.ENROLMENT_RECORD_CREATION -> ENROLMENT_RECORD_CREATION
-    ApiEventPayloadType.ENROLMENT_RECORD_DELETION -> ENROLMENT_RECORD_DELETION
-    ApiEventPayloadType.ARTIFICIAL_TERMINATION -> ARTIFICIAL_TERMINATION
-    ApiEventPayloadType.AUTHENTICATION -> AUTHENTICATION
-    ApiEventPayloadType.CONSENT -> CONSENT
-    ApiEventPayloadType.ENROLMENT -> ENROLMENT
-    ApiEventPayloadType.AUTHORIZATION -> AUTHORIZATION
-    ApiEventPayloadType.FINGERPRINT_CAPTURE -> FINGERPRINT_CAPTURE
-    ApiEventPayloadType.ONE_TO_ONE_MATCH -> ONE_TO_MANY_MATCH
-    ApiEventPayloadType.ONE_TO_MANY_MATCH -> ONE_TO_MANY_MATCH
-    ApiEventPayloadType.PERSON_CREATION -> PERSON_CREATION
-    ApiEventPayloadType.ALERT_SCREEN -> ALERT_SCREEN
-    ApiEventPayloadType.GUID_SELECTION -> GUID_SELECTION
-    ApiEventPayloadType.CONNECTIVITY_SNAPSHOT -> CONNECTIVITY_SNAPSHOT
-    ApiEventPayloadType.REFUSAL -> REFUSAL
-    ApiEventPayloadType.CANDIDATE_READ -> CANDIDATE_READ
-    ApiEventPayloadType.SCANNER_CONNECTION -> SCANNER_CONNECTION
-    ApiEventPayloadType.VERO_2_INFO_SNAPSHOT -> VERO_2_INFO_SNAPSHOT
-    ApiEventPayloadType.SCANNER_FIRMWARE_UPDATE -> SCANNER_FIRMWARE_UPDATE
-    ApiEventPayloadType.INVALID_INTENT -> INVALID_INTENT
-    ApiEventPayloadType.SUSPICIOUS_INTENT -> SUSPICIOUS_INTENT
-    ApiEventPayloadType.INTENT_PARSING -> INTENT_PARSING
-    ApiEventPayloadType.COMPLETION_CHECK -> COMPLETION_CHECK
-    ApiEventPayloadType.SESSION_CAPTURE -> SESSION_CAPTURE
-    ApiEventPayloadType.ENROLMENT_RECORD_MOVE -> ENROLMENT_RECORD_MOVE
-    ApiEventPayloadType.FACE_ONBOARDING_COMPLETE -> FACE_ONBOARDING_COMPLETE
-    ApiEventPayloadType.FACE_FALLBACK_CAPTURE -> FACE_FALLBACK_CAPTURE
-    ApiEventPayloadType.FACE_CAPTURE -> FACE_CAPTURE
-    ApiEventPayloadType.FACE_CAPTURE_CONFIRMATION -> FACE_CAPTURE_CONFIRMATION
-    ApiEventPayloadType.FACE_CAPTURE_RETRY -> FACE_CAPTURE_RETRY
-    ApiEventPayloadType.CALLOUT -> throw UnsupportedOperationException("")
-    ApiEventPayloadType.CALLBACK -> throw UnsupportedOperationException("")
+    ApiEventPayloadType.EnrolmentRecordCreation -> ENROLMENT_RECORD_CREATION
+    ApiEventPayloadType.EnrolmentRecordDeletion -> ENROLMENT_RECORD_DELETION
+    ApiEventPayloadType.ArtificialTermination -> ARTIFICIAL_TERMINATION
+    ApiEventPayloadType.Authentication -> AUTHENTICATION
+    ApiEventPayloadType.Consent -> CONSENT
+    ApiEventPayloadType.Enrolment -> ENROLMENT
+    ApiEventPayloadType.Authorization -> AUTHORIZATION
+    ApiEventPayloadType.FingerprintCapture -> FINGERPRINT_CAPTURE
+    ApiEventPayloadType.OneToOneMatch -> ONE_TO_MANY_MATCH
+    ApiEventPayloadType.OneToManyMatch -> ONE_TO_MANY_MATCH
+    ApiEventPayloadType.PersonCreation -> PERSON_CREATION
+    ApiEventPayloadType.AlertScreen -> ALERT_SCREEN
+    ApiEventPayloadType.GuidSelection -> GUID_SELECTION
+    ApiEventPayloadType.ConnectivitySnapshot -> CONNECTIVITY_SNAPSHOT
+    ApiEventPayloadType.Refusal -> REFUSAL
+    ApiEventPayloadType.CandidateRead -> CANDIDATE_READ
+    ApiEventPayloadType.ScannerConnection -> SCANNER_CONNECTION
+    ApiEventPayloadType.Vero2InfoSnapshot -> VERO_2_INFO_SNAPSHOT
+    ApiEventPayloadType.ScannerFirmwareUpdate -> SCANNER_FIRMWARE_UPDATE
+    ApiEventPayloadType.InvalidIntent -> INVALID_INTENT
+    ApiEventPayloadType.SuspiciousIntent -> SUSPICIOUS_INTENT
+    ApiEventPayloadType.IntentParsing -> INTENT_PARSING
+    ApiEventPayloadType.CompletionCheck -> COMPLETION_CHECK
+    ApiEventPayloadType.SessionCapture -> SESSION_CAPTURE
+    ApiEventPayloadType.EnrolmentRecordMove -> ENROLMENT_RECORD_MOVE
+    ApiEventPayloadType.FaceOnboardingComplete -> FACE_ONBOARDING_COMPLETE
+    ApiEventPayloadType.FaceFallbackCapture -> FACE_FALLBACK_CAPTURE
+    ApiEventPayloadType.FaceCapture -> FACE_CAPTURE
+    ApiEventPayloadType.FaceCaptureConfirmation -> FACE_CAPTURE_CONFIRMATION
+    ApiEventPayloadType.FaceCaptureRetry -> FACE_CAPTURE_RETRY
+    ApiEventPayloadType.Callout -> throw UnsupportedOperationException("")
+    ApiEventPayloadType.Callback -> throw UnsupportedOperationException("")
 }

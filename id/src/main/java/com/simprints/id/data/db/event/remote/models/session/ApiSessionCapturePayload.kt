@@ -20,7 +20,7 @@ open class ApiSessionCapturePayload(override val relativeStartTime: Long,
                                     var uploadedAt: Long = 0,
                                     var databaseInfo: ApiDatabaseInfo,
                                     var location: ApiLocation? = null,
-                                    var analyticsId: String? = null) : ApiEventPayload(ApiEventPayloadType.SESSION_CAPTURE, version, relativeStartTime) {
+                                    var analyticsId: String? = null) : ApiEventPayload(ApiEventPayloadType.SessionCapture, version, relativeStartTime) {
 
     constructor(domainPayload: SessionCapturePayload) : this(
         domainPayload.createdAt,

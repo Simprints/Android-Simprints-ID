@@ -13,7 +13,7 @@ class ApiConsentPayload(override val relativeStartTime: Long,
                         override val version: Int,
                         var relativeEndTime: Long,
                         val consentType: ApiType,
-                        var result: ApiResult) : ApiEventPayload(ApiEventPayloadType.CONSENT, version, relativeStartTime) {
+                        var result: ApiResult) : ApiEventPayload(ApiEventPayloadType.Consent, version, relativeStartTime) {
     @Keep
     enum class ApiType {
         INDIVIDUAL, PARENTAL

@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.CompletionCheckEvent.Complet
 @Keep
 class ApiCompletionCheckPayload(override val relativeStartTime: Long,
                                 override val version: Int,
-                                val completed: Boolean) : ApiEventPayload(ApiEventPayloadType.COMPLETION_CHECK, version, relativeStartTime) {
+                                val completed: Boolean) : ApiEventPayload(ApiEventPayloadType.CompletionCheck, version, relativeStartTime) {
 
     constructor(domainPayload: CompletionCheckPayload) :
         this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.completed)

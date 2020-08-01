@@ -4,4 +4,4 @@ import androidx.annotation.Keep
 
 @Keep
 class ApiIdentificationCallback(val sessionId: String,
-                                val scores: List<ApiCallbackComparisonScore>): ApiCallback(ApiCallbackType.IDENTIFICATION)
+                                val scores: List<ApiCallbackComparisonScore>): ApiCallback(ApiCallbackType.Identification)

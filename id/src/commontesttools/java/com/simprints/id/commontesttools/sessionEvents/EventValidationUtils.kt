@@ -8,7 +8,6 @@ import com.simprints.id.data.db.event.remote.models.ApiRefusalPayload
 import com.simprints.id.data.db.event.remote.models.callback.ApiCallbackType
 import com.simprints.id.data.db.event.remote.models.callout.ApiCalloutType
 import com.simprints.id.tools.extensions.isGuid
-import com.simprints.testtools.common.syntax.failTest
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -34,27 +33,17 @@ fun validateCallbackEventApiModel(json: JSONObject) {
         assertThat(getInt("version")).isEqualTo(0)
         assertThat(getInt("relativeStartTime"))
         with(getJSONObject("callback")) {
-            when (getString("type").fromSerialiseToApiCallbackType()) {
-                ApiCallbackType.ENROLMENT -> verifyCallbackEnrolmentApiModel(this)
-                ApiCallbackType.IDENTIFICATION -> verifyCallbackIdentificationApiModel(this)
-                ApiCallbackType.VERIFICATION -> verifyCallbackVerificationApiModel(this)
-                ApiCallbackType.REFUSAL -> verifyCallbackRefusalApiModel(this)
-                ApiCallbackType.CONFIRMATION -> verifyCallbackConfirmationApiModel(this)
-                ApiCallbackType.ERROR -> verifyCallbackErrorApiModel(this)
+            when (ApiCallbackType.valueOf(getString("type"))) {
+                ApiCallbackType.Enrolment -> verifyCallbackEnrolmentApiModel(this)
+                ApiCallbackType.Identification -> verifyCallbackIdentificationApiModel(this)
+                ApiCallbackType.Verification -> verifyCallbackVerificationApiModel(this)
+                ApiCallbackType.Refusal -> verifyCallbackRefusalApiModel(this)
+                ApiCallbackType.Confirmation -> verifyCallbackConfirmationApiModel(this)
+                ApiCallbackType.Error -> verifyCallbackErrorApiModel(this)
             }
         }
         assertThat(length()).isEqualTo(4)
     }
-}
-
-fun String.fromSerialiseToApiCallbackType(): ApiCallbackType = when (this) {
-    "Enrolment" -> ApiCallbackType.ENROLMENT
-    "Identification" -> ApiCallbackType.IDENTIFICATION
-    "Verification" -> ApiCallbackType.VERIFICATION
-    "Refusal" -> ApiCallbackType.REFUSAL
-    "Error" -> ApiCallbackType.ERROR
-    "Confirmation" -> ApiCallbackType.CONFIRMATION
-    else -> failTest("ApiCallback unrecognised")
 }
 
 fun verifyCallbackEnrolmentApiModel(json: JSONObject) {
@@ -114,25 +103,16 @@ fun validateCalloutEventApiModel(json: JSONObject) {
         assertThat(getInt("version")).isEqualTo(0)
         assertThat(getInt("relativeStartTime"))
         with(getJSONObject("callout")) {
-            when (getString("type").fromSerialiseToApiCalloutType()) {
-                ApiCalloutType.CONFIRMATION -> verifyCalloutConfirmationApiModel(this)
-                ApiCalloutType.ENROLMENT -> verifyCalloutEnrolmentApiModel(this)
-                ApiCalloutType.IDENTIFICATION -> verifyCalloutIdentificationApiModel(this)
-                ApiCalloutType.VERIFICATION -> verifyCalloutVerificationApiModel(this)
-                ApiCalloutType.ENROLMENT_LAST_BIOMETRICS -> verifyCalloutLastEnrolmentBiometricsApiModel(this)
+            when (ApiCalloutType.valueOf(getString("type"))) {
+                ApiCalloutType.Confirmation -> verifyCalloutConfirmationApiModel(this)
+                ApiCalloutType.Enrolment -> verifyCalloutEnrolmentApiModel(this)
+                ApiCalloutType.Identification -> verifyCalloutIdentificationApiModel(this)
+                ApiCalloutType.Verification -> verifyCalloutVerificationApiModel(this)
+                ApiCalloutType.EnrolmentLastBiometrics -> verifyCalloutLastEnrolmentBiometricsApiModel(this)
             }
         }
         assertThat(length()).isEqualTo(4)
     }
-}
-
-fun String.fromSerialiseToApiCalloutType(): ApiCalloutType = when (this) {
-    "Enrolment" -> ApiCalloutType.ENROLMENT
-    "Identification" -> ApiCalloutType.IDENTIFICATION
-    "Verification" -> ApiCalloutType.VERIFICATION
-    "Confirmation" -> ApiCalloutType.CONFIRMATION
-    "EnrolmentLastBiometrics" -> ApiCalloutType.ENROLMENT_LAST_BIOMETRICS
-    else -> failTest("ApiCallback unrecognised")
 }
 
 fun verifyCalloutLastEnrolmentBiometricsApiModel(json: JSONObject) {

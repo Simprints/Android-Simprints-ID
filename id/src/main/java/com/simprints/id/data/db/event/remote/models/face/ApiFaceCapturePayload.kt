@@ -3,7 +3,7 @@ package com.simprints.id.data.db.event.remote.models.face
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
 import com.simprints.id.data.db.event.remote.models.ApiEventPayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FACE_CAPTURE
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FaceCapture
 import com.simprints.id.data.db.event.remote.models.face.ApiFaceCapturePayload.ApiFace
 import com.simprints.id.data.db.event.remote.models.face.ApiFaceCapturePayload.ApiResult.*
 
@@ -15,7 +15,7 @@ class ApiFaceCapturePayload(val id: String,
                             val qualityThreshold: Float,
                             val result: ApiResult,
                             val isFallback: Boolean,
-                            val face: ApiFace?) : ApiEventPayload(FACE_CAPTURE,version, relativeStartTime) {
+                            val face: ApiFace?) : ApiEventPayload(FaceCapture,version, relativeStartTime) {
 
     constructor(domainPayload: FaceCapturePayload) : this(
         "id", //STOPSHIP
