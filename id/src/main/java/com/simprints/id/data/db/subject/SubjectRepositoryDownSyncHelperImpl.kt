@@ -7,13 +7,13 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveE
 import com.simprints.id.data.db.event.remote.models.ApiEvent
 import com.simprints.id.data.db.subject.domain.Subject.Companion.buildSubjectFromCreationPayload
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
+import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationResult
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationResult.DownSyncState.*
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncProgress
-import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
+import com.simprints.id.data.db.event.remote.ApiEventQuery
 import com.simprints.id.services.scheduledSync.subjects.common.SYNC_LOG_TAG
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.SimJsonHelper
@@ -37,7 +37,7 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
     @ExperimentalCoroutinesApi
     override suspend fun performDownSyncWithProgress(scope: CoroutineScope,
                                                      downSyncOperation: SubjectsDownSyncOperation,
-                                                     eventQuery: SyncEventQuery): ReceiveChannel<SubjectsDownSyncProgress> =
+                                                     eventQuery: ApiEventQuery): ReceiveChannel<SubjectsDownSyncProgress> =
         scope.produce {
 
             this@SubjectRepositoryDownSyncHelperImpl.downSyncOperation = downSyncOperation
@@ -74,7 +74,7 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
             }
         }
 
-    private suspend fun getDownSyncStreamFromRemote(eventQuery: SyncEventQuery) =
+    private suspend fun getDownSyncStreamFromRemote(eventQuery: ApiEventQuery) =
         eventRemoteDataSource.getStreaming(eventQuery)
 
     private fun setupJsonReaderFromResponse(responseStream: InputStream): JsonReader =

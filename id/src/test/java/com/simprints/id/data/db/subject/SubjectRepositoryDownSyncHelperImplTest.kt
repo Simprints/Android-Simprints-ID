@@ -8,7 +8,7 @@
 //import com.simprints.id.data.db.subject.SubjectRepositoryDownSyncHelperImpl.Companion.BATCH_SIZE_FOR_DOWNLOADING
 //import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
 //import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-//import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
+//import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 //import com.simprints.id.data.db.event.remote.models.ApiEvent
 //import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 //import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation

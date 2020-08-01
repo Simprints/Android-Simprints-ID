@@ -27,7 +27,7 @@
 //import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
 //import com.simprints.id.data.db.event.domain.events.EventPayloadType.ENROLMENT_RECORD_CREATION
 //import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-//import com.simprints.id.data.db.subject.remote.EventRemoteInterface
+//import com.simprints.id.data.db.event.remote.EventRemoteInterface
 //import com.simprints.id.data.db.event.remote.models.ApiEventCount
 //import com.simprints.id.data.db.event.remote.models.ApiEvent
 //import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType

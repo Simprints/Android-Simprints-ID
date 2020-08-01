@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.local.models
+package com.simprints.id.commontesttools.sessionEvents
 
 import android.net.NetworkInfo.DetailedState.CONNECTED
 import android.os.Build

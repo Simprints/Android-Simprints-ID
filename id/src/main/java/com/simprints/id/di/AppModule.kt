@@ -31,8 +31,6 @@ import com.simprints.id.data.db.event.local.EventDatabaseFactory
 import com.simprints.id.data.db.event.local.DbEventDatabaseFactoryImpl
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.EventLocalDataSourceImpl
-import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
-import com.simprints.id.data.db.event.remote.SessionRemoteDataSourceImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
@@ -217,7 +215,7 @@ open class AppModule {
     @Singleton
     open fun provideSessionEventsRemoteDbManager(
         simApiClientFactory: SimApiClientFactory
-    ): SessionRemoteDataSource = SessionRemoteDataSourceImpl(
+    ): EventRemoteDataSource = EventRemoteDataSourceImpl(
         simApiClientFactory
     )
 
@@ -227,7 +225,7 @@ open class AppModule {
         ctx: Context,
         sessionEventsSyncManager: SessionEventsSyncManager,
         eventLocalDataSource: EventLocalDataSource,
-        sessionRemoteDataSource: SessionRemoteDataSource,
+        eventRemoteDataSource: EventRemoteDataSource,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
@@ -239,7 +237,7 @@ open class AppModule {
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             sessionEventsSyncManager,
             eventLocalDataSource,
-            sessionRemoteDataSource,
+            eventRemoteDataSource,
             preferencesManager,
             crashReportManager,
             timeHelper

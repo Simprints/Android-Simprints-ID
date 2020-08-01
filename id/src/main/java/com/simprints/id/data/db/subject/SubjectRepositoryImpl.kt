@@ -10,13 +10,15 @@ import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.remote.models.ApiEvent
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
+import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncProgress
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
-import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
-import com.simprints.id.domain.modality.Modes
+import com.simprints.id.data.db.event.remote.ApiEventQuery
+import com.simprints.id.data.db.event.remote.fromDomainToApi
+import com.simprints.id.data.db.event.remote.models.fromDomainToApi
+import com.simprints.id.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
 import com.simprints.id.tools.json.SimJsonHelper
 import kotlinx.coroutines.CoroutineScope
@@ -138,20 +140,20 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
 
     private fun buildEventQuery(peopleDownSyncOperation: SubjectsDownSyncOperation) =
         with(peopleDownSyncOperation) {
-            SyncEventQuery(
-                projectId = projectId,
-                userId = attendantId,
-                moduleIds = moduleId?.let { listOf(it) },
-                lastEventId = lastResult?.lastEventId,
-                modes = modes,
-                types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE)
+            ApiEventQuery(
+                    projectId = projectId,
+                    userId = attendantId,
+                    moduleIds = moduleId?.let { listOf(it) },
+                    lastEventId = lastResult?.lastEventId,
+                    modes = modes.map { it.fromDomainToApi() },
+                    types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE).map { it.fromDomainToApi() }
             )
         }
 
-    private fun buildEventQueryForSubjectFetch(projectId: String, subjectId: String) = SyncEventQuery(
-        projectId = projectId,
-        subjectId = subjectId,
-        modes = listOf(Modes.FINGERPRINT),
-        types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE)
+    private fun buildEventQueryForSubjectFetch(projectId: String, subjectId: String) = ApiEventQuery(
+            projectId = projectId,
+            subjectId = subjectId,
+            modes = listOf(FINGERPRINT),
+            types = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION, ENROLMENT_RECORD_MOVE).map { it.fromDomainToApi() }
     )
 }

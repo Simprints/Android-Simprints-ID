@@ -12,7 +12,7 @@
 //import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload
 //import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMovePayload
 //import com.simprints.id.data.db.event.remote.models.ApiEvent
-//import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
+//import com.simprints.id.data.db.event.remote.SyncEventQuery
 //import com.simprints.id.domain.modality.Modes
 //import com.simprints.id.network.*
 //import com.simprints.id.testtools.UnitTestConfig

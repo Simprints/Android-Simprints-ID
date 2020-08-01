@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.models.DbEventQuery
-import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
+import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
@@ -26,7 +26,7 @@ open class EventRepositoryImpl(
     private val projectId: String,
     private val sessionEventsSyncManager: SessionEventsSyncManager,
     private val eventLocalDataSource: EventLocalDataSource,
-    private val sessionRemoteDataSource: SessionRemoteDataSource,
+    private val eventRemoteDataSource: EventRemoteDataSource,
     private val preferencesManager: PreferencesManager,
     private val crashReportManager: CrashReportManager,
     private val timeHelper: TimeHelper

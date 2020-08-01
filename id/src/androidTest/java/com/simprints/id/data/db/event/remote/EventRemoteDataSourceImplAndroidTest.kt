@@ -1,0 +1,408 @@
+package com.simprints.id.data.db.event.remote
+
+import android.net.NetworkInfo
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.EncodingUtils
+import com.simprints.core.tools.utils.randomUUID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.commontesttools.SubjectsGeneratorUtils
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.event.domain.models.*
+import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload
+import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload
+import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
+import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload
+import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
+import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload
+import com.simprints.id.data.db.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload
+import com.simprints.id.data.db.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration
+import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
+import com.simprints.id.data.db.event.domain.models.callback.*
+import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
+import com.simprints.id.data.db.event.domain.models.callout.*
+import com.simprints.id.data.db.event.domain.models.face.*
+import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
+import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
+import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
+import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
+import com.simprints.id.network.SimApiClientFactoryImpl
+import com.simprints.id.testtools.testingapi.TestProjectRule
+import com.simprints.id.testtools.testingapi.models.TestProject
+import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
+import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.testtools.android.waitOnSystem
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
+import okhttp3.internal.toImmutableList
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(AndroidJUnit4::class)
+class EventRemoteDataSourceImplAndroidTest {
+
+    companion object {
+        const val SIGNED_ID_USER = "some_signed_user"
+        const val CLOUD_ASYNC_SESSION_CREATION_TIMEOUT = 5000L
+        const val DEFAULT_TIME = 1000L
+    }
+
+    private val remoteTestingManager: RemoteTestingManager = RemoteTestingManager.create()
+    @MockK lateinit var timeHelper: TimeHelper
+
+    @get:Rule
+    val testProjectRule = TestProjectRule()
+    private lateinit var testProject: TestProject
+
+    private lateinit var eventRemoteDataSource: EventRemoteDataSource
+
+    @MockK
+    var remoteDbManager = mockk<RemoteDbManager>()
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this)
+        testProject = testProjectRule.testProject
+
+        val firebaseTestToken = remoteTestingManager.generateFirebaseToken(testProject.id, SIGNED_ID_USER)
+        coEvery { remoteDbManager.getCurrentToken() } returns firebaseTestToken.token
+        val mockBaseUrlProvider = mockk<BaseUrlProvider>()
+        every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
+        eventRemoteDataSource = EventRemoteDataSourceImpl(
+            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device", remoteDbManager)
+        )
+        every { timeHelper.nowMinus(any(), any()) } returns 100
+        every { timeHelper.now() } returns 100
+    }
+
+//    @Test
+//    fun closeSessions_shouldGetUploaded() {
+//        runBlocking {
+//            val nSession = EventRepositoryImpl.SESSION_BATCH_SIZE + 1
+//            val sessions = createClosedSessions(nSession)
+//
+//            sessions.forEach {
+//                it.addAlertScreenEvents()
+//            }
+//
+//            executeUpload(sessions)
+//
+//            waitOnSystem(CLOUD_ASYNC_SESSION_CREATION_TIMEOUT)
+//
+//            val response = RemoteTestingManager.create().getSessionCount(testProject.id)
+//            assertThat(response.count).isEqualTo(nSession)
+//        }
+//    }
+
+    @Test
+    fun closeSession_withAllEvents_shouldGetUploaded() {
+        runBlocking {
+            val events = mutableListOf<Event>().apply {
+                addAlertScreenEvents()
+                addArtificialTerminationEvent()
+                addAuthenticationEvent()
+                addAuthorizationEvent()
+                addCandidateReadEvent()
+                addConnectivitySnapshotEvent()
+                addConsentEvent()
+                addEnrolmentEvent()
+                addFingerprintCaptureEvent()
+                addFaceCaptureEvent()
+                addFaceCaptureConfirmationEvent()
+                addFaceCaptureRetryEvent()
+                addFaceFallbackCaptureEvent()
+                addFaceOnboardingCompleteEvent()
+                addGuidSelectionEvent()
+                addIntentParsingEvent()
+                addInvalidIntentEvent()
+                addOneToOneMatchEvent()
+                addOneToManyMatchEvent()
+                addPersonCreationEvent()
+                addRefusalEvent()
+                addScannerConnectionEvent()
+                addVero2InfoSnapshotEvents()
+                addScannerFirmwareUpdateEvent()
+                addSuspiciousIntentEvent()
+                addCallbackEvent()
+                addCalloutEvent()
+                addCompletionCheckEvent()
+            }
+
+            executeUpload(events)
+
+            waitOnSystem(CLOUD_ASYNC_SESSION_CREATION_TIMEOUT)
+
+            val response = RemoteTestingManager.create().getSessionCount(testProject.id)
+            assertThat(response.count).isEqualTo(1)
+        }
+    }
+
+    private suspend fun executeUpload(events: MutableList<Event>) {
+        eventRemoteDataSource.post(testProject.id, events.toImmutableList())
+    }
+
+    private fun MutableList<Event>.addAlertScreenEvents() {
+        AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.values()
+            .forEach {
+                add(AlertScreenEvent(DEFAULT_TIME, it))
+            }
+    }
+
+    private fun MutableList<Event>.addArtificialTerminationEvent() {
+        ArtificialTerminationPayload.Reason.values().forEach {
+            add(ArtificialTerminationEvent(DEFAULT_TIME, it))
+        }
+    }
+
+    private fun MutableList<Event>.addAuthenticationEvent() {
+        Result.values().forEach {
+            add(AuthenticationEvent(DEFAULT_TIME, DEFAULT_TIME, UserInfo("some_project", DEFAULT_USER_ID), it))
+        }
+    }
+
+    private fun MutableList<Event>.addAuthorizationEvent() {
+        AuthorizationPayload.AuthorizationResult.values().forEach {
+            add(AuthorizationEvent(DEFAULT_TIME, it, AuthorizationPayload.UserInfo("some_project", DEFAULT_USER_ID)))
+        }
+    }
+
+    private fun MutableList<Event>.addCandidateReadEvent() {
+        CandidateReadPayload.LocalResult.values().forEach { local ->
+            CandidateReadPayload.RemoteResult.values().forEach { remote ->
+                add(CandidateReadEvent(DEFAULT_TIME, DEFAULT_TIME, randomUUID(), local, remote))
+            }
+        }
+    }
+
+    private fun MutableList<Event>.addConnectivitySnapshotEvent() {
+        add(
+            ConnectivitySnapshotEvent(
+                DEFAULT_TIME,
+                "Unknown",
+                listOf(SimNetworkUtils.Connection("connection", NetworkInfo.DetailedState.CONNECTED))
+            )
+        )
+    }
+
+    private fun MutableList<Event>.addConsentEvent() {
+        ConsentPayload.Type.values().forEach { type ->
+            ConsentPayload.Result.values().forEach { result ->
+                add(ConsentEvent(DEFAULT_TIME, DEFAULT_TIME, type, result))
+            }
+        }
+    }
+
+    private fun MutableList<Event>.addEnrolmentEvent() {
+        add(EnrolmentEvent(DEFAULT_TIME, randomUUID()))
+    }
+
+    private fun MutableList<Event>.addFingerprintCaptureEvent() {
+        FingerprintCapturePayload.Result.values().forEach { result ->
+            FingerIdentifier.values().forEach { fingerIdentifier ->
+                val fakeTemplate = EncodingUtils.byteArrayToBase64(
+                    SubjectsGeneratorUtils.getRandomFingerprintSample().template
+                )
+
+                val fingerprint = FingerprintCapturePayload.Fingerprint(
+                    fingerIdentifier,
+                    0,
+                    fakeTemplate
+                )
+
+                val event = FingerprintCaptureEvent(
+                    DEFAULT_TIME,
+                    DEFAULT_TIME,
+                    fingerIdentifier,
+                    0,
+                    result,
+                    fingerprint,
+                    randomUUID()
+                )
+
+                add(event)
+            }
+        }
+    }
+
+    private fun MutableList<Event>.addFaceCaptureEvent() {
+        FaceCapturePayload.Result.values().forEachIndexed { index, result ->
+            val template = EncodingUtils.byteArrayToBase64(
+                SubjectsGeneratorUtils.getRandomFaceSample().template
+            )
+
+            val face = FaceCapturePayload.Face(30f, 40f, 100f, template)
+
+            val event = FaceCaptureEvent(
+                DEFAULT_TIME,
+                DEFAULT_TIME + 100,
+                index + 1,
+                0f,
+                result,
+                false,
+                face
+            )
+
+            add(event)
+        }
+    }
+
+    private fun MutableList<Event>.addFaceCaptureConfirmationEvent() {
+        FaceCaptureConfirmationPayload.Result.values().forEach { result ->
+            val event = FaceCaptureConfirmationEvent(
+                DEFAULT_TIME,
+                DEFAULT_TIME + 100,
+                result
+            )
+
+            add(event)
+        }
+    }
+
+    private fun MutableList<Event>.addFaceCaptureRetryEvent() {
+        val event = FaceCaptureRetryEvent(DEFAULT_TIME, DEFAULT_TIME + 100)
+        add(event)
+    }
+
+    private fun MutableList<Event>.addFaceFallbackCaptureEvent() {
+        val event = FaceFallbackCaptureEvent(DEFAULT_TIME, DEFAULT_TIME + 100)
+        add(event)
+    }
+
+    private fun MutableList<Event>.addFaceOnboardingCompleteEvent() {
+        val event = FaceOnboardingCompleteEvent(DEFAULT_TIME, DEFAULT_TIME + 100)
+        add(event)
+    }
+
+    private fun MutableList<Event>.addGuidSelectionEvent() {
+        add(GuidSelectionEvent(DEFAULT_TIME, randomUUID()))
+    }
+
+    private fun MutableList<Event>.addIntentParsingEvent() {
+        IntentParsingPayload.IntegrationInfo.values().forEach {
+            add(IntentParsingEvent(DEFAULT_TIME, it))
+        }
+    }
+
+    private fun MutableList<Event>.addInvalidIntentEvent() {
+        add(InvalidIntentEvent(DEFAULT_TIME, "some_action", mapOf("wrong_field" to "wrong_value")))
+    }
+
+    private fun MutableList<Event>.addOneToManyMatchEvent() {
+        OneToManyMatchPayload.MatchPoolType.values().forEach {
+            add(
+                OneToManyMatchEvent(
+                    DEFAULT_TIME,
+                    DEFAULT_TIME,
+                    OneToManyMatchPayload.MatchPool(it, 0),
+                    Matcher.SIM_AFIS,
+                    emptyList()
+                )
+            )
+        }
+    }
+
+    private fun MutableList<Event>.addOneToOneMatchEvent() {
+        add(
+            OneToOneMatchEvent(
+                DEFAULT_TIME,
+                DEFAULT_TIME,
+                randomUUID(),
+                Matcher.SIM_AFIS,
+                MatchEntry(randomUUID(), 0F)
+            )
+        )
+    }
+
+    private fun MutableList<Event>.addPersonCreationEvent() {
+        add(PersonCreationEvent(DEFAULT_TIME, listOf(randomUUID(), randomUUID()), listOf(randomUUID())))
+    }
+
+    private fun MutableList<Event>.addRefusalEvent() {
+        RefusalPayload.Answer.values().forEach {
+            add(RefusalEvent(DEFAULT_TIME, DEFAULT_TIME, it, "other_text"))
+        }
+    }
+
+    private fun MutableList<Event>.addScannerConnectionEvent() {
+        add(
+            ScannerConnectionEvent(
+                DEFAULT_TIME,
+                ScannerConnectionPayload.ScannerInfo(
+                    "scanner_id", "macAddress",
+                    ScannerGeneration.VERO_2, "hardware"
+                )
+            )
+        )
+    }
+
+    private fun MutableList<Event>.addVero2InfoSnapshotEvents() {
+        add(
+            Vero2InfoSnapshotEvent(
+                DEFAULT_TIME,
+                Vero2InfoSnapshotPayload.Vero2Version(
+                    Int.MAX_VALUE.toLong() + 1, "1.23",
+                    "api", "stmApp", "stmApi", "un20App", "un20Api"
+                ),
+                Vero2InfoSnapshotPayload.BatteryInfo(70, 15, 1, 37)
+            )
+        )
+    }
+
+    private fun MutableList<Event>.addScannerFirmwareUpdateEvent() {
+        add(
+            ScannerFirmwareUpdateEvent(
+                DEFAULT_TIME, DEFAULT_TIME, "stm",
+                "targetApp", "failureReason"
+            )
+        )
+    }
+
+    private fun MutableList<Event>.addSuspiciousIntentEvent() {
+        add(SuspiciousIntentEvent(DEFAULT_TIME, mapOf("some_extra_key" to "value")))
+    }
+
+    private fun MutableList<Event>.addCompletionCheckEvent() {
+        add(CompletionCheckEvent(DEFAULT_TIME, true))
+    }
+
+    private fun MutableList<Event>.addCallbackEvent() {
+        add(EnrolmentCallbackEvent(DEFAULT_TIME, randomUUID()))
+
+        ErrorCallbackPayload.Reason.values().forEach {
+            add(ErrorCallbackEvent(DEFAULT_TIME, it))
+        }
+
+        Tier.values().forEach {
+            add(IdentificationCallbackEvent(DEFAULT_TIME, randomUUID(), listOf(CallbackComparisonScore(randomUUID(), 0, it))))
+        }
+
+        add(RefusalCallbackEvent(DEFAULT_TIME, "reason", "other_text"))
+        add(VerificationCallbackEvent(DEFAULT_TIME, CallbackComparisonScore(randomUUID(), 0, TIER_1)))
+        add(ConfirmationCallbackEvent(DEFAULT_TIME, true))
+    }
+
+    private fun MutableList<Event>.addCalloutEvent() {
+        add(EnrolmentCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata"))
+        add(ConfirmationCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, randomUUID(), randomUUID()))
+        add(IdentificationCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata"))
+        add(VerificationCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, randomUUID(), "metadata"))
+        add(EnrolmentLastBiometricsCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata", randomUUID()))
+    }
+
+}
