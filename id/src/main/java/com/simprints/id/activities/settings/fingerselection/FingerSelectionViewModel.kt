@@ -52,6 +52,8 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
         }
     }
 
+    fun haveSettingsChanged() = determineFingerSelectionItemsFromPrefs() != _items.toList()
+
     fun savePreference() {
         preferencesManager.fingerprintsToCollect = _items.toFingerIdentifiers()
     }

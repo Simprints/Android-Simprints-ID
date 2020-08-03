@@ -1,5 +1,6 @@
 package com.simprints.id.activities.settings.fingerselection
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.lifecycle.Observer
@@ -66,6 +67,17 @@ class FingerSelectionActivity : BaseSplitActivity() {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
+        if (viewModel.haveSettingsChanged()) {
+            AlertDialog.Builder(this)
+                .setTitle(getString(R.string.finger_selection_confirm_dialog_text))
+                .setPositiveButton(getString(R.string.finger_selection_confirm_dialog_yes)) { _, _ ->
+                    viewModel.savePreference()
+                    super.onBackPressed()
+                }
+                .setNegativeButton(getString(R.string.finger_selection_confirm_dialog_no)) { _, _ -> super.onBackPressed() }
+                .setCancelable(false).create().show()
+        } else {
+            super.onBackPressed()
+        }
     }
 }
