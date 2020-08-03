@@ -260,6 +260,10 @@
     <string name="finger_selection_confirm_dialog_text">Save settings?</string>
     <string name="finger_selection_confirm_dialog_yes">Save</string>
     <string name="finger_selection_confirm_dialog_no">Cancel</string>
+    <string name="finger_selection_finger_label">Finger</string>
+    <string name="finger_selection_quantity_label">Quantity</string>
+    <string name="finger_selection_reset">Reset</string>
+    <string name="finger_selection_add_finger">+ Add Finger</string>
     
     <!--Sync Information Activity-->
     <string name="select_modules_button_title">Select modules</string>
