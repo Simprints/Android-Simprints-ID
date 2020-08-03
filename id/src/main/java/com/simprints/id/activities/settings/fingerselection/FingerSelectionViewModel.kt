@@ -18,7 +18,7 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
 
     fun start() {
         postUpdatedItems {
-            addAll(preferencesManager.fingerprintsToCollect.toFingerSelectionItems())
+            addAll(determineFingerSelectionItemsFromPrefs())
         }
     }
 
@@ -41,16 +41,24 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
             val fingerNotYetUsed = orderedFingers().toMutableList().apply {
                 removeAll(this@postUpdatedItems.map { it.finger })
             }.firstOrNull() ?: FingerIdentifier.LEFT_THUMB
-            add(FingerSelectionItem(fingerNotYetUsed, QUANTITY_OPTIONS.first()))
+            add(FingerSelectionItem(fingerNotYetUsed, QUANTITY_OPTIONS.first(), true))
         }
     }
 
     fun resetFingerItems() {
         postUpdatedItems {
             clear()
-            addAll(preferencesManager.fingerprintsToCollect.toFingerSelectionItems())
+            addAll(determineFingerSelectionItemsFromPrefs())
         }
     }
+
+    private fun determineFingerSelectionItemsFromPrefs(): List<FingerSelectionItem> =
+        preferencesManager.fingerprintsToCollect.toFingerSelectionItems().also { savedPref ->
+            preferencesManager.getRemoteConfigFingerprintsToCollect().toFingerSelectionItems()
+                .map { it.finger }.distinct()
+                .forEach { finger -> savedPref.firstOrNull { it.finger == finger }?.removable = false
+            }
+        }
 
     private fun List<FingerIdentifier>.toFingerSelectionItems(): List<FingerSelectionItem> {
         val result = mutableListOf<FingerSelectionItem>()
@@ -58,7 +66,7 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
             if (result.lastOrNull()?.finger == it) {
                 result.last().quantity++
             } else {
-                result.add(FingerSelectionItem(it, 1))
+                result.add(FingerSelectionItem(it, 1, true))
             }
         }
         return result
@@ -70,7 +78,7 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
         }
 }
 
-data class FingerSelectionItem(var finger: FingerIdentifier, var quantity: Int)
+data class FingerSelectionItem(var finger: FingerIdentifier, var quantity: Int, var removable: Boolean)
 
 fun orderedFingers() = listOf(
     FingerIdentifier.LEFT_THUMB,

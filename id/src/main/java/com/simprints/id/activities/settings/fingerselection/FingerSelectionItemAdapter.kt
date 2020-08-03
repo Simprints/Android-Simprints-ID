@@ -34,7 +34,13 @@ class FingerSelectionItemAdapter(private val context: Context,
         viewHolder.fingerSpinner.onItemSelectedWithPosition { viewModel.changeFingerSelection(position, it) }
         viewHolder.quantitySpinner.onItemSelectedWithPosition { viewModel.changeQuantitySelection(position, it) }
 
-        viewHolder.deleteButton.setOnClickListener { viewModel.removeItem(position) }
+        if (viewModel.items.value?.get(position)?.removable == true) {
+            viewHolder.deleteButton.setOnClickListener { viewModel.removeItem(position) }
+        } else {
+            viewHolder.deleteButton.visibility = View.INVISIBLE
+            viewHolder.fingerSpinner.isEnabled = false
+            viewHolder.fingerSpinner.isClickable = false
+        }
     }
 
     class FingerSelectionItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
