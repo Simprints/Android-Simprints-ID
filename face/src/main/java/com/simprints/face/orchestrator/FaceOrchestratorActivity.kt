@@ -5,9 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.face.OrchestratorGraphDirections
 import com.simprints.face.R
+import com.simprints.face.base.FaceActivity
 import com.simprints.face.capture.FaceCaptureActivity
 import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException
@@ -16,13 +16,12 @@ import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class FaceOrchestratorActivity : BaseSplitActivity() {
+class FaceOrchestratorActivity : FaceActivity() {
     private val viewModel: FaceOrchestratorViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_orchestrator)
-        KoinInjector.acquireFaceKoinModules()
 
         val iFaceRequest: IFaceRequest = this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
             ?: throw InvalidFaceRequestException("No IFaceCaptureRequest found for FaceOrchestratorActivity")
@@ -30,11 +29,6 @@ class FaceOrchestratorActivity : BaseSplitActivity() {
         observeViewModel()
 
         viewModel.start(iFaceRequest)
-    }
-
-    override fun onDestroy() {
-        KoinInjector.releaseFaceKoinModules()
-        super.onDestroy()
     }
 
     private fun observeViewModel() {
