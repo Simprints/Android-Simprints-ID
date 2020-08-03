@@ -35,7 +35,7 @@ open class SettingsPreferencesManagerImpl(
     captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
     saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
     scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
-    fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>
+    private val fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>
 ) : SettingsPreferencesManager {
 
     /**
@@ -255,8 +255,8 @@ open class SettingsPreferencesManagerImpl(
         by OverridableRemoteConfigComplexPreference(
             prefs,
             remoteConfigWrapper,
-            FINGERPRINTS_FOR_COLLECTION_KEY,
-            FINGERPRINTS_FOR_COLLECTION_DEFAULT,
+            FINGERPRINTS_TO_COLLECT_KEY,
+            FINGERPRINTS_TO_COLLECT_DEFAULT,
             fingerprintsToCollectSerializer
         )
 
@@ -345,6 +345,9 @@ open class SettingsPreferencesManagerImpl(
     override fun getRemoteConfigFingerStatus() =
         getRemoteConfigComplexPreference(FINGER_STATUS_KEY, fingerIdToBooleanSerializer)
 
+    override fun getRemoteConfigFingerprintsToCollect() =
+        getRemoteConfigComplexPreference(FINGERPRINTS_TO_COLLECT_KEY, fingerprintsToCollectSerializer)
+
     companion object {
         const val NB_IDS_KEY = "NbOfIdsInt"
         const val NB_IDS_DEFAULT = 10
@@ -414,8 +417,8 @@ open class SettingsPreferencesManagerImpl(
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"
 
-        const val FINGERPRINTS_FOR_COLLECTION_KEY = "FingerprintsToCollect"
-        val FINGERPRINTS_FOR_COLLECTION_DEFAULT = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
+        const val FINGERPRINTS_TO_COLLECT_KEY = "FingerprintsToCollect"
+        val FINGERPRINTS_TO_COLLECT_DEFAULT = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
 
         const val FINGER_IMAGES_EXIST_KEY = "FingerImagesExist"
         const val FINGER_IMAGES_EXIST_DEFAULT = true
