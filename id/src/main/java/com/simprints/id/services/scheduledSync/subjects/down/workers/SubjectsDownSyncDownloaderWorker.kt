@@ -83,6 +83,7 @@ class SubjectsDownSyncDownloaderWorker(context: Context, params: WorkerParameter
             val op = jsonHelper.fromJson<SubjectsDownSyncOperation>(jsonForOp)
             return downSyncScopeRepository.refreshDownSyncOperationFromDb(op) ?: op
         } catch (t: Throwable) {
+            Timber.d(t)
             throw MalformedDownSyncOperationException()
         }
     }

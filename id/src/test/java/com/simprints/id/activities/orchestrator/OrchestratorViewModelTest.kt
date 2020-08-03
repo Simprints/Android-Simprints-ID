@@ -3,20 +3,20 @@ package com.simprints.id.activities.orchestrator
 import android.app.Activity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_METADATA
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.sessionEvents.createFakeSession
+import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponseType
 import com.simprints.id.domain.moduleapi.app.responses.AppResponseType.ENROL
 import com.simprints.id.orchestrator.OrchestratorManager
-import com.simprints.id.orchestrator.SOME_METADATA
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.testtools.UnitTestConfig
 import io.mockk.*
@@ -38,8 +38,8 @@ class OrchestratorViewModelTest {
     private lateinit var liveDataAppResponse: MutableLiveData<AppResponse>
     private lateinit var liveDataNextIntent: MutableLiveData<Step>
 
-    private val enrolAppRequest = AppEnrolRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, SOME_METADATA)
-    private val fakeSession = createFakeSession(id = SOME_SESSION_ID)
+    private val enrolAppRequest = AppEnrolRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA)
+    private val fakeSession = createSessionCaptureEvent()
 
     private lateinit var vm: OrchestratorViewModel
 
@@ -70,7 +70,7 @@ class OrchestratorViewModelTest {
     fun viewModelStart_shouldStartOrchestrator() {
         runBlocking {
             vm.startModalityFlow(enrolAppRequest)
-            coVerify(exactly = 1) { orchestratorManagerMock.initialise(listOf(FACE), enrolAppRequest, SOME_SESSION_ID) }
+            coVerify(exactly = 1) { orchestratorManagerMock.initialise(listOf(FACE), enrolAppRequest, fakeSession.id) }
         }
     }
 

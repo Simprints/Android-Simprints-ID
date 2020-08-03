@@ -7,6 +7,7 @@ import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
+import com.simprints.id.domain.modality.Modes
 import java.util.*
 
 @Keep
@@ -17,15 +18,14 @@ data class SessionCaptureEvent(
     override val payload: SessionCapturePayload
 ) : Event() {
 
-    constructor(createdAt: Long,
-                projectId: String,
+    constructor(projectId: String,
+                createdAt: Long,
+                modalities: List<Modes>,
                 appVersionName: String,
                 libVersionName: String = "",
                 language: String,
                 device: Device,
                 databaseInfo: DatabaseInfo,
-                uploadTime: Long = 0,
-                endTime: Long = 0,
                 location: Location? = null,
                 analyticsId: String? = null,
                 id: String = UUID.randomUUID().toString(),
@@ -35,19 +35,18 @@ data class SessionCaptureEvent(
             SESSION_CAPTURE,
             labels,
             SessionCapturePayload(
-                createdAt,
-                endTime,
                 EVENT_VERSION,
                 id,
                 projectId,
+                createdAt, 0, 0, 0,
+                modalities,
                 appVersionName,
                 libVersionName,
+                analyticsId,
                 language,
                 device,
                 databaseInfo,
-                uploadTime,
-                location,
-                analyticsId)) {
+                location)) {
 
         // Ensure that sessionId is equal to the id
         this.labels = labels.copy(sessionId = id)
@@ -55,19 +54,21 @@ data class SessionCaptureEvent(
 
     @Keep
     data class SessionCapturePayload(
-        override val createdAt: Long,
-        override var endedAt: Long,
         override val eventVersion: Int,
-        val id: String = UUID.randomUUID().toString(),
+        val id: String,
         var projectId: String,
+        override val createdAt: Long,
+        var serverStartTime: Long = 0,
+        override var endedAt: Long = 0,
+        var relativeUploadTime: Long = 0,
+        val modalities: List<Modes>,
         val appVersionName: String,
-        val libVersionName: String = "",
+        val libVersionName: String,
+        var analyticsId: String?,
         val language: String,
         val device: Device,
         val databaseInfo: DatabaseInfo,
-        val uploadTime: Long,
         var location: Location? = null,
-        var analyticsId: String? = null,
         override val type: EventType = SESSION_CAPTURE
     ) : EventPayload()
 

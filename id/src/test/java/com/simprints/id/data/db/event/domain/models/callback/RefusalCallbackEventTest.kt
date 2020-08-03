@@ -7,14 +7,14 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_REFUSAL
 import com.simprints.id.data.db.event.domain.models.callback.RefusalCallbackEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.callback.RefusalCallbackEvent.RefusalCallbackPayload
-import com.simprints.id.orchestrator.SOME_GUID1
+import
 import org.junit.Test
 
 class RefusalCallbackEventTest {
 
     @Test
     fun create_RefusalCallbackEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
+        val labels = EventLabels(sessionId = GUID1)
         val event = RefusalCallbackEvent(CREATED_AT, "some_reason", "some_extra", labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)

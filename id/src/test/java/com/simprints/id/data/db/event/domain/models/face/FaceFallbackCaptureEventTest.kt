@@ -8,14 +8,14 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 
 import com.simprints.id.data.db.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
 import com.simprints.id.data.db.event.domain.models.face.FaceFallbackCaptureEvent.Companion.EVENT_VERSION
-import com.simprints.id.orchestrator.SOME_GUID1
+import
 import org.junit.Test
 
 @Keep
 class FaceFallbackCaptureEventTest {
     @Test
     fun create_FaceFallbackCaptureEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
+        val labels = EventLabels(sessionId = GUID1)
         val event = FaceFallbackCaptureEvent(CREATED_AT, ENDED_AT, labels)
         Truth.assertThat(event.id).isNotNull()
         Truth.assertThat(event.labels).isEqualTo(labels)

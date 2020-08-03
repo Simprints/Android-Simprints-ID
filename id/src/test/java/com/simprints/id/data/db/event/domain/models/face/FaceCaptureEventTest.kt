@@ -10,14 +10,14 @@ import com.simprints.id.data.db.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result.VALID
-import com.simprints.id.orchestrator.SOME_GUID1
+import
 import org.junit.Test
 
 @Keep
 class FaceCaptureEventTest {
     @Test
     fun create_FaceCaptureEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
+        val labels = EventLabels(sessionId = GUID1)
         val faceArg = Face(0F, 1F, 2F, "")
         val event = FaceCaptureEvent(CREATED_AT, ENDED_AT, 0, 1F, VALID, true, faceArg, labels)
         assertThat(event.id).isNotNull()

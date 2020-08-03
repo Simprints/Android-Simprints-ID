@@ -1,4 +1,4 @@
-package com.simprints.id.commontesttools.sessionEvents
+package com.simprints.id.commontesttools.events
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType
@@ -487,16 +487,22 @@ fun validateSessionCaptureApiModel(json: JSONObject) {
 
     with(json.getJSONObject("payload")) {
         assertThat(getInt("version")).isEqualTo(0)
-        assertThat(getLong("relativeStartTime")).isNotNull()
+        assertThat(getString("id")).isNotNull()
+        assertThat(getString("projectId")).isNotNull()
+        assertThat(getLong("startTime")).isNotNull()
+        assertThat(getLong("serverStartTime")).isNotNull()
+        assertThat(getLong("relativeEndTime")).isNotNull()
+        assertThat(getLong("relativeUploadTime")).isNotNull()
+        assertThat(getJSONArray("modalities").length()).isEqualTo(2)
         assertThat(getString("appVersionName")).isNotNull()
         assertThat(getString("libVersionName")).isNotNull()
+        assertThat(getString("analyticsId")).isNotNull()
         assertThat(getString("language")).isNotNull()
-        assertThat(getString("id")).isNotNull()
         validateDeviceApiModel(getJSONObject("device"))
-        assertThat(getLong("uploadedAt")).isNotNull()
         validateDatabaseInfoApiModel(getJSONObject("databaseInfo"))
         validateLocationApiModel(getJSONObject("location"))
-        assertThat(getString("analyticsId")).isNotNull()
+
+        assertThat(length()).isEqualTo(16)
     }
 }
 
@@ -627,6 +633,7 @@ fun validateFaceCaptureEventApiModel(json: JSONObject) {
         assertThat(getInt("version")).isEqualTo(0)
         assertThat(getString("id")).isNotNull()
         assertThat(getLong("relativeStartTime")).isNotNull()
+        assertThat(getLong("relativeEndTime")).isNotNull()
         assertThat(getInt("attemptNb")).isNotNull()
         assertThat(getDouble("qualityThreshold")).isNotNull()
         assertThat(getString("result")).isIn(listOf("VALID", "INVALID", "OFF_YAW", "OFF_ROLL", "TOO_CLOSE", "TOO_FAR"))
@@ -640,7 +647,7 @@ fun validateFaceCaptureEventApiModel(json: JSONObject) {
             assertThat(length()).isEqualTo(4)
         }
 
-        assertThat(length()).isEqualTo(9)
+        assertThat(length()).isEqualTo(10)
     }
 }
 

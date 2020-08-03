@@ -1,20 +1,21 @@
 package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth
-
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventType.ONE_TO_ONE_MATCH
 import com.simprints.id.data.db.event.domain.models.Matcher.RANK_ONE
 import com.simprints.id.data.db.event.domain.models.OneToOneMatchEvent.Companion.EVENT_VERSION
-import com.simprints.id.orchestrator.SOME_GUID1
 import org.junit.Test
 
 class OneToOneMatchEventTest {
 
     @Test
     fun create_OneToOneMatchEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
-        val resultArg = MatchEntry(SOME_GUID1, 0F)
-        val event = OneToOneMatchEvent(CREATED_AT, ENDED_AT, SOME_GUID1, RANK_ONE, resultArg, labels)
+        val labels = EventLabels(sessionId = GUID1)
+        val resultArg = MatchEntry(GUID1, 0F)
+        val event = OneToOneMatchEvent(CREATED_AT, ENDED_AT, GUID1, RANK_ONE, resultArg, labels)
 
         Truth.assertThat(event.id).isNotNull()
         Truth.assertThat(event.labels).isEqualTo(labels)

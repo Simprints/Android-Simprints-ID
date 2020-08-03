@@ -7,6 +7,7 @@ import androidx.work.WorkInfo
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
 import com.simprints.id.domain.modality.Modes
@@ -18,7 +19,6 @@ import com.simprints.id.services.scheduledSync.subjects.master.internal.OUTPUT_F
 import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.coEvery
 import io.mockk.every
@@ -53,11 +53,12 @@ class SubjectsDownSyncDownloaderWorkerTest {
     fun setUp() {
         UnitTestConfig(this).setupWorkManager().setupFirebase()
         app.component = mockk(relaxed = true)
-        val correctInputData = SimJsonHelper.gson.toJson(projectSyncOp)
+        val correctInputData = JsonHelper().toJson(projectSyncOp)
         subjectsDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
 
         coEvery { subjectsDownSyncDownloaderWorker.downSyncScopeRepository.refreshDownSyncOperationFromDb(any()) } returns null
         subjectsDownSyncDownloaderWorker.subjectsDownSyncDownloaderTask = mockk(relaxed = true)
+        subjectsDownSyncDownloaderWorker.jsonHelper = JsonHelper()
     }
 
     @Test

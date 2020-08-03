@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config
 class GeneralConsentTextHelperTest {
 
     private val context = ApplicationProvider.getApplicationContext() as TestApplication
-    private val generalConsentOptionsJson = JsonHelper.toJson(GeneralConsentOptions())
+    private val generalConsentOptionsJson = JsonHelper().toJson(GeneralConsentOptions())
     private val request = AskConsentRequest(ConsentType.ENROL)
 
     companion object {
@@ -35,18 +35,18 @@ class GeneralConsentTextHelperTest {
     @Test
     fun getGeneralConsentTextForFinger_shouldReturnCorrectGeneralConsentText() {
         val generalConsentText = GeneralConsentTextHelper(generalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER), mockk()).assembleText(request, context)
+            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER), mockk(), mockk()).assembleText(request, context)
 
         assertThat(generalConsentText).isEqualTo(GENERAL_CONSENT_ENROL_FINGER_TEXT)
     }
 
     @Test
     fun getGeneralConsentTextForFace_shouldReturnCorrectGeneralConsentText() {
-        val generalConsentOptionsJson = JsonHelper.toJson(GeneralConsentOptions())
+        val generalConsentOptionsJson = JsonHelper().toJson(GeneralConsentOptions())
         val request = AskConsentRequest(ConsentType.ENROL)
 
         val generalConsentText = GeneralConsentTextHelper(generalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FACE), mockk()).assembleText(request, context)
+            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FACE), mockk(), mockk()).assembleText(request, context)
 
         assertThat(generalConsentText).isEqualTo(GENERAL_CONSENT_ENROL_FACE_TEXT)
     }
@@ -54,7 +54,7 @@ class GeneralConsentTextHelperTest {
     @Test
     fun getGeneralConsentTextForMultiModal_shouldReturnCorrectGeneralConsentText() {
         val generalConsentText = GeneralConsentTextHelper(generalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER, Modality.FACE), mockk()).assembleText(request, context)
+            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER, Modality.FACE), mockk(), mockk()).assembleText(request, context)
 
         assertThat(generalConsentText).isEqualTo(GENERAL_CONSENT_ENROL_MULTI_TEXT)
     }

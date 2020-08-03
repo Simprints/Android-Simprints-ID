@@ -9,17 +9,17 @@ import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_IDENTIFIC
 import com.simprints.id.data.db.event.domain.models.callback.IdentificationCallbackEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.callback.IdentificationCallbackEvent.IdentificationCallbackPayload
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
-import com.simprints.id.orchestrator.SOME_GUID1
+import
 import org.junit.Test
 
 class IdentificationCallbackEventTest {
 
     @Test
     fun create_IdentificationCallbackEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
-        val comparisonScore = CallbackComparisonScore(SOME_GUID1, 1, TIER_1)
+        val labels = EventLabels(sessionId = GUID1)
+        val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1)
 
-        val event = IdentificationCallbackEvent(CREATED_AT, SOME_GUID1, listOf(comparisonScore), labels)
+        val event = IdentificationCallbackEvent(CREATED_AT, GUID1, listOf(comparisonScore), labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLBACK_IDENTIFICATION)

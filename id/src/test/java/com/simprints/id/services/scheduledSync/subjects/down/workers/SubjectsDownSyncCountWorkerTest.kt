@@ -51,6 +51,7 @@ class SubjectsDownSyncCountWorkerTest {
             crashReportManager = mockk(relaxed = true)
             subjectRepository = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
+            jsonHelper = JsonHelper()
         }
     }
 
@@ -68,7 +69,7 @@ class SubjectsDownSyncCountWorkerTest {
 
         countWorker.doWork()
 
-        val output = JsonHelper.gson.toJson(counts)
+        val output = JsonHelper().toJson(counts)
         val expectedSuccessfulOutput = workDataOf(SubjectsDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN to output)
         verify { countWorker.resultSetter.success(expectedSuccessfulOutput) }
     }

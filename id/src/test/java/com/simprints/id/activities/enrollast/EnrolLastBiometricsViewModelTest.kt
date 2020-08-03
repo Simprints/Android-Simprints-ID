@@ -8,9 +8,9 @@ import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewSta
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.orchestrator.EnrolmentHelper
-import com.simprints.id.orchestrator.SOME_GUID1
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
@@ -35,10 +35,10 @@ class EnrolLastBiometricsViewModelTest {
 
     lateinit var viewModel: EnrolLastBiometricsViewModel
     private val stepsWithLastEnrolBiometrics = listOf(
-        Step(SOME_GUID1, 0, "activity_name", "key", mockk<EnrolLastBiometricsRequest>(), EnrolLastBiometricsResponse(SOME_GUID1), COMPLETED))
+        Step(GUID1, 0, "activity_name", "key", mockk<EnrolLastBiometricsRequest>(), EnrolLastBiometricsResponse(GUID1), COMPLETED))
 
-    private val appRequestWithPastEnrolLastBiometricSteps = EnrolLastBiometricsRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, stepsWithLastEnrolBiometrics, SOME_GUID1)
-    private val appRequestWithoutPastEnrolLastBiometricSteps = EnrolLastBiometricsRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, emptyList(), SOME_GUID1)
+    private val appRequestWithPastEnrolLastBiometricSteps = EnrolLastBiometricsRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, stepsWithLastEnrolBiometrics, GUID1)
+    private val appRequestWithoutPastEnrolLastBiometricSteps = EnrolLastBiometricsRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, emptyList(), GUID1)
 
     @MockK lateinit var timeHelper: TimeHelper
     @MockK lateinit var enrolHelper: EnrolmentHelper
@@ -66,7 +66,7 @@ class EnrolLastBiometricsViewModelTest {
 
             with(viewModel.getViewStateLiveData()) {
                 Truth.assertThat(this.value).isInstanceOf(Success::class.java)
-                Truth.assertThat((this.value as Success).newGuid).isEqualTo(SOME_GUID1)
+                Truth.assertThat((this.value as Success).newGuid).isEqualTo(GUID1)
             }
         }
     }

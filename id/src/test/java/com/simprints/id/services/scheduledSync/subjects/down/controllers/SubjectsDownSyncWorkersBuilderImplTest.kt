@@ -37,7 +37,7 @@ class SubjectsDownSyncWorkersBuilderImplTest {
     @Before
     fun setUp() {
         subjectsDownSyncScopeRepository = mockk(relaxed = true)
-        subjectsDownSyncWorkersFactory = SubjectsDownSyncWorkersBuilderImpl(subjectsDownSyncScopeRepository)
+        subjectsDownSyncWorkersFactory = SubjectsDownSyncWorkersBuilderImpl(subjectsDownSyncScopeRepository, mockk())
     }
 
     @Test

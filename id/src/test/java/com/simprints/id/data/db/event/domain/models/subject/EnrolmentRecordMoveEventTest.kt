@@ -12,16 +12,16 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveE
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
-import com.simprints.id.orchestrator.SOME_GUID1
+import
 import org.junit.Test
 
 class EnrolmentRecordMoveEventTest {
 
     @Test
     fun create_EnrolmentRecordMoveEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
-        val creation = EnrolmentRecordCreationInMove(SOME_GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, createBiometricReferences())
-        val deletion = EnrolmentRecordDeletionInMove(SOME_GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID)
+        val labels = EventLabels(sessionId = GUID1)
+        val creation = EnrolmentRecordCreationInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, createBiometricReferences())
+        val deletion = EnrolmentRecordDeletionInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID)
         val event = EnrolmentRecordMoveEvent(CREATED_AT, creation, deletion, labels)
 
         assertThat(event.id).isNotNull()

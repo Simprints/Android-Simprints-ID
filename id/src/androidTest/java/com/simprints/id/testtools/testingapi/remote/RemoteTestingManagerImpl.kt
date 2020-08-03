@@ -1,5 +1,7 @@
 package com.simprints.id.testtools.testingapi.remote
 
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
 import com.simprints.id.testtools.testingapi.exceptions.TestingRemoteApiError
 import com.simprints.id.testtools.testingapi.models.*
 import io.reactivex.Single
@@ -38,14 +40,8 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
             .retry(RETRY_ATTEMPTS)
             .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to build firebase token", it) }
 
-    override fun getSessionSignatures(projectId: String): List<TestSessionSignature> =
-        remoteTestingApi.getSessionSignatures(projectId)
-            .retry(RETRY_ATTEMPTS)
-            .toList()
-            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to build session signatures", it) }
-
-    override fun getSessionCount(projectId: String): TestSessionCount =
-        remoteTestingApi.getSessionCount(projectId)
+    override fun getEventCount(projectId: String): TestEventCount =
+        remoteTestingApi.getEventCount(projectId)
             .retry(RETRY_ATTEMPTS)
             .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to build session count") }
 
@@ -58,4 +54,21 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
             e.printStackTrace()
             throw wrapError(e)
         }
+
+
+    // Never invoked, but used to enforce that every test class has a test
+    fun enforceThatAnyTestHasATest() {
+        val type: ApiEventPayloadType? = null
+        when (type) {
+            EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove, Callout, Callback, ArtificialTermination,
+            Authentication, Consent, Enrolment, Authorization, FingerprintCapture, OneToOneMatch,
+            OneToManyMatch, PersonCreation, AlertScreen, GuidSelection, ConnectivitySnapshot, Refusal, CandidateRead,
+            ScannerConnection, Vero2InfoSnapshot, ScannerFirmwareUpdate, InvalidIntent, SuspiciousIntent, IntentParsing,
+            CompletionCheck, SessionCapture, FaceOnboardingComplete, FaceFallbackCapture, FaceCapture,
+            FaceCaptureConfirmation, FaceCaptureRetry,
+            null -> {
+                // ADD TEST FOR NEW EVENT IN THIS CLASS
+            }
+        }
+    }
 }

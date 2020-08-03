@@ -31,8 +31,8 @@ fun ApiEventLabels.fromApiToDomain() =
         projectId = this[PROJECT_ID_LABEL_KEY]?.firstOrNull(),
         subjectId = this[SUBJECT_ID_LABEL_KEY]?.firstOrNull(),
         attendantId = this[ATTENDANT_ID_LABEL_KEY]?.firstOrNull(),
-        moduleIds = this[MODULE_ID_LABEL_KEY] ?: emptyList(),
-        mode = (this[MODE_LABEL_KEY] ?: emptyList()).map { Modes.valueOf(it) },
+        moduleIds = this[MODULE_ID_LABEL_KEY],
+        mode = (this[MODE_LABEL_KEY])?.map { Modes.valueOf(it) },
         sessionId = this[SESSION_ID_LABEL_KEY]?.firstOrNull(),
         deviceId = this[DEVICE_ID_LABEL_KEY]?.firstOrNull()
     )

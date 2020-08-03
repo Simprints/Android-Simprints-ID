@@ -6,14 +6,16 @@ import com.simprints.id.data.db.event.domain.models.EventType.INTENT_PARSING
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
-import com.simprints.id.orchestrator.SOME_GUID1
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import org.junit.Test
 
 class IntentParsingEventTest {
 
     @Test
     fun create_IntentParsingEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
+        val labels = EventLabels(sessionId = GUID1)
         val event = IntentParsingEvent(CREATED_AT, COMMCARE, labels)
 
         assertThat(event.id).isNotNull()

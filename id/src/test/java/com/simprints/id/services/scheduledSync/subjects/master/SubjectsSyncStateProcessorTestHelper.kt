@@ -115,7 +115,7 @@ private fun createDownSyncCounterWorker(state: WorkInfo.State,
                                         id: UUID = UUID.randomUUID()) =
     createWorkInfo(
         state,
-        workDataOf(SubjectsDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN to JsonHelper.gson.toJson(SubjectsCount(TO_DOWNLOAD, 0, 0))),
+        workDataOf(SubjectsDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN to JsonHelper().toJson(SubjectsCount(TO_DOWNLOAD, 0, 0))),
         createCommonDownSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(DOWN_COUNTER)),
         workDataOf(),
         id
@@ -139,7 +139,7 @@ private fun createUpSyncCounterWorker(state: WorkInfo.State,
                                       id: UUID = UUID.randomUUID()) =
     createWorkInfo(
         state,
-        workDataOf(SubjectsUpSyncCountWorker.OUTPUT_COUNT_WORKER_UP to JsonHelper.gson.toJson(SubjectsCount(TO_UPLOAD, 0, 0))),
+        workDataOf(SubjectsUpSyncCountWorker.OUTPUT_COUNT_WORKER_UP to JsonHelper().toJson(SubjectsCount(TO_UPLOAD, 0, 0))),
         createCommonUpSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(UP_COUNTER)),
         workDataOf(),
         id

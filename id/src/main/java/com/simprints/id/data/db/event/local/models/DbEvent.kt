@@ -32,24 +32,26 @@ data class DbEvent(
             name?.let { EventType.valueOf(name) }
 
         @TypeConverter
-        fun fromListOfStringToString(list: List<String>): String =
-            JsonHelper.jackson.writeValueAsString(list)
+        fun fromListOfStringToString(list: List<String>?): String? =
+            list?.let { JsonHelper.jackson.writeValueAsString(list) }
 
         @TypeConverter
-        fun fromStringToListOfString(jsonList: String): List<String> {
-            val type = object : TypeReference<List<String>>() {}
-            return JsonHelper.jackson.readValue(jsonList, type)
-        }
+        fun fromStringToListOfString(jsonList: String?): List<String>? =
+            jsonList?.let {
+                val type = object : TypeReference<List<String>>() {}
+                return JsonHelper.jackson.readValue(jsonList, type)
+            }
 
         @TypeConverter
-        fun fromListOfModesToString(list: List<Modes>): String =
-            JsonHelper.jackson.writeValueAsString(list)
+        fun fromListOfModesToString(list: List<Modes>?): String? =
+            list?.let { JsonHelper.jackson.writeValueAsString(list) }
 
         @TypeConverter
-        fun fromStringToListOfModes(jsonList: String): List<Modes> {
-            val type = object : TypeReference<List<Modes>>() {}
-            return JsonHelper.jackson.readValue(jsonList, type)
-        }
+        fun fromStringToListOfModes(jsonList: String?): List<Modes>? =
+            jsonList?.let {
+                val type = object : TypeReference<List<Modes>>() {}
+                return JsonHelper.jackson.readValue(jsonList, type)
+            }
     }
 
     companion object {

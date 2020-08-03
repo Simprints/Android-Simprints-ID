@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.domain.models.ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.Companion.EVENT_VERSION
-import com.simprints.id.orchestrator.SOME_GUID1
+import
 import org.junit.Test
 
 class SessionCaptureEventTest {
@@ -21,7 +21,7 @@ class SessionCaptureEventTest {
         val deviceArg = Device(
             Build.VERSION.SDK_INT.toString(),
             Build.MANUFACTURER + "_" + Build.MODEL,
-            SOME_GUID1)
+            GUID1)
 
         val databaseInfoArg = DatabaseInfo(2)
         val locationArg = Location(0.0, 0.0)
@@ -37,7 +37,7 @@ class SessionCaptureEventTest {
             ENDED_AT,
             ENDED_AT,
             locationArg,
-            SOME_GUID1)
+            GUID1)
 
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(EventLabels(sessionId = event.id))
@@ -54,7 +54,7 @@ class SessionCaptureEventTest {
             assertThat(language).isEqualTo(languageArg)
             assertThat(device).isEqualTo(deviceArg)
             assertThat(databaseInfo).isEqualTo(databaseInfoArg)
-            assertThat(analyticsId).isEqualTo(SOME_GUID1)
+            assertThat(analyticsId).isEqualTo(GUID1)
             assertThat(location).isEqualTo(locationArg)
         }
     }
