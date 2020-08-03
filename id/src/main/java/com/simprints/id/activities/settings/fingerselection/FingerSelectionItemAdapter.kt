@@ -39,6 +39,9 @@ class FingerSelectionItemAdapter(private val context: Context,
 
         if (viewModel.items.value?.get(position)?.removable == true) {
             viewHolder.deleteButton.setOnClickListener { viewModel.removeItem(position) }
+            viewHolder.deleteButton.visibility = View.VISIBLE
+            viewHolder.fingerSpinner.isEnabled = true
+            viewHolder.fingerSpinner.isClickable = true
         } else {
             viewHolder.deleteButton.visibility = View.INVISIBLE
             viewHolder.fingerSpinner.isEnabled = false

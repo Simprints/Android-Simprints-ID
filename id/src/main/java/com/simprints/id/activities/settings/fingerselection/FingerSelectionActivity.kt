@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -19,6 +22,30 @@ class FingerSelectionActivity : BaseSplitActivity() {
     private lateinit var viewModel: FingerSelectionViewModel
 
     private lateinit var fingerSelectionAdapter: FingerSelectionItemAdapter
+
+    private val itemTouchHelper by lazy {
+        val simpleItemTouchCallback =
+            object : ItemTouchHelper.SimpleCallback(UP or DOWN or START or END, 0) {
+
+                override fun onMove(recyclerView: RecyclerView,
+                                    viewHolder: RecyclerView.ViewHolder,
+                                    target: RecyclerView.ViewHolder): Boolean {
+                    val adapter = recyclerView.adapter as FingerSelectionItemAdapter
+                    val from = viewHolder.adapterPosition
+                    val to = target.adapterPosition
+                    // 2. Update the backing model. Custom implementation in
+                    //    MainRecyclerViewAdapter. You need to implement
+                    //    reordering of the backing model inside the method.
+                    viewModel.moveItem(from, to)
+                    // 3. Tell adapter to render the model update.
+                    adapter.notifyItemMoved(from, to)
+                    return true
+                }
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                }
+            }
+        ItemTouchHelper(simpleItemTouchCallback)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +75,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
         fingerSelectionAdapter = FingerSelectionItemAdapter(this, viewModel)
         fingerSelectionRecyclerView.layoutManager = LinearLayoutManager(this)
         fingerSelectionRecyclerView.adapter = fingerSelectionAdapter
+        itemTouchHelper.attachToRecyclerView(fingerSelectionRecyclerView)
     }
 
     private fun initAddFingerButton() {

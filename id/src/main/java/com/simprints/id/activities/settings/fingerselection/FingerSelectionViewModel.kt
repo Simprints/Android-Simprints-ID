@@ -30,6 +30,15 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
         _items[itemIndex].quantity = QUANTITY_OPTIONS[quantity]
     }
 
+    fun moveItem(from: Int, to: Int) {
+        val fromItem = _items.removeAt(from)
+        if (to < from) {
+            _items.add(to, fromItem)
+        } else {
+            _items.add(to - 1, fromItem)
+        }
+    }
+
     fun removeItem(itemIndex: Int) {
         postUpdatedItems {
             removeAt(itemIndex)
@@ -48,7 +57,9 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
     fun resetFingerItems() {
         postUpdatedItems {
             clear()
-            addAll(determineFingerSelectionItemsFromPrefs())
+            addAll(preferencesManager.getRemoteConfigFingerprintsToCollect().toFingerSelectionItems().apply {
+                forEach { it.removable = false }
+            })
         }
     }
 
