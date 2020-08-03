@@ -1,6 +1,7 @@
 package com.simprints.id.activities.settings.fingerselection
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +24,8 @@ class FingerSelectionActivity : BaseSplitActivity() {
         (application as Application).component.inject(this)
         setContentView(R.layout.activity_finger_selection)
 
+        configureToolbar()
+
         viewModel = ViewModelProvider(this, viewModelFactory).get(FingerSelectionViewModel::class.java)
 
         initRecyclerView()
@@ -32,6 +35,12 @@ class FingerSelectionActivity : BaseSplitActivity() {
         viewModel.items.observe(this, Observer { fingerSelectionAdapter.notifyDataSetChanged() })
 
         viewModel.start()
+    }
+
+    private fun configureToolbar() {
+        setSupportActionBar(settingsToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = getString(R.string.finger_selection_activity_title)
     }
 
     private fun initRecyclerView() {
@@ -46,5 +55,17 @@ class FingerSelectionActivity : BaseSplitActivity() {
 
     private fun initResetButton() {
         resetButton.setOnClickListener { viewModel.resetFingerItems() }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        android.R.id.home -> {
+            onBackPressed()
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
     }
 }
