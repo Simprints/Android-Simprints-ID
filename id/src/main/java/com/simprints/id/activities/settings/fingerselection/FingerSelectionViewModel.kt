@@ -52,6 +52,10 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
         }
     }
 
+    fun savePreference() {
+        preferencesManager.fingerprintsToCollect = _items.toFingerIdentifiers()
+    }
+
     private fun determineFingerSelectionItemsFromPrefs(): List<FingerSelectionItem> =
         preferencesManager.fingerprintsToCollect.toFingerSelectionItems().also { savedPref ->
             preferencesManager.getRemoteConfigFingerprintsToCollect().toFingerSelectionItems()

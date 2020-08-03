@@ -2,7 +2,6 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 
 import android.content.Intent
 import android.os.Bundle
-import android.preference.MultiSelectListPreference
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.view.MenuItem
@@ -38,22 +37,6 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     private fun setTextInLayout() {
         getPreferenceForGeneralCategory().title = getString(R.string.settings_general)
         getPreferenceForAppDetailsCategory().title = getString(R.string.settings_app_details)
-
-        val defaultFingersPreference = (getPreferenceForDefaultFingers() as MultiSelectListPreference)
-        defaultFingersPreference.entries = arrayOf<CharSequence>(
-            getString(R.string.l_1_finger_name),
-            getString(R.string.l_2_finger_name),
-            getString(R.string.r_1_finger_name),
-            getString(R.string.r_2_finger_name),
-            getString(R.string.l_3_finger_name),
-            getString(R.string.r_3_finger_name),
-            getString(R.string.l_4_finger_name),
-            getString(R.string.r_4_finger_name),
-            getString(R.string.l_5_finger_name),
-            getString(R.string.r_5_finger_name)
-        )
-        defaultFingersPreference.positiveButtonText = getString(R.string.ok)
-        defaultFingersPreference.negativeButtonText = getString(R.string.cancel_button)
     }
 
     private fun initTextInLayout() {
