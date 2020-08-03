@@ -140,7 +140,7 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
     }
 
     private fun renderValidFace() {
-        capture_feedback_txt_title.text = getString(R.string.capture_ready)
+        capture_feedback_txt_title.text = getString(R.string.capture_prep_begin_btn)
         capture_feedback_txt_explanation.text = null
 
         capture_feedback_txt_title.setCheckedWithLeftDrawable(
