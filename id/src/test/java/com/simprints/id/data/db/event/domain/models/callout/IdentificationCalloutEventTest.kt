@@ -12,14 +12,14 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_IDENTIFICATION
 import com.simprints.id.data.db.event.domain.models.callout.IdentificationCalloutEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.callout.IdentificationCalloutEvent.IdentificationCalloutPayload
-import com.simprints.id.orchestrator.SOME_GUID1
+import
 import org.junit.Test
 
 @Keep
 class IdentificationCalloutEventTest {
     @Test
     fun create_IdentificationCalloutEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
+        val labels = EventLabels(sessionId = GUID1)
         val event = IdentificationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)

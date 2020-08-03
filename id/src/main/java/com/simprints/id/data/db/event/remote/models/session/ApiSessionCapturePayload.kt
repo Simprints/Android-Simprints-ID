@@ -1,40 +1,50 @@
 package com.simprints.id.data.db.event.remote.models.session
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.simprints.id.data.db.event.domain.models.session.Location
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
+import com.simprints.id.data.db.event.remote.ApiModes
+import com.simprints.id.data.db.event.remote.fromDomainToApi
 import com.simprints.id.data.db.event.remote.models.ApiEventPayload
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
 import java.util.*
 
 
 @Keep
-open class ApiSessionCapturePayload(override val relativeStartTime: Long,
-                                    override val version: Int,
-                                    var appVersionName: String,
-                                    var libVersionName: String,
-                                    var language: String,
-                                    var device: ApiDevice,
+open class ApiSessionCapturePayload(override val version: Int,
                                     val id: String = UUID.randomUUID().toString(),
-                                    var endedAt: Long = 0,
-                                    var uploadedAt: Long = 0,
-                                    var databaseInfo: ApiDatabaseInfo,
-                                    var location: ApiLocation? = null,
-                                    var analyticsId: String? = null) : ApiEventPayload(ApiEventPayloadType.SessionCapture, version, relativeStartTime) {
+                                    val projectId: String,
+                                    val startTime: Long,
+                                    val serverStartTime: Long,
+                                    val relativeEndTime: Long,
+                                    val relativeUploadTime: Long,
+                                    val modalities: List<ApiModes>,
+                                    val appVersionName: String,
+                                    val libVersionName: String,
+                                    val analyticsId: String? = null,
+                                    val language: String,
+                                    val device: ApiDevice,
+                                    val databaseInfo: ApiDatabaseInfo,
+                                    val location: ApiLocation? = null,
+                                    @JsonIgnore override val relativeStartTime: Long = 0) : ApiEventPayload(ApiEventPayloadType.SessionCapture, version, relativeStartTime) {
 
     constructor(domainPayload: SessionCapturePayload) : this(
-        domainPayload.createdAt,
         domainPayload.eventVersion,
+        domainPayload.id,
+        domainPayload.projectId,
+        domainPayload.createdAt,
+        domainPayload.serverStartTime, //StopShip: to fix timestamps
+        domainPayload.endedAt,
+        domainPayload.relativeUploadTime,
+        domainPayload.modalities.map { it.fromDomainToApi() },
         domainPayload.appVersionName,
         domainPayload.libVersionName,
+        domainPayload.analyticsId,
         domainPayload.language,
         domainPayload.device.fromDomainToApi(),
-        domainPayload.id,
-        domainPayload.endedAt ?: 0,
-        domainPayload.uploadTime,
         domainPayload.databaseInfo.fromDomainToApi(),
-        domainPayload.location.fromDomainToApi(),
-        domainPayload.analyticsId
+        domainPayload.location.fromDomainToApi()
     )
 }
 

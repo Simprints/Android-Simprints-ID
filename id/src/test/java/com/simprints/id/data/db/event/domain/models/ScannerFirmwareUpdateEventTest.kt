@@ -1,8 +1,10 @@
 package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
-import com.simprints.id.orchestrator.SOME_GUID1
 import org.junit.Test
 
 class ScannerFirmwareUpdateEventTest {
@@ -13,7 +15,7 @@ class ScannerFirmwareUpdateEventTest {
         val targetVersionArg = "v1"
         val failureReasonArg = "error"
 
-        val labels = EventLabels(sessionId = SOME_GUID1)
+        val labels = EventLabels(sessionId = GUID1)
         val event = ScannerFirmwareUpdateEvent(CREATED_AT, ENDED_AT, chipArg, targetVersionArg, failureReasonArg, labels)
 
         assertThat(event.id).isNotNull()

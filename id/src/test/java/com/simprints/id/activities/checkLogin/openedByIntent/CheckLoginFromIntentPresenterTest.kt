@@ -6,12 +6,12 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_METADATA
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.sessionEvents.createFakeSession
+import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
-import com.simprints.id.orchestrator.SOME_GUID1
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.extensions.just
@@ -58,7 +58,7 @@ class CheckLoginFromIntentPresenterTest {
                 coEvery { crashReportManager.setSessionIdCrashlyticsKey(any()) } just Runs
 
                 eventRepository = mockk(relaxed = true)
-                coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createFakeSession()
+                coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
             }
 
             checkLoginFromIntentPresenter.setup()
@@ -92,7 +92,7 @@ class CheckLoginFromIntentPresenterTest {
             every { this@apply.userId } returns DEFAULT_USER_ID
             every { this@apply.moduleId } returns DEFAULT_MODULE_ID
             every { this@apply.metadata } returns DEFAULT_METADATA
-            every { this@apply.identificationSessionId } returns SOME_GUID1
+            every { this@apply.identificationSessionId } returns GUID1
         }
 
         checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest )
@@ -169,7 +169,7 @@ class CheckLoginFromIntentPresenterTest {
                 every { crashReportManager.setSessionIdCrashlyticsKey(any()) } just runs
 
                 eventRepository = mockk(relaxed = true)
-                coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createFakeSession()
+                coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
 
                 analyticsManager = mockk()
                 coEvery { analyticsManager.getAnalyticsId() } returns "analyticsId"

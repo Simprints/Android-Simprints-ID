@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config
 class ParentalConsentTextHelperTest {
 
     private val context = ApplicationProvider.getApplicationContext() as TestApplication
-    private val parentalConsentOptionsJson = JsonHelper.toJson(ParentalConsentOptions())
+    private val parentalConsentOptionsJson = JsonHelper().toJson(ParentalConsentOptions())
     private val request = AskConsentRequest(ConsentType.ENROL)
 
     companion object {
@@ -35,7 +35,7 @@ class ParentalConsentTextHelperTest {
     @Test
     fun getParentalConsentTextForFinger_shouldReturnCorrectParentalConsentText() {
         val parentalConsentText = ParentalConsentTextHelper(parentalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER), mockk()).assembleText(request, context)
+            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER), mockk(), mockk()).assembleText(request, context)
 
         assertThat(parentalConsentText).isEqualTo(PARENTAL_CONSENT_ENROL_FINGER_TEXT)
     }
@@ -43,7 +43,7 @@ class ParentalConsentTextHelperTest {
     @Test
     fun getParentalConsentTextForFace_shouldReturnCorrectParentalConsentText() {
         val parentalConsentText = ParentalConsentTextHelper(parentalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FACE), mockk()).assembleText(request, context)
+            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FACE), mockk(), mockk()).assembleText(request, context)
 
         assertThat(parentalConsentText).isEqualTo(PARENTAL_CONSENT_ENROL_FACE_TEXT)
     }
@@ -51,7 +51,7 @@ class ParentalConsentTextHelperTest {
     @Test
     fun getParentalConsentTextForMultiModal_shouldReturnCorrectParentalConsentText() {
         val parentalConsentText = ParentalConsentTextHelper(parentalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER, Modality.FACE), mockk()).assembleText(request, context)
+            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER, Modality.FACE), mockk(), mockk()).assembleText(request, context)
 
         assertThat(parentalConsentText).isEqualTo(PARENTAL_CONSENT_ENROL_MULTI_TEXT)
     }

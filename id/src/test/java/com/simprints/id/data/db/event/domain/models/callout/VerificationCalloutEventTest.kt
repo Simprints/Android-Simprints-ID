@@ -13,14 +13,14 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_VERIFICATION
 import com.simprints.id.data.db.event.domain.models.callout.VerificationCalloutEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
-import com.simprints.id.orchestrator.SOME_GUID1
+import
 import org.junit.Test
 
 @Keep
 class VerificationCalloutEventTest {
     @Test
     fun create_VerificationCalloutEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
+        val labels = EventLabels(sessionId = GUID1)
         val event = VerificationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, GUID1, DEFAULT_METADATA, labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)

@@ -12,6 +12,7 @@ import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.models.DbEventQuery
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.modality.toMode
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.ignoreException
@@ -41,8 +42,9 @@ open class EventRepositoryImpl(
         reportExceptionIfNeeded {
             val count = eventLocalDataSource.count()
             val sessionCaptureEvent = SessionCaptureEvent(
-                timeHelper.now(),
                 PROJECT_ID_FOR_NOT_SIGNED_IN,
+                timeHelper.now(),
+                preferencesManager.modalities.map { it.toMode() },
                 appVersionName,
                 libSimprintsVersionName,
                 preferencesManager.language,

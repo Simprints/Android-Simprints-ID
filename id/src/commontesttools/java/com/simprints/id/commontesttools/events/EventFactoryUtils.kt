@@ -1,4 +1,4 @@
-package com.simprints.id.commontesttools.sessionEvents
+package com.simprints.id.commontesttools.events
 
 import android.net.NetworkInfo.DetailedState.CONNECTED
 import android.os.Build
@@ -100,29 +100,29 @@ fun createFaceCaptureRetryEvent() = FaceCaptureRetryEvent(CREATED_AT, ENDED_AT, 
 
 fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(CREATED_AT, ENDED_AT, eventLabels)
 
-fun createSessionCaptureEvent(): SessionCaptureEvent {
+fun createSessionCaptureEvent(id: String = GUID1): SessionCaptureEvent {
     val deviceArg = Device(
         Build.VERSION.SDK_INT.toString(),
         Build.MANUFACTURER + "_" + Build.MODEL,
         GUID1)
 
     return SessionCaptureEvent(
-        CREATED_AT,
         DEFAULT_PROJECT_ID,
+        CREATED_AT,
+        listOf(FACE, FINGERPRINT),
         "appVersionName",
         "libSimprintsVersionName",
         "EN",
         deviceArg,
         DatabaseInfo(0, 2),
-        ENDED_AT,
-        ENDED_AT,
         Location(0.0, 0.0),
+        id = id,
         labels = EventLabels(deviceId = GUID1, projectId = GUID1)
     )
 }
 
 
-private fun buildFakeBiometricReferences(): List<BiometricReference> {
+fun buildFakeBiometricReferences(): List<BiometricReference> {
     val fingerprintReference = FingerprintReference(listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
     val faceReference = FaceReference(listOf(FaceTemplate("some_template")))
     return listOf(fingerprintReference, faceReference)
@@ -146,7 +146,7 @@ fun createEnrolmentRecordMoveEvent() =
         eventLabels.copy(subjectId = GUID1)
     )
 
-private fun createBiometricReferences(): List<BiometricReference> {
+fun createBiometricReferences(): List<BiometricReference> {
     val fingerprintReference = FingerprintReference(listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
     val faceReference = FaceReference(listOf(FaceTemplate("some_template")))
     return listOf(fingerprintReference, faceReference)

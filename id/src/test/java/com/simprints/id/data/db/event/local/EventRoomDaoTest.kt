@@ -11,15 +11,15 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID_2
-import com.simprints.id.data.db.event.domain.models.CREATED_AT
-import com.simprints.id.data.db.event.domain.models.ENDED_AT
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.CONSENT
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.local.models.DbEvent
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.orchestrator.SOME_GUID1
-import com.simprints.id.orchestrator.SOME_GUID2
 import com.simprints.id.tools.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.RelaxedMockK
@@ -33,15 +33,15 @@ import java.io.IOException
 @RunWith(AndroidJUnit4::class)
 class EventRoomDaoTest {
 
-    val event = DbEvent(SOME_GUID1,
+    val event = DbEvent(GUID1,
         EventLabels(
             projectId = DEFAULT_PROJECT_ID,
             subjectId = DEFAULT_USER_ID_2,
             attendantId = DEFAULT_USER_ID,
             moduleIds = listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
             mode = listOf(Modes.FACE, Modes.FINGERPRINT),
-            sessionId = SOME_GUID1,
-            deviceId = SOME_GUID1
+            sessionId = GUID1,
+            deviceId = GUID1
         ),
         SESSION_CAPTURE, "", CREATED_AT, ENDED_AT)
 
@@ -64,7 +64,7 @@ class EventRoomDaoTest {
         runBlocking {
             val wrongEvent = event.copy(id = randomUUID())
             addIntoDb(event, wrongEvent)
-            verifyEvents(listOf(event), eventDao.load(id = SOME_GUID1))
+            verifyEvents(listOf(event), eventDao.load(id = GUID1))
         }
     }
 
@@ -80,7 +80,7 @@ class EventRoomDaoTest {
     @Test
     fun loadByProjectId() {
         runBlocking {
-            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(projectId = SOME_GUID1))
+            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(projectId = GUID1))
             addIntoDb(event, wrongEvent)
             verifyEvents(listOf(event), eventDao.load(projectId = DEFAULT_PROJECT_ID))
         }
@@ -89,7 +89,7 @@ class EventRoomDaoTest {
     @Test
     fun loadBySubjectId() {
         runBlocking {
-            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(subjectId = SOME_GUID1))
+            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(subjectId = GUID1))
             addIntoDb(event, wrongEvent)
             verifyEvents(listOf(event), eventDao.load(subjectId = DEFAULT_USER_ID_2))
         }
@@ -98,7 +98,7 @@ class EventRoomDaoTest {
     @Test
     fun loadByAttendantId() {
         runBlocking {
-            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(attendantId = SOME_GUID1))
+            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(attendantId = GUID1))
             addIntoDb(event, wrongEvent)
             verifyEvents(listOf(event), eventDao.load(attendantId = DEFAULT_USER_ID))
         }
@@ -107,18 +107,18 @@ class EventRoomDaoTest {
     @Test
     fun loadBySessionId() {
         runBlocking {
-            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(sessionId = SOME_GUID2))
+            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID2))
             addIntoDb(event, wrongEvent)
-            verifyEvents(listOf(event), eventDao.load(sessionId = SOME_GUID1))
+            verifyEvents(listOf(event), eventDao.load(sessionId = GUID1))
         }
     }
 
     @Test
     fun loadByDeviceId() {
         runBlocking {
-            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(deviceId = SOME_GUID2))
+            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(deviceId = GUID2))
             addIntoDb(event, wrongEvent)
-            verifyEvents(listOf(event), eventDao.load(deviceId = SOME_GUID1))
+            verifyEvents(listOf(event), eventDao.load(deviceId = GUID1))
         }
     }
 
@@ -159,10 +159,10 @@ class EventRoomDaoTest {
     @Test
     fun deletionBySessionId() {
         runBlocking {
-            val eventSameSession = event.copy(id = randomUUID(), labels = EventLabels(sessionId = SOME_GUID1))
-            val eventDifferentSession = event.copy(id = randomUUID(), labels = EventLabels(sessionId = SOME_GUID2))
+            val eventSameSession = event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID1))
+            val eventDifferentSession = event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID2))
             addIntoDb(event, eventSameSession, eventDifferentSession)
-            db.eventDao.delete(sessionId = SOME_GUID1)
+            db.eventDao.delete(sessionId = GUID1)
             verifyEvents(listOf(eventDifferentSession), eventDao.load())
         }
     }

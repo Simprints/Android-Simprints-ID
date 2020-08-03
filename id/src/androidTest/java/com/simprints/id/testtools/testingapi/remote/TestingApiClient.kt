@@ -16,8 +16,7 @@ class TestingApiClient<T : SimRemoteInterface>(service: KClass<T>, endpoint: Str
     override val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(JacksonConverterFactory.create(
-                JsonHelper.jackson))
+            .addConverterFactory(JacksonConverterFactory.create(JsonHelper.jackson))
             .baseUrl(endpoint)
             .client(okHttpClientConfig.addInterceptor(
                 HttpLoggingInterceptor(TimberLogger()).apply {

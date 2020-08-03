@@ -2,13 +2,13 @@ package com.simprints.id.data.db.event.remote
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.sessionEvents.*
-import com.simprints.id.data.db.event.local.models.*
+import com.simprints.core.tools.extentions.safeSealedWhens
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.id.commontesttools.events.*
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
 import com.simprints.id.data.db.event.remote.models.fromApiToDomain
 import com.simprints.id.data.db.event.remote.models.fromDomainToApi
-import com.simprints.id.tools.json.SimJsonHelper
 import org.json.JSONObject
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ApiEventTest {
 
-    private val jackson = SimJsonHelper.jackson
+    private val jackson = JsonHelper.jackson
 
     @Test
     fun validate_alertScreenEventApiModel() {
@@ -391,7 +391,7 @@ class ApiEventTest {
     }
 
 
-    // Never invoked, but used to enforce that every test class has a test
+    // Never invoked, but used to enforce that the implementation of a test for every event class
     fun enforceThatAnyTestHasATest() {
         val type: ApiEventPayloadType? = null
         when (type) {
@@ -427,8 +427,7 @@ class ApiEventTest {
             FaceCapture -> validate_FaceCaptureEventApiModel()
             FaceCaptureConfirmation -> validate_FaceCaptureConfirmationEventApiModel()
             FaceCaptureRetry -> validate_FaceCaptureRetryEventApiModel()
-            null -> {
-            }
-        }
+            null -> TODO()
+        }.safeSealedWhens
     }
 }

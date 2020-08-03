@@ -9,12 +9,14 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID_2
-import com.simprints.id.commontesttools.sessionEvents.createAlertScreenEvent
-import com.simprints.id.commontesttools.sessionEvents.createSessionCaptureEvent
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
+import com.simprints.id.commontesttools.events.CREATED_AT_RANGE
+import com.simprints.id.commontesttools.events.ENDED_AT_RANGE
+import com.simprints.id.commontesttools.events.createAlertScreenEvent
+import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
-import com.simprints.id.data.db.event.domain.models.CREATED_AT_RANGE
-import com.simprints.id.data.db.event.domain.models.ENDED_AT_RANGE
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.ARTIFICIAL_TERMINATION
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
@@ -24,8 +26,6 @@ import com.simprints.id.data.db.event.local.models.DbEventQuery
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.orchestrator.SOME_GUID1
-import com.simprints.id.orchestrator.SOME_GUID2
 import com.simprints.id.tools.TimeHelper
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
@@ -66,8 +66,8 @@ class EventLocalDataSourceImplTest {
     @Test
     fun createSession_shouldCloseOpenSessions() {
         runBlocking {
-            val oldOpenSession = createSessionCaptureEvent().openSession()
-            val newSession = createSessionCaptureEvent().openSession()
+            val oldOpenSession = createSessionCaptureEvent(randomUUID()).openSession()
+            val newSession = createSessionCaptureEvent(randomUUID()).openSession()
             eventDao.insertOrUpdate(oldOpenSession.fromDomainToDb())
 
             eventLocalDataSource.create(newSession)
@@ -117,7 +117,7 @@ class EventLocalDataSourceImplTest {
 
             eventLocalDataSource.load(eventQuery)
             coVerify {
-                eventDao.load(ID, SESSION_CAPTURE, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_USER_ID_2, SOME_GUID1, SOME_GUID2,
+                eventDao.load(ID, SESSION_CAPTURE, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_USER_ID_2, GUID1, GUID2,
                     CREATED_AT_RANGE.first, CREATED_AT_RANGE.last, ENDED_AT_RANGE.first, ENDED_AT_RANGE.last)
             }
         }
@@ -133,7 +133,7 @@ class EventLocalDataSourceImplTest {
             eventLocalDataSource.count(eventQuery)
 
             coVerify {
-                eventDao.count(ID, SESSION_CAPTURE, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_USER_ID_2, SOME_GUID1, SOME_GUID2,
+                eventDao.count(ID, SESSION_CAPTURE, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_USER_ID_2, GUID1, GUID2,
                     CREATED_AT_RANGE.first, CREATED_AT_RANGE.last, ENDED_AT_RANGE.first, ENDED_AT_RANGE.last)
             }
         }
@@ -150,7 +150,7 @@ class EventLocalDataSourceImplTest {
             eventLocalDataSource.delete(eventQuery)
 
             coVerify {
-                eventDao.delete(ID, SESSION_CAPTURE, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_USER_ID_2, SOME_GUID1, SOME_GUID2,
+                eventDao.delete(ID, SESSION_CAPTURE, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_USER_ID_2, GUID1, GUID2,
                     CREATED_AT_RANGE.first, CREATED_AT_RANGE.last, ENDED_AT_RANGE.first, ENDED_AT_RANGE.last)
             }
         }
@@ -223,8 +223,8 @@ class EventLocalDataSourceImplTest {
             DEFAULT_PROJECT_ID,
             DEFAULT_USER_ID,
             DEFAULT_USER_ID_2,
-            SOME_GUID1,
-            SOME_GUID2,
+            GUID1,
+            GUID2,
             CREATED_AT_RANGE,
             ENDED_AT_RANGE
         )

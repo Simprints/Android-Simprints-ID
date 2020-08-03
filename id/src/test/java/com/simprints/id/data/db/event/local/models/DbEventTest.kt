@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.event.local.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.commontesttools.events.*
 import org.junit.Test
 
 class DbEventTest {

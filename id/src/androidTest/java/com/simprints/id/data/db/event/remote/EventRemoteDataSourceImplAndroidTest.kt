@@ -1,15 +1,21 @@
 package com.simprints.id.data.db.event.remote
 
 import android.net.NetworkInfo
+import android.os.Build
+import android.os.Build.VERSION
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.EncodingUtils
+import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
-import com.simprints.id.commontesttools.sessionEvents.eventLabels
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
+import com.simprints.id.commontesttools.events.createBiometricReferences
+import com.simprints.id.commontesttools.events.eventLabels
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
@@ -31,7 +37,20 @@ import com.simprints.id.data.db.event.domain.models.callout.*
 import com.simprints.id.data.db.event.domain.models.face.*
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
+import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
+import com.simprints.id.data.db.event.domain.models.session.Device
+import com.simprints.id.data.db.event.domain.models.session.Location
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.id.domain.modality.Modes.FACE
+import com.simprints.id.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
 import com.simprints.id.network.BaseUrlProvider
@@ -42,7 +61,6 @@ import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.testtools.android.waitOnSystem
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -92,27 +110,8 @@ class EventRemoteDataSourceImplAndroidTest {
         every { timeHelper.now() } returns 100
     }
 
-//    @Test
-//    fun closeSessions_shouldGetUploaded() {
-//        runBlocking {
-//            val nSession = EventRepositoryImpl.SESSION_BATCH_SIZE + 1
-//            val sessions = createClosedSessions(nSession)
-//
-//            sessions.forEach {
-//                it.addAlertScreenEvents()
-//            }
-//
-//            executeUpload(sessions)
-//
-//            waitOnSystem(CLOUD_ASYNC_SESSION_CREATION_TIMEOUT)
-//
-//            val response = RemoteTestingManager.create().getSessionCount(testProject.id)
-//            assertThat(response.count).isEqualTo(nSession)
-//        }
-//    }
-
     @Test
-    fun closeSession_withAllEvents_shouldGetUploaded() {
+    fun aSessionWithAllEvents_shouldGetUploaded() {
         runBlocking {
             val events = mutableListOf<Event>().apply {
                 addAlertScreenEvents()
@@ -139,6 +138,7 @@ class EventRemoteDataSourceImplAndroidTest {
                 addScannerConnectionEvent()
                 addVero2InfoSnapshotEvents()
                 addScannerFirmwareUpdateEvent()
+                addSessionCaptureEvent()
                 addSuspiciousIntentEvent()
                 addCallbackEvent()
                 addCalloutEvent()
@@ -146,11 +146,6 @@ class EventRemoteDataSourceImplAndroidTest {
             }
 
             executeUpload(events)
-
-            waitOnSystem(CLOUD_ASYNC_SESSION_CREATION_TIMEOUT)
-
-            val response = RemoteTestingManager.create().getSessionCount(testProject.id)
-            assertThat(response.count).isEqualTo(1)
         }
     }
 
@@ -390,6 +385,48 @@ class EventRemoteDataSourceImplAndroidTest {
         add(CompletionCheckEvent(DEFAULT_TIME, true, eventLabels))
     }
 
+    private fun MutableList<Event>.addSessionCaptureEvent() {
+        val deviceArg = Device(
+            VERSION.SDK_INT.toString(),
+            Build.MANUFACTURER + "_" + Build.MODEL,
+            DefaultTestConstants.GUID1)
+
+        add(SessionCaptureEvent(
+            DEFAULT_PROJECT_ID,
+            CREATED_AT,
+            listOf(FINGERPRINT, FACE),
+            "appVersionName",
+            "libSimprintsVersionName",
+            "EN",
+            deviceArg,
+            DatabaseInfo(0, 2),
+            Location(0.0, 0.0),
+            "analyticsId",
+            labels = EventLabels(deviceId = DefaultTestConstants.GUID1, projectId = DefaultTestConstants.GUID1)
+        ))
+    }
+
+    private fun MutableList<Event>.addEnrolmentRecordCreation() {
+        add(EnrolmentRecordCreationEvent(
+            CREATED_AT, DefaultTestConstants.GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(),
+            eventLabels.copy(subjectId = DefaultTestConstants.GUID1)))
+    }
+
+    private fun MutableList<Event>.addEnrolmentRecordMoveEvent() {
+        add(EnrolmentRecordMoveEvent(
+            CREATED_AT,
+            EnrolmentRecordCreationInMove(DefaultTestConstants.GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, createBiometricReferences()),
+            EnrolmentRecordDeletionInMove(DefaultTestConstants.GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID),
+            eventLabels.copy(subjectId = DefaultTestConstants.GUID1)
+        ))
+    }
+
+    private fun MutableList<Event>.addEnrolmentRecordDeletionEvent() {
+        add(EnrolmentRecordDeletionEvent(
+            CREATED_AT, DefaultTestConstants.GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID,
+            eventLabels.copy(subjectId = DefaultTestConstants.GUID1)))
+    }
+
     private fun MutableList<Event>.addCallbackEvent() {
         add(EnrolmentCallbackEvent(DEFAULT_TIME, randomUUID(), eventLabels))
 
@@ -412,6 +449,49 @@ class EventRemoteDataSourceImplAndroidTest {
         add(IdentificationCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata", eventLabels))
         add(VerificationCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, randomUUID(), "metadata", eventLabels))
         add(EnrolmentLastBiometricsCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata", randomUUID(), eventLabels))
+    }
+
+    // Never invoked, but used to enforce that the implementation of a test for every event class
+    fun enforceThatAnyTestHasATest() {
+        val events: MutableList<Event> = mutableListOf<Event>()
+        val type: ApiEventPayloadType? = null
+
+        when (type) {
+            EnrolmentRecordCreation -> events.addEnrolmentRecordCreation()
+            EnrolmentRecordDeletion -> events.addEnrolmentRecordDeletionEvent()
+            EnrolmentRecordMove -> events.addEnrolmentRecordMoveEvent()
+            Callout -> events.addCalloutEvent()
+            Callback -> events.addCallbackEvent()
+            ArtificialTermination -> events.addArtificialTerminationEvent()
+            Authentication -> events.addAuthenticationEvent()
+            Consent -> events.addConsentEvent()
+            Enrolment -> events.addEnrolmentEvent()
+            Authorization -> events.addAuthorizationEvent()
+            FingerprintCapture -> events.addFingerprintCaptureEvent()
+            OneToOneMatch -> events.addOneToOneMatchEvent()
+            OneToManyMatch -> events.addOneToManyMatchEvent()
+            PersonCreation -> events.addPersonCreationEvent()
+            AlertScreen -> events.addAlertScreenEvents()
+            GuidSelection -> events.addGuidSelectionEvent()
+            ConnectivitySnapshot -> events.addConnectivitySnapshotEvent()
+            Refusal -> events.addRefusalEvent()
+            CandidateRead -> events.addCandidateReadEvent()
+            ScannerConnection -> events.addScannerConnectionEvent()
+            Vero2InfoSnapshot -> events.addVero2InfoSnapshotEvents()
+            ScannerFirmwareUpdate -> events.addScannerFirmwareUpdateEvent()
+            InvalidIntent -> events.addInvalidIntentEvent()
+            SuspiciousIntent -> events.addSuspiciousIntentEvent()
+            IntentParsing -> events.addInvalidIntentEvent()
+            CompletionCheck -> events.addCompletionCheckEvent()
+            SessionCapture -> events.addSessionCaptureEvent()
+            FaceOnboardingComplete -> events.addFaceOnboardingCompleteEvent()
+            FaceFallbackCapture -> events.addFaceFallbackCaptureEvent()
+            FaceCapture -> events.addFaceCaptureEvent()
+            FaceCaptureConfirmation -> events.addFaceCaptureConfirmationEvent()
+            FaceCaptureRetry -> events.addFaceCaptureRetryEvent()
+            null -> {
+            }
+        }.safeSealedWhens
     }
 
 }
