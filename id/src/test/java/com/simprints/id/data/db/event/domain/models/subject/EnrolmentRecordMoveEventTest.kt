@@ -4,15 +4,15 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.data.db.event.domain.models.CREATED_AT
-import com.simprints.id.data.db.event.domain.models.DEFAULT_ENDED_AT
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_MOVE
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
-import
 import org.junit.Test
 
 class EnrolmentRecordMoveEventTest {

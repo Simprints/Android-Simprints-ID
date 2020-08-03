@@ -7,14 +7,11 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.data.db.event.domain.models.CREATED_AT
-import com.simprints.id.data.db.event.domain.models.DEFAULT_ENDED_AT
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
-
 import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
 import com.simprints.id.data.db.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.Companion.EVENT_VERSION
-import com.simprints.id.data.db.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
-import
 import org.junit.Test
 
 @Keep
@@ -26,7 +23,7 @@ class EnrolmentLastBiometricsCalloutEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLOUT_LAST_BIOMETRICS)
-        with(event.payload as EnrolmentLastBiometricsCalloutPayload) {
+        with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
             assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
