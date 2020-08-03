@@ -24,6 +24,7 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.activities.settings.fingerselection.FingerSelectionActivity
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
@@ -116,6 +117,7 @@ interface AppComponent {
     fun inject(settingsPreferenceFragment: SettingsPreferenceFragment)
     fun inject(settingsAboutFragment: SettingsAboutFragment)
     fun inject(settingsAboutActivity: SettingsAboutActivity)
+    fun inject(fingerSelectionActivity: FingerSelectionActivity)
     fun inject(consentActivity: ConsentActivity)
     fun inject(coreExitFormActivity: CoreExitFormActivity)
     fun inject(fingerprintExitFormActivity: FingerprintExitFormActivity)
