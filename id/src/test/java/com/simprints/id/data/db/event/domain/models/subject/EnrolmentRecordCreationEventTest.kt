@@ -3,16 +3,16 @@ package com.simprints.id.data.db.event.domain.models.subject
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.data.db.event.domain.models.CREATED_AT
-import com.simprints.id.data.db.event.domain.models.DEFAULT_ENDED_AT
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.id.domain.modality.Modes.FACE
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
-import
-import 
 import org.junit.Test
 
 class EnrolmentRecordCreationEventTest {

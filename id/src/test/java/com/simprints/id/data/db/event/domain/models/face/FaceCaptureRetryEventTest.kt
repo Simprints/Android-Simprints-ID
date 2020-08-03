@@ -2,13 +2,12 @@ package com.simprints.id.data.db.event.domain.models.face
 
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.CREATED_AT
-import com.simprints.id.data.db.event.domain.models.ENDED_AT
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
-
 import com.simprints.id.data.db.event.domain.models.EventType.FACE_CAPTURE_RETRY
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureRetryEvent.Companion.EVENT_VERSION
-import
 import org.junit.Test
 
 @Keep
