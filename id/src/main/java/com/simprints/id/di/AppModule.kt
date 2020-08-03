@@ -325,7 +325,9 @@ open class AppModule {
     )
 
     @Provides
-    open fun provideFingerSelectionViewModelFactory() = FingerSelectionViewModelFactory()
+    open fun provideFingerSelectionViewModelFactory(
+        preferencesManager: PreferencesManager
+    ) = FingerSelectionViewModelFactory(preferencesManager)
 
     @Provides
     open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =

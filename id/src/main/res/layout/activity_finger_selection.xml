@@ -20,8 +20,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="+ Add Finger"
-        app:layout_constraintEnd_toStartOf="@id/resetButton"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/resetButton"
         app:layout_constraintTop_toBottomOf="@id/fingerSelectionRecyclerView"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -31,8 +31,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Reset"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/addFingerButton"
+        app:layout_constraintEnd_toStartOf="@id/addFingerButton"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fingerSelectionRecyclerView"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
