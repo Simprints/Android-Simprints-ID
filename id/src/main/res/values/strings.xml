@@ -257,6 +257,9 @@
 
     <!-- Finger Selection Activity -->
     <string name="finger_selection_activity_title">Select Fingers</string>
+    <string name="finger_selection_confirm_dialog_text">Save settings?</string>
+    <string name="finger_selection_confirm_dialog_yes">Save</string>
+    <string name="finger_selection_confirm_dialog_no">Cancel</string>
     
     <!--Sync Information Activity-->
     <string name="select_modules_button_title">Select modules</string>
