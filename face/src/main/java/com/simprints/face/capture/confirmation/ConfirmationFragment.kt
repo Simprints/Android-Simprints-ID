@@ -2,6 +2,7 @@ package com.simprints.face.capture.confirmation
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
@@ -30,6 +31,10 @@ class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
             mainVM.flowFinished()
         }
         recapture_btn.setOnClickListener {
+            sendConfirmationEvent(RECAPTURE)
+            mainVM.recapture()
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             sendConfirmationEvent(RECAPTURE)
             mainVM.recapture()
         }
