@@ -9,7 +9,6 @@ import com.simprints.face.OrchestratorGraphDirections
 import com.simprints.face.R
 import com.simprints.face.base.FaceActivity
 import com.simprints.face.capture.FaceCaptureActivity
-import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.face.match.FaceMatchActivity
 import com.simprints.moduleapi.face.requests.IFaceRequest
@@ -28,7 +27,7 @@ class FaceOrchestratorActivity : FaceActivity() {
 
         observeViewModel()
 
-        viewModel.start(iFaceRequest)
+        if (savedInstanceState == null) viewModel.start(iFaceRequest)
     }
 
     private fun observeViewModel() {
