@@ -14,7 +14,7 @@ import com.simprints.id.data.db.event.remote.models.callback.ApiCallbackType.*
 import com.simprints.id.data.db.event.remote.models.fromApiToDomain
 
 @Keep
-class ApiCallbackPayload(
+data class ApiCallbackPayload(
     override val relativeStartTime: Long,
     override val version: Int,
     val callback: ApiCallback

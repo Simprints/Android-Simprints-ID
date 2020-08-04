@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.remote.models.face.ApiFaceCapturePayload.A
 import com.simprints.id.data.db.event.remote.models.face.ApiFaceCapturePayload.ApiResult.*
 
 @Keep
-class ApiFaceCapturePayload(val id: String,
+data class ApiFaceCapturePayload(val id: String,
                             override val relativeStartTime: Long,
                             val relativeEndTime: Long,
                             override val version: Int,

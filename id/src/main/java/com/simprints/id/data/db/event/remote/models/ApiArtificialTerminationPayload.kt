@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.A
 import com.simprints.id.data.db.event.remote.models.ApiArtificialTerminationPayload.ApiReason
 
 @Keep
-class ApiArtificialTerminationPayload(override val relativeStartTime: Long,
+data class ApiArtificialTerminationPayload(override val relativeStartTime: Long,
                                       override val version: Int,
                                       val reason: ApiReason) : ApiEventPayload(ApiEventPayloadType.ArtificialTermination, version, relativeStartTime) {
 

@@ -15,15 +15,15 @@ import com.simprints.id.data.db.event.domain.models.subject.FingerprintReference
 sealed class ApiBiometricReference(@Transient val type: ApiBiometricReferenceType)
 
 @Keep
-class ApiFaceReference(val templates: List<ApiFaceTemplate>,
-                       val metadata: HashMap<String, String>? = null): ApiBiometricReference(FACE_REFERENCE)
+data class ApiFaceReference(val templates: List<ApiFaceTemplate>,
+                            val metadata: HashMap<String, String>? = null) : ApiBiometricReference(FACE_REFERENCE)
 
 @Keep
-class ApiFingerprintReference(val templates: List<ApiFingerprintTemplate>,
-                              val metadata: HashMap<String, String>? = null): ApiBiometricReference(FINGERPRINT_REFERENCE)
+data class ApiFingerprintReference(val templates: List<ApiFingerprintTemplate>,
+                                   val metadata: HashMap<String, String>? = null) : ApiBiometricReference(FINGERPRINT_REFERENCE)
 
 @Keep
-enum class ApiBiometricReferenceType() {
+enum class ApiBiometricReferenceType {
     @JsonProperty("FaceReference") FACE_REFERENCE,
     @JsonProperty("FingerprintReference") FINGERPRINT_REFERENCE;
 }
@@ -42,7 +42,7 @@ fun FaceTemplate.fromDomainToApi() = ApiFaceTemplate(template)
 fun FingerprintTemplate.fromDomainToApi() =
     ApiFingerprintTemplate(quality, template, finger.fromDomainToApi())
 
-fun FingerIdentifier.fromDomainToApi() = when(this) {
+fun FingerIdentifier.fromDomainToApi() = when (this) {
     FingerIdentifier.RIGHT_5TH_FINGER -> ApiFingerIdentifier.RIGHT_5TH_FINGER
     FingerIdentifier.RIGHT_4TH_FINGER -> ApiFingerIdentifier.RIGHT_4TH_FINGER
     FingerIdentifier.RIGHT_3RD_FINGER -> ApiFingerIdentifier.RIGHT_3RD_FINGER

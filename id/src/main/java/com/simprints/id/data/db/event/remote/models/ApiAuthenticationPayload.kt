@@ -6,14 +6,14 @@ import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.Authenti
 import com.simprints.id.data.db.event.remote.models.ApiAuthenticationPayload.ApiResult
 
 @Keep
-class ApiAuthenticationPayload(override val relativeStartTime: Long,
+data class ApiAuthenticationPayload(override val relativeStartTime: Long,
                                override val version: Int,
                                val relativeEndTime: Long,
                                val userInfo: ApiUserInfo,
                                val result: ApiResult) : ApiEventPayload(ApiEventPayloadType.Authentication, version, relativeStartTime) {
 
     @Keep
-    class ApiUserInfo(val projectId: String, val userId: String) {
+    data class ApiUserInfo(val projectId: String, val userId: String) {
         constructor(userInfoDomain: AuthenticationPayload.UserInfo) :
             this(userInfoDomain.projectId, userInfoDomain.userId)
     }

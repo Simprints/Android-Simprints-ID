@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.remote.models.ApiCandidateReadPayload.ApiR
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.CandidateRead
 
 @Keep
-class ApiCandidateReadPayload(override val relativeStartTime: Long,
+data class ApiCandidateReadPayload(override val relativeStartTime: Long,
                               override val version: Int,
                               val relativeEndTime: Long,
                               val candidateId: String,

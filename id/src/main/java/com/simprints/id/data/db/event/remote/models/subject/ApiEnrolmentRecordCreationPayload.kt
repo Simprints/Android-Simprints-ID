@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayload
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
 
 @Keep
-class ApiEnrolmentRecordCreationPayload(
+data class ApiEnrolmentRecordCreationPayload(
     @JsonIgnore override val relativeStartTime: Long, //Not added on API yet
     override val version: Int,
     val subjectId: String,
