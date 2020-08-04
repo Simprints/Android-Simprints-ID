@@ -41,6 +41,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
                     adapter.notifyItemMoved(from, to)
                     return true
                 }
+
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 }
             }
