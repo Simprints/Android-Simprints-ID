@@ -5,12 +5,12 @@ import com.simprints.id.data.db.event.domain.models.ScannerFirmwareUpdateEvent.S
 
 
 @Keep
-class ApiScannerFirmwareUpdatePayload(override val relativeStartTime: Long,
-                                      override val version: Int,
-                                      val relativeEndTime: Long,
-                                      val chip: String,
-                                      val targetAppVersion: String,
-                                      val failureReason: String?) : ApiEventPayload(ApiEventPayloadType.ScannerFirmwareUpdate, version, relativeStartTime) {
+data class ApiScannerFirmwareUpdatePayload(override val relativeStartTime: Long,
+                                           override val version: Int,
+                                           val relativeEndTime: Long,
+                                           val chip: String,
+                                           val targetAppVersion: String,
+                                           val failureReason: String?) : ApiEventPayload(ApiEventPayloadType.ScannerFirmwareUpdate, version, relativeStartTime) {
 
     constructor(domainPayload: ScannerFirmwareUpdatePayload) :
         this(domainPayload.createdAt,

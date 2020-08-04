@@ -12,7 +12,7 @@ import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMo
 import com.simprints.id.data.db.event.remote.models.subject.fromApiToDomain
 
 @Keep
-open class ApiEvent(val id: String,
+data class ApiEvent(val id: String,
                     val labels: ApiEventLabels,
                     val payload: ApiEventPayload)
 

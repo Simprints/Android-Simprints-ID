@@ -7,7 +7,7 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
 import io.realm.internal.Keep
 
 @Keep
-class ApiEnrolmentRecordDeletionPayload(
+data class ApiEnrolmentRecordDeletionPayload(
     @JsonIgnore override val relativeStartTime: Long, //Not added on API yet
     override val version: Int,
     val subjectId: String,

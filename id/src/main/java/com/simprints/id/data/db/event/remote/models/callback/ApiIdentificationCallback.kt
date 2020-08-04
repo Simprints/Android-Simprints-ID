@@ -3,5 +3,5 @@ package com.simprints.id.data.db.event.remote.models.callback
 import androidx.annotation.Keep
 
 @Keep
-class ApiIdentificationCallback(val sessionId: String,
+data class ApiIdentificationCallback(val sessionId: String,
                                 val scores: List<ApiCallbackComparisonScore>): ApiCallback(ApiCallbackType.Identification)

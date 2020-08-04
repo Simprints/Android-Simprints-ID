@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayload
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.Callout
 
 @Keep
-class ApiCalloutPayload(
+data class ApiCalloutPayload(
         override val relativeStartTime: Long,
         override val version: Int,
         val callout: ApiCallout) : ApiEventPayload(Callout, version, relativeStartTime) {

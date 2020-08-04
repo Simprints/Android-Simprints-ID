@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
 
 
 @Keep
-class ApiEnrolmentRecordMovePayload(
+data class ApiEnrolmentRecordMovePayload(
     @JsonIgnore override val relativeStartTime: Long, //Not added on API yet
     override val version: Int,
     val enrolmentRecordCreation: ApiEnrolmentRecordCreationInMove?,

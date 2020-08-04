@@ -7,19 +7,19 @@ import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2
 
 
 @Keep
-class ApiVero2InfoSnapshotPayload(override val relativeStartTime: Long,
-                                  override val version: Int,
-                                  val scannerVersion: ApiVero2Version,
-                                  val battery: ApiBatteryInfo) : ApiEventPayload(ApiEventPayloadType.Vero2InfoSnapshot, version, relativeStartTime) {
+data class ApiVero2InfoSnapshotPayload(override val relativeStartTime: Long,
+                                       override val version: Int,
+                                       val scannerVersion: ApiVero2Version,
+                                       val battery: ApiBatteryInfo) : ApiEventPayload(ApiEventPayloadType.Vero2InfoSnapshot, version, relativeStartTime) {
 
     @Keep
-    class ApiVero2Version(val master: Long,
-                          val cypressApp: String,
-                          val cypressApi: String,
-                          val stmApp: String,
-                          val stmApi: String,
-                          val un20App: String,
-                          val un20Api: String) {
+    data class ApiVero2Version(val master: Long,
+                               val cypressApp: String,
+                               val cypressApi: String,
+                               val stmApp: String,
+                               val stmApi: String,
+                               val un20App: String,
+                               val un20Api: String) {
 
         constructor(vero2Version: Vero2Version) :
             this(vero2Version.master,
@@ -32,8 +32,8 @@ class ApiVero2InfoSnapshotPayload(override val relativeStartTime: Long,
     }
 
     @Keep
-    class ApiBatteryInfo(val charge: Int, val voltage: Int,
-                         val current: Int, val temperature: Int) {
+    data class ApiBatteryInfo(val charge: Int, val voltage: Int,
+                              val current: Int, val temperature: Int) {
 
         constructor(batteryInfo: BatteryInfo) :
             this(batteryInfo.charge, batteryInfo.voltage, batteryInfo.current, batteryInfo.temperature)

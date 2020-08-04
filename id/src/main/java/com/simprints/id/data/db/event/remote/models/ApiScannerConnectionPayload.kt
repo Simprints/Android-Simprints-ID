@@ -9,9 +9,9 @@ import com.simprints.id.data.db.event.domain.models.ScannerConnectionEvent.Scann
 import com.simprints.id.data.db.event.remote.models.ApiScannerConnectionPayload.ApiScannerGeneration
 
 @Keep
-class ApiScannerConnectionPayload(override val relativeStartTime: Long,
-                                  override val version: Int,
-                                  val scannerInfo: ApiScannerInfo) : ApiEventPayload(ApiEventPayloadType.ScannerConnection, version, relativeStartTime) {
+data class ApiScannerConnectionPayload(override val relativeStartTime: Long,
+                                       override val version: Int,
+                                       val scannerInfo: ApiScannerInfo) : ApiEventPayload(ApiEventPayloadType.ScannerConnection, version, relativeStartTime) {
 
     @Keep
     class ApiScannerInfo(val scannerId: String,

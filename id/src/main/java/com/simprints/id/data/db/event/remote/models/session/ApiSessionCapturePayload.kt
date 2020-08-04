@@ -12,7 +12,7 @@ import java.util.*
 
 
 @Keep
-open class ApiSessionCapturePayload(override val version: Int,
+data class ApiSessionCapturePayload(override val version: Int,
                                     val id: String = UUID.randomUUID().toString(),
                                     val projectId: String,
                                     val startTime: Long,

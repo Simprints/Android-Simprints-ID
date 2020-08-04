@@ -6,7 +6,7 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 
 
 @Keep
-class ApiConnectivitySnapshotPayload(
+data class ApiConnectivitySnapshotPayload(
     override val relativeStartTime: Long,
     override val version: Int,
     val networkType: String,

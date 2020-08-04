@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FaceCapt
 import com.simprints.id.data.db.event.remote.models.face.ApiFaceCaptureConfirmationPayload.ApiResult
 
 @Keep
-class ApiFaceCaptureConfirmationPayload(override val relativeStartTime: Long, //Not added on API yet
+data class ApiFaceCaptureConfirmationPayload(override val relativeStartTime: Long, //Not added on API yet
                                         val relativeEndTime: Long,
                                         override val version: Int,
                                         val result: ApiResult) : ApiEventPayload(FaceCaptureConfirmation, version, relativeStartTime) {

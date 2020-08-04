@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayload
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FaceCaptureRetry
 
 @Keep
-class ApiFaceCaptureRetryPayload(override val relativeStartTime: Long, //Not added on API yet
+data class ApiFaceCaptureRetryPayload(override val relativeStartTime: Long, //Not added on API yet
                                  val relativeEndTime: Long,
                                  override val version: Int) : ApiEventPayload(FaceCaptureRetry, version, relativeStartTime) {
 

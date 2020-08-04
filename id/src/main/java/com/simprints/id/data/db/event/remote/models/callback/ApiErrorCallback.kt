@@ -17,7 +17,7 @@ import com.simprints.id.data.db.event.remote.models.callback.ApiErrorCallback.Ap
 import io.realm.internal.Keep
 
 @Keep
-class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.Error) {
+data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.Error) {
 
     @Keep
     enum class ApiReason {

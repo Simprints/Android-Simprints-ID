@@ -6,17 +6,17 @@ import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.Fing
 import com.simprints.id.data.db.event.remote.models.ApiFingerprintCapturePayload.ApiResult
 
 @Keep
-class ApiFingerprintCapturePayload(val id: String,
-                                   override val relativeStartTime: Long,
-                                   override val version: Int,
-                                   val relativeEndTime: Long,
-                                   val qualityThreshold: Int,
-                                   val finger: ApiFingerIdentifier,
-                                   val result: ApiResult,
-                                   val fingerprint: ApiFingerprint?) : ApiEventPayload(ApiEventPayloadType.FingerprintCapture, version, relativeStartTime) {
+data class ApiFingerprintCapturePayload(val id: String,
+                                        override val relativeStartTime: Long,
+                                        override val version: Int,
+                                        val relativeEndTime: Long,
+                                        val qualityThreshold: Int,
+                                        val finger: ApiFingerIdentifier,
+                                        val result: ApiResult,
+                                        val fingerprint: ApiFingerprint?) : ApiEventPayload(ApiEventPayloadType.FingerprintCapture, version, relativeStartTime) {
 
     @Keep
-    class ApiFingerprint(val finger: ApiFingerIdentifier, val quality: Int, val template: String) {
+    data class ApiFingerprint(val finger: ApiFingerIdentifier, val quality: Int, val template: String) {
 
         constructor(finger: FingerprintCapturePayload.Fingerprint) : this(
             finger.finger.fromDomainToApi(),
