@@ -20,7 +20,7 @@ class FingerSelectionItemAdapter(private val context: Context,
     RecyclerView.Adapter<FingerSelectionItemAdapter.FingerSelectionItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FingerSelectionItemViewHolder =
-        FingerSelectionItemViewHolder(
+        FingerSelectionItemViewHolder(context, viewModel,
             LayoutInflater.from(context)
                 .inflate(R.layout.item_finger_selection, parent, false)
         )
@@ -28,32 +28,36 @@ class FingerSelectionItemAdapter(private val context: Context,
     override fun getItemCount(): Int = viewModel.items.value?.size ?: 0
 
     override fun onBindViewHolder(viewHolder: FingerSelectionItemViewHolder, position: Int) {
-        viewHolder.fingerSpinner.adapter = FingerIdAdapter(context)
-        viewHolder.quantitySpinner.adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, QUANTITY_OPTIONS)
-
-        viewHolder.fingerSpinner.setSelection(orderedFingers().indexOf(viewModel.items.value?.get(position)?.finger))
-        viewHolder.quantitySpinner.setSelection(QUANTITY_OPTIONS.indexOf(viewModel.items.value?.get(position)?.quantity))
-
-        viewHolder.fingerSpinner.onItemSelectedWithPosition { viewModel.changeFingerSelection(position, it) }
-        viewHolder.quantitySpinner.onItemSelectedWithPosition { viewModel.changeQuantitySelection(position, it) }
-
-        if (viewModel.items.value?.get(position)?.removable == true) {
-            viewHolder.deleteButton.setOnClickListener { viewModel.removeItem(position) }
-            viewHolder.deleteButton.visibility = View.VISIBLE
-            viewHolder.fingerSpinner.isEnabled = true
-            viewHolder.fingerSpinner.isClickable = true
-        } else {
-            viewHolder.deleteButton.visibility = View.INVISIBLE
-            viewHolder.fingerSpinner.isEnabled = false
-            viewHolder.fingerSpinner.isClickable = false
-        }
+        viewHolder.bind()
     }
 
-    class FingerSelectionItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val grip: ImageView = view.gripFingerSelectionImageView
-        val fingerSpinner: Spinner = view.fingerSelectionSpinner
-        val quantitySpinner: Spinner = view.fingerQuantitySpinner
-        val deleteButton: ImageView = view.deleteFingerSelectionImageView
+    class FingerSelectionItemViewHolder(val context: Context, val viewModel: FingerSelectionViewModel, view: View) : RecyclerView.ViewHolder(view) {
+        private val grip: ImageView = view.gripFingerSelectionImageView
+        private val fingerSpinner: Spinner = view.fingerSelectionSpinner
+        private val quantitySpinner: Spinner = view.fingerQuantitySpinner
+        private val deleteButton: ImageView = view.deleteFingerSelectionImageView
+
+        fun bind() {
+            fingerSpinner.adapter = FingerIdAdapter(context)
+            quantitySpinner.adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, QUANTITY_OPTIONS)
+
+            fingerSpinner.setSelection(orderedFingers().indexOf(viewModel.items.value?.get(adapterPosition)?.finger))
+            quantitySpinner.setSelection(QUANTITY_OPTIONS.indexOf(viewModel.items.value?.get(adapterPosition)?.quantity))
+
+            fingerSpinner.onItemSelectedWithPosition { viewModel.changeFingerSelection(adapterPosition, it) }
+            quantitySpinner.onItemSelectedWithPosition { viewModel.changeQuantitySelection(adapterPosition, it) }
+
+            if (viewModel.items.value?.get(adapterPosition)?.removable == true) {
+                deleteButton.setOnClickListener { viewModel.removeItem(adapterPosition) }
+                deleteButton.visibility = View.VISIBLE
+                fingerSpinner.isEnabled = true
+                fingerSpinner.isClickable = true
+            } else {
+                deleteButton.visibility = View.INVISIBLE
+                fingerSpinner.isEnabled = false
+                fingerSpinner.isClickable = false
+            }
+        }
     }
 }
 
