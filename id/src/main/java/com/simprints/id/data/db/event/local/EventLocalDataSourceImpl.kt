@@ -48,8 +48,17 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
             withContext(Dispatchers.IO) {
                 with(dbQuery) {
                     roomDao.load(
-                        id, type, projectId, subjectId, attendantId, sessionId, deviceId,
-                        startTime?.first, startTime?.last, endTime?.first, endTime?.last)
+                        id = id,
+                        type = type,
+                        projectId = projectId,
+                        subjectId = subjectId,
+                        attendantId = attendantId,
+                        sessionId = sessionId,
+                        deviceId = deviceId,
+                        createdAtLower = startTime?.first,
+                        createdAtUpper = startTime?.last,
+                        endedAtLower = endTime?.first,
+                        endedAtUpper = endTime?.last)
                         .map { it.fromDbToDomain() }
                         .asFlow()
                 }
@@ -62,8 +71,17 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
             withContext(Dispatchers.IO) {
                 with(dbQuery) {
                     roomDao.count(
-                        id, type, projectId, subjectId, attendantId, sessionId, deviceId,
-                        startTime?.first, startTime?.endInclusive, endTime?.first, endTime?.last)
+                        id = id,
+                        type = type,
+                        projectId = projectId,
+                        subjectId = subjectId,
+                        attendantId = attendantId,
+                        sessionId = sessionId,
+                        deviceId = deviceId,
+                        createdAtLower = startTime?.first,
+                        createdAtUpper = startTime?.endInclusive,
+                        endedAtLower = endTime?.first,
+                        endedAtUpper = endTime?.last)
                 }
             }
         }
@@ -73,8 +91,17 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
             withContext(Dispatchers.IO) {
                 with(dbQuery) {
                     roomDao.delete(
-                        id, type, projectId, subjectId, attendantId, sessionId, deviceId,
-                        startTime?.first, startTime?.endInclusive, endTime?.first, endTime?.last)
+                        id = id,
+                        type = type,
+                        projectId = projectId,
+                        subjectId = subjectId,
+                        attendantId = attendantId,
+                        sessionId = sessionId,
+                        deviceId = deviceId,
+                        createdAtLower = startTime?.first,
+                        createdAtUpper = startTime?.endInclusive,
+                        endedAtLower = endTime?.first,
+                        endedAtUpper = endTime?.last)
                 }
             }
         }
@@ -129,7 +156,7 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
 
     private fun EventLabels.appendProjectIdLabel(): EventLabels {
         var projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-        if (projectId.isNullOrEmpty()) {
+        if (projectId.isEmpty()) {
             projectId = EventRepositoryImpl.PROJECT_ID_FOR_NOT_SIGNED_IN
         }
         return this.copy(projectId = projectId)

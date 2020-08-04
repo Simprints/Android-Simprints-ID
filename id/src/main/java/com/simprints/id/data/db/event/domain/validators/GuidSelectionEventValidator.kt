@@ -11,11 +11,11 @@ class GuidSelectionEventValidator : EventValidator {
         val currentSession = currentEvents.firstOrNull { it.payload.type == SESSION_CAPTURE }
         if (eventToAdd is GuidSelectionEvent) {
 
-            if (currentEvents.count { it.payload.type == GUID_SELECTION } > 1) {
+            if (currentEvents.any { it.payload.type == GUID_SELECTION }) {
                 throw GuidSelectEventValidatorException("GuidSelectionEvent already exist in session ${currentSession?.id}")
             }
 
-            if (currentEvents.count { it.payload.type == CALLBACK_IDENTIFICATION } == 0)
+            if (currentEvents.none { it.payload.type == CALLBACK_IDENTIFICATION })
                 throw GuidSelectEventValidatorException("Identification Callback missing in session ${currentSession?.id}")
         }
     }
