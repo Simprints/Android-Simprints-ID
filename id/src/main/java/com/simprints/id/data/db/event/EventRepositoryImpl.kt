@@ -87,8 +87,8 @@ open class EventRepositoryImpl(
         }
     }
 
-    override suspend fun downloadEvents(): Flow<DownloadEventProgress> =
-        eventRemoteDataSource.getStreaming()
+    override suspend fun downloadEvents(): Flow<DownloadEventProgress> = emptyFlow()
+        //eventRemoteDataSource.getEvents()
 
     override suspend fun uploadEvents(): Flow<OperationEventProgress> = flow {
         val batches = createBatchesWithCloseSessions()

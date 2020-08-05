@@ -2,13 +2,13 @@ package com.simprints.id.data.db.subject
 
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.common.models.SubjectsCount
+import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncProgress
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
 import com.simprints.id.data.db.subjects_sync.up.domain.SubjectsUpSyncProgress
-import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 

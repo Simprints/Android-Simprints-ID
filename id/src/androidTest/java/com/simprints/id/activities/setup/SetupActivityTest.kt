@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
@@ -66,6 +67,8 @@ class SetupActivityTest {
 
     @Test
     fun launchSetupActivityWithLocationPermissions_shouldAddLocationToSession() {
+        coEvery { mockEventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
+
         val request = SetupRequest(listOf(Modality.FINGER, Modality.FACE), listOf(SetupPermission.LOCATION))
         val intent = Intent().apply {
             setClassName(ApplicationProvider.getApplicationContext<android.app.Application>().packageName,
@@ -75,7 +78,8 @@ class SetupActivityTest {
 
         ActivityScenario.launch<SetupActivity>(intent)
 
-        coVerify(exactly = 1) { mockEventRepository.updateCurrentSession(any())}
+        coVerify(exactly = 1) { mockEventRepository.getCurrentCaptureSessionEvent()}
+        coVerify(exactly = 1) { mockEventRepository.addEventToCurrentSession(any())}
     }
 
     private fun buildFakeLocation() = Location(PROVIDER).apply {

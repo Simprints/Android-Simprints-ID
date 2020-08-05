@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.event.remote
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
@@ -11,20 +10,20 @@ import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.db.common.models.EventCount
+import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventType
+import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.remote.models.ApiEventCount
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.EnrolmentRecordCreation
+import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
 import com.simprints.id.data.db.event.remote.models.fromDomainToApi
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.testtools.UnitTestConfig
 import io.kotlintest.shouldThrow
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -33,6 +32,7 @@ import org.junit.runner.RunWith
 typealias CountInvocation<T, V> = suspend (T) -> V
 
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class EventRemoteDataSourceImplTest {
 
     @MockK lateinit var simApiClientFactory: SimApiClientFactory
@@ -47,7 +47,7 @@ class EventRemoteDataSourceImplTest {
         subjectId = GUID1,
         lastEventId = GUID2,
         modes = listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
-        types = listOf(EnrolmentRecordCreation)
+        types = listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove)
     )
 
     @Before
@@ -72,7 +72,7 @@ class EventRemoteDataSourceImplTest {
 
             val count = eventRemoteDataSource.count(query)
 
-            Truth.assertThat(count).isEqualTo(listOf(EventCount(EventType.ENROLMENT_RECORD_CREATION, 1)))
+            assertThat(count).isEqualTo(listOf(EventCount(EventType.ENROLMENT_RECORD_CREATION, 1)))
             coVerify(exactly = 1) {
                 eventRemoteInterface.countEvents(
                     DEFAULT_PROJECT_ID,
@@ -80,7 +80,7 @@ class EventRemoteDataSourceImplTest {
                     DEFAULT_USER_ID, GUID1,
                     listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
                     GUID2,
-                    listOf(EnrolmentRecordCreation.toString())
+                    listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove)
                 )
             }
         }
@@ -98,32 +98,57 @@ class EventRemoteDataSourceImplTest {
     }
 
     @Test
-    fun getStreaming_shouldMakeANetworkRequest() {
+    fun downloadEvents_shouldParseStreamAndEmitBatches() {
         runBlocking {
-            coEvery { eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any(), any()) } returns mockk()
+            val responseStreamWith6Events = this.javaClass.classLoader?.getResourceAsStream("responses/down_sync_7events.json")!!
+            val channel = mockk<ProducerScope<List<Event>>>(relaxed = true)
+            excludeRecords { channel.isClosedForSend }
 
-            eventRemoteDataSource.getStreaming(query)
+            (eventRemoteDataSource as EventRemoteDataSourceImpl).parseStreamAndEmitEvents(responseStreamWith6Events, channel, 2)
 
-            coVerify(exactly = 1) {
-                eventRemoteInterface.downloadEvents(
-                    DEFAULT_PROJECT_ID,
-                    listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
-                    DEFAULT_USER_ID, GUID1,
-                    listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
-                    GUID2,
-                    listOf(EnrolmentRecordCreation.toString())
-                )
+            coVerifySequence {
+                channel.send(match {
+                    it[0].type == ENROLMENT_RECORD_CREATION && it[1].type == ENROLMENT_RECORD_DELETION
+                })
+                channel.send(match {
+                    it[0].type == ENROLMENT_RECORD_MOVE && it[1].type == ENROLMENT_RECORD_CREATION
+                })
+                channel.send(match {
+                    it[0].type == ENROLMENT_RECORD_DELETION && it[1].type == ENROLMENT_RECORD_MOVE
+                })
+                channel.send(match {
+                    it[0].type == ENROLMENT_RECORD_MOVE
+                })
+            }
+
+            coVerify(exactly = 0) { channel.close(any()) }
+        }
+    }
+
+    @Test
+    fun getEvents_shouldThrowAnException() {
+        runBlocking {
+            coEvery { eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any(), any()) } throws Throwable("Request issue")
+
+            shouldThrow<Throwable> {
+                eventRemoteDataSource.getEvents(query, this)
             }
         }
     }
 
     @Test
-    fun getStreamingFails_shouldThrowAnException() {
+    fun getEvents_shouldMakeTheRightRequest() {
         runBlocking {
-            coEvery { eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any(), any()) } throws Throwable("Request issue")
-
             shouldThrow<Throwable> {
-                eventRemoteDataSource.getStreaming(query)
+                eventRemoteDataSource.getEvents(query, this)
+            }
+
+            with(query) {
+                coVerify {
+                    eventRemoteInterface.downloadEvents(
+                        projectId, moduleIds, userId, subjectId, modes, lastEventId, types.map { it.key }
+                    )
+                }
             }
         }
     }
