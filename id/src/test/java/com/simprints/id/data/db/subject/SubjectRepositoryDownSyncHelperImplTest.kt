@@ -5,14 +5,14 @@
 //import com.google.gson.JsonSyntaxException
 //import com.simprints.id.commontesttools.DefaultTestConstants
 //import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
-//import com.simprints.id.data.db.subject.SubjectRepositoryDownSyncHelperImpl.Companion.BATCH_SIZE_FOR_DOWNLOADING
+//import com.simprints.id.data.db.subjects_sync.down.SubjectRepositoryDownSyncHelperImpl.Companion.BATCH_SIZE_FOR_DOWNLOADING
 //import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
 //import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 //import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 //import com.simprints.id.data.db.event.remote.models.ApiEvent
 //import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
-//import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
-//import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationFactoryImpl
+//import com.simprints.id.data.db.subjects_sync.down.domain.EventsDownSyncOperation
+//import com.simprints.id.data.db.subjects_sync.down.domain.EventsDownSyncOperationFactoryImpl
 //import com.simprints.id.domain.modality.Modes
 //import com.simprints.id.testtools.UnitTestConfig
 //import com.simprints.id.tools.TimeHelperImpl
@@ -40,9 +40,9 @@
 //@RunWith(AndroidJUnit4::class)
 //class SubjectRepositoryDownSyncHelperImplTest {
 //
-//    val builder = SubjectsDownSyncOperationFactoryImpl()
+//    val builder = EventsDownSyncOperationFactoryImpl()
 //    private val modes = listOf(Modes.FACE, Modes.FINGERPRINT)
-//    private val projectSyncOp = SubjectsDownSyncOperation(
+//    private val projectSyncOp = EventsDownSyncOperation(
 //        DefaultTestConstants.DEFAULT_PROJECT_ID,
 //        null,
 //        null,
@@ -50,7 +50,7 @@
 //        null
 //    )
 //
-//    private val userSyncOp = SubjectsDownSyncOperation(
+//    private val userSyncOp = EventsDownSyncOperation(
 //        DefaultTestConstants.DEFAULT_PROJECT_ID,
 //        DefaultTestConstants.DEFAULT_USER_ID,
 //        null,
@@ -58,7 +58,7 @@
 //        null
 //    )
 //
-//    private val moduleSyncOp = SubjectsDownSyncOperation(
+//    private val moduleSyncOp = EventsDownSyncOperation(
 //        DefaultTestConstants.DEFAULT_PROJECT_ID,
 //        null,
 //        DefaultTestConstants.DEFAULT_MODULE_ID,
@@ -242,7 +242,7 @@
 //    private fun runDownSyncAndVerifyConditions(nEventsToDownload: Int,
 //                                               nEventsToDelete: Int,
 //                                               nEventsToUpdate: Int,
-//                                               syncOp: SubjectsDownSyncOperation) {
+//                                               syncOp: EventsDownSyncOperation) {
 //
 //        runBlocking {
 //            mockEventRemoteDataSource(nEventsToDownload, nEventsToDelete, nEventsToUpdate)
@@ -342,7 +342,7 @@
 //
 //    private fun calculateCorrectNumberOfBatchesToSave(nEventsToDownload: Int,
 //                                                      nEventsToUpdate: Int,
-//                                                      syncOp: SubjectsDownSyncOperation) =
+//                                                      syncOp: EventsDownSyncOperation) =
 //        when {
 //            /*
 //            The generator generates move events where it is a deletion for current attendantId and current moduleId to a

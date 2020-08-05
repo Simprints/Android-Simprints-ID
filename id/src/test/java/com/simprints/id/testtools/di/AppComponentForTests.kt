@@ -11,8 +11,8 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.*
 import com.simprints.id.secure.ProjectSecretManagerTest
-import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncWorkerTest
-import com.simprints.id.services.scheduledSync.subjects.down.workers.SubjectsDownSyncCountWorkerTest
+import com.simprints.id.services.sync.imageUpSync.ImageUpSyncWorkerTest
+import com.simprints.id.services.sync.subjects.down.workers.SubjectsDownSyncCountWorkerTest
 import dagger.BindsInstance
 import dagger.Component
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -8,8 +8,8 @@ import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.SubjectRepositoryDownSyncHelper
-import com.simprints.id.data.db.subject.SubjectRepositoryUpSyncHelper
+import com.simprints.id.data.db.subjects_sync.down.SubjectRepositoryDownSyncHelper
+import com.simprints.id.data.db.subjects_sync.up.SubjectRepositoryUpSyncHelper
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
@@ -21,8 +21,8 @@ import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
-import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
+import com.simprints.id.services.sync.subjects.master.internal.SubjectsSyncCache
+import com.simprints.id.services.sync.subjects.up.controllers.SubjectsUpSyncExecutor
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
 import kotlinx.coroutines.FlowPreview
@@ -101,12 +101,12 @@ class TestDataModule(
 
 
     override fun providePersonRepository(
-            subjectLocalDataSource: SubjectLocalDataSource,
-            eventRemoteDataSource: EventRemoteDataSource,
-            subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
-            subjectsUpSyncExecutor: SubjectsUpSyncExecutor,
-            subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
-            subjectRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper
+        subjectLocalDataSource: SubjectLocalDataSource,
+        eventRemoteDataSource: EventRemoteDataSource,
+        subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
+        subjectsUpSyncExecutor: SubjectsUpSyncExecutor,
+        subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
+        subjectRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper
     ): SubjectRepository = personRepositoryRule.resolveDependency {
         super.providePersonRepository(
             subjectLocalDataSource,

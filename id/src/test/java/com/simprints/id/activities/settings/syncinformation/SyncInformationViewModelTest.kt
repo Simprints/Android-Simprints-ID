@@ -10,7 +10,7 @@ import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*

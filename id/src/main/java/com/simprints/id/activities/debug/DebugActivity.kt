@@ -13,13 +13,13 @@ import androidx.work.WorkManager
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.db.subjects_sync.down.local.SubjectsDownSyncOperationLocalDataSource
+import com.simprints.id.data.db.subjects_sync.down.local.EventsDownSyncOperationLocalDataSource
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState.*
+import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncWorkerState
+import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncWorkerState.*
 import kotlinx.android.synthetic.main.activity_debug.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,7 +28,7 @@ import javax.inject.Inject
 class DebugActivity : BaseSplitActivity() {
 
     @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
-    @Inject lateinit var subjectsDownSyncOperationLocalDataSource: SubjectsDownSyncOperationLocalDataSource
+    @Inject lateinit var EventsDownSyncOperationLocalDataSource: EventsDownSyncOperationLocalDataSource
     @Inject lateinit var securityStateRepository: SecurityStateRepository
     @Inject lateinit var securityStateProcessor: SecurityStateProcessor
 
@@ -72,7 +72,7 @@ class DebugActivity : BaseSplitActivity() {
             subjectsSyncManager.stop()
             wm.pruneWork()
 
-            subjectsDownSyncOperationLocalDataSource.deleteAll()
+            EventsDownSyncOperationLocalDataSource.deleteAll()
         }
 
         securityStateCompromised.setOnClickListener {

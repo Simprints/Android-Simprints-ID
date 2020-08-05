@@ -20,7 +20,7 @@ import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.network.NetworkConstants
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
 open class SettingsPreferencesManagerImpl(

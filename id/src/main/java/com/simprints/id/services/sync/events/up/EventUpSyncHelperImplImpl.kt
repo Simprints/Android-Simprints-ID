@@ -1,0 +1,164 @@
+package com.simprints.id.services.sync.events.up
+
+import com.simprints.core.tools.EncodingUtils
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.subject.*
+import com.simprints.id.data.db.subject.domain.FaceSample
+import com.simprints.id.data.db.subject.domain.FingerprintSample
+import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.event.remote.EventRemoteDataSource
+import com.simprints.id.data.db.events_sync.up.SubjectsUpSyncScopeRepository
+import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation
+import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperationResult
+import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperationResult.UpSyncState
+import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperationResult.UpSyncState.RUNNING
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.domain.modality.Modality
+import com.simprints.id.domain.modality.toMode
+import com.simprints.id.tools.extensions.bufferedChunks
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.flow.collect
+import timber.log.Timber
+import java.util.*
+
+class EventUpSyncHelperImplImpl(
+    private val loginInfoManager: LoginInfoManager,
+    private val subjectLocalDataSource: SubjectLocalDataSource,
+    private val eventRemoteDataSource: EventRemoteDataSource,
+    private val subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
+    private val modalities: List<Modality>
+) : EventUpSyncHelperImpl {
+
+    internal val batchSize by lazy { UPSYNC_BATCH_SIZE }
+
+    @ExperimentalCoroutinesApi
+    override suspend fun executeUploadWithProgress(scope: CoroutineScope) = scope.produce {
+        val projectId = getProjectIdForSignedInUserOrThrow()
+        try {
+            subjectLocalDataSource.load(SubjectLocalDataSource.Query(toSync = true))
+                .bufferedChunks(batchSize)
+                .collect {
+                    upSyncBatch(it, projectId)
+                    this.send(SubjectsUpSyncProgress(it.size))
+                }
+
+        } catch (t: Throwable) {
+            Timber.d("PersonRepository : failed uploading people")
+            Timber.d(t)
+            updateState(UpSyncState.FAILED, projectId)
+            throw t
+        }
+
+        updateState(UpSyncState.COMPLETE, projectId)
+    }
+
+    private suspend fun upSyncBatch(subjects: List<Subject>, projectId: String) {
+        uploadPeople(subjects, projectId)
+        markPeopleAsSynced(subjects)
+        updateState(RUNNING, projectId)
+    }
+
+    private suspend fun uploadPeople(subjects: List<Subject>, projectId: String) {
+        if (subjects.isNotEmpty()) {
+            Timber.d("PersonRepository : uploading ${subjects.size} people")
+            eventRemoteDataSource.post(projectId, createEvents(subjects))
+            Timber.d("Uploaded a batch of ${subjects.size} people")
+        }
+    }
+
+    internal fun createEvents(subjects: List<Subject>) =
+        subjects.map { createEventFromPerson(it) }
+
+    private fun createEventFromPerson(subject: Subject): Event =
+        with(subject) {
+            EnrolmentRecordCreationEvent(
+                0, //STOPSHIP
+                subjectId,
+                projectId,
+                moduleId,
+                attendantId,
+                modalities.map { it.toMode() },
+                buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples)
+            )
+        }
+
+    internal fun getRandomUuid() = UUID.randomUUID().toString()
+
+
+    private fun buildBiometricReferences(fingerprintSamples: List<FingerprintSample>,
+                                         faceSamples: List<FaceSample>): List<BiometricReference> {
+        val biometricReferences = mutableListOf<BiometricReference>()
+
+        buildFingerprintReference(fingerprintSamples)?.let {
+            biometricReferences.add(it)
+        }
+
+        buildFaceReference(faceSamples)?.let {
+            biometricReferences.add(it)
+        }
+
+        return biometricReferences
+    }
+
+    private fun buildFingerprintReference(fingerprintSamples: List<FingerprintSample>) =
+        if (fingerprintSamples.isNotEmpty()) {
+            FingerprintReference(
+                fingerprintSamples.map {
+                    FingerprintTemplate(it.templateQualityScore,
+                        EncodingUtils.byteArrayToBase64(it.template),
+                        it.fingerIdentifier.fromSubjectToEvent())
+                }
+            )
+        } else {
+            null
+        }
+
+    private fun buildFaceReference(faceSamples: List<FaceSample>) =
+        if (faceSamples.isNotEmpty()) {
+            FaceReference(
+                faceSamples.map {
+                    FaceTemplate(
+                        EncodingUtils.byteArrayToBase64(it.template)
+                    )
+                }
+            )
+        } else {
+            null
+        }
+
+    private suspend fun markPeopleAsSynced(subjects: List<Subject>) {
+        val updatedPeople = subjects.map { it.copy(toSync = false) }
+        subjectLocalDataSource.insertOrUpdate(updatedPeople)
+        Timber.d("Marked a batch of ${subjects.size} people as synced")
+    }
+
+    private suspend fun updateLastUpSyncTime(eventUpSyncOperation: EventUpSyncOperation) {
+        subjectsUpSyncScopeRepository.insertOrUpdate(eventUpSyncOperation)
+    }
+
+    private suspend fun updateState(state: UpSyncState, projectId: String) {
+        Timber.d("Updating sync state: $state")
+        updateLastUpSyncTime(EventUpSyncOperation(
+            projectId,
+            EventUpSyncOperationResult(
+                state,
+                Date().time
+            )
+        ))
+    }
+
+    private fun getProjectIdForSignedInUserOrThrow(): String {
+        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        if (projectId.isEmpty()) {
+            throw IllegalStateException("People can only be uploaded when signed in")
+        }
+        return projectId
+    }
+
+    companion object {
+        private const val UPSYNC_BATCH_SIZE = 80
+    }
+}

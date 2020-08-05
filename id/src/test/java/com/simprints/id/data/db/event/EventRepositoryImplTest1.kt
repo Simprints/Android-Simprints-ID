@@ -32,7 +32,7 @@ import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.services.sync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

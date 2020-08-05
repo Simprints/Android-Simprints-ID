@@ -19,7 +19,11 @@ import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
+import com.simprints.id.data.db.subjects_sync.down.SubjectRepositoryDownSyncHelper
+import com.simprints.id.data.db.subjects_sync.down.SubjectRepositoryDownSyncHelperImpl
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.db.subjects_sync.up.SubjectRepositoryUpSyncHelper
+import com.simprints.id.data.db.subjects_sync.up.SubjectRepositoryUpSyncHelperImpl
 import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.images.repository.ImageRepositoryImpl
@@ -28,8 +32,8 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
-import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
+import com.simprints.id.services.sync.subjects.master.internal.SubjectsSyncCache
+import com.simprints.id.services.sync.subjects.up.controllers.SubjectsUpSyncExecutor
 import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
@@ -75,12 +79,12 @@ open class DataModule {
 
     @Provides
     open fun providePersonRepositoryUpSyncHelper(
-            loginInfoManager: LoginInfoManager,
-            subjectLocalDataSource: SubjectLocalDataSource,
-            eventRemoteDataSource: EventRemoteDataSource,
-            subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
-            preferencesManager: PreferencesManager,
-            subjectsSyncCache: SubjectsSyncCache): SubjectRepositoryUpSyncHelper =
+        loginInfoManager: LoginInfoManager,
+        subjectLocalDataSource: SubjectLocalDataSource,
+        eventRemoteDataSource: EventRemoteDataSource,
+        subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
+        preferencesManager: PreferencesManager,
+        subjectsSyncCache: SubjectsSyncCache): SubjectRepositoryUpSyncHelper =
         SubjectRepositoryUpSyncHelperImpl(loginInfoManager, subjectLocalDataSource, eventRemoteDataSource,
             subjectsUpSyncScopeRepository, preferencesManager.modalities)
 
@@ -93,19 +97,13 @@ open class DataModule {
 
     @Provides
     open fun providePersonRepository(
-            subjectLocalDataSource: SubjectLocalDataSource,
-            eventRemoteDataSource: EventRemoteDataSource,
-            subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
-            subjectsUpSyncExecutor: SubjectsUpSyncExecutor,
-            subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
-            subjectRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper
+        subjectLocalDataSource: SubjectLocalDataSource,
+        eventRemoteDataSource: EventRemoteDataSource,
+        subjectsUpSyncExecutor: SubjectsUpSyncExecutor
     ): SubjectRepository = SubjectRepositoryImpl(
         eventRemoteDataSource,
         subjectLocalDataSource,
-        subjectsDownSyncScopeRepository,
-        subjectsUpSyncExecutor,
-        subjectRepositoryUpSyncHelper,
-        subjectRepositoryDownSyncHelper
+        subjectsUpSyncExecutor
     )
 
     @Provides

@@ -13,9 +13,9 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
-import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.SyncManager
+import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
 import kotlinx.coroutines.runBlocking

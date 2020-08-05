@@ -6,22 +6,22 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
-import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationFactory
-import com.simprints.id.data.db.subjects_sync.down.local.SubjectsDownSyncOperationLocalDataSource
+import com.simprints.id.data.db.subjects_sync.down.domain.EventsDownSyncOperationFactory
+import com.simprints.id.data.db.subjects_sync.down.local.EventsDownSyncOperationLocalDataSource
 import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.up.local.SubjectsUpSyncOperationLocalDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.SyncModule
-import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.down.controllers.SubjectsDownSyncWorkersBuilder
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncStateProcessor
-import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
-import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
-import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncWorkersBuilder
+import com.simprints.id.services.sync.SyncManager
+import com.simprints.id.services.sync.imageUpSync.ImageUpSyncScheduler
+import com.simprints.id.services.sync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.services.sync.subjects.down.controllers.SubjectsDownSyncWorkersBuilder
+import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.sync.subjects.master.SubjectsSyncStateProcessor
+import com.simprints.id.services.sync.subjects.master.internal.SubjectsSyncCache
+import com.simprints.id.services.sync.subjects.up.controllers.SubjectsUpSyncExecutor
+import com.simprints.id.services.sync.subjects.up.controllers.SubjectsUpSyncWorkersBuilder
 import com.simprints.testtools.common.di.DependencyRule
 import javax.inject.Singleton
 
@@ -44,13 +44,13 @@ class TestSyncModule(
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
         syncStatusDatabase: SubjectsSyncStatusDatabase,
-        subjectsDownSyncOperationFactory: SubjectsDownSyncOperationFactory
+        EventsDownSyncOperationFactory: EventsDownSyncOperationFactory
     ): SubjectsDownSyncScopeRepository = peopleDownSyncScopeRepositoryRule.resolveDependency {
         super.provideDownSyncScopeRepository(
             loginInfoManager,
             preferencesManager,
             syncStatusDatabase,
-            subjectsDownSyncOperationFactory)
+            EventsDownSyncOperationFactory)
     }
 
     @Singleton
@@ -111,7 +111,7 @@ class TestSyncModule(
     @Singleton
     override fun providePeopleDownSyncDao(
         database: SubjectsSyncStatusDatabase
-    ): SubjectsDownSyncOperationLocalDataSource = peopleDownSyncDaoRule.resolveDependency {
+    ): EventsDownSyncOperationLocalDataSource = peopleDownSyncDaoRule.resolveDependency {
         super.providePeopleDownSyncDao(database)
     }
 

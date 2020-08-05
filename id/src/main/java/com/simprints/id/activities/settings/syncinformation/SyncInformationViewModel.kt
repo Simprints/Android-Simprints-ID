@@ -8,8 +8,8 @@ import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeReposito
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.ON
+import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
+import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting.ON
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch

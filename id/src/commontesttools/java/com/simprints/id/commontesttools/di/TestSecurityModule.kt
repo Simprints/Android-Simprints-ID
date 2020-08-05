@@ -22,8 +22,8 @@ import com.simprints.id.secure.*
 import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
-import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.sync.SyncManager
+import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
