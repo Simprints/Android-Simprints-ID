@@ -67,12 +67,11 @@ class FaceCaptureActivity : FaceActivity() {
     }
 
     enum class BackButtonContext {
-        CAPTURE, CONFIRMATION, RETRY;
+        CAPTURE, RETRY;
 
         companion object {
             fun fromFragmentId(fragmentId: Int?): BackButtonContext? = when (fragmentId) {
                 R.id.preparationFragment, R.id.liveFeedbackFragment -> CAPTURE
-                R.id.confirmationFragment -> CONFIRMATION
                 R.id.retryFragment -> RETRY
                 else -> null
             }
