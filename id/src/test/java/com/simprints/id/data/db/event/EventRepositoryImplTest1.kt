@@ -19,6 +19,7 @@ import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabels
+import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
@@ -38,7 +39,9 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -78,7 +81,7 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun createSession_shouldCloseOpenSessions() {
+    fun createSession_shouldCloseOpenSessionEvents() {
         runBlocking {
             val oldOpenSession = createSessionCaptureEvent(randomUUID()).openSession()
             coEvery { eventLocalDataSource.count(any()) } returns 1
@@ -101,7 +104,7 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun createSession_shouldAddANewSession() {
+    fun createSession_shouldAddANewSessionEvent() {
         runBlocking {
             coEvery { eventLocalDataSource.count(any()) } returns 1
             coEvery { eventLocalDataSource.load(any()) } returns flowOf()
@@ -110,7 +113,7 @@ class EventRepositoryImplTest {
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(match {
-                    assertThatEventIsAboutANewSession(it)
+                    assertANewSessionCaptureWasAdded(it)
                 })
             }
         }
@@ -132,28 +135,100 @@ class EventRepositoryImplTest {
     }
 
     @Test
+    fun addEventToCurrentSession_shouldAddEventRelatedToCurrentSessionIntoDb() {
+        runBlocking {
+            coEvery { eventLocalDataSource.load(any()) } returns flowOf(createSessionCaptureEvent(GUID1))
+            val newEvent = createAlertScreenEvent()
+
+            eventRepo.addEventToCurrentSession(newEvent)
+
+            coVerify { eventLocalDataSource.load(DbEventQuery(id = GUID1)) }
+            coVerify {
+                eventLocalDataSource.insertOrUpdate(newEvent.copy(labels = EventLabels(sessionId = GUID1, deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID)))
+            }
+        }
+    }
+
+    @Test
     fun upload_shouldCreateTheRightBatches() {
         runBlocking {
-            val smallSession = createSessionCaptureEvent(GUID1)
-            val mediumSession = createSessionCaptureEvent(GUID2)
-            val bigSession = createSessionCaptureEvent(GUID3)
-
-            coEvery { eventLocalDataSource.load(any()) } returns flowOf(smallSession, mediumSession, bigSession)
-            coEvery { eventLocalDataSource.count(DbEventQuery(sessionId = GUID1)) } returns SESSION_BATCH_SIZE / 2
-            coEvery { eventLocalDataSource.count(DbEventQuery(sessionId = GUID2)) } returns SESSION_BATCH_SIZE / 2 - 1
-            coEvery { eventLocalDataSource.count(DbEventQuery(sessionId = GUID3)) } returns SESSION_BATCH_SIZE
-
+            createMultipleBatches()
 
             val bathes = (eventRepo as EventRepositoryImpl).createBatchesWithCloseSessions()
 
             assertThat(bathes).containsExactly(
-                Batch(listOf(GUID1, GUID2).toMutableList(), SESSION_BATCH_SIZE - 1),
+                Batch(listOf(GUID1, GUID2).toMutableList(), SESSION_BATCH_SIZE),
                 Batch(listOf(GUID3).toMutableList(), SESSION_BATCH_SIZE)
             )
         }
     }
 
-    private fun assertThatEventIsAboutANewSession(event: Event): Boolean =
+    @Test
+    fun upload_shouldLoadTheRightEventsForBatches() {
+        runBlocking {
+            createMultipleBatches()
+
+            eventRepo.uploadEvents().toList()
+
+            coVerify { eventLocalDataSource.load(DbEventQuery(sessionId = GUID1)) }
+            coVerify { eventLocalDataSource.load(DbEventQuery(sessionId = GUID2)) }
+            coVerify { eventLocalDataSource.load(DbEventQuery(sessionId = GUID3)) }
+        }
+    }
+
+    @Test
+    fun uploadSucceeds_shouldDeleteEvents() {
+        runBlocking {
+            val events = createMultipleBatches()
+
+            eventRepo.uploadEvents().toList()
+
+            events.forEach {
+                coVerify {
+                    eventLocalDataSource.delete(DbEventQuery(id = it.id))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun upload_shouldEmitProgress() {
+        runBlocking {
+            createMultipleBatches()
+
+            val progress = eventRepo.uploadEvents().toList()
+
+            assertThat(progress[0]).isEqualTo(OperationEventProgress(SESSION_BATCH_SIZE, 2 * SESSION_BATCH_SIZE))
+            assertThat(progress[1]).isEqualTo(OperationEventProgress(2 * SESSION_BATCH_SIZE, 2 * SESSION_BATCH_SIZE))
+        }
+    }
+
+    private suspend fun createMultipleBatches(): List<Event> {
+        val smallSession1Events = mockSessionWithEvent(GUID1, SESSION_BATCH_SIZE / 2 - 1)
+        val smallSession2Events = mockSessionWithEvent(GUID2, SESSION_BATCH_SIZE / 2 - 1)
+        val bigSessionEvents = mockSessionWithEvent(GUID3, SESSION_BATCH_SIZE - 1)
+        val events = smallSession1Events + smallSession2Events + bigSessionEvents
+
+        coEvery {
+            eventLocalDataSource.load(DbEventQuery(projectId = DEFAULT_PROJECT_ID, type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE)))
+        } returns events.filterIsInstance<SessionCaptureEvent>().asFlow()
+
+        return events
+    }
+
+    private fun mockSessionWithEvent(sessionId: String, nEvents: Int): List<Event> {
+        val events = mutableListOf<Event>()
+        events.add(createSessionCaptureEvent(sessionId))
+        repeat(nEvents) {
+            events.add(createAlertScreenEvent().copy(labels = EventLabels(sessionId = GUID1)))
+        }
+
+        coEvery { eventLocalDataSource.load(DbEventQuery(sessionId = sessionId)) } returns events.asFlow()
+        coEvery { eventLocalDataSource.count(DbEventQuery(sessionId = sessionId)) } returns nEvents + 1
+        return events
+    }
+
+    private fun assertANewSessionCaptureWasAdded(event: Event): Boolean =
         event is SessionCaptureEvent &&
             event.payload.projectId == PROJECT_ID_FOR_NOT_SIGNED_IN &&
             event.payload.createdAt == NOW &&

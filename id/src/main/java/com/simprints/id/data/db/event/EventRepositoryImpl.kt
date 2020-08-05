@@ -41,6 +41,10 @@ open class EventRepositoryImpl(
         const val SESSION_BATCH_SIZE = 20
     }
 
+    private val signedInProject: String
+        get() = loginInfoManager.getSignedInProjectIdOrEmpty()
+
+
     override suspend fun createSession(libSimprintsVersionName: String) {
         reportExceptionIfNeeded {
             val count = eventLocalDataSource.count()
@@ -84,18 +88,19 @@ open class EventRepositoryImpl(
     }
 
     override suspend fun downloadEvents(): Flow<DownloadEventProgress> =
-        emptyFlow()
+        eventRemoteDataSource.getStreaming()
 
     override suspend fun uploadEvents(): Flow<OperationEventProgress> = flow {
         val batches = createBatchesWithCloseSessions()
         var currentProgress = OperationEventProgress(0, batches.sumBy { it.count })
 
         batches.forEach { batch ->
-            val events: List<Event> = batch.sessionIds.fold(mutableListOf()) { acc, sessionId ->
-                acc.addAll(eventLocalDataSource.load(DbEventQuery(sessionId = sessionId)).toList())
-                acc
-            }
+            val events = batch.sessionIds.map {
+                eventLocalDataSource.load(DbEventQuery(sessionId = it)).toList()
+            }.flatten()
+
             eventRemoteDataSource.post(loginInfoManager.getSignedInProjectIdOrEmpty(), events)
+
             events.forEach {
                 eventLocalDataSource.delete(DbEventQuery(id = it.id))
             }
@@ -107,19 +112,18 @@ open class EventRepositoryImpl(
 
     @VisibleForTesting
     suspend fun createBatchesWithCloseSessions(): List<Batch> {
-        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
         val sessionsAndCounts =
-            eventLocalDataSource.load(DbEventQuery(projectId = projectId, type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE))).map {
+            loadCloseSessions().map {
                 it.id to eventLocalDataSource.count(DbEventQuery(sessionId = it.id))
             }
 
         return sessionsAndCounts.toList().fold(mutableListOf()) { batches, sessionAndCount ->
             val lastBatch = batches.lastOrNull()
-            val lastBatchEventsCount = lastBatch?.sessionIds?.size ?: 0
+            val eventsCountInTheLastBatch = lastBatch?.sessionIds?.size ?: 0
             val sessionIdToAdd = sessionAndCount.first
             val eventsCountToAdd = sessionAndCount.second
 
-            val hasLastBatchStillRoom = lastBatchEventsCount + eventsCountToAdd <= SESSION_BATCH_SIZE
+            val hasLastBatchStillRoom = eventsCountInTheLastBatch + eventsCountToAdd <= SESSION_BATCH_SIZE
             if (hasLastBatchStillRoom && lastBatch != null) {
                 lastBatch.sessionIds.add(sessionAndCount.first)
                 lastBatch.count += eventsCountToAdd
@@ -132,7 +136,7 @@ open class EventRepositoryImpl(
 
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent =
         reportExceptionIfNeeded {
-            eventLocalDataSource.load(DbEventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).first() as SessionCaptureEvent
+            loadOpenSessions().first()
         }
 
 
@@ -142,7 +146,7 @@ open class EventRepositoryImpl(
         }
 
     private suspend fun closeAnyOpenSession() {
-        val openSessions = eventLocalDataSource.load(DbEventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).map { it as SessionCaptureEvent }
+        val openSessions = loadOpenSessions()
 
         openSessions.collect { session ->
             val artificialTerminationEvent = ArtificialTerminationEvent(
@@ -164,18 +168,33 @@ open class EventRepositoryImpl(
         sessionEventsSyncManager.cancelSyncWorkers()
     }
 
+    private suspend fun loadOpenSessions() =
+        eventLocalDataSource.load(getDbQueryForCloseSession(signedInProject)).map { it as SessionCaptureEvent }
+
+    private suspend fun loadCloseSessions() =
+        eventLocalDataSource.load(getDbQueryForCloseSession(signedInProject)).map { it as SessionCaptureEvent }
+
+    private fun getDbQueryForOpenSession(projectId: String) =
+        DbEventQuery(projectId = projectId, type = SESSION_CAPTURE, endTime = LongRange(0, 0))
+
+    private fun getDbQueryForCloseSession(projectId: String) =
+        DbEventQuery(projectId = projectId, type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE))
+
     private fun EventLabels.appendLabelsForAllEvents() =
         this.appendProjectIdLabel().appendDeviceIdLabel()
 
     private fun EventLabels.appendProjectIdLabel(): EventLabels {
-        var projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-        if (projectId.isEmpty()) {
-            projectId = PROJECT_ID_FOR_NOT_SIGNED_IN
+        val projectId = if (signedInProject.isEmpty()) {
+            PROJECT_ID_FOR_NOT_SIGNED_IN
+        } else {
+            signedInProject
         }
+
         return this.copy(projectId = projectId)
     }
 
     private fun EventLabels.appendDeviceIdLabel(): EventLabels = this.copy(deviceId = this@EventRepositoryImpl.deviceId)
+
     private fun EventLabels.appendSessionId(sessionId: String): EventLabels = this.copy(sessionId = sessionId)
 
     private suspend fun <T> reportExceptionIfNeeded(block: suspend () -> T): T =
