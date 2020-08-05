@@ -15,15 +15,20 @@ import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.models.DbEventQuery
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
+import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncQuery
+import com.simprints.id.data.db.events_sync.down.domain.fromDomainToApi
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.toMode
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.services.sync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.ignoreException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
 
-// Class to manage the current activeSession
+@OptIn(ExperimentalCoroutinesApi::class)
 open class EventRepositoryImpl(
     private val deviceId: String,
     private val appVersionName: String,
@@ -87,12 +92,12 @@ open class EventRepositoryImpl(
         }
     }
 
-    override suspend fun downloadEvents(): Flow<DownloadEventProgress> = emptyFlow()
-        //eventRemoteDataSource.getEvents()
+    override suspend fun downloadEvents(scope: CoroutineScope, query: EventDownSyncQuery): ReceiveChannel<List<Event>> =
+        eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
 
-    override suspend fun uploadEvents(): Flow<OperationEventProgress> = flow {
+
+    override suspend fun uploadEvents(): Flow<List<Event>> = flow {
         val batches = createBatchesWithCloseSessions()
-        var currentProgress = OperationEventProgress(0, batches.sumBy { it.count })
 
         batches.forEach { batch ->
             val events = batch.sessionIds.map {
@@ -105,8 +110,7 @@ open class EventRepositoryImpl(
                 eventLocalDataSource.delete(DbEventQuery(id = it.id))
             }
 
-            currentProgress = currentProgress.copy(progress = currentProgress.progress + events.size)
-            this.emit(currentProgress)
+            this.emit(events)
         }
     }
 

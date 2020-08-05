@@ -16,11 +16,11 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.ON
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
+import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
+import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting.ON
+import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncState
+import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncWorkerState
 import kotlinx.android.synthetic.main.activity_sync_information.*
 import javax.inject.Inject
 

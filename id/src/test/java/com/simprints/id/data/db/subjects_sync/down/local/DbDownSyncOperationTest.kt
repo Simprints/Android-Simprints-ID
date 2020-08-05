@@ -5,25 +5,25 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODES
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationResult.DownSyncState.COMPLETE
-import com.simprints.id.data.db.subjects_sync.down.local.DbSubjectsDownSyncOperation.Converters.Companion.MODES_STRING_SEPARATOR
+import com.simprints.id.data.db.subjects_sync.down.domain.EventsDownSyncOperationResult.DownSyncState.COMPLETE
+import com.simprints.id.data.db.subjects_sync.down.local.DbEventsDownSyncOperation.Converters.Companion.MODES_STRING_SEPARATOR
 import org.junit.Test
 
-class DbSubjectsDownSyncOperationTest {
+class DbEventDownSyncScopeRepoTest {
 
     companion object {
         const val LAST_EVENT_ID = "lastEventId"
         const val LAST_SYNC_TIME = 2L
     }
 
-    private val converter = DbSubjectsDownSyncOperation.Converters()
-    private val subjectsDownSyncOperationKey = DbSubjectsDownSyncOperationKey(DEFAULT_PROJECT_ID, DEFAULT_MODES, DEFAULT_USER_ID, DEFAULT_MODULE_ID)
-    private val subjectsDownSyncOperationKeyAsString = "$DEFAULT_PROJECT_ID||$DEFAULT_USER_ID||$DEFAULT_MODULE_ID||${DEFAULT_MODES.joinToString("||")}"
+    private val converter = DbEventsDownSyncOperation.Converters()
+    private val EventsDownSyncOperationKey = DbEventsDownSyncOperationKey(DEFAULT_PROJECT_ID, DEFAULT_MODES, DEFAULT_USER_ID, DEFAULT_MODULE_ID)
+    private val EventsDownSyncOperationKeyAsString = "$DEFAULT_PROJECT_ID||$DEFAULT_USER_ID||$DEFAULT_MODULE_ID||${DEFAULT_MODES.joinToString("||")}"
 
     @Test
     fun testOpFromDomainToDb() {
-        val dbKey = DbSubjectsDownSyncOperationKey(DEFAULT_PROJECT_ID, DEFAULT_MODES, DEFAULT_USER_ID, DEFAULT_MODULE_ID)
-        val dbOp = DbSubjectsDownSyncOperation(
+        val dbKey = DbEventsDownSyncOperationKey(DEFAULT_PROJECT_ID, DEFAULT_MODES, DEFAULT_USER_ID, DEFAULT_MODULE_ID)
+        val dbOp = DbEventsDownSyncOperation(
             dbKey, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_MODES,
             COMPLETE,
             LAST_EVENT_ID,
@@ -66,20 +66,20 @@ class DbSubjectsDownSyncOperationTest {
     }
 
     @Test
-    fun testConverterStringToDbSubjectsDownSyncOperationKey() {
-        val downSyncOpKeyString = converter.fromDbSubjectsDownSyncOperationKeyToString(subjectsDownSyncOperationKey)
-        assertThat(downSyncOpKeyString).isEqualTo(subjectsDownSyncOperationKey.key)
+    fun testConverterStringToDbEventsDownSyncOperationKey() {
+        val downSyncOpKeyString = converter.fromDbEventsDownSyncOperationKeyToString(EventsDownSyncOperationKey)
+        assertThat(downSyncOpKeyString).isEqualTo(EventsDownSyncOperationKey.key)
     }
 
     @Test
-    fun testConverterDbSubjectsDownSyncOperationKeyToString() {
-        val downSyncOpKey = converter.fromStringToDbSubjectsDownSyncOperationKey(subjectsDownSyncOperationKeyAsString)
-        assertThat(downSyncOpKey).isEqualTo(subjectsDownSyncOperationKey)
+    fun testConverterDbEventsDownSyncOperationKeyToString() {
+        val downSyncOpKey = converter.fromStringToDbEventsDownSyncOperationKey(EventsDownSyncOperationKeyAsString)
+        assertThat(downSyncOpKey).isEqualTo(EventsDownSyncOperationKey)
     }
 
 
     @Test
-    fun testDbSubjectsDownSyncOperationKey() {
-        assertThat(subjectsDownSyncOperationKey.key).isEqualTo(subjectsDownSyncOperationKeyAsString)
+    fun testDbEventsDownSyncOperationKey() {
+        assertThat(EventsDownSyncOperationKey.key).isEqualTo(EventsDownSyncOperationKeyAsString)
     }
 }

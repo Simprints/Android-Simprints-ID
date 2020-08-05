@@ -31,8 +31,8 @@ import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourc
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourceImpl
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepositoryImpl
-import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.sync.SyncManager
+import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.tools.TimeHelper
