@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
@@ -13,23 +12,10 @@ import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.events.CREATED_AT_RANGE
 import com.simprints.id.commontesttools.events.ENDED_AT_RANGE
-import com.simprints.id.commontesttools.events.createAlertScreenEvent
-import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
-import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
-import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.domain.models.EventType.ARTIFICIAL_TERMINATION
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.domain.validators.EventValidator
 import com.simprints.id.data.db.event.local.models.DbEventQuery
-import com.simprints.id.data.db.event.local.models.fromDbToDomain
-import com.simprints.id.data.db.event.local.models.fromDomainToDb
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.tools.TimeHelper
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -44,78 +30,27 @@ class EventLocalDataSourceImplTest {
     private lateinit var eventDao: EventRoomDao
     private lateinit var eventLocalDataSource: EventLocalDataSource
 
-    @RelaxedMockK lateinit var timeHelper: TimeHelper
     @RelaxedMockK lateinit var eventDatabaseFactory: EventDatabaseFactory
-    @RelaxedMockK lateinit var loginInfoManager: LoginInfoManager
-    lateinit var validators: Array<EventValidator>
 
     @Before
     fun setup() {
         MockKAnnotations.init(this)
 
         val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(context, EventRoomDatabase::class.java).build()
-        validators = arrayOf(mockk(), mockk())
+        db = Room.inMemoryDatabaseBuilder(context, EventRoomDatabase::class.java).allowMainThreadQueries().build()
 
         eventDao = db.eventDao
         every { eventDatabaseFactory.build() } returns db
-        every { timeHelper.now() } returns NOW
-        eventLocalDataSource = EventLocalDataSourceImpl(eventDatabaseFactory, loginInfoManager, DEVICE_ID, timeHelper, validators)
-    }
-
-    @Test
-    fun createSession_shouldCloseOpenSessions() {
-        runBlocking {
-            val oldOpenSession = createSessionCaptureEvent(randomUUID()).openSession()
-            val newSession = createSessionCaptureEvent(randomUUID()).openSession()
-            eventDao.insertOrUpdate(oldOpenSession.fromDomainToDb())
-
-            eventLocalDataSource.create(newSession)
-
-            val storedSessionClose = eventDao.load(id = oldOpenSession.id).firstOrNull()?.fromDbToDomain()
-            val storedSessionOpen = eventDao.load(id = newSession.id).firstOrNull()?.fromDbToDomain()
-
-            assertThat(storedSessionClose?.payload?.endedAt).isEqualTo(NOW)
-            assertThat(storedSessionOpen?.payload?.endedAt).isEqualTo(0)
-        }
-    }
-
-    @Test
-    fun createSession_shouldAddArtificialTerminationEventToThePreviousOne() {
-        runBlocking {
-            val oldOpenSession = createSessionCaptureEvent().openSession()
-            val newSession = createSessionCaptureEvent().openSession()
-            eventDao.insertOrUpdate(oldOpenSession.fromDomainToDb())
-
-            eventLocalDataSource.create(newSession)
-
-            val eventAssociatedToCloseSession = eventDao.load(sessionId = oldOpenSession.id)
-            assertThat(eventAssociatedToCloseSession.firstOrNull()?.type).isEqualTo(SESSION_CAPTURE)
-            assertThat(eventAssociatedToCloseSession[1].type).isEqualTo(ARTIFICIAL_TERMINATION)
-        }
-    }
-
-    @Test
-    fun getCurrentOpenSession() {
-        runBlocking {
-            val closeSession = createSessionCaptureEvent()
-            val newSession = createSessionCaptureEvent().openSession()
-            eventDao.insertOrUpdate(closeSession.fromDomainToDb())
-            eventDao.insertOrUpdate(newSession.fromDomainToDb())
-
-            val currentOpenSession = eventLocalDataSource.getCurrentSessionCaptureEvent()
-            assertThat(currentOpenSession).isEqualTo(newSession)
-        }
+        mockDaoLoadToMakeNothing()
     }
 
     @Test
     fun loadWithAQuery() {
         runBlocking {
-            mockDaoLoadToMakeNothing()
-            eventLocalDataSource = EventLocalDataSourceImpl(eventDatabaseFactory, loginInfoManager, DEVICE_ID, timeHelper, emptyArray())
             val eventQuery = createCompleteEventQuery()
 
             eventLocalDataSource.load(eventQuery)
+
             coVerify {
                 eventDao.load(ID, SESSION_CAPTURE, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_USER_ID_2, GUID1, GUID2,
                     CREATED_AT_RANGE.first, CREATED_AT_RANGE.last, ENDED_AT_RANGE.first, ENDED_AT_RANGE.last)
@@ -126,8 +61,6 @@ class EventLocalDataSourceImplTest {
     @Test
     fun countWithAQuery() {
         runBlocking {
-            mockDaoLoadToMakeNothing()
-            eventLocalDataSource = EventLocalDataSourceImpl(eventDatabaseFactory, loginInfoManager, DEVICE_ID, timeHelper, emptyArray())
             val eventQuery = createCompleteEventQuery()
 
             eventLocalDataSource.count(eventQuery)
@@ -142,9 +75,6 @@ class EventLocalDataSourceImplTest {
     @Test
     fun deleteWithAQuery() {
         runBlocking {
-            mockDaoLoadToMakeNothing()
-            mockNotSignedId()
-            eventLocalDataSource = EventLocalDataSourceImpl(eventDatabaseFactory, loginInfoManager, DEVICE_ID, timeHelper, emptyArray())
             val eventQuery = createCompleteEventQuery()
 
             eventLocalDataSource.delete(eventQuery)
@@ -152,66 +82,6 @@ class EventLocalDataSourceImplTest {
             coVerify {
                 eventDao.delete(ID, SESSION_CAPTURE, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_USER_ID_2, GUID1, GUID2,
                     CREATED_AT_RANGE.first, CREATED_AT_RANGE.last, ENDED_AT_RANGE.first, ENDED_AT_RANGE.last)
-            }
-        }
-    }
-
-    private fun mockNotSignedId() = every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns ""
-    private fun mockSignedId() = every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
-
-    @Test
-    fun insertNewEvent_notSignedIn() {
-        runBlocking {
-            mockNotSignedId()
-            val event = createSessionCaptureEvent().copy(labels = EventLabels())
-            eventLocalDataSource.insertOrUpdate(event)
-            val storedEvent = eventLocalDataSource.load(DbEventQuery(id = event.id)).first()
-
-            assertThat(storedEvent.labels).isEqualTo(EventLabels(projectId = PROJECT_ID_FOR_NOT_SIGNED_IN, deviceId = DEVICE_ID))
-        }
-    }
-
-    @Test
-    fun insertNewEvent_signedIn() {
-        runBlocking {
-            mockSignedId()
-            val event = createSessionCaptureEvent().copy(labels = EventLabels())
-            eventLocalDataSource.insertOrUpdate(event)
-            val storedEvent = eventLocalDataSource.load(DbEventQuery(id = event.id)).first()
-
-            assertThat(storedEvent.labels).isEqualTo(EventLabels(projectId = DEFAULT_PROJECT_ID, deviceId = DEVICE_ID))
-        }
-    }
-
-    @Test
-    fun insertEventIntoCurrentOpenSession() {
-        runBlocking {
-            mockSignedId()
-            val session = createSessionCaptureEvent().openSession()
-            val event = createAlertScreenEvent().removeLabels()
-            eventLocalDataSource.insertOrUpdate(session)
-            eventLocalDataSource.insertOrUpdateInCurrentSession(event)
-
-            val storedEvent = eventLocalDataSource.load(DbEventQuery(id = event.id)).first()
-
-            assertThat(storedEvent.labels).isEqualTo(EventLabels(projectId = DEFAULT_PROJECT_ID, deviceId = DEVICE_ID, sessionId = session.id))
-        }
-    }
-
-    @Test
-    fun insertEventIntoCurrentOpenSession_shouldInvokeValidators() {
-        runBlocking {
-            mockSignedId()
-            val session = createSessionCaptureEvent().openSession()
-            val eventInSession = createAlertScreenEvent().copy(labels = EventLabels(sessionId = session.id))
-            eventLocalDataSource.insertOrUpdate(session)
-            eventLocalDataSource.insertOrUpdate(eventInSession)
-
-            val newEvent = createAlertScreenEvent().removeLabels()
-            eventLocalDataSource.insertOrUpdateInCurrentSession(newEvent)
-
-            validators.forEach {
-                verify { it.validate(listOf(session, eventInSession), newEvent) }
             }
         }
     }
@@ -237,6 +107,7 @@ class EventLocalDataSourceImplTest {
         coEvery { eventDao.count(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()) } returns 0
         every { db.eventDao } returns eventDao
         every { eventDatabaseFactory.build() } returns db
+        eventLocalDataSource = EventLocalDataSourceImpl(eventDatabaseFactory)
     }
 
     @After
@@ -245,18 +116,7 @@ class EventLocalDataSourceImplTest {
         db.close()
     }
 
-    private fun SessionCaptureEvent.openSession(): SessionCaptureEvent =
-        this.copy(payload = this.payload.copy(endedAt = 0))
-
-    private fun SessionCaptureEvent.removeLabels(): SessionCaptureEvent =
-        this.copy(id = ID, labels = EventLabels())
-
-    private fun AlertScreenEvent.removeLabels(): AlertScreenEvent =
-        this.copy(id = ID, labels = EventLabels())
-
     companion object {
-        const val DEVICE_ID = "DEVICE_ID"
-        const val NOW = 1000L
         private val ID = randomUUID()
     }
 }

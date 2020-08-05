@@ -75,9 +75,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     internal suspend fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
         ignoreException {
             if (appRequest !is AppRequest.AppRequestFollowUp) {
-                eventRepository.addEvent(buildConnectivitySnapshotEvent(simNetworkUtils, timeHelper))
+                eventRepository.addEventToCurrentSession(buildConnectivitySnapshotEvent(simNetworkUtils, timeHelper))
             }
-            eventRepository.addEvent(buildRequestEvent(timeHelper.now(), appRequest))
+            eventRepository.addEventToCurrentSession(buildRequestEvent(timeHelper.now(), appRequest))
         }
     }
 
@@ -163,7 +163,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
         // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
         if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest && appRequest !is AppEnrolLastBiometricsRequest) {
-            inBackground { eventRepository.addEvent(buildAuthorizationEvent(AuthorizationResult.NOT_AUTHORIZED)) }
+            inBackground { eventRepository.addEventToCurrentSession(buildAuthorizationEvent(AuthorizationResult.NOT_AUTHORIZED)) }
 
             loginAlreadyTried.set(true)
             view.openLoginActivity(appRequest)
@@ -206,15 +206,16 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
         ignoreException {
-            eventRepository.updateCurrentSession { currentSessionEvent ->
-                val peopleInDb = subjectLocalDataSource.count()
-                val payload = (currentSessionEvent.payload as SessionCapturePayload)
-                payload.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-                payload.databaseInfo.recordCount = peopleInDb
+            val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
-                eventRepository.addEvent(currentSessionEvent)
-                eventRepository.addEvent(buildAuthorizationEvent(AuthorizationResult.AUTHORIZED))
-            }
+            val peopleInDb = subjectLocalDataSource.count()
+            val payload = currentSessionEvent.payload
+            payload.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+            payload.databaseInfo.recordCount = peopleInDb
+
+            eventRepository.addEventToCurrentSession(currentSessionEvent)
+            eventRepository.addEventToCurrentSession(buildAuthorizationEvent(AuthorizationResult.AUTHORIZED))
+
         }
 
         view.openOrchestratorActivity(appRequest)
@@ -241,7 +242,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 (currentSessionEvent.payload as SessionCapturePayload).projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             }
             (currentSessionEvent.payload as SessionCapturePayload).analyticsId = analyticsId
-            eventRepository.addEvent(currentSessionEvent)
+            eventRepository.addEventToCurrentSession(currentSessionEvent)
         }
 
     }

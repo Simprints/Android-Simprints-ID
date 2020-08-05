@@ -22,7 +22,7 @@ class UpSessionEventsWorker(context: Context, params: WorkerParameters) : SimCor
         injectDependencies()
 
         return try {
-            eventRepository.uploadSessions()
+            eventRepository.uploadEvents()
             success()
         } catch (ex: NoSessionsFoundException) {
             Timber.d("No sessions found")

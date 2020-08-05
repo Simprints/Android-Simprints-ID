@@ -97,6 +97,6 @@ class AuthenticationHelperImpl(
             UserInfo(projectId, userId),
             result
         )
-        inBackground { eventRepository.addEvent(event) }
+        inBackground { eventRepository.addEventToCurrentSession(event) }
     }
 }

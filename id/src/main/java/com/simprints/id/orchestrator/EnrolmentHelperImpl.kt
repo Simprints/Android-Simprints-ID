@@ -27,7 +27,7 @@ class EnrolmentHelperImpl(private val repository: SubjectRepository,
 
     private fun registerEvent(subject: Subject) {
         inBackground {
-            eventRepository.addEvent(
+            eventRepository.addEventToCurrentSession(
                 EnrolmentEvent(timeHelper.now(), subject.subjectId)
             )
         }

@@ -197,9 +197,9 @@ class ConsentActivity : BaseSplitActivity() {
 
     private fun deleteLocationInfoFromSession() {
         inBackground {
-            eventRepository.updateCurrentSession {
-                it.payload.location = null
-            }
+            val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
+            currentSessionEvent.payload.location = null
+            eventRepository.addEventToCurrentSession(currentSessionEvent)
         }
     }
 
