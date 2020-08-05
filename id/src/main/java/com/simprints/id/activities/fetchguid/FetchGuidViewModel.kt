@@ -48,7 +48,7 @@ class FetchGuidViewModel(private val subjectRepository: SubjectRepository,
                                               subjectFetchStartTime: Long,
                                               verifyGuid: String) {
         inBackground {
-            eventRepository.addEvent(getCandidateReadEvent(subjectFetchResult, subjectFetchStartTime, verifyGuid))
+            eventRepository.addEventToCurrentSession(getCandidateReadEvent(subjectFetchResult, subjectFetchStartTime, verifyGuid))
         }
     }
 

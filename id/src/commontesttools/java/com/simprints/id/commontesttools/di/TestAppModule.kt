@@ -10,7 +10,6 @@ import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreference
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilder
 import com.simprints.id.data.db.event.local.EventDatabaseFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
@@ -140,21 +139,11 @@ class TestAppModule(
     }
 
     override fun provideSessionEventsLocalDbManager(
-        ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider,
-        timeHelper: TimeHelper,
-        factory: EventDatabaseFactory,
-        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder,
-        loginInfoManager: LoginInfoManager
+        factory: EventDatabaseFactory
     ): EventLocalDataSource =
         sessionEventsLocalDbManagerRule.resolveDependency {
             super.provideSessionEventsLocalDbManager(
-                ctx,
-                secureDataManager,
-                timeHelper,
-                factory,
-                sessionEventValidatorsBuilder,
-                loginInfoManager
+                factory
             )
         }
 

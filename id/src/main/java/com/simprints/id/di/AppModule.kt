@@ -203,14 +203,9 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(
-        ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider,
-        timeHelper: TimeHelper,
-        factory: EventDatabaseFactory,
-        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder,
-        loginInfoManager: LoginInfoManager
+        factory: EventDatabaseFactory
     ): EventLocalDataSource =
-        EventLocalDataSourceImpl(factory, loginInfoManager, ctx.deviceId, timeHelper, sessionEventValidatorsBuilder.build())
+        EventLocalDataSourceImpl(factory)
 
     @Provides
     @Singleton
@@ -227,7 +222,7 @@ open class AppModule {
         EventRepositoryImpl(
             ctx.deviceId,
             ctx.packageVersionName,
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            loginInfoManager,
             sessionEventsSyncManager,
             eventLocalDataSource,
             eventRemoteDataSource,

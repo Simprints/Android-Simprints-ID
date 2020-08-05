@@ -18,6 +18,7 @@ object DefaultTestConstants {
 
     val GUID1 = UUID.randomUUID().toString()
     val GUID2 = UUID.randomUUID().toString()
+    val GUID3 = UUID.randomUUID().toString()
 
     val DEFAULT_MODES = listOf(Modes.FINGERPRINT)
 

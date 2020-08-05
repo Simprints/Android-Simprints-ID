@@ -20,25 +20,25 @@ class ClientApiSessionEventsManagerImpl(private val coreEventRepository: EventRe
             coreEventRepository.createSession(BuildConfig.VERSION_NAME)
         }
 
-        inBackground { coreEventRepository.addEvent(IntentParsingEvent(timeHelper.now(), integration.fromDomainToCore())) }
+        inBackground { coreEventRepository.addEventToCurrentSession(IntentParsingEvent(timeHelper.now(), integration.fromDomainToCore())) }
 
         return coreEventRepository.getCurrentCaptureSessionEvent().id
     }
 
     override suspend fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert) {
-        inBackground { coreEventRepository.addEvent(AlertScreenEvent(timeHelper.now(), clientApiAlertType.fromAlertToAlertTypeEvent())) }
+        inBackground { coreEventRepository.addEventToCurrentSession(AlertScreenEvent(timeHelper.now(), clientApiAlertType.fromAlertToAlertTypeEvent())) }
     }
 
     override suspend fun addCompletionCheckEvent(complete: Boolean) {
-        inBackground { coreEventRepository.addEvent(CompletionCheckEvent(timeHelper.now(), complete)) }
+        inBackground { coreEventRepository.addEventToCurrentSession(CompletionCheckEvent(timeHelper.now(), complete)) }
     }
 
     override suspend fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>) {
-        inBackground { coreEventRepository.addEvent(SuspiciousIntentEvent(timeHelper.now(), unexpectedExtras)) }
+        inBackground { coreEventRepository.addEventToCurrentSession(SuspiciousIntentEvent(timeHelper.now(), unexpectedExtras)) }
     }
 
     override suspend fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>) {
-        inBackground { coreEventRepository.addEvent(InvalidIntentEvent(timeHelper.now(), action, extras)) }
+        inBackground { coreEventRepository.addEventToCurrentSession(InvalidIntentEvent(timeHelper.now(), action, extras)) }
     }
 
     override suspend fun getCurrentSessionId(): String = coreEventRepository.getCurrentCaptureSessionEvent().id
