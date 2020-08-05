@@ -75,8 +75,8 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
             }
         }
 
-    private suspend fun getDownSyncStreamFromRemote(eventQuery: ApiEventQuery) =
-        eventRemoteDataSource.getStreaming(eventQuery)
+    private suspend fun getDownSyncStreamFromRemote(eventQuery: ApiEventQuery) = "test".byteInputStream() as InputStream
+        //eventRemoteDataSource.getStreaming(eventQuery)
 
     private fun setupJsonReaderFromResponse(responseStream: InputStream): JsonReader =
         JsonReader(InputStreamReader(responseStream) as Reader?)

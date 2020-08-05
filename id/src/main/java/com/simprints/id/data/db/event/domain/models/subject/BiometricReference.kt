@@ -7,6 +7,7 @@ import com.simprints.id.data.db.event.domain.models.callback.EnrolmentCallbackEv
 import com.simprints.id.data.db.event.domain.models.subject.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
 import com.simprints.id.data.db.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
 import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReference
+import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReferenceType
 import com.simprints.id.data.db.event.remote.models.subject.ApiFaceReference
 import com.simprints.id.data.db.event.remote.models.subject.ApiFingerprintReference
 
@@ -18,10 +19,10 @@ import com.simprints.id.data.db.event.remote.models.subject.ApiFingerprintRefere
 sealed class BiometricReference(val type: BiometricReferenceType)
 
 data class FaceReference(val templates: List<FaceTemplate>,
-                         val metadata: HashMap<String, String>? = null): BiometricReference(BiometricReferenceType.FACE_REFERENCE)
+                         val metadata: HashMap<String, String>? = null) : BiometricReference(BiometricReferenceType.FACE_REFERENCE)
 
 data class FingerprintReference(val templates: List<FingerprintTemplate>,
-                                val metadata: HashMap<String, String>? = null): BiometricReference(BiometricReferenceType.FINGERPRINT_REFERENCE)
+                                val metadata: HashMap<String, String>? = null) : BiometricReference(BiometricReferenceType.FINGERPRINT_REFERENCE)
 
 enum class BiometricReferenceType(private val key: String) {
     FACE_REFERENCE(BiometricReferenceType.FACE_REFERENCE_KEY),
@@ -33,9 +34,9 @@ enum class BiometricReferenceType(private val key: String) {
     }
 }
 
-fun ApiBiometricReference.fromApiToDomain() = when(this) {
-    is ApiFaceReference -> this.fromApiToDomain()
-    is ApiFingerprintReference -> this.fromApiToDomain()
+fun ApiBiometricReference.fromApiToDomain() = when (this.type) {
+    ApiBiometricReferenceType.FaceReference -> (this as ApiFaceReference).fromApiToDomain()
+    ApiBiometricReferenceType.FingerprintReference -> (this as ApiFingerprintReference).fromApiToDomain()
 }
 
 fun ApiFaceReference.fromApiToDomain() = FaceReference(templates.map { it.fromApiToDomain() }, metadata)

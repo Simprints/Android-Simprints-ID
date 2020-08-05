@@ -70,13 +70,13 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
 
     private suspend fun tryToFetchSubjectFromRemote(projectId: String, subjectId: String): SubjectFetchResult {
         val eventQuery = buildEventQueryForSubjectFetch(projectId, subjectId)
-        val inputStream = eventRemoteDataSource.getStreaming(eventQuery)
-        val reader = setupJsonReaderFromResponseStream(inputStream)
-
-        val apiEventsForSubject = ArrayList<ApiEvent>()
-        while(reader.hasNext()) {
-            //apiEventsForSubject.add(SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java))
-        }
+//        val inputStream = eventRemoteDataSource.getStreaming(eventQuery)
+//        val reader = setupJsonReaderFromResponseStream(inputStream)
+//
+//        val apiEventsForSubject = ArrayList<ApiEvent>()
+//        while(reader.hasNext()) {
+//            //apiEventsForSubject.add(SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java))
+//        }
 
         //STOPSHIP
 //        val latestEvent = apiEventsForSubject.last().fromApiToDomainOrNullIfNoBiometricReferences()
