@@ -9,7 +9,7 @@ import com.simprints.id.data.db.subjects_sync.down.domain.EventsDownSyncOperatio
 import com.simprints.id.data.db.subjects_sync.down.local.DbEventsDownSyncOperation.Converters.Companion.MODES_STRING_SEPARATOR
 import org.junit.Test
 
-class DbEventDownSyncScopeRepoTest {
+class DbEventDownSyncScopeRepositoryTest {
 
     companion object {
         const val LAST_EVENT_ID = "lastEventId"

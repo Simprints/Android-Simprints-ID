@@ -24,8 +24,8 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.services.sync.subjects.common.SYNC_LOG_TAG
-import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
+import com.simprints.id.services.sync.events.master.EventSyncManager
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.activity_dashboard_card_daily_activity.*
 import kotlinx.android.synthetic.main.activity_dashboard_card_project_details.*
@@ -44,7 +44,7 @@ class DashboardActivity : BaseSplitActivity() {
     @Inject lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
     @Inject lateinit var dailyActivityCardDisplayer: DashboardDailyActivityCardDisplayer
     @Inject lateinit var viewModelFactory: DashboardViewModelFactory
-    @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
+    @Inject lateinit var eventSyncManager: EventSyncManager
     @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
 
     private lateinit var viewModel: DashboardViewModel
@@ -158,7 +158,7 @@ class DashboardActivity : BaseSplitActivity() {
 
         syncCardDisplayer.userWantsToSync.observe(this, LiveDataEventObserver {
             syncCardDisplayer.displayState(SyncConnecting(null, 0, null))
-            subjectsSyncManager.sync()
+            eventSyncManager.sync()
         })
     }
 

@@ -11,7 +11,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.di.PreferencesModule
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule

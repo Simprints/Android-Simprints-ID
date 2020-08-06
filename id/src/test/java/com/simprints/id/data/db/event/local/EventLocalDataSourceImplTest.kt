@@ -13,7 +13,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.events.CREATED_AT_RANGE
 import com.simprints.id.commontesttools.events.ENDED_AT_RANGE
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.id.data.db.event.local.models.DbEventQuery
+import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.runBlocking
@@ -87,7 +87,7 @@ class EventLocalDataSourceImplTest {
     }
 
     private fun createCompleteEventQuery() =
-        DbEventQuery(
+        DbLocalEventQuery(
             ID,
             SESSION_CAPTURE,
             DEFAULT_PROJECT_ID,

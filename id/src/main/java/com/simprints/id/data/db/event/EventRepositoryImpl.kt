@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Build.VERSION
 import androidx.annotation.VisibleForTesting
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.id.data.db.event.domain.models.Event
@@ -13,10 +14,12 @@ import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.EventLocalDataSource
-import com.simprints.id.data.db.event.local.models.DbEventQuery
+import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
+import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncQuery
+import com.simprints.id.data.db.events_sync.down.domain.RemoteEventQuery
 import com.simprints.id.data.db.events_sync.down.domain.fromDomainToApi
+import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.toMode
@@ -47,7 +50,11 @@ open class EventRepositoryImpl(
     }
 
     private val signedInProject: String
-        get() = loginInfoManager.getSignedInProjectIdOrEmpty()
+        get() = if (loginInfoManager.getSignedInProjectIdOrEmpty().isEmpty()) {
+            PROJECT_ID_FOR_NOT_SIGNED_IN
+        } else {
+            loginInfoManager.getSignedInProjectIdOrEmpty()
+        }
 
 
     override suspend fun createSession(libSimprintsVersionName: String) {
@@ -65,6 +72,7 @@ open class EventRepositoryImpl(
                     Build.MANUFACTURER + "_" + Build.MODEL,
                     deviceId),
                 DatabaseInfo(count))
+            sessionCaptureEvent.labels = sessionCaptureEvent.labels.appendLabelsForAllEvents()
 
             closeAnyOpenSession()
             eventLocalDataSource.insertOrUpdate(sessionCaptureEvent)
@@ -74,7 +82,7 @@ open class EventRepositoryImpl(
     override suspend fun addEvent(sessionId: String, event: Event) {
         ignoreException {
             reportExceptionIfNeeded {
-                val session = eventLocalDataSource.load(DbEventQuery(id = sessionId)).toList().firstOrNull()
+                val session = eventLocalDataSource.load(DbLocalEventQuery(id = sessionId)).toList().firstOrNull()
                 session.let {
                     event.labels = event.labels.appendLabelsForAllEvents().appendSessionId(sessionId)
                     eventLocalDataSource.insertOrUpdate(event)
@@ -92,7 +100,14 @@ open class EventRepositoryImpl(
         }
     }
 
-    override suspend fun downloadEvents(scope: CoroutineScope, query: EventDownSyncQuery): ReceiveChannel<List<Event>> =
+    override suspend fun countEventsToUpload(query: LocalEventQuery): Int =
+        eventLocalDataSource.count(query.fromDomainToDb())
+
+    override suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount> =
+        eventRemoteDataSource.count(query.fromDomainToApi())
+
+
+    override suspend fun downloadEvents(scope: CoroutineScope, query: RemoteEventQuery): ReceiveChannel<List<Event>> =
         eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
 
 
@@ -101,13 +116,13 @@ open class EventRepositoryImpl(
 
         batches.forEach { batch ->
             val events = batch.sessionIds.map {
-                eventLocalDataSource.load(DbEventQuery(sessionId = it)).toList()
+                eventLocalDataSource.load(DbLocalEventQuery(sessionId = it)).toList()
             }.flatten()
 
             eventRemoteDataSource.post(loginInfoManager.getSignedInProjectIdOrEmpty(), events)
 
             events.forEach {
-                eventLocalDataSource.delete(DbEventQuery(id = it.id))
+                eventLocalDataSource.delete(DbLocalEventQuery(id = it.id))
             }
 
             this.emit(events)
@@ -118,7 +133,7 @@ open class EventRepositoryImpl(
     suspend fun createBatchesWithCloseSessions(): List<Batch> {
         val sessionsAndCounts =
             loadCloseSessions().map {
-                it.id to eventLocalDataSource.count(DbEventQuery(sessionId = it.id))
+                it.id to eventLocalDataSource.count(DbLocalEventQuery(sessionId = it.id))
             }
 
         return sessionsAndCounts.toList().fold(mutableListOf()) { batches, sessionAndCount ->
@@ -146,7 +161,7 @@ open class EventRepositoryImpl(
 
     override suspend fun loadEvents(sessionId: String): Flow<Event> =
         reportExceptionIfNeeded {
-            eventLocalDataSource.load(DbEventQuery(sessionId = sessionId))
+            eventLocalDataSource.load(DbLocalEventQuery(sessionId = sessionId))
         }
 
     private suspend fun closeAnyOpenSession() {
@@ -166,23 +181,23 @@ open class EventRepositoryImpl(
     }
 
     override suspend fun signOut() {
-        eventLocalDataSource.load(DbEventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).collect {
-            eventLocalDataSource.delete(DbEventQuery(sessionId = it.id))
+        eventLocalDataSource.load(DbLocalEventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))).collect {
+            eventLocalDataSource.delete(DbLocalEventQuery(sessionId = it.id))
         }
         sessionEventsSyncManager.cancelSyncWorkers()
     }
 
     private suspend fun loadOpenSessions() =
-        eventLocalDataSource.load(getDbQueryForCloseSession(signedInProject)).map { it as SessionCaptureEvent }
+        eventLocalDataSource.load(getDbQueryForOpenSession(signedInProject)).map { it as SessionCaptureEvent }
 
     private suspend fun loadCloseSessions() =
         eventLocalDataSource.load(getDbQueryForCloseSession(signedInProject)).map { it as SessionCaptureEvent }
 
     private fun getDbQueryForOpenSession(projectId: String) =
-        DbEventQuery(projectId = projectId, type = SESSION_CAPTURE, endTime = LongRange(0, 0))
+        DbLocalEventQuery(projectId = projectId, type = SESSION_CAPTURE, endTime = LongRange(0, 0))
 
     private fun getDbQueryForCloseSession(projectId: String) =
-        DbEventQuery(projectId = projectId, type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE))
+        DbLocalEventQuery(projectId = projectId, type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE))
 
     private fun EventLabels.appendLabelsForAllEvents() =
         this.appendProjectIdLabel().appendDeviceIdLabel()
@@ -205,6 +220,8 @@ open class EventRepositoryImpl(
         try {
             block()
         } catch (t: Throwable) {
+            val events = eventLocalDataSource.load(DbLocalEventQuery()) //STOPSHIP
+
             crashReportManager.logExceptionOrSafeException(t)
             throw t
         }

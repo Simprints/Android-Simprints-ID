@@ -32,7 +32,7 @@ import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourc
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepositoryImpl
 import com.simprints.id.services.sync.SyncManager
-import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.tools.TimeHelper
@@ -48,23 +48,23 @@ open class SecurityModule {
     @Provides
     @Singleton
     open fun provideSignerManager(
-        projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager,
-        subjectsSyncManager: SubjectsSyncManager,
-        syncManager: SyncManager,
-        securityStateScheduler: SecurityStateScheduler,
-        longConsentRepository: LongConsentRepository,
-        eventRepository: EventRepository,
-        baseUrlProvider: BaseUrlProvider,
-        remoteConfigWrapper: RemoteConfigWrapper
+            projectRepository: ProjectRepository,
+            remoteDbManager: RemoteDbManager,
+            loginInfoManager: LoginInfoManager,
+            preferencesManager: PreferencesManager,
+            eventSyncManager: EventSyncManager,
+            syncManager: SyncManager,
+            securityStateScheduler: SecurityStateScheduler,
+            longConsentRepository: LongConsentRepository,
+            eventRepository: EventRepository,
+            baseUrlProvider: BaseUrlProvider,
+            remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
         projectRepository,
         remoteDbManager,
         loginInfoManager,
         preferencesManager,
-        subjectsSyncManager,
+        eventSyncManager,
         syncManager,
         securityStateScheduler,
         longConsentRepository,

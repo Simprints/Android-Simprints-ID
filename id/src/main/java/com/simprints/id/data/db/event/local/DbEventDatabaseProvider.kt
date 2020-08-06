@@ -18,13 +18,19 @@ class DbEventDatabaseFactoryImpl(
 
     @OptIn(ExperimentalStdlibApi::class)
     override fun build(): EventRoomDatabase {
-        val key = getOrCreateKey(DB_NAME)
+        try {
 
-        val passphrase: ByteArray = getBytes(key)
-        val factory = SupportFactory(passphrase)
-        return Room.databaseBuilder(ctx, EventRoomDatabase::class.java, DB_NAME)
-            .openHelperFactory(factory)
-            .build()
+            val key = getOrCreateKey(DB_NAME)
+
+            val passphrase: ByteArray = getBytes(key)
+            val factory = SupportFactory(passphrase)
+            return Room.databaseBuilder(ctx, EventRoomDatabase::class.java, DB_NAME)
+                .openHelperFactory(factory)
+                .build()
+        } catch (t: Throwable) {
+            Timber.e(t)
+            throw t
+        }
     }
 
     @OptIn(ExperimentalStdlibApi::class)

@@ -24,7 +24,7 @@ import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.EventLocalDataSource
-import com.simprints.id.data.db.event.local.models.DbEventQuery
+import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -127,7 +127,7 @@ class EventRepositoryImplTest {
 
             eventRepo.addEvent(GUID1, newEvent)
 
-            coVerify { eventLocalDataSource.load(DbEventQuery(id = GUID1)) }
+            coVerify { eventLocalDataSource.load(DbLocalEventQuery(id = GUID1)) }
             coVerify {
                 eventLocalDataSource.insertOrUpdate(newEvent.copy(labels = EventLabels(sessionId = GUID1, deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID)))
             }
@@ -142,7 +142,7 @@ class EventRepositoryImplTest {
 
             eventRepo.addEventToCurrentSession(newEvent)
 
-            coVerify { eventLocalDataSource.load(DbEventQuery(id = GUID1)) }
+            coVerify { eventLocalDataSource.load(DbLocalEventQuery(id = GUID1)) }
             coVerify {
                 eventLocalDataSource.insertOrUpdate(newEvent.copy(labels = EventLabels(sessionId = GUID1, deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID)))
             }
@@ -170,9 +170,9 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents().toList()
 
-            coVerify { eventLocalDataSource.load(DbEventQuery(sessionId = GUID1)) }
-            coVerify { eventLocalDataSource.load(DbEventQuery(sessionId = GUID2)) }
-            coVerify { eventLocalDataSource.load(DbEventQuery(sessionId = GUID3)) }
+            coVerify { eventLocalDataSource.load(DbLocalEventQuery(sessionId = GUID1)) }
+            coVerify { eventLocalDataSource.load(DbLocalEventQuery(sessionId = GUID2)) }
+            coVerify { eventLocalDataSource.load(DbLocalEventQuery(sessionId = GUID3)) }
         }
     }
 
@@ -185,7 +185,7 @@ class EventRepositoryImplTest {
 
             events.forEach {
                 coVerify {
-                    eventLocalDataSource.delete(DbEventQuery(id = it.id))
+                    eventLocalDataSource.delete(DbLocalEventQuery(id = it.id))
                 }
             }
         }
@@ -210,7 +210,7 @@ class EventRepositoryImplTest {
         val events = smallSession1Events + smallSession2Events + bigSessionEvents
 
         coEvery {
-            eventLocalDataSource.load(DbEventQuery(projectId = DEFAULT_PROJECT_ID, type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE)))
+            eventLocalDataSource.load(DbLocalEventQuery(projectId = DEFAULT_PROJECT_ID, type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE)))
         } returns events.filterIsInstance<SessionCaptureEvent>().asFlow()
 
         return events
@@ -223,8 +223,8 @@ class EventRepositoryImplTest {
             events.add(createAlertScreenEvent().copy(labels = EventLabels(sessionId = GUID1)))
         }
 
-        coEvery { eventLocalDataSource.load(DbEventQuery(sessionId = sessionId)) } returns events.asFlow()
-        coEvery { eventLocalDataSource.count(DbEventQuery(sessionId = sessionId)) } returns nEvents + 1
+        coEvery { eventLocalDataSource.load(DbLocalEventQuery(sessionId = sessionId)) } returns events.asFlow()
+        coEvery { eventLocalDataSource.count(DbLocalEventQuery(sessionId = sessionId)) } returns nEvents + 1
         return events
     }
 

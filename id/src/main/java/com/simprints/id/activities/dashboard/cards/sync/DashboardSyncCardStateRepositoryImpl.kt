@@ -5,29 +5,29 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.down.domain.ModuleSyncScope
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.sync.subjects.common.SYNC_LOG_TAG
-import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.sync.subjects.master.internal.SubjectsSyncCache
-import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
-import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting.ON
-import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncState
-import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncWorkerState
+import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.internal.EventSyncCache
+import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.EXTRA
+import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.ON
+import com.simprints.id.services.sync.events.master.models.SubjectsSyncState
+import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.*
 
-class DashboardSyncCardStateRepositoryImpl(val subjectsSyncManager: SubjectsSyncManager,
+class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManager,
                                            val deviceManager: DeviceManager,
                                            private val preferencesManager: PreferencesManager,
                                            private val syncScopeRepository: SubjectsDownSyncScopeRepository,
-                                           private val cacheSync: SubjectsSyncCache,
+                                           private val cacheSync: EventSyncCache,
                                            private val timeHelper: TimeHelper) : DashboardSyncCardStateRepository {
 
     override val syncCardStateLiveData = MediatorLiveData<DashboardSyncCardState>()
 
-    private var syncStateLiveData = subjectsSyncManager.getLastSyncState()
+    private var syncStateLiveData = eventSyncManager.getLastSyncState()
     private var isConnectedLiveData = deviceManager.isConnectedLiveData
 
     private var lastTimeSyncRun: Date? = null
@@ -85,7 +85,7 @@ class DashboardSyncCardStateRepositoryImpl(val subjectsSyncManager: SubjectsSync
         var delayBeforeObserve = 0L
         if (shouldForceOneTimeSync()) {
             Timber.tag(SYNC_LOG_TAG).d("Re-launching one time sync")
-            subjectsSyncManager.sync()
+            eventSyncManager.sync()
             delayBeforeObserve = 6000
         }
 

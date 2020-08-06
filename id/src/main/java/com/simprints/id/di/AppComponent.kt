@@ -45,15 +45,15 @@ import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.sync.SyncSchedulerImpl
-import com.simprints.id.services.sync.imageUpSync.ImageUpSyncWorker
+import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
 import com.simprints.id.services.sync.sessionSync.UpSessionEventsWorker
-import com.simprints.id.services.sync.subjects.down.workers.SubjectsDownSyncCountWorker
-import com.simprints.id.services.sync.subjects.down.workers.SubjectsDownSyncDownloaderWorker
-import com.simprints.id.services.sync.subjects.master.workers.SubjectsEndSyncReporterWorker
-import com.simprints.id.services.sync.subjects.master.workers.SubjectsStartSyncReporterWorker
-import com.simprints.id.services.sync.subjects.master.workers.SubjectsSyncMasterWorker
-import com.simprints.id.services.sync.subjects.up.workers.SubjectsUpSyncCountWorker
-import com.simprints.id.services.sync.subjects.up.workers.SubjectsUpSyncUploaderWorker
+import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
+import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
+import com.simprints.id.services.sync.events.master.workers.SubjectsEndSyncReporterWorker
+import com.simprints.id.services.sync.events.master.workers.SubjectsStartSyncReporterWorker
+import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker
+import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
+import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.services.securitystate.SecurityStateWorker
 import com.simprints.id.tools.TimeHelper
 import dagger.BindsInstance
@@ -123,11 +123,11 @@ interface AppComponent {
     fun inject(fetchGuidActivity: FetchGuidActivity)
     fun inject(guidSelectionActivity: GuidSelectionActivity)
     fun inject(debugActivity: DebugActivity)
-    fun inject(subjectsDownSyncCountWorker: SubjectsDownSyncCountWorker)
-    fun inject(subjectsDownSyncDownloaderWorker: SubjectsDownSyncDownloaderWorker)
+    fun inject(eventDownSyncCountWorker: EventDownSyncCountWorker)
+    fun inject(eventDownSyncDownloaderWorker: EventDownSyncDownloaderWorker)
     fun inject(subjectsSyncMasterWorker: SubjectsSyncMasterWorker)
-    fun inject(subjectsUpSyncUploaderWorker: SubjectsUpSyncUploaderWorker)
-    fun inject(subjectsUpSyncCountWorker: SubjectsUpSyncCountWorker)
+    fun inject(eventUpSyncUploaderWorker: EventUpSyncUploaderWorker)
+    fun inject(eventUpSyncCountWorker: EventUpSyncCountWorker)
     fun inject(imageUpSyncWorker: ImageUpSyncWorker)
     fun inject(syncInformationActivity: SyncInformationActivity)
     fun inject(subjectsEndSyncReporterWorker: SubjectsEndSyncReporterWorker)

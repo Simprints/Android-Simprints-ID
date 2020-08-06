@@ -10,7 +10,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.db.subjects_sync.down.local.DbEventsDownSyncOperationKey
-import com.simprints.id.data.db.subjects_sync.down.local.EventsDownSyncOperationLocalDataSource
+import com.simprints.id.data.db.subjects_sync.down.local.EventDownSyncOperationLocalDataSource
 import com.simprints.id.data.db.subjects_sync.down.local.fromDbToDomain
 import com.simprints.id.domain.modality.Modes
 import kotlinx.coroutines.runBlocking
@@ -23,7 +23,7 @@ import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class EventsSyncStatusDatabaseTest {
-    private lateinit var downSyncOperationOperationDao: EventsDownSyncOperationLocalDataSource
+    private lateinit var downSyncOperationOperationDao: EventDownSyncOperationLocalDataSource
     private lateinit var db: SubjectsSyncStatusDatabase
 
     private val projectSyncOp = EventsDownSyncOperation(

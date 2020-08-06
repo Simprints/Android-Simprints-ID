@@ -1,16 +1,14 @@
 package com.simprints.id.data.db.events_sync.up.domain
 
-data class EventUpSyncOperation(val projectId: String,
-                                val lastResult: Result?) {
+data class EventUpSyncOperation(val scopeId: String,
+                                val queryEvent: LocalEventQuery,
+                                val lastState: UpSyncState,
+                                val lastSyncTime: Long? = null) {
 
-    data class Result(val lastState: UpSyncState,
-                      val lastSyncTime: Long? = null) {
-
-        enum class UpSyncState {
-            RUNNING,
-            COMPLETE,
-            FAILED
-        }
+    enum class UpSyncState {
+        RUNNING,
+        COMPLETE,
+        FAILED
     }
 }
 

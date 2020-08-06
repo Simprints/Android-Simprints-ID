@@ -4,12 +4,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
-import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting.ON
+import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.EXTRA
+import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.ON
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -18,7 +18,7 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
                                private val subjectLocalDataSource: SubjectLocalDataSource,
                                private val preferencesManager: PreferencesManager,
                                private val projectId: String,
-                               private val subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository) : ViewModel() {
+                               private val downSyncScopeRepository: EventDownSyncScopeRepository) : ViewModel() {
 
     val localRecordCountLiveData = MutableLiveData<Int>()
     val recordsToUpSyncCountLiveData = MutableLiveData<Int>()
@@ -57,10 +57,12 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
 
     internal suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount() {
         try {
-            val downSyncScope = subjectsDownSyncScopeRepository.getDownSyncScope()
-            val counts = personRepository.countToDownSync(downSyncScope)
-            recordsToDownSyncCountLiveData.postValue(counts.created)
-            recordsToDeleteCountLiveData.postValue(counts.deleted)
+            val downSyncScope = downSyncScopeRepository.getDownSyncScope()
+//            val counts = personRepository.countToDownSync(downSyncScope)
+//            recordsToDownSyncCountLiveData.postValue(counts.created)
+//            recordsToDeleteCountLiveData.postValue(counts.deleted)
+
+            //STOPSHIP
         } catch (t: Throwable) {
             t.printStackTrace()
         }

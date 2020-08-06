@@ -16,11 +16,11 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
-import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
-import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting.ON
-import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncState
-import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncWorkerState
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.EXTRA
+import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.ON
+import com.simprints.id.services.sync.events.master.models.SubjectsSyncState
+import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState
 import kotlinx.android.synthetic.main.activity_sync_information.*
 import javax.inject.Inject
 
@@ -28,7 +28,7 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     @Inject lateinit var viewModelFactory: SyncInformationViewModelFactory
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
+    @Inject lateinit var eventSyncManager: EventSyncManager
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
     private val moduleCountAdapterForUnselected by lazy { ModuleCountAdapter() }
@@ -246,7 +246,7 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun observeForSyncState() {
-        subjectsSyncManager.getLastSyncState().observe(this, Observer { syncState ->
+        eventSyncManager.getLastSyncState().observe(this, Observer { syncState ->
             if (syncState.isRunning() && !isProgressOverlayVisible()) {
                 showProgressOverlay()
             } else if (!syncState.isRunning() && isProgressOverlayVisible()) {

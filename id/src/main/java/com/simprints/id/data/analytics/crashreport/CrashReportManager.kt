@@ -3,7 +3,7 @@ package com.simprints.id.data.analytics.crashreport
 import android.util.Log
 import com.simprints.id.Application
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting
 
 interface CrashReportManager: CoreCrashReportManager {
     fun logExceptionOrSafeException(throwable: Throwable)

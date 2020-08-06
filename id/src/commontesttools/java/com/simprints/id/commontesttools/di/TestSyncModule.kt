@@ -7,21 +7,21 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.down.domain.EventsDownSyncOperationFactory
-import com.simprints.id.data.db.subjects_sync.down.local.EventsDownSyncOperationLocalDataSource
+import com.simprints.id.data.db.subjects_sync.down.local.EventDownSyncOperationLocalDataSource
 import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.up.local.SubjectsUpSyncOperationLocalDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.SyncModule
 import com.simprints.id.services.sync.SyncManager
-import com.simprints.id.services.sync.imageUpSync.ImageUpSyncScheduler
+import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.services.sync.subjects.down.controllers.SubjectsDownSyncWorkersBuilder
-import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.sync.subjects.master.SubjectsSyncStateProcessor
-import com.simprints.id.services.sync.subjects.master.internal.SubjectsSyncCache
+import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.SubjectsSyncStateProcessor
+import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.subjects.up.controllers.SubjectsUpSyncExecutor
-import com.simprints.id.services.sync.subjects.up.controllers.SubjectsUpSyncWorkersBuilder
+import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.testtools.common.di.DependencyRule
 import javax.inject.Singleton
 
@@ -60,10 +60,10 @@ class TestSyncModule(
     @Singleton
     override fun providePeopleSyncStateProcessor(
         ctx: Context,
-        subjectsSyncCache: SubjectsSyncCache,
+        eventSyncCache: EventSyncCache,
         personRepository: SubjectRepository
     ): SubjectsSyncStateProcessor = peopleSyncStateProcessor.resolveDependency {
-        super.providePeopleSyncStateProcessor(ctx, subjectsSyncCache, personRepository)
+        super.providePeopleSyncStateProcessor(ctx, eventSyncCache, personRepository)
     }
 
     @Singleton
@@ -72,20 +72,20 @@ class TestSyncModule(
         subjectsSyncStateProcessor: SubjectsSyncStateProcessor,
         subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
         subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
-        subjectsSyncCache: SubjectsSyncCache
-    ): SubjectsSyncManager = peopleSyncManagerRule.resolveDependency {
-        super.providePeopleSyncManager(ctx, subjectsSyncStateProcessor, subjectsUpSyncScopeRepository, subjectsDownSyncScopeRepository, subjectsSyncCache)
+        eventSyncCache: EventSyncCache
+    ): EventSyncManager = peopleSyncManagerRule.resolveDependency {
+        super.providePeopleSyncManager(ctx, subjectsSyncStateProcessor, subjectsUpSyncScopeRepository, subjectsDownSyncScopeRepository, eventSyncCache)
     }
 
     @Singleton
     override fun provideSyncManager(
         sessionEventsSyncManager: SessionEventsSyncManager,
-        subjectsSyncManager: SubjectsSyncManager,
+        eventSyncManager: EventSyncManager,
         imageUpSyncScheduler: ImageUpSyncScheduler
     ): SyncManager = syncManagerRule.resolveDependency {
         super.provideSyncManager(
             sessionEventsSyncManager,
-            subjectsSyncManager,
+            eventSyncManager,
             imageUpSyncScheduler
         )
     }
@@ -94,12 +94,12 @@ class TestSyncModule(
     override fun provideDownSyncWorkerBuilder(
         downSyncScopeRepository: SubjectsDownSyncScopeRepository,
         jsonHelper: JsonHelper
-    ): SubjectsDownSyncWorkersBuilder = peopleDownSyncWorkersBuilderRule.resolveDependency {
+    ): EventDownSyncWorkersBuilder = peopleDownSyncWorkersBuilderRule.resolveDependency {
         super.provideDownSyncWorkerBuilder(downSyncScopeRepository, jsonHelper)
     }
 
     @Singleton
-    override fun providePeopleUpSyncWorkerBuilder(): SubjectsUpSyncWorkersBuilder =
+    override fun providePeopleUpSyncWorkerBuilder(): EventUpSyncWorkersBuilder =
         peopleUpSyncWorkersBuilderRule.resolveDependency {
             super.providePeopleUpSyncWorkerBuilder()
         }
@@ -111,14 +111,14 @@ class TestSyncModule(
     @Singleton
     override fun providePeopleDownSyncDao(
         database: SubjectsSyncStatusDatabase
-    ): EventsDownSyncOperationLocalDataSource = peopleDownSyncDaoRule.resolveDependency {
+    ): EventDownSyncOperationLocalDataSource = peopleDownSyncDaoRule.resolveDependency {
         super.providePeopleDownSyncDao(database)
     }
 
     @Singleton
     override fun providePeopleUpSyncManager(
         ctx: Context,
-        subjectsUpSyncWorkersBuilder: SubjectsUpSyncWorkersBuilder
+        subjectsUpSyncWorkersBuilder: EventUpSyncWorkersBuilder
     ): SubjectsUpSyncExecutor = peopleUpSyncManagerRule.resolveDependency {
         super.providePeopleUpSyncManager(ctx, subjectsUpSyncWorkersBuilder)
     }

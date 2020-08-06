@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.local
 
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.local.models.DbEventQuery
+import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.exceptions.safe.session.SessionDataSourceException
@@ -18,7 +18,7 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
     }
 
 
-    override suspend fun load(dbQuery: DbEventQuery): Flow<Event> =
+    override suspend fun load(dbQuery: DbLocalEventQuery): Flow<Event> =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
                 with(dbQuery) {
@@ -41,7 +41,7 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
         }
 
 
-    override suspend fun count(dbQuery: DbEventQuery): Int =
+    override suspend fun count(dbQuery: DbLocalEventQuery): Int =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
                 with(dbQuery) {
@@ -61,7 +61,7 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
             }
         }
 
-    override suspend fun delete(dbQuery: DbEventQuery) {
+    override suspend fun delete(dbQuery: DbLocalEventQuery) {
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
                 with(dbQuery) {

@@ -8,14 +8,14 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRe
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.sync.subjects.master.internal.SubjectsSyncCache
-import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting
-import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncState
-import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncState.SyncWorkerInfo
-import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncWorkerState.*
-import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncWorkerType.DOWN_COUNTER
-import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncWorkerType.UP_COUNTER
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.internal.EventSyncCache
+import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.events.master.models.SubjectsSyncState
+import com.simprints.id.services.sync.events.master.models.SubjectsSyncState.SyncWorkerInfo
+import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState.*
+import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.DOWN_COUNTER
+import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.UP_COUNTER
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.device.DeviceManager
@@ -37,11 +37,11 @@ class DashboardSyncCardStateRepositoryImplTest {
     private val syncCardTestLiveData
         get() = dashboardSyncCardStateRepository.syncCardStateLiveData
 
-    @MockK lateinit var subjectsSyncManager: SubjectsSyncManager
+    @MockK lateinit var eventSyncManager: EventSyncManager
     @MockK lateinit var deviceManager: DeviceManager
     @MockK lateinit var preferencesManager: PreferencesManager
     @MockK lateinit var syncScopeRepository: SubjectsDownSyncScopeRepository
-    @MockK lateinit var cacheSync: SubjectsSyncCache
+    @MockK lateinit var cacheSync: EventSyncCache
     @MockK lateinit var timeHelper: TimeHelper
 
     private lateinit var isConnectedUpdates: MutableLiveData<Boolean>
@@ -56,11 +56,11 @@ class DashboardSyncCardStateRepositoryImplTest {
         isConnectedUpdates.value = true
         syncStateLiveData = MutableLiveData()
         every { deviceManager.isConnectedLiveData } returns isConnectedUpdates
-        every { subjectsSyncManager.getLastSyncState() } returns syncStateLiveData
+        every { eventSyncManager.getLastSyncState() } returns syncStateLiveData
         every { syncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.projectSyncScope
         every { preferencesManager.selectedModules } returns emptySet()
         every { cacheSync.readLastSuccessfulSyncTime() } returns lastSyncTime
-        every { subjectsSyncManager.hasSyncEverRunBefore() } returns true
+        every { eventSyncManager.hasSyncEverRunBefore() } returns true
 
         isConnectedUpdates.value = true
         dashboardSyncCardStateRepository = createRepository()
@@ -209,7 +209,7 @@ class DashboardSyncCardStateRepositoryImplTest {
         dashboardSyncCardStateRepository.syncIfRequired()
         syncCardTestLiveData.testObserver()
 
-        verify { subjectsSyncManager.sync() }
+        verify { eventSyncManager.sync() }
     }
 
     @Test
@@ -222,7 +222,7 @@ class DashboardSyncCardStateRepositoryImplTest {
         dashboardSyncCardStateRepository.syncIfRequired()
         syncCardTestLiveData.testObserver()
 
-        verify(exactly = 0) { subjectsSyncManager.sync() }
+        verify(exactly = 0) { eventSyncManager.sync() }
     }
 
     @Test
@@ -234,14 +234,14 @@ class DashboardSyncCardStateRepositoryImplTest {
         dashboardSyncCardStateRepository.syncIfRequired()
         dashboardSyncCardStateRepository.syncIfRequired()
 
-        verify(exactly = 0) { subjectsSyncManager.sync() }
+        verify(exactly = 0) { eventSyncManager.sync() }
     }
 
     @Test
     fun noHistoryAboutSync_syncIfRequired_shouldNotLaunchTheSync() = runBlockingTest {
         dashboardSyncCardStateRepository.syncIfRequired()
 
-        verify(exactly = 0) { subjectsSyncManager.sync() }
+        verify(exactly = 0) { eventSyncManager.sync() }
     }
 
     @Test
@@ -270,7 +270,7 @@ class DashboardSyncCardStateRepositoryImplTest {
 
 
     private fun createRepository(specificTimeHelper: TimeHelper = timeHelper) =
-        DashboardSyncCardStateRepositoryImpl(subjectsSyncManager, deviceManager, preferencesManager, syncScopeRepository, cacheSync, specificTimeHelper)
+        DashboardSyncCardStateRepositoryImpl(eventSyncManager, deviceManager, preferencesManager, syncScopeRepository, cacheSync, specificTimeHelper)
 
 }
 
