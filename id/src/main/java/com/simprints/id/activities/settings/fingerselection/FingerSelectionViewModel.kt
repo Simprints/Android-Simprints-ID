@@ -13,7 +13,7 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
 
     private fun postUpdatedItems(block: MutableList<FingerSelectionItem>.() -> Unit) {
         _items.block()
-        items.postValue(_items)
+        items.value = _items
     }
 
     fun start() {
@@ -31,12 +31,7 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
     }
 
     fun moveItem(from: Int, to: Int) {
-        val fromItem = _items.removeAt(from)
-        if (to < from) {
-            _items.add(to, fromItem)
-        } else {
-            _items.add(to - 1, fromItem)
-        }
+        _items.add(to, _items.removeAt(from))
     }
 
     fun removeItem(itemIndex: Int) {
@@ -65,6 +60,12 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
 
     fun haveSettingsChanged() = determineFingerSelectionItemsFromPrefs() != _items.toList()
 
+    fun canSavePreference(): Boolean {
+        val highestNumberOfFingersInItems = _items.toFingerIdentifiers().groupingBy { it }.eachCount().values.max()?: 1
+        val maxAllowedFingers = QUANTITY_OPTIONS.max()?: 1
+        return highestNumberOfFingersInItems <= maxAllowedFingers
+    }
+
     fun savePreference() {
         preferencesManager.fingerprintsToCollect = _items.toFingerIdentifiers()
     }
@@ -73,8 +74,9 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
         preferencesManager.fingerprintsToCollect.toFingerSelectionItems().also { savedPref ->
             preferencesManager.getRemoteConfigFingerprintsToCollect().toFingerSelectionItems()
                 .map { it.finger }.distinct()
-                .forEach { finger -> savedPref.firstOrNull { it.finger == finger }?.removable = false
-            }
+                .forEach { finger ->
+                    savedPref.firstOrNull { it.finger == finger }?.removable = false
+                }
         }
 
     private fun List<FingerIdentifier>.toFingerSelectionItems(): List<FingerSelectionItem> {

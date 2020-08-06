@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_finger_selection.*
 import javax.inject.Inject
 
@@ -23,30 +24,35 @@ class FingerSelectionActivity : BaseSplitActivity() {
 
     private lateinit var fingerSelectionAdapter: FingerSelectionItemAdapter
 
-    private val itemTouchHelper by lazy {
-        val simpleItemTouchCallback =
-            object : ItemTouchHelper.SimpleCallback(UP or DOWN or START or END, 0) {
+    private val itemTouchHelper = ItemTouchHelper(
+        object : ItemTouchHelper.SimpleCallback(UP or DOWN or START or END, 0) {
 
-                override fun onMove(recyclerView: RecyclerView,
-                                    viewHolder: RecyclerView.ViewHolder,
-                                    target: RecyclerView.ViewHolder): Boolean {
-                    val adapter = recyclerView.adapter as FingerSelectionItemAdapter
-                    val from = viewHolder.adapterPosition
-                    val to = target.adapterPosition
-                    // 2. Update the backing model. Custom implementation in
-                    //    MainRecyclerViewAdapter. You need to implement
-                    //    reordering of the backing model inside the method.
-                    viewModel.moveItem(from, to)
-                    // 3. Tell adapter to render the model update.
-                    adapter.notifyItemMoved(from, to)
-                    return true
-                }
-
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                }
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?,
+                                           actionState: Int) {
+                super.onSelectedChanged(viewHolder, actionState)
+                if (actionState == ACTION_STATE_DRAG) viewHolder?.itemView?.alpha = 0.5f
             }
-        ItemTouchHelper(simpleItemTouchCallback)
-    }
+
+            override fun clearView(recyclerView: RecyclerView,
+                                   viewHolder: RecyclerView.ViewHolder) {
+                super.clearView(recyclerView, viewHolder)
+                viewHolder.itemView.alpha = 1.0f
+            }
+
+            override fun onMove(recyclerView: RecyclerView,
+                                viewHolder: RecyclerView.ViewHolder,
+                                target: RecyclerView.ViewHolder): Boolean {
+                val from = viewHolder.adapterPosition
+                val to = target.adapterPosition
+                viewModel.moveItem(from, to)
+                recyclerView.adapter?.notifyItemMoved(from, to)
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            }
+        }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +79,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
     }
 
     private fun initRecyclerView() {
-        fingerSelectionAdapter = FingerSelectionItemAdapter(this, viewModel)
+        fingerSelectionAdapter = FingerSelectionItemAdapter(this, viewModel, itemTouchHelper)
         fingerSelectionRecyclerView.layoutManager = LinearLayoutManager(this)
         fingerSelectionRecyclerView.adapter = fingerSelectionAdapter
         itemTouchHelper.attachToRecyclerView(fingerSelectionRecyclerView)
@@ -97,16 +103,26 @@ class FingerSelectionActivity : BaseSplitActivity() {
 
     override fun onBackPressed() {
         if (viewModel.haveSettingsChanged()) {
-            AlertDialog.Builder(this)
-                .setTitle(getString(R.string.finger_selection_confirm_dialog_text))
-                .setPositiveButton(getString(R.string.finger_selection_confirm_dialog_yes)) { _, _ ->
-                    viewModel.savePreference()
-                    super.onBackPressed()
-                }
-                .setNegativeButton(getString(R.string.finger_selection_confirm_dialog_no)) { _, _ -> super.onBackPressed() }
-                .setCancelable(false).create().show()
+            if (viewModel.canSavePreference()) {
+                createAndShowConfirmationDialog()
+            } else {
+                showToast(R.string.finger_selection_invalid)
+            }
         } else {
             super.onBackPressed()
         }
+    }
+
+    private fun createAndShowConfirmationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.finger_selection_confirm_dialog_text))
+            .setPositiveButton(getString(R.string.finger_selection_confirm_dialog_yes)) { _, _ ->
+                viewModel.savePreference()
+                super.onBackPressed()
+            }
+            .setNegativeButton(getString(R.string.finger_selection_confirm_dialog_no)) { _, _ -> super.onBackPressed() }
+            .setCancelable(false)
+            .create()
+            .show()
     }
 }
