@@ -14,6 +14,8 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.data.db.event.local.EventLocalDataSource
+import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
 import com.simprints.id.data.db.events_sync.down.local.EventDownSyncOperationLocalDataSource
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
@@ -22,6 +24,7 @@ import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState.*
 import kotlinx.android.synthetic.main.activity_debug.*
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,9 +32,10 @@ import javax.inject.Inject
 class DebugActivity : BaseSplitActivity() {
 
     @Inject lateinit var eventSyncManager: EventSyncManager
-    @Inject lateinit var EventDownSyncOperationLocalDataSource: EventDownSyncOperationLocalDataSource
+    @Inject lateinit var eventDownSyncOperationLocalDataSource: EventDownSyncOperationLocalDataSource
     @Inject lateinit var securityStateRepository: SecurityStateRepository
     @Inject lateinit var securityStateProcessor: SecurityStateProcessor
+    @Inject lateinit var eventLocalDataSource: EventLocalDataSource
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(this)
@@ -47,8 +51,8 @@ class DebugActivity : BaseSplitActivity() {
             val states = (it.downSyncWorkersInfo.map { it.state } + it.upSyncWorkersInfo.map { it.state })
             val message =
                 "${it.syncId.takeLast(3)} - " +
-                "${states.toDebugActivitySyncState().name} - " +
-                "${it.progress}/${it.total}"
+                    "${states.toDebugActivitySyncState().name} - " +
+                    "${it.progress}/${it.total}"
 
             val ssb = SpannableStringBuilder(logs.text)
             ssb.append(coloredText(message + "\n", Color.parseColor(getRandomColor(it.syncId))))
@@ -74,7 +78,7 @@ class DebugActivity : BaseSplitActivity() {
             wm.pruneWork()
 
             inBackground {
-                EventDownSyncOperationLocalDataSource.deleteAll()
+                eventDownSyncOperationLocalDataSource.deleteAll()
             }
         }
 
@@ -84,6 +88,16 @@ class DebugActivity : BaseSplitActivity() {
 
         securityStateProjectEnded.setOnClickListener {
             setSecurityStatus(SecurityState.Status.PROJECT_ENDED)
+        }
+
+        printRoomDb.setOnClickListener {
+            logs.text = ""
+            inBackground {
+                val events = eventLocalDataSource.load(DbLocalEventQuery()).toList().groupBy { it.type }
+                events.forEach {
+                    logs.text = "${logs.text} ${it.value} ${it.value.size} \n"
+                }
+            }
         }
     }
 

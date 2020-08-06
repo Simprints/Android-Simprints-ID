@@ -10,6 +10,8 @@ import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
 import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.tools.TimeHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
@@ -72,16 +74,26 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
         }
     }
 
-
-    private fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent) {
-
+    private suspend fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent) {
+        val subject = Subject.buildSubjectFromCreationPayload(event.payload)
+        if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
+            subjectRepository.save(subject)
+        }
     }
 
-    private fun handleSubjectMoveEvent(event: EnrolmentRecordMoveEvent) {
-
+    private suspend fun handleSubjectMoveEvent(event: EnrolmentRecordMoveEvent) {
+        event.payload.enrolmentRecordCreation?.let {
+            val subject = Subject.buildSubjectFromCreationPayload(it)
+            if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
+                subjectRepository.save(subject)
+            }
+        }
+        event.payload.enrolmentRecordDeletion?.let {
+            subjectRepository.delete(listOf(Query(subjectId = it.subjectId)))
+        }
     }
 
-    private fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent) {
-
+    private suspend fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent) {
+        subjectRepository.delete(listOf(Query(subjectId = event.payload.subjectId)))
     }
 }
