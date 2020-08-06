@@ -70,7 +70,7 @@
     <Button
         android:id="@+id/addFingerButton"
         style="?android:attr/borderlessButtonStyle"
-        android:layout_margin="8dp"
+        android:layout_margin="10dp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/button_rounded_corners_orange"
@@ -86,7 +86,10 @@
     <Button
         android:id="@+id/resetButton"
         style="?android:attr/borderlessButtonStyle"
-        android:layout_margin="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="10dp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/button_rounded_corners_orange"

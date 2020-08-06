@@ -1,13 +1,16 @@
 package com.simprints.id.activities.settings.fingerselection
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.CheckedTextView
 import android.widget.ImageView
 import android.widget.Spinner
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
@@ -16,13 +19,13 @@ import com.simprints.id.tools.extensions.onItemSelectedWithPosition
 import kotlinx.android.synthetic.main.item_finger_selection.view.*
 
 class FingerSelectionItemAdapter(private val context: Context,
-                                 private val viewModel: FingerSelectionViewModel) :
+                                 private val viewModel: FingerSelectionViewModel,
+                                 private val itemTouchHelper: ItemTouchHelper) :
     RecyclerView.Adapter<FingerSelectionItemAdapter.FingerSelectionItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FingerSelectionItemViewHolder =
-        FingerSelectionItemViewHolder(context, viewModel,
-            LayoutInflater.from(context)
-                .inflate(R.layout.item_finger_selection, parent, false)
+        FingerSelectionItemViewHolder(context, viewModel, itemTouchHelper,
+            LayoutInflater.from(context).inflate(R.layout.item_finger_selection, parent, false)
         )
 
     override fun getItemCount(): Int = viewModel.items.value?.size ?: 0
@@ -31,12 +34,13 @@ class FingerSelectionItemAdapter(private val context: Context,
         viewHolder.bind()
     }
 
-    class FingerSelectionItemViewHolder(val context: Context, val viewModel: FingerSelectionViewModel, view: View) : RecyclerView.ViewHolder(view) {
-        private val grip: ImageView = view.gripFingerSelectionImageView
+    class FingerSelectionItemViewHolder(val context: Context, val viewModel: FingerSelectionViewModel, val itemTouchHelper: ItemTouchHelper, view: View) : RecyclerView.ViewHolder(view) {
+        val grip: ImageView = view.gripFingerSelectionImageView
         private val fingerSpinner: Spinner = view.fingerSelectionSpinner
         private val quantitySpinner: Spinner = view.fingerQuantitySpinner
         private val deleteButton: ImageView = view.deleteFingerSelectionImageView
 
+        @SuppressLint("ClickableViewAccessibility")
         fun bind() {
             fingerSpinner.adapter = FingerIdAdapter(context)
             quantitySpinner.adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, QUANTITY_OPTIONS)
@@ -56,6 +60,11 @@ class FingerSelectionItemAdapter(private val context: Context,
                 deleteButton.visibility = View.INVISIBLE
                 fingerSpinner.isEnabled = false
                 fingerSpinner.isClickable = false
+            }
+
+            grip.setOnTouchListener { _, event ->
+                if (event.actionMasked == MotionEvent.ACTION_DOWN) itemTouchHelper.startDrag(this)
+                true
             }
         }
     }
