@@ -13,13 +13,13 @@ import androidx.work.WorkManager
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.db.subjects_sync.down.local.EventsDownSyncOperationLocalDataSource
+import com.simprints.id.data.db.events_sync.down.local.EventDownSyncOperationLocalDataSource
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
-import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncWorkerState
-import com.simprints.id.services.sync.subjects.master.models.SubjectsSyncWorkerState.*
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState
+import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState.*
 import kotlinx.android.synthetic.main.activity_debug.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,8 +27,8 @@ import javax.inject.Inject
 
 class DebugActivity : BaseSplitActivity() {
 
-    @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
-    @Inject lateinit var EventsDownSyncOperationLocalDataSource: EventsDownSyncOperationLocalDataSource
+    @Inject lateinit var eventSyncManager: EventSyncManager
+    @Inject lateinit var EventDownSyncOperationLocalDataSource: EventDownSyncOperationLocalDataSource
     @Inject lateinit var securityStateRepository: SecurityStateRepository
     @Inject lateinit var securityStateProcessor: SecurityStateProcessor
 
@@ -42,7 +42,7 @@ class DebugActivity : BaseSplitActivity() {
 
         setContentView(R.layout.activity_debug)
 
-        subjectsSyncManager.getLastSyncState().observe(this, Observer {
+        eventSyncManager.getLastSyncState().observe(this, Observer {
             val states = (it.downSyncWorkersInfo.map { it.state } + it.upSyncWorkersInfo.map { it.state })
             val message =
                 "${it.syncId.takeLast(3)} - " +
@@ -56,23 +56,23 @@ class DebugActivity : BaseSplitActivity() {
         })
 
         syncSchedule.setOnClickListener {
-            subjectsSyncManager.scheduleSync()
+            eventSyncManager.scheduleSync()
         }
 
         syncStart.setOnClickListener {
-            subjectsSyncManager.sync()
+            eventSyncManager.sync()
         }
 
         syncStop.setOnClickListener {
-            subjectsSyncManager.stop()
+            eventSyncManager.stop()
         }
 
         cleanAll.setOnClickListener {
-            subjectsSyncManager.cancelScheduledSync()
-            subjectsSyncManager.stop()
+            eventSyncManager.cancelScheduledSync()
+            eventSyncManager.stop()
             wm.pruneWork()
 
-            EventsDownSyncOperationLocalDataSource.deleteAll()
+            EventDownSyncOperationLocalDataSource.deleteAll()
         }
 
         securityStateCompromised.setOnClickListener {

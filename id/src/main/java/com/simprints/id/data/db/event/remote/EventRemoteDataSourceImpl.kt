@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonToken.START_ARRAY
 import com.fasterxml.jackson.core.JsonToken.START_OBJECT
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.common.models.EventCount
+import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.remote.models.ApiEvent
 import com.simprints.id.data.db.event.remote.models.fromApiToDomain
@@ -24,7 +24,7 @@ import java.io.InputStream
 
 class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFactory) : EventRemoteDataSource {
 
-    override suspend fun count(query: ApiEventQuery): List<EventCount> =
+    override suspend fun count(query: ApiRemoteEventQuery): List<EventCount> =
         with(query) {
             executeCall("EventCount") { eventsRemoteInterface ->
                 eventsRemoteInterface.countEvents(
@@ -40,7 +40,7 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun getEvents(query: ApiEventQuery, scope: CoroutineScope): ReceiveChannel<List<Event>> {
+    override suspend fun getEvents(query: ApiRemoteEventQuery, scope: CoroutineScope): ReceiveChannel<List<Event>> {
         val streaming = takeStreaming(query)
         return scope.produce {
             parseStreamAndEmitEvents(streaming, this)
@@ -80,7 +80,7 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
         }
     }
 
-    private suspend fun takeStreaming(query: ApiEventQuery) =
+    private suspend fun takeStreaming(query: ApiRemoteEventQuery) =
         with(query) {
             executeCall("EventDownload") { eventsRemoteInterface ->
                 eventsRemoteInterface.downloadEvents(

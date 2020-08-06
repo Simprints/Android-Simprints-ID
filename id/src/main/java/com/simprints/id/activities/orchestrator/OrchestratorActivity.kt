@@ -14,8 +14,8 @@ import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.sync.SyncManager
-import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
 import kotlinx.coroutines.runBlocking
@@ -26,7 +26,7 @@ class OrchestratorActivity : BaseSplitActivity() {
 
     @Inject lateinit var orchestratorViewModelFactory: OrchestratorViewModelFactory
     @Inject lateinit var syncManager: SyncManager
-    @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
+    @Inject lateinit var eventSyncManager: EventSyncManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
 
@@ -76,7 +76,7 @@ class OrchestratorActivity : BaseSplitActivity() {
 
     private fun scheduleAndStartSyncIfNecessary() {
         if (preferencesManager.subjectsDownSyncSetting == SubjectsDownSyncSetting.EXTRA) {
-            subjectsSyncManager.sync()
+            eventSyncManager.sync()
         }
         syncManager.scheduleBackgroundSyncs()
     }

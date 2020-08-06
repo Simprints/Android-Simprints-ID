@@ -23,7 +23,7 @@ import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.SyncManager
-import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
@@ -41,24 +41,24 @@ class TestSecurityModule(
 ) : SecurityModule() {
 
     override fun provideSignerManager(
-        projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager,
-        subjectsSyncManager: SubjectsSyncManager,
-        syncManager: SyncManager,
-        securityStateScheduler: SecurityStateScheduler,
-        longConsentRepository: LongConsentRepository,
-        eventRepository: EventRepository,
-        baseUrlProvider: BaseUrlProvider,
-        remoteConfigWrapper: RemoteConfigWrapper
+            projectRepository: ProjectRepository,
+            remoteDbManager: RemoteDbManager,
+            loginInfoManager: LoginInfoManager,
+            preferencesManager: PreferencesManager,
+            eventSyncManager: EventSyncManager,
+            syncManager: SyncManager,
+            securityStateScheduler: SecurityStateScheduler,
+            longConsentRepository: LongConsentRepository,
+            eventRepository: EventRepository,
+            baseUrlProvider: BaseUrlProvider,
+            remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = signerManagerRule.resolveDependency {
         super.provideSignerManager(
             projectRepository,
             remoteDbManager,
             loginInfoManager,
             preferencesManager,
-            subjectsSyncManager,
+            eventSyncManager,
             syncManager,
             securityStateScheduler,
             longConsentRepository,

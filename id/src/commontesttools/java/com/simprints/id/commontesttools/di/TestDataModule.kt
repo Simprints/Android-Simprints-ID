@@ -21,7 +21,7 @@ import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.services.sync.subjects.master.internal.SubjectsSyncCache
+import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.subjects.up.controllers.SubjectsUpSyncExecutor
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
@@ -81,12 +81,12 @@ class TestDataModule(
             eventRemoteDataSource: EventRemoteDataSource,
             subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository,
             preferencesManager: PreferencesManager,
-            subjectsSyncCache: SubjectsSyncCache
+            eventSyncCache: EventSyncCache
     ): SubjectRepositoryUpSyncHelper =
         personRepositoryUpSyncHelperRule.resolveDependency {
             super.providePersonRepositoryUpSyncHelper(
                 loginInfoManager, subjectLocalDataSource, eventRemoteDataSource,
-                subjectsUpSyncScopeRepository, preferencesManager, subjectsSyncCache
+                subjectsUpSyncScopeRepository, preferencesManager, eventSyncCache
             )
     }
 

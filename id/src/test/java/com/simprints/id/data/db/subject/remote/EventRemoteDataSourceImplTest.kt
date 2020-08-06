@@ -5,7 +5,7 @@
 //import com.google.gson.reflect.TypeToken
 //import com.simprints.id.commontesttools.EnrolmentRecordsGeneratorUtils.getRandomEnrolmentEvents
 //import com.simprints.id.data.db.common.RemoteDbManager
-//import com.simprints.id.data.db.common.models.EventCount
+//import com.simprints.id.data.db.event.domain.EventCount
 //import com.simprints.id.data.db.event.domain.events.EventPayloadType.*
 //import com.simprints.id.data.db.event.domain.events.Events
 //import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordCreationPayload

@@ -15,8 +15,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.di.DashboardActivityModule
-import com.simprints.id.services.sync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.sync.subjects.master.internal.SubjectsSyncCache
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.testtools.common.di.DependencyRule
@@ -54,16 +54,16 @@ class TestDashboardActivityModule(
     }
 
     override fun provideDashboardSyncCardStateRepository(
-        subjectsSyncManager: SubjectsSyncManager,
-        deviceManager: DeviceManager,
-        preferencesManager: PreferencesManager,
-        syncScopeRepository: SubjectsDownSyncScopeRepository,
-        cacheSync: SubjectsSyncCache,
-        timeHelper: TimeHelper
+            eventSyncManager: EventSyncManager,
+            deviceManager: DeviceManager,
+            preferencesManager: PreferencesManager,
+            syncScopeRepository: SubjectsDownSyncScopeRepository,
+            cacheSync: EventSyncCache,
+            timeHelper: TimeHelper
     ): DashboardSyncCardStateRepository {
         return syncCardStateRepositoryRule.resolveDependency {
             super.provideDashboardSyncCardStateRepository(
-                subjectsSyncManager,
+                eventSyncManager,
                 deviceManager,
                 preferencesManager,
                 syncScopeRepository,

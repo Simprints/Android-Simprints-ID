@@ -13,7 +13,7 @@ import com.simprints.id.data.db.events_sync.up.local.DbEventsUpSyncOperation
 import com.simprints.id.data.db.events_sync.up.local.EventsUpSyncOperationLocalDataSource
 
 @Database(entities = [DbEventsDownSyncOperation::class, DbEventsUpSyncOperation::class], version = 2, exportSchema = false)
-@TypeConverters(Converters::class, Converters::class)
+@TypeConverters(Converters::class)
 @Keep
 abstract class EventsSyncStatusDatabase : RoomDatabase() {
 
@@ -22,7 +22,7 @@ abstract class EventsSyncStatusDatabase : RoomDatabase() {
     abstract val upSyncOperationsDao: EventsUpSyncOperationLocalDataSource
 
     companion object {
-        private const val ROOM_DB_NAME = "room_db"
+        const val ROOM_DB_NAME = "room_db"
 
         fun getDatabase(context: Context): EventsSyncStatusDatabase = Room
             .databaseBuilder(context.applicationContext, EventsSyncStatusDatabase::class.java, ROOM_DB_NAME)

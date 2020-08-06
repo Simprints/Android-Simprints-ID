@@ -4,13 +4,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
-import com.simprints.id.data.db.common.models.SubjectsCount
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.sync.subjects.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*

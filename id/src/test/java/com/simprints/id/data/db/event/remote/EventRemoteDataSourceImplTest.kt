@@ -9,9 +9,8 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.id.data.db.common.models.EventCount
+import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.remote.models.ApiEventCount
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
@@ -40,7 +39,7 @@ class EventRemoteDataSourceImplTest {
     @MockK lateinit var eventRemoteInterface: EventRemoteInterface
 
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
-    private val query = ApiEventQuery(
+    private val query = ApiRemoteEventQuery(
         projectId = DEFAULT_PROJECT_ID,
         userId = DEFAULT_USER_ID,
         moduleIds = listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
@@ -72,7 +71,7 @@ class EventRemoteDataSourceImplTest {
 
             val count = eventRemoteDataSource.count(query)
 
-            assertThat(count).isEqualTo(listOf(EventCount(EventType.ENROLMENT_RECORD_CREATION, 1)))
+            assertThat(count).isEqualTo(listOf(EventCount(ENROLMENT_RECORD_CREATION, 1)))
             coVerify(exactly = 1) {
                 eventRemoteInterface.countEvents(
                     DEFAULT_PROJECT_ID,

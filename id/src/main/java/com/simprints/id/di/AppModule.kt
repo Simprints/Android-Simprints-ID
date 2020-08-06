@@ -32,11 +32,10 @@ import com.simprints.id.data.db.event.local.EventDatabaseFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.EventLocalDataSourceImpl
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -64,8 +63,9 @@ import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
-import com.simprints.id.services.sync.imageUpSync.ImageUpSyncScheduler
-import com.simprints.id.services.sync.imageUpSync.ImageUpSyncSchedulerImpl
+import com.simprints.id.services.sync.events.down.EventDownSyncHelper
+import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
+import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
 import com.simprints.id.services.sync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.*
 import com.simprints.id.tools.device.ConnectivityHelper
@@ -197,7 +197,7 @@ open class AppModule {
 
     @Provides
     open fun provideDbEventDatabaseFactory(ctx: Context,
-                                            secureDataManager: SecureLocalDbKeyProvider): EventDatabaseFactory =
+                                           secureDataManager: SecureLocalDbKeyProvider): EventDatabaseFactory =
         DbEventDatabaseFactoryImpl(ctx, secureDataManager)
 
     @Provides
@@ -230,12 +230,6 @@ open class AppModule {
             crashReportManager,
             timeHelper
         )
-
-    @Provides
-    @Singleton
-    open fun provideSyncStatusDatabase(ctx: Context): SubjectsSyncStatusDatabase =
-        SubjectsSyncStatusDatabase.getDatabase(ctx)
-
 
     @Provides
     fun provideModuleViewModelFactory(repository: ModuleRepository) =
@@ -287,11 +281,11 @@ open class AppModule {
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
 
     @Provides
-    open fun provideFetchGuidViewModelFactory(personRepository: SubjectRepository,
+    open fun provideFetchGuidViewModelFactory(downSyncHelper: EventDownSyncHelper,
                                               deviceManager: DeviceManager,
                                               eventRepository: EventRepository,
                                               timeHelper: TimeHelper) =
-        FetchGuidViewModelFactory(personRepository, deviceManager, eventRepository, timeHelper)
+        FetchGuidViewModelFactory(downSyncHelper, deviceManager, eventRepository, timeHelper)
 
     @Provides
     open fun provideSyncInformationViewModelFactory(
@@ -299,11 +293,12 @@ open class AppModule {
         subjectLocalDataSource: SubjectLocalDataSource,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
-        subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository
-    ) = SyncInformationViewModelFactory(
-        personRepository, subjectLocalDataSource, preferencesManager,
-        loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository
-    )
+        downSyncScopeRepository: EventDownSyncScopeRepository
+    ) =
+        SyncInformationViewModelFactory(
+            personRepository, subjectLocalDataSource, preferencesManager,
+            loginInfoManager.getSignedInProjectIdOrEmpty(), downSyncScopeRepository
+        )
 
     @Provides
     open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =

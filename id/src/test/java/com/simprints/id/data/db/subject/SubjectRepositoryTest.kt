@@ -9,7 +9,7 @@
 //import com.simprints.id.commontesttools.DefaultTestConstants.userSyncScope
 //import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 //import com.simprints.id.data.db.SubjectFetchResult
-//import com.simprints.id.data.db.common.models.EventCount
+//import com.simprints.id.data.db.event.domain.EventCount
 //import com.simprints.id.data.db.event.domain.events.*
 //import com.simprints.id.data.db.subject.domain.FaceSample
 //import com.simprints.id.data.db.subject.domain.FingerprintSample

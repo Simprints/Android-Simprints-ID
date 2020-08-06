@@ -9,7 +9,7 @@ import com.simprints.id.data.db.subjects_sync.down.domain.EventsDownSyncOperatio
 import com.simprints.id.data.db.subjects_sync.down.local.DbEventsDownSyncOperationKey
 import org.junit.Test
 
-class EventsDownSyncOperationFactoryImplTest {
+class EventDownSyncOperationFactoryImplTest {
 
     companion object {
         const val LAST_EVENT_ID = "lastEventId"

@@ -4,8 +4,12 @@ import androidx.room.TypeConverter
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.domain.models.EventType
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperationResult.DownSyncState
-import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationKey
+import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
+import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation.DownSyncState
+import com.simprints.id.data.db.events_sync.down.domain.RemoteEventQuery
+import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation
+import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation.UpSyncState
+import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.domain.modality.Modes
 
 class Converters {
@@ -41,20 +45,58 @@ class Converters {
         }
 
     @TypeConverter
-    fun fromStringToDownSyncState(string: String?): DownSyncState? =
-        string?.let {
-            DownSyncState.valueOf(it)
-        }
+    fun fromEventDownSyncOperationToString(op: EventDownSyncOperation): String =
+        JsonHelper.jackson.writeValueAsString(op)
 
     @TypeConverter
-    fun fromDownSyncStateToString(downSyncState: DownSyncState?): String? =
-        downSyncState?.toString()
+    fun fromStringToEventDownSyncOperation(json: String): EventDownSyncOperation {
+        val type = object : TypeReference<EventDownSyncOperation>() {}
+        return JsonHelper.jackson.readValue(json, type)
+    }
 
     @TypeConverter
-    fun fromDbEventsDownSyncOperationKeyToString(DbEventsDownSyncOperationKey: DbEventsDownSyncOperationKey): String =
-        DbEventsDownSyncOperationKey.key
+    fun fromEventUpSyncOperationToString(op: EventUpSyncOperation): String =
+        JsonHelper.jackson.writeValueAsString(op)
 
     @TypeConverter
-    fun fromStringToDbEventsDownSyncOperationKey(key: String): DbEventsDownSyncOperationKey =
-        DbEventsDownSyncOperationKey(key)
+    fun fromStringToEventUpSyncOperation(json: String): EventUpSyncOperation {
+        val type = object : TypeReference<EventUpSyncOperation>() {}
+        return JsonHelper.jackson.readValue(json, type)
+    }
+
+    @TypeConverter
+    fun fromLocalEventQueryToString(value: LocalEventQuery): String =
+        JsonHelper.jackson.writeValueAsString(value)
+
+    @TypeConverter
+    fun fromStringToLocalEventQuery(json: String): LocalEventQuery {
+        val type = object : TypeReference<LocalEventQuery>() {}
+        return JsonHelper.jackson.readValue(json, type)
+    }
+
+    @TypeConverter
+    fun fromRemoteEventQueryToString(value: RemoteEventQuery): String =
+        JsonHelper.jackson.writeValueAsString(value)
+
+    @TypeConverter
+    fun fromStringToRemoteEventQuery(json: String): RemoteEventQuery {
+        val type = object : TypeReference<RemoteEventQuery>() {}
+        return JsonHelper.jackson.readValue(json, type)
+    }
+
+    @TypeConverter
+    fun fromDownSyncStateToString(state: DownSyncState): String =
+        state.name
+
+    @TypeConverter
+    fun fromStringToDownSyncState(name: String): DownSyncState =
+        name.let { DownSyncState.valueOf(name) }
+
+    @TypeConverter
+    fun fromUpSyncStateToString(state: UpSyncState): String =
+        state.name
+
+    @TypeConverter
+    fun fromStringToUpSyncState(name: String): UpSyncState =
+        name.let { UpSyncState.valueOf(name) }
 }
