@@ -11,4 +11,5 @@ interface EventDownSyncHelper {
 
     suspend fun downSync(scope: CoroutineScope,
                          operation: EventDownSyncOperation): ReceiveChannel<EventDownSyncProgress>
+
 }

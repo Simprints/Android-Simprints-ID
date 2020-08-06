@@ -2,7 +2,7 @@ package com.simprints.id.data.db.events_sync.up.domain
 
 data class EventUpSyncOperation(val scopeId: String,
                                 val queryEvent: LocalEventQuery,
-                                val lastState: UpSyncState,
+                                val lastState: UpSyncState? = null,
                                 val lastSyncTime: Long? = null) {
 
     enum class UpSyncState {

@@ -3,7 +3,7 @@ package com.simprints.id.data.db.events_sync.down
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
 
-interface EventDownSyncScopeRepo {
+interface EventDownSyncScopeRepository {
 
     suspend fun getDownSyncScope(): EventDownSyncScope
 

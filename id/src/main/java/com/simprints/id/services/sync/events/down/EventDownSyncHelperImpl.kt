@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepo
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
 import com.simprints.id.data.db.subject.SubjectRepository
@@ -20,7 +20,7 @@ import timber.log.Timber
 
 class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                               val eventRepository: EventRepository,
-                              private val eventDownSyncScopeRepo: EventDownSyncScopeRepo,
+                              private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
                               val timeHelper: TimeHelper) : EventDownSyncHelper {
 
     override suspend fun countForDownSync(operation: EventDownSyncOperation): List<EventCount> =
@@ -67,7 +67,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
 
     private suspend fun ProducerScope<EventDownSyncProgress>.emitProgress(lastOperation: EventDownSyncOperation, count: Int) {
         if (!this.isClosedForSend) {
-            eventDownSyncScopeRepo.insertOrUpdate(lastOperation)
+            eventDownSyncScopeRepository.insertOrUpdate(lastOperation)
             this.send(EventDownSyncProgress(lastOperation, count))
         }
     }

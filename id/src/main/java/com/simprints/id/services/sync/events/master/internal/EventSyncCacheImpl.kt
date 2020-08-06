@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 import java.util.*
 
 @SuppressLint("ApplySharedPref")
-class EventDownSyncCacheImpl(private val sharedForProgresses: SharedPreferences,
-                             private val sharedForLastSyncTime: SharedPreferences) : EventDownSyncCache {
+class EventSyncCacheImpl(private val sharedForProgresses: SharedPreferences,
+                         private val sharedForLastSyncTime: SharedPreferences) : EventSyncCache {
 
 
     override fun readLastSuccessfulSyncTime(): Date? {

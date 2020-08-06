@@ -12,10 +12,12 @@ import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.domain.modality.toMode
 import com.simprints.id.exceptions.unexpected.MissingArgumentForDownSyncScopeException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-class EventDownSyncScopeRepoImpl(val loginInfoManager: LoginInfoManager,
-                                 val preferencesManager: PreferencesManager,
-                                 private val downSyncOperationOperationDao: EventDownSyncOperationLocalDataSource) : EventDownSyncScopeRepo {
+class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
+                                       val preferencesManager: PreferencesManager,
+                                       private val downSyncOperationOperationDao: EventDownSyncOperationLocalDataSource) : EventDownSyncScopeRepository {
 
 
     override suspend fun getDownSyncScope(): EventDownSyncScope {
@@ -47,15 +49,21 @@ class EventDownSyncScopeRepoImpl(val loginInfoManager: LoginInfoManager,
     }
 
     private suspend fun fetchOperationFor(syncScope: EventDownSyncScope): List<EventDownSyncOperation> =
-        downSyncOperationOperationDao.load().filter {
-            it.downSyncOp.scopeId == syncScope.id
-        }.map { it.fromDbToDomain() }
+        withContext(Dispatchers.IO) {
+            downSyncOperationOperationDao.load().filter {
+                it.downSyncOp.scopeId == syncScope.id
+            }.map { it.fromDbToDomain() }
+        }
 
     override suspend fun insertOrUpdate(syncScopeOperation: EventDownSyncOperation) {
-        downSyncOperationOperationDao.insertOrUpdate(syncScopeOperation.fromDomainToDb())
+        withContext(Dispatchers.IO) {
+            downSyncOperationOperationDao.insertOrUpdate(syncScopeOperation.fromDomainToDb())
+        }
     }
 
     override suspend fun deleteAll() {
-        downSyncOperationOperationDao.deleteAll()
+        withContext(Dispatchers.IO) {
+            downSyncOperationOperationDao.deleteAll()
+        }
     }
 }
