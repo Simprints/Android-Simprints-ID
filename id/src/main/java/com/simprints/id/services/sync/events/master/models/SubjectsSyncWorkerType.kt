@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.subjects.master.models
+package com.simprints.id.services.sync.events.master.models
 
 
 enum class SubjectsSyncWorkerType {

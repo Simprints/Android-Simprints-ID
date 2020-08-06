@@ -9,7 +9,7 @@ import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.ON
-import com.simprints.id.services.sync.events.up.SubjectsUpSyncWorkersBuilder
+import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -33,7 +33,7 @@ open class SubjectsSyncMasterWorker(private val appContext: Context,
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var downSyncWorkerBuilder: EventDownSyncWorkersBuilder
-    @Inject lateinit var upSyncWorkerBuilder: SubjectsUpSyncWorkersBuilder
+    @Inject lateinit var upSyncWorkerBuilder: EventUpSyncWorkersBuilder
     @Inject lateinit var preferenceManager: PreferencesManager
     @Inject lateinit var eventSyncCache: EventSyncCache
     @Inject lateinit var subjectsSyncSubMasterWorkersBuilder: SubjectsSyncSubMasterWorkersBuilder
@@ -95,7 +95,7 @@ open class SubjectsSyncMasterWorker(private val appContext: Context,
         subjectsDownSyncSetting == ON || subjectsDownSyncSetting == EXTRA
     }
 
-    private fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =
+    private suspend fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =
         upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID)
 
     private fun clearWorkerHistory(uniqueId: String) {

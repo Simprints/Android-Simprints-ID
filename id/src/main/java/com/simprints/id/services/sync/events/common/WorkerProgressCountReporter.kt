@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.subjects.common
+package com.simprints.id.services.sync.events.common
 
 interface WorkerProgressCountReporter {
 

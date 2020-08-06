@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.subjects.master.internal
+package com.simprints.id.services.sync.events.master.internal
 
 import androidx.lifecycle.LiveData
 import androidx.work.WorkInfo

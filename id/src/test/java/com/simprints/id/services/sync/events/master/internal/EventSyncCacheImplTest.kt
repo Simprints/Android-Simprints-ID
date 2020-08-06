@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.services.sync.events.master.internal.EventDownSyncCacheImpl.Companion.PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY
+import com.simprints.id.services.sync.events.master.internal.EventSyncCacheImpl.Companion.PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY
 import io.mockk.MockKAnnotations
 import org.junit.Before
 import org.junit.Test
@@ -13,11 +13,11 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class EventDownSyncCacheImplTest {
+class EventSyncCacheImplTest {
 
     private val workId = UUID.randomUUID().toString()
     private val ctx: Context = ApplicationProvider.getApplicationContext()
-    private lateinit var eventDownSyncCache: EventDownSyncCache
+    private lateinit var eventSyncCache: EventSyncCache
     private lateinit var sharedPrefsForProgresses: SharedPreferences
     private lateinit var sharedPrefsForLastSyncTime: SharedPreferences
 
@@ -27,13 +27,13 @@ class EventDownSyncCacheImplTest {
         sharedPrefsForProgresses = ctx.getSharedPreferences("progress_cache", Context.MODE_PRIVATE)
         sharedPrefsForLastSyncTime = ctx.getSharedPreferences("lastSyncTime_cache", Context.MODE_PRIVATE)
 
-        eventDownSyncCache = EventDownSyncCacheImpl(sharedPrefsForProgresses, sharedPrefsForLastSyncTime)
+        eventSyncCache = EventSyncCacheImpl(sharedPrefsForProgresses, sharedPrefsForLastSyncTime)
     }
 
     @Test
     fun cache_shouldStoreADownSyncWorkerProgress() {
         val progress = 1
-        eventDownSyncCache.saveProgress(workId, progress)
+        eventSyncCache.saveProgress(workId, progress)
         assertThat(sharedPrefsForProgresses.getInt(workId, 0)).isEqualTo(1)
     }
 
@@ -41,21 +41,21 @@ class EventDownSyncCacheImplTest {
     fun cache_shouldReadDownSyncWorkerProgress() {
         val progress = 1
         storeProgresses(workId, progress)
-        val progressRead = eventDownSyncCache.readProgress(workId)
+        val progressRead = eventSyncCache.readProgress(workId)
         assertThat(progressRead).isEqualTo(progress)
     }
 
     @Test
     fun cache_shouldClearProgress() {
         storeProgresses(workId, 1)
-        eventDownSyncCache.clearProgresses()
+        eventSyncCache.clearProgresses()
         assertThat(sharedPrefsForProgresses.all.size).isEqualTo(0)
     }
 
     @Test
     fun cache_shouldStoreLastTime() {
         val now = Date()
-        eventDownSyncCache.storeLastSuccessfulSyncTime(now)
+        eventSyncCache.storeLastSuccessfulSyncTime(now)
         val stored = sharedPrefsForLastSyncTime.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, 0)
         assertThat(stored).isEqualTo(now.time)
     }
@@ -65,7 +65,7 @@ class EventDownSyncCacheImplTest {
         val now = Date()
         sharedPrefsForLastSyncTime.edit().putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, now.time).apply()
 
-        val stored = eventDownSyncCache.readLastSuccessfulSyncTime()
+        val stored = eventSyncCache.readLastSuccessfulSyncTime()
 
         assertThat(stored?.time).isEqualTo(now.time)
     }

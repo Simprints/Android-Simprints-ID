@@ -1,7 +1,7 @@
 package com.simprints.id.services.sync.events.up
 
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepo
+import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
 import com.simprints.id.tools.TimeHelper
@@ -14,7 +14,7 @@ import timber.log.Timber
 
 class EventUpSyncHelperImpl(
     private val eventRepository: EventRepository,
-    private val eventUpSyncScopeRepo: EventUpSyncScopeRepo,
+    private val eventUpSyncScopeRepo: EventUpSyncScopeRepository,
     private val timerHelper: TimeHelper
 ) : EventUpSyncHelper {
 

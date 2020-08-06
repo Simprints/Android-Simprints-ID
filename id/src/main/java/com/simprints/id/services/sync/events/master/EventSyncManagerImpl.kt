@@ -3,8 +3,8 @@ package com.simprints.id.services.sync.events.master
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepo
-import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepo
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.models.SubjectsSyncState
@@ -17,8 +17,8 @@ import java.util.concurrent.TimeUnit
 
 class EventSyncManagerImpl(private val ctx: Context,
                            private val subjectsSyncStateProcessor: SubjectsSyncStateProcessor,
-                           private val downSyncScopeRepo: EventDownSyncScopeRepo,
-                           private val upSyncScopeRepo: EventUpSyncScopeRepo,
+                           private val downSyncScopeRepository: EventDownSyncScopeRepository,
+                           private val upSyncScopeRepo: EventUpSyncScopeRepository,
                            private val eventSyncCache: EventSyncCache) : EventSyncManager {
 
     companion object {
@@ -87,7 +87,7 @@ class EventSyncManagerImpl(private val ctx: Context,
             .build()
 
     override suspend fun deleteSyncInfo() {
-        downSyncScopeRepo.deleteAll()
+        downSyncScopeRepository.deleteAll()
         upSyncScopeRepo.deleteAll()
         eventSyncCache.clearProgresses()
         eventSyncCache.storeLastSuccessfulSyncTime(null)

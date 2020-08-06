@@ -2,7 +2,7 @@ package com.simprints.id.services.sync.events.down
 
 import androidx.work.*
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepo
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
 import com.simprints.id.services.sync.events.common.*
@@ -14,12 +14,12 @@ import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWo
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class EventDownSyncWorkersBuilderImpl(private val downSyncScopeRepo: EventDownSyncScopeRepo,
+class EventDownSyncWorkersBuilderImpl(private val downSyncScopeRepository: EventDownSyncScopeRepository,
                                       private val jsonHelper: JsonHelper) : EventDownSyncWorkersBuilder {
 
 
     override suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest> {
-        val downSyncScope = downSyncScopeRepo.getDownSyncScope()
+        val downSyncScope = downSyncScopeRepository.getDownSyncScope()
         val uniqueDownSyncId = UUID.randomUUID().toString()
         return downSyncScope.operations.map { buildDownSyncWorkers(uniqueSyncId, uniqueDownSyncId, it) } + buildCountWorker(uniqueSyncId, uniqueDownSyncId, downSyncScope)
     }

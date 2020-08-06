@@ -2,7 +2,7 @@ package com.simprints.id.services.sync.events.up
 
 import androidx.work.OneTimeWorkRequest
 
-interface SubjectsUpSyncWorkersBuilder {
+interface EventUpSyncWorkersBuilder {
 
-    fun buildUpSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest>
+    suspend fun buildUpSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest>
 }

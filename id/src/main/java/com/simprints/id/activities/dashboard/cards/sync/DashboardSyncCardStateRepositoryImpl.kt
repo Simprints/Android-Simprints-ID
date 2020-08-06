@@ -2,8 +2,8 @@ package com.simprints.id.activities.dashboard.cards.sync
 
 import androidx.lifecycle.MediatorLiveData
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
-import com.simprints.id.data.db.subjects_sync.down.domain.ModuleSyncScope
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.SubjectModuleScope
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
@@ -21,7 +21,7 @@ import java.util.*
 class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManager,
                                            val deviceManager: DeviceManager,
                                            private val preferencesManager: PreferencesManager,
-                                           private val syncScopeRepository: SubjectsDownSyncScopeRepository,
+                                           private val downSyncScopeRepository: EventDownSyncScopeRepository,
                                            private val cacheSync: EventSyncCache,
                                            private val timeHelper: TimeHelper) : DashboardSyncCardStateRepository {
 
@@ -106,18 +106,19 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
         return !isRunning && (lastUpdate == null || timeHelper.msBetweenNowAndTime(lastUpdate.time) > MAX_TIME_BEFORE_SYNC_AGAIN)
     }
 
-    private fun bindUIToSync() {
+    private suspend fun bindUIToSync() {
+        val isModuleSelectionRequired = isModuleSelectionRequired()
         syncCardStateLiveData.addSource(isConnectedLiveData) { connectivity ->
             emitNewCardState(
                 connectivity,
-                isModuleSelectionRequired(),
+                isModuleSelectionRequired,
                 syncStateLiveData.value)
         }
 
         syncCardStateLiveData.addSource(syncStateLiveData) { syncState ->
             emitNewCardState(
                 isConnected(),
-                isModuleSelectionRequired(),
+                isModuleSelectionRequired,
                 syncState)
         }
     }
@@ -149,7 +150,7 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
         isSyncProcess(allSyncStates) || isSyncConnecting(allSyncStates)
 
 
-    private fun isModuleSelectionRequired() =
+    private suspend fun isModuleSelectionRequired() =
         isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
 
     private fun isDownSyncAllowed() = with(preferencesManager) {
@@ -158,7 +159,7 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
 
     private fun isSelectedModulesEmpty() = preferencesManager.selectedModules.isEmpty()
 
-    private fun isModuleSync() = syncScopeRepository.getDownSyncScope() is ModuleSyncScope
+    private suspend fun isModuleSync() = downSyncScopeRepository.getDownSyncScope() is SubjectModuleScope
 
     private fun isConnected() = isConnectedLiveData.value ?: true
 
