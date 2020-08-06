@@ -65,9 +65,9 @@ class FrameProcessor(private val libYuvJni: LibYuvJni) {
         rotatedTargetBoundingBox: RectF
     ): Pair<Size, ByteArray> {
         return libYuvJni.cropRotateYuvNV21(
-            Size(cameraWidth, cameraHeight), cameraFrame.data,
+            Size(cameraWidth, cameraHeight), cameraFrame.getData(),
             rect = rotatedTargetBoundingBox.toRect(),
-            rotation = cameraFrame.rotation
+            rotation = cameraFrame.rotationToUser
         )
     }
 
@@ -77,7 +77,7 @@ class FrameProcessor(private val libYuvJni: LibYuvJni) {
         cameraWidth: Int,
         cameraHeight: Int
     ): RectF {
-        return when (360 - cameraFrame.rotation) {
+        return when (360 - cameraFrame.rotationToUser) {
             0, 360 -> newBoundingBox
             90 -> RectF(
                 cameraWidth - newBoundingBox.bottom,
@@ -97,7 +97,7 @@ class FrameProcessor(private val libYuvJni: LibYuvJni) {
                 newBoundingBox.bottom,
                 cameraHeight - newBoundingBox.left
             )
-            else -> throw IllegalArgumentException("Unsupported rotation angle: ${cameraFrame.rotation}")
+            else -> throw IllegalArgumentException("Unsupported rotation angle: ${cameraFrame.rotationToUser}")
         }
     }
 
@@ -143,7 +143,7 @@ class FrameProcessor(private val libYuvJni: LibYuvJni) {
             Pair(cameraFrame.size.width, cameraFrame.size.height)
         }
 
-    private fun cameraRotatedPortrait(cameraFrame: Frame) = cameraFrame.rotation in arrayOf(90, 270)
+    private fun cameraRotatedPortrait(cameraFrame: Frame) = cameraFrame.rotationToUser in arrayOf(90, 270)
 
     private fun sizeFromMinRatio(
         cameraWidth: Int,
