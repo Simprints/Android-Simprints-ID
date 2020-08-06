@@ -40,13 +40,8 @@ class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) 
 
     internal var eventDownSyncDownloaderTask: EventDownSyncDownloaderTask = EventDownSyncDownloaderTaskImpl()
 
-    private val jsonForOp by lazy {
-        inputData.getString(INPUT_DOWN_SYNC_OPS)
-            ?: throw IllegalArgumentException("input required")
-    }
-
     private val downSyncOperation by lazy {
-        val jsonInput = inputData.getString(EventDownSyncCountWorker.INPUT_COUNT_WORKER_DOWN)
+        val jsonInput = inputData.getString(INPUT_DOWN_SYNC_OPS)
             ?: throw IllegalArgumentException("input required")
         jsonHelper.fromJson<EventDownSyncOperation>(jsonInput)
     }
