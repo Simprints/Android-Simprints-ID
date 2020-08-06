@@ -17,6 +17,8 @@ import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
 import com.simprints.uicomponents.models.Size
 import kotlinx.android.synthetic.main.fragment_live_feedback.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.isActive
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -56,20 +58,25 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
 
         lifecycleScope.launchWhenResumed {
             for (frame in vm.frameChannel) {
-                vm.process(
-                    frame, capture_overlay.rectInCanvas,
-                    Size(
-                        capture_overlay.width,
-                        capture_overlay.height
-                    )
-                )
+                if (this.isActive)
+                    try {
+                        vm.process(
+                            frame,
+                            capture_overlay.rectInCanvas,
+                            Size(capture_overlay.width, capture_overlay.height)
+                        )
+                    } catch (t: CancellationException) {
+                        Timber.e(t) // This is expected when the lifecycle finishes, read the class
+                    } catch (t: Throwable) {
+                        Timber.e(t)
+                        mainVm.submitError(t)
+                    }
             }
         }
     }
 
     private fun startCamera() {
         face_capture_camera.let {
-            it.useDeviceOrientation = true
             it.setLifecycleOwner(viewLifecycleOwner)
             it.addFrameProcessor(this)
         }
@@ -83,8 +90,8 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
     override fun process(frame: Frame) {
         try {
             vm.handlePreviewFrame(frame.freeze())
-        } catch (ex: IllegalStateException) {
-            Timber.e(ex)
+        } catch (t: Throwable) {
+            Timber.e(t)
         }
     }
 

@@ -68,6 +68,8 @@
     <string name="error_licence_missing_message">Face license is missing, please contact your system administrator</string>
     <string name="error_configuration_error_title">Configuration error</string>
     <string name="error_configuration_error_message">There was an error while configuring face modality, please contact your system administrator</string>
+    <string name="error_unexpected_error_title">Error occurred</string>
+    <string name="error_unexpected_error_message">Please try again and if Simprints does not work contact your system administrator</string>
 
     <!--  Configuration screens  -->
     <string name="face_configuration_started">Configuring face modality</string>

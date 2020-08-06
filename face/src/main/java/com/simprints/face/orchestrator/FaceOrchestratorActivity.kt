@@ -65,8 +65,7 @@ class FaceOrchestratorActivity : FaceActivity() {
                 MATCH_REQUEST -> viewModel.matchFinished(data?.getParcelableExtra(IFaceResponse.BUNDLE_KEY))
             }
         } else {
-            setResult(Activity.RESULT_CANCELED)
-            finish()
+            viewModel.unexpectedErrorHappened()
         }
     }
 
