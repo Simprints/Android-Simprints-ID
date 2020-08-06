@@ -1,7 +1,18 @@
 package com.simprints.id.data.db.events_sync.down.domain
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.SubjectModuleScope
+import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.SubjectUserScope
+import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope.SubjectProjectScope
 import com.simprints.id.domain.modality.Modes
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = SubjectProjectScope::class),
+    JsonSubTypes.Type(value = SubjectUserScope::class),
+    JsonSubTypes.Type(value = SubjectModuleScope::class)
+)
 abstract class EventDownSyncScope(val operations: MutableList<EventDownSyncOperation> = mutableListOf()) {
 
     abstract val id: String
@@ -35,6 +46,10 @@ abstract class EventDownSyncScope(val operations: MutableList<EventDownSyncOpera
     }
 
     companion object {
+        const val PROJECT_SUBJECT_SYNC_KEY = "PROJECT_SUBJECT_SYNC"
+        const val USER_SUBJECT_SYNC_KEY = "USER_SUBJECT_SYNC"
+        const val MODULE_SUBJECT_SYNC_KEY = "MODULE_SUBJECT_SYNC"
+
         private const val separator = "||"
     }
 }

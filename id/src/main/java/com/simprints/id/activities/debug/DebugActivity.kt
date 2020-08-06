@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.db.events_sync.down.local.EventDownSyncOperationLocalDataSource
@@ -72,7 +73,9 @@ class DebugActivity : BaseSplitActivity() {
             eventSyncManager.stop()
             wm.pruneWork()
 
-            EventDownSyncOperationLocalDataSource.deleteAll()
+            inBackground {
+                EventDownSyncOperationLocalDataSource.deleteAll()
+            }
         }
 
         securityStateCompromised.setOnClickListener {
