@@ -22,4 +22,7 @@ class FaceCrashReportManagerImpl(private val crashReportManager: CoreCrashReport
         crashReportManager.logMalfunction(message)
     }
 
+    override fun logException(throwable: Throwable) {
+        crashReportManager.logException(throwable)
+    }
 }
