@@ -25,7 +25,7 @@ class DbEventDatabaseFactoryImpl(
             val passphrase: ByteArray = getBytes(key)
             val factory = SupportFactory(passphrase)
             return Room.databaseBuilder(ctx, EventRoomDatabase::class.java, DB_NAME)
-                .openHelperFactory(factory)
+                //.openHelperFactory(factory) //STOPSHIP
                 .build()
         } catch (t: Throwable) {
             Timber.e(t)

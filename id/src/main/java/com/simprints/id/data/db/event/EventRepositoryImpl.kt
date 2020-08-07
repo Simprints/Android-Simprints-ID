@@ -132,7 +132,7 @@ open class EventRepositoryImpl(
     @VisibleForTesting
     suspend fun createBatchesWithCloseSessions(): List<Batch> {
         val sessionsAndCounts =
-            loadCloseSessions().map {
+            loadCloseSessions(signedInProject).map {
                 it.id to eventLocalDataSource.count(DbLocalEventQuery(sessionId = it.id))
             }
 
@@ -187,16 +187,16 @@ open class EventRepositoryImpl(
         sessionEventsSyncManager.cancelSyncWorkers()
     }
 
-    private suspend fun loadOpenSessions() =
-        eventLocalDataSource.load(getDbQueryForOpenSession(signedInProject)).map { it as SessionCaptureEvent }
+    private suspend fun loadOpenSessions(projectId: String? = null) =
+        eventLocalDataSource.load(getDbQueryForOpenSession(projectId)).map { it as SessionCaptureEvent }
 
-    private suspend fun loadCloseSessions() =
-        eventLocalDataSource.load(getDbQueryForCloseSession(signedInProject)).map { it as SessionCaptureEvent }
+    private suspend fun loadCloseSessions(projectId: String? = null) =
+        eventLocalDataSource.load(getDbQueryForCloseSession(projectId)).map { it as SessionCaptureEvent }
 
-    private fun getDbQueryForOpenSession(projectId: String) =
+    private fun getDbQueryForOpenSession(projectId: String?) =
         DbLocalEventQuery(projectId = projectId, type = SESSION_CAPTURE, endTime = LongRange(0, 0))
 
-    private fun getDbQueryForCloseSession(projectId: String) =
+    private fun getDbQueryForCloseSession(projectId: String?) =
         DbLocalEventQuery(projectId = projectId, type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE))
 
     private fun EventLabels.appendLabelsForAllEvents() =

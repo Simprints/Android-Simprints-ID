@@ -24,8 +24,10 @@ import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState.*
 import kotlinx.android.synthetic.main.activity_debug.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -95,7 +97,9 @@ class DebugActivity : BaseSplitActivity() {
             inBackground {
                 val events = eventLocalDataSource.load(DbLocalEventQuery()).toList().groupBy { it.type }
                 events.forEach {
-                    logs.text = "${logs.text} ${it.value} ${it.value.size} \n"
+                    withContext(Dispatchers.Main) {
+                        logs.text = "${logs.text} ${it.value} ${it.value.size} \n"
+                    }
                 }
             }
         }
