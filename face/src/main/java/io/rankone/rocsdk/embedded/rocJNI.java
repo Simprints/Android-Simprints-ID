@@ -42,6 +42,11 @@ public class rocJNI {
   public final static native void delete_roc_time(long jarg1);
   public final static native void roc_time_assign(long jarg1, java.math.BigInteger jarg2);
   public final static native java.math.BigInteger roc_time_value(long jarg1);
+  public final static native long new_roc_algorithm_options();
+  public final static native long copy_roc_algorithm_options(int jarg1);
+  public final static native void delete_roc_algorithm_options(long jarg1);
+  public final static native void roc_algorithm_options_assign(long jarg1, int jarg2);
+  public final static native int roc_algorithm_options_value(long jarg1);
   public final static native long new_uint8_t_array(int jarg1);
   public final static native void delete_uint8_t_array(long jarg1);
   public final static native short uint8_t_array_getitem(long jarg1, int jarg2);
@@ -131,6 +136,7 @@ public class rocJNI {
   public final static native String roc_from_bgra(byte[] jarg1, long jarg2, long jarg3, long jarg4, long jarg5, roc_image jarg5_);
   public final static native String roc_from_yuv(byte[] jarg1, byte[] jarg2, byte[] jarg3, long jarg4, long jarg5, long jarg6, long jarg7, long jarg8, long jarg9, roc_image jarg9_);
   public final static native String roc_read_ppm(String jarg1, long jarg2, roc_image jarg2_);
+  public final static native String roc_write_ppm(String jarg1, long jarg2, roc_image jarg2_);
   public final static native String roc_free_image(long jarg1, roc_image jarg1_);
   public final static native String roc_set_string(String jarg1, long jarg2);
   public final static native String roc_free_string(long jarg1);
@@ -182,6 +188,8 @@ public class rocJNI {
   public final static native int ROC_FR_COMPATIBILITY_VERSION_get();
   public final static native int ROC_TATTOO_COMPATIBILITY_VERSION_get();
   public final static native int ROC_TEMPLATE_VERSION_MASK_get();
+  public final static native String roc_algorithm_option_to_string(int jarg1, long jarg2);
+  public final static native String roc_algorithm_option_from_string(String jarg1, long jarg2);
   public final static native String roc_check_template_version(long jarg1);
   public final static native java.math.BigInteger ROC_NO_TIMESTAMP_get();
   public final static native long ROC_FR_FV_SIZE_get();
