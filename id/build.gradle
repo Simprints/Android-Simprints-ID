@@ -183,6 +183,8 @@ dependencies {
     implementation deps.rxjava2.tasks
     implementation deps.jackson.core
 
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
+
     // RootBeer (root detection)
     implementation deps.rootbeer.core
 

@@ -10,7 +10,6 @@ import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.Authoriza
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.callout.*
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
@@ -239,9 +238,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
             if (signedInProject.isNotEmpty()) {
-                (currentSessionEvent.payload as SessionCapturePayload).projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+                currentSessionEvent.payload.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             }
-            (currentSessionEvent.payload as SessionCapturePayload).analyticsId = analyticsId
+            currentSessionEvent.payload.analyticsId = analyticsId
             eventRepository.addEventToCurrentSession(currentSessionEvent)
         }
 
