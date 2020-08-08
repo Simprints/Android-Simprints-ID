@@ -11,12 +11,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
 import com.simprints.id.data.db.events_sync.down.local.EventDownSyncOperationLocalDataSource
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
@@ -38,6 +38,7 @@ class DebugActivity : BaseSplitActivity() {
     @Inject lateinit var securityStateRepository: SecurityStateRepository
     @Inject lateinit var securityStateProcessor: SecurityStateProcessor
     @Inject lateinit var eventLocalDataSource: EventLocalDataSource
+    @Inject lateinit var subjectRepository: SubjectRepository
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(this)
@@ -75,12 +76,15 @@ class DebugActivity : BaseSplitActivity() {
         }
 
         cleanAll.setOnClickListener {
-            eventSyncManager.cancelScheduledSync()
-            eventSyncManager.stop()
-            wm.pruneWork()
-
-            inBackground {
-                eventDownSyncOperationLocalDataSource.deleteAll()
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    eventSyncManager.cancelScheduledSync()
+                    eventSyncManager.stop()
+                    eventLocalDataSource.delete()
+                    eventDownSyncOperationLocalDataSource.deleteAll()
+                    subjectRepository.deleteAll()
+                    wm.pruneWork()
+                }
             }
         }
 
@@ -94,15 +98,18 @@ class DebugActivity : BaseSplitActivity() {
 
         printRoomDb.setOnClickListener {
             logs.text = ""
-            inBackground {
-                val events = eventLocalDataSource.load(DbLocalEventQuery()).toList().groupBy { it.type }
-                events.forEach {
-                    withContext(Dispatchers.Main) {
-                        logs.text = "${logs.text} ${it.value} ${it.value.size} \n"
+            lifecycleScope.launch {
+                withContext(Dispatchers.Main) {
+                    logs.text = "${logs.text} ${subjectRepository.count()} \n"
+
+                    val events = eventLocalDataSource.load(DbLocalEventQuery()).toList().groupBy { it.type }
+                    events.forEach {
+                        logs.text = "${logs.text} ${it.key} ${it.value.size} \n"
                     }
                 }
             }
         }
+
     }
 
     private fun getRandomColor(seed: String): String {

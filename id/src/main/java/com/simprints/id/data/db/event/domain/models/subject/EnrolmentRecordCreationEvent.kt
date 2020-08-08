@@ -32,7 +32,7 @@ data class EnrolmentRecordCreationEvent(
         labels: EventLabels = EventLabels() //StopShip
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
+        labels.copy(subjectId = subjectId, projectId = projectId, moduleIds = listOf(moduleId), attendantId = attendantId, mode = modes),
         EnrolmentRecordCreationPayload(createdAt, EVENT_VERSION, subjectId, projectId, moduleId, attendantId, biometricReferences),
         ENROLMENT_RECORD_CREATION)
 

@@ -2,7 +2,6 @@ package com.simprints.id.orchestrator
 
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EnrolmentEvent
-import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.Companion.buildBiometricReferences
 import com.simprints.id.data.db.subject.SubjectRepository
@@ -42,9 +41,9 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
                 subject.moduleId,
                 subject.attendantId,
                 preferencesManager.modalities.map { it.toMode() },
-                buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples),
-                EventLabels(attendantId = subject.attendantId, subjectId = subject.subjectId,  mode = preferencesManager.modalities.map { it.toMode() }))
+                buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples)
             )
+        )
     }
 
     override fun buildSubject(projectId: String,

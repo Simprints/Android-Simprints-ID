@@ -2,6 +2,7 @@ package com.simprints.id.data.db.events_sync.down.domain
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.SubjectModuleScope
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.SubjectUserScope
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope.SubjectProjectScope
@@ -13,7 +14,7 @@ import com.simprints.id.domain.modality.Modes
     JsonSubTypes.Type(value = SubjectUserScope::class),
     JsonSubTypes.Type(value = SubjectModuleScope::class)
 )
-abstract class EventDownSyncScope(val operations: MutableList<EventDownSyncOperation> = mutableListOf()) {
+abstract class EventDownSyncScope(open val operations: List<EventDownSyncOperation> = mutableListOf()) {
 
     abstract val id: String
 
@@ -22,6 +23,9 @@ abstract class EventDownSyncScope(val operations: MutableList<EventDownSyncOpera
         override val id: String
             get() = "$projectId$separator" +
                 modes.joinToString(separator)
+
+        override val operations =
+            listOf(EventDownSyncOperation(id, RemoteEventQuery(projectId, modes = modes, types = subjectEvents)))
     }
 
     data class SubjectUserScope(val projectId: String,
@@ -32,6 +36,9 @@ abstract class EventDownSyncScope(val operations: MutableList<EventDownSyncOpera
                 "$projectId$separator" +
                     "$attendantId$separator" +
                     modes.joinToString(separator)
+
+        override val operations =
+            listOf(EventDownSyncOperation(id, RemoteEventQuery(projectId, attendantId = attendantId, modes = modes, types = subjectEvents)))
     }
 
     data class SubjectModuleScope(val projectId: String,
@@ -43,13 +50,16 @@ abstract class EventDownSyncScope(val operations: MutableList<EventDownSyncOpera
                     "${moduleIds.joinToString(separator)}$separator" +
                     modes.joinToString(separator)
 
+        override val operations =
+            listOf(EventDownSyncOperation(id, RemoteEventQuery(projectId, moduleIds = moduleIds, modes = modes, types = subjectEvents)))
+
     }
 
     companion object {
         const val PROJECT_SUBJECT_SYNC_KEY = "PROJECT_SUBJECT_SYNC"
         const val USER_SUBJECT_SYNC_KEY = "USER_SUBJECT_SYNC"
         const val MODULE_SUBJECT_SYNC_KEY = "MODULE_SUBJECT_SYNC"
-
+        private val subjectEvents = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_MOVE, ENROLMENT_RECORD_DELETION)
         private const val separator = "||"
     }
 }
