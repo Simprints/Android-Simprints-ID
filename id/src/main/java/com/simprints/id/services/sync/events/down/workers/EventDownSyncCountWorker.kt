@@ -13,6 +13,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
+import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
@@ -51,6 +52,7 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result =
         withContext(Dispatchers.IO) {
+            Timber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Started")
             try {
                 getComponent<EventDownSyncCountWorker> { it.inject(this@EventDownSyncCountWorker) }
 
@@ -68,9 +70,11 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
             val downCount = getDownCount(downSyncScope)
             val output = jsonHelper.toJson(downCount)
 
+            Timber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Done $downCount")
             success(workDataOf(OUTPUT_COUNT_WORKER_DOWN to output), output)
 
         } catch (t: Throwable) {
+            Timber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Failed. ${t.message}")
 
             when {
                 t is SyncCloudIntegrationException -> {

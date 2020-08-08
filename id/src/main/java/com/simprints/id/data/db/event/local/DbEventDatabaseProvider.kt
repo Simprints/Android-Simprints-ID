@@ -38,7 +38,7 @@ class DbEventDatabaseFactoryImpl(
         return try {
             secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
         } catch (t: Throwable) {
-            Timber.e(t)
+            Timber.d(t.message)
             secureLocalDbKeyProvider.setLocalDatabaseKey(dbName)
             secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
         }.value.decodeToString().toCharArray()

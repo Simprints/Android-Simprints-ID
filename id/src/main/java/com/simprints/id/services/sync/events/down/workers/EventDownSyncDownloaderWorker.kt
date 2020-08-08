@@ -9,6 +9,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
+import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
@@ -52,6 +53,7 @@ class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) 
         try {
             traceWorkerPerformance()
             getComponent<EventDownSyncDownloaderWorker> { it.inject(this@EventDownSyncDownloaderWorker) }
+            Timber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
 
             crashlyticsLog("Start - Params: $downSyncOperation")
 
@@ -63,9 +65,11 @@ class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) 
                 this@EventDownSyncDownloaderWorker,
                 this)
 
-            Timber.d("Downsync success : $count")
+            Timber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Done $count")
             success(workDataOf(OUTPUT_DOWN_SYNC to count), "Total downloaded: $0 for $downSyncOperation")
         } catch (t: Throwable) {
+            Timber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed")
+
             retryOrFailIfCloudIntegrationErrorOrMalformedOperation(t)
         }
     }

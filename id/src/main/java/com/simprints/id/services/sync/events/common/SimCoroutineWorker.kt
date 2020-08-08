@@ -38,7 +38,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
     protected fun retry(t: Throwable? = null, message: String = t?.message ?: ""): Result {
         val finalMessage = "$tag - Retry] $message"
         crashlyticsLog(finalMessage)
-        Timber.tag(SYNC_LOG_TAG).d(finalMessage)
+        Timber.d(finalMessage)
 
         logExceptionIfRequired(t)
         workerTrace?.stop()
@@ -51,7 +51,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
 
         val finalMessage = "$tag - Failed] $message"
         crashlyticsLog(finalMessage)
-        Timber.tag(SYNC_LOG_TAG).d(finalMessage)
+        Timber.d(finalMessage)
 
         logExceptionIfRequired(t)
         workerTrace?.stop()
@@ -63,7 +63,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
 
         val finalMessage = "$tag - Success] $message"
         crashlyticsLog(finalMessage)
-        Timber.tag(SYNC_LOG_TAG).d(finalMessage)
+        Timber.d(finalMessage)
 
         workerTrace?.stop()
         return resultSetter.success(outputData)

@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.local.models.DbEvent
 
 @Dao
 interface EventRoomDao {
-    
+
     @Query("""
         select * from DbEvent where
         (:id IS NULL OR :id = id) AND
@@ -19,10 +19,10 @@ interface EventRoomDao {
         (:attendantId IS NULL OR :attendantId = attendantId) AND
         (:sessionId IS NULL OR :sessionId = sessionId) AND
         (:deviceId IS NULL OR :deviceId = deviceId) AND
-        (:createdAtLower IS NULL OR :createdAtLower >= createdAt) AND
-        (:createdAtUpper IS NULL OR :createdAtUpper <= createdAt) AND
-        (:endedAtLower IS NULL OR :endedAtLower >= endedAt) AND
-        (:endedAtUpper IS NULL OR :endedAtUpper <= endedAt) order by createdAt desc
+        (:createdAtLower IS NULL OR createdAt >= :createdAtLower) AND
+        (:createdAtUpper IS NULL OR createdAt <= :createdAtUpper) AND
+        (:endedAtLower IS NULL OR endedAt >= :endedAtLower) AND
+        (:endedAtUpper IS NULL OR endedAt <= :endedAtUpper) order by createdAt desc
     """)
     suspend fun load(id: String? = null,
                      type: EventType? = null,
@@ -45,10 +45,10 @@ interface EventRoomDao {
         (:attendantId IS NULL OR :attendantId = attendantId) AND
         (:sessionId IS NULL OR :sessionId = sessionId) AND
         (:deviceId IS NULL OR :deviceId = deviceId) AND
-        (:createdAtLower IS NULL OR :createdAtLower >= createdAt) AND
-        (:createdAtUpper IS NULL OR :createdAtUpper <= createdAt) AND
-        (:endedAtLower IS NULL OR :endedAtLower >= endedAt) AND
-        (:endedAtUpper IS NULL OR :endedAtUpper <= endedAt)
+        (:createdAtLower IS NULL OR createdAt >= :createdAtLower) AND
+        (:createdAtUpper IS NULL OR createdAt <= :createdAtUpper) AND
+        (:endedAtLower IS NULL OR endedAt >= :endedAtLower) AND
+        (:endedAtUpper IS NULL OR endedAt <= :endedAtUpper)
     """)
     suspend fun count(id: String? = null,
                       type: EventType? = null,
@@ -63,18 +63,19 @@ interface EventRoomDao {
                       endedAtUpper: Long? = null): Int
 
     @Query("""
-        delete from DbEvent where
-        (:id IS NULL OR :id = id) AND
-        (:type IS NULL OR :type = type) AND
-        (:projectId IS NULL OR :projectId = projectId) AND
-        (:subjectId IS NULL OR :subjectId = subjectId) AND
-        (:attendantId IS NULL OR :attendantId = attendantId) AND
-        (:sessionId IS NULL OR :sessionId = sessionId) AND
-        (:deviceId IS NULL OR :deviceId = deviceId) AND
-        (:createdAtLower IS NULL OR :createdAtLower >= createdAt) AND
-        (:createdAtUpper IS NULL OR :createdAtUpper <= createdAt) AND
-        (:endedAtLower IS NULL OR :endedAtLower >= endedAt) AND
-        (:endedAtUpper IS NULL OR :endedAtUpper <= endedAt)""")
+    delete from DbEvent where
+    (:id IS NULL OR :id = id) AND
+    (:type IS NULL OR :type = type) AND
+    (:projectId IS NULL OR :projectId = projectId) AND
+    (:subjectId IS NULL OR :subjectId = subjectId) AND
+    (:attendantId IS NULL OR :attendantId = attendantId) AND
+    (:sessionId IS NULL OR :sessionId = sessionId) AND
+    (:deviceId IS NULL OR :deviceId = deviceId) AND
+    (:createdAtLower IS NULL OR createdAt >= :createdAtLower) AND
+    (:createdAtUpper IS NULL OR createdAt <= :createdAtUpper) AND
+    (:endedAtLower IS NULL OR endedAt >= :endedAtLower) AND
+    (:endedAtUpper IS NULL OR endedAt <= :endedAtUpper)
+    """)
     suspend fun delete(id: String? = null,
                        type: EventType? = null,
                        projectId: String? = null,

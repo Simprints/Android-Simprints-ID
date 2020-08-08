@@ -4,6 +4,7 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
+import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.tools.TimeHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
@@ -26,7 +27,8 @@ class EventUpSyncHelperImpl(
             var lastOperation = operation.copy()
             var count = 0
             try {
-                eventRepository.uploadEvents().collect {
+                eventRepository.uploadEvents(operation.queryEvent).collect {
+                    Timber.tag(SYNC_LOG_TAG).d("[UP_SYNC_HELPER] Uploading ${it.size} events")
                     count += it.size
                     lastOperation = lastOperation.copy(lastState = RUNNING, lastSyncTime = timerHelper.now())
                     this.emitProgress(lastOperation, count)

@@ -84,7 +84,7 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
 
         var delayBeforeObserve = 0L
         if (shouldForceOneTimeSync()) {
-            Timber.tag(SYNC_LOG_TAG).d("Re-launching one time sync")
+            Timber.tag(SYNC_LOG_TAG).d("[ACTIVITY]\n Re-launching one time sync")
             eventSyncManager.sync()
             delayBeforeObserve = 6000
         }
@@ -124,7 +124,7 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
     }
 
     private fun updateDashboardCardState(newState: DashboardSyncCardState) {
-        Timber.tag(SYNC_LOG_TAG).d("new dashboard state: $newState")
+        Timber.tag(SYNC_LOG_TAG).d("[ACTIVITY]\n New dashboard state: $newState")
         syncCardStateLiveData.value = newState
     }
 
