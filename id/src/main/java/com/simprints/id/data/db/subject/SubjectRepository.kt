@@ -6,8 +6,6 @@ import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 
 interface SubjectRepository : SubjectLocalDataSource, FingerprintIdentityLocalDataSource {
 
-    suspend fun saveAndUpload(subject: Subject)
-
     suspend fun save(subject: Subject)
 
 }

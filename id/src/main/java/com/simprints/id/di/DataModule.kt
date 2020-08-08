@@ -28,7 +28,6 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.services.sync.subjects.up.controllers.SubjectsUpSyncExecutor
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.FlowPreview
@@ -72,14 +71,12 @@ open class DataModule {
     )
 
     @Provides
-    open fun providePersonRepository(
+    open fun provideSubjectRepository(
         subjectLocalDataSource: SubjectLocalDataSource,
-        eventRemoteDataSource: EventRemoteDataSource,
-        subjectsUpSyncExecutor: SubjectsUpSyncExecutor
+        eventRemoteDataSource: EventRemoteDataSource
     ): SubjectRepository = SubjectRepositoryImpl(
         eventRemoteDataSource,
-        subjectLocalDataSource,
-        subjectsUpSyncExecutor
+        subjectLocalDataSource
     )
 
     @Provides

@@ -14,10 +14,12 @@ import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
 import com.simprints.id.tools.TimeHelper
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
@@ -30,6 +32,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
 
     override suspend fun downSync(scope: CoroutineScope,
                                   operation: EventDownSyncOperation): ReceiveChannel<EventDownSyncProgress> =
+
         scope.produce {
             var lastOperation = operation.copy()
             var count = 0
@@ -67,9 +70,12 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
             emitProgress(lastOperation, count)
         }
 
+
     private suspend fun ProducerScope<EventDownSyncProgress>.emitProgress(lastOperation: EventDownSyncOperation, count: Int) {
         if (!this.isClosedForSend) {
-            eventDownSyncScopeRepository.insertOrUpdate(lastOperation)
+            withContext(Dispatchers.IO) {
+                eventDownSyncScopeRepository.insertOrUpdate(lastOperation)
+            }
             this.send(EventDownSyncProgress(lastOperation, count))
         }
     }

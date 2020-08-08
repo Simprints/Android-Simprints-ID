@@ -5,6 +5,8 @@ import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope.SubjectPr
 import com.simprints.id.data.db.events_sync.up.local.EventsUpSyncOperationLocalDataSource
 import com.simprints.id.data.db.events_sync.up.local.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class EventUpSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                                      private val eventsUpSyncOperationLocalDataSource: EventsUpSyncOperationLocalDataSource) :
@@ -16,11 +18,14 @@ class EventUpSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
     }
 
     override suspend fun insertOrUpdate(syncScopeOperation: EventUpSyncOperation) {
-        eventsUpSyncOperationLocalDataSource.insertOrUpdate(syncScopeOperation.fromDomainToDb())
+        withContext(Dispatchers.IO) {
+            eventsUpSyncOperationLocalDataSource.insertOrUpdate(syncScopeOperation.fromDomainToDb())
+        }
     }
 
-
     override suspend fun deleteAll() {
-        eventsUpSyncOperationLocalDataSource.deleteAll()
+        withContext(Dispatchers.IO) {
+            eventsUpSyncOperationLocalDataSource.deleteAll()
+        }
     }
 }

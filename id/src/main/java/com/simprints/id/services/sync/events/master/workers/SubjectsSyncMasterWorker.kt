@@ -103,7 +103,7 @@ open class SubjectsSyncMasterWorker(private val appContext: Context,
         val syncWorkersWithoutSyncId = syncWorkers.filter { it.getUniqueSyncId() == null && it.state != WorkInfo.State.CANCELLED }
         (workersRelatedToOtherSync + syncWorkersWithoutSyncId).forEach {
             wm.cancelWorkById(it.id)
-            Timber.tag(SYNC_LOG_TAG).d("Deleted ${it.id} worker")
+            Timber.tag(SYNC_LOG_TAG).d("[MASTER_WORKER] Deleted ${it.id} worker")
         }
     }
 

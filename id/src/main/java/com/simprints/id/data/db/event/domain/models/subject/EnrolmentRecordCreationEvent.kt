@@ -1,12 +1,15 @@
 package com.simprints.id.data.db.event.domain.models.subject
 
 import androidx.annotation.Keep
+import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
+import com.simprints.id.data.db.subject.domain.FaceSample
+import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.domain.modality.Modes
 import java.util.*
 
@@ -46,6 +49,48 @@ data class EnrolmentRecordCreationEvent(
     ) : EventPayload()
 
     companion object {
+
+        fun buildBiometricReferences(fingerprintSamples: List<FingerprintSample>,
+                                     faceSamples: List<FaceSample>): List<BiometricReference> {
+            val biometricReferences = mutableListOf<BiometricReference>()
+
+            buildFingerprintReference(fingerprintSamples)?.let {
+                biometricReferences.add(it)
+            }
+
+            buildFaceReference(faceSamples)?.let {
+                biometricReferences.add(it)
+            }
+
+            return biometricReferences
+        }
+
+        private fun buildFingerprintReference(fingerprintSamples: List<FingerprintSample>) =
+            if (fingerprintSamples.isNotEmpty()) {
+                FingerprintReference(
+                    fingerprintSamples.map {
+                        FingerprintTemplate(it.templateQualityScore,
+                            EncodingUtils.byteArrayToBase64(it.template),
+                            it.fingerIdentifier.fromSubjectToEvent())
+                    }
+                )
+            } else {
+                null
+            }
+
+        private fun buildFaceReference(faceSamples: List<FaceSample>) =
+            if (faceSamples.isNotEmpty()) {
+                FaceReference(
+                    faceSamples.map {
+                        FaceTemplate(
+                            EncodingUtils.byteArrayToBase64(it.template)
+                        )
+                    }
+                )
+            } else {
+                null
+            }
+
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION
     }
 }

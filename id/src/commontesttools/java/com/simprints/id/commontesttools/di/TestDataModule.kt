@@ -108,7 +108,7 @@ class TestDataModule(
         subjectRepositoryUpSyncHelper: SubjectRepositoryUpSyncHelper,
         subjectRepositoryDownSyncHelper: SubjectRepositoryDownSyncHelper
     ): SubjectRepository = personRepositoryRule.resolveDependency {
-        super.providePersonRepository(
+        super.provideSubjectRepository(
             subjectLocalDataSource,
             eventRemoteDataSource,
             subjectsDownSyncScopeRepository,

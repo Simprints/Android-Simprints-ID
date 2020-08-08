@@ -8,6 +8,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
+import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
@@ -44,6 +45,7 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) : Si
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
             getComponent<EventUpSyncUploaderWorker> { it.inject(this@EventUpSyncUploaderWorker) }
+            Timber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
 
             val workerId = this@EventUpSyncUploaderWorker.id.toString()
             var count = eventSyncCache.readProgress(workerId)
@@ -54,16 +56,17 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) : Si
                 totalUploaded.poll()?.let {
                     count += it.progress
                     eventSyncCache.saveProgress(workerId, count)
-                    Timber.d("Upsync uploader count : $count for batch : $it")
+                    Timber.tag(SYNC_LOG_TAG).d("[UPLOADER] Uploaded $count for batch : $it")
+
                     reportCount(count)
                 }
             }
 
-            Timber.d("Upsync success : $count")
+            Timber.tag(SYNC_LOG_TAG).d("[UPLOADER] Done")
             success(workDataOf(OUTPUT_UP_SYNC to count), "Total uploaded: $count")
         } catch (t: Throwable) {
-            t.printStackTrace()
-            Timber.d("Upsync failed : ${t.printStackTrace()}")
+            Timber.d(t)
+            Timber.tag(SYNC_LOG_TAG).d("[UPLOADER] Failed ${t.message}")
             retryOrFailIfCloudIntegrationError(t)
         }
     }

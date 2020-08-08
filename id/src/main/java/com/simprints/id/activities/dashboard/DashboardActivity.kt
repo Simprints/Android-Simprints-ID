@@ -193,7 +193,7 @@ class DashboardActivity : BaseSplitActivity() {
                 initialDelayMillis = 0
             ).also {
                 for (event in it) {
-                    Timber.tag(SYNC_LOG_TAG).d("Launch sync if required")
+                    Timber.tag(SYNC_LOG_TAG).d("[ACTIVITY] Launch sync if required")
                     viewModel.syncIfRequired()
                 }
             }

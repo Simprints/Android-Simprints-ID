@@ -1,36 +1,50 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EnrolmentEvent
+import com.simprints.id.data.db.event.domain.models.EventLabels
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.Companion.buildBiometricReferences
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.modality.toMode
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.TimeHelper
 import java.util.*
 
-class EnrolmentHelperImpl(private val repository: SubjectRepository,
+class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
                           private val eventRepository: EventRepository,
+                          private val eventSyncManager: EventSyncManager,
+                          private val preferencesManager: PreferencesManager,
                           private val timeHelper: TimeHelper) : EnrolmentHelper {
 
     override suspend fun enrol(subject: Subject) {
-        saveAndUpload(subject)
         registerEvent(subject)
+        subjectRepository.save(subject)
+        eventSyncManager.sync()
     }
 
-    private suspend fun saveAndUpload(subject: Subject) {
-        repository.saveAndUpload(subject)
-    }
+    private suspend fun registerEvent(subject: Subject) {
+        eventRepository.addEventToCurrentSession(
+            EnrolmentEvent(timeHelper.now(), subject.subjectId)
+        )
 
-    private fun registerEvent(subject: Subject) {
-        inBackground {
-            eventRepository.addEventToCurrentSession(
-                EnrolmentEvent(timeHelper.now(), subject.subjectId)
+        eventRepository.addEventToCurrentSession(
+            EnrolmentRecordCreationEvent(
+                timeHelper.now(),
+                subject.subjectId,
+                subject.projectId,
+                subject.moduleId,
+                subject.attendantId,
+                preferencesManager.modalities.map { it.toMode() },
+                buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples),
+                EventLabels(attendantId = subject.attendantId, subjectId = subject.subjectId,  mode = preferencesManager.modalities.map { it.toMode() }))
             )
-        }
     }
 
     override fun buildSubject(projectId: String,

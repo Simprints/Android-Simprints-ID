@@ -2,8 +2,8 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.simprints.core.tools.json.JsonHelper.Companion.jackson
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
@@ -64,9 +64,9 @@ import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
+import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
-import com.simprints.id.services.sync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.*
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
@@ -177,13 +177,12 @@ open class AppModule {
     open fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
-        baseUrlProvider: BaseUrlProvider,
-        jacksonMapper: ObjectMapper
+        baseUrlProvider: BaseUrlProvider
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
         remoteDbManager,
-        jacksonMapper
+        jackson
     )
 
     @Provides
@@ -211,7 +210,6 @@ open class AppModule {
     @Singleton
     open fun provideSessionEventsManager(
         ctx: Context,
-        sessionEventsSyncManager: SessionEventsSyncManager,
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
         preferencesManager: PreferencesManager,
@@ -223,7 +221,6 @@ open class AppModule {
             ctx.deviceId,
             ctx.packageVersionName,
             loginInfoManager,
-            sessionEventsSyncManager,
             eventLocalDataSource,
             eventRemoteDataSource,
             preferencesManager,
@@ -362,10 +359,12 @@ open class AppModule {
 
     @Provides
     fun provideEnrolmentHelper(
-        repository: SubjectRepository,
+        subjectRepository: SubjectRepository,
         eventRepository: EventRepository,
+        eventSyncManager: EventSyncManager,
+        preferencesManager: PreferencesManager,
         timeHelper: TimeHelper
-    ): EnrolmentHelper = EnrolmentHelperImpl(repository, eventRepository, timeHelper)
+    ): EnrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, eventSyncManager, preferencesManager, timeHelper)
 
     @Provides
     open fun provideEnrolLastBiometricsViewModel(

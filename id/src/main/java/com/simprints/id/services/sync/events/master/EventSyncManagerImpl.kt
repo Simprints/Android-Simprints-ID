@@ -12,6 +12,8 @@ import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWo
 import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
 import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -36,7 +38,8 @@ class EventSyncManagerImpl(private val ctx: Context,
         wm.getAllSubjectsSyncWorkersInfo().get().size > 0
 
     override fun sync() {
-        Timber.tag(SYNC_LOG_TAG).d("Sync one time people master worker")
+        Timber.tag(SYNC_LOG_TAG).d("[SCHEDULER] One time events master worker")
+
         wm.beginUniqueWork(
             MASTER_SYNC_SCHEDULER_ONE_TIME,
             ExistingWorkPolicy.KEEP,
@@ -45,7 +48,8 @@ class EventSyncManagerImpl(private val ctx: Context,
     }
 
     override fun scheduleSync() {
-        Timber.tag(SYNC_LOG_TAG).d("Sync periodic people master worker")
+        Timber.tag(SYNC_LOG_TAG).d("[SCHEDULER] Periodic events master worker")
+
         wm.enqueueUniquePeriodicWork(
             MASTER_SYNC_SCHEDULER_PERIODIC_TIME,
             ExistingPeriodicWorkPolicy.KEEP,
@@ -87,10 +91,12 @@ class EventSyncManagerImpl(private val ctx: Context,
             .build()
 
     override suspend fun deleteSyncInfo() {
-        downSyncScopeRepository.deleteAll()
-        upSyncScopeRepo.deleteAll()
-        eventSyncCache.clearProgresses()
-        eventSyncCache.storeLastSuccessfulSyncTime(null)
-        cleanScheduledHistory()
+        withContext(Dispatchers.IO) {
+            downSyncScopeRepository.deleteAll()
+            upSyncScopeRepo.deleteAll()
+            eventSyncCache.clearProgresses()
+            eventSyncCache.storeLastSuccessfulSyncTime(null)
+            cleanScheduledHistory()
+        }
     }
 }

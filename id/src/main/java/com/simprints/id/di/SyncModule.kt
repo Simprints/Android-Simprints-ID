@@ -36,10 +36,6 @@ import com.simprints.id.services.sync.events.up.EventUpSyncHelperImpl
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
-import com.simprints.id.services.sync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.services.sync.sessionSync.SessionEventsSyncManagerImpl
-import com.simprints.id.services.sync.subjects.up.controllers.SubjectsUpSyncExecutor
-import com.simprints.id.services.sync.subjects.up.controllers.SubjectsUpSyncExecutorImpl
 import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
@@ -50,10 +46,6 @@ open class SyncModule {
     @Provides
     open fun provideWorkManager(ctx: Context): WorkManager =
         WorkManager.getInstance(ctx)
-
-    @Provides
-    open fun provideSessionEventsSyncManager(workManager: WorkManager): SessionEventsSyncManager =
-        SessionEventsSyncManagerImpl(workManager)
 
     @Provides
     open fun providePeopleSyncStateProcessor(ctx: Context,
@@ -76,11 +68,9 @@ open class SyncModule {
 
     @Provides
     open fun provideSyncManager(
-        sessionEventsSyncManager: SessionEventsSyncManager,
         eventSyncManager: EventSyncManager,
         imageUpSyncScheduler: ImageUpSyncScheduler
     ): SyncManager = SyncSchedulerImpl(
-        sessionEventsSyncManager,
         eventSyncManager,
         imageUpSyncScheduler
     )
@@ -111,12 +101,6 @@ open class SyncModule {
     @Provides
     open fun providePeopleDownSyncDao(database: EventsSyncStatusDatabase): EventDownSyncOperationLocalDataSource =
         database.downSyncOperationsDao
-
-    @Provides
-    open fun providePeopleUpSyncManager(ctx: Context,
-                                        subjectsUpSyncWorkersBuilder: EventUpSyncWorkersBuilder): SubjectsUpSyncExecutor =
-        SubjectsUpSyncExecutorImpl(ctx, subjectsUpSyncWorkersBuilder)
-
 
     @Provides
     open fun providePeopleSyncProgressCache(builder: EncryptedSharedPreferencesBuilder): EventSyncCache =
