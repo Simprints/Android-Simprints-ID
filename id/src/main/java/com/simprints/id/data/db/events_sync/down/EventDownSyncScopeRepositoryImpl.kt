@@ -4,7 +4,6 @@ import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.*
 import com.simprints.id.data.db.events_sync.down.local.EventDownSyncOperationLocalDataSource
-import com.simprints.id.data.db.events_sync.down.local.fromDbToDomain
 import com.simprints.id.data.db.events_sync.down.local.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -14,6 +13,7 @@ import com.simprints.id.domain.modality.toMode
 import com.simprints.id.exceptions.unexpected.MissingArgumentForDownSyncScopeException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.koin.ext.scope
 
 class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                                        val preferencesManager: PreferencesManager,
@@ -44,16 +44,17 @@ class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                 SubjectModuleScope(projectId, possibleModuleIds, modes)
         }
 
-        syncScope.operations.addAll(fetchOperationFor(syncScope))
+        syncScope.operations.forEach { op ->
+            val state =
+                downSyncOperationOperationDao.load().toList().firstOrNull { it.scope.id == op.scopeId && it.downSyncOp.queryEvent == op.queryEvent }
+            state?.downSyncOp?.let { opWithState ->
+                op.lastEventId = opWithState.lastEventId
+                op.lastSyncTime = opWithState.lastSyncTime
+                op.state = opWithState.state
+            }
+        }
         return syncScope
     }
-
-    private suspend fun fetchOperationFor(syncScope: EventDownSyncScope): List<EventDownSyncOperation> =
-        withContext(Dispatchers.IO) {
-            downSyncOperationOperationDao.load().filter {
-                it.downSyncOp.scopeId == syncScope.id
-            }.map { it.fromDbToDomain() }
-        }
 
     override suspend fun insertOrUpdate(syncScopeOperation: EventDownSyncOperation) {
         withContext(Dispatchers.IO) {

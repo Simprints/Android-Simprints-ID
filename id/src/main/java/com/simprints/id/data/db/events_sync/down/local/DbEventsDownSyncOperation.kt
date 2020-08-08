@@ -9,13 +9,13 @@ import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 @Entity(tableName = "DbEventsDownSyncOperation")
 @Keep
 data class DbEventsDownSyncOperation(
-    @PrimaryKey var id: String,
+    @PrimaryKey var id: Int,
     @Embedded val downSyncOp: EventDownSyncOperation
 )
 
 fun EventDownSyncOperation.fromDomainToDb(): DbEventsDownSyncOperation =
     DbEventsDownSyncOperation(
-        this.hashCode().toString(),
+        this.queryEvent.hashCode(),
         this
     )
 
