@@ -25,6 +25,7 @@ data class EnrolmentCallbackEvent(
         EnrolmentCallbackPayload(createdAt, EVENT_VERSION, guid),
         CALLBACK_ENROLMENT)
 
+    @Keep
     data class EnrolmentCallbackPayload(
         override val createdAt: Long,
         override val eventVersion: Int,

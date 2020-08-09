@@ -2,8 +2,6 @@ package com.simprints.id.data.db.event.domain.models.subject
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.simprints.id.data.db.event.domain.models.callback.ConfirmationCallbackEvent.ConfirmationCallbackPayload
-import com.simprints.id.data.db.event.domain.models.callback.EnrolmentCallbackEvent.EnrolmentCallbackPayload
 import com.simprints.id.data.db.event.domain.models.subject.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
 import com.simprints.id.data.db.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
 import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReference
@@ -13,8 +11,8 @@ import com.simprints.id.data.db.event.remote.models.subject.ApiFingerprintRefere
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = ConfirmationCallbackPayload::class, name = FACE_REFERENCE_KEY),
-    JsonSubTypes.Type(value = EnrolmentCallbackPayload::class, name = FINGERPRINT_REFERENCE_KEY)
+    JsonSubTypes.Type(value = FaceReference::class, name = FACE_REFERENCE_KEY),
+    JsonSubTypes.Type(value = FingerprintReference::class, name = FINGERPRINT_REFERENCE_KEY)
 )
 sealed class BiometricReference(val type: BiometricReferenceType)
 

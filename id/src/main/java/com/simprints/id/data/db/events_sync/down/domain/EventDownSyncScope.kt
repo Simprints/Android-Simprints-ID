@@ -3,8 +3,7 @@ package com.simprints.id.data.db.events_sync.down.domain
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.ModuleScope
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.UserScope
+import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.*
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope.SubjectProjectScope
 import com.simprints.id.domain.modality.Modes
 
@@ -12,9 +11,10 @@ import com.simprints.id.domain.modality.Modes
 @JsonSubTypes(
     JsonSubTypes.Type(value = SubjectProjectScope::class),
     JsonSubTypes.Type(value = UserScope::class),
-    JsonSubTypes.Type(value = ModuleScope::class)
+    JsonSubTypes.Type(value = ModuleScope::class),
+    JsonSubTypes.Type(value = SubjectScope::class)
 )
-abstract class EventDownSyncScope(open val operations: List<EventDownSyncOperation> = mutableListOf()) {
+sealed class EventDownSyncScope(open val operations: List<EventDownSyncOperation> = mutableListOf()) {
 
     abstract val id: String
 
@@ -71,9 +71,6 @@ abstract class EventDownSyncScope(open val operations: List<EventDownSyncOperati
     }
 
     companion object {
-        const val PROJECT_SUBJECT_SYNC_KEY = "PROJECT_SUBJECT_SYNC"
-        const val USER_SUBJECT_SYNC_KEY = "USER_SUBJECT_SYNC"
-        const val MODULE_SUBJECT_SYNC_KEY = "MODULE_SUBJECT_SYNC"
         private val subjectEvents = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_MOVE, ENROLMENT_RECORD_DELETION)
         private const val separator = "||"
     }

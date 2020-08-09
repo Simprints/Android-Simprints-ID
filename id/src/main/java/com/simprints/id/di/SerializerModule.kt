@@ -1,6 +1,5 @@
 package com.simprints.id.di
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
@@ -47,11 +46,8 @@ class SerializerModule {
     fun provideModalSerializer(): Serializer<List<Modality>> = ModalitiesListSerializer()
 
     @Provides
-    fun provideJsonHelper(): JsonHelper = JsonHelper()
-
-    @Provides
     @Singleton
-    fun provideJackson(): ObjectMapper = JsonHelper.jackson
+    fun provideJsonHelper(): JsonHelper = JsonHelper()
 
     @Provides
     @Singleton

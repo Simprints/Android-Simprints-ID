@@ -9,9 +9,7 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 @Keep
 class JsonHelper {
 
-    companion object {
-        val jackson = ObjectMapper().registerKotlinModule().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
+    val jackson: ObjectMapper by lazy { ObjectMapper().registerKotlinModule().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) }
 
     fun toJson(any: Any): String {
         return jackson.writeValueAsString(any)

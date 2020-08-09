@@ -1,6 +1,5 @@
 package com.simprints.id.network
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.simprints.core.tools.coroutines.retryIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
@@ -18,7 +17,7 @@ open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<
                                                     private val url: String,
                                                     private val deviceId: String,
                                                     private val authToken: String? = null,
-                                                    private val jacksonMapper: ObjectMapper = JsonHelper.jackson) : SimApiClient<T> {
+                                                    private val jsonHelper: JsonHelper) : SimApiClient<T> {
 
     override val api: T by lazy {
         retrofit.create(service.java)
@@ -27,7 +26,7 @@ open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<
     open val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(JacksonConverterFactory.create(jacksonMapper))
+            .addConverterFactory(JacksonConverterFactory.create(jsonHelper.jackson))
             .baseUrl(url)
             .client(okHttpClientConfig.build()).build()
     }

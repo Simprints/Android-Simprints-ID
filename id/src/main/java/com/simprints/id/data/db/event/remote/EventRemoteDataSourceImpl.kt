@@ -23,7 +23,8 @@ import okhttp3.internal.toImmutableList
 import timber.log.Timber
 import java.io.InputStream
 
-class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFactory) : EventRemoteDataSource {
+class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFactory,
+                                private val jsonHelper: JsonHelper) : EventRemoteDataSource {
 
     override suspend fun count(query: ApiRemoteEventQuery): List<EventCount> =
         with(query) {
@@ -58,7 +59,7 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
         try {
             while (parser.nextToken() == START_OBJECT) {
 
-                val event = JsonHelper.jackson.readValue(parser, ApiEvent::class.java)
+                val event = jsonHelper.jackson.readValue(parser, ApiEvent::class.java)
                 buffer.add(event)
 
                 if (buffer.size >= batchSize) {
