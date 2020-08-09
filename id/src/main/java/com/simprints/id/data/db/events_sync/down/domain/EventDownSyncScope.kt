@@ -66,7 +66,7 @@ abstract class EventDownSyncScope(open val operations: List<EventDownSyncOperati
                     modes.joinToString(separator)
 
         override val operations =
-            listOf(EventDownSyncOperation(id, RemoteEventQuery(projectId, subjectId = subjectId, types = subjectEvents)))
+            listOf(EventDownSyncOperation(id, RemoteEventQuery(projectId, subjectId = subjectId, modes = modes, types = subjectEvents)))
 
     }
 
