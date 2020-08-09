@@ -17,6 +17,7 @@ import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
+import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.DOWNLOADER
 import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.UPLOADER
@@ -115,7 +116,7 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
 }
 
 fun WorkInfo.getDownCountsFromOutput(): List<EventCount>? {
-    val outputJson = this.outputData.getString(EventDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN)
+    val outputJson = this.outputData.getString(OUTPUT_COUNT_WORKER_DOWN)
     return try {
         JsonHelper.jackson.readValue(outputJson, object : TypeReference<List<EventCount>>() {})
     } catch (t: Throwable) {

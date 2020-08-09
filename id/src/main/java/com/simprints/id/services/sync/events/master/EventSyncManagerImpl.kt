@@ -18,7 +18,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class EventSyncManagerImpl(private val ctx: Context,
-                           private val subjectsSyncStateProcessor: SubjectsSyncStateProcessor,
+                           private val eventSyncStateProcessor: EventSyncStateProcessor,
                            private val downSyncScopeRepository: EventDownSyncScopeRepository,
                            private val upSyncScopeRepo: EventUpSyncScopeRepository,
                            private val eventSyncCache: EventSyncCache) : EventSyncManager {
@@ -32,7 +32,7 @@ class EventSyncManagerImpl(private val ctx: Context,
         get() = WorkManager.getInstance(ctx)
 
     override fun getLastSyncState(): LiveData<SubjectsSyncState> =
-        subjectsSyncStateProcessor.getLastSyncState()
+        eventSyncStateProcessor.getLastSyncState()
 
     override fun hasSyncEverRunBefore(): Boolean =
         wm.getAllSubjectsSyncWorkersInfo().get().size > 0

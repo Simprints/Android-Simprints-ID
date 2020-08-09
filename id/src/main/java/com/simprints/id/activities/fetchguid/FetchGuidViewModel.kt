@@ -6,19 +6,17 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
-import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class FetchGuidViewModel(private val downSyncHelper: EventDownSyncHelper,
+class FetchGuidViewModel(private val fetchGuidHelper: FetchGuidHelper,
                          private val deviceManager: DeviceManager,
                          private val eventRepository: EventRepository,
                          private val timeHelper: TimeHelper) : ViewModel() {
@@ -35,9 +33,9 @@ class FetchGuidViewModel(private val downSyncHelper: EventDownSyncHelper,
     }
 
     private suspend fun getSubjectFetchResult(projectId: String, verifyGuid: String) = try {
-        SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
-        //downSyncHelper.loadFromRemoteIfNeeded(projectId, verifyGuid)
-        //STOPSHIP
+        withContext(Dispatchers.IO) {
+            fetchGuidHelper.loadFromRemoteIfNeeded(this, projectId, verifyGuid)
+        }
     } catch (t: Throwable) {
         getSubjectFetchResultForError()
     }

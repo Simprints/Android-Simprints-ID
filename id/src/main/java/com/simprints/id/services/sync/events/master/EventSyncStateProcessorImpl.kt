@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
 import androidx.work.WorkInfo
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.filterByTags
 import com.simprints.id.services.sync.events.common.sortByScheduledTime
@@ -26,9 +25,8 @@ import com.simprints.id.services.sync.events.up.workers.getUpCountsFromOutput
 import timber.log.Timber
 
 class EventSyncStateProcessorImpl(val ctx: Context,
-                                  val personRepository: SubjectRepository,
                                   private val eventSyncCache: EventSyncCache,
-                                  private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider = SyncWorkersLiveDataProviderImpl(ctx)) : SubjectsSyncStateProcessor {
+                                  private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider = SyncWorkersLiveDataProviderImpl(ctx)) : EventSyncStateProcessor {
 
     override fun getLastSyncState(): LiveData<SubjectsSyncState> =
         observerForLastSyncId().switchMap { lastSyncId ->

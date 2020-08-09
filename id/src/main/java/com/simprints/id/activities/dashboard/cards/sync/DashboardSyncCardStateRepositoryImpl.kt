@@ -3,7 +3,7 @@ package com.simprints.id.activities.dashboard.cards.sync
 import androidx.lifecycle.MediatorLiveData
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.SubjectModuleScope
+import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.ModuleScope
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
@@ -159,7 +159,7 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
 
     private fun isSelectedModulesEmpty() = preferencesManager.selectedModules.isEmpty()
 
-    private suspend fun isModuleSync() = downSyncScopeRepository.getDownSyncScope() is SubjectModuleScope
+    private suspend fun isModuleSync() = downSyncScopeRepository.getDownSyncScope() is ModuleScope
 
     private fun isConnected() = isConnectedLiveData.value ?: true
 

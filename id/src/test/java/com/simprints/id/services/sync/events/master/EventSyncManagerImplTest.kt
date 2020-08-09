@@ -31,7 +31,7 @@ import org.junit.runner.RunWith
 class EventSyncManagerImplTest {
 
     private lateinit var subjectsSyncManager: EventSyncManagerImpl
-    @MockK lateinit var subjectsSyncStateProcessor: SubjectsSyncStateProcessor
+    @MockK lateinit var eventSyncStateProcessor: EventSyncStateProcessor
     @MockK lateinit var subjectsUpSyncScopeRepository: SubjectsUpSyncScopeRepository
     @MockK lateinit var subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository
     @MockK lateinit var eventSyncCache: EventSyncCache
@@ -53,13 +53,13 @@ class EventSyncManagerImplTest {
             .setupFirebase()
 
         MockKAnnotations.init(this, relaxed = true)
-        subjectsSyncManager = EventSyncManagerImpl(ctx, subjectsSyncStateProcessor, subjectsUpSyncScopeRepository, subjectsDownSyncScopeRepository, eventSyncCache)
+        subjectsSyncManager = EventSyncManagerImpl(ctx, eventSyncStateProcessor, subjectsUpSyncScopeRepository, subjectsDownSyncScopeRepository, eventSyncCache)
     }
 
     @Test
     fun getLastSyncState_shouldUseProcessor() {
         subjectsSyncManager.getLastSyncState()
-        verify { subjectsSyncStateProcessor.getLastSyncState() }
+        verify { eventSyncStateProcessor.getLastSyncState() }
     }
 
     @Test

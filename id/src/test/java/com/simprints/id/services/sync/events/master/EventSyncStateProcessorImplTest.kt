@@ -56,7 +56,7 @@ class EventSyncStateProcessorImplTest {
     private var startSyncReporterWorker = MutableLiveData<List<WorkInfo>>()
     private var syncWorkersLiveData = MutableLiveData<List<WorkInfo>>()
 
-    lateinit var subjectsSyncStateProcessor: SubjectsSyncStateProcessor
+    lateinit var eventSyncStateProcessor: EventSyncStateProcessor
     @RelaxedMockK lateinit var subjectRepository: SubjectRepository
     @RelaxedMockK lateinit var syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider
     @RelaxedMockK lateinit var eventSyncCache: EventSyncCache
@@ -65,7 +65,7 @@ class EventSyncStateProcessorImplTest {
     fun setUp() {
         UnitTestConfig(this).setupWorkManager()
         MockKAnnotations.init(this)
-        subjectsSyncStateProcessor = EventSyncStateProcessorImpl(ctx, subjectRepository, eventSyncCache, syncWorkersLiveDataProvider)
+        eventSyncStateProcessor = EventSyncStateProcessorImpl(ctx, subjectRepository, eventSyncCache, syncWorkersLiveDataProvider)
         mockDependencies()
     }
 
@@ -73,7 +73,7 @@ class EventSyncStateProcessorImplTest {
     fun processor_masterWorkerCompletes_shouldExtractTheUniqueSyncId() = runBlockingTest {
         startSyncReporterWorker.value = successfulMasterWorkers
 
-        subjectsSyncStateProcessor.getLastSyncState().testObserver()
+        eventSyncStateProcessor.getLastSyncState().testObserver()
 
         verify { syncWorkersLiveDataProvider.getSyncWorkersLiveData(UNIQUE_SYNC_ID) }
     }
@@ -82,7 +82,7 @@ class EventSyncStateProcessorImplTest {
     fun processor_masterWorkerFails_shouldNotExtractTheUniqueSyncId() = runBlockingTest {
         startSyncReporterWorker.value = failedMasterWorkers
 
-        subjectsSyncStateProcessor.getLastSyncState().testObserver()
+        eventSyncStateProcessor.getLastSyncState().testObserver()
 
         verify(exactly = 0) { syncWorkersLiveDataProvider.getSyncWorkersLiveData(UNIQUE_SYNC_ID) }
     }
@@ -92,7 +92,7 @@ class EventSyncStateProcessorImplTest {
         startSyncReporterWorker.value = successfulMasterWorkers
         syncWorkersLiveData.value = createWorkInfosHistoryForSuccessfulSync()
 
-        val syncStates = subjectsSyncStateProcessor.getLastSyncState().testObserver().observedValues
+        val syncStates = eventSyncStateProcessor.getLastSyncState().testObserver().observedValues
 
         val lastSyncState = syncStates.last()
         lastSyncState!!.assertSuccessfulSyncState()
@@ -103,7 +103,7 @@ class EventSyncStateProcessorImplTest {
         startSyncReporterWorker.value = successfulMasterWorkers
         syncWorkersLiveData.value = createWorkInfosHistoryForRunningSync()
 
-        val syncStates = subjectsSyncStateProcessor.getLastSyncState().testObserver().observedValues
+        val syncStates = eventSyncStateProcessor.getLastSyncState().testObserver().observedValues
 
         val lastSyncState = syncStates.last()
         lastSyncState!!.assertRunningSyncState()
@@ -114,7 +114,7 @@ class EventSyncStateProcessorImplTest {
         startSyncReporterWorker.value = successfulMasterWorkers
         syncWorkersLiveData.value = createWorkInfosHistoryForFailingSync()
 
-        val syncStates = subjectsSyncStateProcessor.getLastSyncState().testObserver().observedValues
+        val syncStates = eventSyncStateProcessor.getLastSyncState().testObserver().observedValues
 
         val lastSyncState = syncStates.last()
         lastSyncState!!.assertFailingSyncState()
@@ -125,7 +125,7 @@ class EventSyncStateProcessorImplTest {
         startSyncReporterWorker.value = successfulMasterWorkers
         syncWorkersLiveData.value = createWorkInfosHistoryForConnectingSync()
 
-        val syncStates = subjectsSyncStateProcessor.getLastSyncState().testObserver().observedValues
+        val syncStates = eventSyncStateProcessor.getLastSyncState().testObserver().observedValues
 
         val lastSyncState = syncStates.last()
         lastSyncState!!.assertConnectingSyncState()
