@@ -3,11 +3,11 @@ package com.simprints.id.activities.settings.syncinformation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 
-class SyncInformationViewModelFactory(private val personRepository: SubjectRepository,
+class SyncInformationViewModelFactory(private val downySyncHelper: EventDownSyncHelper,
                                       private val subjectLocalDataSource: SubjectLocalDataSource,
                                       private val preferencesManager: PreferencesManager,
                                       private val projectId: String,
@@ -16,7 +16,7 @@ class SyncInformationViewModelFactory(private val personRepository: SubjectRepos
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return if (modelClass.isAssignableFrom(SyncInformationViewModel::class.java)) {
-            SyncInformationViewModel(personRepository, subjectLocalDataSource, preferencesManager,
+            SyncInformationViewModel(downySyncHelper, subjectLocalDataSource, preferencesManager,
                 projectId, downSyncScopeRepository) as T
         } else {
             throw IllegalArgumentException("ViewModel Not Found")

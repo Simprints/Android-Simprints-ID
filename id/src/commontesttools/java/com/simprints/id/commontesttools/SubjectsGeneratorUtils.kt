@@ -3,26 +3,10 @@ package com.simprints.id.commontesttools
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subjects_sync.down.domain.EventsDownSyncOperation
 import java.util.*
 import kotlin.random.Random
 
 object SubjectsGeneratorUtils {
-
-    fun getRandomPeople(nPeople: Int,
-                        downSyncOp: EventsDownSyncOperation,
-                        toSync: List<Boolean>): MutableList<Subject> =
-        mutableListOf<Subject>().also { fakePeople ->
-            repeat(nPeople) {
-                fakePeople.add(
-                    getRandomSubject(
-                        UUID.randomUUID().toString(),
-                        downSyncOp.projectId,
-                        downSyncOp.attendantId ?: "",
-                        downSyncOp.moduleId ?: "",
-                        toSync.takeRandom()))
-            }
-        }
 
     fun getRandomPeople(numberOfPeople: Int,
                         projectId: String = UUID.randomUUID().toString(),

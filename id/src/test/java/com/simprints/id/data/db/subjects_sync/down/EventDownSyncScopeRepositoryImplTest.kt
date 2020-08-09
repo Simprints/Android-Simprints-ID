@@ -10,8 +10,6 @@ import com.simprints.id.commontesttools.DefaultTestConstants.moduleSyncScope
 import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
 import com.simprints.id.commontesttools.DefaultTestConstants.userSyncScope
 import com.simprints.id.data.db.subjects_sync.down.domain.*
-import com.simprints.id.data.db.subjects_sync.down.domain.EventsDownSyncOperationResult.DownSyncState.COMPLETE
-import com.simprints.id.data.db.subjects_sync.down.local.EventDownSyncOperationLocalDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP

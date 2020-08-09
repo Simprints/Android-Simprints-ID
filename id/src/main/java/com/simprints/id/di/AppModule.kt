@@ -286,14 +286,14 @@ open class AppModule {
 
     @Provides
     open fun provideSyncInformationViewModelFactory(
-        personRepository: SubjectRepository,
+        downySyncHelper: EventDownSyncHelper,
         subjectLocalDataSource: SubjectLocalDataSource,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         downSyncScopeRepository: EventDownSyncScopeRepository
     ) =
         SyncInformationViewModelFactory(
-            personRepository, subjectLocalDataSource, preferencesManager,
+            downySyncHelper, subjectLocalDataSource, preferencesManager,
             loginInfoManager.getSignedInProjectIdOrEmpty(), downSyncScopeRepository
         )
 

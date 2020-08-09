@@ -4,17 +4,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
+import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
+import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.ON
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
-class SyncInformationViewModel(private val personRepository: SubjectRepository,
+class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
                                private val subjectLocalDataSource: SubjectLocalDataSource,
                                private val preferencesManager: PreferencesManager,
                                private val projectId: String,
@@ -58,11 +60,18 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
     internal suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount() {
         try {
             val downSyncScope = downSyncScopeRepository.getDownSyncScope()
-//            val counts = personRepository.countToDownSync(downSyncScope)
-//            recordsToDownSyncCountLiveData.postValue(counts.created)
-//            recordsToDeleteCountLiveData.postValue(counts.deleted)
+            var creationsToDownload = 0
+            var deletionsToDownload = 0
 
-            //STOPSHIP
+            downSyncScope.operations.forEach {
+                val counts = downySyncHelper.countForDownSync(it)
+                creationsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_CREATION }?.count ?: 0
+                deletionsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_DELETION }?.count ?: 0
+            }
+
+            recordsToDownSyncCountLiveData.postValue(creationsToDownload)
+            recordsToDeleteCountLiveData.postValue(deletionsToDownload)
+
         } catch (t: Throwable) {
             t.printStackTrace()
         }
