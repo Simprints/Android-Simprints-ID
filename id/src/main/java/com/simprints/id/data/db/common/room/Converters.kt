@@ -14,6 +14,8 @@ import com.simprints.id.domain.modality.Modes
 
 class Converters {
 
+    private val jsonHelper = JsonHelper()
+
     @TypeConverter
     fun fromEventPayloadTypeToString(type: EventType?): String? =
         type?.name
@@ -24,64 +26,64 @@ class Converters {
 
     @TypeConverter
     fun fromListOfStringToString(list: List<String>?): String? =
-        list?.let { JsonHelper.jackson.writeValueAsString(list) }
+        list?.let { jsonHelper.toJson(list) }
 
     @TypeConverter
     fun fromStringToListOfString(jsonList: String?): List<String>? =
         jsonList?.let {
             val type = object : TypeReference<List<String>>() {}
-            return JsonHelper.jackson.readValue(jsonList, type)
+            return  jsonHelper.fromJson(jsonList, type)
         }
 
     @TypeConverter
     fun fromListOfModesToString(list: List<Modes>?): String? =
-        list?.let { JsonHelper.jackson.writeValueAsString(list) }
+        list?.let { jsonHelper.toJson(list) }
 
     @TypeConverter
     fun fromStringToListOfModes(jsonList: String?): List<Modes>? =
         jsonList?.let {
             val type = object : TypeReference<List<Modes>>() {}
-            return JsonHelper.jackson.readValue(jsonList, type)
+            return jsonHelper.fromJson(jsonList, type)
         }
 
     @TypeConverter
     fun fromEventDownSyncOperationToString(op: EventDownSyncOperation): String =
-        JsonHelper.jackson.writeValueAsString(op)
+        jsonHelper.toJson(op)
 
     @TypeConverter
     fun fromStringToEventDownSyncOperation(json: String): EventDownSyncOperation {
         val type = object : TypeReference<EventDownSyncOperation>() {}
-        return JsonHelper.jackson.readValue(json, type)
+        return jsonHelper.fromJson(json, type)
     }
 
     @TypeConverter
     fun fromEventUpSyncOperationToString(op: EventUpSyncOperation): String =
-        JsonHelper.jackson.writeValueAsString(op)
+        jsonHelper.toJson(op)
 
     @TypeConverter
     fun fromStringToEventUpSyncOperation(json: String): EventUpSyncOperation {
         val type = object : TypeReference<EventUpSyncOperation>() {}
-        return JsonHelper.jackson.readValue(json, type)
+        return jsonHelper.fromJson(json, type)
     }
 
     @TypeConverter
     fun fromLocalEventQueryToString(value: LocalEventQuery): String =
-        JsonHelper.jackson.writeValueAsString(value)
+        jsonHelper.toJson(value)
 
     @TypeConverter
     fun fromStringToLocalEventQuery(json: String): LocalEventQuery {
         val type = object : TypeReference<LocalEventQuery>() {}
-        return JsonHelper.jackson.readValue(json, type)
+        return jsonHelper.fromJson(json, type)
     }
 
     @TypeConverter
     fun fromRemoteEventQueryToString(value: RemoteEventQuery): String =
-        JsonHelper.jackson.writeValueAsString(value)
+        jsonHelper.toJson(value)
 
     @TypeConverter
     fun fromStringToRemoteEventQuery(json: String): RemoteEventQuery {
         val type = object : TypeReference<RemoteEventQuery>() {}
-        return JsonHelper.jackson.readValue(json, type)
+        return jsonHelper.fromJson(json, type)
     }
 
     @TypeConverter

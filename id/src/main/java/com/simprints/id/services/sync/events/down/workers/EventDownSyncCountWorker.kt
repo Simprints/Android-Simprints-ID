@@ -118,7 +118,7 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
 fun WorkInfo.getDownCountsFromOutput(): List<EventCount>? {
     val outputJson = this.outputData.getString(OUTPUT_COUNT_WORKER_DOWN)
     return try {
-        JsonHelper.jackson.readValue(outputJson, object : TypeReference<List<EventCount>>() {})
+        JsonHelper().fromJson(outputJson!!, object : TypeReference<List<EventCount>>() {})
     } catch (t: Throwable) {
         null
     }

@@ -2,6 +2,7 @@ package com.simprints.id.di
 
 import android.content.Context
 import androidx.room.Room
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSourceImpl
@@ -38,8 +39,9 @@ open class DataModule {
 
     @Provides
     open fun provideEventRemoteDataSource(
-        simApiClientFactory: SimApiClientFactory
-    ): EventRemoteDataSource = EventRemoteDataSourceImpl(simApiClientFactory)
+        simApiClientFactory: SimApiClientFactory,
+        jsonHelper: JsonHelper
+    ): EventRemoteDataSource = EventRemoteDataSourceImpl(simApiClientFactory, jsonHelper)
 
     @Provides
     @FlowPreview

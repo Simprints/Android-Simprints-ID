@@ -30,10 +30,10 @@ fun Event.fromDomainToDb(): DbEvent =
         id,
         labels,
         payload.type,
-        JsonHelper.jackson.writeValueAsString(this),
+        JsonHelper().toJson(this),
         payload.createdAt,
         payload.endedAt
     )
 
 fun DbEvent.fromDbToDomain(): Event =
-    JsonHelper.jackson.readValue(this.eventJson, object : TypeReference<Event>() {})
+    JsonHelper().fromJson(this.eventJson, object : TypeReference<Event>() {})

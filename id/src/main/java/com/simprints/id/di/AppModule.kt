@@ -3,7 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.simprints.core.tools.json.JsonHelper.Companion.jackson
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
@@ -179,12 +179,13 @@ open class AppModule {
     open fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
-        baseUrlProvider: BaseUrlProvider
+        baseUrlProvider: BaseUrlProvider,
+        jsonHelper: JsonHelper
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
         remoteDbManager,
-        jackson
+        jsonHelper
     )
 
     @Provides
