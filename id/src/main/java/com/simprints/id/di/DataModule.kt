@@ -124,6 +124,7 @@ open class DataModule {
         loginInfoManager, crashReportManager)
 
     @Provides
+    @Singleton
     open fun provideEventsSyncStatusDatabase(ctx: Context): EventsSyncStatusDatabase =
         Room.databaseBuilder(ctx, EventsSyncStatusDatabase::class.java, EventsSyncStatusDatabase.ROOM_DB_NAME)
             .build()

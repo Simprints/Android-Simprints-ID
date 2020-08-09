@@ -26,13 +26,13 @@ import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
+import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
-import com.simprints.id.services.sync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -53,7 +53,6 @@ class EventRepositoryImplTest {
     lateinit var eventRepo: EventRepository
 
     @MockK lateinit var loginInfoManager: LoginInfoManager
-    @MockK lateinit var sessionEventsSyncManager: SessionEventsSyncManager
     @MockK lateinit var eventLocalDataSource: EventLocalDataSource
     @MockK lateinit var eventRemoteDataSource: EventRemoteDataSource
     @MockK lateinit var preferencesManager: PreferencesManager
@@ -72,7 +71,6 @@ class EventRepositoryImplTest {
             DEVICE_ID,
             APP_VERSION_NAME,
             loginInfoManager,
-            sessionEventsSyncManager,
             eventLocalDataSource,
             eventRemoteDataSource,
             preferencesManager,
@@ -154,7 +152,7 @@ class EventRepositoryImplTest {
         runBlocking {
             createMultipleBatches()
 
-            val bathes = (eventRepo as EventRepositoryImpl).createBatchesWithCloseSessions()
+            val bathes = (eventRepo as EventRepositoryImpl).createBatchesWithCloseSessions(LocalEventQuery())
 
             assertThat(bathes).containsExactly(
                 Batch(listOf(GUID1, GUID2).toMutableList(), SESSION_BATCH_SIZE),
@@ -168,7 +166,7 @@ class EventRepositoryImplTest {
         runBlocking {
             createMultipleBatches()
 
-            eventRepo.uploadEvents().toList()
+            eventRepo.uploadEvents(LocalEventQuery()).toList()
 
             coVerify { eventLocalDataSource.load(DbLocalEventQuery(sessionId = GUID1)) }
             coVerify { eventLocalDataSource.load(DbLocalEventQuery(sessionId = GUID2)) }
@@ -181,7 +179,7 @@ class EventRepositoryImplTest {
         runBlocking {
             val events = createMultipleBatches()
 
-            eventRepo.uploadEvents().toList()
+            eventRepo.uploadEvents(LocalEventQuery()).toList()
 
             events.forEach {
                 coVerify {
@@ -196,10 +194,10 @@ class EventRepositoryImplTest {
         runBlocking {
             createMultipleBatches()
 
-            val progress = eventRepo.uploadEvents().toList()
+            val progress = eventRepo.uploadEvents(LocalEventQuery()).toList()
 
-            assertThat(progress[0]).isEqualTo(OperationEventProgress(SESSION_BATCH_SIZE, 2 * SESSION_BATCH_SIZE))
-            assertThat(progress[1]).isEqualTo(OperationEventProgress(2 * SESSION_BATCH_SIZE, 2 * SESSION_BATCH_SIZE))
+            assertThat(progress[0].size).isEqualTo(2 * SESSION_BATCH_SIZE)
+            assertThat(progress[1].size).isEqualTo(2 * SESSION_BATCH_SIZE)
         }
     }
 

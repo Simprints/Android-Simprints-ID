@@ -13,7 +13,6 @@ import com.simprints.id.domain.modality.toMode
 import com.simprints.id.exceptions.unexpected.MissingArgumentForDownSyncScopeException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.koin.ext.scope
 
 class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                                        val preferencesManager: PreferencesManager,
@@ -46,11 +45,14 @@ class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
 
         syncScope.operations.forEach { op ->
             val state =
-                downSyncOperationOperationDao.load().toList().firstOrNull { it.scope.id == op.scopeId && it.downSyncOp.queryEvent == op.queryEvent }
+                downSyncOperationOperationDao.load().toList().firstOrNull {
+                    it.downSyncOp.scopeId == op.scopeId && it.downSyncOp.queryEvent == op.queryEvent }
+
             state?.downSyncOp?.let { opWithState ->
                 op.lastEventId = opWithState.lastEventId
                 op.lastSyncTime = opWithState.lastSyncTime
                 op.state = opWithState.state
+                op.queryEvent = op.queryEvent.copy(lastEventId = opWithState.lastEventId)
             }
         }
         return syncScope

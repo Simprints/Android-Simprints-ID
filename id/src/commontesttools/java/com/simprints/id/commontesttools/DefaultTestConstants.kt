@@ -1,9 +1,7 @@
 package com.simprints.id.commontesttools
 
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
-import com.simprints.id.data.db.subjects_sync.down.domain.ModuleSyncScope
-import com.simprints.id.data.db.subjects_sync.down.domain.ProjectSyncScope
-import com.simprints.id.data.db.subjects_sync.down.domain.UserSyncScope
+import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.*
 import com.simprints.id.domain.modality.Modes
 import java.util.*
 
@@ -27,18 +25,18 @@ object DefaultTestConstants {
         moduleId = DEFAULT_MODULE_ID,
         userId = DEFAULT_USER_ID)
 
-    val projectSyncScope = ProjectSyncScope(
+    val projectSyncScope = SubjectProjectScope(
         DEFAULT_PROJECT_ID,
         DEFAULT_MODES
     )
 
-    val userSyncScope = UserSyncScope(
+    val userSyncScope = SubjectUserScope(
         DEFAULT_PROJECT_ID,
         DEFAULT_USER_ID,
         DEFAULT_MODES
     )
 
-    val moduleSyncScope = ModuleSyncScope(
+    val moduleSyncScope = SubjectModuleScope(
         DEFAULT_PROJECT_ID,
         listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
         DEFAULT_MODES

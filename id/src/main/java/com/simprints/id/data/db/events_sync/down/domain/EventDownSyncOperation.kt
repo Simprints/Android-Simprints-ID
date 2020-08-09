@@ -2,7 +2,7 @@ package com.simprints.id.data.db.events_sync.down.domain
 
 
 data class EventDownSyncOperation(val scopeId: String,
-                                  val queryEvent: RemoteEventQuery,
+                                  var queryEvent: RemoteEventQuery,
                                   var state: DownSyncState? = null,
                                   var lastEventId: String? = null,
                                   var lastSyncTime: Long? = null) {

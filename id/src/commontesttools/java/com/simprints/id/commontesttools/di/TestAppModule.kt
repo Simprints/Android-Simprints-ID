@@ -14,7 +14,6 @@ import com.simprints.id.data.db.event.local.EventDatabaseFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
-import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
@@ -26,7 +25,6 @@ import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.services.sync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
@@ -118,7 +116,6 @@ class TestAppModule(
 
     override fun provideSessionEventsManager(
         ctx: Context,
-        sessionEventsSyncManager: SessionEventsSyncManager,
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
         preferencesManager: PreferencesManager,
@@ -128,7 +125,6 @@ class TestAppModule(
     ): EventRepository = sessionEventsManagerRule.resolveDependency {
         super.provideSessionEventsManager(
             ctx,
-            sessionEventsSyncManager,
             eventLocalDataSource,
             eventRemoteDataSource,
             preferencesManager,
@@ -154,9 +150,6 @@ class TestAppModule(
         locationManagerRule.resolveDependency {
             super.provideLocationManager(ctx)
         }
-
-    override fun provideSyncStatusDatabase(ctx: Context): SubjectsSyncStatusDatabase =
-        syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase(ctx) }
 
     // Android keystore is not available in unit tests - so it returns a mock that builds the standard shared prefs.
     override fun provideEncryptedSharedPreferencesBuilder(

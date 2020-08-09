@@ -4,14 +4,20 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
-import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.EventCount
+import com.simprints.id.data.db.event.domain.models.EventType.*
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -27,8 +33,8 @@ class SyncInformationViewModelTest {
 
     @MockK lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
     @MockK lateinit var preferencesManagerMock: PreferencesManager
-    @MockK lateinit var subjectsDownSyncScopeRepositoryMock: SubjectsDownSyncScopeRepository
-    private lateinit var subjectRepositoryMock: SubjectRepository
+    @MockK lateinit var eventRepository: EventRepository
+    @MockK lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 
     private val projectId = "projectId"
     private lateinit var viewModel: SyncInformationViewModel
@@ -36,8 +42,7 @@ class SyncInformationViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        subjectRepositoryMock = mockk()
-        viewModel = SyncInformationViewModel(subjectRepositoryMock, subjectLocalDataSourceMock, preferencesManagerMock, projectId, subjectsDownSyncScopeRepositoryMock)
+        viewModel = SyncInformationViewModel(eventRepository, subjectLocalDataSourceMock, preferencesManagerMock, projectId, eventDownSyncScopeRepository)
     }
 
     @Test
@@ -55,10 +60,13 @@ class SyncInformationViewModelTest {
         val countInRemoteForCreate = 123
         val countInRemoteForMove = 0
         val countInRemoteForDelete = 22
-        val subjectsCount = SubjectsCount(countInRemoteForCreate, countInRemoteForDelete, countInRemoteForMove)
 
-        every { subjectsDownSyncScopeRepositoryMock.getDownSyncScope() } returns projectSyncScope
-        coEvery { subjectRepositoryMock.countToDownSync(any()) } returns subjectsCount
+        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectSyncScope
+        coEvery { eventRepository.countEventsToDownload(any()) } returns
+            listOf(
+                EventCount(ENROLMENT_RECORD_CREATION, countInRemoteForCreate),
+                EventCount(ENROLMENT_RECORD_DELETION, countInRemoteForDelete),
+                EventCount(ENROLMENT_RECORD_MOVE, countInRemoteForMove))
 
         viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount()
 
