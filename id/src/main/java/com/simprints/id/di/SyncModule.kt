@@ -23,8 +23,8 @@ import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManagerImpl
+import com.simprints.id.services.sync.events.master.EventSyncStateProcessor
 import com.simprints.id.services.sync.events.master.EventSyncStateProcessorImpl
-import com.simprints.id.services.sync.events.master.SubjectsSyncStateProcessor
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache.Companion.FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache.Companion.FILENAME_FOR_PROGRESSES_SHARED_PREFS
@@ -49,9 +49,8 @@ open class SyncModule {
 
     @Provides
     open fun providePeopleSyncStateProcessor(ctx: Context,
-                                             eventSyncCache: EventSyncCache,
-                                             personRepository: SubjectRepository): SubjectsSyncStateProcessor =
-        EventSyncStateProcessorImpl(ctx, personRepository, eventSyncCache)
+                                             eventSyncCache: EventSyncCache): EventSyncStateProcessor =
+        EventSyncStateProcessorImpl(ctx, eventSyncCache)
 
     @Provides
     open fun provideEventUpSyncScopeRepo(loginInfoManager: LoginInfoManager,
@@ -60,11 +59,11 @@ open class SyncModule {
 
     @Provides
     open fun providePeopleSyncManager(ctx: Context,
-                                      subjectsSyncStateProcessor: SubjectsSyncStateProcessor,
+                                      eventSyncStateProcessor: EventSyncStateProcessor,
                                       downSyncScopeRepository: EventDownSyncScopeRepository,
                                       upSyncScopeRepo: EventUpSyncScopeRepository,
                                       eventSyncCache: EventSyncCache): EventSyncManager =
-        EventSyncManagerImpl(ctx, subjectsSyncStateProcessor, downSyncScopeRepository, upSyncScopeRepo, eventSyncCache)
+        EventSyncManagerImpl(ctx, eventSyncStateProcessor, downSyncScopeRepository, upSyncScopeRepo, eventSyncCache)
 
     @Provides
     open fun provideSyncManager(

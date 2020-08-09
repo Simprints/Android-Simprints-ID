@@ -3,7 +3,7 @@ package com.simprints.id.commontesttools.di
 import android.content.Context
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.di.SyncModule
-import com.simprints.id.services.sync.events.master.SubjectsSyncStateProcessor
+import com.simprints.id.services.sync.events.master.EventSyncStateProcessor
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.testtools.common.di.DependencyRule
 import javax.inject.Singleton
@@ -28,7 +28,7 @@ class TestSyncModule(
         ctx: Context,
         eventSyncCache: EventSyncCache,
         personRepository: SubjectRepository
-    ): SubjectsSyncStateProcessor = peopleSyncStateProcessor.resolveDependency {
+    ): EventSyncStateProcessor = peopleSyncStateProcessor.resolveDependency {
         super.providePeopleSyncStateProcessor(ctx, eventSyncCache, personRepository)
     }
 }

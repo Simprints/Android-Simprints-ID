@@ -65,9 +65,10 @@ class EventUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCo
 }
 
 fun WorkInfo.getUpCountsFromOutput(): Int? =
-    if (this.outputData.hasKeyWithValueOfType(OUTPUT_COUNT_WORKER_UP, Int::class.java)) {
-        this.outputData.getInt(OUTPUT_COUNT_WORKER_UP,0)
-    } else {
-        null
+    this.outputData.getInt(OUTPUT_COUNT_WORKER_UP, -1).let {
+        if (it > -1) {
+            it
+        } else {
+            null
+        }
     }
-

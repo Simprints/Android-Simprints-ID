@@ -36,11 +36,11 @@ class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
 
         val syncScope = when (preferencesManager.syncGroup) {
             GROUP.GLOBAL ->
-                SubjectProjectScope(projectId, modes)
+                ProjectScope(projectId, modes)
             GROUP.USER ->
-                SubjectUserScope(projectId, possibleUserId, modes)
+                UserScope(projectId, possibleUserId, modes)
             GROUP.MODULE ->
-                SubjectModuleScope(projectId, possibleModuleIds, modes)
+                ModuleScope(projectId, possibleModuleIds, modes)
         }
 
         syncScope.operations.forEach { op ->

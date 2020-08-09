@@ -15,6 +15,7 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
@@ -42,7 +43,7 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun getEvents(query: ApiRemoteEventQuery, scope: CoroutineScope): ReceiveChannel<List<Event>> {
         val streaming = takeStreaming(query)
-        return scope.produce {
+        return scope.produce(capacity = Channel.UNLIMITED) {
             parseStreamAndEmitEvents(streaming, this)
         }
     }

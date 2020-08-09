@@ -25,18 +25,18 @@ object DefaultTestConstants {
         moduleId = DEFAULT_MODULE_ID,
         userId = DEFAULT_USER_ID)
 
-    val projectSyncScope = SubjectProjectScope(
+    val projectSyncScope = ProjectScope(
         DEFAULT_PROJECT_ID,
         DEFAULT_MODES
     )
 
-    val userSyncScope = SubjectUserScope(
+    val userSyncScope = UserScope(
         DEFAULT_PROJECT_ID,
         DEFAULT_USER_ID,
         DEFAULT_MODES
     )
 
-    val moduleSyncScope = SubjectModuleScope(
+    val moduleSyncScope = ModuleScope(
         DEFAULT_PROJECT_ID,
         listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
         DEFAULT_MODES

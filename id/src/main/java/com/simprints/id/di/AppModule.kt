@@ -8,6 +8,8 @@ import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsViewModelFactory
+import com.simprints.id.activities.fetchguid.FetchGuidHelper
+import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
@@ -278,11 +280,17 @@ open class AppModule {
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
 
     @Provides
-    open fun provideFetchGuidViewModelFactory(downSyncHelper: EventDownSyncHelper,
+    open fun provideGuidFetchGuidHelper(downSyncHelper: EventDownSyncHelper,
+                                        subjectRepository: SubjectRepository,
+                                        preferencesManager: PreferencesManager): FetchGuidHelper =
+        FetchGuidHelperImpl(downSyncHelper, subjectRepository, preferencesManager)
+
+    @Provides
+    open fun provideFetchGuidViewModelFactory(guidFetchGuidHelper: FetchGuidHelper,
                                               deviceManager: DeviceManager,
                                               eventRepository: EventRepository,
                                               timeHelper: TimeHelper) =
-        FetchGuidViewModelFactory(downSyncHelper, deviceManager, eventRepository, timeHelper)
+        FetchGuidViewModelFactory(guidFetchGuidHelper, deviceManager, eventRepository, timeHelper)
 
     @Provides
     open fun provideSyncInformationViewModelFactory(
