@@ -2,10 +2,12 @@ package com.simprints.id.activities.settings.fingerselection
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 
-class FingerSelectionViewModel(private val preferencesManager: PreferencesManager) : ViewModel() {
+class FingerSelectionViewModel(private val preferencesManager: PreferencesManager,
+                               private val crashReportManager: CrashReportManager) : ViewModel() {
 
     val items = MutableLiveData<List<FingerSelectionItem>>()
 
@@ -61,13 +63,16 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
     fun haveSettingsChanged() = determineFingerSelectionItemsFromPrefs() != _items.toList()
 
     fun canSavePreference(): Boolean {
-        val highestNumberOfFingersInItems = _items.toFingerIdentifiers().groupingBy { it }.eachCount().values.max()?: 1
-        val maxAllowedFingers = QUANTITY_OPTIONS.max()?: 1
+        val highestNumberOfFingersInItems = _items.toFingerIdentifiers().groupingBy { it }.eachCount().values.max()
+            ?: 1
+        val maxAllowedFingers = QUANTITY_OPTIONS.max() ?: 1
         return highestNumberOfFingersInItems <= maxAllowedFingers
     }
 
     fun savePreference() {
-        preferencesManager.fingerprintsToCollect = _items.toFingerIdentifiers()
+        val fingerprintsToCollect = _items.toFingerIdentifiers()
+        preferencesManager.fingerprintsToCollect = fingerprintsToCollect
+        crashReportManager.setFingersSelectedCrashlyticsKey(fingerprintsToCollect)
     }
 
     private fun determineFingerSelectionItemsFromPrefs(): List<FingerSelectionItem> =

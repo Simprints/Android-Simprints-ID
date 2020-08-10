@@ -2,6 +2,7 @@ package com.simprints.id.activities.settings.fingerselection
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 import io.mockk.every
@@ -17,7 +18,8 @@ class FingerSelectionViewModelTest {
     val rule = InstantTaskExecutorRule()
 
     private val prefsMock: PreferencesManager = mockk()
-    private val viewModel = FingerSelectionViewModel(prefsMock)
+    private val crashReportManagerMock: CrashReportManager = mockk()
+    private val viewModel = FingerSelectionViewModel(prefsMock, crashReportManagerMock)
 
     @Test
     fun start_loadsStartingFingerStateCorrectly() {
@@ -184,7 +186,7 @@ class FingerSelectionViewModelTest {
     }
 
     @Test
-    fun savePreference_savesPreferenceCorrectly() {
+    fun savePreference_savesPreferenceAndCrashReportInfoCorrectly() {
         every { prefsMock.fingerprintsToCollect } returns listOf(
             FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
             FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB)
@@ -195,10 +197,18 @@ class FingerSelectionViewModelTest {
 
         viewModel.savePreference()
 
-        val slot = slot<List<FingerIdentifier>>()
-        verify { prefsMock.fingerprintsToCollect = capture(slot) }
+        val prefSlot = slot<List<FingerIdentifier>>()
+        verify { prefsMock.fingerprintsToCollect = capture(prefSlot) }
 
-        assertThat(slot.captured).containsExactlyElementsIn(listOf(
+        assertThat(prefSlot.captured).containsExactlyElementsIn(listOf(
+            FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
+            FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB,
+            FingerIdentifier.LEFT_INDEX_FINGER)).inOrder()
+
+        val crashReportSlot = slot<List<FingerIdentifier>>()
+        verify { crashReportManagerMock.setFingersSelectedCrashlyticsKey(capture(crashReportSlot)) }
+
+        assertThat(crashReportSlot.captured).containsExactlyElementsIn(listOf(
             FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
             FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB,
             FingerIdentifier.LEFT_INDEX_FINGER)).inOrder()

@@ -54,8 +54,6 @@ interface SettingsPreferencesManager {
 
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
-    @Deprecated("To be removed")
-    fun getRemoteConfigFingerStatus(): Map<FingerIdentifier, Boolean>
     fun getRemoteConfigFingerprintsToCollect(): List<FingerIdentifier>
 
 }
