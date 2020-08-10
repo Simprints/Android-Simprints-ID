@@ -42,7 +42,7 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
 
     fun addNewFinger() {
         postUpdatedItems {
-            val fingerNotYetUsed = orderedFingers().toMutableList().apply {
+            val fingerNotYetUsed = ORDERED_FINGERS.toMutableList().apply {
                 removeAll(this@postUpdatedItems.map { it.finger })
             }.firstOrNull() ?: FingerIdentifier.LEFT_THUMB
             add(FingerSelectionItem(fingerNotYetUsed, QUANTITY_OPTIONS.first(), true))
@@ -99,7 +99,7 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
 
 data class FingerSelectionItem(var finger: FingerIdentifier, var quantity: Int, var removable: Boolean)
 
-fun orderedFingers() = listOf(
+val ORDERED_FINGERS = listOf(
     FingerIdentifier.LEFT_THUMB,
     FingerIdentifier.LEFT_INDEX_FINGER,
     FingerIdentifier.LEFT_3RD_FINGER,
