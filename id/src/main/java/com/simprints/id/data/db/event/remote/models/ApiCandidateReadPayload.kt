@@ -1,6 +1,8 @@
 package com.simprints.id.data.db.event.remote.models
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
@@ -9,6 +11,7 @@ import com.simprints.id.data.db.event.remote.models.ApiCandidateReadPayload.ApiR
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.CandidateRead
 
 @Keep
+@JsonInclude(Include.NON_NULL)
 data class ApiCandidateReadPayload(override val relativeStartTime: Long,
                               override val version: Int,
                               val relativeEndTime: Long,

@@ -9,8 +9,8 @@ import com.simprints.id.data.db.event.remote.models.ApiArtificialTerminationPayl
 
 @Keep
 data class ApiArtificialTerminationPayload(override val relativeStartTime: Long,
-                                      override val version: Int,
-                                      val reason: ApiReason) : ApiEventPayload(ApiEventPayloadType.ArtificialTermination, version, relativeStartTime) {
+                                           override val version: Int,
+                                           val reason: ApiReason) : ApiEventPayload(ApiEventPayloadType.ArtificialTermination, version, relativeStartTime) {
 
     constructor(domainPayload: ArtificialTerminationPayload) :
         this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.reason.fromDomainToApi())

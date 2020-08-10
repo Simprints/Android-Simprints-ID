@@ -1,5 +1,7 @@
 package com.simprints.id.data.db.events_sync.up.domain
 
+import java.util.*
+
 data class EventUpSyncOperation(val scopeId: String,
                                 val queryEvent: LocalEventQuery,
                                 var lastState: UpSyncState? = null,
@@ -13,4 +15,8 @@ data class EventUpSyncOperation(val scopeId: String,
 }
 
 fun EventUpSyncOperation.getUniqueKey() =
-    this.copy(lastState = null, lastSyncTime = null).hashCode()
+    with(this.queryEvent) {
+        UUID.nameUUIDFromBytes(
+            "$projectId".toByteArray()
+        ).toString()
+    }

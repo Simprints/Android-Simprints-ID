@@ -1,5 +1,7 @@
 package com.simprints.id.data.db.events_sync.down.domain
 
+import java.util.*
+
 data class EventDownSyncOperation(val scopeId: String,
                                   val queryEvent: RemoteEventQuery,
                                   val state: DownSyncState? = null,
@@ -14,8 +16,15 @@ data class EventDownSyncOperation(val scopeId: String,
 }
 
 //Unique key: all request params expect for lastEventId
-fun EventDownSyncOperation.getUniqueKey(): Int {
-    val paramsRequest = this.queryEvent.copy(lastEventId = null)
-    return paramsRequest.hashCode()
-}
-
+fun EventDownSyncOperation.getUniqueKey(): String =
+    with(this.queryEvent) {
+        UUID.nameUUIDFromBytes(
+            (projectId +
+                "$attendantId" +
+                "$subjectId" +
+                "${moduleIds?.joinToString()}" +
+                modes.joinToString { it.name } +
+                types.joinToString { it.name }
+                ).toByteArray()
+        ).toString()
+    }

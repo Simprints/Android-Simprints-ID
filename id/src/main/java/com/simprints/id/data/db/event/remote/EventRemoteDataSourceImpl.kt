@@ -59,8 +59,6 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
 
         try {
             while (parser.nextToken() == START_OBJECT) {
-                Timber.tag(SYNC_LOG_TAG).d("[EVENT_REMOTE_SOURCE] Got it")
-
                 val event = jsonHelper.jackson.readValue(parser, ApiEvent::class.java)
                 channel.send(event.fromApiToDomain())
             }

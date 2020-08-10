@@ -1,6 +1,8 @@
 package com.simprints.id.data.db.event.remote.models.face
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.RECAPTURE
@@ -9,6 +11,7 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FaceCapt
 import com.simprints.id.data.db.event.remote.models.face.ApiFaceCaptureConfirmationPayload.ApiResult
 
 @Keep
+@JsonInclude(Include.NON_NULL)
 data class ApiFaceCaptureConfirmationPayload(override val relativeStartTime: Long, //Not added on API yet
                                         val relativeEndTime: Long,
                                         override val version: Int,

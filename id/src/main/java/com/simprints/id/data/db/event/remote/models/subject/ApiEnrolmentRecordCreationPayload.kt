@@ -2,12 +2,15 @@ package com.simprints.id.data.db.event.remote.models.subject
 
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.domain.models.subject.fromApiToDomain
 import com.simprints.id.data.db.event.remote.models.ApiEventPayload
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
 
 @Keep
+@JsonInclude(Include.NON_NULL)
 data class ApiEnrolmentRecordCreationPayload(
     @JsonIgnore override val relativeStartTime: Long, //Not added on API yet
     override val version: Int,

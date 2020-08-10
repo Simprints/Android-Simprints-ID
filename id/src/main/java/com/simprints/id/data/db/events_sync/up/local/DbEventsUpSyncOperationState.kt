@@ -10,7 +10,7 @@ import com.simprints.id.data.db.events_sync.up.domain.getUniqueKey
 @Entity(tableName = "DbEventsUpSyncOperation")
 @Keep
 data class DbEventsUpSyncOperationState(
-    @PrimaryKey var id: Int,
+    @PrimaryKey var id: String,
     val lastState: UpSyncState?,
     val lastUpdatedTime: Long?
 ) {
