@@ -1,6 +1,5 @@
 package com.simprints.id.data.prefs.settings
 
-import com.google.gson.JsonSyntaxException
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
@@ -21,9 +20,6 @@ interface SettingsPreferencesManager {
     var maxNumberOfModules: Int
     var syncGroup: GROUP
     var matchGroup: GROUP
-    /** @throws JsonSyntaxException */
-    @Deprecated("Use fingerprintsToCollect instead")
-    var fingerStatus: Map<FingerIdentifier, Boolean>
 
     var programName: String
     var organizationName: String

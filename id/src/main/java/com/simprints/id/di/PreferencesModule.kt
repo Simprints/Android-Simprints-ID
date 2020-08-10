@@ -20,7 +20,6 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
-import com.simprints.id.data.prefs.settings.fingerprint.serializers.FingerprintsToCollectSerializer
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
@@ -73,7 +72,6 @@ open class PreferencesModule {
     open fun provideSettingsPreferencesManager(
         prefs: ImprovedSharedPreferences,
         remoteConfigWrapper: RemoteConfigWrapper,
-        @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
         @Named("GroupSerializer") groupSerializer: Serializer<GROUP>,
         @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
         @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
@@ -86,7 +84,6 @@ open class PreferencesModule {
     ): SettingsPreferencesManager = SettingsPreferencesManagerImpl(
         prefs,
         remoteConfigWrapper,
-        fingerIdToBooleanSerializer,
         groupSerializer,
         modalitiesSerializer,
         languagesStringArraySerializer,
