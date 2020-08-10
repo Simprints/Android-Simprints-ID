@@ -2,6 +2,7 @@ package com.simprints.id.activities.settings.fingerselection
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.FingerIdentifier.*
+import com.simprints.id.tools.extensions.disableLongPress
 import com.simprints.id.tools.extensions.onItemSelectedWithPosition
 import kotlinx.android.synthetic.main.item_finger_selection.view.*
 
@@ -34,22 +36,33 @@ class FingerSelectionItemAdapter(private val context: Context,
         viewHolder.bind()
     }
 
-    class FingerSelectionItemViewHolder(val context: Context, val viewModel: FingerSelectionViewModel, val itemTouchHelper: ItemTouchHelper, view: View) : RecyclerView.ViewHolder(view) {
-        val grip: ImageView = view.gripFingerSelectionImageView
+    class FingerSelectionItemViewHolder(val context: Context, val viewModel: FingerSelectionViewModel, private val itemTouchHelper: ItemTouchHelper, view: View) : RecyclerView.ViewHolder(view) {
+
+        private val grip: ImageView = view.gripFingerSelectionImageView
         private val fingerSpinner: Spinner = view.fingerSelectionSpinner
         private val quantitySpinner: Spinner = view.fingerQuantitySpinner
         private val deleteButton: ImageView = view.deleteFingerSelectionImageView
 
         @SuppressLint("ClickableViewAccessibility")
         fun bind() {
-            fingerSpinner.adapter = FingerIdAdapter(context)
-            quantitySpinner.adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, QUANTITY_OPTIONS)
+            val fingerIdAdapter = FingerIdAdapter(viewModel, context)
+            val quantityAdapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, QUANTITY_OPTIONS)
+
+            fingerSpinner.adapter = fingerIdAdapter
+            quantitySpinner.adapter = quantityAdapter
 
             fingerSpinner.setSelection(orderedFingers().indexOf(viewModel.items.value?.get(adapterPosition)?.finger))
             quantitySpinner.setSelection(QUANTITY_OPTIONS.indexOf(viewModel.items.value?.get(adapterPosition)?.quantity))
 
-            fingerSpinner.onItemSelectedWithPosition { viewModel.changeFingerSelection(adapterPosition, it) }
-            quantitySpinner.onItemSelectedWithPosition { viewModel.changeQuantitySelection(adapterPosition, it) }
+            fingerSpinner.disableLongPress()
+            quantitySpinner.disableLongPress()
+
+            fingerSpinner.onItemSelectedWithPosition { position ->
+                fingerIdAdapter.getItem(position)?.let { viewModel.changeFingerSelection(adapterPosition, it) }
+            }
+            quantitySpinner.onItemSelectedWithPosition { position ->
+                quantityAdapter.getItem(position)?.let { viewModel.changeQuantitySelection(adapterPosition, it) }
+            }
 
             if (viewModel.items.value?.get(adapterPosition)?.removable == true) {
                 deleteButton.setOnClickListener { viewModel.removeItem(adapterPosition) }
@@ -70,7 +83,9 @@ class FingerSelectionItemAdapter(private val context: Context,
     }
 }
 
-class FingerIdAdapter(context: Context) : ArrayAdapter<FingerIdentifier>(context, 0, orderedFingers()) {
+class FingerIdAdapter(private val viewModel: FingerSelectionViewModel, context: Context) : ArrayAdapter<FingerIdentifier>(context, 0, orderedFingers()) {
+
+    override fun isEnabled(position: Int): Boolean = isFingerAvailable(position)
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View =
         (convertView as? CheckedTextView? ?: LayoutInflater.from(context)
@@ -80,7 +95,13 @@ class FingerIdAdapter(context: Context) : ArrayAdapter<FingerIdentifier>(context
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View =
         (convertView as? CheckedTextView? ?: LayoutInflater.from(context)
             .inflate(android.R.layout.simple_spinner_dropdown_item, parent, false) as CheckedTextView)
-            .apply { text = getItem(position)?.toString(context) }
+            .apply {
+                text = getItem(position)?.toString(context)
+                setTextColor(if (isFingerAvailable(position)) Color.BLACK else Color.LTGRAY)
+            }
+
+    private fun isFingerAvailable(position: Int) =
+        !(viewModel.items.value?.map { it.finger } ?: emptyList()).contains(getItem(position))
 }
 
 fun FingerIdentifier.toString(context: Context) =

@@ -22,12 +22,12 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
         }
     }
 
-    fun changeFingerSelection(itemIndex: Int, fingerIndex: Int) {
-        _items[itemIndex].finger = orderedFingers()[fingerIndex]
+    fun changeFingerSelection(itemIndex: Int, finger: FingerIdentifier) {
+        _items[itemIndex].finger = finger
     }
 
     fun changeQuantitySelection(itemIndex: Int, quantity: Int) {
-        _items[itemIndex].quantity = QUANTITY_OPTIONS[quantity]
+        _items[itemIndex].quantity = quantity
     }
 
     fun moveItem(from: Int, to: Int) {
