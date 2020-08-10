@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -102,18 +102,18 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
         }
     }
 
-    private fun buildQuery(projectId: String, userId: String, moduleId: String, matchGroup: GROUP): SubjectLocalDataSource.Query =
+    private fun buildQuery(projectId: String, userId: String, moduleId: String, matchGroup: GROUP): SubjectQuery =
         when (matchGroup) {
-            GROUP.GLOBAL -> SubjectLocalDataSource.Query(projectId)
-            GROUP.USER -> SubjectLocalDataSource.Query(projectId, attendantId = userId)
-            GROUP.MODULE -> SubjectLocalDataSource.Query(projectId, moduleId = moduleId)
+            GROUP.GLOBAL -> SubjectQuery(projectId)
+            GROUP.USER -> SubjectQuery(projectId, attendantId = userId)
+            GROUP.MODULE -> SubjectQuery(projectId, moduleId = moduleId)
         }
 
-    private fun addMatchingStepForFinger(probeSamples: List<FingerprintCaptureSample>, query: SubjectLocalDataSource.Query) {
+    private fun addMatchingStepForFinger(probeSamples: List<FingerprintCaptureSample>, query: SubjectQuery) {
         steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query))
     }
 
-    private fun addMatchingStepForFace(probeSamples: List<FaceCaptureSample>, query: SubjectLocalDataSource.Query) {
+    private fun addMatchingStepForFace(probeSamples: List<FaceCaptureSample>, query: SubjectQuery) {
         steps.add(faceStepProcessor.buildStepMatch(probeSamples, query))
     }
 }

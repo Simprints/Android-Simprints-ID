@@ -19,5 +19,8 @@ fun EventUpSyncOperation.fromDomainToDb(): DbEventsUpSyncOperation =
         this
     )
 
-fun DbEventsUpSyncOperation.fromDbToDomain() =
+private fun DbEventsUpSyncOperation.fromDbToDomain() =
     this.upSyncOp
+
+private fun EventUpSyncOperation.getUniqueKey() =
+    this.copy(lastState = null, lastSyncTime = null).hashCode()

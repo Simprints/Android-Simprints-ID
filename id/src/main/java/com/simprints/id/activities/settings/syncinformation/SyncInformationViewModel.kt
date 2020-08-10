@@ -8,6 +8,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_C
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.EXTRA
@@ -40,11 +41,11 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
     }
 
     internal suspend fun fetchAndUpdateLocalRecordCount() {
-        localRecordCountLiveData.value = subjectLocalDataSource.count(SubjectLocalDataSource.Query(projectId = projectId))
+        localRecordCountLiveData.value = subjectLocalDataSource.count(SubjectQuery(projectId = projectId))
     }
 
     internal suspend fun fetchAndUpdateRecordsToUpSyncCount() {
-        recordsToUpSyncCountLiveData.value = subjectLocalDataSource.count(SubjectLocalDataSource.Query(toSync = true))
+        recordsToUpSyncCountLiveData.value = subjectLocalDataSource.count(SubjectQuery(toSync = true))
     }
 
     internal suspend fun fetchRecordsToUpdateAndDeleteCountIfNecessary() {
@@ -80,13 +81,13 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
     internal suspend fun fetchAndUpdateSelectedModulesCount() {
         selectedModulesCountLiveData.value = preferencesManager.selectedModules.map {
             ModuleCount(it,
-                subjectLocalDataSource.count(SubjectLocalDataSource.Query(projectId = projectId, moduleId = it)))
+                subjectLocalDataSource.count(SubjectQuery(projectId = projectId, moduleId = it)))
         }
     }
 
     internal suspend fun fetchAndUpdatedUnselectedModulesCount() {
         val unselectedModules = subjectLocalDataSource.load(
-            SubjectLocalDataSource.Query(projectId = projectId)
+            SubjectQuery(projectId = projectId)
         ).filter { !preferencesManager.selectedModules.contains(it.moduleId) }
             .toList()
             .groupBy { it.moduleId }

@@ -67,9 +67,9 @@ class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) 
 
             Timber.tag(SYNC_LOG_TAG).d("[xDOWNLOADER] Done $count")
             success(workDataOf(OUTPUT_DOWN_SYNC to count), "Total downloaded: $0 for $downSyncOperation")
+
         } catch (t: Throwable) {
             Timber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed")
-
             retryOrFailIfCloudIntegrationErrorOrMalformedOperation(t)
         }
     }
@@ -81,16 +81,6 @@ class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) 
             retry(t)
         }
     }
-
-//    private suspend fun extractSubSyncScopeFromInput(): EventsDownSyncOperation {
-//        try {
-//            val op = jsonHelper.fromJson<EventsDownSyncOperation>(jsonForOp)
-//            return downSyncScopeRepository.refreshDownSyncOperationFromDb(op) ?: op
-//        } catch (t: Throwable) {
-//            Timber.d(t)
-//            throw MalformedDownSyncOperationException()
-//        }
-//    }
 
     override suspend fun reportCount(count: Int) {
         setProgress(

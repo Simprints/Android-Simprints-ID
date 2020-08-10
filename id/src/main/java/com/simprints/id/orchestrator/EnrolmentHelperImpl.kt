@@ -8,6 +8,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.domain.SubjectAction
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.toMode
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -24,7 +25,7 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
 
     override suspend fun enrol(subject: Subject) {
         registerEvent(subject)
-        subjectRepository.save(subject)
+        subjectRepository.performActions(listOf(SubjectAction.Creation(subject)))
         eventSyncManager.sync()
     }
 

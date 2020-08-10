@@ -29,7 +29,7 @@ interface EventRepository {
 
     suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount>
 
-    suspend fun downloadEvents(scope: CoroutineScope, query: RemoteEventQuery): ReceiveChannel<List<Event>>
+    suspend fun downloadEvents(scope: CoroutineScope, query: RemoteEventQuery): ReceiveChannel<Event>
 
     suspend fun signOut()
 

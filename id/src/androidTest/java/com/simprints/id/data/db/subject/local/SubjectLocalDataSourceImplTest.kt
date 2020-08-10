@@ -83,7 +83,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = subjectLocalDataSource.count(SubjectLocalDataSource.Query(attendantId = fakePerson.attendantId))
+        val count = subjectLocalDataSource.count(SubjectQuery(attendantId = fakePerson.attendantId))
         assertThat(count).isEqualTo(1)
     }
 
@@ -92,7 +92,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = subjectLocalDataSource.count(SubjectLocalDataSource.Query(moduleId = fakePerson.moduleId))
+        val count = subjectLocalDataSource.count(SubjectQuery(moduleId = fakePerson.moduleId))
         assertThat(count).isEqualTo(1)
     }
 
@@ -109,7 +109,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = subjectLocalDataSource.count(SubjectLocalDataSource.Query(subjectId = fakePerson.subjectId))
+        val count = subjectLocalDataSource.count(SubjectQuery(subjectId = fakePerson.subjectId))
         assertThat(count).isEqualTo(1)
     }
 
@@ -144,7 +144,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         subjectLocalDataSource.insertOrUpdate(listOf(fakePerson2.fromDbToDomain()))
 
         val fingerprintIdentityLocalDataSource = (subjectLocalDataSource as FingerprintIdentityLocalDataSource)
-        val fingerprintIdentities = fingerprintIdentityLocalDataSource.loadFingerprintIdentities(SubjectLocalDataSource.Query()).toList()
+        val fingerprintIdentities = fingerprintIdentityLocalDataSource.loadFingerprintIdentities(SubjectQuery()).toList()
         realm.executeTransaction {
             with(fingerprintIdentities) {
                 verifyIdentity(fakePerson1, get(0))
@@ -161,7 +161,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         subjectLocalDataSource.insertOrUpdate(listOf(fakePerson2.fromDbToDomain()))
 
         val faceIdentityDataSource = (subjectLocalDataSource as FaceIdentityLocalDataSource)
-        val faceRecords = faceIdentityDataSource.loadFaceIdentities(SubjectLocalDataSource.Query()).toList()
+        val faceRecords = faceIdentityDataSource.loadFaceIdentities(SubjectQuery()).toList()
         realm.executeTransaction {
             with(faceRecords) {
                 verifyIdentity(fakePerson1, get(0))
@@ -195,7 +195,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = subjectLocalDataSource.load(SubjectLocalDataSource.Query(attendantId = fakePerson.attendantId)).toList()
+        val people = subjectLocalDataSource.load(SubjectQuery(attendantId = fakePerson.attendantId)).toList()
         listOf(fakePerson).zip(people).forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
     }
 
@@ -204,7 +204,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = subjectLocalDataSource.load(SubjectLocalDataSource.Query(moduleId = fakePerson.moduleId)).toList()
+        val people = subjectLocalDataSource.load(SubjectQuery(moduleId = fakePerson.moduleId)).toList()
         listOf(fakePerson).zip(people).forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
     }
 
@@ -212,7 +212,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
     fun givenManyPeopleSaved_loadByToSyncShouldReturnTheRightPeople() = runBlocking {
         saveFakePeople(realm, getRandomPeople(20, toSync = true))
 
-        val people = subjectLocalDataSource.load(SubjectLocalDataSource.Query(toSync = true)).toList()
+        val people = subjectLocalDataSource.load(SubjectQuery(toSync = true)).toList()
         assertThat(people.size).isEqualTo(20)
     }
 
@@ -220,7 +220,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
     fun givenManyPeopleSaved_loadByToNoSyncShouldReturnTheRightPeople() = runBlocking {
         saveFakePeople(realm, getRandomPeople(20, toSync = true))
 
-        val people = subjectLocalDataSource.load(SubjectLocalDataSource.Query(toSync = false)).toList()
+        val people = subjectLocalDataSource.load(SubjectQuery(toSync = false)).toList()
         assertThat(people.size).isEqualTo(0)
     }
 
@@ -232,7 +232,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         saveFakePerson(realm, subject2)
 
         subjectLocalDataSource.delete(
-            listOf(SubjectLocalDataSource.Query(subjectId = subject1.subjectId))
+            listOf(SubjectQuery(subjectId = subject1.subjectId))
         )
 
         val peopleCount = subjectLocalDataSource.count()

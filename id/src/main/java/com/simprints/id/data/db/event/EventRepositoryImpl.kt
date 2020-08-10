@@ -109,7 +109,7 @@ open class EventRepositoryImpl(
         eventRemoteDataSource.count(query.fromDomainToApi())
 
 
-    override suspend fun downloadEvents(scope: CoroutineScope, query: RemoteEventQuery): ReceiveChannel<List<Event>> =
+    override suspend fun downloadEvents(scope: CoroutineScope, query: RemoteEventQuery): ReceiveChannel<Event> =
         eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
 
 

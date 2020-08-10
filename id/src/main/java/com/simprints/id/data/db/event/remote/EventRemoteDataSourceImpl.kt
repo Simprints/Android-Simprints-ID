@@ -13,16 +13,16 @@ import com.simprints.id.data.db.event.remote.models.fromApiToDomain
 import com.simprints.id.data.db.event.remote.models.fromDomainToApi
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
+import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
-import okhttp3.internal.toImmutableList
 import timber.log.Timber
 import java.io.InputStream
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFactory,
                                 private val jsonHelper: JsonHelper) : EventRemoteDataSource {
 
@@ -41,45 +41,36 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
             }
         }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun getEvents(query: ApiRemoteEventQuery, scope: CoroutineScope): ReceiveChannel<List<Event>> {
+    override suspend fun getEvents(query: ApiRemoteEventQuery, scope: CoroutineScope): ReceiveChannel<Event> {
         val streaming = takeStreaming(query)
-        return scope.produce(capacity = Channel.UNLIMITED) {
+        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REMOTE_SOURCE] Stream taken")
+
+        return scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
             parseStreamAndEmitEvents(streaming, this)
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @VisibleForTesting
-    suspend fun parseStreamAndEmitEvents(streaming: InputStream, channel: ProducerScope<List<Event>>, batchSize: Int = BATCH_SIZE_FOR_DOWNLOADING) {
+    suspend fun parseStreamAndEmitEvents(streaming: InputStream, channel: ProducerScope<Event>) {
         val parser: JsonParser = JsonFactory().createParser(streaming)
         check(parser.nextToken() == START_ARRAY) { "Expected an array" }
-        val buffer = mutableListOf<ApiEvent>()
+
+        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REMOTE_SOURCE] Start parsing stream")
 
         try {
             while (parser.nextToken() == START_OBJECT) {
-
                 val event = jsonHelper.jackson.readValue(parser, ApiEvent::class.java)
-                buffer.add(event)
-
-                if (buffer.size >= batchSize) {
-                    if (!channel.isClosedForSend) {
-                        channel.send(buffer.toImmutableList().map { it.fromApiToDomain() })
-                    }
-                    buffer.clear()
-                }
+                channel.send(event.fromApiToDomain())
             }
-
-            channel.send(buffer.toImmutableList().map { it.fromApiToDomain() })
 
         } catch (t: Throwable) {
             Timber.d(t)
-            if (!channel.isClosedForSend) {
-                channel.send(buffer.toImmutableList().map { it.fromApiToDomain() })
-                channel.close(t)
-            }
             parser.close()
+            channel.close(t)
         }
+
+        parser.close()
+        channel.close()
     }
 
     private suspend fun takeStreaming(query: ApiRemoteEventQuery) =
@@ -114,6 +105,6 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
         simApiClientFactory.buildClient(EventRemoteInterface::class)
 
     companion object {
-        const val BATCH_SIZE_FOR_DOWNLOADING = 200
+        private const val CHANNEL_CAPACITY_FOR_PROPAGATION = 2000
     }
 }

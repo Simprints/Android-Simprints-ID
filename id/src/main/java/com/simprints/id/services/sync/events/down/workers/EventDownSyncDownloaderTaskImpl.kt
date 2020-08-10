@@ -6,6 +6,7 @@ import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.consumeEach
 
 class EventDownSyncDownloaderTaskImpl : EventDownSyncDownloaderTask {
 
@@ -20,13 +21,12 @@ class EventDownSyncDownloaderTaskImpl : EventDownSyncDownloaderTask {
         var progress = syncCache.readProgress(workerId)
         val totalDownloaded = downSyncHelper.downSync(downloadScope, downSyncOperation)
 
-        while (!totalDownloaded.isClosedForReceive) {
-            totalDownloaded.poll()?.let {
-                progress = it.progress
-                syncCache.saveProgress(workerId, progress)
-                reporter.reportCount(progress)
-            }
+        totalDownloaded.consumeEach {
+            progress = it.progress
+            syncCache.saveProgress(workerId, progress)
+            reporter.reportCount(progress)
         }
+
         return progress
     }
 }
