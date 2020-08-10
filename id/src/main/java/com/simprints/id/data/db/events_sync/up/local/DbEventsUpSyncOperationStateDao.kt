@@ -6,13 +6,13 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface EventsUpSyncOperationLocalDataSource {
+interface DbEventsUpSyncOperationStateDao {
 
     @Query("select * from DbEventsUpSyncOperation")
-    suspend fun load(): List<DbEventsUpSyncOperation>
+    suspend fun load(): List<DbEventsUpSyncOperationState>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdate(operation: DbEventsUpSyncOperation)
+    suspend fun insertOrUpdate(operation: DbEventsUpSyncOperationState)
 
     @Query("delete from DbEventsUpSyncOperation")
     suspend fun deleteAll()

@@ -9,5 +9,7 @@ interface EventDownSyncScopeRepository {
 
     suspend fun insertOrUpdate(syncScopeOperation: EventDownSyncOperation)
 
+    suspend fun refreshState(syncScopeOperation: EventDownSyncOperation): EventDownSyncOperation
+
     suspend fun deleteAll()
 }

@@ -14,7 +14,7 @@ import com.simprints.id.domain.modality.Modes
     JsonSubTypes.Type(value = ModuleScope::class),
     JsonSubTypes.Type(value = SubjectScope::class)
 )
-sealed class EventDownSyncScope(open val operations: List<EventDownSyncOperation> = mutableListOf()) {
+sealed class EventDownSyncScope(open var operations: List<EventDownSyncOperation> = mutableListOf()) {
 
     abstract val id: String
 
@@ -24,7 +24,7 @@ sealed class EventDownSyncScope(open val operations: List<EventDownSyncOperation
             get() = "$projectId$separator" +
                 modes.joinToString(separator)
 
-        override val operations =
+        override var operations =
             listOf(EventDownSyncOperation(id, RemoteEventQuery(projectId, modes = modes, types = subjectEvents)))
     }
 
@@ -37,7 +37,7 @@ sealed class EventDownSyncScope(open val operations: List<EventDownSyncOperation
                     "$attendantId$separator" +
                     modes.joinToString(separator)
 
-        override val operations =
+        override var operations =
             listOf(EventDownSyncOperation(id, RemoteEventQuery(projectId, attendantId = attendantId, modes = modes, types = subjectEvents)))
     }
 
@@ -50,7 +50,7 @@ sealed class EventDownSyncScope(open val operations: List<EventDownSyncOperation
                     "${moduleIds.joinToString(separator)}$separator" +
                     modes.joinToString(separator)
 
-        override val operations =
+        override var operations =
             listOf(EventDownSyncOperation(id, RemoteEventQuery(projectId, moduleIds = moduleIds, modes = modes, types = subjectEvents)))
 
     }
@@ -65,7 +65,7 @@ sealed class EventDownSyncScope(open val operations: List<EventDownSyncOperation
                     "$subjectId$separator" +
                     modes.joinToString(separator)
 
-        override val operations =
+        override var operations =
             listOf(EventDownSyncOperation(id, RemoteEventQuery(projectId, subjectId = subjectId, modes = modes, types = subjectEvents)))
 
     }

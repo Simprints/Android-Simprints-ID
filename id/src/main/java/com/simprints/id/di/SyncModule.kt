@@ -7,10 +7,10 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.events_sync.EventsSyncStatusDatabase
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepositoryImpl
-import com.simprints.id.data.db.events_sync.down.local.EventDownSyncOperationLocalDataSource
+import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationStateDao
 import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepositoryImpl
-import com.simprints.id.data.db.events_sync.up.local.EventsUpSyncOperationLocalDataSource
+import com.simprints.id.data.db.events_sync.up.local.DbEventsUpSyncOperationStateDao
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -54,8 +54,8 @@ open class SyncModule {
 
     @Provides
     open fun provideEventUpSyncScopeRepo(loginInfoManager: LoginInfoManager,
-                                         eventsUpSyncOperationLocalDataSource: EventsUpSyncOperationLocalDataSource
-    ): EventUpSyncScopeRepository = EventUpSyncScopeRepositoryImpl(loginInfoManager, eventsUpSyncOperationLocalDataSource)
+                                         dbEventsUpSyncOperationStateDao: DbEventsUpSyncOperationStateDao
+    ): EventUpSyncScopeRepository = EventUpSyncScopeRepositoryImpl(loginInfoManager, dbEventsUpSyncOperationStateDao)
 
     @Provides
     open fun providePeopleSyncManager(ctx: Context,
@@ -78,9 +78,9 @@ open class SyncModule {
     open fun provideEventDownSyncScopeRepo(
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
-        downSyncOperationLocalDataSource: EventDownSyncOperationLocalDataSource
+        downSyncOperationStateDao: DbEventsDownSyncOperationStateDao
     ): EventDownSyncScopeRepository =
-        EventDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, downSyncOperationLocalDataSource)
+        EventDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, downSyncOperationStateDao)
 
     @Provides
     open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: EventDownSyncScopeRepository,
@@ -94,11 +94,11 @@ open class SyncModule {
         EventUpSyncWorkersBuilderImpl(upSyncScopeRepository, jsonHelper)
 
     @Provides
-    open fun providePeopleUpSyncDao(database: EventsSyncStatusDatabase): EventsUpSyncOperationLocalDataSource =
-        database.upSyncOperationsDao
+    open fun providePeopleUpSyncDao(database: EventsSyncStatusDatabase): DbEventsUpSyncOperationStateDao =
+        database.upSyncOperationsDaoDb
 
     @Provides
-    open fun providePeopleDownSyncDao(database: EventsSyncStatusDatabase): EventDownSyncOperationLocalDataSource =
+    open fun providePeopleDownSyncDao(database: EventsSyncStatusDatabase): DbEventsDownSyncOperationStateDao =
         database.downSyncOperationsDao
 
     @Provides
