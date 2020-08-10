@@ -51,7 +51,7 @@ class FingerSelectionItemAdapter(private val context: Context,
             fingerSpinner.adapter = fingerIdAdapter
             quantitySpinner.adapter = quantityAdapter
 
-            fingerSpinner.setSelection(orderedFingers().indexOf(viewModel.items.value?.get(adapterPosition)?.finger))
+            fingerSpinner.setSelection(ORDERED_FINGERS.indexOf(viewModel.items.value?.get(adapterPosition)?.finger))
             quantitySpinner.setSelection(QUANTITY_OPTIONS.indexOf(viewModel.items.value?.get(adapterPosition)?.quantity))
 
             fingerSpinner.disableLongPress()
@@ -83,7 +83,7 @@ class FingerSelectionItemAdapter(private val context: Context,
     }
 }
 
-class FingerIdAdapter(private val viewModel: FingerSelectionViewModel, context: Context) : ArrayAdapter<FingerIdentifier>(context, 0, orderedFingers()) {
+class FingerIdAdapter(private val viewModel: FingerSelectionViewModel, context: Context) : ArrayAdapter<FingerIdentifier>(context, 0, ORDERED_FINGERS) {
 
     override fun isEnabled(position: Int): Boolean = isFingerAvailable(position)
 
