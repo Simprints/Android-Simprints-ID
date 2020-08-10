@@ -66,6 +66,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(FingerSelectionViewModel::class.java)
 
+        initTextInLayout()
         initRecyclerView()
         initAddFingerButton()
         initResetButton()
@@ -73,6 +74,13 @@ class FingerSelectionActivity : BaseSplitActivity() {
         listenForItemChanges()
 
         viewModel.start()
+    }
+
+    private fun initTextInLayout() {
+        addFingerButton.text = getString(R.string.finger_selection_add_finger)
+        resetButton.text = getString(R.string.finger_selection_reset)
+        fingerLabelTextView.text = getString(R.string.finger_selection_finger_label)
+        quantityLabelTextView.text = getString(R.string.finger_selection_quantity_label)
     }
 
     private fun listenForItemChanges() {
