@@ -46,4 +46,7 @@ class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager) :
                 IdScannerGeneration.VERO_2 -> ScannerGeneration.VERO_2
             }
         }
+
+    override val qualityThreshold: Int
+        get() = prefs.fingerprintQualityThreshold
 }
