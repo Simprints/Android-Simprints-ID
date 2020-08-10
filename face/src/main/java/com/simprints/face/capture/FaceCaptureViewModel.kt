@@ -69,7 +69,6 @@ class FaceCaptureViewModel(
     fun handleBackButton(backButtonContext: BackButtonContext) {
         when (backButtonContext) {
             CAPTURE -> startExitForm()
-            CONFIRMATION -> flowFinished()
             RETRY -> handleRetry(true)
         }
     }
