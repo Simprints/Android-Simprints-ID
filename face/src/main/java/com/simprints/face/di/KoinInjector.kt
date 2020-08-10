@@ -68,7 +68,7 @@ object KoinInjector {
         (androidApplication() as Application).component
 
     /**
-     * Call this on the first point of contact of your modality (usually onCreate() of OrchestratorActivity)
+     * Call this on the creation of activities
      */
     fun acquireFaceKoinModules() {
         consumers.incrementAndGet()
@@ -80,7 +80,7 @@ object KoinInjector {
     }
 
     /**
-     * Call this on the last point of contact of your modality, usually onDestroy()
+     * Call this on destroy of activites
      */
     fun releaseFaceKoinModules() {
         if (consumers.decrementAndGet() == 0) {
