@@ -1,6 +1,8 @@
 package com.simprints.id.data.db.event.remote.models.face
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
 import com.simprints.id.data.db.event.remote.models.ApiEventPayload
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FaceCapture
@@ -8,6 +10,7 @@ import com.simprints.id.data.db.event.remote.models.face.ApiFaceCapturePayload.A
 import com.simprints.id.data.db.event.remote.models.face.ApiFaceCapturePayload.ApiResult.*
 
 @Keep
+@JsonInclude(Include.NON_NULL)
 data class ApiFaceCapturePayload(val id: String,
                             override val relativeStartTime: Long,
                             val relativeEndTime: Long,

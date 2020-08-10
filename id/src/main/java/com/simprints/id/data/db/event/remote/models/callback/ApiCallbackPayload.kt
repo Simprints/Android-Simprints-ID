@@ -1,6 +1,8 @@
 package com.simprints.id.data.db.event.remote.models.callback
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.callback.ConfirmationCallbackEvent.ConfirmationCallbackPayload
 import com.simprints.id.data.db.event.domain.models.callback.EnrolmentCallbackEvent.EnrolmentCallbackPayload
@@ -14,6 +16,7 @@ import com.simprints.id.data.db.event.remote.models.callback.ApiCallbackType.*
 import com.simprints.id.data.db.event.remote.models.fromApiToDomain
 
 @Keep
+@JsonInclude(Include.NON_NULL)
 data class ApiCallbackPayload(
     override val relativeStartTime: Long,
     override val version: Int,

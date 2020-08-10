@@ -10,7 +10,7 @@ import com.simprints.id.data.db.events_sync.down.domain.getUniqueKey
 @Entity(tableName = "DbEventsDownSyncOperation")
 @Keep
 data class DbEventsDownSyncOperationState(
-    @PrimaryKey var id: Int,
+    @PrimaryKey var id: String,
     val lastState: DownSyncState?,
     val lastEventId: String?,
     val lastUpdatedTime: Long?

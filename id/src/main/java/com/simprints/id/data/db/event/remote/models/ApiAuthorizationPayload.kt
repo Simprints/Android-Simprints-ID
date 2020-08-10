@@ -1,6 +1,8 @@
 package com.simprints.id.data.db.event.remote.models
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.NOT_AUTHORIZED
@@ -9,6 +11,7 @@ import com.simprints.id.data.db.event.remote.models.ApiAuthorizationPayload.ApiR
 
 
 @Keep
+@JsonInclude(Include.NON_NULL)
 data class ApiAuthorizationPayload(override val relativeStartTime: Long,
                               override val version: Int,
                               val result: ApiResult,

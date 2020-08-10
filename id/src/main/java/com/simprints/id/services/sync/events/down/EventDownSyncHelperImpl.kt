@@ -43,7 +43,8 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                 eventRepository.downloadEvents(scope, operation.queryEvent).consumeEach {
                     batchOfEventsToProcess.add(it)
                     count++
-                    if (batchOfEventsToProcess.size > EVENTS_BATCH_SIZE) {
+                    //We immediately process the first event to initialise a progress
+                    if (batchOfEventsToProcess.size > EVENTS_BATCH_SIZE || count == 1) {
                         lastOperation = processBatchedEvents(batchOfEventsToProcess, lastOperation)
                         emitProgress(lastOperation, count)
                         batchOfEventsToProcess.clear()
