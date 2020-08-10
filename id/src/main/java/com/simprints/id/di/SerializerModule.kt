@@ -53,15 +53,6 @@ class SerializerModule {
 
     @Provides
     @Singleton
-    @Named("FingerIdToBooleanSerializer")
-    fun provideFingerIdToBooleanSerializer(
-        @Named("FingerIdentifierSerializer") fingerIdentifierSerializer: Serializer<FingerIdentifier>,
-        @Named("BooleanSerializer") booleanSerializer: Serializer<Boolean>,
-        gson: Gson
-    ): Serializer<Map<FingerIdentifier, Boolean>> = MapSerializer(fingerIdentifierSerializer, booleanSerializer, gson)
-
-    @Provides
-    @Singleton
     @Named("LanguagesStringArraySerializer")
     fun provideLanguagesStringArraySerializer(): Serializer<Array<String>> = LanguagesStringArraySerializer()
 

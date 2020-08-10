@@ -8,7 +8,6 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
-import com.simprints.id.data.prefs.settings.fingerprint.serializers.FingerprintsToCollectSerializer
 import com.simprints.id.di.PreferencesModule
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
@@ -29,7 +28,6 @@ class TestPreferencesModule(
     override fun provideSettingsPreferencesManager(
         prefs: ImprovedSharedPreferences,
         remoteConfigWrapper: RemoteConfigWrapper,
-        fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
         groupSerializer: Serializer<GROUP>,
         languagesStringArraySerializer: Serializer<Array<String>>,
         moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
@@ -43,7 +41,6 @@ class TestPreferencesModule(
         super.provideSettingsPreferencesManager(
             prefs,
             remoteConfigWrapper,
-            fingerIdToBooleanSerializer,
             groupSerializer,
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,

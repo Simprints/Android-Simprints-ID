@@ -1,6 +1,5 @@
 package com.simprints.id.data.prefs.settings
 
-import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_DEFAULT
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_KEY
@@ -26,7 +25,6 @@ import com.simprints.id.tools.serializers.Serializer
 open class SettingsPreferencesManagerImpl(
     prefs: ImprovedSharedPreferences,
     private val remoteConfigWrapper: RemoteConfigWrapper,
-    private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
     groupSerializer: Serializer<GROUP>,
     modalitySerializer: Serializer<List<Modality>>,
     languagesStringArraySerializer: Serializer<Array<String>>,
@@ -120,19 +118,6 @@ open class SettingsPreferencesManagerImpl(
             MATCH_GROUP_KEY,
             MATCH_GROUP_DEFAULT,
             groupSerializer
-        )
-
-    /**
-     * The map of default fingers
-     * @throws JsonSyntaxException
-     */
-    override var fingerStatus: Map<FingerIdentifier, Boolean>
-        by OverridableRemoteConfigComplexPreference(
-            prefs,
-            remoteConfigWrapper,
-            FINGER_STATUS_KEY,
-            FINGER_STATUS_DEFAULT,
-            fingerIdToBooleanSerializer
         )
 
     /**
@@ -342,9 +327,6 @@ open class SettingsPreferencesManagerImpl(
         serializer: Serializer<T>
     ): T = serializer.deserialize(getRemoteConfigStringPreference(key))
 
-    override fun getRemoteConfigFingerStatus() =
-        getRemoteConfigComplexPreference(FINGER_STATUS_KEY, fingerIdToBooleanSerializer)
-
     override fun getRemoteConfigFingerprintsToCollect() =
         getRemoteConfigComplexPreference(FINGERPRINTS_TO_COLLECT_KEY, fingerprintsToCollectSerializer)
 
@@ -369,20 +351,6 @@ open class SettingsPreferencesManagerImpl(
 
         const val MATCH_GROUP_KEY = "MatchGroup"
         val MATCH_GROUP_DEFAULT = GROUP.USER
-
-        const val FINGER_STATUS_KEY = "FingerStatus"
-        val FINGER_STATUS_DEFAULT = mapOf(
-            FingerIdentifier.RIGHT_THUMB to false,
-            FingerIdentifier.RIGHT_INDEX_FINGER to false,
-            FingerIdentifier.RIGHT_3RD_FINGER to false,
-            FingerIdentifier.RIGHT_4TH_FINGER to false,
-            FingerIdentifier.RIGHT_5TH_FINGER to false,
-            FingerIdentifier.LEFT_THUMB to true,
-            FingerIdentifier.LEFT_INDEX_FINGER to true,
-            FingerIdentifier.LEFT_3RD_FINGER to false,
-            FingerIdentifier.LEFT_4TH_FINGER to false,
-            FingerIdentifier.LEFT_5TH_FINGER to false
-        )
 
         const val PROGRAM_NAME_KEY = "ProgramName"
         const val PROGRAM_NAME_DEFAULT = "this program"
