@@ -1,13 +1,12 @@
 package com.simprints.fingerprint.activities.collect.state
 
-import com.simprints.fingerprint.activities.collect.domain.ScanConfig
-
 data class ScanResult(
     val qualityScore: Int,
     val template: ByteArray,
-    val image: ByteArray?
+    val image: ByteArray?,
+    private val qualityThreshold: Int
 ) {
-    fun isGoodScan() = qualityScore >= ScanConfig.qualityThreshold
+    fun isGoodScan() = qualityScore >= qualityThreshold
 
     override fun toString(): String {
         val qualityScoreStr = "$qualityScore (${if (isGoodScan()) "good scan" else "bad scan"})"
