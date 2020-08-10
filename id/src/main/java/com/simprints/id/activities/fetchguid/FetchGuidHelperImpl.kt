@@ -4,14 +4,14 @@ import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.SubjectScope
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.toMode
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.toList
 
-class FetchGuidHelperImpl(val downSyncHelper: EventDownSyncHelper,
+class FetchGuidHelperImpl(private val downSyncHelper: EventDownSyncHelper,
                           val subjectRepository: SubjectRepository,
                           val preferencesManager: PreferencesManager) : FetchGuidHelper {
 
@@ -23,7 +23,7 @@ class FetchGuidHelperImpl(val downSyncHelper: EventDownSyncHelper,
         } else {
             val downSyncScopeOps = SubjectScope(projectId, subjectId, preferencesManager.modalities.map { it.toMode() }).operations
             val subjectsChannel = downSyncHelper.downSync(coroutineScope, downSyncScopeOps.first())
-            while (!subjectsChannel.isClosedForReceive) {
+            while (!subjectsChannel.isClosedForReceive) { //STOPSHIP
                 //
             }
             val subjectResult = fetchFromLocalDb(projectId, subjectId)
@@ -37,7 +37,7 @@ class FetchGuidHelperImpl(val downSyncHelper: EventDownSyncHelper,
     }
 
     private suspend fun fetchFromLocalDb(projectId: String, subjectId: String): SubjectFetchResult? {
-        val subject = subjectRepository.load(Query(projectId = projectId, subjectId = subjectId)).toList().firstOrNull()
+        val subject = subjectRepository.load(SubjectQuery(projectId = projectId, subjectId = subjectId)).toList().firstOrNull()
         return subject?.let {
             SubjectFetchResult(subject, LOCAL)
         }

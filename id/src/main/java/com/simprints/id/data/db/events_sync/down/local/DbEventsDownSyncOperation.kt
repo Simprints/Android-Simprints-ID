@@ -15,9 +15,13 @@ data class DbEventsDownSyncOperation(
 
 fun EventDownSyncOperation.fromDomainToDb(): DbEventsDownSyncOperation =
     DbEventsDownSyncOperation(
-        this.queryEvent.hashCode(),
+        this.getUniqueKey(),
         this
     )
 
 fun DbEventsDownSyncOperation.fromDbToDomain() =
     this.downSyncOp
+
+fun EventDownSyncOperation.getUniqueKey() =
+    this.queryEvent.copy(lastEventId = null).hashCode()
+//Unique key: all request params expect for lastEventId

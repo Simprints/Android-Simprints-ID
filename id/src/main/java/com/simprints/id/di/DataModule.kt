@@ -77,7 +77,6 @@ open class DataModule {
         subjectLocalDataSource: SubjectLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource
     ): SubjectRepository = SubjectRepositoryImpl(
-        eventRemoteDataSource,
         subjectLocalDataSource
     )
 
