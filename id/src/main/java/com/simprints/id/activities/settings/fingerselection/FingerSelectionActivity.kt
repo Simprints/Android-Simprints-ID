@@ -1,6 +1,9 @@
 package com.simprints.id.activities.settings.fingerselection
 
 import android.app.AlertDialog
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.lifecycle.Observer
@@ -67,9 +70,22 @@ class FingerSelectionActivity : BaseSplitActivity() {
         initAddFingerButton()
         initResetButton()
 
-        viewModel.items.observe(this, Observer { fingerSelectionAdapter.notifyDataSetChanged() })
+        listenForItemChanges()
 
         viewModel.start()
+    }
+
+    private fun listenForItemChanges() {
+        viewModel.items.observe(this, Observer {
+            fingerSelectionAdapter.notifyDataSetChanged()
+            if (it.size >= 10) {
+                addFingerButton.isEnabled = false
+                addFingerButton.background.colorFilter = PorterDuffColorFilter(Color.LTGRAY, PorterDuff.Mode.LIGHTEN)
+            } else {
+                addFingerButton.isEnabled = true
+                addFingerButton.background.colorFilter = null
+            }
+        })
     }
 
     private fun configureToolbar() {
