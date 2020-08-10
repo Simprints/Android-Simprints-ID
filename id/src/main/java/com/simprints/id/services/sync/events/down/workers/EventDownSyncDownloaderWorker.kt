@@ -6,6 +6,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
@@ -35,17 +36,21 @@ class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) 
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var downSyncHelper: EventDownSyncHelper
+    @Inject lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 
     @Inject lateinit var syncCache: EventSyncCache
     @Inject lateinit var jsonHelper: JsonHelper
 
     internal var eventDownSyncDownloaderTask: EventDownSyncDownloaderTask = EventDownSyncDownloaderTaskImpl()
 
-    private val downSyncOperation by lazy {
+    private val downSyncOperationInput by lazy {
         val jsonInput = inputData.getString(INPUT_DOWN_SYNC_OPS)
             ?: throw IllegalArgumentException("input required")
-        jsonHelper.fromJson<EventDownSyncOperation>(jsonInput)
+            jsonHelper.fromJson<EventDownSyncOperation>(jsonInput)
     }
+
+    private suspend fun getDownSyncOperation() =
+        eventDownSyncScopeRepository.refreshState(downSyncOperationInput)
 
     @ExperimentalCoroutinesApi
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
@@ -55,18 +60,18 @@ class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) 
             getComponent<EventDownSyncDownloaderWorker> { it.inject(this@EventDownSyncDownloaderWorker) }
             Timber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
 
-            crashlyticsLog("Start - Params: $downSyncOperation")
+            crashlyticsLog("Start - Params: $downSyncOperationInput")
 
             val count = eventDownSyncDownloaderTask.execute(
                 this@EventDownSyncDownloaderWorker.id.toString(),
-                downSyncOperation,
+                getDownSyncOperation(),
                 downSyncHelper,
                 syncCache,
                 this@EventDownSyncDownloaderWorker,
                 this)
 
             Timber.tag(SYNC_LOG_TAG).d("[xDOWNLOADER] Done $count")
-            success(workDataOf(OUTPUT_DOWN_SYNC to count), "Total downloaded: $0 for $downSyncOperation")
+            success(workDataOf(OUTPUT_DOWN_SYNC to count), "Total downloaded: $0 for $downSyncOperationInput")
 
         } catch (t: Throwable) {
             Timber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed")

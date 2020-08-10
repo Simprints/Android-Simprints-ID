@@ -1,10 +1,10 @@
 package com.simprints.id.data.db.events_sync.down.domain
 
 data class EventDownSyncOperation(val scopeId: String,
-                                  var queryEvent: RemoteEventQuery,
-                                  var state: DownSyncState? = null,
-                                  var lastEventId: String? = null,
-                                  var lastSyncTime: Long? = null) {
+                                  val queryEvent: RemoteEventQuery,
+                                  val state: DownSyncState? = null,
+                                  val lastEventId: String? = null,
+                                  val lastSyncTime: Long? = null) {
 
     enum class DownSyncState {
         RUNNING,
@@ -12,3 +12,10 @@ data class EventDownSyncOperation(val scopeId: String,
         FAILED
     }
 }
+
+//Unique key: all request params expect for lastEventId
+fun EventDownSyncOperation.getUniqueKey(): Int {
+    val paramsRequest = this.queryEvent.copy(lastEventId = null)
+    return paramsRequest.hashCode()
+}
+

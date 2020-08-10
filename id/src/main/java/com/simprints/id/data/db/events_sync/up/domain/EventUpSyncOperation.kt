@@ -2,8 +2,8 @@ package com.simprints.id.data.db.events_sync.up.domain
 
 data class EventUpSyncOperation(val scopeId: String,
                                 val queryEvent: LocalEventQuery,
-                                val lastState: UpSyncState? = null,
-                                val lastSyncTime: Long? = null) {
+                                var lastState: UpSyncState? = null,
+                                var lastSyncTime: Long? = null) {
 
     enum class UpSyncState {
         RUNNING,
@@ -12,4 +12,5 @@ data class EventUpSyncOperation(val scopeId: String,
     }
 }
 
-
+fun EventUpSyncOperation.getUniqueKey() =
+    this.copy(lastState = null, lastSyncTime = null).hashCode()

@@ -3,8 +3,9 @@ package com.simprints.id.data.db.events_sync.down
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.*
-import com.simprints.id.data.db.events_sync.down.local.EventDownSyncOperationLocalDataSource
-import com.simprints.id.data.db.events_sync.down.local.fromDomainToDb
+import com.simprints.id.data.db.events_sync.down.domain.getUniqueKey
+import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState
+import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationStateDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
@@ -16,7 +17,7 @@ import kotlinx.coroutines.withContext
 
 class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                                        val preferencesManager: PreferencesManager,
-                                       private val downSyncOperationOperationDao: EventDownSyncOperationLocalDataSource) : EventDownSyncScopeRepository {
+                                       private val downSyncOperationOperationDao: DbEventsDownSyncOperationStateDao) : EventDownSyncScopeRepository {
 
 
     override suspend fun getDownSyncScope(): EventDownSyncScope {
@@ -43,25 +44,30 @@ class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                 ModuleScope(projectId, possibleModuleIds, modes)
         }
 
-        syncScope.operations.forEach { op ->
-            val state =
-                downSyncOperationOperationDao.load().toList().firstOrNull {
-                    it.downSyncOp.scopeId == op.scopeId && it.downSyncOp.queryEvent == op.queryEvent }
-
-            state?.downSyncOp?.let { opWithState ->
-                op.lastEventId = opWithState.lastEventId
-                op.lastSyncTime = opWithState.lastSyncTime
-                op.state = opWithState.state
-                op.queryEvent = op.queryEvent.copy(lastEventId = opWithState.lastEventId)
-            }
+        syncScope.operations = syncScope.operations.map { op ->
+            refreshState(op)
         }
         return syncScope
     }
 
     override suspend fun insertOrUpdate(syncScopeOperation: EventDownSyncOperation) {
         withContext(Dispatchers.IO) {
-            downSyncOperationOperationDao.insertOrUpdate(syncScopeOperation.fromDomainToDb())
+            downSyncOperationOperationDao.insertOrUpdate(buildFromEventsDownSyncOperationState(syncScopeOperation))
         }
+    }
+
+    override suspend fun refreshState(syncScopeOperation: EventDownSyncOperation): EventDownSyncOperation {
+        val uniqueOpId = syncScopeOperation.getUniqueKey()
+        val state =
+            downSyncOperationOperationDao.load().toList().firstOrNull {
+                it.id == uniqueOpId
+            }
+
+        return syncScopeOperation.copy(
+            queryEvent = syncScopeOperation.queryEvent.copy(lastEventId = state?.lastEventId),
+            lastEventId = state?.lastEventId,
+            lastSyncTime = state?.lastUpdatedTime,
+            state = state?.lastState)
     }
 
     override suspend fun deleteAll() {
