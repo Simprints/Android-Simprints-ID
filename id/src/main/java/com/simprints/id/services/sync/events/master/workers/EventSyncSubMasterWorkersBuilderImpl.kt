@@ -4,24 +4,24 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.workDataOf
 import com.simprints.id.services.sync.events.common.*
 
-class SubjectsSyncSubMasterWorkersBuilderImpl: SubjectsSyncSubMasterWorkersBuilder {
+class EventSyncSubMasterWorkersBuilderImpl: EventSyncSubMasterWorkersBuilder {
 
     override fun buildStartSyncReporterWorker(uniqueSyncID: String) =
-        OneTimeWorkRequest.Builder(SubjectsStartSyncReporterWorker::class.java)
+        OneTimeWorkRequest.Builder(EventStartSyncReporterWorker::class.java)
             .addTagForMasterSyncId(uniqueSyncID)
             .addTagForScheduledAtNow()
             .addCommonTagForAllSyncWorkers()
             .addTagForStartSyncReporter()
-            .setInputData(workDataOf(SubjectsStartSyncReporterWorker.SYNC_ID_STARTED to uniqueSyncID))
+            .setInputData(workDataOf(EventStartSyncReporterWorker.SYNC_ID_STARTED to uniqueSyncID))
             .build() as OneTimeWorkRequest
 
 
     override fun buildEndSyncReporterWorker(uniqueSyncID: String): OneTimeWorkRequest =
-        OneTimeWorkRequest.Builder(SubjectsEndSyncReporterWorker::class.java)
+        OneTimeWorkRequest.Builder(EventEndSyncReporterWorker::class.java)
             .addTagForMasterSyncId(uniqueSyncID)
             .addTagForScheduledAtNow()
             .addCommonTagForAllSyncWorkers()
             .addTagForEndSyncReporter()
-            .setInputData(workDataOf(SubjectsEndSyncReporterWorker.SYNC_ID_TO_MARK_AS_COMPLETED to uniqueSyncID))
+            .setInputData(workDataOf(EventEndSyncReporterWorker.SYNC_ID_TO_MARK_AS_COMPLETED to uniqueSyncID))
             .build() as OneTimeWorkRequest
 }

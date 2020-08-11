@@ -8,11 +8,11 @@ import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncState
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
+import com.simprints.id.services.sync.events.master.models.EventSyncState
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -32,7 +32,7 @@ class EventSyncManagerImpl(private val ctx: Context,
     private val wm: WorkManager
         get() = WorkManager.getInstance(ctx)
 
-    override fun getLastSyncState(): LiveData<SubjectsSyncState> =
+    override fun getLastSyncState(): LiveData<EventSyncState> =
         eventSyncStateProcessor.getLastSyncState()
 
     override fun hasSyncEverRunBefore(): Boolean =
@@ -71,7 +71,7 @@ class EventSyncManagerImpl(private val ctx: Context,
     }
 
     private fun buildOneTimeRequest(): OneTimeWorkRequest =
-        OneTimeWorkRequest.Builder(SubjectsSyncMasterWorker::class.java)
+        OneTimeWorkRequest.Builder(EventSyncMasterWorker::class.java)
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTagForSyncMasterWorkers()
             .addTagForOneTimeSyncMasterWorker()
@@ -79,7 +79,7 @@ class EventSyncManagerImpl(private val ctx: Context,
             .build() as OneTimeWorkRequest
 
     private fun buildPeriodicRequest(): PeriodicWorkRequest =
-        PeriodicWorkRequest.Builder(SubjectsSyncMasterWorker::class.java, SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
+        PeriodicWorkRequest.Builder(EventSyncMasterWorker::class.java, SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTagForSyncMasterWorkers()
             .addTagForBackgroundSyncMasterWorker()

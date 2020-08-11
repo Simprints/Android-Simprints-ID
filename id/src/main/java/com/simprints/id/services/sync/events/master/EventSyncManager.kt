@@ -1,11 +1,11 @@
 package com.simprints.id.services.sync.events.master
 
 import androidx.lifecycle.LiveData
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncState
+import com.simprints.id.services.sync.events.master.models.EventSyncState
 
 interface EventSyncManager {
 
-    fun getLastSyncState(): LiveData<SubjectsSyncState>
+    fun getLastSyncState(): LiveData<EventSyncState>
     fun hasSyncEverRunBefore(): Boolean
 
     fun sync()

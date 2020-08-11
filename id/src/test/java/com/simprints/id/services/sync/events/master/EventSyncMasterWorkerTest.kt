@@ -11,18 +11,18 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.OFF
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.ON
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.*
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.sync.events.master.workers.SubjectsEndSyncReporterWorker
-import com.simprints.id.services.sync.events.master.workers.SubjectsStartSyncReporterWorker
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.OFF
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.sync.events.master.workers.EventEndSyncReporterWorker
+import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.testtools.TestApplication
@@ -37,7 +37,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SubjectsSyncMasterWorkerTest {
+class EventSyncMasterWorkerTest {
 
     companion object {
         const val UNIQUE_SYNC_ID = "UNIQUE_SYNC_ID"
@@ -48,16 +48,16 @@ class SubjectsSyncMasterWorkerTest {
     private val wm: WorkManager
         get() = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
 
-    private lateinit var masterWorker: SubjectsSyncMasterWorker
+    private lateinit var masterWorker: EventSyncMasterWorker
 
     @Before
     fun setUp() {
         UnitTestConfig(this).setupWorkManager()
 
         masterWorker =
-            TestListenableWorkerBuilder<SubjectsSyncMasterWorker>(app)
+            TestListenableWorkerBuilder<EventSyncMasterWorker>(app)
                 .setTags(listOf(MASTER_SYNC_SCHEDULER_PERIODIC_TIME))
-                .build() as SubjectsSyncMasterWorker
+                .build() as EventSyncMasterWorker
 
         app.component = mockk(relaxed = true)
         mockDependencies()
@@ -70,7 +70,7 @@ class SubjectsSyncMasterWorkerTest {
             downSyncWorkerBuilder = mockk(relaxed = true)
             upSyncWorkerBuilder = mockk(relaxed = true)
             eventSyncCache = mockk(relaxed = true)
-            subjectsSyncSubMasterWorkersBuilder = mockk(relaxed = true)
+            eventSyncSubMasterWorkersBuilder = mockk(relaxed = true)
         }
         mockSubjectsDownSyncSetting(ON)
     }
@@ -181,7 +181,7 @@ class SubjectsSyncMasterWorkerTest {
 
     private fun assertSyncWorkersState(uniqueSyncId: String,
                                        state: WorkInfo.State,
-                                       specificType: SubjectsSyncWorkerType? = null) {
+                                       specificType: EventSyncWorkerType? = null) {
 
         val allWorkers = wm.getWorkInfosByTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId").get()
         val specificWorkers = specificType?.let { allWorkers.filterByTags(tagForType(specificType)) } ?: allWorkers
@@ -204,28 +204,28 @@ class SubjectsSyncMasterWorkerTest {
     private fun prepareSyncWorkers(uniqueSyncId: String) {
         coEvery { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } returns buildDownSyncWorkers(uniqueSyncId)
         coEvery { masterWorker.upSyncWorkerBuilder.buildUpSyncWorkerChain(any()) } returns buildUpSyncWorkers(uniqueSyncId)
-        coEvery { masterWorker.subjectsSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns buildStartSyncReporterWorker(uniqueSyncId)
-        coEvery { masterWorker.subjectsSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(any()) } returns buildEndSyncReporterWorker(uniqueSyncId)
+        coEvery { masterWorker.eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns buildStartSyncReporterWorker(uniqueSyncId)
+        coEvery { masterWorker.eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(any()) } returns buildEndSyncReporterWorker(uniqueSyncId)
 
     }
 
     private fun buildEndSyncReporterWorker(uniqueSyncId: String): OneTimeWorkRequest =
-        OneTimeWorkRequest.Builder(SubjectsEndSyncReporterWorker::class.java)
+        OneTimeWorkRequest.Builder(EventEndSyncReporterWorker::class.java)
             .addTagForMasterSyncId(uniqueSyncId)
             .addTagForScheduledAtNow()
             .addCommonTagForAllSyncWorkers()
             .addTagForEndSyncReporter()
-            .setInputData(workDataOf(SubjectsEndSyncReporterWorker.SYNC_ID_TO_MARK_AS_COMPLETED to uniqueSyncId))
+            .setInputData(workDataOf(EventEndSyncReporterWorker.SYNC_ID_TO_MARK_AS_COMPLETED to uniqueSyncId))
             .setConstraints(constraintsForWorkers())
             .build() as OneTimeWorkRequest
 
     private fun buildStartSyncReporterWorker(uniqueSyncId: String): OneTimeWorkRequest =
-        OneTimeWorkRequest.Builder(SubjectsStartSyncReporterWorker::class.java)
+        OneTimeWorkRequest.Builder(EventStartSyncReporterWorker::class.java)
             .addTagForMasterSyncId(uniqueSyncId)
             .addTagForScheduledAtNow()
             .addCommonTagForAllSyncWorkers()
             .addTagForStartSyncReporter()
-            .setInputData(workDataOf(SubjectsStartSyncReporterWorker.SYNC_ID_STARTED to uniqueSyncId))
+            .setInputData(workDataOf(EventStartSyncReporterWorker.SYNC_ID_STARTED to uniqueSyncId))
             .setConstraints(constraintsForWorkers())
             .build() as OneTimeWorkRequest
 
@@ -269,16 +269,16 @@ class SubjectsSyncMasterWorkerTest {
         verify { masterWorker.resultSetter.success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId)) }
     }
 
-    private fun mockSubjectsDownSyncSetting(subjectsDownSyncSetting: SubjectsDownSyncSetting) {
+    private fun mockSubjectsDownSyncSetting(eventDownSyncSetting: EventDownSyncSetting) {
         masterWorker.preferenceManager = mockk<PreferencesManager>(relaxed = true).apply {
-            every { this@apply.subjectsDownSyncSetting } returns subjectsDownSyncSetting
+            every { this@apply.eventDownSyncSetting } returns eventDownSyncSetting
         }
     }
 
     private fun buildOneTimeMasterWorker() {
-        masterWorker = TestListenableWorkerBuilder<SubjectsSyncMasterWorker>(app)
+        masterWorker = TestListenableWorkerBuilder<EventSyncMasterWorker>(app)
             .setTags(listOf(MASTER_SYNC_SCHEDULER_ONE_TIME))
-            .build() as SubjectsSyncMasterWorker
+            .build() as EventSyncMasterWorker
         mockDependencies()
     }
 }

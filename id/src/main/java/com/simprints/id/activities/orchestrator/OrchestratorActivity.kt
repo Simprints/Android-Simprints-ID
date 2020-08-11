@@ -15,7 +15,7 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.tools.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
 import kotlinx.coroutines.runBlocking
@@ -76,7 +76,7 @@ class OrchestratorActivity : BaseSplitActivity() {
 
     private fun scheduleAndStartSyncIfNecessary() {
         syncManager.scheduleBackgroundSyncs()
-        if (preferencesManager.subjectsDownSyncSetting == SubjectsDownSyncSetting.EXTRA) {
+        if (preferencesManager.eventDownSyncSetting == EventDownSyncSetting.EXTRA) {
             eventSyncManager.sync()
         }
     }

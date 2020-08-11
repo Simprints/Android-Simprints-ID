@@ -11,8 +11,8 @@ import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.EXTRA
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.ON
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -55,7 +55,7 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
     }
 
     private fun isDownSyncAllowed() = with(preferencesManager) {
-        subjectsDownSyncSetting == ON || subjectsDownSyncSetting == EXTRA
+        eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
     }
 
     internal suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount() {

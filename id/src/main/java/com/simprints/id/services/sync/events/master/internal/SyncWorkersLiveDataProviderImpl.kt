@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.simprints.id.services.sync.events.common.getUniqueSyncIdTag
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 
 class SyncWorkersLiveDataProviderImpl(val ctx: Context) : SyncWorkersLiveDataProvider {
 
@@ -14,7 +14,7 @@ class SyncWorkersLiveDataProviderImpl(val ctx: Context) : SyncWorkersLiveDataPro
 
 
     override fun getStartSyncReportersLiveData(): LiveData<List<WorkInfo>> =
-        wm.getWorkInfosByTagLiveData((tagForType(SubjectsSyncWorkerType.START_SYNC_REPORTER)))
+        wm.getWorkInfosByTagLiveData((tagForType(EventSyncWorkerType.START_SYNC_REPORTER)))
 
     override fun getSyncWorkersLiveData(uniqueSyncId: String): LiveData<List<WorkInfo>> =
         wm.getWorkInfosByTagLiveData(getUniqueSyncIdTag(uniqueSyncId))

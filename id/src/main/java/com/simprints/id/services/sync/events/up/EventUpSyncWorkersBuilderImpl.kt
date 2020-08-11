@@ -5,7 +5,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.services.sync.events.common.*
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.INPUT_COUNT_WORKER_UP
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
@@ -58,7 +58,7 @@ class EventUpSyncWorkersBuilderImpl(private val upSyncScopeRepository: EventUpSy
             .addCommonTagForAllSyncWorkers()
             .also { builder ->
                 uniqueMasterSyncId?.let {
-                    builder.setBackoffCriteria(BackoffPolicy.LINEAR, SubjectsSyncMasterWorker.MIN_BACKOFF_SECS, TimeUnit.SECONDS)
+                    builder.setBackoffCriteria(BackoffPolicy.LINEAR, EventSyncMasterWorker.MIN_BACKOFF_SECS, TimeUnit.SECONDS)
                 }
             }
 }

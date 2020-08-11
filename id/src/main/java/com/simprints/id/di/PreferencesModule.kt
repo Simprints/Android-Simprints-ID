@@ -22,7 +22,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintIm
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 import dagger.Module
 import dagger.Provides
@@ -76,7 +76,7 @@ open class PreferencesModule {
         @Named("GroupSerializer") groupSerializer: Serializer<GROUP>,
         @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
         @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-        @Named("PeopleDownSyncSettingSerializer") subjectsDownSyncSettingSerializer: Serializer<SubjectsDownSyncSetting>,
+        @Named("PeopleDownSyncSettingSerializer") eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
         @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
         @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         @Named("SaveFingerprintImagesStrategySerializer") saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
@@ -89,7 +89,7 @@ open class PreferencesModule {
         modalitiesSerializer,
         languagesStringArraySerializer,
         moduleIdOptionsStringSetSerializer,
-        subjectsDownSyncSettingSerializer,
+        eventDownSyncSettingSerializer,
         captureFingerprintStrategySerializer,
         saveFingerprintImagesStrategySerializer,
         scannerGenerationsSerializer

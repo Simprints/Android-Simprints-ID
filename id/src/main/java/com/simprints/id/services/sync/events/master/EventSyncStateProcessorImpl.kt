@@ -14,12 +14,12 @@ import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.internal.SyncWorkersLiveDataProvider
 import com.simprints.id.services.sync.events.master.internal.SyncWorkersLiveDataProviderImpl
 import com.simprints.id.services.sync.events.master.internal.didFailBecauseCloudIntegration
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncState
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncState.SyncWorkerInfo
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState.Companion.fromWorkInfo
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.*
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.sync.events.master.workers.SubjectsStartSyncReporterWorker.Companion.SYNC_ID_STARTED
+import com.simprints.id.services.sync.events.master.models.EventSyncState
+import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWorkerInfo
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Companion.fromWorkInfo
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import com.simprints.id.services.sync.events.up.workers.extractUpSyncProgress
 import com.simprints.id.services.sync.events.up.workers.getUpCountsFromOutput
 import timber.log.Timber
@@ -28,10 +28,10 @@ class EventSyncStateProcessorImpl(val ctx: Context,
                                   private val eventSyncCache: EventSyncCache,
                                   private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider = SyncWorkersLiveDataProviderImpl(ctx)) : EventSyncStateProcessor {
 
-    override fun getLastSyncState(): LiveData<SubjectsSyncState> =
+    override fun getLastSyncState(): LiveData<EventSyncState> =
         observerForLastSyncId().switchMap { lastSyncId ->
             observerForLastSyncIdWorkers(lastSyncId).switchMap { syncWorkers ->
-                MutableLiveData<SubjectsSyncState>().apply {
+                MutableLiveData<EventSyncState>().apply {
                     with(syncWorkers) {
                         val progress = calculateProgressForDownSync() + calculateProgressForUpSync()
                         val total = calculateTotalForSync()
@@ -39,7 +39,7 @@ class EventSyncStateProcessorImpl(val ctx: Context,
                         val upSyncStates = upSyncUploadersStates() + upSyncCountersStates()
                         val downSyncStates = downSyncDownloadersStates() + downSyncCountersStates()
 
-                        val syncState = SubjectsSyncState(lastSyncId, progress, total, upSyncStates, downSyncStates)
+                        val syncState = EventSyncState(lastSyncId, progress, total, upSyncStates, downSyncStates)
                         this@apply.postValue(syncState)
                         Timber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Emitting for UI $syncState")
                     }

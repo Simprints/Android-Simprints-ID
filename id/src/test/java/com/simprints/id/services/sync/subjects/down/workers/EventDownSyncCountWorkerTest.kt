@@ -14,8 +14,8 @@ import com.simprints.id.data.db.subjects_sync.down.domain.ProjectSyncScope
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -122,7 +122,7 @@ class EventDownSyncCountWorkerTest {
     private fun mockWorkManagerToReturnDownloaderWorkInfo(state: WorkInfo.State) {
         val mockWm = mockk<WorkManager>(relaxed = true)
         val mockWorkInfo = mockk<ListenableFuture<List<WorkInfo>>>()
-        every { mockWorkInfo.get() } returns listOf(WorkInfo(UUID.randomUUID(), state, workDataOf(), listOf(tagForMasterSyncId, tagForType(SubjectsSyncWorkerType.DOWNLOADER)), workDataOf(), 2))
+        every { mockWorkInfo.get() } returns listOf(WorkInfo(UUID.randomUUID(), state, workDataOf(), listOf(tagForMasterSyncId, tagForType(EventSyncWorkerType.DOWNLOADER)), workDataOf(), 2))
         every { mockWm.getWorkInfosByTag(any()) } returns mockWorkInfo
         countWorker.wm = mockWm
     }

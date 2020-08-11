@@ -11,7 +11,7 @@ import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
@@ -154,7 +154,7 @@ class SyncInformationViewModelTest {
 
     @Test
     fun downSyncSettingIsOn_shouldRequestRecordsToDownloadAndDeleteCount() = runBlockingTest {
-        every { preferencesManagerMock.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.ON
+        every { preferencesManagerMock.eventDownSyncSetting } returns EventDownSyncSetting.ON
 
         viewModel.fetchRecordsToUpdateAndDeleteCountIfNecessary()
 
@@ -163,7 +163,7 @@ class SyncInformationViewModelTest {
 
     @Test
     fun downSyncSettingIsExtra_shouldRequestRecordsToDownloadAndDeleteCount() = runBlockingTest {
-        every { preferencesManagerMock.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.EXTRA
+        every { preferencesManagerMock.eventDownSyncSetting } returns EventDownSyncSetting.EXTRA
 
         viewModel.fetchRecordsToUpdateAndDeleteCountIfNecessary()
 
@@ -172,7 +172,7 @@ class SyncInformationViewModelTest {
 
     @Test
     fun downSyncSettingIsOffShouldRequestRecordsToDownloadAndDeleteCount() = runBlockingTest {
-        every { preferencesManagerMock.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.OFF
+        every { preferencesManagerMock.eventDownSyncSetting } returns EventDownSyncSetting.OFF
 
         viewModel.fetchRecordsToUpdateAndDeleteCountIfNecessary()
 

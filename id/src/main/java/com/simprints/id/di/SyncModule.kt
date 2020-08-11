@@ -29,8 +29,8 @@ import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache.Companion.FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache.Companion.FILENAME_FOR_PROGRESSES_SHARED_PREFS
 import com.simprints.id.services.sync.events.master.internal.EventSyncCacheImpl
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncSubMasterWorkersBuilder
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncSubMasterWorkersBuilderImpl
+import com.simprints.id.services.sync.events.master.workers.EventSyncSubMasterWorkersBuilder
+import com.simprints.id.services.sync.events.master.workers.EventSyncSubMasterWorkersBuilderImpl
 import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.EventUpSyncHelperImpl
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
@@ -122,6 +122,6 @@ open class SyncModule {
         EventUpSyncHelperImpl(eventRepository, eventUpSyncScopeRepo, timerHelper)
 
     @Provides
-    open fun providePeopleSyncSubMasterWorkersBuilder(): SubjectsSyncSubMasterWorkersBuilder =
-        SubjectsSyncSubMasterWorkersBuilderImpl()
+    open fun providePeopleSyncSubMasterWorkersBuilder(): EventSyncSubMasterWorkersBuilder =
+        EventSyncSubMasterWorkersBuilderImpl()
 }

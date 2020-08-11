@@ -14,9 +14,9 @@ import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilderImp
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.DOWNLOADER
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.DOWN_COUNTER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWN_COUNTER
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
