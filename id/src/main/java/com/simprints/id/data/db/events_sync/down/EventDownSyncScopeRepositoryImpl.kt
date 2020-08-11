@@ -14,7 +14,6 @@ import com.simprints.id.domain.modality.toMode
 import com.simprints.id.exceptions.unexpected.MissingArgumentForDownSyncScopeException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                                        val preferencesManager: PreferencesManager,
@@ -46,20 +45,14 @@ class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
         }
 
         syncScope.operations = syncScope.operations.map { op ->
-            refreshState(op).also {
-                Timber.d("TEST!!! $it")
-            }
+            refreshState(op)
         }
-        Timber.d("TEST!!! $syncScope")
         return syncScope
     }
 
     override suspend fun insertOrUpdate(syncScopeOperation: EventDownSyncOperation) {
         withContext(Dispatchers.IO) {
-            downSyncOperationOperationDao.insertOrUpdate(buildFromEventsDownSyncOperationState(syncScopeOperation)).also {
-                Timber.d("TEST!!! Insert ${buildFromEventsDownSyncOperationState(syncScopeOperation)} id ${syncScopeOperation.getUniqueKey()} for $syncScopeOperation")
-
-            }
+            downSyncOperationOperationDao.insertOrUpdate(buildFromEventsDownSyncOperationState(syncScopeOperation))
         }
     }
 
