@@ -67,6 +67,8 @@ android {
             signingConfig signingConfigs.debug
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
             buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-dev-firebase-storage\"")
+
+            resValue("string", "DB_PASSWORD_DBEVENTS", "test") //STOPSHIP
         }
 
         staging {
@@ -183,7 +185,8 @@ dependencies {
     implementation deps.rxjava2.tasks
     implementation deps.jackson.core
 
-    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
+    //debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
+    debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
 
     // RootBeer (root detection)
     implementation deps.rootbeer.core
@@ -223,6 +226,8 @@ dependencies {
     api deps.playcore.core_ktx
     api deps.androidx.sqlite
     api deps.sqlcipher.core
+
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6' //STOPSHIP
 
     // ######################################################
     //                      Unit test
@@ -310,6 +315,7 @@ dependencies {
 }
 
 kapt {
+    useBuildCache = true
     arguments {
         arg("realm.ignoreKotlinNullability", true)
     }

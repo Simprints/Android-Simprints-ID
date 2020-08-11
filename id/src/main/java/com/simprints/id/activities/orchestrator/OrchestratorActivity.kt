@@ -75,10 +75,10 @@ class OrchestratorActivity : BaseSplitActivity() {
     }
 
     private fun scheduleAndStartSyncIfNecessary() {
+        syncManager.scheduleBackgroundSyncs()
         if (preferencesManager.subjectsDownSyncSetting == SubjectsDownSyncSetting.EXTRA) {
             eventSyncManager.sync()
         }
-        syncManager.scheduleBackgroundSyncs()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
