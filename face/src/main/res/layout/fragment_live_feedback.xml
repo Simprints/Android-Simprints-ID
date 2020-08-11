@@ -14,7 +14,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:keepScreenOn="true"
-        app:cameraAudio="off" />
+        app:cameraAudio="off"
+        app:cameraEngine="camera1"
+        app:cameraFrameProcessingExecutors="1"
+        app:cameraFrameProcessingPoolSize="1"
+        app:cameraPreviewFrameRate="10" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/capture_guide_frame"
