@@ -145,7 +145,7 @@ def rootbeer = [
     core: "com.scottyab:rootbeer-lib:$rootbeer_version"
 ]
 
-def cameraView = "com.otaliastudios:cameraview:2.2.0"
+def cameraView = "com.otaliastudios:cameraview:2.6.3"
 def circleImageView = "de.hdodenhof:circleimageview:3.0.1"
 
 // Testing

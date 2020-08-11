@@ -56,6 +56,11 @@ class FaceCaptureActivity : FaceActivity() {
             setResult(Activity.RESULT_OK, intent)
             finish()
         })
+
+        vm.unexpectedErrorEvent.observe(this, LiveDataEventObserver {
+            setResult(Activity.RESULT_CANCELED)
+            finish()
+        })
     }
 
     override fun onBackPressed() {
