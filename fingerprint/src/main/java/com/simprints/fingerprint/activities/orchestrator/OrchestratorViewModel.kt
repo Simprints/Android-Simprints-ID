@@ -9,6 +9,7 @@ import com.simprints.fingerprint.exceptions.unexpected.result.NoTaskResultExcept
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.models.FinalResult
+import com.simprints.fingerprint.orchestrator.runnable.RunnableTaskDispatcher
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
@@ -17,6 +18,7 @@ import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
 import io.reactivex.schedulers.Schedulers
 
 class OrchestratorViewModel(private val orchestrator: Orchestrator,
+                            private val runnableTaskDispatcher: RunnableTaskDispatcher,
                             private val scannerManager: ScannerManager,
                             private val firmwareFileUpdateScheduler: FirmwareFileUpdateScheduler) : ViewModel() {
 
@@ -53,10 +55,18 @@ class OrchestratorViewModel(private val orchestrator: Orchestrator,
 
     private fun executeNextTask() =
         when (val task = orchestrator.getNextTask()) {
-            is FingerprintTask.ActivityTask -> postNextTask(task)
+            is FingerprintTask.ActivityTask -> postNextActivityTask(task)
+            is FingerprintTask.RunnableTask -> dispatchRunnableTaskThenExecuteNextTask(task)
         }
 
-    private fun postNextTask(activityTask: FingerprintTask.ActivityTask) {
+    private fun dispatchRunnableTaskThenExecuteNextTask(runnableTask: FingerprintTask.RunnableTask) {
+        runnableTaskDispatcher.dispatch(runnableTask) {
+            orchestrator.handleRunnableTaskResult(it)
+        }
+        executeNextTaskOrFinish()
+    }
+
+    private fun postNextActivityTask(activityTask: FingerprintTask.ActivityTask) {
         nextActivityCall.postValue(activityTask.toActivityCall())
     }
 
