@@ -9,12 +9,21 @@ import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskRes
 import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
+import com.simprints.fingerprint.controllers.fingerprint.config.ConfigurationTaskRequest
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 
 sealed class FingerprintTask(
     val taskResultKey: String,
     val createTaskRequest: () -> TaskRequest
 ) {
+
+    abstract class RunnableTask(
+        taskResultKey: String,
+        createTaskRequest: () -> TaskRequest
+    ) : FingerprintTask(taskResultKey, createTaskRequest)
+
+    class Configuration(taskResultKey: String, createConfigurationTaskRequest: () -> ConfigurationTaskRequest) :
+        RunnableTask(taskResultKey, createConfigurationTaskRequest)
 
     abstract class ActivityTask(
         taskResultKey: String,
