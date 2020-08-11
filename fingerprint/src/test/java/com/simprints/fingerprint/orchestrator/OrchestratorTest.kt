@@ -10,10 +10,12 @@ import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskRes
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
+import com.simprints.fingerprint.controllers.fingerprint.config.ConfigurationTaskResult
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintConfigurationRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
@@ -115,6 +117,36 @@ class OrchestratorTest {
     }
 
     @Test
+    fun configurationTaskFlow_succeeds_shouldFinishSuccessfully() {
+        with(Orchestrator(FinalResultBuilder())) {
+            start(createFingerprintConfigurationRequest())
+            assertNextTaskIs<Configuration>()
+            okConfigurationResult()
+            assertTrue(isFinished())
+            with(getFinalResult()) {
+                assertEquals(Activity.RESULT_OK, resultCode)
+                assertNotNull(resultData?.extras?.getParcelable<IFingerprintConfigurationResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                    assertEquals(IFingerprintResponseType.CONFIGURATION, type)
+                })
+            }
+        }
+    }
+
+    @Test
+    fun configurationTaskFlow_fails_shouldFinishCancelledWithNoData() {
+        with(Orchestrator(FinalResultBuilder())) {
+            start(createFingerprintConfigurationRequest())
+            assertNextTaskIs<Configuration>()
+            failedRunnableResult()
+            assertTrue(isFinished())
+            with(getFinalResult()) {
+                assertEquals(Activity.RESULT_CANCELED, resultCode)
+                assertNull(resultData?.extras)
+            }
+        }
+    }
+
+    @Test
     fun newOrchestrator_resumedFromStateAfterStarted_shouldAssumeNewState() {
         val state = with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintCaptureRequest())
@@ -136,6 +168,7 @@ class OrchestratorTest {
             }
         }
     }
+
     private inline fun <reified T : FingerprintTask> Orchestrator.assertNextTaskIs() {
         assertFalse(isFinished())
         assertTrue(getNextTask() is T)
@@ -164,6 +197,14 @@ class OrchestratorTest {
                 MatchResult(UUID.randomUUID().toString(), score)
             }.sortedByDescending { it.confidence })
         }
+    }
+
+    private fun Orchestrator.okConfigurationResult() {
+        handleRunnableTaskResult(ConfigurationTaskResult())
+    }
+
+    private fun Orchestrator.failedRunnableResult() {
+        handleRunnableTaskResult(null)
     }
 
     private fun Orchestrator.alertResult() {
@@ -197,5 +238,8 @@ class OrchestratorTest {
 
         private fun createFingerprintMatchRequest() =
             FingerprintMatchRequest(listOf(mockk()), mockk())
+
+        private fun createFingerprintConfigurationRequest() =
+            FingerprintConfigurationRequest()
     }
 }

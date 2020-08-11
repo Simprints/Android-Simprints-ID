@@ -20,6 +20,10 @@ class Orchestrator(private val finalResultBuilder: FinalResultBuilder) {
         taskFlow.handleActivityTaskResult(resultCode, getTaskResult)
     }
 
+    fun handleRunnableTaskResult(taskResult: TaskResult?) {
+        taskFlow.handleRunnableTaskResult(taskResult)
+    }
+
     fun isFinished() = taskFlow.isFlowFinished()
 
     fun getNextTask() = taskFlow.getCurrentTask()
