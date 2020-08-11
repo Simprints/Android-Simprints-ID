@@ -8,6 +8,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtraWithKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
@@ -36,6 +37,7 @@ import org.koin.test.KoinTest
 import org.koin.test.mock.declareModule
 
 @RunWith(AndroidJUnit4::class)
+@MediumTest
 class OrchestratorActivityAndroidTest : KoinTest {
 
     private val orchestratorMock = mockk<Orchestrator>(relaxed = true)
@@ -62,6 +64,8 @@ class OrchestratorActivityAndroidTest : KoinTest {
         every { orchestratorMock.getNextTask() } returns FingerprintTask.ConnectScanner("connect") {
             launchTaskRequest()
         }
+        every { orchestratorMock.getFinalResult() } returns
+            FinalResult(Activity.RESULT_OK, Intent().putExtra("test_key", 42))
 
         intending(hasExtraWithKey(ConnectScannerTaskRequest.BUNDLE_KEY))
             .respondWith(Instrumentation.ActivityResult(ResultCode.OK.value,
@@ -72,10 +76,8 @@ class OrchestratorActivityAndroidTest : KoinTest {
         verify { firmwareFileUpdateSchedulerMock.scheduleOrCancelWorkIfNecessary() }
 
         every { orchestratorMock.isFinished() } returns true
-        every { orchestratorMock.getFinalResult() } returns
-            FinalResult(Activity.RESULT_OK, Intent().putExtra("test_key", 42))
-        assertNotNull(scenario.result.resultData.extras?.get("test_key") as Int?)
 
+        assertNotNull(scenario.result.resultData.extras?.get("test_key") as Int?)
         verify { orchestratorMock.handleActivityTaskResult(any(), any()) }
     }
 
