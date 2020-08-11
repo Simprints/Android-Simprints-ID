@@ -4,8 +4,9 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.*
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
 
 fun FingerprintRequest.toFingerprintTaskFlow(): FingerprintTaskFlow =
-    when (this) { // TODO : use safer method (either store type in enum or sealed class)
+    when (this) {
         is FingerprintCaptureRequest -> CaptureTaskFlow(this)
         is FingerprintMatchRequest -> MatchTaskFlow(this)
+        is FingerprintConfigurationRequest -> ConfigurationTaskFlow(this)
         else -> throw InvalidRequestForFingerprintException("Could not build task flow for request")
     }

@@ -5,8 +5,10 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintConfigurationRequest
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintCaptureRequest
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintConfigurationRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintMatchRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 
@@ -18,6 +20,8 @@ object FingerprintToDomainRequest {
                 fromFingerprintToDomainCaptureRequest(iFingerprintRequest)
             is IFingerprintMatchRequest ->
                 fromFingerprintToDomainMatchRequest(iFingerprintRequest)
+            is IFingerprintConfigurationRequest ->
+                fromFingerprintToDomainConfigurationRequest(iFingerprintRequest)
             else -> throw InvalidRequestForFingerprintException("Could not convert to domain request")
         }
 
@@ -37,4 +41,8 @@ object FingerprintToDomainRequest {
                 )
             }, queryForCandidates)
         }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun fromFingerprintToDomainConfigurationRequest(iFingerprintRequest: IFingerprintConfigurationRequest): FingerprintConfigurationRequest =
+        FingerprintConfigurationRequest()
 }
