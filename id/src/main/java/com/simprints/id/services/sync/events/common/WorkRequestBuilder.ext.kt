@@ -3,11 +3,11 @@ package com.simprints.id.services.sync.events.common
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.*
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import java.util.*
 
 internal const val TAG_SUBJECTS_SYNC_ALL_WORKERS = "TAG_SUBJECTS_SYNC_ALL_WORKERS"

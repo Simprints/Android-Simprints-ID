@@ -17,10 +17,10 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.EXTRA
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.ON
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncState
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
+import com.simprints.id.services.sync.events.master.models.EventSyncState
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import kotlinx.android.synthetic.main.activity_sync_information.*
 import javax.inject.Inject
 
@@ -268,15 +268,15 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun isDownSyncAllowed() = with(preferencesManager) {
-        subjectsDownSyncSetting == ON || subjectsDownSyncSetting == EXTRA
+        eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
     }
 
-    private fun SubjectsSyncState.isRunning(): Boolean {
+    private fun EventSyncState.isRunning(): Boolean {
         val downSyncStates = downSyncWorkersInfo
         val upSyncStates = upSyncWorkersInfo
         val allSyncStates = downSyncStates + upSyncStates
         return allSyncStates.any {
-            it.state is SubjectsSyncWorkerState.Running || it.state is SubjectsSyncWorkerState.Enqueued
+            it.state is EventSyncWorkerState.Running || it.state is EventSyncWorkerState.Enqueued
         }
     }
 

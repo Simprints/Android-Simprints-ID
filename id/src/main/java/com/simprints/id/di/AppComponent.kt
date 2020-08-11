@@ -48,9 +48,9 @@ import com.simprints.id.services.securitystate.SecurityStateWorker
 import com.simprints.id.services.sync.SyncSchedulerImpl
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
-import com.simprints.id.services.sync.events.master.workers.SubjectsEndSyncReporterWorker
-import com.simprints.id.services.sync.events.master.workers.SubjectsStartSyncReporterWorker
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker
+import com.simprints.id.services.sync.events.master.workers.EventEndSyncReporterWorker
+import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
@@ -123,13 +123,13 @@ interface AppComponent {
     fun inject(debugActivity: DebugActivity)
     fun inject(eventDownSyncCountWorker: EventDownSyncCountWorker)
     fun inject(eventDownSyncDownloaderWorker: EventDownSyncDownloaderWorker)
-    fun inject(subjectsSyncMasterWorker: SubjectsSyncMasterWorker)
+    fun inject(eventSyncMasterWorker: EventSyncMasterWorker)
     fun inject(eventUpSyncUploaderWorker: EventUpSyncUploaderWorker)
     fun inject(eventUpSyncCountWorker: EventUpSyncCountWorker)
     fun inject(imageUpSyncWorker: ImageUpSyncWorker)
     fun inject(syncInformationActivity: SyncInformationActivity)
-    fun inject(subjectsEndSyncReporterWorker: SubjectsEndSyncReporterWorker)
-    fun inject(subjectsStartSyncWorker: SubjectsStartSyncReporterWorker)
+    fun inject(eventEndSyncReporterWorker: EventEndSyncReporterWorker)
+    fun inject(eventStartSyncWorker: EventStartSyncReporterWorker)
     fun inject(qrCaptureActivity: QrCaptureActivity)
     fun inject(enrolLastBiometricsActivity: EnrolLastBiometricsActivity)
     fun inject(setupActivity: SetupActivity)

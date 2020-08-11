@@ -226,7 +226,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
             setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
             setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
-            setDownSyncTriggersCrashlyticsKey(preferencesManager.subjectsDownSyncSetting)
+            setDownSyncTriggersCrashlyticsKey(preferencesManager.eventDownSyncSetting)
             setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
         }
     }

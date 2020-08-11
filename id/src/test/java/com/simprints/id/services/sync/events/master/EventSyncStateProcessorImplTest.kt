@@ -15,9 +15,9 @@ import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_SYNC_ALL_WORKER
 import com.simprints.id.services.sync.events.common.TAG_SCHEDULED_AT
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.internal.SyncWorkersLiveDataProvider
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.START_SYNC_REPORTER
-import com.simprints.id.services.sync.events.master.workers.SubjectsStartSyncReporterWorker.Companion.SYNC_ID_STARTED
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.START_SYNC_REPORTER
+import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.MockKAnnotations

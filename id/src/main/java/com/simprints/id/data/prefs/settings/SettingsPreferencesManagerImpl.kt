@@ -20,7 +20,7 @@ import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.network.NetworkConstants
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
 open class SettingsPreferencesManagerImpl(
@@ -31,7 +31,7 @@ open class SettingsPreferencesManagerImpl(
     modalitySerializer: Serializer<List<Modality>>,
     languagesStringArraySerializer: Serializer<Array<String>>,
     moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-    subjectsDownSyncSettingSerializer: Serializer<SubjectsDownSyncSetting>,
+    eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
     captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
     saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
     scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
@@ -241,13 +241,13 @@ open class SettingsPreferencesManagerImpl(
             modalitySerializer
         )
 
-    override var subjectsDownSyncSetting: SubjectsDownSyncSetting
+    override var eventDownSyncSetting: EventDownSyncSetting
         by RemoteConfigComplexPreference(
             prefs,
             remoteConfigWrapper,
             PEOPLE_DOWN_SYNC_SETTING_KEY,
             PEOPLE_DOWN_SYNC_SETTING_DEFAULT,
-            subjectsDownSyncSettingSerializer
+            eventDownSyncSettingSerializer
         )
 
     override var fingerImagesExist: Boolean
@@ -399,7 +399,7 @@ open class SettingsPreferencesManagerImpl(
         const val ENROLMENT_PLUS_DEFAULT = false
 
         const val PEOPLE_DOWN_SYNC_SETTING_KEY = "DownSyncSetting"
-        val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = SubjectsDownSyncSetting.ON
+        val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = EventDownSyncSetting.ON
 
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"

@@ -21,8 +21,8 @@ import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState.*
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
 import kotlinx.android.synthetic.main.activity_debug.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
@@ -127,7 +127,7 @@ class DebugActivity : BaseSplitActivity() {
         return spannableString
     }
 
-    private fun List<SubjectsSyncWorkerState>.toDebugActivitySyncState(): DebugActivitySyncState =
+    private fun List<EventSyncWorkerState>.toDebugActivitySyncState(): DebugActivitySyncState =
         when {
             isEmpty() -> DebugActivitySyncState.NOT_RUNNING
             this.any { it is Running } -> DebugActivitySyncState.RUNNING

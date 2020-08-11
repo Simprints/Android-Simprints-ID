@@ -3,14 +3,14 @@ package com.simprints.id.services.sync.events.master.models
 import androidx.work.WorkInfo
 
 // val state: String is used for logs purpose only - otherwise any state.toString() would print the same output.
-sealed class SubjectsSyncWorkerState(val state: String) {
+sealed class EventSyncWorkerState(val state: String) {
 
-    object Enqueued : SubjectsSyncWorkerState("Enqueued")
-    object Running : SubjectsSyncWorkerState("Running")
-    object Succeeded : SubjectsSyncWorkerState("Succeeded")
-    class Failed(val failedBecauseCloudIntegration: Boolean = false) : SubjectsSyncWorkerState("Failed")
-    object Blocked : SubjectsSyncWorkerState("Blocked")
-    object Cancelled : SubjectsSyncWorkerState("Cancelled")
+    object Enqueued : EventSyncWorkerState("Enqueued")
+    object Running : EventSyncWorkerState("Running")
+    object Succeeded : EventSyncWorkerState("Succeeded")
+    class Failed(val failedBecauseCloudIntegration: Boolean = false) : EventSyncWorkerState("Failed")
+    object Blocked : EventSyncWorkerState("Blocked")
+    object Cancelled : EventSyncWorkerState("Cancelled")
 
     companion object {
         fun fromWorkInfo(state: WorkInfo.State,

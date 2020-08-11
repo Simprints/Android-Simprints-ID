@@ -10,16 +10,16 @@ import com.simprints.id.services.sync.events.common.getUniqueSyncId
 import com.simprints.id.services.sync.events.common.sortByScheduledTime
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.EXTRA
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.ON
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
-open class SubjectsSyncMasterWorker(private val appContext: Context,
-                                    params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
+open class EventSyncMasterWorker(private val appContext: Context,
+                                 params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
 
     companion object {
         const val MIN_BACKOFF_SECS = 15L
@@ -31,14 +31,14 @@ open class SubjectsSyncMasterWorker(private val appContext: Context,
         const val OUTPUT_LAST_SYNC_ID = "OUTPUT_LAST_SYNC_ID"
     }
 
-    override val tag: String = SubjectsSyncMasterWorker::class.java.simpleName
+    override val tag: String = EventSyncMasterWorker::class.java.simpleName
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var downSyncWorkerBuilder: EventDownSyncWorkersBuilder
     @Inject lateinit var upSyncWorkerBuilder: EventUpSyncWorkersBuilder
     @Inject lateinit var preferenceManager: PreferencesManager
     @Inject lateinit var eventSyncCache: EventSyncCache
-    @Inject lateinit var subjectsSyncSubMasterWorkersBuilder: SubjectsSyncSubMasterWorkersBuilder
+    @Inject lateinit var eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(appContext)
@@ -57,15 +57,15 @@ open class SubjectsSyncMasterWorker(private val appContext: Context,
     override suspend fun doWork(): Result =
         withContext(Dispatchers.IO) {
             try {
-                getComponent<SubjectsSyncMasterWorker> { it.inject(this@SubjectsSyncMasterWorker) }
+                getComponent<EventSyncMasterWorker> { it.inject(this@EventSyncMasterWorker) }
                 crashlyticsLog("Start")
 
                 if (!isSyncRunning()) {
-                    val startSyncReporterWorker = subjectsSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
+                    val startSyncReporterWorker = eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
                     val upSyncWorkers = upSyncWorkersChain(uniqueSyncId)
                     val downSyncWorkers = downSyncWorkersChain(uniqueSyncId)
                     val chain = upSyncWorkers + downSyncWorkers
-                    val endSyncReporterWorker = subjectsSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
+                    val endSyncReporterWorker = eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
                     wm.beginWith(startSyncReporterWorker).then(chain).then(endSyncReporterWorker).enqueue()
 
                     eventSyncCache.clearProgresses()
@@ -94,7 +94,7 @@ open class SubjectsSyncMasterWorker(private val appContext: Context,
     }
 
     private fun isPeopleDownSyncAllowed() = with(preferenceManager) {
-        subjectsDownSyncSetting == ON || subjectsDownSyncSetting == EXTRA
+        eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
     }
 
     private suspend fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =

@@ -17,33 +17,33 @@ import com.simprints.id.services.sync.events.master.EventSyncStateProcessorImplT
 import com.simprints.id.services.sync.events.master.EventSyncStateProcessorImplTest.Companion.UNIQUE_SYNC_ID
 import com.simprints.id.services.sync.events.master.EventSyncStateProcessorImplTest.Companion.UNIQUE_UP_SYNC_ID
 import com.simprints.id.services.sync.events.master.EventSyncStateProcessorImplTest.Companion.UPLOADED
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncState
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState.*
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.*
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.sync.events.master.models.EventSyncState
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import java.util.*
 
-fun SubjectsSyncState.assertConnectingSyncState() {
+fun EventSyncState.assertConnectingSyncState() {
     assertProgressAndTotal(syncId, total, progress)
     assertThat(downSyncWorkersInfo.count { it.state is Enqueued }).isEqualTo(1)
     upSyncWorkersInfo.all { it.state is Succeeded }
 }
 
-fun SubjectsSyncState.assertFailingSyncState() {
+fun EventSyncState.assertFailingSyncState() {
     assertProgressAndTotal(syncId, total, progress)
     assertThat(downSyncWorkersInfo.count { it.state is Failed }).isEqualTo(1)
     upSyncWorkersInfo.all { it.state is Succeeded }
 }
 
-fun SubjectsSyncState.assertSuccessfulSyncState() {
+fun EventSyncState.assertSuccessfulSyncState() {
     assertProgressAndTotal(syncId, total, progress)
     downSyncWorkersInfo.all { it.state is Succeeded }
     upSyncWorkersInfo.all { it.state is Succeeded }
 }
 
-fun SubjectsSyncState.assertRunningSyncState() {
+fun EventSyncState.assertRunningSyncState() {
     assertProgressAndTotal(syncId, total, progress)
     assertThat(downSyncWorkersInfo.count { it.state is Running }).isEqualTo(1)
     upSyncWorkersInfo.all { it.state is Succeeded }

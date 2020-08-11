@@ -14,9 +14,9 @@ import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_SYNC_ALL_WORKER
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
-import com.simprints.id.services.sync.events.master.workers.SubjectsSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.id.testtools.UnitTestConfig
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify

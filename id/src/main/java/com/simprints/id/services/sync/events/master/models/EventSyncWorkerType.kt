@@ -1,7 +1,7 @@
 package com.simprints.id.services.sync.events.master.models
 
 
-enum class SubjectsSyncWorkerType {
+enum class EventSyncWorkerType {
     DOWN_COUNTER,
     UP_COUNTER,
     UPLOADER,
@@ -13,6 +13,6 @@ enum class SubjectsSyncWorkerType {
 
         private const val TAG_PEOPLE_SYNC_WORKER_TYPE = "TAG_PEOPLE_SYNC_WORKER_TYPE_"
 
-        fun tagForType(type: SubjectsSyncWorkerType) = "$TAG_PEOPLE_SYNC_WORKER_TYPE${type}"
+        fun tagForType(type: EventSyncWorkerType) = "$TAG_PEOPLE_SYNC_WORKER_TYPE${type}"
     }
 }

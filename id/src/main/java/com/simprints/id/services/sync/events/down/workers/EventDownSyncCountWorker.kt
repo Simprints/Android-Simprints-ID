@@ -18,9 +18,9 @@ import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.DOWNLOADER
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerType.UPLOADER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UPLOADER
 import com.simprints.id.tools.delegates.lazyVar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

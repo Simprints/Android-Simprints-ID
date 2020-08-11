@@ -8,10 +8,10 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.EXTRA
-import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.ON
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncState
-import com.simprints.id.services.sync.events.master.models.SubjectsSyncWorkerState
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
+import com.simprints.id.services.sync.events.master.models.EventSyncState
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import kotlinx.coroutines.delay
@@ -39,7 +39,7 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
 
     private fun emitNewCardState(isConnected: Boolean,
                                  isModuleSelectionRequired: Boolean,
-                                 syncState: SubjectsSyncState?) {
+                                 syncState: EventSyncState?) {
 
         val syncRunningAndInfoNotReadyYet = syncState == null && syncCardStateLiveData.value is SyncConnecting
         val syncNoRunningAndInfoNotReadyYet = syncState == null && syncCardStateLiveData.value !is SyncConnecting
@@ -61,7 +61,7 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
         }
     }
 
-    private fun processRecentSyncState(syncState: SubjectsSyncState): DashboardSyncCardState {
+    private fun processRecentSyncState(syncState: EventSyncState): DashboardSyncCardState {
 
         val downSyncStates = syncState.downSyncWorkersInfo
         val upSyncStates = syncState.upSyncWorkersInfo
@@ -128,25 +128,25 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
         syncCardStateLiveData.value = newState
     }
 
-    private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is SubjectsSyncWorkerState.Failed && it.state.failedBecauseCloudIntegration }
+    private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
+        allSyncStates.any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseCloudIntegration }
 
-    private fun isThereNotSyncHistory(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) = allSyncStates.isEmpty()
+    private fun isThereNotSyncHistory(allSyncStates: List<EventSyncState.SyncWorkerInfo>) = allSyncStates.isEmpty()
 
-    private fun isSyncProcess(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is SubjectsSyncWorkerState.Running }
+    private fun isSyncProcess(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
+        allSyncStates.any { it.state is EventSyncWorkerState.Running }
 
-    private fun isSyncFailed(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is SubjectsSyncWorkerState.Failed || it.state is SubjectsSyncWorkerState.Blocked || it.state is SubjectsSyncWorkerState.Cancelled }
+    private fun isSyncFailed(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
+        allSyncStates.any { it.state is EventSyncWorkerState.Failed || it.state is EventSyncWorkerState.Blocked || it.state is EventSyncWorkerState.Cancelled }
 
-    private fun isSyncConnecting(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is SubjectsSyncWorkerState.Enqueued }
+    private fun isSyncConnecting(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
+        allSyncStates.any { it.state is EventSyncWorkerState.Enqueued }
 
-    private fun isSyncCompleted(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) =
-        allSyncStates.all { it.state is SubjectsSyncWorkerState.Succeeded }
+    private fun isSyncCompleted(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
+        allSyncStates.all { it.state is EventSyncWorkerState.Succeeded }
 
 
-    private fun isSyncRunning(allSyncStates: List<SubjectsSyncState.SyncWorkerInfo>) =
+    private fun isSyncRunning(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
         isSyncProcess(allSyncStates) || isSyncConnecting(allSyncStates)
 
 
@@ -154,7 +154,7 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
         isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
 
     private fun isDownSyncAllowed() = with(preferencesManager) {
-        subjectsDownSyncSetting == ON || subjectsDownSyncSetting == EXTRA
+        eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
     }
 
     private fun isSelectedModulesEmpty() = preferencesManager.selectedModules.isEmpty()

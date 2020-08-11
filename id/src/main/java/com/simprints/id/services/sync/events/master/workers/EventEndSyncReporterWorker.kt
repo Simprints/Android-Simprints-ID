@@ -14,10 +14,10 @@ import javax.inject.Inject
  * It's executed at the end of the sync, when all workers succeed (downloaders and uploaders).
  * It stores the "last successful timestamp"
  */
-class SubjectsEndSyncReporterWorker(appContext: Context,
-                                    params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
+class EventEndSyncReporterWorker(appContext: Context,
+                                 params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
 
-    override val tag: String = SubjectsEndSyncReporterWorker::class.java.simpleName
+    override val tag: String = EventEndSyncReporterWorker::class.java.simpleName
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var syncCache: EventSyncCache
@@ -25,7 +25,7 @@ class SubjectsEndSyncReporterWorker(appContext: Context,
     override suspend fun doWork(): Result =
         withContext(Dispatchers.IO) {
             try {
-                getComponent<SubjectsSyncMasterWorker> { it.inject(this@SubjectsEndSyncReporterWorker) }
+                getComponent<EventSyncMasterWorker> { it.inject(this@EventEndSyncReporterWorker) }
                 val syncId = inputData.getString(SYNC_ID_TO_MARK_AS_COMPLETED)
                 crashlyticsLog("Start - Params: $syncId")
 
