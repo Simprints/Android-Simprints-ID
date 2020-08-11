@@ -4,7 +4,10 @@ import android.content.Context
 import androidx.work.*
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.sync.events.common.*
+import com.simprints.id.services.sync.events.common.SimCoroutineWorker
+import com.simprints.id.services.sync.events.common.getAllSubjectsSyncWorkersInfo
+import com.simprints.id.services.sync.events.common.getUniqueSyncId
+import com.simprints.id.services.sync.events.common.sortByScheduledTime
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetting.EXTRA
@@ -12,7 +15,6 @@ import com.simprints.id.services.sync.events.master.models.SubjectsDownSyncSetti
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -67,7 +69,7 @@ open class SubjectsSyncMasterWorker(private val appContext: Context,
                     wm.beginWith(startSyncReporterWorker).then(chain).then(endSyncReporterWorker).enqueue()
 
                     eventSyncCache.clearProgresses()
-                    clearWorkerHistory(uniqueSyncId)
+
                     success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId),
                         "Master work done: new id $uniqueSyncId")
                 } else {
@@ -97,16 +99,6 @@ open class SubjectsSyncMasterWorker(private val appContext: Context,
 
     private suspend fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =
         upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID)
-
-    private fun clearWorkerHistory(uniqueId: String) {
-        val workersRelatedToOtherSync = syncWorkers.filter { !it.isPartOfSubjectsSync(uniqueId) }
-        val syncWorkersWithoutSyncId = syncWorkers.filter { it.getUniqueSyncId() == null && it.state != WorkInfo.State.CANCELLED }
-        (workersRelatedToOtherSync + syncWorkersWithoutSyncId).forEach {
-            wm.cancelWorkById(it.id)
-            Timber.tag(SYNC_LOG_TAG).d("[MASTER_WORKER] Deleted ${it.id} worker")
-        }
-    }
-
 
     private fun getLastSyncId(): String? {
         return syncWorkers.last()?.getUniqueSyncId()
