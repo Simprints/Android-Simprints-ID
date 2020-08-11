@@ -2,6 +2,7 @@ package com.simprints.id.services.sync.images.up
 
 import android.content.Context
 import androidx.work.*
+import com.simprints.id.BuildConfig
 import java.util.concurrent.TimeUnit
 
 class ImageUpSyncSchedulerImpl(context: Context) : ImageUpSyncScheduler {
@@ -36,7 +37,7 @@ class ImageUpSyncSchedulerImpl(context: Context) : ImageUpSyncScheduler {
 
     companion object {
         private const val WORK_NAME = "image-upsync-work"
-        private const val SYNC_REPEAT_INTERVAL = 60L
+        private const val SYNC_REPEAT_INTERVAL = BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL_MINUTES
         private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
     }
 }

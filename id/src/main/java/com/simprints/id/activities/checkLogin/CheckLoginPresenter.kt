@@ -1,5 +1,6 @@
 package com.simprints.id.activities.checkLogin
 
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
@@ -62,10 +63,21 @@ abstract class CheckLoginPresenter(
 
     protected open suspend fun handleSignedInUser() {
         CoroutineScope(Dispatchers.Main).launch {
-            for (status in securityStateRepository.securityStatusChannel) {
-                if (status.isCompromisedOrProjectEnded())
-                    handleNotSignedInUser()
-            }
+            setLanguageInHelper()
+            checkStatusForDeviceAndProject()
+        }
+    }
+
+    /*We need to override the language in LanguageHelper as it uses the SharedPreferences directly
+      rather than using PreferencesManager.*/
+    private fun setLanguageInHelper() {
+        LanguageHelper.language = preferencesManager.language
+    }
+
+    private suspend fun  checkStatusForDeviceAndProject() {
+        for (status in securityStateRepository.securityStatusChannel) {
+            if (status.isCompromisedOrProjectEnded())
+                handleNotSignedInUser()
         }
     }
 

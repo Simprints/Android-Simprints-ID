@@ -3,6 +3,7 @@ package com.simprints.id.services.sync.events.master
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
+import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.services.sync.events.common.*
@@ -24,7 +25,7 @@ class EventSyncManagerImpl(private val ctx: Context,
                            private val eventSyncCache: EventSyncCache) : EventSyncManager {
 
     companion object {
-        const val SYNC_REPEAT_INTERVAL = 60L
+        private const val SYNC_REPEAT_INTERVAL = BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL_MINUTES
         val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
     }
 
