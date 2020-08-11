@@ -285,6 +285,14 @@ open class SettingsPreferencesManagerImpl(
             scannerGenerationsSerializer
         )
 
+    override var fingerprintQualityThreshold: Int
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            FINGERPRINT_QUALITY_THRESHOLD_KEY,
+            FINGERPRINT_QUALITY_THRESHOLD_DEFAULT
+        )
+
     override var apiBaseUrl: String
         by PrimitivePreference(prefs, API_BASE_URL_KEY, NetworkConstants.DEFAULT_BASE_URL)
 
@@ -415,6 +423,9 @@ open class SettingsPreferencesManagerImpl(
 
         val SCANNER_GENERATIONS_DEFAULT = listOf(ScannerGeneration.VERO_1)
         const val SCANNER_GENERATIONS_KEY = "ScannerGenerations"
+
+        const val FINGERPRINT_QUALITY_THRESHOLD_DEFAULT = 60
+        const val FINGERPRINT_QUALITY_THRESHOLD_KEY = "FingerprintQualityThreshold"
 
         const val API_BASE_URL_KEY = "ApiBaseUrl"
 

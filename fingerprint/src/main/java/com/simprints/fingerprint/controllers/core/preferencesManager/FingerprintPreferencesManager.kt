@@ -11,4 +11,5 @@ interface FingerprintPreferencesManager {
     val captureFingerprintStrategy: CaptureFingerprintStrategy
     val saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
     val scannerGenerations: List<ScannerGeneration>
+    val qualityThreshold: Int
 }
