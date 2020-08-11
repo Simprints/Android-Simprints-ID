@@ -55,7 +55,9 @@ class CollectFingerprintsViewModelTest : KoinTest {
     private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
     private val fingerprintAnalyticsManager: FingerprintAnalyticsManager = mockk(relaxed = true)
     private val crashReportManager: FingerprintCrashReportManager = mockk(relaxed = true)
-    private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true)
+    private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true) {
+        every { qualityThreshold } returns 60
+    }
     private val scanner: ScannerWrapper = mockk(relaxUnitFun = true)
     private val scannerManager: ScannerManager = ScannerManagerImpl(mockk(), mockk(), mockk(), mockk()).also {
         it.scanner = scanner
@@ -120,7 +122,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.TransferringImage(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null)))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.TransferringImage(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null, 60)))
     }
 
     @Test
@@ -132,7 +134,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null)))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null, 60)))
         vm.vibrate.assertEventReceived()
 
         mockTimer.executeNextTask()
@@ -151,7 +153,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE)))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE, 60)))
         vm.vibrate.assertEventReceived()
         verify { sessionEventsManager.addEventInBackground(any()) }
 
@@ -168,7 +170,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(BAD_QUALITY, TEMPLATE, null), 1))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(BAD_QUALITY, TEMPLATE, null, 60), 1))
         vm.vibrate.assertEventReceived()
         verify { sessionEventsManager.addEventInBackground(any()) }
     }
@@ -182,7 +184,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(BAD_QUALITY, TEMPLATE, null), 1))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(BAD_QUALITY, TEMPLATE, null, 60), 1))
         vm.vibrate.assertEventReceived()
         verify { sessionEventsManager.addEventInBackground(any()) }
     }
@@ -237,11 +239,11 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(BAD_QUALITY, TEMPLATE, null), 1))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(BAD_QUALITY, TEMPLATE, null, 60), 1))
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(BAD_QUALITY, TEMPLATE, null), 2))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(BAD_QUALITY, TEMPLATE, null, 60), 2))
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(BAD_QUALITY, TEMPLATE, IMAGE), 3))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(BAD_QUALITY, TEMPLATE, IMAGE, 60), 3))
 
         assertThat(vm.state().isShowingSplashScreen).isTrue()
         mockTimer.executeNextTask()
@@ -269,7 +271,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         assertThat(vm.state()).isEqualTo(CollectFingerprintsState(
             fingerStates = FOUR_FINGERS_IDS.map {
-                FingerCollectionState.Collected(it, ScanResult(BAD_QUALITY, TEMPLATE, IMAGE), numberOfBadScans = 3)
+                FingerCollectionState.Collected(it, ScanResult(BAD_QUALITY, TEMPLATE, IMAGE, 60), numberOfBadScans = 3)
             },
             currentFingerIndex = 3,
             isAskingRescan = false,
@@ -305,7 +307,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         }
 
         assertThat(vm.state()).isEqualTo(CollectFingerprintsState(
-            fingerStates = TWO_FINGERS_IDS.map { FingerCollectionState.Collected(it, ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE)) },
+            fingerStates = TWO_FINGERS_IDS.map { FingerCollectionState.Collected(it, ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE, 60)) },
             currentFingerIndex = 1,
             isAskingRescan = false,
             isShowingConfirmDialog = true,
@@ -339,7 +341,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         }
 
         assertThat(vm.state()).isEqualTo(CollectFingerprintsState(
-            fingerStates = TWO_FINGERS_IDS.map { FingerCollectionState.Collected(it, ScanResult(GOOD_QUALITY, TEMPLATE, null)) },
+            fingerStates = TWO_FINGERS_IDS.map { FingerCollectionState.Collected(it, ScanResult(GOOD_QUALITY, TEMPLATE, null, 60)) },
             currentFingerIndex = 1,
             isAskingRescan = false,
             isShowingConfirmDialog = true,
@@ -379,7 +381,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         vm.handleScanButtonPressed()
         assertThat(vm.state().isAskingRescan).isFalse()
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(DIFFERENT_GOOD_QUALITY, DIFFERENT_TEMPLATE, null)))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(DIFFERENT_GOOD_QUALITY, DIFFERENT_TEMPLATE, null, 60)))
 
         verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }
     }
@@ -473,10 +475,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         assertThat(vm.state()).isEqualTo(CollectFingerprintsState(
             fingerStates = listOf(
-                FingerCollectionState.Collected(FOUR_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE), numberOfBadScans = 2),
+                FingerCollectionState.Collected(FOUR_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE, 60), numberOfBadScans = 2),
                 FingerCollectionState.Skipped(FOUR_FINGERS_IDS[1]),
-                FingerCollectionState.Collected(FOUR_FINGERS_IDS[2], ScanResult(BAD_QUALITY, TEMPLATE, IMAGE), numberOfBadScans = 3),
-                FingerCollectionState.Collected(FOUR_FINGERS_IDS[3], ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE), numberOfBadScans = 0)
+                FingerCollectionState.Collected(FOUR_FINGERS_IDS[2], ScanResult(BAD_QUALITY, TEMPLATE, IMAGE, 60), numberOfBadScans = 3),
+                FingerCollectionState.Collected(FOUR_FINGERS_IDS[3], ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE, 60), numberOfBadScans = 0)
             ),
             currentFingerIndex = 3,
             isAskingRescan = false,
@@ -520,9 +522,9 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.TransferringImage(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null)))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.TransferringImage(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null, 60)))
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.TransferringImage(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null)))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.TransferringImage(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null, 60)))
     }
 
     @Test
@@ -577,7 +579,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.TransferringImage(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null)))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.TransferringImage(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null, 60)))
         vm.handleOnBackPressed()
         assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.NotCollected(TWO_FINGERS_IDS[0]))
     }
@@ -591,7 +593,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         vm.handleOnBackPressed()
-        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null)))
+        assertThat(vm.state().currentFingerState()).isEqualTo(FingerCollectionState.Collected(TWO_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null, 60)))
     }
 
     @Test
