@@ -38,7 +38,7 @@ class OdkIdentifyResponseTest : BaseOdkClientApiTest() {
             assertThat(it.getString(ODK_GUIDS_KEY)).isEqualTo(guidsInOdkFormat(appIdentifyResponse.identifications))
             assertThat(it.getString(ODK_CONFIDENCES_KEY)).isEqualTo(confidenceScoresInOdkFormat(appIdentifyResponse.identifications))
             assertThat(it.getString(ODK_TIERS_KEY)).isEqualTo(tiersInOdkFormat(appIdentifyResponse.identifications))
-            assertThat(it.getString(ODK_IDENTIFY_SESSION_ID)).isEqualTo(appIdentifyResponse.sessionId)
+            assertThat(it.getString(ODK_SESSION_ID)).isEqualTo(appIdentifyResponse.sessionId)
             assertThat(it.getBoolean(ODK_IDENTIFY_BIOMETRICS_COMPLETE)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
         } ?: throw Exception("No bundle found")
     }

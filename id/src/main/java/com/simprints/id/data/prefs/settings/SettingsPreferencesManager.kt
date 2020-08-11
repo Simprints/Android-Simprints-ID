@@ -41,6 +41,7 @@ interface SettingsPreferencesManager {
     var captureFingerprintStrategy: CaptureFingerprintStrategy
     var saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
     var scannerGenerations: List<ScannerGeneration>
+    var fingerprintQualityThreshold: Int
     var apiBaseUrl: String
 
     var faceMaxRetries: Int
