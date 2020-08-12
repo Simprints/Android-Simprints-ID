@@ -90,7 +90,13 @@ class FingerSelectionActivity : BaseSplitActivity() {
     }
 
     private fun initRecyclerView() {
-        fingerSelectionAdapter = FingerSelectionItemAdapter(viewModel, itemTouchHelper)
+        fingerSelectionAdapter = FingerSelectionItemAdapter(
+            itemTouchHelper,
+            { viewModel.items.value ?: emptyList() },
+            viewModel::changeFingerSelection,
+            viewModel::changeQuantitySelection,
+            viewModel::removeItem
+        )
         fingerSelectionRecyclerView.layoutManager = LinearLayoutManager(this)
         fingerSelectionRecyclerView.adapter = fingerSelectionAdapter
         itemTouchHelper.attachToRecyclerView(fingerSelectionRecyclerView)

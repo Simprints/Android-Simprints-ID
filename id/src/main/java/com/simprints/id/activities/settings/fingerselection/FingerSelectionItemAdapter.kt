@@ -20,29 +20,40 @@ import com.simprints.id.tools.extensions.disableLongPress
 import com.simprints.id.tools.extensions.onItemSelectedWithPosition
 import kotlinx.android.synthetic.main.item_finger_selection.view.*
 
-class FingerSelectionItemAdapter(private val viewModel: FingerSelectionViewModel,
-                                 private val itemTouchHelper: ItemTouchHelper) :
+class FingerSelectionItemAdapter(private val itemTouchHelper: ItemTouchHelper,
+                                 private val getItems: () -> List<FingerSelectionItem>,
+                                 private val onFingerSelectionChanged: (itemIndex: Int, finger: FingerIdentifier) -> Unit,
+                                 private val onQuantitySelectionChanged: (itemIndex: Int, quantity: Int) -> Unit,
+                                 private val removeItem: (itemIndex: Int) -> Unit) :
     RecyclerView.Adapter<FingerSelectionItemAdapter.FingerSelectionItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FingerSelectionItemViewHolder =
-        FingerSelectionItemViewHolder(parent.context, viewModel, itemTouchHelper,
+        FingerSelectionItemViewHolder(parent.context, itemTouchHelper, getItems, onFingerSelectionChanged, onQuantitySelectionChanged, removeItem,
             LayoutInflater.from(parent.context).inflate(R.layout.item_finger_selection, parent, false)
         )
 
-    override fun getItemCount(): Int = viewModel.items.value?.size ?: 0
+    override fun getItemCount(): Int = getItems().size
 
     override fun onBindViewHolder(viewHolder: FingerSelectionItemViewHolder, position: Int) {
         viewHolder.bind()
     }
 
-    class FingerSelectionItemViewHolder(val context: Context, val viewModel: FingerSelectionViewModel, private val itemTouchHelper: ItemTouchHelper, view: View) : RecyclerView.ViewHolder(view) {
+    class FingerSelectionItemViewHolder(
+        val context: Context,
+        private val itemTouchHelper: ItemTouchHelper,
+        private val getItems: () -> List<FingerSelectionItem>,
+        private val onFingerSelectionChanged: (itemIndex: Int, finger: FingerIdentifier) -> Unit,
+        private val onQuantitySelectionChanged: (itemIndex: Int, quantity: Int) -> Unit,
+        private val removeItem: (itemIndex: Int) -> Unit,
+        view: View
+    ) : RecyclerView.ViewHolder(view) {
 
         private val grip: ImageView = view.gripFingerSelectionImageView
         private val fingerSpinner: Spinner = view.fingerSelectionSpinner
         private val quantitySpinner: Spinner = view.fingerQuantitySpinner
         private val deleteButton: ImageView = view.deleteFingerSelectionImageView
 
-        private val fingerIdAdapter = FingerIdAdapter(viewModel, context)
+        private val fingerIdAdapter = FingerIdAdapter(context, getItems)
         private val quantityAdapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, QUANTITY_OPTIONS)
 
         @SuppressLint("ClickableViewAccessibility")
@@ -50,21 +61,21 @@ class FingerSelectionItemAdapter(private val viewModel: FingerSelectionViewModel
             fingerSpinner.adapter = fingerIdAdapter
             quantitySpinner.adapter = quantityAdapter
 
-            fingerSpinner.setSelection(ORDERED_FINGERS.indexOf(viewModel.items.value?.get(adapterPosition)?.finger))
-            quantitySpinner.setSelection(QUANTITY_OPTIONS.indexOf(viewModel.items.value?.get(adapterPosition)?.quantity))
+            fingerSpinner.setSelection(ORDERED_FINGERS.indexOf(getItems().get(adapterPosition).finger))
+            quantitySpinner.setSelection(QUANTITY_OPTIONS.indexOf(getItems().get(adapterPosition).quantity))
 
             fingerSpinner.disableLongPress()
             quantitySpinner.disableLongPress()
 
             fingerSpinner.onItemSelectedWithPosition { position ->
-                fingerIdAdapter.getItem(position)?.let { viewModel.changeFingerSelection(adapterPosition, it) }
+                fingerIdAdapter.getItem(position)?.let { onFingerSelectionChanged(adapterPosition, it) }
             }
             quantitySpinner.onItemSelectedWithPosition { position ->
-                quantityAdapter.getItem(position)?.let { viewModel.changeQuantitySelection(adapterPosition, it) }
+                quantityAdapter.getItem(position)?.let { onQuantitySelectionChanged(adapterPosition, it) }
             }
 
-            if (viewModel.items.value?.get(adapterPosition)?.removable == true) {
-                deleteButton.setOnClickListener { viewModel.removeItem(adapterPosition) }
+            if (getItems().get(adapterPosition).removable) {
+                deleteButton.setOnClickListener { removeItem(adapterPosition) }
                 deleteButton.visibility = View.VISIBLE
                 fingerSpinner.isEnabled = true
                 fingerSpinner.isClickable = true
@@ -82,7 +93,7 @@ class FingerSelectionItemAdapter(private val viewModel: FingerSelectionViewModel
     }
 }
 
-class FingerIdAdapter(private val viewModel: FingerSelectionViewModel, context: Context) : ArrayAdapter<FingerIdentifier>(context, 0, ORDERED_FINGERS) {
+class FingerIdAdapter(context: Context, private val getItems: () -> List<FingerSelectionItem>) : ArrayAdapter<FingerIdentifier>(context, 0, ORDERED_FINGERS) {
 
     override fun isEnabled(position: Int): Boolean = isFingerAvailable(position)
 
@@ -100,7 +111,7 @@ class FingerIdAdapter(private val viewModel: FingerSelectionViewModel, context: 
             }
 
     private fun isFingerAvailable(position: Int) =
-        !(viewModel.items.value?.map { it.finger } ?: emptyList()).contains(getItem(position))
+        !getItems().map { it.finger }.contains(getItem(position))
 }
 
 fun FingerIdentifier.toString(context: Context) =
