@@ -20,14 +20,13 @@ import com.simprints.id.tools.extensions.disableLongPress
 import com.simprints.id.tools.extensions.onItemSelectedWithPosition
 import kotlinx.android.synthetic.main.item_finger_selection.view.*
 
-class FingerSelectionItemAdapter(private val context: Context,
-                                 private val viewModel: FingerSelectionViewModel,
+class FingerSelectionItemAdapter(private val viewModel: FingerSelectionViewModel,
                                  private val itemTouchHelper: ItemTouchHelper) :
     RecyclerView.Adapter<FingerSelectionItemAdapter.FingerSelectionItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FingerSelectionItemViewHolder =
-        FingerSelectionItemViewHolder(context, viewModel, itemTouchHelper,
-            LayoutInflater.from(context).inflate(R.layout.item_finger_selection, parent, false)
+        FingerSelectionItemViewHolder(parent.context, viewModel, itemTouchHelper,
+            LayoutInflater.from(parent.context).inflate(R.layout.item_finger_selection, parent, false)
         )
 
     override fun getItemCount(): Int = viewModel.items.value?.size ?: 0
@@ -43,11 +42,11 @@ class FingerSelectionItemAdapter(private val context: Context,
         private val quantitySpinner: Spinner = view.fingerQuantitySpinner
         private val deleteButton: ImageView = view.deleteFingerSelectionImageView
 
+        private val fingerIdAdapter = FingerIdAdapter(viewModel, context)
+        private val quantityAdapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, QUANTITY_OPTIONS)
+
         @SuppressLint("ClickableViewAccessibility")
         fun bind() {
-            val fingerIdAdapter = FingerIdAdapter(viewModel, context)
-            val quantityAdapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, QUANTITY_OPTIONS)
-
             fingerSpinner.adapter = fingerIdAdapter
             quantitySpinner.adapter = quantityAdapter
 

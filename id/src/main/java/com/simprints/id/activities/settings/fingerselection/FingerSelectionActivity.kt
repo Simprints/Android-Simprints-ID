@@ -76,6 +76,12 @@ class FingerSelectionActivity : BaseSplitActivity() {
         viewModel.start()
     }
 
+    private fun configureToolbar() {
+        setSupportActionBar(settingsToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = getString(R.string.finger_selection_activity_title)
+    }
+
     private fun initTextInLayout() {
         addFingerButton.text = getString(R.string.finger_selection_add_finger)
         resetButton.text = getString(R.string.finger_selection_reset)
@@ -83,27 +89,8 @@ class FingerSelectionActivity : BaseSplitActivity() {
         quantityLabelTextView.text = getString(R.string.finger_selection_quantity_label)
     }
 
-    private fun listenForItemChanges() {
-        viewModel.items.observe(this, Observer {
-            fingerSelectionAdapter.notifyDataSetChanged()
-            if (it.size >= 10) {
-                addFingerButton.isEnabled = false
-                addFingerButton.background.colorFilter = PorterDuffColorFilter(Color.LTGRAY, PorterDuff.Mode.LIGHTEN)
-            } else {
-                addFingerButton.isEnabled = true
-                addFingerButton.background.colorFilter = null
-            }
-        })
-    }
-
-    private fun configureToolbar() {
-        setSupportActionBar(settingsToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.finger_selection_activity_title)
-    }
-
     private fun initRecyclerView() {
-        fingerSelectionAdapter = FingerSelectionItemAdapter(this, viewModel, itemTouchHelper)
+        fingerSelectionAdapter = FingerSelectionItemAdapter(viewModel, itemTouchHelper)
         fingerSelectionRecyclerView.layoutManager = LinearLayoutManager(this)
         fingerSelectionRecyclerView.adapter = fingerSelectionAdapter
         itemTouchHelper.attachToRecyclerView(fingerSelectionRecyclerView)
@@ -115,6 +102,19 @@ class FingerSelectionActivity : BaseSplitActivity() {
 
     private fun initResetButton() {
         resetButton.setOnClickListener { viewModel.resetFingerItems() }
+    }
+
+    private fun listenForItemChanges() {
+        viewModel.items.observe(this, Observer {
+            fingerSelectionAdapter.notifyDataSetChanged()
+            if (it.size >= MAXIMUM_NUMBER_OF_ITEMS) {
+                addFingerButton.isEnabled = false
+                addFingerButton.background.colorFilter = PorterDuffColorFilter(Color.LTGRAY, PorterDuff.Mode.LIGHTEN)
+            } else {
+                addFingerButton.isEnabled = true
+                addFingerButton.background.colorFilter = null
+            }
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -148,5 +148,9 @@ class FingerSelectionActivity : BaseSplitActivity() {
             .setCancelable(false)
             .create()
             .show()
+    }
+
+    companion object {
+        private const val MAXIMUM_NUMBER_OF_ITEMS = 10
     }
 }
