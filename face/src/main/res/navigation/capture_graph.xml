@@ -58,8 +58,17 @@
         android:id="@+id/refusalFragment"
         android:name="com.simprints.face.exitform.ExitFormFragment"
         android:label="refusal_fragment"
-        tools:layout="@layout/fragment_exit_form" />
+        tools:layout="@layout/fragment_exit_form" >
+        <action
+            android:id="@+id/action_refusalFragment_to_liveFeedbackFragment"
+            app:destination="@+id/liveFeedbackFragment"
+            app:popUpTo="@+id/capture_graph"
+            app:popUpToInclusive="true"/>
+
+    </fragment>
     <action
         android:id="@+id/action_global_refusalFragment"
-        app:destination="@+id/refusalFragment" />
+        app:destination="@+id/refusalFragment"
+        app:popUpTo="@+id/capture_graph"
+        app:popUpToInclusive="true"/>
 </navigation>
