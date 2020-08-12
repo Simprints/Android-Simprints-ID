@@ -72,7 +72,6 @@ open class PreferencesModule {
     open fun provideSettingsPreferencesManager(
         prefs: ImprovedSharedPreferences,
         remoteConfigWrapper: RemoteConfigWrapper,
-        @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
         @Named("GroupSerializer") groupSerializer: Serializer<GROUP>,
         @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
         @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
@@ -80,11 +79,11 @@ open class PreferencesModule {
         @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
         @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         @Named("SaveFingerprintImagesStrategySerializer") saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
-        @Named("ScannerGenerationsSerializer") scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
+        @Named("ScannerGenerationsSerializer") scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
+        @Named("FingerprintsToCollectSerializer") fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>
     ): SettingsPreferencesManager = SettingsPreferencesManagerImpl(
         prefs,
         remoteConfigWrapper,
-        fingerIdToBooleanSerializer,
         groupSerializer,
         modalitiesSerializer,
         languagesStringArraySerializer,
@@ -92,7 +91,8 @@ open class PreferencesModule {
         subjectsDownSyncSettingSerializer,
         captureFingerprintStrategySerializer,
         saveFingerprintImagesStrategySerializer,
-        scannerGenerationsSerializer
+        scannerGenerationsSerializer,
+        fingerprintsToCollectSerializer
     )
 
     @Provides
