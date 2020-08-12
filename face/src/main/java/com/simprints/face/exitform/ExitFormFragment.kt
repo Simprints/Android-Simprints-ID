@@ -64,7 +64,7 @@ class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
 
     private fun setButtonListeners() {
         btGoBack.setOnClickListener {
-            findNavController().popBackStack()
+            findNavController().navigate(R.id.action_refusalFragment_to_liveFeedbackFragment)
         }
         btSubmitExitForm.setOnClickListener {
             vm.submitExitForm(getExitFormText())

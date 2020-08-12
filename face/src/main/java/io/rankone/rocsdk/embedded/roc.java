@@ -154,6 +154,28 @@ public class roc implements rocConstants {
     return rocJNI.roc_time_value(SWIGTYPE_p_unsigned_long_long.getCPtr(obj));
   }
 
+  public static SWIGTYPE_p_roc_algorithm_options new_roc_algorithm_options() {
+    long cPtr = rocJNI.new_roc_algorithm_options();
+    return (cPtr == 0) ? null : new SWIGTYPE_p_roc_algorithm_options(cPtr, false);
+  }
+
+  public static SWIGTYPE_p_roc_algorithm_options copy_roc_algorithm_options(int value) {
+    long cPtr = rocJNI.copy_roc_algorithm_options(value);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_roc_algorithm_options(cPtr, false);
+  }
+
+  public static void delete_roc_algorithm_options(SWIGTYPE_p_roc_algorithm_options obj) {
+    rocJNI.delete_roc_algorithm_options(SWIGTYPE_p_roc_algorithm_options.getCPtr(obj));
+  }
+
+  public static void roc_algorithm_options_assign(SWIGTYPE_p_roc_algorithm_options obj, int value) {
+    rocJNI.roc_algorithm_options_assign(SWIGTYPE_p_roc_algorithm_options.getCPtr(obj), value);
+  }
+
+  public static int roc_algorithm_options_value(SWIGTYPE_p_roc_algorithm_options obj) {
+    return rocJNI.roc_algorithm_options_value(SWIGTYPE_p_roc_algorithm_options.getCPtr(obj));
+  }
+
   public static SWIGTYPE_p_unsigned_char new_uint8_t_array(int nelements) {
     long cPtr = rocJNI.new_uint8_t_array(nelements);
     return (cPtr == 0) ? null : new SWIGTYPE_p_unsigned_char(cPtr, false);
@@ -392,6 +414,10 @@ public class roc implements rocConstants {
     return rocJNI.roc_read_ppm(file_name, roc_image.getCPtr(image), image);
   }
 
+  public static String roc_write_ppm(String file_name, roc_image image) {
+    return rocJNI.roc_write_ppm(file_name, roc_image.getCPtr(image), image);
+  }
+
   public static String roc_free_image(roc_image image) {
     return rocJNI.roc_free_image(roc_image.getCPtr(image), image);
   }
@@ -418,6 +444,14 @@ public class roc implements rocConstants {
 
   public static String roc_adaptive_minimum_size(roc_image image, float relative_minimum_size, long absolute_minimum_size, SWIGTYPE_p_size_t adaptive_minimum_size) {
     return rocJNI.roc_adaptive_minimum_size(roc_image.getCPtr(image), image, relative_minimum_size, absolute_minimum_size, SWIGTYPE_p_size_t.getCPtr(adaptive_minimum_size));
+  }
+
+  public static String roc_algorithm_option_to_string(int algorithm_option, SWIGTYPE_p_p_char str) {
+    return rocJNI.roc_algorithm_option_to_string(algorithm_option, SWIGTYPE_p_p_char.getCPtr(str));
+  }
+
+  public static String roc_algorithm_option_from_string(String str, SWIGTYPE_p_roc_algorithm_options algorithm_option) {
+    return rocJNI.roc_algorithm_option_from_string(str, SWIGTYPE_p_roc_algorithm_options.getCPtr(algorithm_option));
   }
 
   public static String roc_check_template_version(long algorithm_id) {
