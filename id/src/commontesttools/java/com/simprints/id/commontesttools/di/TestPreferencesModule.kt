@@ -28,7 +28,6 @@ class TestPreferencesModule(
     override fun provideSettingsPreferencesManager(
         prefs: ImprovedSharedPreferences,
         remoteConfigWrapper: RemoteConfigWrapper,
-        fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
         groupSerializer: Serializer<GROUP>,
         languagesStringArraySerializer: Serializer<Array<String>>,
         moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
@@ -36,12 +35,12 @@ class TestPreferencesModule(
         modalitiesSerializer: Serializer<List<Modality>>,
         captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
-        scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
+        scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
+        fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>
     ): SettingsPreferencesManager = settingsPreferencesManagerRule.resolveDependency {
         super.provideSettingsPreferencesManager(
             prefs,
             remoteConfigWrapper,
-            fingerIdToBooleanSerializer,
             groupSerializer,
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
@@ -49,7 +48,8 @@ class TestPreferencesModule(
             modalitiesSerializer,
             captureFingerprintStrategySerializer,
             saveFingerprintImagesStrategySerializer,
-            scannerGenerationsSerializer
+            scannerGenerationsSerializer,
+            fingerprintsToCollectSerializer
         )
     }
 

@@ -10,11 +10,8 @@
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"/>
 
-        <MultiSelectListPreference
-            android:entries="@array/finger_array"
-            android:entryValues="@array/finger_values"
-            android:key="@string/preference_select_fingers_key"
-            android:enabled="false"/>
+        <Preference
+            android:key="@string/preference_select_fingers_key" />
 
         <Preference
             android:key="@string/preference_sync_info_key" />
