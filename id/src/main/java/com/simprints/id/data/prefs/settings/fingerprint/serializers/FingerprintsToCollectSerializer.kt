@@ -5,14 +5,8 @@ import com.simprints.id.tools.serializers.Serializer
 
 class FingerprintsToCollectSerializer : Serializer<List<FingerIdentifier>> {
 
-    override fun serialize(value: List<FingerIdentifier>): String = StringBuilder().apply {
-        value.forEachIndexed { index, finger ->
-            append(finger.toString())
-            if (index != value.size - 1) {
-                append(delimiter)
-            }
-        }
-    }.toString()
+    override fun serialize(value: List<FingerIdentifier>): String =
+        value.joinToString(delimiter) { it.toString() }
 
     override fun deserialize(string: String): List<FingerIdentifier> =
         string.replace(" ", "").replace("\n", "").replace("\r", "")
