@@ -11,6 +11,7 @@ import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -35,6 +36,7 @@ class SyncInformationViewModelTest {
     @MockK lateinit var preferencesManagerMock: PreferencesManager
     @MockK lateinit var eventRepository: EventRepository
     @MockK lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+    @MockK lateinit var downSyncHelper: EventDownSyncHelper
 
     private val projectId = "projectId"
     private lateinit var viewModel: SyncInformationViewModel
@@ -42,7 +44,7 @@ class SyncInformationViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        viewModel = SyncInformationViewModel(eventRepository, subjectLocalDataSourceMock, preferencesManagerMock, projectId, eventDownSyncScopeRepository)
+        viewModel = SyncInformationViewModel(downSyncHelper, subjectLocalDataSourceMock, preferencesManagerMock, projectId, eventDownSyncScopeRepository)
     }
 
     @Test

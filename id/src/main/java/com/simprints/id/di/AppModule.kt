@@ -239,11 +239,11 @@ open class AppModule {
     fun provideModuleRepository(
         preferencesManager: PreferencesManager,
         crashReportManager: CrashReportManager,
-        subjectLocalDataSource: SubjectLocalDataSource
+        subjectRepository: SubjectRepository
     ): ModuleRepository = ModuleRepositoryImpl(
         preferencesManager,
         crashReportManager,
-        subjectLocalDataSource
+        subjectRepository
     )
 
     @Provides

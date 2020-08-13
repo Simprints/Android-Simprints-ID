@@ -5,7 +5,7 @@ import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.*
 import com.simprints.id.data.db.events_sync.down.domain.getUniqueKey
 import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState
-import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationStateDao
+import com.simprints.id.data.db.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
 
 class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                                        val preferencesManager: PreferencesManager,
-                                       private val downSyncOperationOperationDao: DbEventsDownSyncOperationStateDao) : EventDownSyncScopeRepository {
+                                       private val downSyncOperationOperationDao: DbEventDownSyncOperationStateDao) : EventDownSyncScopeRepository {
 
 
     override suspend fun getDownSyncScope(): EventDownSyncScope {

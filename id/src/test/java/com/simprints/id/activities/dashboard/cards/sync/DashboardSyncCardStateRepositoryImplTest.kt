@@ -90,7 +90,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun downSyncSettingIsOnAndModulesEmpty_syncStateShouldBeSelectModules() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.moduleSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.modulesSyncScope
         every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.ON
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -102,7 +102,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun downSyncSettingIsExtraAndModulesEmpty_syncStateShouldBeSelectModules() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.moduleSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.modulesSyncScope
         every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.EXTRA
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -114,7 +114,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun downSyncSettingIsOffAndModulesEmpty_syncStateShouldBeConnecting() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.moduleSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.modulesSyncScope
         every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.OFF
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -126,7 +126,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun modulesSelectedWithSyncByModule_syncStateShouldBeConnecting() = runBlockingTest {
         every { preferencesManager.selectedModules } returns setOf(DefaultTestConstants.DEFAULT_MODULE_ID)
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.moduleSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.modulesSyncScope
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.testObserver()

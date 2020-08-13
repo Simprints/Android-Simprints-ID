@@ -22,7 +22,7 @@ import java.io.IOException
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class EventsSyncStatusDatabaseTest {
+class EventSyncStatusDatabaseTest {
     private lateinit var downSyncOperationOperationDao: EventDownSyncOperationLocalDataSource
     private lateinit var db: SubjectsSyncStatusDatabase
 

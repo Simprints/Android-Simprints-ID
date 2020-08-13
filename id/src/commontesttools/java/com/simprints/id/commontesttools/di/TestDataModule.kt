@@ -62,11 +62,6 @@ class TestDataModule(
         )
     }
 
-    override fun provideEventRemoteDataSource(simApiClientFactory: SimApiClientFactory) =
-        eventRemoteDataSourceRule.resolveDependency {
-            super.provideEventRemoteDataSource(simApiClientFactory)
-        }
-
 
     override fun provideSubjectRepository(
         subjectLocalDataSource: SubjectLocalDataSource,

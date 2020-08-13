@@ -16,42 +16,30 @@ import com.simprints.id.domain.modality.Modes
 )
 sealed class EventDownSyncScope(open var operations: List<EventDownSyncOperation> = mutableListOf()) {
 
-    abstract val id: String
-
     data class ProjectScope(val projectId: String,
                             val modes: List<Modes>) : EventDownSyncScope() {
-        override val id: String
-            get() = "$projectId$separator" +
-                modes.joinToString(separator)
 
         override var operations =
-            listOf(EventDownSyncOperation(id, RemoteEventQuery(projectId, modes = modes, types = subjectEvents)))
+            listOf(EventDownSyncOperation(RemoteEventQuery(projectId, modes = modes, types = subjectEvents)))
     }
 
     data class UserScope(val projectId: String,
                          val attendantId: String,
                          val modes: List<Modes>) : EventDownSyncScope() {
-        override val id: String
-            get() =
-                "$projectId$separator" +
-                    "$attendantId$separator" +
-                    modes.joinToString(separator)
 
         override var operations =
-            listOf(EventDownSyncOperation(id, RemoteEventQuery(projectId, attendantId = attendantId, modes = modes, types = subjectEvents)))
+            listOf(EventDownSyncOperation(RemoteEventQuery(projectId, attendantId = attendantId, modes = modes, types = subjectEvents)))
     }
 
     data class ModuleScope(val projectId: String,
                            val moduleIds: List<String>,
                            val modes: List<Modes>) : EventDownSyncScope() {
-        override val id: String
-            get() =
-                "$projectId$separator" +
-                    "${moduleIds.joinToString(separator)}$separator" +
-                    modes.joinToString(separator)
 
+        //The backend is capable to receive multiple modules, but SID is still making a request (operation) for each module
         override var operations =
-            listOf(EventDownSyncOperation(id, RemoteEventQuery(projectId, moduleIds = moduleIds, modes = modes, types = subjectEvents)))
+            moduleIds.map {
+                EventDownSyncOperation(RemoteEventQuery(projectId, moduleIds = listOf(it), modes = modes, types = subjectEvents))
+            }
 
     }
 
@@ -59,19 +47,13 @@ sealed class EventDownSyncScope(open var operations: List<EventDownSyncOperation
     data class SubjectScope(val projectId: String,
                             val subjectId: String,
                             val modes: List<Modes>) : EventDownSyncScope() {
-        override val id: String
-            get() =
-                "$projectId$separator" +
-                    "$subjectId$separator" +
-                    modes.joinToString(separator)
 
         override var operations =
-            listOf(EventDownSyncOperation(id, RemoteEventQuery(projectId, subjectId = subjectId, modes = modes, types = subjectEvents)))
+            listOf(EventDownSyncOperation( RemoteEventQuery(projectId, subjectId = subjectId, modes = modes, types = subjectEvents)))
 
     }
 
     companion object {
         private val subjectEvents = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_MOVE, ENROLMENT_RECORD_DELETION)
-        private const val separator = "||"
     }
 }

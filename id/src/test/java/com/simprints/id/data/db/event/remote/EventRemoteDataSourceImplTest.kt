@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.remote
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
@@ -11,6 +12,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.remote.models.ApiEventCount
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
@@ -61,7 +63,7 @@ class EventRemoteDataSourceImplTest {
         }
 
         coEvery { simApiClientFactory.buildClient(EventRemoteInterface::class) } returns simApiClient
-        eventRemoteDataSource = EventRemoteDataSourceImpl(simApiClientFactory)
+        eventRemoteDataSource = EventRemoteDataSourceImpl(simApiClientFactory, JsonHelper())
     }
 
     @Test
@@ -100,27 +102,30 @@ class EventRemoteDataSourceImplTest {
     fun downloadEvents_shouldParseStreamAndEmitBatches() {
         runBlocking {
             val responseStreamWith6Events = this.javaClass.classLoader?.getResourceAsStream("responses/down_sync_7events.json")!!
-            val channel = mockk<ProducerScope<List<Event>>>(relaxed = true)
+            val channel = mockk<ProducerScope<Event>>(relaxed = true)
             excludeRecords { channel.isClosedForSend }
 
-            (eventRemoteDataSource as EventRemoteDataSourceImpl).parseStreamAndEmitEvents(responseStreamWith6Events, channel, 2)
+            (eventRemoteDataSource as EventRemoteDataSourceImpl).parseStreamAndEmitEvents(responseStreamWith6Events, channel)
 
-            coVerifySequence {
-                channel.send(match {
-                    it[0].type == ENROLMENT_RECORD_CREATION && it[1].type == ENROLMENT_RECORD_DELETION
-                })
-                channel.send(match {
-                    it[0].type == ENROLMENT_RECORD_MOVE && it[1].type == ENROLMENT_RECORD_CREATION
-                })
-                channel.send(match {
-                    it[0].type == ENROLMENT_RECORD_DELETION && it[1].type == ENROLMENT_RECORD_MOVE
-                })
-                channel.send(match {
-                    it[0].type == ENROLMENT_RECORD_MOVE
-                })
-            }
+            verifySequenceOfEventsEmitted(channel,
+                listOf(ENROLMENT_RECORD_CREATION,
+                    ENROLMENT_RECORD_DELETION,
+                    ENROLMENT_RECORD_MOVE,
+                    ENROLMENT_RECORD_CREATION,
+                    ENROLMENT_RECORD_DELETION,
+                    ENROLMENT_RECORD_MOVE))
 
             coVerify(exactly = 0) { channel.close(any()) }
+        }
+    }
+
+    private fun verifySequenceOfEventsEmitted(channel: ProducerScope<Event>, eventTypes: List<EventType>) {
+        coVerifySequence {
+            eventTypes.forEach { eventType ->
+                channel.send(match {
+                    it.type == eventType
+                })
+            }
         }
     }
 

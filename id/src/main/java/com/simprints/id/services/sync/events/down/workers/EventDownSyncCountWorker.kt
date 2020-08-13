@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.EventCount
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
@@ -43,6 +44,7 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var eventDownSyncHelper: EventDownSyncHelper
     @Inject lateinit var jsonHelper: JsonHelper
+    @Inject lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 
     private val downSyncScope by lazy {
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_DOWN)
@@ -110,7 +112,8 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
 
     private suspend fun getDownCount(syncScope: EventDownSyncScope) =
         downSyncScope.operations.map {
-            eventDownSyncHelper.countForDownSync(it)
+            val opWithLastState = eventDownSyncScopeRepository.refreshState(it)
+            eventDownSyncHelper.countForDownSync(opWithLastState)
         }.flatten()
 
 }

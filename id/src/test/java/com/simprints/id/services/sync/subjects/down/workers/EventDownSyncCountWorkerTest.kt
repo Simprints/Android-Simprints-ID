@@ -8,21 +8,17 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.data.db.common.models.SubjectsCount
-import com.simprints.id.data.db.subjects_sync.down.domain.ProjectSyncScope
-import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
+import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
+import com.simprints.id.data.db.event.domain.EventCount
+import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
+import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -48,10 +44,9 @@ class EventDownSyncCountWorkerTest {
 
         app.component = mockk(relaxed = true)
         with(countWorker) {
-            downSyncScopeRepository = mockk(relaxed = true)
             crashReportManager = mockk(relaxed = true)
-            subjectRepository = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
+            eventDownSyncHelper = mockk(relaxed = true)
             jsonHelper = JsonHelper()
         }
     }
@@ -60,12 +55,12 @@ class EventDownSyncCountWorkerTest {
     fun countWorker_shouldExtractTheDownSyncScopeFromTheRepo() = runBlocking {
         countWorker.doWork()
 
-        verify { countWorker.downSyncScopeRepository.getDownSyncScope() }
+        coVerify { countWorker.eventDownSyncScopeRepository.refreshState(any()) }
     }
 
     @Test
     fun countWorker_shouldExecuteTheTaskSuccessfully() = runBlocking {
-        val counts = SubjectsCount(1,1,1)
+        val counts = EventCount(SESSION_CAPTURE, 1)
         mockDependenciesToSucceed(counts)
 
         countWorker.doWork()
@@ -77,7 +72,7 @@ class EventDownSyncCountWorkerTest {
 
     @Test
     fun countWorker_anUnexpectedErrorOccurs_shouldFail() = runBlocking {
-        coEvery { countWorker.downSyncScopeRepository.getDownSyncScope() } throws Throwable("Impossible to extract downSyncScope")
+        coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope() } throws Throwable("Impossible to extract downSyncScope")
 
         countWorker.doWork()
 
@@ -86,8 +81,8 @@ class EventDownSyncCountWorkerTest {
 
     @Test
     fun countWorkerFailed_syncStillRunning_shouldRetry() = runBlocking {
-        coEvery { countWorker.subjectRepository.countToDownSync(any()) } throws Throwable("IO Error")
-        coEvery { countWorker.downSyncScopeRepository.getDownSyncScope() } returns ProjectSyncScope(DEFAULT_PROJECT_ID, listOf(Modes.FINGERPRINT))
+        coEvery { countWorker.eventDownSyncHelper.countForDownSync(any()) } throws Throwable("IO Error")
+        coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope() } returns projectSyncScope
         mockDependenciesToHaveSyncStillRunning()
 
         countWorker.doWork()
@@ -97,8 +92,8 @@ class EventDownSyncCountWorkerTest {
 
     @Test
     fun countWorkerFailed_syncIsNotRunning_shouldSucceed() = runBlocking {
-        coEvery { countWorker.subjectRepository.countToDownSync(any()) } throws Throwable("IO Error")
-        coEvery { countWorker.downSyncScopeRepository.getDownSyncScope() } returns ProjectSyncScope(DEFAULT_PROJECT_ID, listOf(Modes.FINGERPRINT))
+        coEvery { countWorker.eventDownSyncHelper.countForDownSync(any()) } throws Throwable("IO Error")
+        coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope() } returns projectSyncScope
         mockDependenciesToHaveSyncNotRunning()
 
         countWorker.doWork()
@@ -106,9 +101,9 @@ class EventDownSyncCountWorkerTest {
         verify { countWorker.resultSetter.success() }
     }
 
-    private fun mockDependenciesToSucceed(counts: SubjectsCount) {
-        coEvery { countWorker.subjectRepository.countToDownSync(any()) } returns counts
-        coEvery { countWorker.downSyncScopeRepository.getDownSyncScope() } returns ProjectSyncScope(DEFAULT_PROJECT_ID, listOf(Modes.FINGERPRINT))
+    private fun mockDependenciesToSucceed(counts: EventCount) {
+        coEvery { countWorker.eventDownSyncHelper.countForDownSync(any()) } returns listOf(counts)
+        coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope() } returns projectSyncScope
     }
 
     private fun mockDependenciesToHaveSyncStillRunning() {

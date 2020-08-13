@@ -4,13 +4,13 @@ import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope.SubjectProjectScope
 import com.simprints.id.data.db.events_sync.up.domain.getUniqueKey
 import com.simprints.id.data.db.events_sync.up.local.DbEventsUpSyncOperationState.Companion.buildFromEventsUpSyncOperationState
-import com.simprints.id.data.db.events_sync.up.local.DbEventsUpSyncOperationStateDao
+import com.simprints.id.data.db.events_sync.up.local.DbEventUpSyncOperationStateDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class EventUpSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
-                                     private val dbEventsUpSyncOperationStateDao: DbEventsUpSyncOperationStateDao) :
+                                     private val dbEventUpSyncOperationStateDao: DbEventUpSyncOperationStateDao) :
     EventUpSyncScopeRepository {
 
     override suspend fun getUpSyncScope(): SubjectProjectScope {
@@ -24,14 +24,14 @@ class EventUpSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
 
     override suspend fun insertOrUpdate(syncScopeOperation: EventUpSyncOperation) {
         withContext(Dispatchers.IO) {
-            dbEventsUpSyncOperationStateDao.insertOrUpdate(buildFromEventsUpSyncOperationState(syncScopeOperation))
+            dbEventUpSyncOperationStateDao.insertOrUpdate(buildFromEventsUpSyncOperationState(syncScopeOperation))
         }
     }
 
     private suspend fun refreshState(upOperation: EventUpSyncOperation): EventUpSyncOperation {
         val op = upOperation.copy()
         val state =
-            dbEventsUpSyncOperationStateDao.load().toList().firstOrNull {
+            dbEventUpSyncOperationStateDao.load().toList().firstOrNull {
                 it.id == op.getUniqueKey()
             }
 
@@ -40,7 +40,7 @@ class EventUpSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
 
     override suspend fun deleteAll() {
         withContext(Dispatchers.IO) {
-            dbEventsUpSyncOperationStateDao.deleteAll()
+            dbEventUpSyncOperationStateDao.deleteAll()
         }
     }
 }

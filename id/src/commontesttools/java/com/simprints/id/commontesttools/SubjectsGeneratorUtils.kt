@@ -41,7 +41,6 @@ object SubjectsGeneratorUtils {
             moduleId = moduleId,
             createdAt = if (!toSync) createdAt else null,
             updatedAt = if (!toSync) updateAt else null,
-            toSync = toSync,
             fingerprintSamples = fingerprintSamples.toList()
         )
 

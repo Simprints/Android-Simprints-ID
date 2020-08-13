@@ -2,16 +2,14 @@ package com.simprints.id.services.sync.subjects.down.controllers
 
 import androidx.work.WorkRequest
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
-import com.simprints.id.data.db.subjects_sync.down.domain.EventsDownSyncOperationFactoryImpl
+import com.simprints.id.commontesttools.DefaultTestConstants.modulesSyncScope
+import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
+import com.simprints.id.commontesttools.DefaultTestConstants.userSyncScope
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.domain.modality.Modes
+import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilderImpl
-import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
@@ -25,26 +23,19 @@ import org.junit.Test
 
 class EventDownSyncWorkersBuilderImplTest {
 
-    val builder = EventsDownSyncOperationFactoryImpl()
     private val modes = listOf(Modes.FINGERPRINT, Modes.FACE)
-    private val opsForProjectDownSync = listOf(builder.buildProjectSyncOperation(DEFAULT_PROJECT_ID, modes, null))
-    private val opsForUserDownSync = listOf(builder.buildUserSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, modes, null))
-    private val opsForModuleDownSync = listOf(
-        builder.buildModuleSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, modes, null),
-        builder.buildModuleSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID_2, modes, null))
-
     private lateinit var eventDownSyncWorkersFactory: EventDownSyncWorkersBuilder
-    private lateinit var subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository
+    private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 
     @Before
     fun setUp() {
-        subjectsDownSyncScopeRepository = mockk(relaxed = true)
-        eventDownSyncWorkersFactory = EventDownSyncWorkersBuilderImpl(subjectsDownSyncScopeRepository, mockk())
+        eventDownSyncScopeRepository = mockk(relaxed = true)
+        eventDownSyncWorkersFactory = EventDownSyncWorkersBuilderImpl(eventDownSyncScopeRepository, mockk())
     }
 
     @Test
     fun builder_forProjectDownSync_shouldReturnTheRightWorkers() = runBlocking {
-        coEvery { subjectsDownSyncScopeRepository.getDownSyncOperations(any()) } returns opsForProjectDownSync
+        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectSyncScope
 
         val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
         chain.assertNumberOfDownSyncDownloaderWorker(1)
@@ -54,7 +45,7 @@ class EventDownSyncWorkersBuilderImplTest {
 
     @Test
     fun builder_forUserDownSync_shouldReturnTheRightWorkers() = runBlocking {
-        coEvery { subjectsDownSyncScopeRepository.getDownSyncOperations(any()) } returns opsForUserDownSync
+        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns userSyncScope
 
         val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
         chain.assertNumberOfDownSyncDownloaderWorker(1)
@@ -64,7 +55,7 @@ class EventDownSyncWorkersBuilderImplTest {
 
     @Test
     fun builder_forModuleDownSync_shouldReturnTheRightWorkers() = runBlocking {
-        coEvery { subjectsDownSyncScopeRepository.getDownSyncOperations(any()) } returns opsForModuleDownSync
+        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns modulesSyncScope
 
         val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
         chain.assertNumberOfDownSyncDownloaderWorker(2)
@@ -74,7 +65,7 @@ class EventDownSyncWorkersBuilderImplTest {
 
     @Test
     fun builder_periodicDownSyncWorkers_shouldHaveTheRightTags() = runBlocking {
-        coEvery { subjectsDownSyncScopeRepository.getDownSyncOperations(any()) } returns opsForProjectDownSync
+        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectSyncScope
         val uniqueSyncId = "uniqueSyncId"
         val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain(uniqueSyncId)
         chain.assertNumberOfDownSyncDownloaderWorker(1)
@@ -85,7 +76,7 @@ class EventDownSyncWorkersBuilderImplTest {
 
     @Test
     fun builder_oneTimeDownSyncWorkers_shouldHaveTheRightTags() = runBlocking {
-        coEvery { subjectsDownSyncScopeRepository.getDownSyncOperations(any()) } returns opsForProjectDownSync
+        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectSyncScope
 
         val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain(null)
         chain.assertNumberOfDownSyncDownloaderWorker(1)

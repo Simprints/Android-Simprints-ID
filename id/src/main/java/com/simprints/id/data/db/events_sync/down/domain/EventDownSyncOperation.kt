@@ -2,8 +2,7 @@ package com.simprints.id.data.db.events_sync.down.domain
 
 import java.util.*
 
-data class EventDownSyncOperation(val scopeId: String,
-                                  val queryEvent: RemoteEventQuery,
+data class EventDownSyncOperation(val queryEvent: RemoteEventQuery,
                                   val state: DownSyncState? = null,
                                   val lastEventId: String? = null,
                                   val lastSyncTime: Long? = null) {
@@ -20,9 +19,9 @@ fun EventDownSyncOperation.getUniqueKey(): String =
     with(this.queryEvent) {
         UUID.nameUUIDFromBytes(
             (projectId +
-                "$attendantId" +
-                "$subjectId" +
-                "${moduleIds?.joinToString()}" +
+                (attendantId ?: "") +
+                (subjectId ?: "") +
+                ((moduleIds ?: emptyList()).joinToString()) +
                 modes.joinToString { it.name } +
                 types.joinToString { it.name }
                 ).toByteArray()
