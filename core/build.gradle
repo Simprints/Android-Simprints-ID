@@ -49,6 +49,7 @@ dependencies {
     implementation project(':libsimprints')
 
     implementation deps.androidx.appcompat
+    implementation deps.androidx.lifecycle.viewmodel
 
     implementation deps.kotlin.stdlib
     implementation deps.kotlin.coroutines_core
