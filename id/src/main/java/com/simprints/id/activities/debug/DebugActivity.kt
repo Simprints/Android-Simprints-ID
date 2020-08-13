@@ -15,7 +15,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
-import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationStateDao
+import com.simprints.id.data.db.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
@@ -34,7 +34,7 @@ import javax.inject.Inject
 class DebugActivity : BaseSplitActivity() {
 
     @Inject lateinit var eventSyncManager: EventSyncManager
-    @Inject lateinit var dbEventsDownSyncOperationStateDao: DbEventsDownSyncOperationStateDao
+    @Inject lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
     @Inject lateinit var securityStateRepository: SecurityStateRepository
     @Inject lateinit var securityStateProcessor: SecurityStateProcessor
     @Inject lateinit var eventLocalDataSource: EventLocalDataSource
@@ -81,7 +81,7 @@ class DebugActivity : BaseSplitActivity() {
                     eventSyncManager.cancelScheduledSync()
                     eventSyncManager.stop()
                     eventLocalDataSource.delete()
-                    dbEventsDownSyncOperationStateDao.deleteAll()
+                    dbEventDownSyncOperationStateDao.deleteAll()
                     subjectRepository.deleteAll()
                     wm.pruneWork()
                 }

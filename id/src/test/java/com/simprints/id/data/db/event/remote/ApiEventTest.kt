@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ApiEventTest {
 
-    private val jackson = JsonHelper.jackson
+    private val jackson = JsonHelper().jackson
 
     @Test
     fun validate_alertScreenEventApiModel() {

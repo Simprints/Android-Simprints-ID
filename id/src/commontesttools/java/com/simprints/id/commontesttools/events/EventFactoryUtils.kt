@@ -52,8 +52,9 @@ import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
 import com.simprints.id.tools.utils.SimNetworkUtils.Connection
 
 const val CREATED_AT: Long = 1234L
-const val DEFAULT_ENDED_AT: Long = 0L
 const val ENDED_AT: Long = 4567L
+const val DEFAULT_ENDED_AT: Long = 0L
+
 val CREATED_AT_RANGE = LongRange(CREATED_AT - 10, CREATED_AT + 10)
 val ENDED_AT_RANGE = LongRange(ENDED_AT - 10, ENDED_AT + 10)
 

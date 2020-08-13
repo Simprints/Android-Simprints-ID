@@ -16,7 +16,6 @@ data class Subject(
     val moduleId: String,
     val createdAt: Date? = null,
     val updatedAt: Date? = null,
-    var toSync: Boolean = true,
     var fingerprintSamples: List<FingerprintSample> = emptyList(),
     var faceSamples: List<FaceSample> = emptyList()) : Parcelable {
 
@@ -27,7 +26,6 @@ data class Subject(
                 projectId = projectId,
                 attendantId = attendantId,
                 moduleId = moduleId,
-                toSync = false,
                 fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
                 faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences)
             )
@@ -39,7 +37,6 @@ data class Subject(
                 projectId = projectId,
                 attendantId = attendantId,
                 moduleId = moduleId,
-                toSync = false,
                 fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
                 faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences)
             )

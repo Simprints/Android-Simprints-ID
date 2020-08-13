@@ -4,6 +4,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.FirebaseApp
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClientFactory
@@ -43,7 +45,9 @@ class SecurityStateRemoteDataSourceImplTest {
         } returns SimApiClientImpl(
             SecureApiInterface::class,
             mockWebServer.url("/").toString(),
-            DEVICE_ID
+            DEVICE_ID,
+            randomUUID(),
+            JsonHelper()
         )
 
         every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID

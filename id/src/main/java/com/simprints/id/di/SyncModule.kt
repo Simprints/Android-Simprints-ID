@@ -4,13 +4,13 @@ import android.content.Context
 import androidx.work.WorkManager
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.events_sync.EventsSyncStatusDatabase
+import com.simprints.id.data.db.events_sync.EventSyncStatusDatabase
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepositoryImpl
-import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationStateDao
+import com.simprints.id.data.db.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepositoryImpl
-import com.simprints.id.data.db.events_sync.up.local.DbEventsUpSyncOperationStateDao
+import com.simprints.id.data.db.events_sync.up.local.DbEventUpSyncOperationStateDao
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -54,8 +54,8 @@ open class SyncModule {
 
     @Provides
     open fun provideEventUpSyncScopeRepo(loginInfoManager: LoginInfoManager,
-                                         dbEventsUpSyncOperationStateDao: DbEventsUpSyncOperationStateDao
-    ): EventUpSyncScopeRepository = EventUpSyncScopeRepositoryImpl(loginInfoManager, dbEventsUpSyncOperationStateDao)
+                                         dbEventUpSyncOperationStateDao: DbEventUpSyncOperationStateDao
+    ): EventUpSyncScopeRepository = EventUpSyncScopeRepositoryImpl(loginInfoManager, dbEventUpSyncOperationStateDao)
 
     @Provides
     open fun providePeopleSyncManager(ctx: Context,
@@ -78,7 +78,7 @@ open class SyncModule {
     open fun provideEventDownSyncScopeRepo(
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
-        downSyncOperationStateDao: DbEventsDownSyncOperationStateDao
+        downSyncOperationStateDao: DbEventDownSyncOperationStateDao
     ): EventDownSyncScopeRepository =
         EventDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, downSyncOperationStateDao)
 
@@ -94,11 +94,11 @@ open class SyncModule {
         EventUpSyncWorkersBuilderImpl(upSyncScopeRepository, jsonHelper)
 
     @Provides
-    open fun providePeopleUpSyncDao(database: EventsSyncStatusDatabase): DbEventsUpSyncOperationStateDao =
+    open fun providePeopleUpSyncDao(database: EventSyncStatusDatabase): DbEventUpSyncOperationStateDao =
         database.upSyncOperationsDaoDb
 
     @Provides
-    open fun providePeopleDownSyncDao(database: EventsSyncStatusDatabase): DbEventsDownSyncOperationStateDao =
+    open fun providePeopleDownSyncDao(database: EventSyncStatusDatabase): DbEventDownSyncOperationStateDao =
         database.downSyncOperationsDao
 
     @Provides

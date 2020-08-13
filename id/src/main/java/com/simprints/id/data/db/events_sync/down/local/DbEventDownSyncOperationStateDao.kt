@@ -8,7 +8,6 @@ import androidx.room.Query
 @Dao
 interface DbEventsDownSyncOperationStateDao {
 
-
     @Query("select * from DbEventsDownSyncOperation")
     suspend fun load(): List<DbEventsDownSyncOperationState>
 

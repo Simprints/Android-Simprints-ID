@@ -67,7 +67,7 @@ def support = [
     material: "com.google.android.material:material:1.1.0-alpha03"
 ]
 
-def work_version = "2.3.0-beta01"
+def work_version = "2.4.0"
 def arch_components = [
     work: "androidx.work:work-runtime-ktx:$work_version"
 ]

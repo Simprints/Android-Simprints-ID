@@ -2,8 +2,7 @@ package com.simprints.id.data.db.events_sync.up.domain
 
 import java.util.*
 
-data class EventUpSyncOperation(val scopeId: String,
-                                val queryEvent: LocalEventQuery,
+data class EventUpSyncOperation(val queryEvent: LocalEventQuery,
                                 var lastState: UpSyncState? = null,
                                 var lastSyncTime: Long? = null) {
 

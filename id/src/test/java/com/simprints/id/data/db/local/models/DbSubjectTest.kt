@@ -22,7 +22,7 @@ class DbSubjectTest {
         val faceSample = getRandomFaceSample()
 
         val domainSubject = Subject(
-            "guid", DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, Date(0), Date(1), true,
+            "guid", DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, Date(0), Date(1),
             listOf(fingerprintSample),
             listOf(faceSample)
         )

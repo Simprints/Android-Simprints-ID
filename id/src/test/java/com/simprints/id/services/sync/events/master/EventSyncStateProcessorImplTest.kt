@@ -10,9 +10,9 @@ import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.workDataOf
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
+import com.simprints.id.services.sync.events.common.TAG_SCHEDULED_AT
 import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS
 import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
-import com.simprints.id.services.sync.events.common.TAG_SCHEDULED_AT
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.internal.SyncWorkersLiveDataProvider
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
@@ -56,7 +56,7 @@ class EventSyncStateProcessorImplTest {
     private var startSyncReporterWorker = MutableLiveData<List<WorkInfo>>()
     private var syncWorkersLiveData = MutableLiveData<List<WorkInfo>>()
 
-    lateinit var eventSyncStateProcessor: EventSyncStateProcessor
+    private lateinit var eventSyncStateProcessor: EventSyncStateProcessor
     @RelaxedMockK lateinit var subjectRepository: SubjectRepository
     @RelaxedMockK lateinit var syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider
     @RelaxedMockK lateinit var eventSyncCache: EventSyncCache
@@ -65,7 +65,7 @@ class EventSyncStateProcessorImplTest {
     fun setUp() {
         UnitTestConfig(this).setupWorkManager()
         MockKAnnotations.init(this)
-        eventSyncStateProcessor = EventSyncStateProcessorImpl(ctx, subjectRepository, eventSyncCache, syncWorkersLiveDataProvider)
+        eventSyncStateProcessor = EventSyncStateProcessorImpl(ctx, eventSyncCache, syncWorkersLiveDataProvider)
         mockDependencies()
     }
 

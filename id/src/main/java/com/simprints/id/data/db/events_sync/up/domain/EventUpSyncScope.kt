@@ -14,17 +14,8 @@ import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope.SubjectPr
 abstract class EventUpSyncScope(val type: EventUpSyncScopeType,
                                 var operation: EventUpSyncOperation) {
 
-    abstract val id: String
-
     data class SubjectProjectScope(val projectId: String) :
-        EventUpSyncScope(PROJECT_SUBJECT_SYNC, EventUpSyncOperation(buildId(projectId), LocalEventQuery(projectId = projectId))) {
-
-        override val id: String
-            get() = buildId(projectId)
-
-        companion object {
-            private fun buildId(projectId: String) = "$projectId$separator"
-        }
+        EventUpSyncScope(PROJECT_SUBJECT_SYNC, EventUpSyncOperation(LocalEventQuery(projectId = projectId))) {
     }
 
     enum class EventUpSyncScopeType {

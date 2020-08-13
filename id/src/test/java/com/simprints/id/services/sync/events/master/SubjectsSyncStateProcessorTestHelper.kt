@@ -6,7 +6,8 @@ import androidx.work.WorkInfo.State.*
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.common.models.SubjectsCount
+import com.simprints.id.data.db.event.domain.EventCount
+import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
@@ -115,7 +116,7 @@ private fun createDownSyncCounterWorker(state: WorkInfo.State,
                                         id: UUID = UUID.randomUUID()) =
     createWorkInfo(
         state,
-        workDataOf(EventDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN to JsonHelper().toJson(SubjectsCount(TO_DOWNLOAD, 0, 0))),
+        workDataOf(EventDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN to JsonHelper().toJson(EventCount(ENROLMENT_RECORD_CREATION, TO_DOWNLOAD))),
         createCommonDownSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(DOWN_COUNTER)),
         workDataOf(),
         id
@@ -139,7 +140,7 @@ private fun createUpSyncCounterWorker(state: WorkInfo.State,
                                       id: UUID = UUID.randomUUID()) =
     createWorkInfo(
         state,
-        workDataOf(EventUpSyncCountWorker.OUTPUT_COUNT_WORKER_UP to JsonHelper().toJson(SubjectsCount(TO_UPLOAD, 0, 0))),
+        workDataOf(EventUpSyncCountWorker.OUTPUT_COUNT_WORKER_UP to JsonHelper().toJson(EventCount(ENROLMENT_RECORD_CREATION, TO_UPLOAD))),
         createCommonUpSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(UP_COUNTER)),
         workDataOf(),
         id

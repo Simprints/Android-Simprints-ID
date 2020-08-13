@@ -10,7 +10,7 @@ import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.event.remote.EventRemoteDataSourceImpl
-import com.simprints.id.data.db.events_sync.EventsSyncStatusDatabase
+import com.simprints.id.data.db.events_sync.EventSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -126,7 +126,7 @@ open class DataModule {
 
     @Provides
     @Singleton
-    open fun provideEventsSyncStatusDatabase(ctx: Context): EventsSyncStatusDatabase =
-        Room.databaseBuilder(ctx, EventsSyncStatusDatabase::class.java, EventsSyncStatusDatabase.ROOM_DB_NAME)
+    open fun provideEventsSyncStatusDatabase(ctx: Context): EventSyncStatusDatabase =
+        Room.databaseBuilder(ctx, EventSyncStatusDatabase::class.java, EventSyncStatusDatabase.ROOM_DB_NAME)
             .build()
 }

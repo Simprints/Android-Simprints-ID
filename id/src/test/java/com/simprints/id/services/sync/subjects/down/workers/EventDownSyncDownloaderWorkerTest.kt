@@ -8,17 +8,15 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.data.db.subjects_sync.down.domain.EventsDownSyncOperation
-import com.simprints.id.domain.modality.Modes
+import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.id.services.sync.events.down.workers.extractDownSyncProgress
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
+import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -42,23 +40,14 @@ class EventDownSyncDownloaderWorkerTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private lateinit var eventDownSyncDownloaderWorker: EventDownSyncDownloaderWorker
 
-    private val projectSyncOp = EventsDownSyncOperation(
-        DEFAULT_PROJECT_ID,
-        null,
-        null,
-        listOf(Modes.FINGERPRINT),
-        null
-    )
-
 
     @Before
     fun setUp() {
         UnitTestConfig(this).setupWorkManager().setupFirebase()
         app.component = mockk(relaxed = true)
-        val correctInputData = JsonHelper().toJson(projectSyncOp)
+        val correctInputData = JsonHelper().toJson(projectSyncScope.operations.first())
         eventDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
 
-        coEvery { eventDownSyncDownloaderWorker.downSyncScopeRepository.refreshDownSyncOperationFromDb(any()) } returns null
         eventDownSyncDownloaderWorker.eventDownSyncDownloaderTask = mockk(relaxed = true)
         eventDownSyncDownloaderWorker.jsonHelper = JsonHelper()
     }
@@ -152,8 +141,7 @@ class EventDownSyncDownloaderWorkerTest {
         } ?: TestListenableWorkerBuilder<EventDownSyncDownloaderWorker>(app).build()).apply {
             crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
-            downSyncScopeRepository = mockk(relaxed = true)
-            subjectRepository = mockk(relaxed = true)
+            eventDownSyncScopeRepository = mockk(relaxed = true)
             syncCache = mockk(relaxed = true)
         }
 }
