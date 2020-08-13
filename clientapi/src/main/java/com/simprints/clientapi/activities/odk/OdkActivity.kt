@@ -3,6 +3,7 @@ package com.simprints.clientapi.activities.odk
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
+import com.simprints.clientapi.activities.odk.OdkAction.*
 import com.simprints.clientapi.activities.odk.OdkAction.Companion.buildOdkAction
 import com.simprints.clientapi.clientrequests.extractors.EnrolExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
@@ -83,7 +84,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     override fun returnRegistration(registrationId: String, sessionId: String, flowCompletedCheck: Boolean) = Intent().let {
         it.putExtra(ODK_REGISTRATION_ID_KEY, registrationId)
         it.putExtra(ODK_SESSION_ID, sessionId)
-        it.putExtra(ODK_REGISTER_BIOMETRICS_COMPLETE, flowCompletedCheck)
+        addFlowCompletedCheckBasedOnAction(it, flowCompletedCheck)
 
         sendOkResult(it)
     }
@@ -97,7 +98,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         it.putExtra(ODK_CONFIDENCES_KEY, confidenceList)
         it.putExtra(ODK_TIERS_KEY, tierList)
         it.putExtra(ODK_SESSION_ID, sessionId)
-        it.putExtra(ODK_IDENTIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
+        addFlowCompletedCheckBasedOnAction(it, flowCompletedCheck)
 
         sendOkResult(it)
     }
@@ -107,7 +108,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         it.putExtra(ODK_CONFIDENCES_KEY, confidence)
         it.putExtra(ODK_TIERS_KEY, tier)
         it.putExtra(ODK_SESSION_ID, sessionId)
-        it.putExtra(ODK_VERIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
+        addFlowCompletedCheckBasedOnAction(it, flowCompletedCheck)
 
         sendOkResult(it)
     }
@@ -115,14 +116,14 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     override fun returnExitForm(reason: String, extra: String, sessionId: String, flowCompletedCheck: Boolean) = Intent().let {
         it.putExtra(ODK_EXIT_REASON, reason)
         it.putExtra(ODK_EXIT_EXTRA, extra)
-        it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
+        addFlowCompletedCheckBasedOnAction(it, flowCompletedCheck)
         it.putExtra(ODK_SESSION_ID, sessionId)
 
         sendOkResult(it)
     }
 
     override fun returnConfirmation(flowCompletedCheck: Boolean, sessionId: String) = Intent().let {
-        it.putExtra(ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE, flowCompletedCheck)
+        addFlowCompletedCheckBasedOnAction(it, flowCompletedCheck)
         it.putExtra(ODK_SESSION_ID, sessionId)
         sendOkResult(it)
     }
@@ -130,10 +131,21 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     override fun returnErrorToClient(errorResponse: ErrorResponse,
                                      flowCompletedCheck: Boolean,
                                      sessionId: String) = Intent().let {
-        it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
+        addFlowCompletedCheckBasedOnAction(it, flowCompletedCheck)
         it.putExtra(ODK_SESSION_ID, sessionId)
 
         sendOkResult(it)
+    }
+
+    private fun addFlowCompletedCheckBasedOnAction(intent: Intent, flowCompletedCheck: Boolean) {
+        when (action) {
+            OdkActionFollowUpAction.ConfirmIdentity -> intent.putExtra(ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE, flowCompletedCheck)
+            OdkActionFollowUpAction.EnrolLastBiometrics -> intent.putExtra(ODK_REGISTER_BIOMETRICS_COMPLETE, flowCompletedCheck)
+            Enrol -> intent.putExtra(ODK_REGISTER_BIOMETRICS_COMPLETE, flowCompletedCheck)
+            Verify -> intent.putExtra(ODK_VERIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
+            Identify -> intent.putExtra(ODK_IDENTIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
+            Invalid -> intent.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
+        }
     }
 
     override fun onDestroy() {
