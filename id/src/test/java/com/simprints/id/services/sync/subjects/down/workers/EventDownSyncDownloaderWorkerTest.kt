@@ -8,7 +8,7 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
+import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
@@ -45,7 +45,7 @@ class EventDownSyncDownloaderWorkerTest {
     fun setUp() {
         UnitTestConfig(this).setupWorkManager().setupFirebase()
         app.component = mockk(relaxed = true)
-        val correctInputData = JsonHelper().toJson(projectSyncScope.operations.first())
+        val correctInputData = JsonHelper().toJson(projectDownSyncScope.operations.first())
         eventDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
 
         eventDownSyncDownloaderWorker.eventDownSyncDownloaderTask = mockk(relaxed = true)

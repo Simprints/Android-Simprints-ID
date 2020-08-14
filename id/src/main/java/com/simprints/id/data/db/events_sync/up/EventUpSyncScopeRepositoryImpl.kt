@@ -1,10 +1,10 @@
 package com.simprints.id.data.db.events_sync.up
 
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope.SubjectProjectScope
+import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope.ProjectScope
 import com.simprints.id.data.db.events_sync.up.domain.getUniqueKey
-import com.simprints.id.data.db.events_sync.up.local.DbEventsUpSyncOperationState.Companion.buildFromEventsUpSyncOperationState
 import com.simprints.id.data.db.events_sync.up.local.DbEventUpSyncOperationStateDao
+import com.simprints.id.data.db.events_sync.up.local.DbEventsUpSyncOperationState.Companion.buildFromEventsUpSyncOperationState
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -13,9 +13,9 @@ class EventUpSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                                      private val dbEventUpSyncOperationStateDao: DbEventUpSyncOperationStateDao) :
     EventUpSyncScopeRepository {
 
-    override suspend fun getUpSyncScope(): SubjectProjectScope {
+    override suspend fun getUpSyncScope(): ProjectScope {
         val projectId = loginInfoManager.getSignedInProjectIdOrEmpty() //STOPSHIP
-        val syncScope = SubjectProjectScope(projectId)
+        val syncScope = ProjectScope(projectId)
 
         syncScope.operation = refreshState(syncScope.operation)
 

@@ -1,5 +1,5 @@
 package com.simprints.id.data.db.event.domain.validators
 
-interface SessionEventValidatorsBuilder {
+interface SessionEventValidatorsFactory {
     fun build(): Array<EventValidator>
 }

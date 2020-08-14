@@ -21,7 +21,9 @@ interface EventRepository {
 
     suspend fun addEventToCurrentSession(event: Event)
 
-    suspend fun addEvent(sessionId: String, event: Event)
+    suspend fun addEvent(event: Event, sessionId: String)
+
+    suspend fun addEvent(event: Event)
 
     suspend fun countEventsToUpload(query: LocalEventQuery): Int
 

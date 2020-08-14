@@ -70,7 +70,7 @@ class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) 
                 this@EventDownSyncDownloaderWorker,
                 this)
 
-            Timber.tag(SYNC_LOG_TAG).d("[xDOWNLOADER] Done $count")
+            Timber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Done $count")
             success(workDataOf(OUTPUT_DOWN_SYNC to count), "Total downloaded: $0 for $downSyncOperationInput")
 
         } catch (t: Throwable) {

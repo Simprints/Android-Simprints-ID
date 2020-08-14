@@ -27,8 +27,8 @@ import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.EventRepositoryImpl
-import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilder
-import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsBuilderImpl
+import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
+import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactoryImpl
 import com.simprints.id.data.db.event.local.DbEventDatabaseFactoryImpl
 import com.simprints.id.data.db.event.local.EventDatabaseFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
@@ -37,7 +37,6 @@ import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -194,8 +193,8 @@ open class AppModule {
 
 
     @Provides
-    open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsBuilder =
-        SessionEventValidatorsBuilderImpl()
+    open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsFactory =
+        SessionEventValidatorsFactoryImpl()
 
     @Provides
     open fun provideDbEventDatabaseFactory(ctx: Context,
@@ -211,14 +210,15 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSessionEventsManager(
+    open fun provideEventRepository(
         ctx: Context,
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
-        crashReportManager: CrashReportManager
+        crashReportManager: CrashReportManager,
+        validatorFactory: SessionEventValidatorsFactory
     ): EventRepository =
         EventRepositoryImpl(
             ctx.deviceId,
@@ -228,7 +228,8 @@ open class AppModule {
             eventRemoteDataSource,
             preferencesManager,
             crashReportManager,
-            timeHelper
+            timeHelper,
+            validatorFactory
         )
 
     @Provides
@@ -301,13 +302,14 @@ open class AppModule {
     @Provides
     open fun provideSyncInformationViewModelFactory(
         downySyncHelper: EventDownSyncHelper,
-        subjectLocalDataSource: SubjectLocalDataSource,
+        eventRepository: EventRepository,
+        subjectRepository: SubjectRepository,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         downSyncScopeRepository: EventDownSyncScopeRepository
     ) =
         SyncInformationViewModelFactory(
-            downySyncHelper, subjectLocalDataSource, preferencesManager,
+            downySyncHelper, subjectRepository, eventRepository, preferencesManager,
             loginInfoManager.getSignedInProjectIdOrEmpty(), downSyncScopeRepository
         )
 

@@ -4,8 +4,8 @@ import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.*
 import com.simprints.id.data.db.events_sync.down.domain.getUniqueKey
-import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState
 import com.simprints.id.data.db.events_sync.down.local.DbEventDownSyncOperationStateDao
+import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
@@ -37,11 +37,11 @@ class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
 
         val syncScope = when (preferencesManager.syncGroup) {
             GROUP.GLOBAL ->
-                ProjectScope(projectId, modes)
+                SubjectProjectScope(projectId, modes)
             GROUP.USER ->
-                UserScope(projectId, possibleUserId, modes)
+                SubjectUserScope(projectId, possibleUserId, modes)
             GROUP.MODULE ->
-                ModuleScope(projectId, possibleModuleIds, modes)
+                SubjectModuleScope(projectId, possibleModuleIds, modes)
         }
 
         syncScope.operations = syncScope.operations.map { op ->

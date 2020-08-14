@@ -4,10 +4,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
@@ -18,7 +20,8 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
-                               private val subjectLocalDataSource: SubjectLocalDataSource,
+                               private val eventRepository: EventRepository,
+                               private val subjectRepository: SubjectRepository,
                                private val preferencesManager: PreferencesManager,
                                private val projectId: String,
                                private val downSyncScopeRepository: EventDownSyncScopeRepository) : ViewModel() {
@@ -41,15 +44,16 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
     }
 
     internal suspend fun fetchAndUpdateLocalRecordCount() {
-        localRecordCountLiveData.value = subjectLocalDataSource.count(SubjectQuery(projectId = projectId))
+        localRecordCountLiveData.value = subjectRepository.count(SubjectQuery(projectId = projectId))
     }
 
     internal suspend fun fetchAndUpdateRecordsToUpSyncCount() {
-        recordsToUpSyncCountLiveData.value = subjectLocalDataSource.count(SubjectQuery(toSync = true))
+        recordsToUpSyncCountLiveData.value =
+            eventRepository.countEventsToUpload(LocalEventQuery(projectId = projectId, type = ENROLMENT_RECORD_CREATION))
     }
 
     internal suspend fun fetchRecordsToUpdateAndDeleteCountIfNecessary() {
-        if(isDownSyncAllowed()) {
+        if (isDownSyncAllowed()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         }
     }
@@ -66,8 +70,10 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
 
             downSyncScope.operations.forEach {
                 val counts = downySyncHelper.countForDownSync(it)
-                creationsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_CREATION }?.count ?: 0
-                deletionsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_DELETION }?.count ?: 0
+                creationsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_CREATION }?.count
+                    ?: 0
+                deletionsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_DELETION }?.count
+                    ?: 0
             }
 
             recordsToDownSyncCountLiveData.postValue(creationsToDownload)
@@ -81,12 +87,12 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
     internal suspend fun fetchAndUpdateSelectedModulesCount() {
         selectedModulesCountLiveData.value = preferencesManager.selectedModules.map {
             ModuleCount(it,
-                subjectLocalDataSource.count(SubjectQuery(projectId = projectId, moduleId = it)))
+                subjectRepository.count(SubjectQuery(projectId = projectId, moduleId = it)))
         }
     }
 
     internal suspend fun fetchAndUpdatedUnselectedModulesCount() {
-        val unselectedModules = subjectLocalDataSource.load(
+        val unselectedModules = subjectRepository.load(
             SubjectQuery(projectId = projectId)
         ).filter { !preferencesManager.selectedModules.contains(it.moduleId) }
             .toList()

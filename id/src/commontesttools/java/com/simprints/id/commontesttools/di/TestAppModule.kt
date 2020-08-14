@@ -10,6 +10,7 @@ import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreference
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.id.data.db.event.local.EventDatabaseFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
@@ -114,23 +115,25 @@ class TestAppModule(
     override fun provideKeystoreManager(): KeystoreManager =
         keystoreManagerRule.resolveDependency { super.provideKeystoreManager() }
 
-    override fun provideSessionEventsManager(
+    override fun provideEventRepository(
         ctx: Context,
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
-        crashReportManager: CrashReportManager
+        crashReportManager: CrashReportManager,
+        validatorFactory: SessionEventValidatorsFactory
     ): EventRepository = sessionEventsManagerRule.resolveDependency {
-        super.provideSessionEventsManager(
+        super.provideEventRepository(
             ctx,
             eventLocalDataSource,
             eventRemoteDataSource,
             preferencesManager,
             loginInfoManager,
             timeHelper,
-            crashReportManager
+            crashReportManager,
+            validatorFactory
         )
     }
 

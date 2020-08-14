@@ -3,7 +3,7 @@ package com.simprints.id.data.db.events_sync.down.local
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.TIME1
-import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
+import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE
 import com.simprints.id.data.db.events_sync.down.domain.getUniqueKey
 import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState
@@ -13,7 +13,7 @@ class DbEventsDownSyncOperationStateTest {
 
     @Test
     fun buildDbEventsDownSyncOperationState_fromEventDownSyncOperation() {
-        val op = projectSyncScope.operations
+        val op = projectDownSyncScope.operations
             .first().copy(lastSyncTime = TIME1, lastEventId = GUID1, state = COMPLETE)
         val downSyncState = buildFromEventsDownSyncOperationState(op)
 

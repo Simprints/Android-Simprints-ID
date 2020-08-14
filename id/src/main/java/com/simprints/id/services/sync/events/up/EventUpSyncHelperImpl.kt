@@ -7,12 +7,14 @@ import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation.UpSyn
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.tools.TimeHelper
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class EventUpSyncHelperImpl(
     private val eventRepository: EventRepository,
     private val eventUpSyncScopeRepo: EventUpSyncScopeRepository,
@@ -31,16 +33,19 @@ class EventUpSyncHelperImpl(
                     Timber.tag(SYNC_LOG_TAG).d("[UP_SYNC_HELPER] Uploading ${it.size} events")
                     count += it.size
                     lastOperation = lastOperation.copy(lastState = RUNNING, lastSyncTime = timerHelper.now())
-                    this.emitProgress(lastOperation, count)
+                    emitProgress(lastOperation, count)
                 }
+
+                lastOperation = lastOperation.copy(lastState = COMPLETE, lastSyncTime = timerHelper.now())
+                emitProgress(lastOperation, count)
+                close()
+
             } catch (t: Throwable) {
                 Timber.d(t)
                 lastOperation = lastOperation.copy(lastState = FAILED, lastSyncTime = timerHelper.now())
-                this.emitProgress(lastOperation, count)
+                emitProgress(lastOperation, count)
+                close(t)
             }
-
-            lastOperation = lastOperation.copy(lastState = COMPLETE, lastSyncTime = timerHelper.now())
-            this.emitProgress(lastOperation, count)
         }
 
     private suspend fun ProducerScope<EventUpSyncProgress>.emitProgress(lastOperation: EventUpSyncOperation, count: Int) {

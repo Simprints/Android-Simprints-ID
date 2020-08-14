@@ -8,7 +8,7 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
+import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
@@ -82,7 +82,7 @@ class EventDownSyncCountWorkerTest {
     @Test
     fun countWorkerFailed_syncStillRunning_shouldRetry() = runBlocking {
         coEvery { countWorker.eventDownSyncHelper.countForDownSync(any()) } throws Throwable("IO Error")
-        coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope() } returns projectSyncScope
+        coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope() } returns projectDownSyncScope
         mockDependenciesToHaveSyncStillRunning()
 
         countWorker.doWork()
@@ -93,7 +93,7 @@ class EventDownSyncCountWorkerTest {
     @Test
     fun countWorkerFailed_syncIsNotRunning_shouldSucceed() = runBlocking {
         coEvery { countWorker.eventDownSyncHelper.countForDownSync(any()) } throws Throwable("IO Error")
-        coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope() } returns projectSyncScope
+        coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope() } returns projectDownSyncScope
         mockDependenciesToHaveSyncNotRunning()
 
         countWorker.doWork()
@@ -103,7 +103,7 @@ class EventDownSyncCountWorkerTest {
 
     private fun mockDependenciesToSucceed(counts: EventCount) {
         coEvery { countWorker.eventDownSyncHelper.countForDownSync(any()) } returns listOf(counts)
-        coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope() } returns projectSyncScope
+        coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope() } returns projectDownSyncScope
     }
 
     private fun mockDependenciesToHaveSyncStillRunning() {

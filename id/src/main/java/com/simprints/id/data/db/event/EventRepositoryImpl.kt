@@ -13,6 +13,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
@@ -25,6 +26,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.toMode
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
 import com.simprints.id.tools.ignoreException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,7 +43,8 @@ open class EventRepositoryImpl(
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val preferencesManager: PreferencesManager,
     private val crashReportManager: CrashReportManager,
-    private val timeHelper: TimeHelper
+    private val timeHelper: TimeHelper,
+    validatorsFactory: SessionEventValidatorsFactory
 ) : EventRepository {
 
     companion object {
@@ -49,7 +52,9 @@ open class EventRepositoryImpl(
         const val SESSION_BATCH_SIZE = 20
     }
 
-    private val signedInProject: String
+    private val validators = validatorsFactory.build()
+
+    private val currentProject: String
         get() = if (loginInfoManager.getSignedInProjectIdOrEmpty().isEmpty()) {
             PROJECT_ID_FOR_NOT_SIGNED_IN
         } else {
@@ -72,22 +77,10 @@ open class EventRepositoryImpl(
                     Build.MANUFACTURER + "_" + Build.MODEL,
                     deviceId),
                 DatabaseInfo(count))
-            sessionCaptureEvent.labels = sessionCaptureEvent.labels.appendLabelsForAllEvents()
+            sessionCaptureEvent.labels = sessionCaptureEvent.labels.appendSessionId(sessionCaptureEvent.id)
 
             closeAnyOpenSession()
-            eventLocalDataSource.insertOrUpdate(sessionCaptureEvent)
-        }
-    }
-
-    override suspend fun addEvent(sessionId: String, event: Event) {
-        ignoreException {
-            reportExceptionIfNeeded {
-                val session = eventLocalDataSource.load(DbLocalEventQuery(id = sessionId)).toList().firstOrNull()
-                session.let {
-                    event.labels = event.labels.appendLabelsForAllEvents().appendSessionId(sessionId)
-                    eventLocalDataSource.insertOrUpdate(event)
-                }
-            }
+            addEvent(sessionCaptureEvent)
         }
     }
 
@@ -95,15 +88,40 @@ open class EventRepositoryImpl(
         ignoreException {
             reportExceptionIfNeeded {
                 val session = getCurrentCaptureSessionEvent()
-                addEvent(session.id, event)
+                addEvent(event, session.id)
+            }
+        }
+    }
+
+    override suspend fun addEvent(event: Event, sessionId: String) {
+        ignoreException {
+            reportExceptionIfNeeded {
+                val session = eventLocalDataSource.load(DbLocalEventQuery(type = SESSION_CAPTURE, id = sessionId)).toList().firstOrNull() as SessionCaptureEvent
+
+                session.let {
+                    val eventsInSession = eventLocalDataSource.load(DbLocalEventQuery(sessionId = sessionId)).toList()
+                    validators.forEach {
+                        it.validate(eventsInSession, event)
+                    }
+
+                    event.labels = event.labels.appendSessionId(sessionId)
+                    addEvent(event)
+                }
+            }
+        }
+    }
+
+    override suspend fun addEvent(event: Event) {
+        ignoreException {
+            reportExceptionIfNeeded {
+                event.labels = event.labels.appendLabelsForAllEvents()
+                eventLocalDataSource.insertOrUpdate(event)
             }
         }
     }
 
     override suspend fun countEventsToUpload(query: LocalEventQuery): Int =
-        closeSessionsForQuery(query).map {
-            eventLocalDataSource.count(DbLocalEventQuery(sessionId = it.id))
-        }.toList().sum()
+        createBatchesWithCloseSessions(query).sumBy { it.events.size }
 
     override suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount> =
         eventRemoteDataSource.count(query.fromDomainToApi())
@@ -117,49 +135,57 @@ open class EventRepositoryImpl(
         val batches = createBatchesWithCloseSessions(query)
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading batches ${batches.size}")
 
-        //STOPSHIP - go ahead if batch fails
         batches.forEach { batch ->
-            val events = batch.sessionIds.map {
-                eventLocalDataSource.load(DbLocalEventQuery(sessionId = it)).toList()
-            }.flatten()
-
+            val events = batch.events
             Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading ${events.size} events in a batch")
 
-            eventRemoteDataSource.post(signedInProject, events)
-
-            events.forEach {
-                Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Deleting ${it.id}")
-                eventLocalDataSource.delete(DbLocalEventQuery(id = it.id))
+            try {
+                eventRemoteDataSource.post(currentProject, events)
+                deleteEventsFromDb(events)
+            } catch (t: Throwable) {
+                Timber.d(t)
+                if (t.isClientAndCloudIntegrationIssue()) {
+                    deleteEventsFromDb(events)
+                }
             }
-
             this.emit(events)
+        }
+    }
+
+    private suspend fun deleteEventsFromDb(events: List<Event>) {
+        events.forEach {
+            Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Deleting ${it.id}")
+            eventLocalDataSource.delete(DbLocalEventQuery(id = it.id))
         }
     }
 
     @VisibleForTesting
     suspend fun createBatchesWithCloseSessions(query: LocalEventQuery): List<Batch> {
-        val sessionsAndCounts = closeSessionsForQuery(query).map {
-            it.id to eventLocalDataSource.count(DbLocalEventQuery(sessionId = it.id))
-        }
+        return createBatchesForEventsInSessions(query) + createBatchesForEventsNotInSessions(query)
+    }
 
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Sessions to upload ${sessionsAndCounts.toList().size}")
+    private suspend fun createBatchesForEventsNotInSessions(query: LocalEventQuery): List<Batch> {
+        val events = eventLocalDataSource.load(query.fromDomainToDb()).filter { it.labels.sessionId == null }.toList()
+        return events.chunked(SESSION_BATCH_SIZE).map { Batch(it.toMutableList()) }
+    }
 
-        return sessionsAndCounts.toList().shuffled().fold(mutableListOf()) { batches, sessionAndCount ->
+    private suspend fun createBatchesForEventsInSessions(query: LocalEventQuery): List<Batch> {
+        val sessionsToUpload = closeSessionsForQuery(query)
+
+        return sessionsToUpload.fold(mutableListOf()) { batches, session ->
             val lastBatch = batches.lastOrNull()
-            val eventsCountInTheLastBatch = lastBatch?.sessionIds?.size ?: 0
-            val sessionIdToAdd = sessionAndCount.first
-            val eventsCountToAdd = sessionAndCount.second
+            val eventsCountInTheLastBatch = lastBatch?.events?.size ?: 0
+            val eventsToUpload = eventLocalDataSource.load(DbLocalEventQuery(sessionId = session.id)).toList()
 
-            val hasLastBatchStillRoom = eventsCountInTheLastBatch + eventsCountToAdd <= SESSION_BATCH_SIZE
+            val hasLastBatchStillRoom = eventsCountInTheLastBatch + eventsToUpload.size <= SESSION_BATCH_SIZE
             if (hasLastBatchStillRoom && lastBatch != null) {
-                Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Creating new batch")
-
-                lastBatch.sessionIds.add(sessionAndCount.first)
-                lastBatch.count += eventsCountToAdd
-            } else {
                 Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Adding $eventsCountInTheLastBatch into an existing batch")
 
-                batches.add(Batch(mutableListOf(sessionIdToAdd), eventsCountToAdd))
+                lastBatch.events.addAll(eventsToUpload)
+            } else {
+                Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Creating new batch")
+
+                batches.add(Batch(eventsToUpload.toMutableList()))
             }
             batches
         }
@@ -167,8 +193,8 @@ open class EventRepositoryImpl(
 
     private suspend fun closeSessionsForQuery(query: LocalEventQuery) =
         eventLocalDataSource.load(
-            query.copy(type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE), projectId = signedInProject).fromDomainToDb()).also {
-            Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Loading sessions for query ${query.copy(type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE), projectId = signedInProject)}")
+            query.copy(type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE), projectId = currentProject).fromDomainToDb()).also {
+            Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Loading sessions for query ${query.copy(type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE), projectId = currentProject)}")
         }
 
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent =
@@ -190,16 +216,16 @@ open class EventRepositoryImpl(
                 timeHelper.now(),
                 NEW_SESSION
             )
-            artificialTerminationEvent.labels = artificialTerminationEvent.labels.appendLabelsForAllEvents().appendSessionId(session.id)
-            eventLocalDataSource.insertOrUpdate(artificialTerminationEvent)
+            artificialTerminationEvent.labels = artificialTerminationEvent.labels.appendSessionId(session.id)
+            addEvent(artificialTerminationEvent)
 
             session.payload.endedAt = timeHelper.now()
-            eventLocalDataSource.insertOrUpdate(session)
+            addEvent(session)
         }
     }
 
     override suspend fun signOut() {
-        eventLocalDataSource.load(getDbQueryForCloseSession().fromDomainToDb()).collect {
+        loadCloseSessions().collect {
             eventLocalDataSource.delete(DbLocalEventQuery(sessionId = it.id))
         }
     }
@@ -220,13 +246,7 @@ open class EventRepositoryImpl(
         this.appendProjectIdLabel().appendDeviceIdLabel()
 
     private fun EventLabels.appendProjectIdLabel(): EventLabels {
-        val projectId = if (signedInProject.isEmpty()) {
-            PROJECT_ID_FOR_NOT_SIGNED_IN
-        } else {
-            signedInProject
-        }
-
-        return this.copy(projectId = projectId)
+        return this.copy(projectId = currentProject)
     }
 
     private fun EventLabels.appendDeviceIdLabel(): EventLabels = this.copy(deviceId = this@EventRepositoryImpl.deviceId)
@@ -241,5 +261,5 @@ open class EventRepositoryImpl(
             throw t
         }
 
-    data class Batch(val sessionIds: MutableList<String>, var count: Int)
+    data class Batch(val events: MutableList<Event>)
 }
