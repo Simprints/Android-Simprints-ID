@@ -1,11 +1,14 @@
 package com.simprints.id.secure
 
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
-import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent.Result.*
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
@@ -21,7 +24,7 @@ class AuthenticationHelperImpl(
     private val loginInfoManager: LoginInfoManager,
     private val timeHelper: TimeHelper,
     private val projectAuthenticator: ProjectAuthenticator,
-    private val sessionRepository: SessionRepository
+    private val eventRepository: EventRepository
 ) : AuthenticationHelper {
 
     private var loginStartTime = 0L
@@ -31,7 +34,7 @@ class AuthenticationHelperImpl(
         projectId: String,
         projectSecret: String,
         deviceId: String
-    ): AuthenticationEvent.Result {
+    ): Result {
         val result = try {
             logMessageForCrashReportWithNetworkTrigger("Making authentication request")
             loginInfoManager.cleanCredentials()
@@ -41,7 +44,7 @@ class AuthenticationHelperImpl(
             projectAuthenticator.authenticate(nonceScope, projectSecret, deviceId)
 
             logMessageForCrashReportWithNetworkTrigger("Sign in success")
-            AUTHENTICATED
+            Result.AUTHENTICATED
         } catch (t: Throwable) {
             Timber.e(t)
             crashReportManager.logExceptionOrSafeException(t)
@@ -56,7 +59,7 @@ class AuthenticationHelperImpl(
         }
     }
 
-    private fun extractResultFromException(t: Throwable): AuthenticationEvent.Result {
+    private fun extractResultFromException(t: Throwable): Result {
         return when (t) {
             is IOException -> OFFLINE
             is AuthRequestInvalidCredentialsException -> BAD_CREDENTIALS
@@ -68,7 +71,7 @@ class AuthenticationHelperImpl(
 
     private fun getSafetyNetExceptionReason(
         reason: SafetyNetExceptionReason
-    ): AuthenticationEvent.Result {
+    ): Result {
         return when (reason) {
             SafetyNetExceptionReason.SERVICE_UNAVAILABLE -> SAFETYNET_UNAVAILABLE
             SafetyNetExceptionReason.INVALID_CLAIMS -> SAFETYNET_INVALID_CLAIM
@@ -84,16 +87,16 @@ class AuthenticationHelperImpl(
     }
 
     private fun addEventAndUpdateProjectIdIfRequired(
-        result: AuthenticationEvent.Result,
+        result: Result,
         projectId: String,
         userId: String
     ) {
         val event = AuthenticationEvent(
             loginStartTime,
             timeHelper.now(),
-            AuthenticationEvent.UserInfo(projectId, userId),
+            UserInfo(projectId, userId),
             result
         )
-        sessionRepository.addEventToCurrentSessionInBackground(event)
+        inBackground { eventRepository.addEvent(event) }
     }
 }

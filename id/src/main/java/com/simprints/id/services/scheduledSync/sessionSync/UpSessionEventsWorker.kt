@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.services.scheduledSync.subjects.common.SimCoroutineWorker
@@ -14,7 +14,7 @@ import javax.inject.Inject
 class UpSessionEventsWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
 
     override val tag: String = UpSessionEventsWorker::class.java.simpleName
-    @Inject lateinit var sessionRepository: SessionRepository
+    @Inject lateinit var eventRepository: EventRepository
     @Inject override lateinit var crashReportManager: CrashReportManager
 
     override suspend fun doWork(): Result {
@@ -22,7 +22,7 @@ class UpSessionEventsWorker(context: Context, params: WorkerParameters) : SimCor
         injectDependencies()
 
         return try {
-            sessionRepository.uploadSessions()
+            eventRepository.uploadSessions()
             success()
         } catch (ex: NoSessionsFoundException) {
             Timber.d("No sessions found")

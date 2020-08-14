@@ -7,9 +7,9 @@ import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
@@ -48,7 +48,7 @@ class TestSecurityModule(
         syncManager: SyncManager,
         securityStateScheduler: SecurityStateScheduler,
         longConsentRepository: LongConsentRepository,
-        sessionRepository: SessionRepository,
+        eventRepository: EventRepository,
         baseUrlProvider: BaseUrlProvider,
         remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = signerManagerRule.resolveDependency {
@@ -61,7 +61,7 @@ class TestSecurityModule(
             syncManager,
             securityStateScheduler,
             longConsentRepository,
-            sessionRepository,
+            eventRepository,
             baseUrlProvider,
             remoteConfigWrapper
         )
@@ -120,11 +120,11 @@ class TestSecurityModule(
     }
 
     override fun provideAuthenticationHelper(
-        crashReportManager: CrashReportManager,
-        loginInfoManager: LoginInfoManager,
-        timeHelper: TimeHelper,
-        projectAuthenticator: ProjectAuthenticator,
-        sessionRepository: SessionRepository
+            crashReportManager: CrashReportManager,
+            loginInfoManager: LoginInfoManager,
+            timeHelper: TimeHelper,
+            projectAuthenticator: ProjectAuthenticator,
+            eventRepository: EventRepository
     ): AuthenticationHelper {
         return authenticationHelperRule.resolveDependency {
             super.provideAuthenticationHelper(
@@ -132,7 +132,7 @@ class TestSecurityModule(
                 loginInfoManager,
                 timeHelper,
                 projectAuthenticator,
-                sessionRepository
+                eventRepository
             )
         }
     }

@@ -1,8 +1,8 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.domain.modality.Modality
@@ -29,7 +29,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
                                     private val fingerprintStepProcessor: FingerprintStepProcessor,
                                     private val faceStepProcessor: FaceStepProcessor,
                                     private val timeHelper: TimeHelper,
-                                    private val sessionRepository: SessionRepository,
+                                    private val eventRepository: EventRepository,
                                     private val consentRequired: Boolean,
                                     private val locationRequired: Boolean,
                                     private val modalities: List<Modality>,
@@ -144,19 +144,16 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
 
     private suspend fun addPersonCreationEventForFingerprintSamples(fingerprintSamples: List<FingerprintSample>) {
         ignoreException {
-            sessionRepository.updateCurrentSession {
-                val event = PersonCreationEvent.build(timeHelper, it, fingerprintSamples, faceSamples = null)
-                it.addEvent(event)
-            }
+            val currentCaptureSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
+            eventRepository.addEvent(PersonCreationEvent.build(timeHelper, currentCaptureSessionEvent, fingerprintSamples, null))
         }
     }
 
     private suspend fun addPersonCreationEventForFaceSamples(faceSamples: List<FaceSample>) {
         ignoreException {
-            sessionRepository.updateCurrentSession {
-                val event = PersonCreationEvent.build(timeHelper, it, fingerprintSamples = null, faceSamples = faceSamples)
-                it.addEvent(event)
-            }
+            val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
+            val event = PersonCreationEvent.build(timeHelper, currentSessionEvent, fingerprintSamples = null, faceSamples = faceSamples)
+            eventRepository.addEvent(event)
         }
     }
 }

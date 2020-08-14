@@ -1,10 +1,11 @@
 package com.simprints.id.data.db.subject
 
 import com.simprints.core.tools.EncodingUtils
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.subject.*
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.domain.subjectevents.*
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
 import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
@@ -70,31 +71,23 @@ class SubjectRepositoryUpSyncHelperImpl(
     }
 
     internal fun createEvents(subjects: List<Subject>) =
-        Events(subjects.map { createEventFromPerson(it) })
+        subjects.map { createEventFromPerson(it) }
 
     private fun createEventFromPerson(subject: Subject): Event =
         with(subject) {
-            Event(
-                getRandomUuid(),
-                listOf(projectId),
-                listOf(subjectId),
-                listOf(attendantId),
-                listOf(moduleId),
+            EnrolmentRecordCreationEvent(
+                0, //STOPSHIP
+                subjectId,
+                projectId,
+                moduleId,
+                attendantId,
                 modalities.map { it.toMode() },
-                createPayload(subject)
+                buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples)
             )
         }
 
     internal fun getRandomUuid() = UUID.randomUUID().toString()
 
-    private fun createPayload(subject: Subject) =
-        EnrolmentRecordCreationPayload(
-            subjectId = subject.subjectId,
-            projectId = subject.projectId,
-            moduleId = subject.moduleId,
-            attendantId = subject.attendantId,
-            biometricReferences = buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples)
-        )
 
     private fun buildBiometricReferences(fingerprintSamples: List<FingerprintSample>,
                                          faceSamples: List<FaceSample>): List<BiometricReference> {
@@ -120,7 +113,9 @@ class SubjectRepositoryUpSyncHelperImpl(
                         it.fingerIdentifier.fromSubjectToEvent())
                 }
             )
-        } else { null }
+        } else {
+            null
+        }
 
     private fun buildFaceReference(faceSamples: List<FaceSample>) =
         if (faceSamples.isNotEmpty()) {
@@ -131,7 +126,9 @@ class SubjectRepositoryUpSyncHelperImpl(
                     )
                 }
             )
-        } else { null }
+        } else {
+            null
+        }
 
     private suspend fun markPeopleAsSynced(subjects: List<Subject>) {
         val updatedPeople = subjects.map { it.copy(toSync = false) }

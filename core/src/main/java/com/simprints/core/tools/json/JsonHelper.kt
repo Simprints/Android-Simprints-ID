@@ -8,6 +8,7 @@ import java.util.*
 @Keep
 class JsonHelper {
     companion object {
+
         val defaultBuilder by lazy {
             GsonBuilder().apply {
                 registerDateAdapter(this)

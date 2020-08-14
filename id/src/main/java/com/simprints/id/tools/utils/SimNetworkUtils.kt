@@ -6,7 +6,7 @@ import androidx.annotation.Keep
 interface SimNetworkUtils {
 
     @Keep
-    class Connection(val type: String, val state: NetworkInfo.DetailedState)
+    data class Connection(val type: String, val state: NetworkInfo.DetailedState)
 
     val mobileNetworkType: String?
     val connectionsStates: List<Connection>

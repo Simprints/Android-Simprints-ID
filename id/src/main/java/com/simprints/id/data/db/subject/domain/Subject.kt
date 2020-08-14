@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.subject.domain
 
 import android.os.Parcelable
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.subject.domain.FaceSample.Companion.extractFaceSamplesFromBiometricReferences
 import com.simprints.id.data.db.subject.domain.FingerprintSample.Companion.extractFingerprintSamplesFromBiometricReferences
-import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 

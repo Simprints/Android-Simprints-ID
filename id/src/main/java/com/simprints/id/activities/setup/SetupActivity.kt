@@ -24,13 +24,13 @@ import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.activities.setup.SetupActivityHelper.extractPermissionsFromRequest
 import com.simprints.id.activities.setup.SetupActivityHelper.storeUserLocationIntoCurrentSession
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
-import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
+import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.extensions.hasPermission
@@ -49,7 +49,7 @@ class SetupActivity: BaseSplitActivity() {
 
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var sessionRepository: SessionRepository
+    @Inject lateinit var eventRepository: EventRepository
     @Inject lateinit var viewModelFactory: SetupViewModelFactory
 
     private lateinit var setupRequest: SetupRequest
@@ -120,11 +120,11 @@ class SetupActivity: BaseSplitActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when(requestCode) {
+        when (requestCode) {
             PERMISSIONS_REQUEST_CODE -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     lifecycleScope.launch {
-                        storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
+                        storeUserLocationIntoCurrentSession(locationManager, eventRepository, crashReportManager)
                     }
                 }
             }
@@ -146,7 +146,7 @@ class SetupActivity: BaseSplitActivity() {
     private fun performPermissionActionsAndFinish() {
         lifecycleScope.launch {
             Timber.d("Adding location to session")
-            storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
+            storeUserLocationIntoCurrentSession(locationManager, eventRepository, crashReportManager)
         }
         setResultAndFinish(SETUP_COMPLETE_FLAG)
     }

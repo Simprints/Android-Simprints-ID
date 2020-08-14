@@ -1,15 +1,15 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.orchestrator.identifyAppRequest
+import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE_AND_FINGER
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT
-import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE_WITHOUT_CONSENT
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FINGER
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FINGER_WITHOUT_CONSENT
@@ -36,7 +36,7 @@ class ModalityFlowIdentifyImplTest {
     @MockK lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @MockK lateinit var faceStepProcessor: FaceStepProcessor
     @MockK lateinit var coreStepProcessor: CoreStepProcessor
-    @MockK lateinit var sessionRepository: SessionRepository
+    @MockK lateinit var eventRepository: EventRepository
     @MockK lateinit var fingerprintStepMock: Step
     @MockK lateinit var faceStepMock: Step
     @MockK lateinit var consentStepMock: Step
@@ -169,7 +169,7 @@ class ModalityFlowIdentifyImplTest {
 
     private fun buildModalityFlowIdentify(consentRequired: Boolean, modalities: List<Modality>) {
         modalityFlowIdentify = ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, GROUP.GLOBAL, timeHelper, sessionRepository, consentRequired, true,
+            coreStepProcessor, GROUP.GLOBAL, timeHelper, eventRepository, consentRequired, true,
             modalities,"projectId", "deviceId")
     }
 }

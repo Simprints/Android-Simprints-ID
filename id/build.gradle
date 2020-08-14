@@ -181,6 +181,7 @@ dependencies {
     implementation deps.koin.android
     implementation deps.fuzzywuzzy.core
     implementation deps.rxjava2.tasks
+    implementation deps.jackson.core
 
     // RootBeer (root detection)
     implementation deps.rootbeer.core
@@ -194,6 +195,7 @@ dependencies {
     api deps.firebase.mlkit
     api deps.firebase.mlkit_barcode
     api deps.firebase.crashlytics
+
     api deps.gson.core
     api deps.gson.extras
     api deps.timber.core
@@ -217,6 +219,8 @@ dependencies {
     api deps.koin.viewmodel
     api deps.playcore.core
     api deps.playcore.core_ktx
+    api deps.androidx.sqlite
+    api deps.sqlcipher.core
 
     // ######################################################
     //                      Unit test

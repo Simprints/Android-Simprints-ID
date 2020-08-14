@@ -1,23 +1,19 @@
 package com.simprints.id.data.db.subject
 
 import com.google.gson.stream.JsonReader
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload
+import com.simprints.id.data.db.event.remote.events.ApiEvent
 import com.simprints.id.data.db.subject.domain.Subject.Companion.buildSubjectFromCreationPayload
-import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
-import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordDeletionPayload
-import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordMovePayload
-import com.simprints.id.data.db.subject.domain.subjectevents.fromApiToDomainOrNullIfNoBiometricReferences
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordCreationPayload
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordDeletionPayload
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEnrolmentRecordMovePayload
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
-import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationResult
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationResult.DownSyncState.*
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncProgress
+import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
 import com.simprints.id.services.scheduledSync.subjects.common.SYNC_LOG_TAG
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.SimJsonHelper
@@ -41,7 +37,7 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
     @ExperimentalCoroutinesApi
     override suspend fun performDownSyncWithProgress(scope: CoroutineScope,
                                                      downSyncOperation: SubjectsDownSyncOperation,
-                                                     eventQuery: EventQuery): ReceiveChannel<SubjectsDownSyncProgress> =
+                                                     eventQuery: SyncEventQuery): ReceiveChannel<SubjectsDownSyncProgress> =
         scope.produce {
 
             this@SubjectRepositoryDownSyncHelperImpl.downSyncOperation = downSyncOperation
@@ -78,7 +74,7 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
             }
         }
 
-    private suspend fun getDownSyncStreamFromRemote(eventQuery: EventQuery) =
+    private suspend fun getDownSyncStreamFromRemote(eventQuery: SyncEventQuery) =
         eventRemoteDataSource.getStreaming(eventQuery)
 
     private fun setupJsonReaderFromResponse(responseStream: InputStream): JsonReader =
@@ -110,30 +106,32 @@ class SubjectRepositoryDownSyncHelperImpl(val subjectLocalDataSource: SubjectLoc
 
     private suspend fun filterBatchOfPeopleToSyncWithLocal(batchOfEvents: List<ApiEvent>,
                                                            moduleId: String?, attendantId: String?) {
-        val batchOfPeopleToSaveInLocal =
-            batchOfEvents.filter { it.payload is ApiEnrolmentRecordCreationPayload }.mapNotNull { apiEvent ->
-                apiEvent.fromApiToDomainOrNullIfNoBiometricReferences()?.let {
-                    it.payload as EnrolmentRecordCreationPayload
-                }
-            }
 
-        val eventRecordsToBeDeleted =
-            batchOfEvents.filter { it.payload is ApiEnrolmentRecordDeletionPayload }.mapNotNull { apiEvent ->
-                apiEvent.fromApiToDomainOrNullIfNoBiometricReferences()?.let {
-                    it.payload as EnrolmentRecordDeletionPayload
-                }
-            }
-
-        val eventRecordsToMove =
-            batchOfEvents.filter { it.payload is ApiEnrolmentRecordMovePayload }.mapNotNull { apiEvent ->
-                apiEvent.fromApiToDomainOrNullIfNoBiometricReferences()?.let {
-                    it.payload as EnrolmentRecordMovePayload
-                }
-            }
-
-        savePeopleBatchInLocal(batchOfPeopleToSaveInLocal)
-        deletePeopleBatchFromLocal(eventRecordsToBeDeleted)
-        movePeopleBatchesInLocal(eventRecordsToMove, moduleId, attendantId)
+        //STOPSHIP
+//        val batchOfPeopleToSaveInLocal =
+//            batchOfEvents.filter { it.payload is ApiEnrolmentRecordCreationPayload }.mapNotNull { apiEvent ->
+//                apiEvent.fromApiToDomainOrNullIfNoBiometricReferences()?.let {
+//                    it.payload as EnrolmentRecordCreationPayload
+//                }
+//            }
+//
+//        val eventRecordsToBeDeleted =
+//            batchOfEvents.filter { it.payload is ApiEnrolmentRecordDeletionPayload }.mapNotNull { apiEvent ->
+//                apiEvent.fromApiToDomainOrNullIfNoBiometricReferences()?.let {
+//                    it.payload as EnrolmentRecordDeletionPayload
+//                }
+//            }
+//
+//        val eventRecordsToMove =
+//            batchOfEvents.filter { it.payload is ApiEnrolmentRecordMovePayload }.mapNotNull { apiEvent ->
+//                apiEvent.fromApiToDomainOrNullIfNoBiometricReferences()?.let {
+//                    it.payload as EnrolmentRecordMovePayload
+//                }
+//            }
+//
+//        savePeopleBatchInLocal(batchOfPeopleToSaveInLocal)
+//        deletePeopleBatchFromLocal(eventRecordsToBeDeleted)
+//        movePeopleBatchesInLocal(eventRecordsToMove, moduleId, attendantId)
     }
 
     private suspend fun savePeopleBatchInLocal(batchOfEventsToSaveInLocal: List<EnrolmentRecordCreationPayload>) {
