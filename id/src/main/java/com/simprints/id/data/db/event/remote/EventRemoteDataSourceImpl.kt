@@ -63,14 +63,14 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
                 channel.send(event.fromApiToDomain())
             }
 
+            parser.close()
+            channel.close()
+
         } catch (t: Throwable) {
             Timber.d(t)
             parser.close()
             channel.close(t)
         }
-
-        parser.close()
-        channel.close()
     }
 
     private suspend fun takeStreaming(query: ApiRemoteEventQuery) =

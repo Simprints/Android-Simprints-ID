@@ -168,10 +168,10 @@ class EventRepositoryImplTest {
         runBlocking {
             createMultipleBatches()
 
-            val bathes = (eventRepo as EventRepositoryImpl).createBatchesWithCloseSessions(LocalEventQuery())
+            val bathes = (eventRepo as EventRepositoryImpl).createBatches(LocalEventQuery())
 
-            assertThat(bathes.first().count).isEqualTo(SESSION_BATCH_SIZE)
-            assertThat(bathes[1].count).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(bathes.first().events.size).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(bathes[1].events.size).isEqualTo(SESSION_BATCH_SIZE)
         }
     }
 

@@ -21,7 +21,9 @@ class EventDownSyncWorkersBuilderImpl(private val downSyncScopeRepository: Event
     override suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest> {
         val downSyncScope = downSyncScopeRepository.getDownSyncScope()
         val uniqueDownSyncId = UUID.randomUUID().toString()
-        return downSyncScope.operations.map { buildDownSyncWorkers(uniqueSyncId, uniqueDownSyncId, it) } + buildCountWorker(uniqueSyncId, uniqueDownSyncId, downSyncScope)
+        return downSyncScope.operations.map {
+            buildDownSyncWorkers(uniqueSyncId, uniqueDownSyncId, it)
+        } + buildCountWorker(uniqueSyncId, uniqueDownSyncId, downSyncScope)
     }
 
     private fun buildDownSyncWorkers(uniqueSyncID: String?,
