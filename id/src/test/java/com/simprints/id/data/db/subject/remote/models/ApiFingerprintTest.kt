@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.commontesttools.FingerprintGeneratorUtils
+import com.simprints.id.data.db.event.remote.events.subject.ApiFingerprintSample
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Assert.assertEquals

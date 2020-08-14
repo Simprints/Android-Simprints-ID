@@ -1,7 +1,7 @@
 package com.simprints.face.controllers.core.events.model
 
 import com.simprints.face.error.ErrorType
-import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 
 enum class FaceAlertType {
     FACE_LICENSE_INVALID,

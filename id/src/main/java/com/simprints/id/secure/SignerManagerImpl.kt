@@ -2,8 +2,8 @@ package com.simprints.id.secure
 
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
@@ -22,7 +22,7 @@ open class SignerManagerImpl(
     private val syncManager: SyncManager,
     private val securityStateScheduler: SecurityStateScheduler,
     private val longConsentRepository: LongConsentRepository,
-    private val sessionRepository: SessionRepository,
+    private val eventRepository: EventRepository,
     private val baseUrlProvider: BaseUrlProvider,
     private val remoteConfigWrapper: RemoteConfigWrapper
 ) : SignerManager {
@@ -45,7 +45,7 @@ open class SignerManagerImpl(
         subjectsSyncManager.deleteSyncInfo()
         preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
         longConsentRepository.deleteLongConsents()
-        sessionRepository.signOut()
+        eventRepository.signOut()
         baseUrlProvider.resetApiBaseUrl()
         remoteConfigWrapper.clearRemoteConfig()
     }

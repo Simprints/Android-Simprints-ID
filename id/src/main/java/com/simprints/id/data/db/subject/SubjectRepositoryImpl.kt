@@ -2,23 +2,20 @@ package com.simprints.id.data.db.subject
 
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.SubjectFetchResult
-import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.LOCAL
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE
 import com.simprints.id.data.db.common.models.EventCount
 import com.simprints.id.data.db.common.models.SubjectsCount
+import com.simprints.id.data.db.event.domain.models.EventType.*
+import com.simprints.id.data.db.event.remote.events.ApiEvent
 import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.domain.Subject.Companion.buildSubjectFromCreationPayload
-import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
-import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordMovePayload
-import com.simprints.id.data.db.subject.domain.subjectevents.EventPayloadType.*
-import com.simprints.id.data.db.subject.domain.subjectevents.fromApiToDomainOrNullIfNoBiometricReferences
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
-import com.simprints.id.data.db.subject.remote.models.subjectevents.ApiEvent
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
-import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperation
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncProgress
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
+import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
 import com.simprints.id.tools.json.SimJsonHelper
@@ -79,24 +76,28 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
         while(reader.hasNext()) {
             apiEventsForSubject.add(SimJsonHelper.gson.fromJson(reader, ApiEvent::class.java))
         }
-        val latestEvent = apiEventsForSubject.last().fromApiToDomainOrNullIfNoBiometricReferences()
 
-        return latestEvent?.let { event ->
-            when(event.payload.type) {
-                ENROLMENT_RECORD_CREATION -> {
-                    val subject = buildSubjectFromCreationPayload(event.payload as EnrolmentRecordCreationPayload)
-                    SubjectFetchResult(subject, REMOTE)
-                }
-                ENROLMENT_RECORD_DELETION -> {
-                    SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
-                }
-                ENROLMENT_RECORD_MOVE -> {
-                    (event.payload as EnrolmentRecordMovePayload).enrolmentRecordCreation?.let {
-                        SubjectFetchResult(buildSubjectFromCreationPayload(it), REMOTE)
-                    } ?: SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
-                }
-            }
-        } ?: SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
+        //STOPSHIP
+//        val latestEvent = apiEventsForSubject.last().fromApiToDomainOrNullIfNoBiometricReferences()
+//
+//        return latestEvent?.let { event ->
+//            when(event.payload.type) {
+//                ENROLMENT_RECORD_CREATION -> {
+//                    val subject = buildSubjectFromCreationPayload(event.payload as EnrolmentRecordCreationPayload)
+//                    SubjectFetchResult(subject, REMOTE)
+//                }
+//                ENROLMENT_RECORD_DELETION -> {
+//                    SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
+//                }
+//                ENROLMENT_RECORD_MOVE -> {
+//                    (event.payload as EnrolmentRecordMovePayload).enrolmentRecordCreation?.let {
+//                        SubjectFetchResult(buildSubjectFromCreationPayload(it), REMOTE)
+//                    } ?: SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
+//                }
+//                else -> throw Throwable("To change") //StopShip
+//            }
+//        } ?: SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
+        return SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
     }
 
     private fun setupJsonReaderFromResponseStream(responseStream: InputStream): JsonReader =
@@ -137,7 +138,7 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
 
     private fun buildEventQuery(peopleDownSyncOperation: SubjectsDownSyncOperation) =
         with(peopleDownSyncOperation) {
-            EventQuery(
+            SyncEventQuery(
                 projectId = projectId,
                 userId = attendantId,
                 moduleIds = moduleId?.let { listOf(it) },
@@ -147,7 +148,7 @@ class SubjectRepositoryImpl(private val eventRemoteDataSource: EventRemoteDataSo
             )
         }
 
-    private fun buildEventQueryForSubjectFetch(projectId: String, subjectId: String) = EventQuery(
+    private fun buildEventQueryForSubjectFetch(projectId: String, subjectId: String) = SyncEventQuery(
         projectId = projectId,
         subjectId = subjectId,
         modes = listOf(Modes.FINGERPRINT),

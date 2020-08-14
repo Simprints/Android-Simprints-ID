@@ -24,8 +24,8 @@ import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
@@ -38,6 +38,7 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import io.mockk.every
 import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -51,7 +52,7 @@ class AlertActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    @Inject lateinit var sessionEventManagerMock: SessionRepository
+    @Inject lateinit var eventEventManagerMock: EventRepository
     @Inject lateinit var preferencesManagerSpy: PreferencesManager
 
     private val preferencesModule by lazy {
@@ -78,7 +79,7 @@ class AlertActivityTest {
         launchAlertActivity()
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
-        verify(atLeast = 1) { sessionEventManagerMock.addEventToCurrentSessionInBackground(any<AlertScreenEvent>()) }
+        verify(atLeast = 1) { runBlocking { eventEventManagerMock.addEvent(any<AlertScreenEvent>()) } }
     }
 
     @Test

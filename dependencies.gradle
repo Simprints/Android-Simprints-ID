@@ -56,9 +56,13 @@ def androidx = [
         fragment       : "androidx.navigation:navigation-fragment-ktx:$androidx_navigation_version",
         ui             : "androidx.navigation:navigation-ui-ktx:$androidx_navigation_version",
         dynamicfeatures: "androidx.navigation:navigation-dynamic-features-fragment:$androidx_navigation_version"
-    ]
+    ],
+    sqlite    : ['androidx.sqlite:sqlite:2.1.0']
 ]
 
+def sqlcipher = [
+    core: 'net.zetetic:android-database-sqlcipher:4.4.0'
+]
 def support = [
     material: "com.google.android.material:material:1.1.0-alpha03"
 ]
@@ -102,10 +106,15 @@ def retrofit = [
     okhttp          : "com.squareup.okhttp3:okhttp:$okttp_version",
 ]
 
-def gson_version = "2.8.5"
+def gson_version = "2.8.6"
 def gson = [
     core  : "com.google.code.gson:gson:$gson_version",
     extras: "org.danilopianini:gson-extras:0.2.1"
+]
+
+def jackson_version = "2.11.1"
+def jackson = [
+    core: "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
 ]
 
 def timber = [
@@ -216,6 +225,7 @@ ext.deps = [
     kotlin         : kotlin,
     dagger         : dagger,
     androidx       : androidx,
+    sqlcipher      : sqlcipher,
     support        : support,
     arch_components: arch_components,
     playservices   : playservices,
@@ -223,6 +233,7 @@ ext.deps = [
     firebase       : firebase,
     retrofit       : retrofit,
     gson           : gson,
+    jackson        : jackson,
     timber         : timber,
     rxjava2        : rxjava2,
     testing        : testing,

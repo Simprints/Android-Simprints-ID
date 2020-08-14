@@ -1,11 +1,12 @@
 package com.simprints.id.activities.alert
 
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.R
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
@@ -24,7 +25,7 @@ class AlertPresenter(val view: AlertContract.View,
                      private val alertType: AlertType) : AlertContract.Presenter {
 
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var sessionRepository: SessionRepository
+    @Inject lateinit var eventRepository: EventRepository
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var exitFormHelper: ExitFormHelper
@@ -43,7 +44,7 @@ class AlertPresenter(val view: AlertContract.View,
         initTextAndDrawables()
 
         alertType.fromAlertToAlertTypeEvent()?.let {
-            sessionRepository.addEventToCurrentSessionInBackground(AlertScreenEvent(timeHelper.now(), it))
+            inBackground { eventRepository.addEvent(AlertScreenEvent(timeHelper.now(), it)) }
         }
     }
 
@@ -69,7 +70,7 @@ class AlertPresenter(val view: AlertContract.View,
     private fun getParamsForMessageString(): List<Any> {
         return when (alertViewModel) {
             ENROLMENT_LAST_BIOMETRICS_FAILED -> {
-               getParamsForLastBiometricsFailedAlert()
+                getParamsForLastBiometricsFailedAlert()
             }
             MODALITY_DOWNLOAD_CANCELLED -> {
                 getParamsForModalityDownloadCancelledAlert()
@@ -80,11 +81,17 @@ class AlertPresenter(val view: AlertContract.View,
         }
     }
 
-    private fun getParamsForLastBiometricsFailedAlert() =  with(preferencesManager.modalities) {
+    private fun getParamsForLastBiometricsFailedAlert() = with(preferencesManager.modalities) {
         when {
-            isFingerprintAndFace() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_all_param)) }
-            isFace() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_face_param)) }
-            isFingerprint() -> { listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_fingerprint_param)) }
+            isFingerprintAndFace() -> {
+                listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_all_param))
+            }
+            isFace() -> {
+                listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_face_param))
+            }
+            isFingerprint() -> {
+                listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_fingerprint_param))
+            }
             else -> {
                 emptyList()
             }
@@ -94,13 +101,17 @@ class AlertPresenter(val view: AlertContract.View,
     private fun getParamsForModalityDownloadCancelledAlert() = with(preferencesManager.modalities) {
         when {
             isFingerprintAndFace() -> {
-                listOf(view.getTranslatedString(R.string.fingerprint_face_feature_alert)) }
+                listOf(view.getTranslatedString(R.string.fingerprint_face_feature_alert))
+            }
             isFace() -> {
-                listOf(view.getTranslatedString(R.string.face_feature_alert)) }
+                listOf(view.getTranslatedString(R.string.face_feature_alert))
+            }
             isFingerprint() -> {
-                listOf(view.getTranslatedString(R.string.fingerprint_feature_alert)) }
+                listOf(view.getTranslatedString(R.string.fingerprint_feature_alert))
+            }
             else -> {
-                emptyList() }
+                emptyList()
+            }
         }
     }
 

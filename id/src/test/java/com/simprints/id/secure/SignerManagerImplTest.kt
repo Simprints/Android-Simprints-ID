@@ -4,9 +4,9 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
@@ -33,7 +33,7 @@ class SignerManagerImplTest {
     @MockK lateinit var mockSubjectsSyncManager: SubjectsSyncManager
     @MockK lateinit var mockSecurityStateScheduler: SecurityStateScheduler
     @MockK lateinit var mockLongConsentRepository: LongConsentRepository
-    @MockK lateinit var mockSessionRepository: SessionRepository
+    @MockK lateinit var mockEventRepository: EventRepository
     @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
     @MockK lateinit var mockRemoteConfigWrapper: RemoteConfigWrapper
 
@@ -54,7 +54,7 @@ class SignerManagerImplTest {
             mockSyncManager,
             mockSecurityStateScheduler,
             mockLongConsentRepository,
-            mockSessionRepository,
+            mockEventRepository,
             mockBaseUrlProvider,
             mockRemoteConfigWrapper
         )
@@ -191,7 +191,7 @@ class SignerManagerImplTest {
     fun signOut_sessionRepositorySignsOut() = runBlockingTest {
         signerManager.signOut()
 
-        coVerify(exactly = 1) { mockSessionRepository.signOut() }
+        coVerify(exactly = 1) { mockEventRepository.signOut() }
     }
 
     @Test

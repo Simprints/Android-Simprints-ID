@@ -6,7 +6,7 @@ import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
@@ -86,7 +86,7 @@ class OrchestratorModule {
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
-        sessionRepository: SessionRepository,
+        eventRepository: EventRepository,
         preferenceManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         ctx: Context
@@ -96,7 +96,7 @@ class OrchestratorModule {
             faceStepProcessor,
             coreStepProcessor,
             timeHelper,
-            sessionRepository,
+            eventRepository,
             preferenceManager.consentRequired,
             preferenceManager.locationPermissionRequired,
             preferenceManager.modalities,
@@ -113,7 +113,7 @@ class OrchestratorModule {
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
-        sessionRepository: SessionRepository,
+        eventRepository: EventRepository,
         preferenceManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         ctx: Context
@@ -123,7 +123,7 @@ class OrchestratorModule {
             faceStepProcessor,
             coreStepProcessor,
             timeHelper,
-            sessionRepository,
+            eventRepository,
             preferenceManager.consentRequired,
             preferenceManager.locationPermissionRequired,
             preferenceManager.modalities,
@@ -139,7 +139,7 @@ class OrchestratorModule {
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
         prefs: PreferencesManager,
-        sessionRepository: SessionRepository,
+        eventRepository: EventRepository,
         loginInfoManager: LoginInfoManager,
         ctx: Context
     ): ModalityFlow =
@@ -149,7 +149,7 @@ class OrchestratorModule {
             coreStepProcessor,
             prefs.matchGroup,
             timeHelper,
-            sessionRepository,
+            eventRepository,
             prefs.consentRequired,
             prefs.locationPermissionRequired,
             prefs.modalities,
@@ -189,24 +189,24 @@ class OrchestratorModule {
 
     @Provides
     fun provideOrchestratorEventsHelper(
-        sessionRepository: SessionRepository,
-        timeHelper: TimeHelper
+            eventRepository: EventRepository,
+            timeHelper: TimeHelper
     ): OrchestratorEventsHelper =
-        OrchestratorEventsHelperImpl(sessionRepository, timeHelper)
+        OrchestratorEventsHelperImpl(eventRepository, timeHelper)
 
     @Provides
     fun provideOrchestratorViewModelFactory(
-        orchestratorManager: OrchestratorManager,
-        orchestratorEventsHelper: OrchestratorEventsHelper,
-        preferenceManager: PreferencesManager,
-        sessionRepository: SessionRepository,
-        crashReportManager: CrashReportManager
+            orchestratorManager: OrchestratorManager,
+            orchestratorEventsHelper: OrchestratorEventsHelper,
+            preferenceManager: PreferencesManager,
+            eventRepository: EventRepository,
+            crashReportManager: CrashReportManager
     ): OrchestratorViewModelFactory {
         return OrchestratorViewModelFactory(
             orchestratorManager,
             orchestratorEventsHelper,
             preferenceManager.modalities,
-            sessionRepository,
+            eventRepository,
             DomainToModuleApiAppResponse,
             crashReportManager
         )

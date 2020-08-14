@@ -1,17 +1,18 @@
 package com.simprints.id.data.db.subject.remote
 
 import com.simprints.id.data.db.common.models.EventCount
-import com.simprints.id.data.db.subject.domain.subjectevents.Events
-import com.simprints.id.data.db.subject.remote.models.subjectcounts.fromApiToDomain
-import com.simprints.id.data.db.subject.remote.models.subjectevents.fromDomainToApi
-import com.simprints.id.data.db.subjects_sync.down.domain.EventQuery
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.remote.events.ApiEvents
+import com.simprints.id.data.db.event.remote.events.fromApiToDomain
+import com.simprints.id.data.db.event.remote.events.fromDomainToApi
+import com.simprints.id.data.db.subjects_sync.down.domain.SyncEventQuery
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
 import java.io.InputStream
 
 class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFactory) : EventRemoteDataSource {
 
-    override suspend fun count(query: EventQuery): List<EventCount> = with(query.fromDomainToApi()) {
+    override suspend fun count(query: SyncEventQuery): List<EventCount> = with(query.fromDomainToApi()) {
         executeCall("EventCount") { subjectsRemoteInterface ->
             subjectsRemoteInterface.countEvents(
                 projectId = projectId,
@@ -25,7 +26,7 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
         }
     }
 
-    override suspend fun getStreaming(query: EventQuery): InputStream = with(query.fromDomainToApi()) {
+    override suspend fun getStreaming(query: SyncEventQuery): InputStream = with(query.fromDomainToApi()) {
         executeCall("EventDownload") { subjectsRemoteInterface ->
             subjectsRemoteInterface.downloadEvents(
                 projectId = projectId,
@@ -39,9 +40,9 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
         }
     }.byteStream()
 
-    override suspend fun post(projectId: String, events: Events) {
+    override suspend fun post(projectId: String, events: List<Event>) {
         executeCall("EventUpload") {
-            it.uploadEvents(projectId, events.fromDomainToApi())
+            it.uploadEvents(projectId, ApiEvents(events.map { it.fromDomainToApi() }))
         }
     }
 

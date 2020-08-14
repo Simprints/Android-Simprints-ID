@@ -11,7 +11,7 @@ import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
-import com.simprints.id.orchestrator.SOME_GUID
+import com.simprints.id.orchestrator.SOME_GUID1
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.extensions.just
@@ -57,8 +57,8 @@ class CheckLoginFromIntentPresenterTest {
                 crashReportManager = mockk()
                 coEvery { crashReportManager.setSessionIdCrashlyticsKey(any()) } just Runs
 
-                sessionRepository = mockk(relaxed = true)
-                coEvery { sessionRepository.getCurrentSession() } returns createFakeSession()
+                eventRepository = mockk(relaxed = true)
+                coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createFakeSession()
             }
 
             checkLoginFromIntentPresenter.setup()
@@ -92,7 +92,7 @@ class CheckLoginFromIntentPresenterTest {
             every { this@apply.userId } returns DEFAULT_USER_ID
             every { this@apply.moduleId } returns DEFAULT_MODULE_ID
             every { this@apply.metadata } returns DEFAULT_METADATA
-            every { this@apply.identificationSessionId } returns SOME_GUID
+            every { this@apply.identificationSessionId } returns SOME_GUID1
         }
 
         checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest )
@@ -168,8 +168,8 @@ class CheckLoginFromIntentPresenterTest {
                 crashReportManager = mockk()
                 every { crashReportManager.setSessionIdCrashlyticsKey(any()) } just runs
 
-                sessionRepository = mockk(relaxed = true)
-                coEvery { sessionRepository.getCurrentSession() } returns createFakeSession()
+                eventRepository = mockk(relaxed = true)
+                coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createFakeSession()
 
                 analyticsManager = mockk()
                 coEvery { analyticsManager.getAnalyticsId() } returns "analyticsId"

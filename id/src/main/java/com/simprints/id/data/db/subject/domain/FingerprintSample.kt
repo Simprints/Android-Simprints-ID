@@ -2,10 +2,10 @@ package com.simprints.id.data.db.subject.domain
 
 import android.os.Parcelable
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.id.data.db.subject.domain.subjectevents.BiometricReference
-import com.simprints.id.data.db.subject.domain.subjectevents.FingerprintReference
-import com.simprints.id.data.db.subject.domain.subjectevents.FingerprintTemplate
-import com.simprints.id.data.db.subject.domain.subjectevents.fromEventToPerson
+import com.simprints.id.data.db.event.domain.models.subject.BiometricReference
+import com.simprints.id.data.db.event.domain.models.subject.FingerprintReference
+import com.simprints.id.data.db.event.domain.models.subject.FingerprintTemplate
+import com.simprints.id.data.db.event.domain.models.subject.fromEventToPerson
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import java.util.*

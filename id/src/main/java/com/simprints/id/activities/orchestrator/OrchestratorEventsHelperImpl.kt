@@ -1,11 +1,13 @@
 package com.simprints.id.activities.orchestrator
 
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.callback.*
+import com.simprints.core.tools.extentions.inBackground
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.models.callback.*
+import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.Companion.fromAppResponseErrorReasonToEventReason
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.tools.TimeHelper
 
-class OrchestratorEventsHelperImpl(private val sessionRepository: SessionRepository,
+class OrchestratorEventsHelperImpl(private val eventRepository: EventRepository,
                                    private val timeHelper: TimeHelper) : OrchestratorEventsHelper {
 
     override fun addCallbackEventInSessions(appResponse: AppResponse) {
@@ -18,7 +20,11 @@ class OrchestratorEventsHelperImpl(private val sessionRepository: SessionReposit
             AppResponseType.CONFIRMATION -> buildConfirmIdentityCallbackEvent(appResponse as AppConfirmationResponse)
         }
 
-        callbackEvent.let { sessionRepository.addEventToCurrentSessionInBackground(it) }
+        callbackEvent.let {
+            inBackground {
+                eventRepository.addEvent(it)
+            }
+        }
     }
 
     private fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) =
@@ -49,7 +55,7 @@ class OrchestratorEventsHelperImpl(private val sessionRepository: SessionReposit
         }
 
     private fun buildErrorCallbackEvent(appErrorResponse: AppErrorResponse) =
-        ErrorCallbackEvent(timeHelper.now(), appErrorResponse.reason)
+        ErrorCallbackEvent(timeHelper.now(), fromAppResponseErrorReasonToEventReason(appErrorResponse.reason))
 
     private fun buildConfirmIdentityCallbackEvent(appResponse: AppConfirmationResponse) =
         ConfirmationCallbackEvent(timeHelper.now(), appResponse.identificationOutcome)

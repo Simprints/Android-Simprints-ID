@@ -1,7 +1,7 @@
 package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.session.domain.models.events.FaceOnboardingCompleteEvent as CoreFaceOnboardingCompleteEvent
+import com.simprints.id.data.db.event.domain.models.face.FaceOnboardingCompleteEvent as CoreFaceOnboardingCompleteEvent
 
 @Keep
 class FaceOnboardingCompleteEvent(

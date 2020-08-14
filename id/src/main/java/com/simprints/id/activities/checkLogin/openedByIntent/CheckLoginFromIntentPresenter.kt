@@ -1,13 +1,16 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.AuthorizationEvent
-import com.simprints.id.data.db.session.domain.models.events.ConnectivitySnapshotEvent
-import com.simprints.id.data.db.session.domain.models.events.Event
-import com.simprints.id.data.db.session.domain.models.events.callout.*
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.callout.*
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
@@ -27,6 +30,7 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import com.simprints.id.data.db.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload.Companion.buildEvent as buildConnectivitySnapshotEvent
 
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     val deviceId: String,
@@ -39,7 +43,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var setupFailed: Boolean = false
 
-    @Inject lateinit var sessionRepository: SessionRepository
+    @Inject lateinit var eventRepository: EventRepository
     @Inject lateinit var subjectLocalDataSource: SubjectLocalDataSource
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     internal lateinit var appRequest: AppRequest
@@ -70,14 +74,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     internal suspend fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
         ignoreException {
-            sessionRepository.updateCurrentSession { currentSession ->
-                with(currentSession) {
-                    if (appRequest !is AppRequest.AppRequestFollowUp) {
-                        addEvent(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
-                    }
-                    addEvent(buildRequestEvent(timeHelper.now(), appRequest))
-                }
+            if (appRequest !is AppRequest.AppRequestFollowUp) {
+                eventRepository.addEvent(buildConnectivitySnapshotEvent(simNetworkUtils, timeHelper))
             }
+            eventRepository.addEvent(buildRequestEvent(timeHelper.now(), appRequest))
         }
     }
 
@@ -163,7 +163,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
         // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
         if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest && appRequest !is AppEnrolLastBiometricsRequest) {
-            sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(AuthorizationEvent.Result.NOT_AUTHORIZED))
+            inBackground { eventRepository.addEvent(buildAuthorizationEvent(AuthorizationResult.NOT_AUTHORIZED)) }
 
             loginAlreadyTried.set(true)
             view.openLoginActivity(appRequest)
@@ -206,15 +206,14 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
         ignoreException {
-            val peopleInDb = subjectLocalDataSource.count()
-            sessionRepository.updateCurrentSession { currentSession ->
-                val authorisationEvent = buildAuthorizationEvent(AuthorizationEvent.Result.AUTHORIZED)
+            eventRepository.updateCurrentSession { currentSessionEvent ->
+                val peopleInDb = subjectLocalDataSource.count()
+                val payload = (currentSessionEvent.payload as SessionCapturePayload)
+                payload.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+                payload.databaseInfo.recordCount = peopleInDb
 
-                with(currentSession) {
-                    addEvent(authorisationEvent)
-                    projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-                    databaseInfo.recordCount = peopleInDb
-                }
+                eventRepository.addEvent(currentSessionEvent)
+                eventRepository.addEvent(buildAuthorizationEvent(AuthorizationResult.AUTHORIZED))
             }
         }
 
@@ -235,22 +234,24 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     internal suspend fun addAnalyticsInfoAndProjectId() {
         ignoreException {
             val analyticsId = analyticsManager.getAnalyticsId()
-            sessionRepository.updateCurrentSession { currentSession ->
-                val signedInProject = loginInfoManager.getSignedInProjectIdOrEmpty()
-                if (signedInProject.isNotEmpty()) {
-                    currentSession.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-                }
-                currentSession.analyticsId = analyticsId
+            val signedInProject = loginInfoManager.getSignedInProjectIdOrEmpty()
+            val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
+
+            if (signedInProject.isNotEmpty()) {
+                (currentSessionEvent.payload as SessionCapturePayload).projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             }
+            (currentSessionEvent.payload as SessionCapturePayload).analyticsId = analyticsId
+            eventRepository.addEvent(currentSessionEvent)
         }
+
     }
 
-    private fun buildAuthorizationEvent(result: AuthorizationEvent.Result) =
+    private fun buildAuthorizationEvent(result: AuthorizationResult) =
         AuthorizationEvent(
             timeHelper.now(),
             result,
-            if (result == AuthorizationEvent.Result.AUTHORIZED) {
-                AuthorizationEvent.UserInfo(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
+            if (result == AuthorizationResult.AUTHORIZED) {
+                UserInfo(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
             } else {
                 null
             }
@@ -260,7 +261,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @SuppressLint("CheckResult")
     private suspend fun setSessionIdCrashlyticsKey() {
         ignoreException {
-            crashReportManager.setSessionIdCrashlyticsKey(sessionRepository.getCurrentSession().id)
+            crashReportManager.setSessionIdCrashlyticsKey(eventRepository.getCurrentCaptureSessionEvent().id)
         }
     }
 }

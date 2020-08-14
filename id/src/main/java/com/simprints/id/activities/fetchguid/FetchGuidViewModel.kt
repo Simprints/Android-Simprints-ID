@@ -3,10 +3,13 @@ package com.simprints.id.activities.fetchguid
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.CandidateReadEvent
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.models.CandidateReadEvent
+import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
+import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
@@ -14,7 +17,7 @@ import kotlinx.coroutines.launch
 
 class FetchGuidViewModel(private val subjectRepository: SubjectRepository,
                          private val deviceManager: DeviceManager,
-                         private val sessionRepository: SessionRepository,
+                         private val eventRepository: EventRepository,
                          private val timeHelper: TimeHelper) : ViewModel() {
 
     var subjectFetch = MutableLiveData<SubjectSource>()
@@ -44,8 +47,9 @@ class FetchGuidViewModel(private val subjectRepository: SubjectRepository,
     private fun addSubjectFetchEventToSession(subjectFetchResult: SubjectFetchResult,
                                               subjectFetchStartTime: Long,
                                               verifyGuid: String) {
-        sessionRepository.addEventToCurrentSessionInBackground(getCandidateReadEvent(subjectFetchResult,
-            subjectFetchStartTime, verifyGuid))
+        inBackground {
+            eventRepository.addEvent(getCandidateReadEvent(subjectFetchResult, subjectFetchStartTime, verifyGuid))
+        }
     }
 
     private fun getCandidateReadEvent(subjectFetchResult: SubjectFetchResult,
@@ -59,15 +63,15 @@ class FetchGuidViewModel(private val subjectRepository: SubjectRepository,
 
     private fun getLocalResultForFetchEvent(subjectSource: SubjectSource) =
         if (subjectSource == SubjectSource.LOCAL) {
-            CandidateReadEvent.LocalResult.FOUND
+            LocalResult.FOUND
         } else {
-            CandidateReadEvent.LocalResult.NOT_FOUND
+            LocalResult.NOT_FOUND
         }
 
     private fun getRemoteResultForFetchEvent(subjectSource: SubjectSource) =
         if (subjectSource == SubjectSource.REMOTE) {
-            CandidateReadEvent.RemoteResult.FOUND
+            RemoteResult.FOUND
         } else {
-            CandidateReadEvent.RemoteResult.NOT_FOUND
+            RemoteResult.NOT_FOUND
         }
 }
