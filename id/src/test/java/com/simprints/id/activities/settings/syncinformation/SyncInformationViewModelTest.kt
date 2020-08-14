@@ -3,7 +3,7 @@ package com.simprints.id.activities.settings.syncinformation
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
+import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.EventType.*
@@ -63,7 +63,7 @@ class SyncInformationViewModelTest {
         val countInRemoteForMove = 0
         val countInRemoteForDelete = 22
 
-        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectSyncScope
+        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectDownSyncScope
         coEvery { eventRepository.countEventsToDownload(any()) } returns
             listOf(
                 EventCount(ENROLMENT_RECORD_CREATION, countInRemoteForCreate),

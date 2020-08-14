@@ -84,7 +84,7 @@ open class EventSyncMasterWorker(private val appContext: Context,
         }
 
     private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
-        val downSyncChainRequired = isPeopleDownSyncAllowed()
+        val downSyncChainRequired = isEventDownSyncAllowed()
 
         return if (downSyncChainRequired) {
             downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncID)
@@ -93,7 +93,7 @@ open class EventSyncMasterWorker(private val appContext: Context,
         }
     }
 
-    private fun isPeopleDownSyncAllowed() = with(preferenceManager) {
+    private fun isEventDownSyncAllowed() = with(preferenceManager) {
         eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
     }
 

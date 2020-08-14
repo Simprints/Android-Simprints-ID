@@ -41,6 +41,8 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
 
             try {
                 eventRepository.downloadEvents(scope, operation.queryEvent).consumeEach {
+                    Timber.d("[DOWN_SYNC_HELPER] Event Received")
+
                     batchOfEventsToProcess.add(it)
                     count++
                     //We immediately process the first event to initialise a progress
@@ -57,6 +59,8 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                 lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now())
                 emitProgress(lastOperation, count)
 
+                close()
+
             } catch (t: Throwable) {
                 Timber.d(t)
 
@@ -65,7 +69,9 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
 
                 lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now())
                 emitProgress(lastOperation, count)
+                close(t)
             }
+
         }
 
     private suspend fun processBatchedEvents(batchOfEventsToProcess: MutableList<Event>,
@@ -101,6 +107,8 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
 
 
     private suspend fun ProducerScope<EventDownSyncProgress>.emitProgress(lastOperation: EventDownSyncOperation, count: Int) {
+        Timber.d("[DOWN_SYNC_HELPER] Emit progress")
+
         if (!this.isClosedForSend) {
             withContext(Dispatchers.IO) {
                 eventDownSyncScopeRepository.insertOrUpdate(lastOperation)

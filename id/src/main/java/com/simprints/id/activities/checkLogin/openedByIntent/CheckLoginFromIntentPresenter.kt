@@ -209,9 +209,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
             val peopleInDb = subjectLocalDataSource.count()
             val payload = currentSessionEvent.payload
-            payload.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             payload.databaseInfo.recordCount = peopleInDb
+            currentSessionEvent.updateProjectId(loginInfoManager.getSignedInProjectIdOrEmpty())
 
+            Timber.d("[CHECK_LOGIN] Update session $currentSessionEvent")
             eventRepository.addEventToCurrentSession(currentSessionEvent)
             eventRepository.addEventToCurrentSession(buildAuthorizationEvent(AuthorizationResult.AUTHORIZED))
 
@@ -238,7 +239,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
             if (signedInProject.isNotEmpty()) {
-                currentSessionEvent.payload.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+                currentSessionEvent.updateProjectId(loginInfoManager.getSignedInProjectIdOrEmpty())
             }
             currentSessionEvent.payload.analyticsId = analyticsId
             eventRepository.addEventToCurrentSession(currentSessionEvent)

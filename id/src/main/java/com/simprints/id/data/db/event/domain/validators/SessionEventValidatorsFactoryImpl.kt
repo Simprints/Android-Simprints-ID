@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.event.domain.validators
 
-class SessionEventValidatorsBuilderImpl : SessionEventValidatorsBuilder {
+class SessionEventValidatorsFactoryImpl : SessionEventValidatorsFactory {
     override fun build(): Array<EventValidator> = arrayOf(
         GuidSelectionEventValidator(),
         SessionCaptureEventValidator()

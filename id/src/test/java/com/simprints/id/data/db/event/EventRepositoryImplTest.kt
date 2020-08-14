@@ -1,218 +1,397 @@
-//package com.simprints.id.data.db.event.controllers.domain
-//
-//import androidx.test.ext.junit.runners.AndroidJUnit4
-//import com.google.common.truth.Truth.assertThat
-//import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
-//import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
-//import com.simprints.id.data.analytics.crashreport.CrashReportManager
-//import com.simprints.id.data.db.event.EventRepository
-//import com.simprints.id.data.db.event.EventRepositoryImpl
-//import com.simprints.id.data.db.event.domain.events.SessionQuery
-//import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
-//import com.simprints.id.data.db.event.local.SessionLocalDataSource
-//import com.simprints.id.data.db.event.remote.SessionRemoteDataSource
-//import com.simprints.id.data.prefs.PreferencesManager
-//import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-//import com.simprints.id.testtools.TestApplication
-//import com.simprints.id.tools.TimeHelperImpl
-//import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-//import io.kotlintest.shouldThrow
-//import io.mockk.*
-//import io.mockk.impl.annotations.MockK
-//import kotlinx.coroutines.flow.flow
-//import kotlinx.coroutines.flow.flowOf
-//import kotlinx.coroutines.runBlocking
-//import kotlinx.coroutines.test.runBlockingTest
-//import org.junit.Before
-//import org.junit.Ignore
-//import org.junit.Test
-//import org.junit.runner.RunWith
-//import org.robolectric.annotation.Config
-//import org.robolectric.shadows.ShadowLog
-// TOFIX
-//@RunWith(AndroidJUnit4::class)
-//@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-//class EventRepositoryImplTest {
-//
-//    @MockK private lateinit var sessionEventsSyncManagerMock: SessionEventsSyncManager
-//    @MockK private lateinit var sessionLocalDataSourceMock: SessionLocalDataSource
-//    @MockK private lateinit var sessionRemoteDataSourceMock: SessionRemoteDataSource
-//    @MockK private lateinit var preferencesManagerMock: PreferencesManager
-//    @MockK private lateinit var crashReportManagerMock: CrashReportManager
-//    private lateinit var sessionsRepository: EventRepository
-//    private val timeHelper = TimeHelperImpl()
-//
-//    @Before
-//    fun setUp() {
-//        ShadowLog.stream = System.out
-//        MockKAnnotations.init(this, relaxed = true)
-//
-//        coEvery { sessionLocalDataSourceMock.count(any()) } returns 0
-//
-//        sessionsRepository = EventRepositoryImpl(
-//            DEVICE_ID,
-//            APP_VERSION_NAME,
-//            PROJECT_ID,
-//            sessionEventsSyncManagerMock, sessionLocalDataSourceMock, sessionRemoteDataSourceMock,
-//            preferencesManagerMock, crashReportManagerMock, timeHelper)
-//        mockPreferenceManagerInfo()
-//    }
-//
-//    private fun mockPreferenceManagerInfo() {
-//        every { preferencesManagerMock.language } returns LANGUAGE
-//    }
-//
-//    @Test
-//    fun createSession_shouldCreateASession() {
-//        runBlocking {
-//            sessionsRepository.createSession(LIB_VERSION_NAME)
-//
-//            coVerify(exactly = 1) { sessionLocalDataSourceMock.create(APP_VERSION_NAME, LIB_VERSION_NAME, LANGUAGE, DEVICE_ID) }
-//            coVerify(exactly = 1) { preferencesManagerMock.language }
-//        }
-//    }
-//
-//    @Test
-//    fun createSession_shouldReportExceptionAndThrow() {
-//        runBlockingTest {
-//            every { preferencesManagerMock.language } throws Throwable("Error")
-//
-//            shouldThrow<Throwable> {
-//                sessionsRepository.createSession("")
-//            }
-//
-//            coVerify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
-//        }
-//    }
-//
-//    @Test
-//    fun getCurrentSession_shouldReturnCurrentSession() {
-//        runBlockingTest {
-//            val session = createFakeOpenSession(timeHelper)
-//            coEvery { sessionLocalDataSourceMock.load(any()) } returns flowOf(session)
-//
-//            val currentSession = sessionsRepository.getCurrentCaptureSessionEvent()
-//
-//            assertThat(currentSession).isEqualTo(session)
-//            coVerify(exactly = 1) { sessionLocalDataSourceMock.load(SessionQuery(openSession = true)) }
-//        }
-//    }
-//
-//    @Test
-//    fun getCurrentSession_shouldReportExceptionAndThrow() {
-//        runBlockingTest {
-//            coEvery { sessionLocalDataSourceMock.updateCurrentSession(any()) } throws Throwable("Error")
-//            shouldThrow<Throwable> {
-//                sessionsRepository.getCurrentCaptureSessionEvent()
-//            }
-//            coVerify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
-//        }
-//    }
-//
-//    @Test
-//    fun updateCurrentSession_shouldUpdateCurrentSession() {
-//        runBlockingTest {
-//            val block: (SessionCaptureEvent) -> Unit = {}
-//            sessionsRepository.updateCurrentSession(block)
-//            coVerify(exactly = 1) { sessionLocalDataSourceMock.updateCurrentSession(block) }
-//        }
-//    }
-//
-//    @Test
-//    fun updateCurrentSession_shouldReportExceptionAndThrow() {
-//        runBlockingTest {
-//            coEvery { sessionLocalDataSourceMock.updateCurrentSession(any()) } throws Throwable("Error")
-//            shouldThrow<Throwable> {
-//                sessionsRepository.updateCurrentSession { }
-//            }
-//            coVerify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
-//        }
-//    }
-//
-//    @Ignore ("Another flaky test")
-//    @Test
-//    fun addEventToCurrentSessionInBackground_shouldAddEventIntoCurrentSession() {
-//        runBlockingTest {
-//            val event = mockk<Event>()
-//            sessionsRepository.addEventToCurrentSessionInBackground(event)
-//            coVerify(exactly = 1) { sessionLocalDataSourceMock.addEventToCurrentSession(event) }
-//        }
-//    }
-//
-//    @Ignore("Fabio to take a look next week at flaky test")
-//    @Test
-//    fun addEventToCurrentSessionInBackground_shouldReportException() {
-//        runBlockingTest {
-//            coEvery { sessionLocalDataSourceMock.addEventToCurrentSession(any()) } throws Throwable("Error")
-//            sessionsRepository.addEventToCurrentSessionInBackground(mockk())
-//
-//            coVerify(exactly = 1) { crashReportManagerMock.logExceptionOrSafeException(any()) }
-//        }
-//    }
-//
-//
-//    @Test
-//    fun signOut_shouldDeleteSessionsAndStopWorkers() {
-//        runBlockingTest {
-//            sessionsRepository.signOut()
-//
-//            coVerify(exactly = 1) { sessionLocalDataSourceMock.delete(SessionQuery(openSession = false)) }
-//            coVerify(exactly = 1) { sessionEventsSyncManagerMock.cancelSyncWorkers() }
-//        }
-//    }
-//
-//    @Test
-//    fun uploadSessions_shouldDeleteAfterUploading() {
-//        runBlockingTest {
-//            val closedSession = createFakeClosedSession(timeHelper)
-//            coEvery { sessionLocalDataSourceMock.load(any()) } returns flowOf(closedSession)
-//
-//            sessionsRepository.uploadSessions()
-//
-//            coVerify(exactly = 1) { sessionRemoteDataSourceMock.uploadSessions(PROJECT_ID, listOf(closedSession)) }
-//            coVerify(exactly = 1) { sessionLocalDataSourceMock.delete(SessionQuery(openSession = false)) }
-//        }
-//    }
-//
-//    @Test
-//    fun closedSessions_shouldBeFilteredOutToBeUploaded() {
-//        runBlockingTest {
-//            val fakeClosedSession = createFakeClosedSession(timeHelper)
-//            val sessions = flowOf(
-//                createFakeOpenSession(timeHelper),
-//                fakeClosedSession
-//            )
-//            coEvery { sessionLocalDataSourceMock.load(any()) } returns sessions
-//
-//            sessionsRepository.uploadSessions()
-//
-//            coVerify(exactly = 1) { sessionRemoteDataSourceMock.uploadSessions(PROJECT_ID, listOf(fakeClosedSession)) }
-//        }
-//    }
-//
-//    @Test
-//    fun closedSessionsToUpload_shouldCreateBatches() {
-//        runBlockingTest {
-//            val sessions = createClosedSessions()
-//            coEvery { sessionLocalDataSourceMock.load(any()) } returns sessions
-//
-//            sessionsRepository.uploadSessions()
-//
-//            coVerify(exactly = 3) { sessionRemoteDataSourceMock.uploadSessions(PROJECT_ID, any()) }
-//        }
-//    }
-//
-//    private fun createClosedSessions() = flow {
-//        for(i in 1..59) {
-//            emit(createFakeClosedSession(timeHelper))
-//        }
-//    }
-//
-//    companion object {
-//        private const val DEVICE_ID = "deviceId"
-//        private const val APP_VERSION_NAME = "v1"
-//        private const val LIB_VERSION_NAME = "v1"
-//        private const val LANGUAGE = "en"
-//        private const val PROJECT_ID = "projectId"
-//    }
-//}
+package com.simprints.id.data.db.event
+
+import android.os.Build
+import android.os.Build.VERSION
+import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.utils.randomUUID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID3
+import com.simprints.id.commontesttools.events.createAlertScreenEvent
+import com.simprints.id.commontesttools.events.createSessionCaptureEvent
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
+import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
+import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
+import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.EventLabels
+import com.simprints.id.data.db.event.domain.models.EventType.ARTIFICIAL_TERMINATION
+import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
+import com.simprints.id.data.db.event.domain.models.session.Device
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.validators.EventValidator
+import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
+import com.simprints.id.data.db.event.local.EventLocalDataSource
+import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
+import com.simprints.id.data.db.event.remote.EventRemoteDataSource
+import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.modality.Modality.FACE
+import com.simprints.id.domain.modality.Modality.FINGER
+import com.simprints.id.domain.modality.Modes
+import com.simprints.id.domain.modality.Modes.FINGERPRINT
+import com.simprints.id.tools.TimeHelper
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
+import okhttp3.ResponseBody.Companion.toResponseBody
+import org.junit.Before
+import org.junit.Test
+import retrofit2.HttpException
+import retrofit2.Response
+
+class EventRepositoryImplTest {
+
+    lateinit var eventRepo: EventRepository
+
+    @MockK lateinit var loginInfoManager: LoginInfoManager
+    @MockK lateinit var eventLocalDataSource: EventLocalDataSource
+    @MockK lateinit var eventRemoteDataSource: EventRemoteDataSource
+    @MockK lateinit var preferencesManager: PreferencesManager
+    @MockK lateinit var crashReportManager: CrashReportManager
+    @MockK lateinit var timeHelper: TimeHelper
+    @MockK lateinit var sessionEventValidatorsFactory: SessionEventValidatorsFactory
+    @MockK lateinit var eventValidator: EventValidator
+
+    private val openSessionsQuery = DbLocalEventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))
+
+    @Before
+    fun setup() {
+        MockKAnnotations.init(this, relaxed = true)
+        every { timeHelper.now() } returns NOW
+        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        every { preferencesManager.modalities } returns listOf(FACE, FINGER)
+        every { preferencesManager.language } returns LANGUAGE
+
+        every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
+
+        eventRepo = EventRepositoryImpl(
+            DEVICE_ID,
+            APP_VERSION_NAME,
+            loginInfoManager,
+            eventLocalDataSource,
+            eventRemoteDataSource,
+            preferencesManager,
+            crashReportManager,
+            timeHelper,
+            sessionEventValidatorsFactory)
+    }
+
+    @Test
+    fun createSession_shouldCloseOpenSessionEvents() {
+        runBlocking {
+            val oldOpenSession = createSessionCaptureEvent(randomUUID()).openSession()
+            coEvery { eventLocalDataSource.count(any()) } returns 1
+            coEvery { eventLocalDataSource.load(any()) } returns flowOf(oldOpenSession)
+
+            eventRepo.createSession(LIB_VERSION_NAME)
+
+            coVerify {
+                eventLocalDataSource.insertOrUpdate(match {
+                    assertThatArtificialTerminationEventWasAdded(it, oldOpenSession.id)
+                })
+            }
+
+            coVerify {
+                eventLocalDataSource.insertOrUpdate(match {
+                    assertThatSessionCaptureEventWasClosed(it)
+                })
+            }
+        }
+    }
+
+    @Test
+    fun createSession_shouldAddANewSessionEvent() {
+        runBlocking {
+            coEvery { eventLocalDataSource.count(any()) } returns 1
+            coEvery { eventLocalDataSource.load(any()) } returns flowOf()
+
+            eventRepo.createSession(LIB_VERSION_NAME)
+
+            coVerify {
+                eventLocalDataSource.insertOrUpdate(match {
+                    assertANewSessionCaptureWasAdded(it)
+                })
+            }
+        }
+    }
+
+    @Test
+    fun addEvent_shouldAddEventIntoDb() {
+        runBlocking {
+            val session = createSessionCaptureEvent(GUID1).openSession()
+            with(eventLocalDataSource) {
+                coEvery { load(openSessionsQuery) } returns flowOf(session)
+                coEvery { load(DbLocalEventQuery(type = SESSION_CAPTURE, id = GUID1)) } returns flowOf(session)
+                coEvery { load(DbLocalEventQuery(sessionId = GUID1)) } returns flowOf(session)
+            }
+            val newEvent = createAlertScreenEvent()
+
+            eventRepo.addEvent(newEvent, GUID1)
+
+            coVerify {
+                eventLocalDataSource.insertOrUpdate(
+                    newEvent.copy(labels = EventLabels(sessionId = GUID1, deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID)))
+            }
+        }
+    }
+
+    @Test
+    fun addEventToCurrentSession_shouldAddEventRelatedToCurrentSessionIntoDb() {
+        runBlocking {
+            val session = createSessionCaptureEvent(GUID1).openSession()
+            with(eventLocalDataSource) {
+                coEvery { load(openSessionsQuery) } returns flowOf(session)
+                coEvery { load(DbLocalEventQuery(type = SESSION_CAPTURE, id = session.id)) } returns flowOf(session)
+                coEvery { load(DbLocalEventQuery(sessionId = session.id)) } returns flowOf(session)
+            }
+            val newEvent = createAlertScreenEvent()
+
+            eventRepo.addEventToCurrentSession(newEvent)
+
+            coVerify {
+                eventLocalDataSource.insertOrUpdate(newEvent.copy(labels = EventLabels(sessionId = GUID1, deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID)))
+            }
+        }
+    }
+
+    @Test
+    fun upload_shouldCreateTheRightBatches() {
+        runBlocking {
+            createMultipleBatches()
+
+            val bathes = (eventRepo as EventRepositoryImpl).createBatchesWithCloseSessions(LocalEventQuery())
+
+            assertThat(bathes.first().count).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(bathes[1].count).isEqualTo(SESSION_BATCH_SIZE)
+        }
+    }
+
+    @Test
+    fun upload_shouldLoadTheRightEventsForBatches() {
+        runBlocking {
+            createMultipleBatches()
+
+            eventRepo.uploadEvents(LocalEventQuery()).toList()
+
+            coVerify { eventLocalDataSource.load(DbLocalEventQuery(sessionId = GUID1)) }
+            coVerify { eventLocalDataSource.load(DbLocalEventQuery(sessionId = GUID2)) }
+            coVerify { eventLocalDataSource.load(DbLocalEventQuery(sessionId = GUID3)) }
+        }
+    }
+
+    @Test
+    fun uploadSucceeds_shouldDeleteEvents() {
+        runBlocking {
+            val events = createMultipleBatches()
+
+            eventRepo.uploadEvents(LocalEventQuery()).toList()
+
+            events.forEach {
+                coVerify {
+                    eventLocalDataSource.delete(DbLocalEventQuery(id = it.id))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun upload_shouldEmitProgress() {
+        runBlocking {
+            createMultipleBatches()
+
+            val progress = eventRepo.uploadEvents(LocalEventQuery()).toList()
+
+            assertThat(progress[0].size).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(progress[1].size).isEqualTo(SESSION_BATCH_SIZE)
+        }
+    }
+
+    @Test
+    fun upload_shouldDeleteUploadedEvents() {
+        runBlocking {
+            val events = createMultipleBatches()
+
+            eventRepo.uploadEvents(LocalEventQuery()).toList()
+
+            for (event in events) {
+                coVerify { eventLocalDataSource.delete(DbLocalEventQuery(id = event.id)) }
+            }
+        }
+    }
+
+    @Test
+    fun upload_shouldNotDeleteEventsAfterNetworkIssues() {
+        runBlocking {
+            val events = createMultipleBatches()
+            coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("Network issue")
+
+            eventRepo.uploadEvents(LocalEventQuery()).toList()
+
+            coVerify(exactly = 0) { eventLocalDataSource.delete(any()) }
+        }
+    }
+
+    @Test
+    fun upload_shouldDeleteEventsAfterIntegrationIssues() {
+        runBlocking {
+            coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(Response.error<String>(404, "".toResponseBody(null)))
+            val events = createMultipleBatches()
+
+            eventRepo.uploadEvents(LocalEventQuery()).toList()
+
+            for (event in events) {
+                coVerify { eventLocalDataSource.delete(DbLocalEventQuery(id = event.id)) }
+            }
+        }
+    }
+
+    private suspend fun createMultipleBatches(): List<Event> {
+        val smallSession1Events = mockSessionWithEvent(GUID1, SESSION_BATCH_SIZE / 2 - 1)
+        val smallSession2Events = mockSessionWithEvent(GUID2, SESSION_BATCH_SIZE / 2 - 1)
+        val bigSessionEvents = mockSessionWithEvent(GUID3, SESSION_BATCH_SIZE - 1)
+        val events = smallSession1Events + smallSession2Events + bigSessionEvents
+
+        coEvery {
+            eventLocalDataSource.load(DbLocalEventQuery(projectId = DEFAULT_PROJECT_ID, type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE)))
+        } returns events.filterIsInstance<SessionCaptureEvent>().asFlow()
+
+        return events
+    }
+
+    private fun mockSessionWithEvent(sessionId: String, nEvents: Int): List<Event> {
+        val events = mutableListOf<Event>()
+        events.add(createSessionCaptureEvent(sessionId))
+        repeat(nEvents) {
+            events.add(createAlertScreenEvent().copy(labels = EventLabels(sessionId = GUID1)))
+        }
+
+        coEvery { eventLocalDataSource.load(DbLocalEventQuery(sessionId = sessionId)) } returns events.asFlow()
+        coEvery { eventLocalDataSource.count(DbLocalEventQuery(sessionId = sessionId)) } returns nEvents + 1
+        return events
+    }
+
+    private fun assertANewSessionCaptureWasAdded(event: Event): Boolean =
+        event is SessionCaptureEvent &&
+            event.payload.projectId == PROJECT_ID_FOR_NOT_SIGNED_IN &&
+            event.payload.createdAt == NOW &&
+            event.payload.modalities == listOf(Modes.FACE, FINGERPRINT) &&
+            event.payload.appVersionName == APP_VERSION_NAME &&
+            event.payload.language == LANGUAGE &&
+            event.payload.device == Device(VERSION.SDK_INT.toString(), Build.MANUFACTURER + "_" + Build.MODEL, DEVICE_ID) &&
+            event.payload.databaseInfo == DatabaseInfo(1) &&
+            event.payload.endedAt == 0L
+
+
+    private fun assertThatSessionCaptureEventWasClosed(event: Event): Boolean =
+        event is SessionCaptureEvent && event.payload.endedAt > 0
+
+    private fun assertThatArtificialTerminationEventWasAdded(event: Event, id: String): Boolean =
+        event is ArtificialTerminationEvent &&
+            event.labels == EventLabels(sessionId = id, deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID) &&
+            event.payload.reason == NEW_SESSION &&
+            event.payload.createdAt == NOW
+
+
+    @Test
+    fun createSession_shouldAddArtificialTerminationEventToThePreviousOne() {
+        runBlocking {
+            coEvery { eventLocalDataSource.count(any()) } returns 1
+            val oldOpenSession = createSessionCaptureEvent().openSession()
+            coEvery { eventLocalDataSource.load(any()) } returns flowOf(oldOpenSession)
+
+            eventRepo.createSession(LIB_VERSION_NAME)
+
+            coVerify { eventLocalDataSource.load(openSessionsQuery) }
+            coVerify {
+                eventLocalDataSource.insertOrUpdate(match {
+                    it.type == ARTIFICIAL_TERMINATION && it.labels.sessionId == oldOpenSession.id
+                })
+            }
+        }
+    }
+
+    @Test
+    fun getCurrentOpenSession() {
+        runBlocking {
+            val session = createSessionCaptureEvent().openSession()
+            with(eventLocalDataSource) {
+                coEvery { load(openSessionsQuery) } returns flowOf(session)
+                coEvery { load(DbLocalEventQuery(type = SESSION_CAPTURE, id = session.id)) } returns flowOf(session)
+                coEvery { load(DbLocalEventQuery(sessionId = session.id)) } returns flowOf(session)
+            }
+
+            val loadedSession = eventRepo.getCurrentCaptureSessionEvent()
+            assertThat(loadedSession).isEqualTo(session)
+        }
+    }
+
+    @Test
+    fun insertEventIntoCurrentOpenSession() {
+        runBlocking {
+            mockSignedId()
+            val session = createSessionCaptureEvent().openSession()
+            with(eventLocalDataSource) {
+                coEvery { load(openSessionsQuery) } returns flowOf(session)
+                coEvery { load(DbLocalEventQuery(type = SESSION_CAPTURE, id = session.id)) } returns flowOf(session)
+                coEvery { load(DbLocalEventQuery(sessionId = session.id)) } returns flowOf(session)
+            }
+            val event = createAlertScreenEvent().removeLabels()
+
+            eventRepo.addEventToCurrentSession(event)
+
+            coVerify { eventLocalDataSource.load(openSessionsQuery) }
+            coVerify {
+                eventLocalDataSource.insertOrUpdate(
+                    event.copy(labels = EventLabels(deviceId = DEVICE_ID, sessionId = session.id, projectId = DEFAULT_PROJECT_ID)))
+            }
+        }
+    }
+
+    @Test
+    fun insertEventIntoCurrentOpenSession_shouldInvokeValidators() {
+        runBlocking {
+            mockSignedId()
+            val session = createSessionCaptureEvent().openSession()
+            val eventInSession = createAlertScreenEvent().removeLabels()
+            coEvery { eventLocalDataSource.load(openSessionsQuery) } returns flowOf(session)
+            coEvery { eventLocalDataSource.load(DbLocalEventQuery(type = SESSION_CAPTURE, id = session.id)) } returns flowOf(session)
+            coEvery { eventLocalDataSource.load(DbLocalEventQuery(sessionId = session.id)) } returns flowOf(session, eventInSession)
+
+            val event = createAlertScreenEvent().removeLabels()
+
+            eventRepo.addEventToCurrentSession(event)
+
+            verify { eventValidator.validate(listOf(session, eventInSession), event) }
+        }
+    }
+
+    private fun mockSignedId() = every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+
+    private fun SessionCaptureEvent.openSession(): SessionCaptureEvent =
+        this.copy(payload = this.payload.copy(endedAt = 0))
+
+    private fun SessionCaptureEvent.removeLabels(): SessionCaptureEvent =
+        this.copy(id = GUID1, labels = EventLabels())
+
+    private fun AlertScreenEvent.removeLabels(): AlertScreenEvent =
+        this.copy(id = GUID1, labels = EventLabels())
+
+    companion object {
+        const val DEVICE_ID = "DEVICE_ID"
+        const val APP_VERSION_NAME = "APP_VERSION_NAME"
+        const val LIB_VERSION_NAME = "LIB_VERSION_NAME"
+        const val LANGUAGE = "en"
+
+        const val NOW = 1000L
+        private val ID = randomUUID()
+    }
+}

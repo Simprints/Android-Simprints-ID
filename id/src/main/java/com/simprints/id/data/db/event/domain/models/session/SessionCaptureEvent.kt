@@ -18,6 +18,9 @@ data class SessionCaptureEvent(
     override val payload: SessionCapturePayload
 ) : Event() {
 
+    fun isOpen(): Boolean =
+        payload.endedAt == 0L
+
     constructor(projectId: String,
                 createdAt: Long,
                 modalities: List<Modes>,
