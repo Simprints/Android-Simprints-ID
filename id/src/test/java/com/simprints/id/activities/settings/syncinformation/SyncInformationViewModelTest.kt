@@ -8,8 +8,8 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
@@ -32,9 +32,10 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SyncInformationViewModelTest {
 
-    @MockK lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
-    @MockK lateinit var preferencesManagerMock: PreferencesManager
+    @MockK lateinit var subjectRepository: SubjectRepository
     @MockK lateinit var eventRepository: EventRepository
+
+    @MockK lateinit var preferencesManagerMock: PreferencesManager
     @MockK lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
     @MockK lateinit var downSyncHelper: EventDownSyncHelper
 
@@ -44,7 +45,7 @@ class SyncInformationViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        viewModel = SyncInformationViewModel(downSyncHelper, subjectLocalDataSourceMock, preferencesManagerMock, projectId, eventDownSyncScopeRepository)
+        viewModel = SyncInformationViewModel(downSyncHelper, eventRepository, subjectRepository, preferencesManagerMock, projectId, eventDownSyncScopeRepository)
     }
 
     @Test
@@ -123,7 +124,7 @@ class SyncInformationViewModelTest {
         )
         val selectedModuleSet = setOf(selectedModuleName)
 
-        coEvery { subjectLocalDataSourceMock.load(any()) } returns subjectsRecords
+        coEvery { subjectRepository.load(any()) } returns subjectsRecords
         every { preferencesManagerMock.selectedModules } returns selectedModuleSet
 
         viewModel.fetchAndUpdatedUnselectedModulesCount()
@@ -146,7 +147,7 @@ class SyncInformationViewModelTest {
         val subjectsRecords = flowOf(recordWithSelectedModule, recordWithSelectedModule)
         val selectedModuleSet = setOf(selectedModuleName)
 
-        coEvery { subjectLocalDataSourceMock.load(any()) } returns subjectsRecords
+        coEvery { subjectRepository.load(any()) } returns subjectsRecords
         every { preferencesManagerMock.selectedModules } returns selectedModuleSet
 
         viewModel.fetchAndUpdatedUnselectedModulesCount()
@@ -182,7 +183,7 @@ class SyncInformationViewModelTest {
     }
 
     private fun mockSubjectLocalDataSourceCount(recordCount: Int) {
-        coEvery { subjectLocalDataSourceMock.count(any()) } returns recordCount
+        coEvery { subjectRepository.count(any()) } returns recordCount
     }
 
 }

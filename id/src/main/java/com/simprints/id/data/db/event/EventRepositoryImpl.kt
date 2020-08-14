@@ -121,7 +121,7 @@ open class EventRepositoryImpl(
     }
 
     override suspend fun countEventsToUpload(query: LocalEventQuery): Int =
-        createBatchesWithCloseSessions(query).sumBy { it.events.size }
+        createBatches(query).sumBy { it.events.size }
 
     override suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount> =
         eventRemoteDataSource.count(query.fromDomainToApi())
@@ -132,7 +132,7 @@ open class EventRepositoryImpl(
 
 
     override suspend fun uploadEvents(query: LocalEventQuery): Flow<List<Event>> = flow {
-        val batches = createBatchesWithCloseSessions(query)
+        val batches = createBatches(query)
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading batches ${batches.size}")
 
         batches.forEach { batch ->
@@ -160,7 +160,7 @@ open class EventRepositoryImpl(
     }
 
     @VisibleForTesting
-    suspend fun createBatchesWithCloseSessions(query: LocalEventQuery): List<Batch> {
+    suspend fun createBatches(query: LocalEventQuery): List<Batch> {
         return createBatchesForEventsInSessions(query) + createBatchesForEventsNotInSessions(query)
     }
 

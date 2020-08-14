@@ -14,7 +14,7 @@ class EventUpSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
     EventUpSyncScopeRepository {
 
     override suspend fun getUpSyncScope(): ProjectScope {
-        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty() //STOPSHIP
+        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
         val syncScope = ProjectScope(projectId)
 
         syncScope.operation = refreshState(syncScope.operation)
