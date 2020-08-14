@@ -81,4 +81,9 @@ data class SessionCaptureEvent(
         const val GRACE_PERIOD: Long = 1000 * 60 * 5 // 5 minutes
         const val EVENT_VERSION = DEFAULT_EVENT_VERSION
     }
+
+    fun updateProjectId(projectId: String) {
+        payload.projectId = projectId
+        labels = labels.copy(projectId = projectId)
+    }
 }
