@@ -13,7 +13,10 @@ import com.simprints.id.tools.TimeHelper
 class AppResponseFactoryImpl(
     private val enrolmentHelper: EnrolmentHelper,
     private val timeHelper: TimeHelper,
-    private val isEnrolmentPlus: Boolean
+    private val isEnrolmentPlus: Boolean,
+    private val fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>,
+    private val faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>,
+    private val returnIdentificationCount: Int
 ) : AppResponseFactory {
 
     override suspend fun buildAppResponse(modalities: List<Modality>,
@@ -27,15 +30,18 @@ class AppResponseFactoryImpl(
         when (appRequest) {
             is AppEnrolRequest -> {
                 if (isEnrolmentPlus){
-                    AppResponseBuilderForIdentify()
+                    buildAppResponseBuilderForIdentify()
                 } else {
                     AppResponseBuilderForEnrol(enrolmentHelper, timeHelper)
                 }
             }
-            is AppIdentifyRequest -> AppResponseBuilderForIdentify()
+            is AppIdentifyRequest -> buildAppResponseBuilderForIdentify()
             is AppVerifyRequest -> AppResponseBuilderForVerify()
             is AppConfirmIdentityRequest -> AppResponseBuilderForConfirmIdentity()
             is AppEnrolLastBiometricsRequest -> AppResponseBuilderForEnrolLastBiometrics()
         }.buildAppResponse(modalities, appRequest, steps, sessionId)
+
+    private fun buildAppResponseBuilderForIdentify() =
+        AppResponseBuilderForIdentify(fingerprintConfidenceThresholds, faceConfidenceThresholds, returnIdentificationCount)
 }
 
