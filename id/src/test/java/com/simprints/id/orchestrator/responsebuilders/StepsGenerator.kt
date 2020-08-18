@@ -53,7 +53,8 @@ fun mockFingerprintMatchStep(): Step {
         bundleKey = "BUNDLE_KEY",
         request = request,
         result = FingerprintMatchResponse(listOf(
-            FingerprintMatchResult("person_id", 75f)
+            FingerprintMatchResult("person_id", 75f),
+            FingerprintMatchResult("person_id2", 10f)
         )),
         status = Step.Status.COMPLETED
     )
@@ -84,7 +85,11 @@ fun mockFaceMatchStep(): Step {
     val request = FaceMatchRequest(mockk(), mockk())
 
     val response =
-        FaceMatchResponse(listOf(FaceMatchResult(guidFound = "guid", confidence = 75f)))
+        FaceMatchResponse(listOf(
+            FaceMatchResult(guidFound = "guid", confidence = 75f),
+            FaceMatchResult(guidFound = "guid2", confidence = 15f),
+            FaceMatchResult(guidFound = "guid3", confidence = 30f)
+        ))
 
     return Step(
         requestCode = 322,
