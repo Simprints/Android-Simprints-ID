@@ -212,6 +212,12 @@ def commons_io = [
     commons_io: "commons-io:commons-io:$commons_io_version"
 ]
 
+// For NTP time
+def kronos_version = "0.0.1-alpha09"
+def kronos = [
+    kronos: "com.lyft.kronos:kronos-android:$kronos_version"
+]
+
 ext.deps = [
     kotlin         : kotlin,
     dagger         : dagger,
@@ -231,5 +237,6 @@ ext.deps = [
     fuzzywuzzy     : fuzzywuzzy,
     rootbeer       : rootbeer,
     cameraView     : cameraView,
-    circleImageView: circleImageView
+    circleImageView: circleImageView,
+    kronos         : kronos
 ]

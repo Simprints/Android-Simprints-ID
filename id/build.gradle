@@ -187,6 +187,7 @@ dependencies {
     implementation deps.koin.android
     implementation deps.fuzzywuzzy.core
     implementation deps.rxjava2.tasks
+    implementation deps.kronos.kronos
 
     // RootBeer (root detection)
     implementation deps.rootbeer.core
