@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
+import com.lyft.kronos.AndroidClockFactory
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
@@ -76,6 +77,7 @@ import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
+import com.simprints.id.tools.time.KronosTimeHelperImpl
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
@@ -190,7 +192,10 @@ open class AppModule {
 
     @Provides
     @Singleton
-    fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
+    // https://github.com/lyft/Kronos-Android
+    fun provideTimeHelper(app: Application): TimeHelper = KronosTimeHelperImpl(
+        AndroidClockFactory.createKronosClock(app)
+    )
 
     @Provides
     open fun provideSessionRealmConfigBuilder(): SessionRealmConfigBuilder =
@@ -200,7 +205,6 @@ open class AppModule {
     @Singleton
     open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsBuilder =
         SessionEventValidatorsBuilderImpl()
-
 
     @Provides
     @Singleton
