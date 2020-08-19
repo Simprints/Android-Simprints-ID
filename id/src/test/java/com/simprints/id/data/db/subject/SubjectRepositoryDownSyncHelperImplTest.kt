@@ -16,7 +16,7 @@ import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperat
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationFactoryImpl
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.testtools.common.channel.testChannel
 import com.simprints.testtools.common.syntax.assertThrows
@@ -69,7 +69,7 @@ class SubjectRepositoryDownSyncHelperImplTest {
     @RelaxedMockK lateinit var subjectLocalDataSource: SubjectLocalDataSource
     @RelaxedMockK lateinit var eventRemoteDataSource: EventRemoteDataSource
     @RelaxedMockK lateinit var subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository
-    val timeHelper = TimeHelperImpl()
+    val timeHelper = TestTimeHelperImpl()
 
     @Before
     fun setUp() {

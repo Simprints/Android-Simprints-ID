@@ -18,7 +18,7 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.commontesttools.TestTimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -44,7 +44,7 @@ class ModalityFlowEnrolImplTest {
     }
 
     private lateinit var modalityFlowEnrol: ModalityFlowEnrolImpl
-    private val timeHelper = TimeHelperImpl()
+    private val timeHelper = TestTimeHelperImpl()
     @MockK lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @MockK lateinit var faceStepProcessor: FaceStepProcessor
     @MockK lateinit var coreStepProcessor: CoreStepProcessor

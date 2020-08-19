@@ -16,7 +16,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.kotlintest.shouldThrow
 import io.mockk.*
@@ -42,7 +42,7 @@ class SessionRepositoryImplTest {
     @MockK private lateinit var preferencesManagerMock: PreferencesManager
     @MockK private lateinit var crashReportManagerMock: CrashReportManager
     private lateinit var sessionsRepository: SessionRepository
-    private val timeHelper = TimeHelperImpl()
+    private val timeHelper = TestTimeHelperImpl()
 
     @Before
     fun setUp() {

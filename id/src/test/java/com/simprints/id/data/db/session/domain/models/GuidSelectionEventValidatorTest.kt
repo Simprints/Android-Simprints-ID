@@ -4,14 +4,14 @@ import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.data.db.session.domain.models.events.GuidSelectionEvent
 import com.simprints.id.data.db.session.domain.models.events.callback.IdentificationCallbackEvent
 import com.simprints.id.exceptions.safe.session.validator.GuidSelectEventValidatorException
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.commontesttools.TestTimeHelperImpl
 import io.kotlintest.shouldThrow
 import org.junit.Test
 import java.util.*
 
 class GuidSelectionEventValidatorTest {
 
-    val timeHelper = TimeHelperImpl()
+    val timeHelper = TestTimeHelperImpl()
 
     @Test
     fun validate_shouldRejectASessionWithMultipleGuidSelectionEvents() {
