@@ -8,7 +8,7 @@ import com.simprints.id.data.db.session.local.SessionLocalDataSource
 import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.extensions.bufferedChunks
 import com.simprints.id.tools.ignoreException
 import kotlinx.coroutines.CoroutineScope

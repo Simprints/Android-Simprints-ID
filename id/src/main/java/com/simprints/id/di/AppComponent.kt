@@ -56,7 +56,7 @@ import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsS
 import com.simprints.id.services.scheduledSync.subjects.up.workers.SubjectsUpSyncCountWorker
 import com.simprints.id.services.scheduledSync.subjects.up.workers.SubjectsUpSyncUploaderWorker
 import com.simprints.id.services.securitystate.SecurityStateWorker
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton

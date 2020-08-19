@@ -8,7 +8,7 @@ import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.CandidateReadEvent
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import kotlinx.coroutines.launch
 

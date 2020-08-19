@@ -9,7 +9,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.just
 import com.simprints.testtools.common.livedata.testObserver

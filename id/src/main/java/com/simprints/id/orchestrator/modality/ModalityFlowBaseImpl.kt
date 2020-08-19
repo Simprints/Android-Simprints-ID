@@ -22,7 +22,7 @@ import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitForm
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.ignoreException
 
 abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProcessor,

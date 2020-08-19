@@ -24,7 +24,7 @@ import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -120,11 +120,11 @@ class TestSecurityModule(
     }
 
     override fun provideAuthenticationHelper(
-        crashReportManager: CrashReportManager,
-        loginInfoManager: LoginInfoManager,
-        timeHelper: TimeHelper,
-        projectAuthenticator: ProjectAuthenticator,
-        sessionRepository: SessionRepository
+            crashReportManager: CrashReportManager,
+            loginInfoManager: LoginInfoManager,
+            timeHelper: TimeHelper,
+            projectAuthenticator: ProjectAuthenticator,
+            sessionRepository: SessionRepository
     ): AuthenticationHelper {
         return authenticationHelperRule.resolveDependency {
             super.provideAuthenticationHelper(

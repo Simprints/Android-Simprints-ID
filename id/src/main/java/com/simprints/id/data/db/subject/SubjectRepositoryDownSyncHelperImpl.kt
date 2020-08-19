@@ -19,7 +19,7 @@ import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperat
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncOperationResult.DownSyncState.*
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncProgress
 import com.simprints.id.services.scheduledSync.subjects.common.SYNC_LOG_TAG
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.json.SimJsonHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi

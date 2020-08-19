@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.session.domain.models.events.Event
 import com.simprints.id.data.db.session.domain.models.events.EventType
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import java.util.*
 
 @Keep

@@ -34,7 +34,7 @@ import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.extensions.deviceId
 import dagger.Module
 import dagger.Provides
@@ -134,11 +134,11 @@ open class SecurityModule {
 
     @Provides
     open fun provideAuthenticationHelper(
-        crashReportManager: CrashReportManager,
-        loginInfoManager: LoginInfoManager,
-        timeHelper: TimeHelper,
-        projectAuthenticator: ProjectAuthenticator,
-        sessionRepository: SessionRepository
+            crashReportManager: CrashReportManager,
+            loginInfoManager: LoginInfoManager,
+            timeHelper: TimeHelper,
+            projectAuthenticator: ProjectAuthenticator,
+            sessionRepository: SessionRepository
     ): AuthenticationHelper {
         return AuthenticationHelperImpl(
             crashReportManager,

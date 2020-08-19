@@ -3,7 +3,7 @@ package com.simprints.id.activities.orchestrator
 import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.db.session.domain.models.events.callback.*
 import com.simprints.id.domain.moduleapi.app.responses.*
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 
 class OrchestratorEventsHelperImpl(private val sessionRepository: SessionRepository,
                                    private val timeHelper: TimeHelper) : OrchestratorEventsHelper {

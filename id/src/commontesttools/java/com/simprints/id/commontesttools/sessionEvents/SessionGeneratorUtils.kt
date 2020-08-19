@@ -4,7 +4,7 @@ import com.simprints.id.data.db.session.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.session.domain.models.session.Device
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import java.util.*
 
 fun createFakeSession(timeHelper: TimeHelper? = null,

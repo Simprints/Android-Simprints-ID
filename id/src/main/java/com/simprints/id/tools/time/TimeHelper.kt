@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.id.tools.time
 
 import com.simprints.id.Application
 import java.util.*
