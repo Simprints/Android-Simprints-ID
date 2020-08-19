@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 
 class FetchGuidViewModelFactory(private val personRepository: SubjectRepository,

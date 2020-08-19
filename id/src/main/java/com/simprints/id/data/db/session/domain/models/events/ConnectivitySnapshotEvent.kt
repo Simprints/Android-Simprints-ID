@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.session.domain.models.events
 
 import androidx.annotation.Keep
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 
 @Keep

@@ -30,7 +30,7 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
 import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.FlowPreview

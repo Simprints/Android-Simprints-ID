@@ -10,7 +10,7 @@ import com.simprints.core.tools.extentions.getQuantityString
 import com.simprints.core.tools.extentions.nand
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import kotlinx.android.synthetic.main.activity_dashboard_card_daily_activity.view.*
 
 class DashboardDailyActivityCardDisplayerImpl(

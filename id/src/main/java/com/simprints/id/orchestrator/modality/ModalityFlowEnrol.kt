@@ -20,7 +20,7 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFace
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 
 class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
                             private val faceStepProcessor: FaceStepProcessor,

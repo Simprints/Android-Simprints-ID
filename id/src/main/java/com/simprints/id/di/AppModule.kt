@@ -78,6 +78,7 @@ import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
@@ -209,11 +210,11 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(
-        ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider,
-        timeHelper: TimeHelper,
-        sessionRealmConfigBuilder: SessionRealmConfigBuilder,
-        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
+            ctx: Context,
+            secureDataManager: SecureLocalDbKeyProvider,
+            timeHelper: TimeHelper,
+            sessionRealmConfigBuilder: SessionRealmConfigBuilder,
+            sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
     ): SessionLocalDataSource =
         SessionLocalDataSourceImpl(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder, sessionEventValidatorsBuilder.build())
 
@@ -228,14 +229,14 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideSessionEventsManager(
-        ctx: Context,
-        sessionEventsSyncManager: SessionEventsSyncManager,
-        sessionLocalDataSource: SessionLocalDataSource,
-        sessionRemoteDataSource: SessionRemoteDataSource,
-        preferencesManager: PreferencesManager,
-        loginInfoManager: LoginInfoManager,
-        timeHelper: TimeHelper,
-        crashReportManager: CrashReportManager
+            ctx: Context,
+            sessionEventsSyncManager: SessionEventsSyncManager,
+            sessionLocalDataSource: SessionLocalDataSource,
+            sessionRemoteDataSource: SessionRemoteDataSource,
+            preferencesManager: PreferencesManager,
+            loginInfoManager: LoginInfoManager,
+            timeHelper: TimeHelper,
+            crashReportManager: CrashReportManager
     ): SessionRepository =
         SessionRepositoryImpl(
             ctx.deviceId,
@@ -272,12 +273,12 @@ open class AppModule {
 
     @Provides
     open fun provideGuidSelectionManager(
-        context: Context,
-        loginInfoManager: LoginInfoManager,
-        analyticsManager: AnalyticsManager,
-        crashReportManager: CrashReportManager,
-        timeHelper: TimeHelper,
-        sessionRepository: SessionRepository
+            context: Context,
+            loginInfoManager: LoginInfoManager,
+            analyticsManager: AnalyticsManager,
+            crashReportManager: CrashReportManager,
+            timeHelper: TimeHelper,
+            sessionRepository: SessionRepository
     ): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId,

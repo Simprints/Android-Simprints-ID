@@ -12,16 +12,16 @@ import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsExce
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import timber.log.Timber
 import java.io.IOException
 
 class AuthenticationHelperImpl(
-    private val crashReportManager: CrashReportManager,
-    private val loginInfoManager: LoginInfoManager,
-    private val timeHelper: TimeHelper,
-    private val projectAuthenticator: ProjectAuthenticator,
-    private val sessionRepository: SessionRepository
+        private val crashReportManager: CrashReportManager,
+        private val loginInfoManager: LoginInfoManager,
+        private val timeHelper: TimeHelper,
+        private val projectAuthenticator: ProjectAuthenticator,
+        private val sessionRepository: SessionRepository
 ) : AuthenticationHelper {
 
     private var loginStartTime = 0L

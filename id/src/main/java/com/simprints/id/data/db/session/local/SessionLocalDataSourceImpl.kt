@@ -19,7 +19,7 @@ import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionDataSourceException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery

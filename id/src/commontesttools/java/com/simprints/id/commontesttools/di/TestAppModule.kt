@@ -31,7 +31,7 @@ import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -119,14 +119,14 @@ class TestAppModule(
         keystoreManagerRule.resolveDependency { super.provideKeystoreManager() }
 
     override fun provideSessionEventsManager(
-        ctx: Context,
-        sessionEventsSyncManager: SessionEventsSyncManager,
-        sessionLocalDataSource: SessionLocalDataSource,
-        sessionRemoteDataSource: SessionRemoteDataSource,
-        preferencesManager: PreferencesManager,
-        loginInfoManager: LoginInfoManager,
-        timeHelper: TimeHelper,
-        crashReportManager: CrashReportManager
+            ctx: Context,
+            sessionEventsSyncManager: SessionEventsSyncManager,
+            sessionLocalDataSource: SessionLocalDataSource,
+            sessionRemoteDataSource: SessionRemoteDataSource,
+            preferencesManager: PreferencesManager,
+            loginInfoManager: LoginInfoManager,
+            timeHelper: TimeHelper,
+            crashReportManager: CrashReportManager
     ): SessionRepository = sessionEventsManagerRule.resolveDependency {
         super.provideSessionEventsManager(
             ctx,
@@ -141,11 +141,11 @@ class TestAppModule(
     }
 
     override fun provideSessionEventsLocalDbManager(
-        ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider,
-        timeHelper: TimeHelper,
-        sessionRealmConfigBuilder: SessionRealmConfigBuilder,
-        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
+            ctx: Context,
+            secureDataManager: SecureLocalDbKeyProvider,
+            timeHelper: TimeHelper,
+            sessionRealmConfigBuilder: SessionRealmConfigBuilder,
+            sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
     ): SessionLocalDataSource =
         sessionEventsLocalDbManagerRule.resolveDependency {
             super.provideSessionEventsLocalDbManager(

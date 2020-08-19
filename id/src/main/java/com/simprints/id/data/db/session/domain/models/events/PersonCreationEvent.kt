@@ -5,7 +5,7 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.db.session.domain.models.session.SessionEvents
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 
 /*
  * At the end of the sequence of capture, we build a Person object
@@ -20,10 +20,10 @@ class PersonCreationEvent(
 
     companion object {
         fun build(
-            timeHelper: TimeHelper,
-            currentSession: SessionEvents,
-            fingerprintSamples: List<FingerprintSample>?,
-            faceSamples: List<FaceSample>?
+                timeHelper: TimeHelper,
+                currentSession: SessionEvents,
+                fingerprintSamples: List<FingerprintSample>?,
+                faceSamples: List<FaceSample>?
         ) = PersonCreationEvent(
             startTime = timeHelper.now(),
             fingerprintCaptureIds = extractFingerprintCaptureEventIdsBasedOnPersonTemplate(

@@ -16,7 +16,7 @@ import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSy
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState.*
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerType.DOWN_COUNTER
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerType.UP_COUNTER
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.testtools.common.livedata.testObserver
