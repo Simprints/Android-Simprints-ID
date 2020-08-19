@@ -17,7 +17,7 @@ import com.simprints.id.data.db.session.local.models.DbSession
 import com.simprints.id.data.db.session.local.models.toDomain
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.safe.session.SessionDataSourceException
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.commontesttools.TestTimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -58,7 +58,7 @@ class SessionLocalDataSourceImplTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
         Realm.init(ctx)
-        sessionLocalDataSource = SessionLocalDataSourceImpl(ctx, mockk(relaxed = true), TimeHelperImpl(), realmConfigBuilder, arrayOf(fakeValidator))
+        sessionLocalDataSource = SessionLocalDataSourceImpl(ctx, mockk(relaxed = true), TestTimeHelperImpl(), realmConfigBuilder, arrayOf(fakeValidator))
         every { realmConfigBuilder.build(any(), any()) } returns configForTest
         runBlockingInIO {
             Realm.deleteRealm(configForTest)
@@ -83,7 +83,7 @@ class SessionLocalDataSourceImplTest {
     @Test
     fun create_shouldCloseAnyOtherSession() {
         runBlockingInIO {
-            saveFakeSessions(realmForTest, listOf(createFakeOpenSession(TimeHelperImpl())))
+            saveFakeSessions(realmForTest, listOf(createFakeOpenSession(TestTimeHelperImpl())))
 
             sessionLocalDataSource.create(
                 APP_VERSION_NAME,
@@ -135,8 +135,8 @@ class SessionLocalDataSourceImplTest {
     fun countByProjectIt_shouldReturnTheRightCount() {
         runBlockingInIO {
             val storedSessions = 4
-            val sessions = (0 until storedSessions - 1).map { createFakeOpenSession(TimeHelperImpl()) }
-            saveFakeSessions(realmForTest, sessions + createFakeOpenSession(TimeHelperImpl(), "projectId"))
+            val sessions = (0 until storedSessions - 1).map { createFakeOpenSession(TestTimeHelperImpl()) }
+            saveFakeSessions(realmForTest, sessions + createFakeOpenSession(TestTimeHelperImpl(), "projectId"))
 
             assertThat(sessionLocalDataSource.count(SessionQuery())).isEqualTo(storedSessions)
             assertThat(sessionLocalDataSource.count(SessionQuery(projectId = "projectId"))).isEqualTo(1)
@@ -147,8 +147,8 @@ class SessionLocalDataSourceImplTest {
     fun countByOpen_shouldReturnTheRightCount() {
         runBlockingInIO {
             val storedSessions = 4
-            val sessions = (0 until storedSessions - 1).map { createFakeClosedSession(TimeHelperImpl()) }
-            saveFakeSessions(realmForTest, sessions + createFakeOpenSession(TimeHelperImpl(), "projectId"))
+            val sessions = (0 until storedSessions - 1).map { createFakeClosedSession(TestTimeHelperImpl()) }
+            saveFakeSessions(realmForTest, sessions + createFakeOpenSession(TestTimeHelperImpl(), "projectId"))
 
             assertThat(sessionLocalDataSource.count(SessionQuery())).isEqualTo(storedSessions)
             assertThat(sessionLocalDataSource.count(SessionQuery(openSession = true))).isEqualTo(1)
@@ -169,8 +169,8 @@ class SessionLocalDataSourceImplTest {
     fun loadByProjectIt_shouldReturnTheRightResults() {
         runBlockingInIO {
             val storedSessions = 4
-            val sessions = (0 until storedSessions - 1).map { createFakeOpenSession(TimeHelperImpl()) }
-            val specificSession = createFakeOpenSession(TimeHelperImpl(), "projectId")
+            val sessions = (0 until storedSessions - 1).map { createFakeOpenSession(TestTimeHelperImpl()) }
+            val specificSession = createFakeOpenSession(TestTimeHelperImpl(), "projectId")
             saveFakeSessions(realmForTest, sessions + specificSession)
 
             with(sessionLocalDataSource) {
@@ -184,8 +184,8 @@ class SessionLocalDataSourceImplTest {
     fun loadByClose_shouldReturnTheRightResults() {
         runBlockingInIO {
             val storedSessions = 4
-            val sessions = (0 until storedSessions - 1).map { createFakeOpenSession(TimeHelperImpl()) }
-            val specificSession = createFakeClosedSession(TimeHelperImpl())
+            val sessions = (0 until storedSessions - 1).map { createFakeOpenSession(TestTimeHelperImpl()) }
+            val specificSession = createFakeClosedSession(TestTimeHelperImpl())
             saveFakeSessions(realmForTest, sessions + specificSession)
 
             with(sessionLocalDataSource) {
@@ -209,7 +209,7 @@ class SessionLocalDataSourceImplTest {
     fun delete_shouldDeleteAllSessions() {
         runBlockingInIO {
             val storedSessions = 4
-            val sessions = (0 until storedSessions).map { createFakeOpenSession(TimeHelperImpl()) }
+            val sessions = (0 until storedSessions).map { createFakeOpenSession(TestTimeHelperImpl()) }
             saveFakeSessions(realmForTest, sessions)
             assertThat(realmForTest.where(DbSession::class.java).findAll().count()).isEqualTo(storedSessions)
 
@@ -223,8 +223,8 @@ class SessionLocalDataSourceImplTest {
     fun deleteByClose_shouldDeleteCloseSession() {
         runBlockingInIO {
             val storedSessions = 4
-            val sessions = (0 until storedSessions - 1).map { createFakeClosedSession(TimeHelperImpl()) }
-            val specificSession = createFakeOpenSession(TimeHelperImpl())
+            val sessions = (0 until storedSessions - 1).map { createFakeClosedSession(TestTimeHelperImpl()) }
+            val specificSession = createFakeOpenSession(TestTimeHelperImpl())
             saveFakeSessions(realmForTest, sessions + specificSession)
             assertThat(realmForTest.where(DbSession::class.java).findAll().count()).isEqualTo(storedSessions)
 
@@ -247,7 +247,7 @@ class SessionLocalDataSourceImplTest {
     @Test
     fun update_shouldUpdateStoredSession() {
         runBlockingInIO {
-            val session = createFakeOpenSession(TimeHelperImpl())
+            val session = createFakeOpenSession(TestTimeHelperImpl())
             saveFakeSessions(realmForTest, listOf(session))
 
             sessionLocalDataSource.update(session.id) {
@@ -262,7 +262,7 @@ class SessionLocalDataSourceImplTest {
     @Test
     fun update_shouldValidateTheNewSession() {
         runBlockingInIO {
-            val session = createFakeOpenSession(TimeHelperImpl())
+            val session = createFakeOpenSession(TestTimeHelperImpl())
             saveFakeSessions(realmForTest, listOf(session))
 
             sessionLocalDataSource.update(session.id) {
@@ -276,7 +276,7 @@ class SessionLocalDataSourceImplTest {
     @Test
     fun update_shouldThrowIfValidationFails() {
         runBlockingInIO {
-            val session = createFakeOpenSession(TimeHelperImpl())
+            val session = createFakeOpenSession(TestTimeHelperImpl())
             saveFakeSessions(realmForTest, listOf(session))
             every { fakeValidator.validate(any()) } throws Throwable("Invalid session")
 
@@ -303,8 +303,8 @@ class SessionLocalDataSourceImplTest {
     @Test
     fun updateCurrentSession_shouldUpdateOnlyCurrentSession() {
         runBlockingInIO {
-            val currentSession = createFakeOpenSession(TimeHelperImpl())
-            val oldSession = createFakeClosedSession(TimeHelperImpl())
+            val currentSession = createFakeOpenSession(TestTimeHelperImpl())
+            val oldSession = createFakeClosedSession(TestTimeHelperImpl())
             saveFakeSessions(realmForTest, listOf(currentSession, oldSession))
 
             sessionLocalDataSource.updateCurrentSession {
@@ -336,8 +336,8 @@ class SessionLocalDataSourceImplTest {
     @Test
     fun addEventToCurrentSession_shouldUpdateOnlyCurrentSession() {
         runBlockingInIO {
-            val currentSession = createFakeOpenSession(TimeHelperImpl())
-            val oldSession = createFakeClosedSession(TimeHelperImpl())
+            val currentSession = createFakeOpenSession(TestTimeHelperImpl())
+            val oldSession = createFakeClosedSession(TestTimeHelperImpl())
             saveFakeSessions(realmForTest, listOf(currentSession, oldSession))
 
             sessionLocalDataSource.addEventToCurrentSession(AlertScreenEvent(0, DIFFERENT_PROJECT_ID))

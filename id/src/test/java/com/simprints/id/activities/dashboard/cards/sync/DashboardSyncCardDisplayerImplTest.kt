@@ -17,7 +17,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.commontesttools.TestTimeHelperImpl
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,7 +40,7 @@ class DashboardSyncCardDisplayerImplTest {
     fun setUp() {
         ctx = ApplicationProvider.getApplicationContext()
         syncCardRootLayout = LinearLayout(ctx)
-        syncCardDisplayer = DashboardSyncCardDisplayerImpl(TimeHelperImpl())
+        syncCardDisplayer = DashboardSyncCardDisplayerImpl(TestTimeHelperImpl())
         syncCardDisplayer.initRoot(syncCardRootLayout)
     }
 

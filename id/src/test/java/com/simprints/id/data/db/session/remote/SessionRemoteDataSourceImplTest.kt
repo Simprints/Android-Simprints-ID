@@ -7,7 +7,7 @@ import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.time.TimeHelper
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -24,7 +24,7 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionRemoteDataSourceImplTest {
 
-    private val timeHelper: TimeHelper = TimeHelperImpl()
+    private val timeHelper: TimeHelper = TestTimeHelperImpl()
 
     @MockK
     lateinit var simApiClientFactory: SimApiClientFactory
