@@ -400,8 +400,9 @@ open class AppModule {
     @Provides
     open fun provideEnrolLastBiometricsViewModel(
         enrolmentHelper: EnrolmentHelper,
-        timeHelper: TimeHelper
-    ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper)
+        timeHelper: TimeHelper,
+        preferencesManager: PreferencesManager
+    ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper, preferencesManager)
 
     @ExperimentalCoroutinesApi
     @Provides
