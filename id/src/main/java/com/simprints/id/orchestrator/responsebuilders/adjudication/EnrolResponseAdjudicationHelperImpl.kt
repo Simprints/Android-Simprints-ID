@@ -12,8 +12,9 @@ class EnrolResponseAdjudicationHelperImpl(
 ) : EnrolResponseAdjudicationHelper {
     override fun getAdjudicationAction(isEnrolmentPlus: Boolean, steps: List<Step>): EnrolAdjudicationAction {
         if (isEnrolmentPlus) {
-            val faceResponse = getFaceMatchResponseFromStepsOrNull(steps)
-            val fingerResponse = getFingerMatchResponseFromStepsOrNull(steps)
+            val results = steps.map { it.getResult() }
+            val faceResponse = getFaceMatchResponseFromResultsOrNull(results)
+            val fingerResponse = getFingerMatchResponseFromResultsOrNull(results)
 
            return when {
                 fingerResponse != null && faceResponse != null -> {
@@ -33,11 +34,11 @@ class EnrolResponseAdjudicationHelperImpl(
         }
     }
 
-    private fun getFingerMatchResponseFromStepsOrNull(steps: List<Step>) =
-        steps.firstOrNull { it.getResult() is FingerprintMatchResponse }?.getResult() as FingerprintMatchResponse?
+    private fun getFingerMatchResponseFromResultsOrNull(results: List<Step.Result?>) =
+        results.filterIsInstance(FingerprintMatchResponse::class.java).lastOrNull()
 
-    private fun getFaceMatchResponseFromStepsOrNull(steps: List<Step>) =
-        steps.firstOrNull { it.getResult() is FaceMatchResponse }?.getResult() as FaceMatchResponse?
+    private fun getFaceMatchResponseFromResultsOrNull(results: List<Step.Result?>) =
+        results.filterIsInstance(FaceMatchResponse::class.java).lastOrNull()
 
     private fun performAdjudicationForFingerprint(fingerprintResponse: FingerprintMatchResponse) =
         if (allFingerprintConfidenceScoresAreBelowLowerThreshold(fingerprintResponse)) {
