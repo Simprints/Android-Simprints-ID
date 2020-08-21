@@ -3,6 +3,7 @@ package com.simprints.clientapi.activities.odk
 import com.simprints.clientapi.activities.BasePresenter
 import com.simprints.clientapi.activities.BaseView
 import com.simprints.clientapi.activities.baserequest.RequestContract
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 
 interface OdkContract {
 
@@ -10,7 +11,8 @@ interface OdkContract {
 
         fun returnRegistration(registrationId: String, sessionId: String, flowCompletedCheck:Boolean)
 
-        fun returnIdentification(idList: String, confidenceList: String, tierList: String, sessionId: String, flowCompletedCheck:Boolean)
+        fun returnIdentification(idList: String, confidenceList: String,
+                                 tierList: String, sessionId: String, matchConfidence: String, flowCompletedCheck:Boolean)
 
         fun returnVerification(id: String, confidence: String, tier: String, sessionId: String, flowCompletedCheck:Boolean)
 
