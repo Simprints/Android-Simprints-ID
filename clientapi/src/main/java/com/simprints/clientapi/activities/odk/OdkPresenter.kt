@@ -72,10 +72,10 @@ class OdkPresenter(
             addCompletionCheckEvent(flowCompletedCheck)
             view.returnIdentification(
                 identify.identifications.getIdsString(),
-                identify.identifications.getConfidencesString(),
+                identify.identifications.getConfidencesScoresString(),
                 identify.identifications.getTiersString(),
                 identify.sessionId,
-                getMatchConfidenceForHighestResult(identify.identifications).toString(),
+                identify.identifications.getConfidencesFlagsString(),
                 flowCompletedCheck
             )
         }
@@ -95,7 +95,7 @@ class OdkPresenter(
             addCompletionCheckEvent(flowCompletedCheck)
             view.returnVerification(
                 verify.matchResult.guidFound,
-                verify.matchResult.confidence.toString(),
+                verify.matchResult.confidenceScore.toString(),
                 verify.matchResult.tier.toString(),
                 getCurrentSessionIdOrEmpty(),
                 flowCompletedCheck

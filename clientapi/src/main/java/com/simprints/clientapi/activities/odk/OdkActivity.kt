@@ -14,7 +14,6 @@ import com.simprints.clientapi.clientrequests.extractors.odk.OdkVerifyExtractor
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
-import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
@@ -34,7 +33,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_REGISTER_BIOMETRICS_COMPLETE = "odk-register-biometrics-complete"
 
         private const val ODK_IDENTIFY_BIOMETRICS_COMPLETE = "odk-identify-biometrics-complete"
-        private const val ODK_MATCH_CONFIDENCE_KEY = "odk-confidence"
+        private const val ODK_MATCH_CONFIDENCE_KEY = "odk-confidences"
 
         private const val ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE = "odk-confirm-identity-biometrics-complete"
 
@@ -93,16 +92,16 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     }
 
     override fun returnIdentification(idList: String,
-                                      confidenceList: String,
+                                      confidenceScoresList: String,
                                       tierList: String,
                                       sessionId: String,
-                                      matchConfidence: String,
+                                      matchConfidencesList: String,
                                       flowCompletedCheck: Boolean) = Intent().let {
         it.putExtra(ODK_GUIDS_KEY, idList)
-        it.putExtra(ODK_CONFIDENCES_KEY, confidenceList)
+        it.putExtra(ODK_CONFIDENCES_KEY, confidenceScoresList)
         it.putExtra(ODK_TIERS_KEY, tierList)
         it.putExtra(ODK_SESSION_ID, sessionId)
-        it.putExtra(ODK_MATCH_CONFIDENCE_KEY, matchConfidence)
+        it.putExtra(ODK_MATCH_CONFIDENCE_KEY, matchConfidencesList)
         addFlowCompletedCheckBasedOnAction(it, flowCompletedCheck)
 
         sendOkResult(it)

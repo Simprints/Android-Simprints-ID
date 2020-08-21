@@ -11,8 +11,8 @@ interface OdkContract {
 
         fun returnRegistration(registrationId: String, sessionId: String, flowCompletedCheck:Boolean)
 
-        fun returnIdentification(idList: String, confidenceList: String,
-                                 tierList: String, sessionId: String, matchConfidence: String, flowCompletedCheck:Boolean)
+        fun returnIdentification(idList: String, confidenceScoresList: String,
+                                 tierList: String, sessionId: String, matchConfidencesList: String, flowCompletedCheck:Boolean)
 
         fun returnVerification(id: String, confidence: String, tier: String, sessionId: String, flowCompletedCheck:Boolean)
 
