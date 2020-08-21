@@ -98,45 +98,29 @@ class AppResponseBuilderForIdentify(private val fingerprintConfidenceThresholds:
             it.confidenceScore > fingerprintConfidenceThresholds.getValue(FingerprintConfidenceThresholds.LOW)
         }.take(returnIdentificationsCount).sortedByDescending { it.confidenceScore }
 
-        return if(doFingerprintFilteredResultsHaveHighConfidenceMatch(lowFilteredResults)) {
-            getFingerprintFilteredResultsWithHighConfidence(lowFilteredResults)
-        } else {
+        return getFingerprintFilteredResultsWithHighConfidence(lowFilteredResults).ifEmpty {
             lowFilteredResults
-        }
-    }
-
-    private fun doFingerprintFilteredResultsHaveHighConfidenceMatch(lowFilteredResults: List<FingerprintMatchResult>): Boolean {
-        return lowFilteredResults.any {
-            it.confidenceScore > fingerprintConfidenceThresholds.getValue(FingerprintConfidenceThresholds.HIGH)
         }
     }
 
     private fun getFingerprintFilteredResultsWithHighConfidence(lowFilteredResults: List<FingerprintMatchResult>): List<FingerprintMatchResult> =
         lowFilteredResults.filter {
-            it.confidenceScore > fingerprintConfidenceThresholds.getValue(FingerprintConfidenceThresholds.HIGH)
+            it.confidenceScore >= fingerprintConfidenceThresholds.getValue(FingerprintConfidenceThresholds.HIGH)
         }
 
     private fun buildResultsFromFaceMatchResponse(faceResponse: FaceMatchResponse): List<FaceMatchResult> {
 
         val lowFilteredResults = faceResponse.result.filter {
-            it.confidence > faceConfidenceThresholds.getValue(FaceConfidenceThresholds.LOW)
+            it.confidence >= faceConfidenceThresholds.getValue(FaceConfidenceThresholds.LOW)
         }.take(returnIdentificationsCount).sortedByDescending { it.confidence }
 
-        return if(doFaceFilteredResultsHaveHighConfidenceMatch(lowFilteredResults)) {
-            getFaceFilteredResultsWithHighConfidence(lowFilteredResults)
-        } else {
+        return getFaceFilteredResultsWithHighConfidence(lowFilteredResults).ifEmpty {
             lowFilteredResults
-        }
-    }
-
-    private fun doFaceFilteredResultsHaveHighConfidenceMatch(lowFilteredResults: List<FaceMatchResult>): Boolean {
-        return lowFilteredResults.any {
-            it.confidence > faceConfidenceThresholds.getValue(FaceConfidenceThresholds.HIGH)
         }
     }
 
     private fun getFaceFilteredResultsWithHighConfidence(lowFilteredResults: List<FaceMatchResult>): List<FaceMatchResult> =
         lowFilteredResults.filter {
-            it.confidence > faceConfidenceThresholds.getValue(FaceConfidenceThresholds.HIGH)
+            it.confidence >= faceConfidenceThresholds.getValue(FaceConfidenceThresholds.HIGH)
         }
 }
