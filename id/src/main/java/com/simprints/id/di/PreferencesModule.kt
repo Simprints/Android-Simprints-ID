@@ -22,6 +22,8 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintIm
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
+import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
+import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 import dagger.Module
@@ -80,7 +82,9 @@ open class PreferencesModule {
         @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         @Named("SaveFingerprintImagesStrategySerializer") saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
         @Named("ScannerGenerationsSerializer") scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
-        @Named("FingerprintsToCollectSerializer") fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>
+        @Named("FingerprintsToCollectSerializer") fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>,
+        @Named("FingerprintConfidenceThresholdsSerializer") fingerprintConfidenceThresholdsSerializer: Serializer<Map<FingerprintConfidenceThresholds, Int>>,
+        @Named("FaceConfidenceThresholdsSerializer") faceConfidenceThresholdsSerializer: Serializer<Map<FaceConfidenceThresholds, Int>>
     ): SettingsPreferencesManager = SettingsPreferencesManagerImpl(
         prefs,
         remoteConfigWrapper,
@@ -92,7 +96,9 @@ open class PreferencesModule {
         captureFingerprintStrategySerializer,
         saveFingerprintImagesStrategySerializer,
         scannerGenerationsSerializer,
-        fingerprintsToCollectSerializer
+        fingerprintsToCollectSerializer,
+        fingerprintConfidenceThresholdsSerializer,
+        faceConfidenceThresholdsSerializer
     )
 
     @Provides

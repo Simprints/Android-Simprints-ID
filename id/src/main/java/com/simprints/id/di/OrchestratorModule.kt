@@ -217,7 +217,14 @@ class OrchestratorModule {
         enrolmentHelper: EnrolmentHelper,
         timeHelper: TimeHelper,
         preferenceManager: PreferencesManager
-    ): AppResponseFactory = AppResponseFactoryImpl(enrolmentHelper, timeHelper, preferenceManager.isEnrolmentPlus)
+    ): AppResponseFactory = AppResponseFactoryImpl(
+        enrolmentHelper,
+        timeHelper,
+        preferenceManager.isEnrolmentPlus,
+        preferenceManager.fingerprintConfidenceThresholds,
+        preferenceManager.faceConfidenceThresholds,
+        preferenceManager.returnIdCount
+    )
 
     @Provides
     fun provideFlowManager(

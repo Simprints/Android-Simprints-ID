@@ -1,5 +1,6 @@
 package com.simprints.id.orchestrator.responsebuilders
 
+import com.google.common.truth.Truth.assertThat
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
@@ -15,10 +16,25 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class AppResponseBuilderForIdentifyTest {
 
-    private val responseBuilder = AppResponseBuilderForIdentify()
+    companion object {
+        private val fingerprintConfidenceThresholds = mapOf(
+            FingerprintConfidenceThresholds.LOW to 15,
+            FingerprintConfidenceThresholds.MEDIUM to 30,
+            FingerprintConfidenceThresholds.HIGH to 40
+        )
+        private val faceConfidenceThresholds = mapOf(
+            FaceConfidenceThresholds.LOW to 15,
+            FaceConfidenceThresholds.MEDIUM to 30,
+            FaceConfidenceThresholds.HIGH to 40
+        )
+        private const val RETURN_ID_COUNT = 10
+    }
+
+    private val responseBuilder =
+        AppResponseBuilderForIdentify(fingerprintConfidenceThresholds, faceConfidenceThresholds, RETURN_ID_COUNT)
 
     @Test
-    fun withFingerprintOnlySteps_shouldBuildAppResponse() {
+    fun withFingerprintOnlyStepsWithHighMatch_shouldBuildAppResponseBasedOnThresholds() {
         runBlockingTest {
             val modalities = listOf(FINGER)
             val steps = mockSteps(modalities)
@@ -28,11 +44,35 @@ class AppResponseBuilderForIdentifyTest {
             )
 
             assertThat(response, instanceOf(AppIdentifyResponse::class.java))
+            with(response as AppIdentifyResponse) {
+                assertThat(identifications.all {
+                    it.confidence >= fingerprintConfidenceThresholds.getValue(FingerprintConfidenceThresholds.HIGH)
+                }).isTrue()
+            }
         }
     }
 
     @Test
-    fun withFaceOnlySteps_shouldBuildAppIdentifyResponse() {
+    fun withFingerprintOnlyStepsWithoutHighMatch_shouldBuildAppResponseBasedOnThresholds() {
+        runBlockingTest {
+            val modalities = listOf(FINGER)
+            val steps = mockSteps(modalities, includeHighMatch = false)
+
+            val response = responseBuilder.buildAppResponse(
+                modalities, mockRequest(), steps, "sessionId"
+            )
+
+            assertThat(response, instanceOf(AppIdentifyResponse::class.java))
+            with(response as AppIdentifyResponse) {
+                assertThat(identifications.all {
+                    it.confidence >= fingerprintConfidenceThresholds.getValue(FingerprintConfidenceThresholds.LOW)
+                }).isTrue()
+            }
+        }
+    }
+
+    @Test
+    fun withFaceOnlyStepsWithHighMatch_shouldBuildAppIdentifyResponseBasedOnThresholds() {
         runBlockingTest {
             val modalities = listOf(FACE)
             val steps = mockSteps(modalities)
@@ -42,6 +82,30 @@ class AppResponseBuilderForIdentifyTest {
             )
 
             assertThat(response, instanceOf(AppIdentifyResponse::class.java))
+            with(response as AppIdentifyResponse) {
+                assertThat(identifications.all {
+                    it.confidence >= faceConfidenceThresholds.getValue(FaceConfidenceThresholds.HIGH)
+                }).isTrue()
+            }
+        }
+    }
+
+    @Test
+    fun withFaceOnlyStepsWithoutHighMatch_shouldBuildAppIdentifyResponseBasedOnThresholds() {
+        runBlockingTest {
+            val modalities = listOf(FACE)
+            val steps = mockSteps(modalities, includeHighMatch = false)
+
+            val response = responseBuilder.buildAppResponse(
+                modalities, mockRequest(), steps, "sessionId"
+            )
+
+            assertThat(response, instanceOf(AppIdentifyResponse::class.java))
+            with(response as AppIdentifyResponse) {
+                assertThat(identifications.all {
+                    it.confidence >= faceConfidenceThresholds.getValue(FaceConfidenceThresholds.LOW)
+                }).isTrue()
+            }
         }
     }
 
@@ -64,17 +128,17 @@ class AppResponseBuilderForIdentifyTest {
     )
 
 
-    private fun mockSteps(modalities: List<Modality>): List<Step> {
+    private fun mockSteps(modalities: List<Modality>, includeHighMatch: Boolean = true): List<Step> {
         val steps = arrayListOf<Step>()
 
         if (modalities.contains(FINGER)) {
             steps.add(mockFingerprintCaptureStep())
-            steps.add(mockFingerprintMatchStep())
+            steps.add(mockFingerprintMatchStep(includeHighMatch))
         }
 
         if (modalities.contains(FACE)) {
             steps.add(mockFaceCaptureStep())
-            steps.add(mockFaceMatchStep())
+            steps.add(mockFaceMatchStep(includeHighMatch))
         }
 
         return steps
