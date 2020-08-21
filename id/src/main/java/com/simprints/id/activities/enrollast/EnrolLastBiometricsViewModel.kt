@@ -92,12 +92,12 @@ class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
 
     private fun isAnyResponseWithHighConfidence(fingerprintResponse: FingerprintMatchResponse) =
         fingerprintResponse.result.any {
-            it.confidenceScore > fingerprintConfidenceThresholds.getValue(FingerprintConfidenceThresholds.HIGH)
+            it.confidenceScore >= fingerprintConfidenceThresholds.getValue(FingerprintConfidenceThresholds.HIGH)
         }
 
     private fun isAnyResponseWithHighConfidence(faceResponse: FaceMatchResponse) =
         faceResponse.result.any {
-            it.confidence > faceConfidenceThresholds.getValue(FaceConfidenceThresholds.HIGH)
+            it.confidence >= faceConfidenceThresholds.getValue(FaceConfidenceThresholds.HIGH)
         }
 
     private fun getFingerprintMatchResponseFromSteps(results: List<Step.Result?>) =
