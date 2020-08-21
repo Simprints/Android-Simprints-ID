@@ -175,7 +175,7 @@ class CommCarePresenterTest {
         verify(exactly = 1) {
             view.returnIdentification(
                 ArrayList(idList.map {
-                    com.simprints.libsimprints.Identification(it.guidFound, it.confidence, com.simprints.libsimprints.Tier.valueOf(it.tier.name))
+                    com.simprints.libsimprints.Identification(it.guidFound, it.confidenceScore, com.simprints.libsimprints.Tier.valueOf(it.tier.name))
                 }), sessionId)
         }
     }
@@ -199,7 +199,7 @@ class CommCarePresenterTest {
 
         verify(exactly = 1) {
             view.returnVerification(
-                verification.matchResult.confidence,
+                verification.matchResult.confidenceScore,
                 com.simprints.libsimprints.Tier.valueOf(verification.matchResult.tier.name),
                 verification.matchResult.guidFound,
                 sessionId,

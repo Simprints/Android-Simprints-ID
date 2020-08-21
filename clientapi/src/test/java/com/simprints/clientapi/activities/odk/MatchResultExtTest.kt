@@ -12,7 +12,7 @@ class MatchResultExtTest {
     fun matchResultShouldBeTransformedToOdkFormat(){
         val listId = listOf(MatchResult("some_guid", 40, Tier.TIER_1, MatchConfidence.HIGH), MatchResult("some_guid2", 25, Tier.TIER_2, MatchConfidence.MEDIUM))
         val okdIdsFormat = listId.getIdsString()
-        val okdConfidenceFormat = listId.getConfidencesString()
+        val okdConfidenceFormat = listId.getConfidencesScoresString()
         val okdTierFormat = listId.getTiersString()
 
 

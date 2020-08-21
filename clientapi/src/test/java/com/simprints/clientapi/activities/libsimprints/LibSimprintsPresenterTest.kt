@@ -193,7 +193,7 @@ class LibSimprintsPresenterTest {
                 withArg { listOfIdentificationsReturned ->
                     expectedReturnedList.forEach { expected ->
                         listOfIdentificationsReturned.find {
-                            it.confidence == expected.confidence.toFloat() &&
+                            it.confidence == expected.confidenceScore.toFloat() &&
                                 it.guid == expected.guidFound &&
                                 it.tier.name == expected.tier.name
                         }
@@ -225,7 +225,7 @@ class LibSimprintsPresenterTest {
         }
 
         val libVerification = Verification(
-            verification.matchResult.confidence,
+            verification.matchResult.confidenceScore,
             Tier.valueOf(verification.matchResult.tier.name),
             verification.matchResult.guidFound)
 

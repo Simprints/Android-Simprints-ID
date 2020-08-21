@@ -10,7 +10,6 @@ import com.simprints.clientapi.domain.responses.EnrolResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
-import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence.*
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
@@ -122,10 +121,10 @@ class OdkPresenterTest {
         verify(exactly = 1) {
             view.returnIdentification(
                 idList = "${id1.guidFound} ${id2.guidFound}",
-                confidenceList = "${id1.confidence} ${id2.confidence}",
+                confidenceScoresList = "${id1.confidenceScore} ${id2.confidenceScore}",
                 tierList = "${id1.tier} ${id2.tier}",
                 sessionId = sessionId,
-                matchConfidence = highestMatchConfidence,
+                matchConfidenceList = highestMatchConfidence,
                 flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
     }
@@ -145,7 +144,7 @@ class OdkPresenterTest {
         verify(exactly = 1) {
             view.returnVerification(
                 id = verification.matchResult.guidFound,
-                confidence = verification.matchResult.confidence.toString(),
+                confidence = verification.matchResult.confidenceScore.toString(),
                 tier = verification.matchResult.tier.toString(),
                 sessionId = sessionId,
                 flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
