@@ -26,10 +26,6 @@ class AppResponseFactoryImpl(
                                           appRequest: AppRequest,
                                           steps: List<Step>,
                                           sessionId: String): AppResponse =
-        /**
-         * Currently only FINGER/AppResponseBuilderForFinger is used. The others
-         * are placeholders for when we will introduce the FaceModality
-         */
         when (appRequest) {
             is AppEnrolRequest -> performAdjudicationForEnrolRequest(steps).run {
                 when(this) {

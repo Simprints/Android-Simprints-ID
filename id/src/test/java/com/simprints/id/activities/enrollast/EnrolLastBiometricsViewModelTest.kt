@@ -112,7 +112,7 @@ class EnrolLastBiometricsViewModelTest {
     fun fingerprintWithEnrolmentPlus_processRequestWithHighConfidenceInPreviousSteps_shouldFail() {
         runBlocking {
             buildViewModel(isEnrolmentPlus = true)
-            val highConfidenceScore = 50f
+            val highConfidenceScore = 40f
             viewModel.processEnrolLastBiometricsRequest(
                 buildRequestWithFingerprintPreviousStepsHavingAHighConfidence(highConfidenceScore)
             )
@@ -125,7 +125,7 @@ class EnrolLastBiometricsViewModelTest {
     fun fingerprintWithEnrolmentPlus_processRequestWithLessThanHighConfidenceInPreviousSteps_shouldSucceedWithRegistration() {
         runBlocking {
             buildViewModel(isEnrolmentPlus = true)
-            val lowerThanHighConfidenceScore = 30f
+            val lowerThanHighConfidenceScore = 39f
             val newEnrolment = SubjectsGeneratorUtils.getRandomSubject()
             every { enrolHelper.buildSubject(any(), any(), any(), any(), any(), any()) } returns newEnrolment
             viewModel.processEnrolLastBiometricsRequest(
@@ -143,7 +143,7 @@ class EnrolLastBiometricsViewModelTest {
     fun faceWithEnrolmentPlus_processRequestWithHighConfidenceInPreviousSteps_shouldFail() {
         runBlocking {
             buildViewModel(isEnrolmentPlus = true)
-            val highConfidenceScore = 50f
+            val highConfidenceScore = 40f
             viewModel.processEnrolLastBiometricsRequest(
                 buildRequestWithFacePreviousStepsHavingAHighConfidence(highConfidenceScore)
             )
@@ -156,7 +156,7 @@ class EnrolLastBiometricsViewModelTest {
     fun faceWithEnrolmentPlus_processRequestWithLessThanHighConfidenceInPreviousSteps_shouldSucceedWithRegistration() {
         runBlocking {
             buildViewModel(isEnrolmentPlus = true)
-            val lowerThanHighConfidenceScore = 30f
+            val lowerThanHighConfidenceScore = 39f
             val newEnrolment = SubjectsGeneratorUtils.getRandomSubject()
             every { enrolHelper.buildSubject(any(), any(), any(), any(), any(), any()) } returns newEnrolment
             viewModel.processEnrolLastBiometricsRequest(
