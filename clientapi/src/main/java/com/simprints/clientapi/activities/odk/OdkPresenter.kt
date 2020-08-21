@@ -3,11 +3,14 @@ package com.simprints.clientapi.activities.odk
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.odk.OdkAction.*
-import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.*
+import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.ConfirmIdentity
+import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.EnrolLastBiometrics
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.*
+import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
@@ -72,10 +75,19 @@ class OdkPresenter(
                 identify.identifications.getConfidencesString(),
                 identify.identifications.getTiersString(),
                 identify.sessionId,
+                getMatchConfidenceForHighestResult(identify.identifications).toString(),
                 flowCompletedCheck
             )
         }
     }
+
+    private fun getMatchConfidenceForHighestResult(identifications: List<MatchResult>) =
+        when {
+            identifications.any { it.matchConfidence == HIGH } -> HIGH
+            identifications.any { it.matchConfidence == MEDIUM } -> MEDIUM
+            identifications.any { it.matchConfidence == LOW } -> LOW
+            else -> NONE
+        }
 
     override fun handleVerifyResponse(verify: VerifyResponse) {
         CoroutineScope(Dispatchers.Main).launch {

@@ -38,7 +38,7 @@ class AppResponseFactoryImpl(
                 }
             }
             is AppIdentifyRequest -> buildAppResponseBuilderForIdentify()
-            is AppVerifyRequest -> AppResponseBuilderForVerify()
+            is AppVerifyRequest -> AppResponseBuilderForVerify(fingerprintConfidenceThresholds, faceConfidenceThresholds)
             is AppConfirmIdentityRequest -> AppResponseBuilderForConfirmIdentity()
             is AppEnrolLastBiometricsRequest -> AppResponseBuilderForEnrolLastBiometrics()
         }.buildAppResponse(modalities, appRequest, steps, sessionId)
