@@ -7,5 +7,5 @@ data class FingerState(val id: FingerIdentifier,
                        var currentCaptureIndex: Int = 0) {
 
     fun isMultiCapture(): Boolean = captures.size > 1
-    fun currentCapture(): CaptureState = captures.last()
+    fun currentCapture(): CaptureState = captures[currentCaptureIndex]
 }
