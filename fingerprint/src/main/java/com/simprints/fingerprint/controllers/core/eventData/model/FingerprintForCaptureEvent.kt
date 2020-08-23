@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
+import com.simprints.fingerprint.activities.collect.state.CaptureState
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
@@ -37,10 +37,10 @@ class FingerprintCaptureEvent(
     }
 
     companion object {
-        fun buildResult(status: FingerCollectionState): Result = when (status) {
-            is FingerCollectionState.Skipped -> Result.SKIPPED
-            is FingerCollectionState.NotDetected -> Result.NO_FINGER_DETECTED
-            is FingerCollectionState.Collected -> if (status.scanResult.isGoodScan()) {
+        fun buildResult(status: CaptureState): Result = when (status) {
+            is CaptureState.Skipped -> Result.SKIPPED
+            is CaptureState.NotDetected -> Result.NO_FINGER_DETECTED
+            is CaptureState.Collected -> if (status.scanResult.isGoodScan()) {
                 Result.GOOD_SCAN
             } else {
                 Result.BAD_QUALITY

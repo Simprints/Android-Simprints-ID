@@ -18,7 +18,7 @@ import com.simprints.fingerprint.activities.collect.resources.buttonTextId
 import com.simprints.fingerprint.activities.collect.resources.nameTextId
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
-import com.simprints.fingerprint.activities.collect.state.FingerCollectionState.*
+import com.simprints.fingerprint.activities.collect.state.CaptureState.*
 import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningOnlyTimeoutBar
 import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar
 import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningWithImageTransferTimeoutBar
@@ -90,7 +90,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
             view_pager,
             indicator_layout,
             onFingerSelected = { position -> vm.updateSelectedFinger(position) },
-            isAbleToSelectNewFinger = { !vm.state().currentFingerState().isCommunicating() }
+            isAbleToSelectNewFinger = { !vm.state().currentCaptureState().isCommunicating() }
         )
     }
 
@@ -140,7 +140,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun CollectFingerprintsState.updateScanButton() {
-        with(currentFingerState()) {
+        with(currentCaptureState()) {
             scan_button.text = getString(buttonTextId(isAskingRescan))
             scan_button.setTextColor(resources.getColor(buttonTextColour(), null))
             scan_button.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
@@ -149,7 +149,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     private fun CollectFingerprintsState.updateProgressBar() {
         with(timeoutBar) {
-            when (val fingerState = currentFingerState()) {
+            when (val fingerState = currentCaptureState()) {
                 is NotCollected,
                 is Skipped -> {
                     handleCancelled()
@@ -175,8 +175,9 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private fun CollectFingerprintsState.listenForConfirmDialog() {
         confirmDialog = if (isShowingConfirmDialog && confirmDialog == null) {
             val mapOfScannedFingers = fingerStates.associate { fingerState ->
+                val currentCapture = fingerState.currentCapture()
                 getString(fingerState.id.nameTextId()) to
-                    (fingerState is Collected && fingerState.scanResult.isGoodScan())
+                    (currentCapture is Collected && currentCapture.scanResult.isGoodScan())
             }
             ConfirmFingerprintsDialog(this@CollectFingerprintsActivity, mapOfScannedFingers,
                 callbackConfirm = {
@@ -244,7 +245,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     override fun onBackPressed() {
         vm.handleOnBackPressed()
-        if (!vm.state().currentFingerState().isCommunicating()) {
+        if (!vm.state().currentCaptureState().isCommunicating()) {
             launchRefusalActivity()
         }
     }

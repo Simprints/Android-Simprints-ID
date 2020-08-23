@@ -57,15 +57,15 @@ class FingerFragment : FingerprintFragment() {
 
     private fun CollectFingerprintsState.updateFingerResultText() {
         fingerStates.find { it.id == fingerId }?.run {
-            fingerResultText.text = getString(resultTextId())
-            fingerResultText.setTextColor(resources.getColor(resultTextColour(), null))
+            fingerResultText.text = getString(currentCapture().resultTextId())
+            fingerResultText.setTextColor(resources.getColor(currentCapture().resultTextColour(), null))
         }
     }
 
     private fun CollectFingerprintsState.updateFingerDirectionText() {
         fingerStates.find { it.id == fingerId }?.run {
-            fingerDirectionText.text = getString(directionTextId(isOnLastFinger()))
-            fingerDirectionText.setTextColor(resources.getColor(directionTextColour(), null))
+            fingerDirectionText.text = getString(currentCapture().directionTextId(isOnLastFinger()))
+            fingerDirectionText.setTextColor(resources.getColor(currentCapture().directionTextColour(), null))
         }
     }
 
