@@ -7,7 +7,8 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.collect.domain.FingerOrderDeterminer
+import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
+import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
 import com.simprints.fingerprint.activities.collect.state.CaptureState
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.FingerState
@@ -53,7 +54,8 @@ class CollectFingerprintsViewModel(
     private val crashReportManager: FingerprintCrashReportManager,
     private val timeHelper: FingerprintTimeHelper,
     private val sessionEventsManager: FingerprintSessionEventsManager,
-    private val fingerOrderDeterminer: FingerOrderDeterminer
+    private val fingerPriorityDeterminer: FingerPriorityDeterminer,
+    private val startingStateDeterminer: StartingStateDeterminer
 ) : ViewModel() {
 
     val state = MutableLiveData<CollectFingerprintsState>()
@@ -111,9 +113,9 @@ class CollectFingerprintsViewModel(
     }
 
     private fun setStartingState() {
-        state.value = CollectFingerprintsState(originalFingerprintsToCapture
-            .map { FingerState(it, listOf(CaptureState.NotCollected)) })
-//            .let { fingerOrderDeterminer.sortedUsingCaptureOrder(it) { id } })
+        state.value = CollectFingerprintsState(
+            startingStateDeterminer.determineStartingFingerStates(originalFingerprintsToCapture)
+        )
     }
 
     fun isImageTransferRequired(): Boolean =
@@ -287,10 +289,9 @@ class CollectFingerprintsViewModel(
 
     private fun handleAutoAddFinger() {
         updateState {
-            val nextPriorityFingerId = fingerOrderDeterminer.determineNextPriorityFinger(fingerStates.map { it.id })
+            val nextPriorityFingerId = fingerPriorityDeterminer.determineNextPriorityFinger(fingerStates.map { it.id })
             if (nextPriorityFingerId != null) {
-                val newFingerState = FingerState(nextPriorityFingerId, listOf(CaptureState.NotCollected))
-                fingerStates = fingerOrderDeterminer.sortedUsingCaptureOrder(fingerStates + listOf(newFingerState)) { id }
+                fingerStates = fingerStates + listOf(FingerState(nextPriorityFingerId, listOf(CaptureState.NotCollected)))
             }
         }
     }
