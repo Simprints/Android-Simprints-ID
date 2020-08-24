@@ -57,6 +57,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         ODK_REGISTER_BIOMETRICS_COMPLETE,
         ODK_IDENTIFY_BIOMETRICS_COMPLETE,
         ODK_MATCH_CONFIDENCE_FLAGS_KEY,
+        ODK_HIGHEST_MATCH_CONFIDENCE_FLAG_KEY,
         ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE,
         ODK_VERIFY_BIOMETRICS_COMPLETE
     )
@@ -104,6 +105,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         it.putExtra(ODK_TIERS_KEY, tierList)
         it.putExtra(ODK_SESSION_ID, sessionId)
         it.putExtra(ODK_MATCH_CONFIDENCE_FLAGS_KEY, matchConfidencesList)
+        it.putExtra(ODK_HIGHEST_MATCH_CONFIDENCE_FLAG_KEY, highestMatchConfidence)
         addFlowCompletedCheckBasedOnAction(it, flowCompletedCheck)
 
         sendOkResult(it)
