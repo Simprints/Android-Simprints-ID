@@ -89,10 +89,12 @@ class CollectFingerprintsViewModel(
     val finishWithFingerprints = MutableLiveData<LiveDataEventWithContent<List<Fingerprint>>>()
 
     private lateinit var originalFingerprintsToCapture: List<FingerIdentifier>
-    private val captureEventIds: MutableMap<FingerIdentifier, String> = mutableMapOf()
+    private val captureEventIds: MutableMap<CaptureId, String> = mutableMapOf()
     private var lastCaptureStartedAt: Long = 0
     private var scanningTask: Disposable? = null
     private var imageTransferTask: Disposable? = null
+
+    private data class CaptureId(val finger: FingerIdentifier, val captureIndex: Int)
 
     private val scannerTriggerListener = ScannerTriggerListener {
         viewModelScope.launch(context = Dispatchers.Main) {
@@ -246,19 +248,18 @@ class CollectFingerprintsViewModel(
     }
 
     private fun addCaptureEventInSession() {
-        with(state()) {
-            val fingerState = currentFingerState()
+        with(state().currentFingerState()) {
             val captureEvent = FingerprintCaptureEvent(
                 lastCaptureStartedAt,
                 timeHelper.now(),
-                fingerState.id,
+                id,
                 fingerprintPreferencesManager.qualityThreshold,
-                FingerprintCaptureEvent.buildResult(fingerState.currentCapture()),
-                (fingerState.currentCapture() as? CaptureState.Collected)?.scanResult?.let {
-                    FingerprintCaptureEvent.Fingerprint(fingerState.id, it.qualityScore, EncodingUtils.byteArrayToBase64(it.template))
+                FingerprintCaptureEvent.buildResult(currentCapture()),
+                (currentCapture() as? CaptureState.Collected)?.scanResult?.let {
+                    FingerprintCaptureEvent.Fingerprint(id, it.qualityScore, EncodingUtils.byteArrayToBase64(it.template))
                 }
             )
-            captureEventIds[fingerState.id] = captureEvent.id
+            captureEventIds[CaptureId(id, currentCaptureIndex)] = captureEvent.id
             sessionEventsManager.addEventInBackground(captureEvent)
         }
     }
@@ -391,8 +392,13 @@ class CollectFingerprintsViewModel(
 
     fun handleConfirmFingerprintsAndContinue() {
         val collectedFingers = state().fingerStates
-            .filter { it.currentCapture() is CaptureState.Collected }
-            .map { Pair(it.id, it.currentCapture() as CaptureState.Collected) }
+            .flatMap {
+                it.captures
+                    .mapIndexed { index, capture ->
+                        Pair(CaptureId(it.id, index), capture)
+                    }
+                    .filterIsInstance<Pair<CaptureId, CaptureState.Collected>>()
+            }
 
         if (collectedFingers.isEmpty()) {
             noFingersScannedToast.postEvent()
@@ -402,19 +408,19 @@ class CollectFingerprintsViewModel(
         }
     }
 
-    private fun saveImagesAndProceedToFinish(collectedFingers: List<Pair<FingerIdentifier, CaptureState.Collected>>) {
+    private fun saveImagesAndProceedToFinish(collectedFingers: List<Pair<CaptureId, CaptureState.Collected>>) {
         runBlocking {
             val imageRefs = collectedFingers.map { (id, collectedFinger) ->
                 saveImageIfExists(id, collectedFinger)
             }
             val domainFingerprints = collectedFingers.zip(imageRefs) { (id, collectedFinger), imageRef ->
-                Fingerprint(id, collectedFinger.scanResult.template).also { it.imageRef = imageRef }
+                Fingerprint(id.finger, collectedFinger.scanResult.template).also { it.imageRef = imageRef }
             }
             finishWithFingerprints.postEvent(domainFingerprints)
         }
     }
 
-    private suspend fun saveImageIfExists(id: FingerIdentifier, collectedFinger: CaptureState.Collected): FingerprintImageRef? {
+    private suspend fun saveImageIfExists(id: CaptureId, collectedFinger: CaptureState.Collected): FingerprintImageRef? {
         val captureEventId = captureEventIds[id]
 
         if (collectedFinger.scanResult.image != null && captureEventId != null) {
