@@ -393,11 +393,9 @@ class CollectFingerprintsViewModel(
     fun handleConfirmFingerprintsAndContinue() {
         val collectedFingers = state().fingerStates
             .flatMap {
-                it.captures
-                    .mapIndexed { index, capture ->
-                        Pair(CaptureId(it.id, index), capture)
-                    }
-                    .filterIsInstance<Pair<CaptureId, CaptureState.Collected>>()
+                it.captures.mapIndexedNotNull { index, capture ->
+                    if (capture is CaptureState.Collected) Pair(CaptureId(it.id, index), capture) else null
+                }
             }
 
         if (collectedFingers.isEmpty()) {
