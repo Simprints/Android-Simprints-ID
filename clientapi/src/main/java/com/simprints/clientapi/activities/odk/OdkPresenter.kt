@@ -76,6 +76,7 @@ class OdkPresenter(
                 identify.identifications.getTiersString(),
                 identify.sessionId,
                 identify.identifications.getConfidencesFlagsString(),
+                getMatchConfidenceForHighestResult(identify.identifications).name,
                 flowCompletedCheck
             )
         }

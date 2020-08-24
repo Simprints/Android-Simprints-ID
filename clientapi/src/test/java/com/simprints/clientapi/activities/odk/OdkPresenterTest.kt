@@ -124,7 +124,8 @@ class OdkPresenterTest {
                 confidenceScoresList = "${id1.confidenceScore} ${id2.confidenceScore}",
                 tierList = "${id1.tier} ${id2.tier}",
                 sessionId = sessionId,
-                matchConfidenceList = highestMatchConfidence,
+                matchConfidencesList =  "${id1.matchConfidence} ${id2.matchConfidence}",
+                highestMatchConfidence = highestMatchConfidence,
                 flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
     }

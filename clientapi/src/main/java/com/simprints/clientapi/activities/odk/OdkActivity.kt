@@ -33,7 +33,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_REGISTER_BIOMETRICS_COMPLETE = "odk-register-biometrics-complete"
 
         private const val ODK_IDENTIFY_BIOMETRICS_COMPLETE = "odk-identify-biometrics-complete"
-        private const val ODK_MATCH_CONFIDENCE_KEY = "odk-confidences"
+        private const val ODK_MATCH_CONFIDENCE_FLAGS_KEY = "odk-match-confidence-flags"
+        private const val ODK_HIGHEST_MATCH_CONFIDENCE_FLAG_KEY = "odk-highest-match-confidence-flag"
 
         private const val ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE = "odk-confirm-identity-biometrics-complete"
 
@@ -55,7 +56,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         ODK_REGISTRATION_ID_KEY,
         ODK_REGISTER_BIOMETRICS_COMPLETE,
         ODK_IDENTIFY_BIOMETRICS_COMPLETE,
-        ODK_MATCH_CONFIDENCE_KEY,
+        ODK_MATCH_CONFIDENCE_FLAGS_KEY,
         ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE,
         ODK_VERIFY_BIOMETRICS_COMPLETE
     )
@@ -96,12 +97,13 @@ class OdkActivity : RequestActivity(), OdkContract.View {
                                       tierList: String,
                                       sessionId: String,
                                       matchConfidencesList: String,
+                                      highestMatchConfidence: String,
                                       flowCompletedCheck: Boolean) = Intent().let {
         it.putExtra(ODK_GUIDS_KEY, idList)
         it.putExtra(ODK_CONFIDENCES_KEY, confidenceScoresList)
         it.putExtra(ODK_TIERS_KEY, tierList)
         it.putExtra(ODK_SESSION_ID, sessionId)
-        it.putExtra(ODK_MATCH_CONFIDENCE_KEY, matchConfidencesList)
+        it.putExtra(ODK_MATCH_CONFIDENCE_FLAGS_KEY, matchConfidencesList)
         addFlowCompletedCheckBasedOnAction(it, flowCompletedCheck)
 
         sendOkResult(it)
