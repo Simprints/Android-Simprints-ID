@@ -19,6 +19,8 @@ import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.modality.*
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
+import com.simprints.id.orchestrator.responsebuilders.adjudication.EnrolResponseAdjudicationHelper
+import com.simprints.id.orchestrator.responsebuilders.adjudication.EnrolResponseAdjudicationHelperImpl
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
@@ -216,19 +218,25 @@ class OrchestratorModule {
     fun provideAppResponseBuilderFactory(
         enrolmentHelper: EnrolmentHelper,
         timeHelper: TimeHelper,
-        preferenceManager: PreferencesManager
+        preferenceManager: PreferencesManager,
+        enrolResponseAdjudicationHelper: EnrolResponseAdjudicationHelper
     ): AppResponseFactory = AppResponseFactoryImpl(
         enrolmentHelper,
         timeHelper,
         preferenceManager.isEnrolmentPlus,
         preferenceManager.fingerprintConfidenceThresholds,
         preferenceManager.faceConfidenceThresholds,
-        preferenceManager.returnIdCount
+        preferenceManager.returnIdCount,
+        enrolResponseAdjudicationHelper
     )
 
     @Provides
     fun provideFlowManager(
         orchestratorManagerImpl: OrchestratorManagerImpl
     ): FlowProvider = orchestratorManagerImpl
+
+    @Provides
+    fun provideEnrolAdjudicationActionHelper(prefs: PreferencesManager): EnrolResponseAdjudicationHelper =
+        EnrolResponseAdjudicationHelperImpl(prefs.fingerprintConfidenceThresholds, prefs.faceConfidenceThresholds)
 
 }
