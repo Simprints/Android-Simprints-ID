@@ -45,7 +45,8 @@ open class BaseOdkClientApiTest : BaseClientApiTest() {
         internal const val ODK_REGISTER_BIOMETRICS_COMPLETE = "odk-register-biometrics-complete"
 
         internal const val ODK_IDENTIFY_BIOMETRICS_COMPLETE = "odk-identify-biometrics-complete"
-        internal const val ODK_MATCH_CONFIDENCE_KEY = "odk-confidence"
+        internal const val ODK_MATCH_CONFIDENCE_FLAGS_KEY = "odk-match-confidence-flags"
+        internal const val ODK_HIGHEST_MATCH_CONFIDENCE_FLAG_KEY = "odk-highest-match-confidence-flag"
 
         internal const val ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE = "odk-confirm-identity-biometrics-complete"
 
