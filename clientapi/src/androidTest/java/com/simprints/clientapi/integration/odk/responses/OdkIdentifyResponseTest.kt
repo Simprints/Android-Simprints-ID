@@ -5,6 +5,7 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.odk.OdkActivity
+import com.simprints.clientapi.activities.odk.getConfidencesFlagsString
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.integration.AppIdentifyResponse
 import com.simprints.clientapi.integration.AppMatchResult
@@ -41,7 +42,8 @@ class OdkIdentifyResponseTest : BaseOdkClientApiTest() {
             assertThat(it.getString(ODK_CONFIDENCES_KEY)).isEqualTo(confidenceScoresInOdkFormat(appIdentifyResponse.identifications))
             assertThat(it.getString(ODK_TIERS_KEY)).isEqualTo(tiersInOdkFormat(appIdentifyResponse.identifications))
             assertThat(it.getString(ODK_SESSION_ID)).isEqualTo(appIdentifyResponse.sessionId)
-            assertThat(it.getString(ODK_MATCH_CONFIDENCE_KEY)).isEqualTo(getHighestMatchConfidenceAsString(appIdentifyResponse.identifications))
+            assertThat(it.getString(ODK_MATCH_CONFIDENCE_FLAGS_KEY)).isEqualTo(confidenceFlagsInOdkFormat(appIdentifyResponse.identifications))
+            assertThat(it.getString(ODK_HIGHEST_MATCH_CONFIDENCE_FLAG_KEY)).isEqualTo(getHighestMatchConfidenceAsString(appIdentifyResponse.identifications))
             assertThat(it.getBoolean(ODK_IDENTIFY_BIOMETRICS_COMPLETE)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
         } ?: throw Exception("No bundle found")
     }
@@ -62,4 +64,7 @@ class OdkIdentifyResponseTest : BaseOdkClientApiTest() {
             identifications.any { it.matchConfidence == IAppMatchConfidence.LOW } -> IAppMatchConfidence.LOW.name
             else -> IAppMatchConfidence.NONE.name
         }
+
+    private fun confidenceFlagsInOdkFormat(identifications: List<IAppMatchResult>) =
+        identifications.map { it.matchConfidence }.joinToString(separator = " ").trimEnd()
 }
