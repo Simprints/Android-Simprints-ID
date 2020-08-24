@@ -59,6 +59,10 @@ class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
     private suspend fun processResponsesAndGetViewState(fingerprintResponse: FingerprintMatchResponse?,
                                                         faceResponse: FaceMatchResponse?, enrolLastBiometricsRequest: EnrolLastBiometricsRequest, steps: List<Step>): ViewState {
         return when {
+            /**
+             * We would only process the fingerprint response in a multi-modal flow until a
+            proper results combining mechanism is in place
+             */
             fingerprintResponse != null && faceResponse != null -> {
                 if (isAnyResponseWithHighConfidence(fingerprintResponse)) {
                     Failed

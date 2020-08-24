@@ -32,7 +32,7 @@ class EnrolResponseAdjudicationHelperImplTest {
 
     @Test
     fun getAdjudicationForFingerprintConfidenceScoreBelowMedium_shouldReturnEnrolAction() {
-        val lowerThanMediumConfidenceScore = 20f
+        val lowerThanMediumConfidenceScore = 29f
         val adjudication =
             enrolResponseAdjudicationHelper.getAdjudicationAction(isEnrolmentPlus,
                 buildFingerprintMatchStepsWithMatchScore(lowerThanMediumConfidenceScore))
@@ -42,10 +42,10 @@ class EnrolResponseAdjudicationHelperImplTest {
 
     @Test
     fun getAdjudicationForFingerprintConfidenceScoreAboveMedium_shouldReturnIdentifyAction() {
-        val higherThanMediumConfidenceScore = 35f
+        val mediumConfidenceScore = 30f
         val adjudication =
             enrolResponseAdjudicationHelper.getAdjudicationAction(isEnrolmentPlus,
-                buildFingerprintMatchStepsWithMatchScore(higherThanMediumConfidenceScore))
+                buildFingerprintMatchStepsWithMatchScore(mediumConfidenceScore))
 
         assertThat(adjudication).isEqualTo(EnrolAdjudicationAction.IDENTIFY)
     }
@@ -53,7 +53,7 @@ class EnrolResponseAdjudicationHelperImplTest {
 
     @Test
     fun getAdjudicationForFaceConfidenceScoreBelowMedium_shouldReturnEnrolAction() {
-        val lowerThanMediumConfidenceScore = 20f
+        val lowerThanMediumConfidenceScore = 29f
         val adjudication =
             enrolResponseAdjudicationHelper.getAdjudicationAction(isEnrolmentPlus,
                 buildFaceMatchStepsWithConfidenceScore(lowerThanMediumConfidenceScore))
@@ -63,10 +63,10 @@ class EnrolResponseAdjudicationHelperImplTest {
 
     @Test
     fun getAdjudicationForFaceConfidenceScoreAboveMedium_shouldReturnIdentifyAction() {
-        val higherThanMediumConfidenceScore = 35f
+        val mediumConfidenceScore = 30f
         val adjudication =
             enrolResponseAdjudicationHelper.getAdjudicationAction(isEnrolmentPlus,
-                buildFaceMatchStepsWithConfidenceScore(higherThanMediumConfidenceScore))
+                buildFaceMatchStepsWithConfidenceScore(mediumConfidenceScore))
 
         assertThat(adjudication).isEqualTo(EnrolAdjudicationAction.IDENTIFY)
     }

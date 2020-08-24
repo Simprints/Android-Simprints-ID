@@ -41,25 +41,25 @@ class EnrolResponseAdjudicationHelperImpl(
         results.filterIsInstance(FaceMatchResponse::class.java).lastOrNull()
 
     private fun performAdjudicationForFingerprint(fingerprintResponse: FingerprintMatchResponse) =
-        if (allFingerprintConfidenceScoresAreBelowLowerThreshold(fingerprintResponse)) {
+        if (allFingerprintConfidenceScoresAreBelowMediumThreshold(fingerprintResponse)) {
             EnrolAdjudicationAction.ENROL
         } else {
             EnrolAdjudicationAction.IDENTIFY
         }
 
-    private fun allFingerprintConfidenceScoresAreBelowLowerThreshold(fingerprintResponse: FingerprintMatchResponse) =
+    private fun allFingerprintConfidenceScoresAreBelowMediumThreshold(fingerprintResponse: FingerprintMatchResponse) =
         fingerprintResponse.result.all {
             it.confidenceScore < fingerprintThresholds.getValue(FingerprintConfidenceThresholds.MEDIUM)
         }
 
     private fun performAdjudicationForFace(faceResponse: FaceMatchResponse) =
-        if (allFaceConfidenceScoresAreBelowLowerThreshold(faceResponse)) {
+        if (allFaceConfidenceScoresAreBelowMediumThreshold(faceResponse)) {
             EnrolAdjudicationAction.ENROL
         } else {
             EnrolAdjudicationAction.IDENTIFY
         }
 
-    private fun allFaceConfidenceScoresAreBelowLowerThreshold(faceResponse: FaceMatchResponse) =
+    private fun allFaceConfidenceScoresAreBelowMediumThreshold(faceResponse: FaceMatchResponse) =
         faceResponse.result.all {
             it.confidence < faceThresholds.getValue(FaceConfidenceThresholds.MEDIUM)
         }
