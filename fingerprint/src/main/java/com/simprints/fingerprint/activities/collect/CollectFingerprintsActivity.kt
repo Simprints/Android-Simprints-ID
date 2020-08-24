@@ -15,7 +15,6 @@ import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsT
 import com.simprints.fingerprint.activities.collect.resources.buttonBackgroundColour
 import com.simprints.fingerprint.activities.collect.resources.buttonTextColour
 import com.simprints.fingerprint.activities.collect.resources.buttonTextId
-import com.simprints.fingerprint.activities.collect.resources.nameTextId
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.state.CaptureState.Collected
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
@@ -90,7 +89,6 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun initMissingFingerButton() {
-
         missingFingerText.text = getString(R.string.missing_finger)
         missingFingerText.paintFlags = missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         missingFingerText.setOnClickListener {
@@ -135,12 +133,14 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     private fun CollectFingerprintsState.listenForConfirmDialog() {
         confirmDialog = if (isShowingConfirmDialog && confirmDialog == null) {
-            val mapOfScannedFingers = fingerStates.associate { fingerState ->
-                val currentCapture = fingerState.currentCapture()
-                getString(fingerState.id.nameTextId()) to
-                    (currentCapture is Collected && currentCapture.scanResult.isGoodScan())
+            val dialogItems = fingerStates.map {
+                ConfirmFingerprintsDialog.Item(
+                    it.id,
+                    it.captures.count { capture -> capture is Collected && capture.scanResult.isGoodScan() },
+                    it.captures.size
+                )
             }
-            ConfirmFingerprintsDialog(this@CollectFingerprintsActivity, mapOfScannedFingers,
+            ConfirmFingerprintsDialog(this@CollectFingerprintsActivity, dialogItems,
                 callbackConfirm = {
                     vm.logUiMessageForCrashReport("Confirm fingerprints clicked")
                     vm.handleConfirmFingerprintsAndContinue()

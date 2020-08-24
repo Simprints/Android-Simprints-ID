@@ -19,10 +19,10 @@ fun FingerState.indicatorSelectedDrawableId(): Int =
         is CaptureState.TransferringImage -> R.drawable.ic_blank_selected
         is CaptureState.Skipped,
         is CaptureState.NotDetected -> R.drawable.ic_alert_selected
-        is CaptureState.Collected -> if (captures.all { it is CaptureState.Collected && it.scanResult.isGoodScan() }) {
-            R.drawable.ic_ok_selected
-        } else {
-            R.drawable.ic_alert_selected
+        is CaptureState.Collected -> when {
+            captures.all { it is CaptureState.Collected && it.scanResult.isGoodScan() } -> R.drawable.ic_ok_selected
+            captures.any { it is CaptureState.NotCollected } -> R.drawable.ic_blank_selected
+            else -> R.drawable.ic_alert_selected
         }
     }
 
@@ -34,10 +34,10 @@ fun FingerState.indicatorDeselectedDrawableId(): Int =
         is CaptureState.TransferringImage -> R.drawable.ic_blank_deselected
         is CaptureState.Skipped,
         is CaptureState.NotDetected -> R.drawable.ic_alert_deselected
-        is CaptureState.Collected -> if (captures.all { it is CaptureState.Collected && it.scanResult.isGoodScan() }) {
-            R.drawable.ic_ok_deselected
-        } else {
-            R.drawable.ic_alert_deselected
+        is CaptureState.Collected -> when {
+            captures.all { it is CaptureState.Collected && it.scanResult.isGoodScan() } -> R.drawable.ic_ok_deselected
+            captures.any { it is CaptureState.NotCollected } -> R.drawable.ic_blank_deselected
+            else -> R.drawable.ic_alert_deselected
         }
     }
 
