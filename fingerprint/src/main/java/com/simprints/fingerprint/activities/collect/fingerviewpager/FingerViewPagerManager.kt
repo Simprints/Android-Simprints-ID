@@ -71,7 +71,7 @@ class FingerViewPagerManager(
             val selected = currentFingerIndex == index
             indicatorLayout.children.iterator().withIndex().forEach { (i, view) ->
                 if (i == index && view is ImageView) {
-                    view.setImageResource(fingerState.currentCapture().indicatorDrawableId(selected))
+                    view.setImageResource(fingerState.indicatorDrawableId(selected))
                 }
             }
         }

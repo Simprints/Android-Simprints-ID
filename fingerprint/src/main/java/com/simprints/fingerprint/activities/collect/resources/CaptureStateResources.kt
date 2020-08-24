@@ -1,44 +1,9 @@
 package com.simprints.fingerprint.activities.collect.resources
 
 import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.state.CaptureState
-
-@DrawableRes
-fun CaptureState.indicatorDrawableId(selected: Boolean): Int =
-    if (selected) indicatorSelectedDrawableId() else indicatorDeselectedDrawableId()
-
-@DrawableRes
-fun CaptureState.indicatorSelectedDrawableId(): Int =
-    when (this) {
-        is CaptureState.NotCollected,
-        is CaptureState.Scanning,
-        is CaptureState.TransferringImage -> R.drawable.ic_blank_selected
-        is CaptureState.Skipped,
-        is CaptureState.NotDetected -> R.drawable.ic_alert_selected
-        is CaptureState.Collected -> if (scanResult.isGoodScan()) {
-            R.drawable.ic_ok_selected
-        } else {
-            R.drawable.ic_alert_selected
-        }
-    }
-
-@DrawableRes
-fun CaptureState.indicatorDeselectedDrawableId(): Int =
-    when (this) {
-        is CaptureState.NotCollected,
-        is CaptureState.Scanning,
-        is CaptureState.TransferringImage -> R.drawable.ic_blank_deselected
-        is CaptureState.Skipped,
-        is CaptureState.NotDetected -> R.drawable.ic_alert_deselected
-        is CaptureState.Collected -> if (scanResult.isGoodScan()) {
-            R.drawable.ic_ok_deselected
-        } else {
-            R.drawable.ic_alert_deselected
-        }
-    }
 
 @StringRes
 fun CaptureState.buttonTextId(isAskingRescan: Boolean): Int =
