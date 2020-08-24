@@ -36,6 +36,7 @@ class FingerFragment : FingerprintFragment() {
         vm.state.fragmentObserveWith {
             updateOrHideFingerImageAccordingToSettings()
             updateFingerNameText()
+            it.updateFingerCaptureNumberText()
             it.updateFingerResultText()
             it.updateFingerDirectionText()
         }
@@ -55,6 +56,18 @@ class FingerFragment : FingerprintFragment() {
         fingerNumberText.setTextColor(resources.getColor(fingerId.nameTextColour(), null))
     }
 
+    private fun CollectFingerprintsState.updateFingerCaptureNumberText() {
+        fingerStates.find { it.id == fingerId }?.run {
+            if (isMultiCapture()) {
+                fingerCaptureNumberText.setTextColor(resources.getColor(nameTextColour(), null))
+                fingerCaptureNumberText.text = getString(captureNumberTextId(), currentCaptureIndex + 1, captures.size)
+                fingerCaptureNumberText.visibility = View.VISIBLE
+            } else {
+                fingerCaptureNumberText.visibility = View.GONE
+            }
+        }
+    }
+
     private fun CollectFingerprintsState.updateFingerResultText() {
         fingerStates.find { it.id == fingerId }?.run {
             fingerResultText.text = getString(currentCapture().resultTextId())
@@ -64,8 +77,8 @@ class FingerFragment : FingerprintFragment() {
 
     private fun CollectFingerprintsState.updateFingerDirectionText() {
         fingerStates.find { it.id == fingerId }?.run {
-            fingerDirectionText.text = getString(currentCapture().directionTextId(isOnLastFinger()))
-            fingerDirectionText.setTextColor(resources.getColor(currentCapture().directionTextColour(), null))
+            fingerDirectionText.text = getString(directionTextId(isOnLastFinger()))
+            fingerDirectionText.setTextColor(resources.getColor(directionTextColour(), null))
         }
     }
 

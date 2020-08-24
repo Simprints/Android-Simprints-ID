@@ -38,6 +38,15 @@
         android:textSize="20sp" />
 
     <TextView
+        android:id="@+id/fingerCaptureNumberText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textSize="20sp" />
+
+    <TextView
         android:id="@+id/fingerDirectionText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

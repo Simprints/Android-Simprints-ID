@@ -91,6 +91,8 @@
     <string name="no_fingers_scanned">Please scan at least 1 required finger</string>
     <string name="reconnecting_message">Reconnecting…</string>
     <string name="confirm_fingers_dialog_title">Fingers Scanned</string>
+    <string name="capture_number_text">Scan %1$s of %2$s</string>
+    <string name="please_scan_again">Please scan again</string>
     <!-- Button Labels -->
     <string name="rescan_label">Re-scan</string>
     <string name="rescan_label_question">Re-scan?</string>
