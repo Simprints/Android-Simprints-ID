@@ -17,11 +17,8 @@ import com.simprints.fingerprint.activities.collect.resources.buttonTextColour
 import com.simprints.fingerprint.activities.collect.resources.buttonTextId
 import com.simprints.fingerprint.activities.collect.resources.nameTextId
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
+import com.simprints.fingerprint.activities.collect.state.CaptureState.Collected
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
-import com.simprints.fingerprint.activities.collect.state.CaptureState.*
-import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningOnlyTimeoutBar
-import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar
-import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningWithImageTransferTimeoutBar
 import com.simprints.fingerprint.activities.collect.tryagainsplash.SplashScreenActivity
 import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
@@ -47,7 +44,6 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private val vm: CollectFingerprintsViewModel by viewModel()
 
     private lateinit var fingerViewPagerManager: FingerViewPagerManager
-    private lateinit var timeoutBar: ScanningTimeoutBar
     private var confirmDialog: AlertDialog? = null
     private var hasSplashScreenBeenTriggered: Boolean = false
 
@@ -68,7 +64,6 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private fun initUiComponents() {
         initToolbar()
         initViewPagerManager()
-        initTimeoutBar()
         initScanButton()
         initMissingFingerButton()
     }
@@ -111,19 +106,10 @@ class CollectFingerprintsActivity : FingerprintActivity() {
         }
     }
 
-    private fun initTimeoutBar() {
-        timeoutBar = if (vm.isImageTransferRequired()) {
-            ScanningWithImageTransferTimeoutBar(pb_timeout, CollectFingerprintsViewModel.scanningTimeoutMs, CollectFingerprintsViewModel.imageTransferTimeoutMs)
-        } else {
-            ScanningOnlyTimeoutBar(pb_timeout, CollectFingerprintsViewModel.scanningTimeoutMs)
-        }
-    }
-
     private fun observeStateChanges() {
         vm.state.activityObserveWith {
             it.updateViewPagerManager()
             it.updateScanButton()
-            it.updateProgressBar()
             it.listenForConfirmDialog()
             it.listenForSplashScreen()
         }
@@ -144,31 +130,6 @@ class CollectFingerprintsActivity : FingerprintActivity() {
             scan_button.text = getString(buttonTextId(isAskingRescan))
             scan_button.setTextColor(resources.getColor(buttonTextColour(), null))
             scan_button.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
-        }
-    }
-
-    private fun CollectFingerprintsState.updateProgressBar() {
-        with(timeoutBar) {
-            when (val fingerState = currentCaptureState()) {
-                is NotCollected,
-                is Skipped -> {
-                    handleCancelled()
-                    progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bar)
-                }
-                is Scanning -> startTimeoutBar()
-                is TransferringImage -> handleScanningFinished()
-                is NotDetected -> {
-                    handleCancelled()
-                    progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
-                }
-                is Collected -> if (fingerState.scanResult.isGoodScan()) {
-                    handleCancelled()
-                    progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_good)
-                } else {
-                    handleCancelled()
-                    progressBar.progressDrawable = getDrawable(R.drawable.timer_progress_bad)
-                }
-            }
         }
     }
 
