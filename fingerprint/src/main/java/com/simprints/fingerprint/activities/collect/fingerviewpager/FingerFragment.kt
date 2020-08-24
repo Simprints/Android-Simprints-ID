@@ -30,7 +30,7 @@ class FingerFragment : FingerprintFragment() {
 
     private lateinit var fingerId: FingerIdentifier
 
-    private lateinit var timeoutBar: ScanningTimeoutBar
+    private lateinit var timeoutBars: List<ScanningTimeoutBar>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_finger, container, false)
@@ -42,7 +42,7 @@ class FingerFragment : FingerprintFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initTimeoutBar()
+        initTimeoutBars()
 
         vm.state.fragmentObserveWith {
             updateOrHideFingerImageAccordingToSettings()
@@ -50,20 +50,25 @@ class FingerFragment : FingerprintFragment() {
             it.updateFingerCaptureNumberText()
             it.updateFingerResultText()
             it.updateFingerDirectionText()
-            it.updateProgressBar()
+            it.updateTimeoutBars()
         }
     }
 
-    private fun initTimeoutBar() {
-        val progressBar = ProgressBar(requireContext(), null, android.R.attr.progressBarStyleHorizontal).apply {
-            progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bar)
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
-        }
-        progressBarContainer.addView(progressBar)
-        timeoutBar = if (vm.isImageTransferRequired()) {
-            ScanningWithImageTransferTimeoutBar(progressBar, CollectFingerprintsViewModel.scanningTimeoutMs, CollectFingerprintsViewModel.imageTransferTimeoutMs)
-        } else {
-            ScanningOnlyTimeoutBar(progressBar, CollectFingerprintsViewModel.scanningTimeoutMs)
+    private fun initTimeoutBars() {
+        vm.state().fingerStates.find { it.id == fingerId }?.run {
+            timeoutBars = List(captures.size) {
+                ProgressBar(requireContext(), null, android.R.attr.progressBarStyleHorizontal).apply {
+                    progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bar)
+                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f / captures.size)
+                }
+            }.map { progressBar ->
+                progressBarContainer.addView(progressBar)
+                if (vm.isImageTransferRequired()) {
+                    ScanningWithImageTransferTimeoutBar(progressBar, CollectFingerprintsViewModel.scanningTimeoutMs, CollectFingerprintsViewModel.imageTransferTimeoutMs)
+                } else {
+                    ScanningOnlyTimeoutBar(progressBar, CollectFingerprintsViewModel.scanningTimeoutMs)
+                }
+            }
         }
     }
 
@@ -107,26 +112,30 @@ class FingerFragment : FingerprintFragment() {
         }
     }
 
-    private fun CollectFingerprintsState.updateProgressBar() {
-        with(timeoutBar) {
-            when (val fingerState = currentCaptureState()) {
-                is CaptureState.NotCollected,
-                is CaptureState.Skipped -> {
-                    handleCancelled()
-                    progressBar.progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bar)
-                }
-                is CaptureState.Scanning -> startTimeoutBar()
-                is CaptureState.TransferringImage -> handleScanningFinished()
-                is CaptureState.NotDetected -> {
-                    handleCancelled()
-                    progressBar.progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bad)
-                }
-                is CaptureState.Collected -> if (fingerState.scanResult.isGoodScan()) {
-                    handleCancelled()
-                    progressBar.progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_good)
-                } else {
-                    handleCancelled()
-                    progressBar.progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bad)
+    private fun CollectFingerprintsState.updateTimeoutBars() {
+        fingerStates.find { it.id == fingerId }?.run {
+            timeoutBars.forEachIndexed { captureIndex, timeoutBar ->
+                with(timeoutBar) {
+                    when (val fingerState = captures[captureIndex]) {
+                        is CaptureState.NotCollected,
+                        is CaptureState.Skipped -> {
+                            handleCancelled()
+                            progressBar.progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bar)
+                        }
+                        is CaptureState.Scanning -> startTimeoutBar()
+                        is CaptureState.TransferringImage -> handleScanningFinished()
+                        is CaptureState.NotDetected -> {
+                            handleCancelled()
+                            progressBar.progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bad)
+                        }
+                        is CaptureState.Collected -> if (fingerState.scanResult.isGoodScan()) {
+                            handleCancelled()
+                            progressBar.progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_good)
+                        } else {
+                            handleCancelled()
+                            progressBar.progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bad)
+                        }
+                    }
                 }
             }
         }
