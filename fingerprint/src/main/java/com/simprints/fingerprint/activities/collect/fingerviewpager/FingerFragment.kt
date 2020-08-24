@@ -60,6 +60,7 @@ class FingerFragment : FingerprintFragment() {
                 ProgressBar(requireContext(), null, android.R.attr.progressBarStyleHorizontal).apply {
                     progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bar)
                     layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f / captures.size)
+                        .apply { if (it != 0) marginStart = PROGRESS_BAR_MARGIN }
                 }
             }.map { progressBar ->
                 progressBarContainer.addView(progressBar)
@@ -144,6 +145,8 @@ class FingerFragment : FingerprintFragment() {
     companion object {
 
         private const val FINGER_ID_BUNDLE_KEY = "finger_id"
+
+        private const val PROGRESS_BAR_MARGIN = 4
 
         fun newInstance(fingerId: FingerIdentifier) = FingerFragment().also {
             it.arguments = Bundle().apply { putInt(FINGER_ID_BUNDLE_KEY, fingerId.ordinal) }
