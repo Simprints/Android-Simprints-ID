@@ -14,7 +14,6 @@ androidExtensions {
 
 android {
     compileSdkVersion 29
-    buildToolsVersion '29.0.3'
 
     defaultConfig {
         minSdkVersion config.min_sdk

@@ -4,6 +4,7 @@ junitJacoco {
     jacocoVersion = '0.8.5' // type String
     ignoreProjects = [] // type String array
     excludes = [
+        'jdk.internal.*',
         '**/R.class',
         '**/R2.class', // ButterKnife Gradle Plugin.
         '**/R$*.class',
