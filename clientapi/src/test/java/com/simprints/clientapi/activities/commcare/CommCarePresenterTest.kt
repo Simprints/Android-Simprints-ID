@@ -9,6 +9,7 @@ import com.simprints.clientapi.domain.responses.EnrolResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
@@ -156,8 +157,8 @@ class CommCarePresenterTest {
 
     @Test
     fun handleIdentification_ShouldReturnValidIdentification() {
-        val id1 = MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1)
-        val id2 = MatchResult(UUID.randomUUID().toString(), 15, Tier.TIER_5)
+        val id1 = MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH)
+        val id2 = MatchResult(UUID.randomUUID().toString(), 15, Tier.TIER_5, MatchConfidence.LOW)
         val idList = arrayListOf(id1, id2)
         val sessionId = UUID.randomUUID().toString()
 
@@ -174,14 +175,14 @@ class CommCarePresenterTest {
         verify(exactly = 1) {
             view.returnIdentification(
                 ArrayList(idList.map {
-                    com.simprints.libsimprints.Identification(it.guidFound, it.confidence, com.simprints.libsimprints.Tier.valueOf(it.tier.name))
+                    com.simprints.libsimprints.Identification(it.guidFound, it.confidenceScore, com.simprints.libsimprints.Tier.valueOf(it.tier.name))
                 }), sessionId)
         }
     }
 
     @Test
     fun handleVerification_ShouldReturnValidVerification() {
-        val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1))
+        val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH))
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
@@ -198,7 +199,7 @@ class CommCarePresenterTest {
 
         verify(exactly = 1) {
             view.returnVerification(
-                verification.matchResult.confidence,
+                verification.matchResult.confidenceScore,
                 com.simprints.libsimprints.Tier.valueOf(verification.matchResult.tier.name),
                 verification.matchResult.guidFound,
                 sessionId,
