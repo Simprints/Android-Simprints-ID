@@ -18,9 +18,9 @@ internal fun ErrorResponse.isFlowCompletedWithCurrentError(): Boolean =
         ErrorResponse.Reason.INVALID_VERIFY_ID,
         ErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED,
         ErrorResponse.Reason.INVALID_STATE_FOR_INTENT_ACTION,
-        ErrorResponse.Reason.ENROLMENT_LAST_BIOMETRICS_FAILED,
         ErrorResponse.Reason.GUID_NOT_FOUND_ONLINE -> Constants.RETURN_FOR_FLOW_COMPLETED
         ErrorResponse.Reason.LOGIN_NOT_COMPLETE,
+        ErrorResponse.Reason.ENROLMENT_LAST_BIOMETRICS_FAILED,
         ErrorResponse.Reason.ROOTED_DEVICE,
         ErrorResponse.Reason.FACE_LICENSE_MISSING,
         ErrorResponse.Reason.SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD,

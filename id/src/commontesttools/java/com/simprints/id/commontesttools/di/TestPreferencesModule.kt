@@ -11,6 +11,8 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.di.PreferencesModule
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
+import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
+import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.testtools.common.di.DependencyRule
@@ -36,7 +38,9 @@ class TestPreferencesModule(
         captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
         scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
-        fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>
+        fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>,
+        fingerprintConfidenceThresholdsSerializer: Serializer<Map<FingerprintConfidenceThresholds, Int>>,
+        faceConfidenceThresholdsSerializer: Serializer<Map<FaceConfidenceThresholds, Int>>
     ): SettingsPreferencesManager = settingsPreferencesManagerRule.resolveDependency {
         super.provideSettingsPreferencesManager(
             prefs,
@@ -49,7 +53,9 @@ class TestPreferencesModule(
             captureFingerprintStrategySerializer,
             saveFingerprintImagesStrategySerializer,
             scannerGenerationsSerializer,
-            fingerprintsToCollectSerializer
+            fingerprintsToCollectSerializer,
+            fingerprintConfidenceThresholdsSerializer,
+            faceConfidenceThresholdsSerializer
         )
     }
 

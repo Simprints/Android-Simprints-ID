@@ -10,6 +10,7 @@ import com.simprints.clientapi.domain.responses.EnrolResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.*
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
@@ -108,8 +109,9 @@ class OdkPresenterTest {
 
     @Test
     fun handleIdentification_ShouldReturnValidOdkIdentification() {
-        val id1 = MatchResult(UUID.randomUUID().toString(), 100, TIER_1)
-        val id2 = MatchResult(UUID.randomUUID().toString(), 15, TIER_5)
+        val id1 = MatchResult(UUID.randomUUID().toString(), 100, TIER_1, HIGH)
+        val id2 = MatchResult(UUID.randomUUID().toString(), 15, TIER_5, LOW)
+        val highestMatchConfidence = HIGH.toString()
         val sessionId = UUID.randomUUID().toString()
 
         OdkPresenter(view, Identify, mockk(), mockk(), mockk()).apply {
@@ -119,16 +121,18 @@ class OdkPresenterTest {
         verify(exactly = 1) {
             view.returnIdentification(
                 idList = "${id1.guidFound} ${id2.guidFound}",
-                confidenceList = "${id1.confidence} ${id2.confidence}",
+                confidenceScoresList = "${id1.confidenceScore} ${id2.confidenceScore}",
                 tierList = "${id1.tier} ${id2.tier}",
                 sessionId = sessionId,
+                matchConfidencesList =  "${id1.matchConfidence} ${id2.matchConfidence}",
+                highestMatchConfidence = highestMatchConfidence,
                 flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
     }
 
     @Test
     fun handleVerification_ShouldReturnValidOdkVerification() {
-        val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
+        val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1, HIGH))
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
@@ -141,7 +145,7 @@ class OdkPresenterTest {
         verify(exactly = 1) {
             view.returnVerification(
                 id = verification.matchResult.guidFound,
-                confidence = verification.matchResult.confidence.toString(),
+                confidence = verification.matchResult.confidenceScore.toString(),
                 tier = verification.matchResult.tier.toString(),
                 sessionId = sessionId,
                 flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
