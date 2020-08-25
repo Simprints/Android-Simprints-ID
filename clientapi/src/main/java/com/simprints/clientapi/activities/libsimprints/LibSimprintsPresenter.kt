@@ -76,7 +76,7 @@ class LibSimprintsPresenter(
             view.returnIdentification(ArrayList(identify.identifications.map {
                 Identification(
                     it.guidFound,
-                    it.confidence,
+                    it.confidenceScore,
                     it.tier.fromDomainToLibsimprintsTier())
             }), identify.sessionId, flowCompletedCheck)
         }
@@ -88,7 +88,7 @@ class LibSimprintsPresenter(
             addCompletionCheckEvent(flowCompletedCheck)
             with(verify) {
                 val verification = Verification(
-                    matchResult.confidence,
+                    matchResult.confidenceScore,
                     matchResult.tier.fromDomainToLibsimprintsTier(),
                     matchResult.guidFound)
                 view.returnVerification(verification, getCurrentSessionIdOrEmpty(), flowCompletedCheck)

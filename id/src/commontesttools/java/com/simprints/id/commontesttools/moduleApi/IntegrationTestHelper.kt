@@ -24,9 +24,9 @@ internal data class AppVerifyResponse(
 
 @Parcelize
 internal data class AppMatchResult(
-    override val guid: String,
-    override val confidence: Int,
-    override val tier: IAppResponseTier
+        override val guid: String,
+        override val confidenceScore: Int,
+        override val tier: IAppResponseTier
 ) : IAppMatchResult
 
 @Parcelize
