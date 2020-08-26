@@ -6,8 +6,8 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockAcquireImageResult.OK
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.*
-import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.CaptureState
+import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
@@ -502,6 +502,74 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    fun receivesMixOfScanResults_withEagerImageTransfer_updatesStateCorrectlyAndReturnsFingersCorrectly() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(
+            BAD_SCAN, NO_FINGER_DETECTED, BAD_SCAN, GOOD_SCAN,
+            BAD_SCAN, NO_FINGER_DETECTED, NO_FINGER_DETECTED, // skipped
+            NO_FINGER_DETECTED, BAD_SCAN, BAD_SCAN, BAD_SCAN,
+            NO_FINGER_DETECTED, GOOD_SCAN
+        )
+        acquireImageResponses(OK)
+        withImageTransfer(isEager = true)
+
+        vm.start(TWO_FINGERS_IDS)
+
+        // Finger 1
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        mockTimer.executeAllTasks()
+
+        // Finger 2
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleMissingFingerButtonPressed()
+        mockTimer.executeAllTasks()
+
+        // Finger 3
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        mockTimer.executeAllTasks()
+
+        // Finger 4
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+
+        assertThat(vm.state()).isEqualTo(CollectFingerprintsState(
+            fingerStates = listOf(
+                FingerState(FOUR_FINGERS_IDS[0], listOf(CaptureState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE, 60), numberOfBadScans = 2))),
+                FingerState(FOUR_FINGERS_IDS[1], listOf(CaptureState.Skipped)),
+                FingerState(FOUR_FINGERS_IDS[2], listOf(CaptureState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, IMAGE, 60), numberOfBadScans = 3))),
+                FingerState(FOUR_FINGERS_IDS[3], listOf(CaptureState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE, 60), numberOfBadScans = 0)))
+            ),
+            currentFingerIndex = 3,
+            isAskingRescan = false,
+            isShowingConfirmDialog = true,
+            isShowingSplashScreen = false
+        ))
+        verify(exactly = 14) { sessionEventsManager.addEventInBackground(any()) }
+
+        // If eager, expect that images were saved before confirm was pressed, including bad scans
+        coVerify(exactly = 8) { imageManager.save(any(), any(), any()) }
+
+        vm.handleConfirmFingerprintsAndContinue()
+
+        vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
+            assertThat(actualFingerprints).hasSize(3)
+            assertThat(actualFingerprints.map { it.fingerId }).containsExactly(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_INDEX_FINGER)
+            actualFingerprints.forEach {
+                assertThat(it.templateBytes).isEqualTo(TEMPLATE)
+                assertThat(it.imageRef).isNotNull()
+            }
+        }
+    }
+
+    @Test
     fun pressingCancel_duringScan_cancelsProperly() {
         mockScannerSetUiIdle()
         captureFingerprintResponses(NEVER_RETURNS)
@@ -631,8 +699,9 @@ class CollectFingerprintsViewModelTest : KoinTest {
         every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.NEVER
     }
 
-    private fun withImageTransfer() {
-        every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.WSQ_15
+    private fun withImageTransfer(isEager: Boolean = false) {
+        every { preferencesManager.saveFingerprintImagesStrategy } returns
+            if (isEager) SaveFingerprintImagesStrategy.WSQ_15_EAGER else SaveFingerprintImagesStrategy.WSQ_15
         coEvery { imageManager.save(any(), any(), any()) } returns mockk()
     }
 

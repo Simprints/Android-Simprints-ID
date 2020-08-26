@@ -213,7 +213,9 @@ class CollectFingerprintsViewModel(
 
     private fun shouldProceedToImageTransfer(quality: Int) =
         isImageTransferRequired() &&
-            (quality >= fingerprintPreferencesManager.qualityThreshold || tooManyBadScans(state().currentCaptureState(), plusBadScan = true))
+            (quality >= fingerprintPreferencesManager.qualityThreshold ||
+                tooManyBadScans(state().currentCaptureState(), plusBadScan = true) ||
+                fingerprintPreferencesManager.saveFingerprintImagesStrategy.isEager())
 
     private fun proceedToImageTransfer() {
         imageTransferTask?.dispose()
