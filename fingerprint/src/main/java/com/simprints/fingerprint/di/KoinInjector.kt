@@ -6,7 +6,8 @@ import com.simprints.fingerprint.activities.alert.AlertContract
 import com.simprints.fingerprint.activities.alert.AlertPresenter
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
-import com.simprints.fingerprint.activities.collect.domain.FingerOrderDeterminer
+import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
+import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.nfcpair.NfcPairViewModel
 import com.simprints.fingerprint.activities.connect.issues.ota.OtaViewModel
@@ -172,7 +173,8 @@ object KoinInjector {
         factory { FinalResultBuilder() }
         factory { Orchestrator(get()) }
 
-        factory { FingerOrderDeterminer() }
+        factory { FingerPriorityDeterminer() }
+        factory { StartingStateDeterminer() }
     }
 
     private fun Module.defineBuildersForPresentersAndViewModels() {
@@ -185,7 +187,7 @@ object KoinInjector {
 
         viewModel { OrchestratorViewModel(get(), get(), get(), get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
-        viewModel { CollectFingerprintsViewModel(get(), get(), get(), get(), get(), get(), get()) }
+        viewModel { CollectFingerprintsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
