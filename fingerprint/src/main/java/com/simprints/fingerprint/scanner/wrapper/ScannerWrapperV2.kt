@@ -201,7 +201,8 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     private fun SaveFingerprintImagesStrategy.deduceImageAcquisitionFormat(): ImageFormatData? =
         when (this) {
             SaveFingerprintImagesStrategy.NEVER -> null
-            SaveFingerprintImagesStrategy.WSQ_15 -> ImageFormatData.WSQ(15)
+            SaveFingerprintImagesStrategy.WSQ_15,
+            SaveFingerprintImagesStrategy.WSQ_15_EAGER-> ImageFormatData.WSQ(15)
         }
 
     private fun Completable.wrapErrorsFromScanner() =
