@@ -24,8 +24,9 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
-import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.data.domain.images.deduceFileExtension
+import com.simprints.fingerprint.data.domain.images.isEager
+import com.simprints.fingerprint.data.domain.images.isImageTransferRequired
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
@@ -90,6 +91,7 @@ class CollectFingerprintsViewModel(
 
     private lateinit var originalFingerprintsToCapture: List<FingerIdentifier>
     private val captureEventIds: MutableMap<CaptureId, String> = mutableMapOf()
+    private val imageRefs: MutableMap<CaptureId, FingerprintImageRef?> = mutableMapOf()
     private var lastCaptureStartedAt: Long = 0
     private var scanningTask: Disposable? = null
     private var imageTransferTask: Disposable? = null
@@ -120,10 +122,7 @@ class CollectFingerprintsViewModel(
     }
 
     fun isImageTransferRequired(): Boolean =
-        when (fingerprintPreferencesManager.saveFingerprintImagesStrategy) {
-            SaveFingerprintImagesStrategy.NEVER -> false
-            SaveFingerprintImagesStrategy.WSQ_15 -> true
-        }
+        fingerprintPreferencesManager.saveFingerprintImagesStrategy.isImageTransferRequired()
 
     fun updateSelectedFinger(index: Int) {
         scannerManager.scanner { setUiIdle() }.doInBackground()
@@ -214,7 +213,9 @@ class CollectFingerprintsViewModel(
 
     private fun shouldProceedToImageTransfer(quality: Int) =
         isImageTransferRequired() &&
-            (quality >= fingerprintPreferencesManager.qualityThreshold || tooManyBadScans(state().currentCaptureState(), plusBadScan = true))
+            (quality >= fingerprintPreferencesManager.qualityThreshold ||
+                tooManyBadScans(state().currentCaptureState(), plusBadScan = true) ||
+                fingerprintPreferencesManager.saveFingerprintImagesStrategy.isEager())
 
     private fun proceedToImageTransfer() {
         imageTransferTask?.dispose()
@@ -237,6 +238,7 @@ class CollectFingerprintsViewModel(
         with(state()) {
             logUiMessageForCrashReport("Finger scanned - ${currentFingerState().id} - ${currentFingerState()}")
             addCaptureEventInSession()
+            saveCurrentImageIfEager()
             if (captureHasSatisfiedTerminalCondition(state().currentCaptureState())) {
                 if (fingerHasSatisfiedTerminalCondition(state().currentFingerState())) {
                     resolveFingerTerminalConditionTriggered()
@@ -261,6 +263,18 @@ class CollectFingerprintsViewModel(
             )
             captureEventIds[CaptureId(id, currentCaptureIndex)] = captureEvent.id
             sessionEventsManager.addEventInBackground(captureEvent)
+        }
+    }
+
+    private fun saveCurrentImageIfEager() {
+        if (fingerprintPreferencesManager.saveFingerprintImagesStrategy.isEager()) {
+            with(state().currentFingerState()) {
+                (currentCapture() as? CaptureState.Collected)?.let { capture ->
+                    runBlocking {
+                        saveImageIfExists(CaptureId(id, currentCaptureIndex), capture)
+                    }
+                }
+            }
         }
     }
 
@@ -402,32 +416,40 @@ class CollectFingerprintsViewModel(
             noFingersScannedToast.postEvent()
             handleRestart()
         } else {
-            saveImagesAndProceedToFinish(collectedFingers)
+            if (!fingerprintPreferencesManager.saveFingerprintImagesStrategy.isEager()) {
+                saveImages(collectedFingers)
+            }
+            proceedToFinish(collectedFingers)
         }
     }
 
-    private fun saveImagesAndProceedToFinish(collectedFingers: List<Pair<CaptureId, CaptureState.Collected>>) {
+    private fun saveImages(collectedFingers: List<Pair<CaptureId, CaptureState.Collected>>) {
         runBlocking {
-            val imageRefs = collectedFingers.map { (id, collectedFinger) ->
+            collectedFingers.map { (id, collectedFinger) ->
                 saveImageIfExists(id, collectedFinger)
             }
-            val domainFingerprints = collectedFingers.zip(imageRefs) { (id, collectedFinger), imageRef ->
-                Fingerprint(id.finger, collectedFinger.scanResult.template).also { it.imageRef = imageRef }
-            }
-            finishWithFingerprints.postEvent(domainFingerprints)
         }
     }
 
-    private suspend fun saveImageIfExists(id: CaptureId, collectedFinger: CaptureState.Collected): FingerprintImageRef? {
+    private fun proceedToFinish(collectedFingers: List<Pair<CaptureId, CaptureState.Collected>>) {
+        val domainFingerprints = collectedFingers.map { (id, collectedFinger) ->
+            Fingerprint(id.finger, collectedFinger.scanResult.template).also { it.imageRef = imageRefs[id] }
+        }
+        finishWithFingerprints.postEvent(domainFingerprints)
+    }
+
+    private suspend fun saveImageIfExists(id: CaptureId, collectedFinger: CaptureState.Collected) {
         val captureEventId = captureEventIds[id]
 
-        if (collectedFinger.scanResult.image != null && captureEventId != null) {
-            return imageManager.save(collectedFinger.scanResult.image, captureEventId,
+        val imageRef = if (collectedFinger.scanResult.image != null && captureEventId != null) {
+            imageManager.save(collectedFinger.scanResult.image, captureEventId,
                 fingerprintPreferencesManager.saveFingerprintImagesStrategy.deduceFileExtension())
         } else if (collectedFinger.scanResult.image != null && captureEventId == null) {
             crashReportManager.logExceptionOrSafeException(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
-        }
-        return null
+            null
+        } else null
+
+        imageRefs[id] = imageRef
     }
 
     fun handleRestart() {
