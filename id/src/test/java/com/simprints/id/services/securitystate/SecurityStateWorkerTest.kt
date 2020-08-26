@@ -55,12 +55,12 @@ class SecurityStateWorkerTest {
     }
 
     @Test
-    fun whenAnExceptionIsThrown_shouldReturnRetry() = runBlocking {
+    fun whenAnExceptionIsThrown_shouldStillSucceed() = runBlocking {
         mockException()
 
         val result = worker.doWork()
 
-        assertThat(result).isEqualTo(ListenableWorker.Result.retry())
+        assertThat(result).isEqualTo(ListenableWorker.Result.success())
     }
 
     @Test
