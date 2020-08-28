@@ -448,15 +448,15 @@ open class SettingsPreferencesManagerImpl(
         const val FINGERPRINT_CONFIDENCE_THRESHOLDS = "FingerprintConfidenceThresholds"
         val FINGERPRINT_CONFIDENCE_THRESHOLDS_DEFAULT = mapOf(
             FingerprintConfidenceThresholds.LOW to 0,
-            FingerprintConfidenceThresholds.MEDIUM to 125,
-            FingerprintConfidenceThresholds.HIGH to 125
+            FingerprintConfidenceThresholds.MEDIUM to 0,
+            FingerprintConfidenceThresholds.HIGH to 700
         )
 
         const val FACE_CONFIDENCE_THRESHOLDS = "FaceConfidenceThresholds"
         val FACE_CONFIDENCE_THRESHOLDS_DEFAULT = mapOf(
             FaceConfidenceThresholds.LOW to 0,
-            FaceConfidenceThresholds.MEDIUM to 125,
-            FaceConfidenceThresholds.HIGH to 125
+            FaceConfidenceThresholds.MEDIUM to 0,
+            FaceConfidenceThresholds.HIGH to 700
         )
     }
 
