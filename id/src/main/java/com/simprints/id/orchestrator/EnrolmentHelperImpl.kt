@@ -26,7 +26,7 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
     override suspend fun enrol(subject: Subject) {
         registerEvent(subject)
         subjectRepository.performActions(listOf(SubjectAction.Creation(subject)))
-        eventSyncManager.sync()
+        eventSyncManager.sync() //STOPSHIP: shall we do the downsync too?
     }
 
     private suspend fun registerEvent(subject: Subject) {
