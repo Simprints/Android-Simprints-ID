@@ -30,6 +30,8 @@
     <string name="good_scan_message">"ছাপ নেয়া সঠিক হয়েছে "</string>
     <string name="poor_scan_message">ছাপ নেয়া ভুল হয়েছে</string>
     <string name="reconnecting_message">পুনঃসংযোগ করা হচ্ছে</string>
+    <string name="capture_number_text">%2$s এর %1$s স্ক্যান  করুন</string>
+    <string name="please_scan_again">আবার স্ক্যান করুন</string>
     <!-- Button Labels -->
     <string name="rescan_label">পুনরায় স্ক্যান করুন</string>
     <string name="rescan_label_question">পুনরায় স্ক্যান করতে চান?</string>
