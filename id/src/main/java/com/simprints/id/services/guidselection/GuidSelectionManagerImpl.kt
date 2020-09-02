@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.ignoreException
 import io.reactivex.Completable
 import timber.log.Timber

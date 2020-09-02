@@ -22,7 +22,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import dagger.Module
 import dagger.Provides
@@ -96,8 +96,8 @@ open class DashboardActivityModule {
 
     @Provides
     open fun provideDashboardSyncCardDisplayer(
-        timeHelper: TimeHelper,
-        ctx: Context
+            timeHelper: TimeHelper,
+            ctx: Context
     ): DashboardSyncCardDisplayer =
         DashboardSyncCardDisplayerImpl(timeHelper)
 

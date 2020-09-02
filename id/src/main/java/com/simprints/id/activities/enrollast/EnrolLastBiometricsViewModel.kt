@@ -13,7 +13,7 @@ import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import timber.log.Timber
 
 class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,

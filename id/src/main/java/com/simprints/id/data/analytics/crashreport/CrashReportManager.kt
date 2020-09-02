@@ -25,7 +25,7 @@ interface CoreCrashReportManager {
     fun setModuleIdsCrashlyticsKey(moduleIds: Set<String>?)
     fun setDownSyncTriggersCrashlyticsKey(eventDownSyncSetting: EventDownSyncSetting)
     fun setSessionIdCrashlyticsKey(sessionId: String)
-    fun setFingersSelectedCrashlyticsKey(fingersSelected: Map<FingerIdentifier, Boolean>)
+    fun setFingersSelectedCrashlyticsKey(fingersSelected: List<FingerIdentifier>)
 
     companion object {
         fun build(app: Application): CoreCrashReportManager =

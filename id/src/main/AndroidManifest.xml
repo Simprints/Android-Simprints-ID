@@ -109,6 +109,10 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.MaterialComponents"/>
+        <activity android:name=".activities.settings.fingerselection.FingerSelectionActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.ActionBar"/>
 
         <activity
             android:name=".activities.dashboard.DashboardActivity"

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.core.tools.json.JsonHelper
+import com.lyft.kronos.AndroidClockFactory
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
@@ -14,6 +15,7 @@ import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
 import com.simprints.id.activities.qrcapture.tools.*
+import com.simprints.id.activities.settings.fingerselection.FingerSelectionViewModelFactory
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.activities.setup.SetupViewModelFactory
@@ -75,6 +77,8 @@ import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
+import com.simprints.id.tools.time.KronosTimeHelperImpl
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
@@ -189,7 +193,10 @@ open class AppModule {
 
     @Provides
     @Singleton
-    fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
+    // https://github.com/lyft/Kronos-Android
+    fun provideTimeHelper(app: Application): TimeHelper = KronosTimeHelperImpl(
+        AndroidClockFactory.createKronosClock(app)
+    )
 
 
     @Provides
@@ -312,6 +319,12 @@ open class AppModule {
             downySyncHelper, subjectRepository, eventRepository, preferencesManager,
             loginInfoManager.getSignedInProjectIdOrEmpty(), downSyncScopeRepository
         )
+
+    @Provides
+    open fun provideFingerSelectionViewModelFactory(
+        preferencesManager: PreferencesManager,
+        crashReportManager: CrashReportManager
+    ) = FingerSelectionViewModelFactory(preferencesManager, crashReportManager)
 
     @Provides
     open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =

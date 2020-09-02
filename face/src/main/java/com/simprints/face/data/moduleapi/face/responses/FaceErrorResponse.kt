@@ -33,6 +33,7 @@ enum class FaceErrorReason {
                 ErrorType.LICENSE_MISSING -> LICENSE_MISSING
                 ErrorType.LICENSE_INVALID -> LICENSE_INVALID
                 ErrorType.CONFIGURATION_ERROR -> CONFIGURATION_ERROR
+                ErrorType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
             }
     }
 }

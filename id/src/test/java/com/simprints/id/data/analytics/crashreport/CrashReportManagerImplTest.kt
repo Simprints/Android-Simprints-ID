@@ -143,11 +143,11 @@ class CrashReportManagerImplTest : AutoCloseKoinTest() {
     fun setFingersSelectedCrashlyticsKey_shouldSetCorrectKeyValueInCrashlytics() {
         val crashReportManagerSpy = spyk(CrashReportManagerImpl())
         val crashlyticsInstanceMock: FirebaseCrashlytics = mockk()
-        val testFingersSelected = mapOf(
-            FingerIdentifier.LEFT_3RD_FINGER to true,
-            FingerIdentifier.LEFT_4TH_FINGER to true,
-            FingerIdentifier.LEFT_THUMB to true,
-            FingerIdentifier.RIGHT_4TH_FINGER to false
+        val testFingersSelected = listOf(
+            FingerIdentifier.LEFT_3RD_FINGER,
+            FingerIdentifier.LEFT_4TH_FINGER,
+            FingerIdentifier.LEFT_THUMB,
+            FingerIdentifier.RIGHT_4TH_FINGER
         )
 
         every { crashReportManagerSpy.crashlyticsInstance } returns crashlyticsInstanceMock

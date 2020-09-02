@@ -8,7 +8,6 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.FingerOrderDeterminer
-import com.simprints.fingerprint.activities.collect.domain.ScanConfig
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
@@ -177,7 +176,7 @@ class CollectFingerprintsViewModel(
                 captureFingerprint(
                     fingerprintPreferencesManager.captureFingerprintStrategy,
                     scanningTimeoutMs.toInt(),
-                    ScanConfig.qualityThreshold
+                    fingerprintPreferencesManager.qualityThreshold
                 )
             })
             .subscribeOn(Schedulers.io())
@@ -189,7 +188,7 @@ class CollectFingerprintsViewModel(
     }
 
     private fun handleCaptureSuccess(captureFingerprintResponse: CaptureFingerprintResponse) {
-        val scanResult = ScanResult(captureFingerprintResponse.imageQualityScore, captureFingerprintResponse.template, null)
+        val scanResult = ScanResult(captureFingerprintResponse.imageQualityScore, captureFingerprintResponse.template, null, fingerprintPreferencesManager.qualityThreshold)
         vibrate.postEvent()
         if (shouldProceedToImageTransfer(scanResult.qualityScore)) {
             updateFingerState { toTransferringImage(scanResult) }
@@ -202,7 +201,7 @@ class CollectFingerprintsViewModel(
 
     private fun shouldProceedToImageTransfer(quality: Int) =
         isImageTransferRequired() &&
-            (quality >= ScanConfig.qualityThreshold || tooManyBadScans(state().currentFingerState(), plusBadScan = true))
+            (quality >= fingerprintPreferencesManager.qualityThreshold || tooManyBadScans(state().currentFingerState(), plusBadScan = true))
 
     private fun proceedToImageTransfer() {
         imageTransferTask?.dispose()
@@ -238,7 +237,7 @@ class CollectFingerprintsViewModel(
                 lastCaptureStartedAt,
                 timeHelper.now(),
                 fingerState.id,
-                ScanConfig.qualityThreshold,
+                fingerprintPreferencesManager.qualityThreshold,
                 FingerprintCaptureEvent.buildResult(fingerState),
                 (fingerState as? FingerCollectionState.Collected)?.scanResult?.let {
                     FingerprintCaptureEvent.Fingerprint(fingerState.id, it.qualityScore, EncodingUtils.byteArrayToBase64(it.template))

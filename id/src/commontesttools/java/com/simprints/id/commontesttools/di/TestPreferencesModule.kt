@@ -41,7 +41,6 @@ class TestPreferencesModule(
         super.provideSettingsPreferencesManager(
             prefs,
             remoteConfigWrapper,
-            fingerIdToBooleanSerializer,
             groupSerializer,
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
@@ -49,7 +48,8 @@ class TestPreferencesModule(
             modalitiesSerializer,
             captureFingerprintStrategySerializer,
             saveFingerprintImagesStrategySerializer,
-            scannerGenerationsSerializer
+            scannerGenerationsSerializer,
+            fingerprintsToCollectSerializer
         )
     }
 

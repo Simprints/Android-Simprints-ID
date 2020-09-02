@@ -22,7 +22,7 @@ import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitForm
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.ignoreException
 
 abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProcessor,
@@ -60,9 +60,9 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         steps.add(buildSetupStep())
     }
 
-    private fun buildModalityConfigurationSteps(modalities: List<Modality>) = modalities.mapNotNull {
+    private fun buildModalityConfigurationSteps(modalities: List<Modality>) = modalities.map {
         when (it) {
-            Modality.FINGER -> null // TODO : Change back to buildConfigurationStep once handling for the step is implemented on Fingerprint's side
+            Modality.FINGER -> fingerprintStepProcessor.buildConfigurationStep()
             Modality.FACE -> faceStepProcessor.buildConfigurationStep(projectId, deviceId)
         }
     }

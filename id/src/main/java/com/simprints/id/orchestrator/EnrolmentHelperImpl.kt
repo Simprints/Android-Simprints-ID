@@ -14,7 +14,7 @@ import com.simprints.id.domain.modality.toMode
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import java.util.*
 
 class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,

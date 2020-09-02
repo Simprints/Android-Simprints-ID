@@ -20,8 +20,8 @@ android {
         minSdkVersion config.min_sdk
         targetSdkVersion 29
         vectorDrawables.useSupportLibrary = true
-        versionName "2020.3.0"
-        versionCode 250
+        versionName "2020.3.1"
+        versionCode 252
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -189,6 +189,7 @@ dependencies {
     implementation deps.koin.android
     implementation deps.fuzzywuzzy.core
     implementation deps.rxjava2.tasks
+    implementation deps.kronos.kronos
     implementation deps.jackson.core
 
     //debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'

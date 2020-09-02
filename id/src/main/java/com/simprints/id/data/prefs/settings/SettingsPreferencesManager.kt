@@ -1,6 +1,5 @@
 package com.simprints.id.data.prefs.settings
 
-import com.google.gson.JsonSyntaxException
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
@@ -21,8 +20,6 @@ interface SettingsPreferencesManager {
     var maxNumberOfModules: Int
     var syncGroup: GROUP
     var matchGroup: GROUP
-    /** @throws JsonSyntaxException */
-    var fingerStatus: Map<FingerIdentifier, Boolean>
 
     var programName: String
     var organizationName: String
@@ -39,10 +36,12 @@ interface SettingsPreferencesManager {
     var modalities: List<Modality>
     var eventDownSyncSetting: EventDownSyncSetting
 
+    var fingerprintsToCollect: List<FingerIdentifier>
     var fingerImagesExist: Boolean
     var captureFingerprintStrategy: CaptureFingerprintStrategy
     var saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
     var scannerGenerations: List<ScannerGeneration>
+    var fingerprintQualityThreshold: Int
     var apiBaseUrl: String
 
     var faceMaxRetries: Int
@@ -52,6 +51,6 @@ interface SettingsPreferencesManager {
 
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
-    fun getRemoteConfigFingerStatus(): Map<FingerIdentifier, Boolean>
+    fun getRemoteConfigFingerprintsToCollect(): List<FingerIdentifier>
 
 }

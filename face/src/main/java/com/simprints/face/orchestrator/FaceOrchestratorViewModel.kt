@@ -97,4 +97,8 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
         }
     }
 
+    fun unexpectedErrorHappened() {
+        errorEvent.send(ErrorType.UNEXPECTED_ERROR)
+    }
+
 }

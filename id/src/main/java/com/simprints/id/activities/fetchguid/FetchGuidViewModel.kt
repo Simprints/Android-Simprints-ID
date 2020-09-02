@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

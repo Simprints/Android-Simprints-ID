@@ -111,8 +111,8 @@ class TestDashboardActivityModule(
     }
 
     override fun provideDashboardSyncCardDisplayer(
-        timeHelper: TimeHelper,
-        ctx: Context
+            timeHelper: TimeHelper,
+            ctx: Context
     ): DashboardSyncCardDisplayer {
         return syncCardDisplayerRule.resolveDependency {
             super.provideDashboardSyncCardDisplayer(timeHelper, ctx)
