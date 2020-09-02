@@ -16,7 +16,7 @@ import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject

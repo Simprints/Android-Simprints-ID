@@ -13,4 +13,5 @@ interface FaceCrashReportManager {
 
     fun logMalfunction(message: String)
 
+    fun logException(throwable: Throwable)
 }

@@ -14,14 +14,14 @@ def dagger = [
     javax   : "javax.inject:javax.inject:1@jar"
 ]
 
-def androidx_lifecycle_version = "2.2.0-rc03"
+def androidx_lifecycle_version = "2.2.0"
 def androidx_room_version = "2.1.0-alpha04"
 def androidx_camerax_version = '1.0.0-beta01'
 def androidx_navigation_version = "2.3.0-alpha04"
 def androidx = [
     core      : "androidx.core:core-ktx:1.0.2",
     multidex  : "androidx.multidex:multidex:2.0.1",
-    appcompat : "androidx.appcompat:appcompat:1.0.2",
+    appcompat : "androidx.appcompat:appcompat:1.2.0",
     legacy    : "androidx.legacy:legacy-support-v4: 1.0.0",
     room      : [
         core      : "androidx.room:room-runtime:$androidx_room_version",
@@ -92,7 +92,7 @@ def firebase = [
     storage      : "com.google.firebase:firebase-storage-ktx:19.1.1",
     mlkit        : "com.google.firebase:firebase-ml-vision:24.0.1",
     mlkit_barcode: "com.google.firebase:firebase-ml-vision-barcode-model:16.0.2",
-    crashlytics  : "com.google.firebase:firebase-crashlytics:17.0.0-beta02"
+    crashlytics  : "com.google.firebase:firebase-crashlytics:17.1.1"
 ]
 
 def retrofit_version = "2.7.1"
@@ -155,7 +155,7 @@ def rootbeer = [
     core: "com.scottyab:rootbeer-lib:$rootbeer_version"
 ]
 
-def cameraView = "com.otaliastudios:cameraview:2.2.0"
+def cameraView = "com.otaliastudios:cameraview:2.6.3"
 def circleImageView = "de.hdodenhof:circleimageview:3.0.1"
 
 // Testing
@@ -222,6 +222,12 @@ def commons_io = [
     commons_io: "commons-io:commons-io:$commons_io_version"
 ]
 
+// For NTP time
+def kronos_version = "0.0.1-alpha09"
+def kronos = [
+    kronos: "com.lyft.kronos:kronos-android:$kronos_version"
+]
+
 ext.deps = [
     kotlin         : kotlin,
     dagger         : dagger,
@@ -243,5 +249,6 @@ ext.deps = [
     fuzzywuzzy     : fuzzywuzzy,
     rootbeer       : rootbeer,
     cameraView     : cameraView,
-    circleImageView: circleImageView
+    circleImageView: circleImageView,
+    kronos         : kronos
 ]

@@ -17,7 +17,7 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.exitformhandler.ExitFormHelper
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,

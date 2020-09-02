@@ -12,12 +12,7 @@ class FingerprintRequestFactoryImpl : FingerprintRequestFactory {
     override fun buildFingerprintCaptureRequest(prefs: PreferencesManager): FingerprintCaptureRequest =
         with(prefs) {
             FingerprintCaptureRequest(
-                fingerprintsToCapture = fingerStatus.mapNotNull {
-                    if (it.value)
-                        it.key
-                    else
-                        null
-                }
+                fingerprintsToCapture = fingerprintsToCollect
             )
         }
 

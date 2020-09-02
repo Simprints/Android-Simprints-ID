@@ -68,7 +68,7 @@ open class CrashReportManagerImpl: CrashReportManager {
         crashlyticsInstance.setCustomKey(SESSION_ID, sessionId)
     }
 
-    override fun setFingersSelectedCrashlyticsKey(fingersSelected: Map<FingerIdentifier, Boolean>) {
+    override fun setFingersSelectedCrashlyticsKey(fingersSelected: List<FingerIdentifier>) {
         crashlyticsInstance.setCustomKey(FINGERS_SELECTED, fingersSelected.toString())
     }
 }

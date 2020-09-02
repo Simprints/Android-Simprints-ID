@@ -35,7 +35,7 @@ import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.extensions.deviceId
 import dagger.Module
 import dagger.Provides

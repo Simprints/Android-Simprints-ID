@@ -25,7 +25,7 @@ import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi

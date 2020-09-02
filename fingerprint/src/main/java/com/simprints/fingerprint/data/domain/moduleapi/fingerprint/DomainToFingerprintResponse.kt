@@ -64,6 +64,9 @@ object DomainToFingerprintResponse {
             BLUETOOTH_NOT_SUPPORTED -> IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
         }
 
+    fun fromDomainToFingerprintConfigurationResponse(@Suppress("UNUSED_PARAMETER") configurationResponse: FingerprintConfigurationResponse): IFingerprintConfigurationResponse =
+        IFingerprintConfigurationResponseImpl()
+
 }
 
 @Parcelize
@@ -117,3 +120,7 @@ private class IPathImpl(
     override val parts: Array<String>
 ) : IPath
 
+@Parcelize
+private class IFingerprintConfigurationResponseImpl : Parcelable, IFingerprintConfigurationResponse {
+    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.CONFIGURATION
+}

@@ -44,6 +44,18 @@ abstract class FingerprintTaskFlow(private val fingerprintRequest: FingerprintRe
         }
     }
 
+    fun handleRunnableTaskResult(taskResult: TaskResult?) {
+        (getCurrentTask() as FingerprintTask.RunnableTask).apply {
+            if (taskResult != null) {
+                lastResultCode = ResultCode.OK
+                taskResults[taskResultKey] = taskResult
+                currentTaskIndex++
+            } else {
+                lastResultCode = ResultCode.CANCELLED
+            }
+        }
+    }
+
     fun getFinalResult(finalResultBuilder: FinalResultBuilder) =
         when (lastResultCode) {
             ResultCode.OK -> getFinalOkResult(finalResultBuilder)

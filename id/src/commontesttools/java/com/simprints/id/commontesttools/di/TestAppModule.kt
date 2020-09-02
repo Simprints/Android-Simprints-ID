@@ -28,7 +28,7 @@ import com.simprints.id.di.AppModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.utils.SimNetworkUtils

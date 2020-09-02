@@ -7,7 +7,8 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext
-import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.*
+import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.CAPTURE
+import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.RETRY
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportTag.FACE_CAPTURE
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportTrigger.UI
@@ -31,6 +32,7 @@ class FaceCaptureViewModel(
     val retryFlowEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val recaptureEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val exitFormEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val unexpectedErrorEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
     val finishFlowEvent: MutableLiveData<LiveDataEventWithContent<FaceCaptureResponse>> =
         MutableLiveData()
@@ -131,6 +133,11 @@ class FaceCaptureViewModel(
 
     fun submitExitForm(reason: RefusalAnswer, exitFormText: String) {
         finishFlowWithExitFormEvent.send(FaceExitFormResponse(reason, exitFormText))
+    }
+
+    fun submitError(throwable: Throwable) {
+        crashReportManager.logException(throwable)
+        unexpectedErrorEvent.send()
     }
 
 }

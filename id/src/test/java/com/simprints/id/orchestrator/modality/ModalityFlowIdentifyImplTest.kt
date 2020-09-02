@@ -19,8 +19,8 @@ import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.SETUP_ACTIVITY_NAME
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
-import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.tools.time.TimeHelper
+import com.simprints.id.commontesttools.TestTimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -32,7 +32,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorI
 class ModalityFlowIdentifyImplTest {
 
     private lateinit var modalityFlowIdentify: ModalityFlowIdentifyImpl
-    private val timeHelper: TimeHelper = TimeHelperImpl()
+    private val timeHelper: TimeHelper = TestTimeHelperImpl()
     @MockK lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @MockK lateinit var faceStepProcessor: FaceStepProcessor
     @MockK lateinit var coreStepProcessor: CoreStepProcessor
@@ -80,8 +80,8 @@ class ModalityFlowIdentifyImplTest {
             println(this)
 
             assertThat(this).hasSize(NUMBER_STEPS_FINGER)
-            verifyStepWasAdded(get(1), CONSENT_ACTIVITY_NAME) // TODO : Change back to 2 once fingerprint implements configuration request
-            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -93,9 +93,9 @@ class ModalityFlowIdentifyImplTest {
         with(modalityFlowIdentify.steps) {
             println(this)
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
-            verifyStepWasAdded(get(2), CONSENT_ACTIVITY_NAME) // TODO : Change back to 3 once fingerprint implements configuration request
-            verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
-            verifyStepWasAdded(get(4), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(5), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -108,9 +108,9 @@ class ModalityFlowIdentifyImplTest {
             println(this)
 
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
-            verifyStepWasAdded(get(2), CONSENT_ACTIVITY_NAME) // TODO : Change back to 3 fingerprint implements configuration request
-            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(4), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(5), FACE_ACTIVITY_NAME)
         }
     }
 
@@ -134,7 +134,7 @@ class ModalityFlowIdentifyImplTest {
             println(this)
 
             assertThat(this).hasSize(NUMBER_STEPS_FINGER_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(1), FINGERPRINT_ACTIVITY_NAME) // TODO : Change back to 1 once fingerprint implements configuration request
+            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -146,8 +146,8 @@ class ModalityFlowIdentifyImplTest {
         with(modalityFlowIdentify.steps) {
             println(this)
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(2), FACE_ACTIVITY_NAME) // TODO : Change back to 3 once fingerprint implements configuration request
-            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -159,8 +159,8 @@ class ModalityFlowIdentifyImplTest {
         with(modalityFlowIdentify.steps) {
             println(this)
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME) // TODO : Change back to 3 once fingerprint implements configuration request
-            verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(4), FACE_ACTIVITY_NAME)
         }
     }
 

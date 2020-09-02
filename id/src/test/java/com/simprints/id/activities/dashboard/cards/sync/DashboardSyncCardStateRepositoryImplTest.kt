@@ -16,8 +16,8 @@ import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWo
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWN_COUNTER
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UP_COUNTER
-import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.tools.time.TimeHelper
+import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.MockKAnnotations

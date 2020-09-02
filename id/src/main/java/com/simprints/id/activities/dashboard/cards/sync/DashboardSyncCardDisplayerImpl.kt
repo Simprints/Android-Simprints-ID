@@ -15,7 +15,7 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
 import org.jetbrains.anko.layoutInflater
