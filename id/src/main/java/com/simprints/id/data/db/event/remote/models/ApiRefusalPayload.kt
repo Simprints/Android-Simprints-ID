@@ -24,10 +24,10 @@ data class ApiRefusalPayload(override val relativeStartTime: Long,
         OTHER
     }
 
-    constructor(domainPayload: RefusalPayload) : this(
-        domainPayload.createdAt,
+    constructor(domainPayload: RefusalPayload, baseStartTime: Long) : this(
+        domainPayload.createdAt - baseStartTime,
         domainPayload.eventVersion,
-        domainPayload.endedAt,
+        domainPayload.endedAt - baseStartTime,
         domainPayload.reason.toApiRefusalEventAnswer(),
         domainPayload.otherText)
 }

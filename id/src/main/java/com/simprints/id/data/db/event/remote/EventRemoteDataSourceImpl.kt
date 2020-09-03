@@ -7,10 +7,8 @@ import com.fasterxml.jackson.core.JsonToken.START_ARRAY
 import com.fasterxml.jackson.core.JsonToken.START_OBJECT
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.domain.EventCount
-import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.remote.models.ApiEvent
 import com.simprints.id.data.db.event.remote.models.fromApiToDomain
-import com.simprints.id.data.db.event.remote.models.fromDomainToApi
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
@@ -41,7 +39,7 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
             }
         }
 
-    override suspend fun getEvents(query: ApiRemoteEventQuery, scope: CoroutineScope): ReceiveChannel<Event> {
+    override suspend fun getEvents(query: ApiRemoteEventQuery, scope: CoroutineScope): ReceiveChannel<ApiEvent> {
         val streaming = takeStreaming(query)
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REMOTE_SOURCE] Stream taken")
 
@@ -51,7 +49,7 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
     }
 
     @VisibleForTesting
-    suspend fun parseStreamAndEmitEvents(streaming: InputStream, channel: ProducerScope<Event>) {
+    suspend fun parseStreamAndEmitEvents(streaming: InputStream, channel: ProducerScope<ApiEvent>) {
         val parser: JsonParser = JsonFactory().createParser(streaming)
         check(parser.nextToken() == START_ARRAY) { "Expected an array" }
 
@@ -60,7 +58,7 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
         try {
             while (parser.nextToken() == START_OBJECT) {
                 val event = jsonHelper.jackson.readValue(parser, ApiEvent::class.java)
-                channel.send(event.fromApiToDomain())
+                channel.send(event)
             }
 
             parser.close()
@@ -88,9 +86,9 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
             }
         }.byteStream()
 
-    override suspend fun post(projectId: String, events: List<Event>) {
+    override suspend fun post(projectId: String, events: List<ApiEvent>) {
         executeCall("EventUpload") {
-            it.uploadEvents(projectId, ApiUploadEventsBody(events.map { it.fromDomainToApi() }))
+            it.uploadEvents(projectId, ApiUploadEventsBody(events))
         }
     }
 

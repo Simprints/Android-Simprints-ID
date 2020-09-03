@@ -3,8 +3,8 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.simprints.core.tools.json.JsonHelper
 import com.lyft.kronos.AndroidClockFactory
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
@@ -68,9 +68,13 @@ import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
-import com.simprints.id.tools.*
+import com.simprints.id.tools.LocationManager
+import com.simprints.id.tools.LocationManagerImpl
+import com.simprints.id.tools.RandomGenerator
+import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
@@ -195,7 +199,7 @@ open class AppModule {
     @Singleton
     // https://github.com/lyft/Kronos-Android
     fun provideTimeHelper(app: Application): TimeHelper = KronosTimeHelperImpl(
-        AndroidClockFactory.createKronosClock(app)
+        AndroidClockFactory.createKronosClock(app) //StopShip: Changing cache time from 1 minute to 1 hour?
     )
 
 
@@ -309,14 +313,14 @@ open class AppModule {
     @Provides
     open fun provideSyncInformationViewModelFactory(
         downySyncHelper: EventDownSyncHelper,
-        eventRepository: EventRepository,
+        upSyncHelper: EventUpSyncHelper,
         subjectRepository: SubjectRepository,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         downSyncScopeRepository: EventDownSyncScopeRepository
     ) =
         SyncInformationViewModelFactory(
-            downySyncHelper, subjectRepository, eventRepository, preferencesManager,
+            downySyncHelper, subjectRepository, upSyncHelper, preferencesManager,
             loginInfoManager.getSignedInProjectIdOrEmpty(), downSyncScopeRepository
         )
 

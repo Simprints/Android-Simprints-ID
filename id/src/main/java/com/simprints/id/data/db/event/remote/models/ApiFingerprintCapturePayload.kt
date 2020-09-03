@@ -26,11 +26,11 @@ data class ApiFingerprintCapturePayload(val id: String,
             finger.quality, finger.template)
     }
 
-    constructor(domainPayload: FingerprintCapturePayload) :
+    constructor(domainPayload: FingerprintCapturePayload, baseStartTime: Long) :
         this(domainPayload.id,
-            domainPayload.createdAt,
+            domainPayload.createdAt - baseStartTime,
             domainPayload.eventVersion,
-            domainPayload.endedAt,
+            domainPayload.endedAt - baseStartTime,
             domainPayload.qualityThreshold,
             domainPayload.finger.fromDomainToApi(),
             domainPayload.result.fromDomainToApi(),

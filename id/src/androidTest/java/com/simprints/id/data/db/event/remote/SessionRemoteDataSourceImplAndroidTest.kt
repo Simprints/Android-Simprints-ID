@@ -35,7 +35,7 @@
 //import com.simprints.id.testtools.testingapi.TestProjectRule
 //import com.simprints.id.testtools.testingapi.models.TestProject
 //import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
-//import com.simprints.id.tools.TimeHelperImpl
+//import com.simprints.id.tools.time.TimeHelperImpl
 //import com.simprints.id.tools.utils.SimNetworkUtils
 //import com.simprints.testtools.android.waitOnSystem
 //import io.mockk.MockKAnnotations

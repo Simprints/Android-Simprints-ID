@@ -35,7 +35,7 @@ class ParentalConsentTextHelperTest {
     @Test
     fun getParentalConsentTextForFinger_shouldReturnCorrectParentalConsentText() {
         val parentalConsentText = ParentalConsentTextHelper(parentalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER), mockk(), mockk()).assembleText(request, context)
+            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER), mockk(), JsonHelper()).assembleText(request, context)
 
         assertThat(parentalConsentText).isEqualTo(PARENTAL_CONSENT_ENROL_FINGER_TEXT)
     }
@@ -43,7 +43,7 @@ class ParentalConsentTextHelperTest {
     @Test
     fun getParentalConsentTextForFace_shouldReturnCorrectParentalConsentText() {
         val parentalConsentText = ParentalConsentTextHelper(parentalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FACE), mockk(), mockk()).assembleText(request, context)
+            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FACE), mockk(), JsonHelper()).assembleText(request, context)
 
         assertThat(parentalConsentText).isEqualTo(PARENTAL_CONSENT_ENROL_FACE_TEXT)
     }
@@ -51,7 +51,7 @@ class ParentalConsentTextHelperTest {
     @Test
     fun getParentalConsentTextForMultiModal_shouldReturnCorrectParentalConsentText() {
         val parentalConsentText = ParentalConsentTextHelper(parentalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER, Modality.FACE), mockk(), mockk()).assembleText(request, context)
+            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER, Modality.FACE), mockk(), JsonHelper()).assembleText(request, context)
 
         assertThat(parentalConsentText).isEqualTo(PARENTAL_CONSENT_ENROL_MULTI_TEXT)
     }

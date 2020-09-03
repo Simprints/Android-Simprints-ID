@@ -28,8 +28,6 @@ open class DbSubject(
 
     var updatedAt: Date? = null,
 
-    var toSync: Boolean = false,
-
     var fingerprintSamples: RealmList<DbFingerprintSample> = RealmList(),
 
     var faceSamples: RealmList<DbFaceSample> = RealmList()

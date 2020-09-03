@@ -11,8 +11,8 @@ data class ApiIntentParsingPayload(override val relativeStartTime: Long,
                                    override val version: Int,
                                    val integration: ApiIntegrationInfo) : ApiEventPayload(ApiEventPayloadType.IntentParsing, version, relativeStartTime) {
 
-    constructor(domainPayload: IntentParsingPayload) : this(
-        domainPayload.createdAt,
+    constructor(domainPayload: IntentParsingPayload, baseStartTime: Long) : this(
+        domainPayload.createdAt - baseStartTime,
         domainPayload.eventVersion,
         domainPayload.integration.fromDomainToApi())
 

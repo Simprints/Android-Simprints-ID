@@ -27,7 +27,7 @@ interface EventRepository {
 
     suspend fun countEventsToUpload(query: LocalEventQuery): Int
 
-    suspend fun uploadEvents(query: LocalEventQuery): Flow<List<Event>>
+    suspend fun uploadEvents(query: LocalEventQuery): Flow<Int>
 
     suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount>
 

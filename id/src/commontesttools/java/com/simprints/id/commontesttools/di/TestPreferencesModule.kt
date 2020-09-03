@@ -26,17 +26,17 @@ class TestPreferencesModule(
     }
 
     override fun provideSettingsPreferencesManager(
-            prefs: ImprovedSharedPreferences,
-            remoteConfigWrapper: RemoteConfigWrapper,
-            fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-            groupSerializer: Serializer<GROUP>,
-            languagesStringArraySerializer: Serializer<Array<String>>,
-            moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-            eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
-            modalitiesSerializer: Serializer<List<Modality>>,
-            captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
-            saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
-            scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
+        prefs: ImprovedSharedPreferences,
+        remoteConfigWrapper: RemoteConfigWrapper,
+        groupSerializer: Serializer<GROUP>,
+        languagesStringArraySerializer: Serializer<Array<String>>,
+        moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
+        eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
+        modalitiesSerializer: Serializer<List<Modality>>,
+        captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
+        saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
+        scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
+        fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>
     ): SettingsPreferencesManager = settingsPreferencesManagerRule.resolveDependency {
         super.provideSettingsPreferencesManager(
             prefs,

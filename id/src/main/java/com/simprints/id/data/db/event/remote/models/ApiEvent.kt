@@ -16,8 +16,8 @@ data class ApiEvent(val id: String,
                     val labels: ApiEventLabels,
                     val payload: ApiEventPayload)
 
-fun Event.fromDomainToApi() =
-    ApiEvent(id, labels.fromDomainToApi(), payload.fromDomainToApi()) 
+fun Event.fromDomainToApi(baseStartTime: Long = 0) =
+    ApiEvent(id, labels.fromDomainToApi(), payload.fromDomainToApi(baseStartTime))
 
 fun ApiEvent.fromApiToDomain() =
     when (payload.type) {

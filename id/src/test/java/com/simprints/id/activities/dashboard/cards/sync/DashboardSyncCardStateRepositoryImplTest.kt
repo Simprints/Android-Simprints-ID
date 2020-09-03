@@ -19,6 +19,8 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.U
 import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.id.tools.time.KronosTimeHelperImpl
+import com.simprints.id.tools.time.TimeHelper.Companion
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -202,7 +204,7 @@ class DashboardSyncCardStateRepositoryImplTest {
 
     @Test
     fun syncSucceedInBackgroundLongTimeAgo_syncShouldBeTriggered() = runBlockingTest {
-        dashboardSyncCardStateRepository = createRepository(TimeHelperImpl())
+        dashboardSyncCardStateRepository = createRepository(timeHelper)
         syncStateLiveData.value = EventSyncState(syncId, 10, 10,
             listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
         every { cacheSync.readLastSuccessfulSyncTime() } returns Date(System.currentTimeMillis() - MAX_TIME_BEFORE_SYNC_AGAIN - 1)
@@ -215,7 +217,7 @@ class DashboardSyncCardStateRepositoryImplTest {
 
     @Test
     fun syncSucceedInBackgroundNotTooLongAgo_syncShouldNotBeTriggered() = runBlockingTest {
-        dashboardSyncCardStateRepository = createRepository(TimeHelperImpl())
+        dashboardSyncCardStateRepository = createRepository(timeHelper)
         syncStateLiveData.value = EventSyncState(syncId, 10, 10,
             listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded)))
         every { cacheSync.readLastSuccessfulSyncTime() } returns Date()

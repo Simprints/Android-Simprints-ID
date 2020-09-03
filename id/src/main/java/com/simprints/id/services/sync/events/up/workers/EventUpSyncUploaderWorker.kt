@@ -8,6 +8,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
+import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
@@ -35,10 +36,14 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) : Si
     @Inject lateinit var jsonHelper: JsonHelper
 
     private val upSyncScope by lazy {
-        val jsonInput = inputData.getString(INPUT_UP_SYNC)
-            ?: throw IllegalArgumentException("input required")
-        Timber.d("Received $jsonInput")
-        jsonHelper.fromJson<EventUpSyncScope>(jsonInput)
+        try {
+            val jsonInput = inputData.getString(INPUT_UP_SYNC)
+                ?: throw IllegalArgumentException("input required")
+            Timber.d("Received $jsonInput")
+            jsonHelper.fromJson<EventUpSyncScope>(jsonInput)
+        } catch (t: Throwable) {
+            throw MalformedDownSyncOperationException(t.message ?: "")
+        }
     }
 
     @ExperimentalCoroutinesApi

@@ -18,8 +18,8 @@ data class ApiConnectivitySnapshotPayload(
             : this(connection.type, connection.state.toString())
     }
 
-    constructor(domainPayload: ConnectivitySnapshotPayload) :
-        this(domainPayload.createdAt,
+    constructor(domainPayload: ConnectivitySnapshotPayload, baseStartTime: Long) :
+        this(domainPayload.createdAt - baseStartTime,
             domainPayload.eventVersion,
             domainPayload.networkType,
             domainPayload.connections.map { ApiConnection(it) })

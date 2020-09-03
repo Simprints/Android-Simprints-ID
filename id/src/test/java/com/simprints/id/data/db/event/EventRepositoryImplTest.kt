@@ -35,7 +35,7 @@ import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.asFlow
@@ -210,8 +210,8 @@ class EventRepositoryImplTest {
 
             val progress = eventRepo.uploadEvents(LocalEventQuery()).toList()
 
-            assertThat(progress[0].size).isEqualTo(SESSION_BATCH_SIZE)
-            assertThat(progress[1].size).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(progress[0]).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(progress[1]).isEqualTo(SESSION_BATCH_SIZE)
         }
     }
 

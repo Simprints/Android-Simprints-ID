@@ -11,11 +11,12 @@ import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.db.event.domain.EventCount
-import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.*
+import com.simprints.id.data.db.event.remote.models.ApiEvent
 import com.simprints.id.data.db.event.remote.models.ApiEventCount
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
+import com.simprints.id.data.db.event.remote.models.fromApiToDomain
 import com.simprints.id.data.db.event.remote.models.fromDomainToApi
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
@@ -102,7 +103,7 @@ class EventRemoteDataSourceImplTest {
     fun downloadEvents_shouldParseStreamAndEmitBatches() {
         runBlocking {
             val responseStreamWith6Events = this.javaClass.classLoader?.getResourceAsStream("responses/down_sync_7events.json")!!
-            val channel = mockk<ProducerScope<Event>>(relaxed = true)
+            val channel = mockk<ProducerScope<ApiEvent>>(relaxed = true)
             excludeRecords { channel.isClosedForSend }
 
             (eventRemoteDataSource as EventRemoteDataSourceImpl).parseStreamAndEmitEvents(responseStreamWith6Events, channel)
@@ -119,11 +120,11 @@ class EventRemoteDataSourceImplTest {
         }
     }
 
-    private fun verifySequenceOfEventsEmitted(channel: ProducerScope<Event>, eventTypes: List<EventType>) {
+    private fun verifySequenceOfEventsEmitted(channel: ProducerScope<ApiEvent>, eventTypes: List<EventType>) {
         coVerifySequence {
             eventTypes.forEach { eventType ->
                 channel.send(match {
-                    it.type == eventType
+                    it.fromApiToDomain().type == eventType
                 })
             }
         }
@@ -162,14 +163,14 @@ class EventRemoteDataSourceImplTest {
         runBlocking {
             coEvery { eventRemoteInterface.uploadEvents(any(), any()) } returns mockk()
 
-            val events = listOf(createSessionCaptureEvent())
+            val events = listOf(createSessionCaptureEvent().fromDomainToApi())
             eventRemoteDataSource.post(DEFAULT_PROJECT_ID, events)
 
             coVerify(exactly = 1) {
                 eventRemoteInterface.uploadEvents(
                     DEFAULT_PROJECT_ID,
                     match {
-                        assertThat(it.events).containsExactlyElementsIn(events.map { it.fromDomainToApi() })
+                        assertThat(it.events).containsExactlyElementsIn(events)
                         true
                     }
                 )
@@ -183,7 +184,7 @@ class EventRemoteDataSourceImplTest {
             coEvery { eventRemoteInterface.uploadEvents(any(), any()) } throws Throwable("Request issue")
 
             shouldThrow<Throwable> {
-                eventRemoteDataSource.post(DEFAULT_PROJECT_ID, listOf(createSessionCaptureEvent()))
+                eventRemoteDataSource.post(DEFAULT_PROJECT_ID, listOf(createSessionCaptureEvent().fromDomainToApi()))
             }
         }
     }

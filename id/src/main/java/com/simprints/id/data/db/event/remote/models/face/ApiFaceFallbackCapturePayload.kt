@@ -11,8 +11,8 @@ data class ApiFaceFallbackCapturePayload(override val relativeStartTime: Long, /
                                          val relativeEndTime: Long,
                                          override val version: Int) : ApiEventPayload(FaceFallbackCapture, version, relativeStartTime) {
 
-    constructor(domainPayload: FaceFallbackCapturePayload) : this(
-        domainPayload.createdAt,
-        domainPayload.endedAt,
+    constructor(domainPayload: FaceFallbackCapturePayload, baseStartTime: Long) : this(
+        domainPayload.createdAt - baseStartTime,
+        domainPayload.endedAt - baseStartTime,
         domainPayload.eventVersion)
 }

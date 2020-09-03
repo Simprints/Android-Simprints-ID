@@ -48,7 +48,7 @@ data class ApiEnrolmentRecordMovePayload(
 
 fun ApiEnrolmentRecordMovePayload.fromApiToDomain() =
     EnrolmentRecordMovePayload(
-        relativeStartTime,
+        0,
         version,
         enrolmentRecordCreation?.let {
             EnrolmentRecordCreationInMove(it.subjectId, it.projectId, it.moduleId, it.attendantId, it.biometricReferences?.map { it.fromApiToDomain() })

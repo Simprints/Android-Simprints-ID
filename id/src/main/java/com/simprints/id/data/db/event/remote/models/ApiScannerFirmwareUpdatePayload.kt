@@ -15,10 +15,10 @@ data class ApiScannerFirmwareUpdatePayload(override val relativeStartTime: Long,
                                            val targetAppVersion: String,
                                            val failureReason: String?) : ApiEventPayload(ApiEventPayloadType.ScannerFirmwareUpdate, version, relativeStartTime) {
 
-    constructor(domainPayload: ScannerFirmwareUpdatePayload) :
-        this(domainPayload.createdAt,
+    constructor(domainPayload: ScannerFirmwareUpdatePayload, baseStartTime: Long) :
+        this(domainPayload.createdAt - baseStartTime,
             domainPayload.eventVersion,
-            domainPayload.endedAt,
+            domainPayload.endedAt - baseStartTime,
             domainPayload.chip,
             domainPayload.targetAppVersion,
             domainPayload.failureReason)
