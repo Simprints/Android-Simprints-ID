@@ -13,8 +13,10 @@ data class ApiAlertScreenPayload(override val relativeStartTime: Long,
                                  override val version: Int,
                                  val alertType: ApiAlertScreenEventType) : ApiEventPayload(AlertScreen, version, relativeStartTime) {
 
-    constructor(domainPayload: AlertScreenPayload) :
-        this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.alertType.fromDomainToApi())
+    constructor(domainPayload: AlertScreenPayload, baseStartTime: Long) :
+        this(domainPayload.createdAt - baseStartTime,
+            domainPayload.eventVersion,
+            domainPayload.alertType.fromDomainToApi())
 
     @Keep
     enum class ApiAlertScreenEventType {

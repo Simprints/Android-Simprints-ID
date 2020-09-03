@@ -13,11 +13,11 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.Candidat
 @Keep
 @JsonInclude(Include.NON_NULL)
 data class ApiCandidateReadPayload(override val relativeStartTime: Long,
-                              override val version: Int,
-                              val relativeEndTime: Long,
-                              val candidateId: String,
-                              val localResult: ApiLocalResult,
-                              val remoteResult: ApiRemoteResult?) : ApiEventPayload(CandidateRead, version, relativeStartTime) {
+                                   override val version: Int,
+                                   val relativeEndTime: Long,
+                                   val candidateId: String,
+                                   val localResult: ApiLocalResult,
+                                   val remoteResult: ApiRemoteResult?) : ApiEventPayload(CandidateRead, version, relativeStartTime) {
 
     @Keep
     enum class ApiLocalResult {
@@ -29,10 +29,10 @@ data class ApiCandidateReadPayload(override val relativeStartTime: Long,
         FOUND, NOT_FOUND;
     }
 
-    constructor(domainPayload: CandidateReadPayload) :
-        this(domainPayload.createdAt,
+    constructor(domainPayload: CandidateReadPayload, baseStartTime: Long) :
+        this(domainPayload.createdAt - baseStartTime,
             domainPayload.eventVersion,
-            domainPayload.endedAt,
+            domainPayload.endedAt - baseStartTime,
             domainPayload.candidateId,
             domainPayload.localResult.fromDomainToApi(),
             domainPayload.remoteResult?.fromDomainToApi())

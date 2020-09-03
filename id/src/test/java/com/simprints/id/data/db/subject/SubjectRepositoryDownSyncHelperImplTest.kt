@@ -15,7 +15,7 @@
 //import com.simprints.id.data.db.subjects_sync.down.domain.EventsDownSyncOperationFactoryImpl
 //import com.simprints.id.domain.modality.Modes
 //import com.simprints.id.testtools.UnitTestConfig
-//import com.simprints.id.tools.TimeHelperImpl
+//import com.simprints.id.tools.time.TimeHelperImpl
 //import com.simprints.id.tools.json.SimJsonHelper
 //import com.simprints.testtools.common.channel.testChannel
 //import com.simprints.testtools.common.syntax.assertThrows

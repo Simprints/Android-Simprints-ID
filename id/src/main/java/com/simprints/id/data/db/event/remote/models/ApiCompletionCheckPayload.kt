@@ -8,7 +8,7 @@ data class ApiCompletionCheckPayload(override val relativeStartTime: Long,
                                      override val version: Int,
                                      val completed: Boolean) : ApiEventPayload(ApiEventPayloadType.CompletionCheck, version, relativeStartTime) {
 
-    constructor(domainPayload: CompletionCheckPayload) :
-        this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.completed)
+    constructor(domainPayload: CompletionCheckPayload, baseStartTime: Long) :
+        this(domainPayload.createdAt - baseStartTime, domainPayload.eventVersion, domainPayload.completed)
 }
 

@@ -10,8 +10,8 @@ data class ApiFaceOnboardingCompletePayload(override val relativeStartTime: Long
                                        val relativeEndTime: Long,
                                        override val version: Int) : ApiEventPayload(FaceOnboardingComplete, version, relativeStartTime) {
 
-    constructor(domainPayload: FaceOnboardingCompletePayload) : this(
-        domainPayload.createdAt,
-        domainPayload.endedAt,
+    constructor(domainPayload: FaceOnboardingCompletePayload, baseStartTime: Long) : this(
+        domainPayload.createdAt - baseStartTime,
+        domainPayload.endedAt - baseStartTime,
         domainPayload.eventVersion)
 }

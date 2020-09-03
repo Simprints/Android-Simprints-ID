@@ -11,8 +11,8 @@ data class ApiSuspiciousIntentPayload(override val relativeStartTime: Long,
                                       override val version: Int,
                                       val unexpectedExtras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.SuspiciousIntent, version, relativeStartTime) {
 
-    constructor(domainPayload: SuspiciousIntentPayload) :
-        this(domainPayload.createdAt,
+    constructor(domainPayload: SuspiciousIntentPayload, baseStartTime: Long) :
+        this(domainPayload.createdAt - baseStartTime,
             domainPayload.eventVersion,
             domainPayload.unexpectedExtras)
 }

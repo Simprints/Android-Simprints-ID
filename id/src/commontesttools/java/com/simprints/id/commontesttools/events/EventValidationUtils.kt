@@ -490,7 +490,6 @@ fun validateSessionCaptureApiModel(json: JSONObject) {
         assertThat(getString("id")).isNotNull()
         assertThat(getString("projectId")).isNotNull()
         assertThat(getLong("startTime")).isNotNull()
-        assertThat(getLong("serverStartTime")).isNotNull()
         assertThat(getLong("relativeEndTime")).isNotNull()
         assertThat(getLong("relativeUploadTime")).isNotNull()
         assertThat(getJSONArray("modalities").length()).isEqualTo(2)
@@ -502,7 +501,7 @@ fun validateSessionCaptureApiModel(json: JSONObject) {
         validateDatabaseInfoApiModel(getJSONObject("databaseInfo"))
         validateLocationApiModel(getJSONObject("location"))
 
-        assertThat(length()).isEqualTo(16)
+        assertThat(length()).isEqualTo(15)
     }
 }
 

@@ -21,10 +21,10 @@ data class ApiFaceCapturePayload(val id: String,
                             val isFallback: Boolean,
                             val face: ApiFace?) : ApiEventPayload(FaceCapture,version, relativeStartTime) {
 
-    constructor(domainPayload: FaceCapturePayload) : this(
+    constructor(domainPayload: FaceCapturePayload, baseStartTime: Long) : this(
         domainPayload.id,
-        domainPayload.createdAt,
-        domainPayload.endedAt,
+        domainPayload.createdAt - baseStartTime,
+        domainPayload.endedAt - baseStartTime,
         domainPayload.eventVersion,
         domainPayload.attemptNb,
         domainPayload.qualityThreshold,

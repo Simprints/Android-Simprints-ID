@@ -24,10 +24,10 @@ data class ApiConsentPayload(override val relativeStartTime: Long,
         ACCEPTED, DECLINED, NO_RESPONSE
     }
 
-    constructor(domainPayload: ConsentPayload) :
-        this(domainPayload.createdAt,
+    constructor(domainPayload: ConsentPayload, baseStartTime: Long) :
+        this(domainPayload.createdAt - baseStartTime,
             domainPayload.eventVersion,
-            domainPayload.endedAt,
+            domainPayload.endedAt - baseStartTime,
             domainPayload.consentType.fromDomainToApi(),
             domainPayload.result.fromDomainToApi())
 }

@@ -38,7 +38,6 @@ class DbSubjectTest {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
             assertThat(fingerprintSamples.first()?.id).isEqualTo(fingerprintSample.id)
             assertThat(faceSamples.first()?.id).isEqualTo(faceSample.id)
-            assertThat(toSync).isTrue()
         }
     }
 }

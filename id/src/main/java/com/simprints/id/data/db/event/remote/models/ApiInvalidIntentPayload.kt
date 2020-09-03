@@ -12,8 +12,8 @@ data class ApiInvalidIntentPayload(override val relativeStartTime: Long,
                                    val action: String,
                                    val extras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.InvalidIntent, version, relativeStartTime) {
 
-    constructor(domainPayload: InvalidIntentPayload) :
-        this(domainPayload.createdAt,
+    constructor(domainPayload: InvalidIntentPayload, baseStartTime: Long) :
+        this(domainPayload.createdAt - baseStartTime,
             domainPayload.eventVersion,
             domainPayload.action,
             domainPayload.extras)

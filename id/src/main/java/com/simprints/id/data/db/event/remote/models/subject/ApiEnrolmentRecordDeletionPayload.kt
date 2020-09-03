@@ -20,10 +20,9 @@ data class ApiEnrolmentRecordDeletionPayload(
         this(payload.createdAt, payload.eventVersion, payload.subjectId, payload.projectId, payload.moduleId, payload.attendantId)
 }
 
-
 fun ApiEnrolmentRecordDeletionPayload.fromApiToDomain() =
     EnrolmentRecordDeletionPayload(
-        relativeStartTime,
+        0,
         version,
         subjectId,
         projectId,

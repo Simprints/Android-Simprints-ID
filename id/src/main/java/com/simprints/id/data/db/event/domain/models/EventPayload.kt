@@ -92,5 +92,4 @@ abstract class EventPayload {
     abstract val eventVersion: Int
     abstract val createdAt: Long
     abstract val endedAt: Long
-
 }

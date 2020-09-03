@@ -27,10 +27,10 @@ data class ApiOneToManyMatchPayload(override val relativeStartTime: Long,
         PROJECT;
     }
 
-    constructor(domainPayload: OneToManyMatchPayload) :
-        this(domainPayload.createdAt,
+    constructor(domainPayload: OneToManyMatchPayload, baseStartTime: Long) :
+        this(domainPayload.createdAt - baseStartTime,
             domainPayload.eventVersion,
-            domainPayload.endedAt,
+            domainPayload.endedAt - baseStartTime,
             ApiMatchPool(domainPayload.pool),
             domainPayload.matcher.fromDomainToApi(),
             domainPayload.result?.map { ApiMatchEntry(it) })

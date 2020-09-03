@@ -28,8 +28,8 @@ data class ApiScannerConnectionPayload(override val relativeStartTime: Long,
                 scannerInfo.generation.toApiScannerGeneration(), scannerInfo.hardwareVersion)
     }
 
-    constructor(domainPayload: ScannerConnectionPayload) : this(
-        domainPayload.createdAt,
+    constructor(domainPayload: ScannerConnectionPayload, baseStartTime: Long) : this(
+        domainPayload.createdAt - baseStartTime,
         domainPayload.eventVersion,
         ApiScannerInfo(domainPayload.scannerInfo))
 

@@ -9,6 +9,7 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
+import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
@@ -40,16 +41,12 @@ class EventDownSyncDownloaderWorkerTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private lateinit var eventDownSyncDownloaderWorker: EventDownSyncDownloaderWorker
 
-
     @Before
     fun setUp() {
         UnitTestConfig(this).setupWorkManager().setupFirebase()
         app.component = mockk(relaxed = true)
         val correctInputData = JsonHelper().toJson(projectDownSyncScope.operations.first())
         eventDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
-
-        eventDownSyncDownloaderWorker.eventDownSyncDownloaderTask = mockk(relaxed = true)
-        eventDownSyncDownloaderWorker.jsonHelper = JsonHelper()
     }
 
     @Test
@@ -95,17 +92,6 @@ class EventDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_inputDataIsWrong_shouldFail() = runBlocking {
-        eventDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to "error"))
-        with(eventDownSyncDownloaderWorker) {
-
-            doWork()
-
-            verify { resultSetter.failure(any()) }
-        }
-    }
-
-    @Test
     fun worker_progressCountInProgressData_shouldExtractTheProgressCountCorrectly() = runBlocking {
         val progress = 2
         val syncCacheMock = mockk<EventSyncCache>()
@@ -142,7 +128,11 @@ class EventDownSyncDownloaderWorkerTest {
             crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
             eventDownSyncScopeRepository = mockk(relaxed = true)
+            coEvery { eventDownSyncScopeRepository.refreshState(any()) } answers { this.args.first() as EventDownSyncOperation }
             syncCache = mockk(relaxed = true)
+            jsonHelper = JsonHelper()
+            eventDownSyncDownloaderTask = mockk(relaxed = true)
+            downSyncHelper = mockk(relaxed = true)
         }
 }
 

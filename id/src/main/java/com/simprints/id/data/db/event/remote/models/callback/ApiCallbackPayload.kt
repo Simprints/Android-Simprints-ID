@@ -23,35 +23,35 @@ data class ApiCallbackPayload(
     val callback: ApiCallback
 ) : ApiEventPayload(Callback, version, relativeStartTime) {
 
-    constructor(domainPayload: EnrolmentCallbackPayload) : this(
-        domainPayload.createdAt,
+    constructor(domainPayload: EnrolmentCallbackPayload, baseStartTime: Long) : this(
+        domainPayload.createdAt - baseStartTime,
         domainPayload.eventVersion,
         ApiEnrolmentCallback(domainPayload.guid)
     )
 
-    constructor(domainPayload: IdentificationCallbackPayload) : this(
-        domainPayload.createdAt,
+    constructor(domainPayload: IdentificationCallbackPayload, baseStartTime: Long) : this(
+        domainPayload.createdAt - baseStartTime,
         domainPayload.eventVersion,
         ApiIdentificationCallback(domainPayload.sessionId, domainPayload.scores.map { it.fromDomainToApi() })
     )
 
-    constructor(domainPayload: VerificationCallbackPayload) : this(
-        domainPayload.createdAt,
+    constructor(domainPayload: VerificationCallbackPayload, baseStartTime: Long) : this(
+        domainPayload.createdAt - baseStartTime,
         domainPayload.eventVersion,
         ApiVerificationCallback(domainPayload.score.fromDomainToApi()))
 
-    constructor(domainPayload: ConfirmationCallbackPayload) : this(
-        domainPayload.createdAt,
+    constructor(domainPayload: ConfirmationCallbackPayload, baseStartTime: Long) : this(
+        domainPayload.createdAt - baseStartTime,
         domainPayload.eventVersion,
         ApiConfirmationCallback(domainPayload.identificationOutcome))
 
-    constructor(domainPayload: ErrorCallbackPayload) : this(
-        domainPayload.createdAt,
+    constructor(domainPayload: ErrorCallbackPayload, baseStartTime: Long) : this(
+        domainPayload.createdAt - baseStartTime,
         domainPayload.eventVersion,
         ApiErrorCallback(domainPayload.reason.fromDomainToApi()))
 
-    constructor(domainPayload: RefusalCallbackPayload) : this(
-        domainPayload.createdAt,
+    constructor(domainPayload: RefusalCallbackPayload, baseStartTime: Long) : this(
+        domainPayload.createdAt - baseStartTime,
         domainPayload.eventVersion,
         ApiRefusalCallback(domainPayload.reason, domainPayload.extra))
 }

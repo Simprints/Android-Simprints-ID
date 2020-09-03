@@ -16,10 +16,10 @@ data class ApiOneToOneMatchPayload(override val relativeStartTime: Long,
                                    val matcher: ApiMatcher,
                                    val result: ApiMatchEntry?) : ApiEventPayload(ApiEventPayloadType.OneToOneMatch, version, relativeStartTime) {
 
-    constructor(domainPayload: OneToOneMatchPayload) :
-        this(domainPayload.createdAt,
+    constructor(domainPayload: OneToOneMatchPayload, baseStartTime: Long) :
+        this(domainPayload.createdAt - baseStartTime,
             domainPayload.eventVersion,
-            domainPayload.endedAt,
+            domainPayload.endedAt - baseStartTime,
             domainPayload.candidateId,
             domainPayload.matcher.fromDomainToApi(),
             domainPayload.result?.let { ApiMatchEntry(it) })

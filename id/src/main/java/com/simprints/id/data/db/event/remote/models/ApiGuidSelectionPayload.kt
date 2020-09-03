@@ -8,8 +8,8 @@ data class ApiGuidSelectionPayload(override val relativeStartTime: Long,
                                    override val version: Int,
                                    val selectedId: String) : ApiEventPayload(ApiEventPayloadType.GuidSelection, version, relativeStartTime) {
 
-    constructor(domainPayload: GuidSelectionPayload) :
-        this(domainPayload.createdAt,
+    constructor(domainPayload: GuidSelectionPayload, baseStartTime: Long) :
+        this(domainPayload.createdAt - baseStartTime,
             domainPayload.eventVersion,
             domainPayload.selectedId)
 }

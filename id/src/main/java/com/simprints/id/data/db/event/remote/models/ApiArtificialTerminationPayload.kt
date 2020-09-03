@@ -12,8 +12,8 @@ data class ApiArtificialTerminationPayload(override val relativeStartTime: Long,
                                            override val version: Int,
                                            val reason: ApiReason) : ApiEventPayload(ApiEventPayloadType.ArtificialTermination, version, relativeStartTime) {
 
-    constructor(domainPayload: ArtificialTerminationPayload) :
-        this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.reason.fromDomainToApi())
+    constructor(domainPayload: ArtificialTerminationPayload, baseStartTime: Long) :
+        this(domainPayload.createdAt - baseStartTime, domainPayload.eventVersion, domainPayload.reason.fromDomainToApi())
 
     @Keep
     enum class ApiReason {

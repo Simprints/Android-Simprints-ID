@@ -53,7 +53,7 @@ class EventDownSyncScopeTest {
             val query = this.first().queryEvent
             checkModuleScope(query, DEFAULT_MODULE_ID)
 
-            val query2 = this[2].queryEvent
+            val query2 = this[1].queryEvent
             checkModuleScope(query2, DEFAULT_MODULE_ID_2)
 
         }

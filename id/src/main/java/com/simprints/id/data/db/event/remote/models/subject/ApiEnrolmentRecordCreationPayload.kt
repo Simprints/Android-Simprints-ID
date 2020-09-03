@@ -29,7 +29,7 @@ data class ApiEnrolmentRecordCreationPayload(
 
 fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() =
     EnrolmentRecordCreationPayload(
-        relativeStartTime ?: 0,
+        0,
         version,
         subjectId,
         projectId,
@@ -37,17 +37,3 @@ fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() =
         attendantId,
         biometricReferences?.map { it.fromApiToDomain() } ?: emptyList()
     )
-
-/* For GDPR, we might have to remove biometric references for some creation events,
-which would mean that we would get a response from the backend without biometric references,
-if that happens, we would  not be converting that event payload to domain. */
-//fun ApiEnrolmentRecordCreationPayload.fromApiToDomainOrNullIfNoBiometricReferences() =
-//    biometricReferences?.let { biometricRefs ->
-//        EnrolmentRecordCreationPayload(
-//            subjectId,
-//            projectId,
-//            moduleId,
-//            attendantId,
-//            biometricRefs.map { it.fromApiToDomain() }
-//        )
-//    }

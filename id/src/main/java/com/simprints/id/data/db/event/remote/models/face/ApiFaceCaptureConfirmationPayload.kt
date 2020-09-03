@@ -17,9 +17,9 @@ data class ApiFaceCaptureConfirmationPayload(override val relativeStartTime: Lon
                                         override val version: Int,
                                         val result: ApiResult) : ApiEventPayload(FaceCaptureConfirmation, version, relativeStartTime) {
 
-    constructor(domainPayload: FaceCaptureConfirmationPayload) : this(
-        domainPayload.createdAt,
-        domainPayload.endedAt,
+    constructor(domainPayload: FaceCaptureConfirmationPayload, baseStartTime: Long) : this(
+        domainPayload.createdAt - baseStartTime,
+        domainPayload.endedAt - baseStartTime,
         domainPayload.eventVersion,
         domainPayload.result.fromDomainToApi())
 

@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 
 import com.simprints.id.data.db.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
 import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import java.util.*
 

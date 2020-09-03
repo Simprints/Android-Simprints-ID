@@ -5,7 +5,7 @@
 //import com.simprints.id.data.db.event.domain.events.GuidSelectionEvent
 //import com.simprints.id.data.db.event.domain.events.callback.IdentificationCallbackEvent
 //import com.simprints.id.exceptions.safe.session.validator.GuidSelectEventValidatorException
-//import com.simprints.id.tools.TimeHelperImpl
+//import com.simprints.id.tools.time.TimeHelperImpl
 //import io.kotlintest.shouldThrow
 //import org.junit.Test
 //import java.util.*

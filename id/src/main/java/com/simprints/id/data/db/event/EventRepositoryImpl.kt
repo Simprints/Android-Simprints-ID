@@ -18,6 +18,10 @@ import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
+import com.simprints.id.data.db.event.remote.models.ApiEvent
+import com.simprints.id.data.db.event.remote.models.fromApiToDomain
+import com.simprints.id.data.db.event.remote.models.fromDomainToApi
+import com.simprints.id.data.db.event.remote.models.session.ApiSessionCapturePayload
 import com.simprints.id.data.db.events_sync.down.domain.RemoteEventQuery
 import com.simprints.id.data.db.events_sync.down.domain.fromDomainToApi
 import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
@@ -25,12 +29,14 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.toMode
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
 import com.simprints.id.tools.ignoreException
+import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
@@ -126,12 +132,15 @@ open class EventRepositoryImpl(
     override suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount> =
         eventRemoteDataSource.count(query.fromDomainToApi())
 
-
     override suspend fun downloadEvents(scope: CoroutineScope, query: RemoteEventQuery): ReceiveChannel<Event> =
-        eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
+        scope.produce {
+            val apiEvents = eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
+            apiEvents.consumeEach {
+                this.send(it.fromApiToDomain())
+            }
+        }
 
-
-    override suspend fun uploadEvents(query: LocalEventQuery): Flow<List<Event>> = flow {
+    override suspend fun uploadEvents(query: LocalEventQuery): Flow<Int> = flow {
         val batches = createBatches(query)
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading batches ${batches.size}")
 
@@ -139,23 +148,27 @@ open class EventRepositoryImpl(
             val events = batch.events
             Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading ${events.size} events in a batch")
 
+            events.filterIsInstance<ApiSessionCapturePayload>().forEach {
+                it.relativeUploadTime = timeHelper.now() - it.startTime
+            }
+
             try {
                 eventRemoteDataSource.post(currentProject, events)
-                deleteEventsFromDb(events)
+                deleteEventsFromDb(events.map { it.id })
             } catch (t: Throwable) {
                 Timber.d(t)
                 if (t.isClientAndCloudIntegrationIssue()) {
-                    deleteEventsFromDb(events)
+                    deleteEventsFromDb(events.map { it.id })
                 }
             }
-            this.emit(events)
+            this.emit(events.size)
         }
     }
 
-    private suspend fun deleteEventsFromDb(events: List<Event>) {
-        events.forEach {
-            Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Deleting ${it.id}")
-            eventLocalDataSource.delete(DbLocalEventQuery(id = it.id))
+    private suspend fun deleteEventsFromDb(eventsIds: List<String>) {
+        eventsIds.forEach {
+            Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Deleting $it")
+            eventLocalDataSource.delete(DbLocalEventQuery(id = it))
         }
     }
 
@@ -166,7 +179,7 @@ open class EventRepositoryImpl(
 
     private suspend fun createBatchesForEventsNotInSessions(query: LocalEventQuery): List<Batch> {
         val events = eventLocalDataSource.load(query.fromDomainToDb()).filter { it.labels.sessionId == null }.toList()
-        return events.chunked(SESSION_BATCH_SIZE).map { Batch(it.toMutableList()) }
+        return events.chunked(SESSION_BATCH_SIZE).map { Batch(it.map { it.fromDomainToApi() }.toMutableList()) }
     }
 
     private suspend fun createBatchesForEventsInSessions(query: LocalEventQuery): List<Batch> {
@@ -181,11 +194,11 @@ open class EventRepositoryImpl(
             if (hasLastBatchStillRoom && lastBatch != null) {
                 Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Adding $eventsCountInTheLastBatch into an existing batch")
 
-                lastBatch.events.addAll(eventsToUpload)
+                lastBatch.events.addAll(eventsToUpload.map { it.fromDomainToApi(session.payload.createdAt) })
             } else {
                 Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Creating new batch")
 
-                batches.add(Batch(eventsToUpload.toMutableList()))
+                batches.add(Batch(eventsToUpload.map { it.fromDomainToApi(session.payload.createdAt) }.toMutableList()))
             }
             batches
         }
@@ -261,5 +274,6 @@ open class EventRepositoryImpl(
             throw t
         }
 
-    data class Batch(val events: MutableList<Event>)
+    @VisibleForTesting
+    data class Batch(val events: MutableList<ApiEvent>)
 }

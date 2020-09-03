@@ -10,8 +10,8 @@ data class ApiFaceCaptureRetryPayload(override val relativeStartTime: Long, //No
                                       val relativeEndTime: Long,
                                       override val version: Int) : ApiEventPayload(FaceCaptureRetry, version, relativeStartTime) {
 
-    constructor(domainPayload: FaceCaptureRetryPayload) : this(
-        domainPayload.createdAt,
-        domainPayload.endedAt,
+    constructor(domainPayload: FaceCaptureRetryPayload, baseStartTime: Long) : this(
+        domainPayload.createdAt - baseStartTime,
+        domainPayload.endedAt - baseStartTime,
         domainPayload.eventVersion)
 }

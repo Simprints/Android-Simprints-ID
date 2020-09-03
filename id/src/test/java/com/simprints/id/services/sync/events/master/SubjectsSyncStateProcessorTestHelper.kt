@@ -10,7 +10,9 @@ import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
-import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
+import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
+import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
+import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.id.services.sync.events.master.EventSyncStateProcessorImplTest.Companion.DOWNLOADED
 import com.simprints.id.services.sync.events.master.EventSyncStateProcessorImplTest.Companion.TO_DOWNLOAD
 import com.simprints.id.services.sync.events.master.EventSyncStateProcessorImplTest.Companion.TO_UPLOAD
@@ -23,7 +25,10 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
+import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
+import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
+import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import java.util.*
 
 fun EventSyncState.assertConnectingSyncState() {
@@ -104,9 +109,9 @@ private fun createDownSyncDownloaderWorker(state: WorkInfo.State,
                                            id: UUID = UUID.randomUUID()) =
     createWorkInfo(
         state,
-        workDataOf(EventDownSyncDownloaderWorker.OUTPUT_DOWN_SYNC to DOWNLOADED),
+        workDataOf(OUTPUT_DOWN_SYNC to DOWNLOADED),
         createCommonDownSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(DOWNLOADER)),
-        workDataOf(EventDownSyncDownloaderWorker.PROGRESS_DOWN_SYNC to DOWNLOADED),
+        workDataOf(PROGRESS_DOWN_SYNC to DOWNLOADED),
         id
     )
 
@@ -116,7 +121,7 @@ private fun createDownSyncCounterWorker(state: WorkInfo.State,
                                         id: UUID = UUID.randomUUID()) =
     createWorkInfo(
         state,
-        workDataOf(EventDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN to JsonHelper().toJson(EventCount(ENROLMENT_RECORD_CREATION, TO_DOWNLOAD))),
+        workDataOf(OUTPUT_COUNT_WORKER_DOWN to JsonHelper().toJson(listOf(EventCount(ENROLMENT_RECORD_CREATION, TO_DOWNLOAD)))),
         createCommonDownSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(DOWN_COUNTER)),
         workDataOf(),
         id
@@ -128,9 +133,9 @@ private fun createUpSyncUploaderWorker(state: WorkInfo.State,
                                        id: UUID = UUID.randomUUID()) =
     createWorkInfo(
         state,
-        workDataOf(EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to UPLOADED),
+        workDataOf(OUTPUT_UP_SYNC to UPLOADED),
         createCommonUpSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(UPLOADER)),
-        workDataOf(EventUpSyncUploaderWorker.PROGRESS_UP_SYNC to UPLOADED),
+        workDataOf(PROGRESS_UP_SYNC to UPLOADED),
         id
     )
 
@@ -140,7 +145,7 @@ private fun createUpSyncCounterWorker(state: WorkInfo.State,
                                       id: UUID = UUID.randomUUID()) =
     createWorkInfo(
         state,
-        workDataOf(EventUpSyncCountWorker.OUTPUT_COUNT_WORKER_UP to JsonHelper().toJson(EventCount(ENROLMENT_RECORD_CREATION, TO_UPLOAD))),
+        workDataOf(OUTPUT_COUNT_WORKER_UP to TO_UPLOAD),
         createCommonUpSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(UP_COUNTER)),
         workDataOf(),
         id

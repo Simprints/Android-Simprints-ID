@@ -20,7 +20,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.CONSENT
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.local.models.DbEvent
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.runBlocking

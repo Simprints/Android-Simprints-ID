@@ -9,8 +9,8 @@ data class ApiPersonCreationPayload(override val relativeStartTime: Long,
                                     override val version: Int,
                                     val fingerprintCaptureIds: List<String>) : ApiEventPayload(ApiEventPayloadType.PersonCreation, version, relativeStartTime) {
 
-    constructor(domainPayload: PersonCreationPayload) :
-        this(domainPayload.createdAt,
+    constructor(domainPayload: PersonCreationPayload, baseStartTime: Long) :
+        this(domainPayload.createdAt - baseStartTime,
             domainPayload.eventVersion,
             domainPayload.fingerprintCaptureIds)
 }

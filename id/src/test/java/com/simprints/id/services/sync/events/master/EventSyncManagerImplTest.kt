@@ -22,7 +22,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -101,14 +101,15 @@ class EventSyncManagerImplTest {
     }
 
     @Test
-    fun deleteSyncInfo_shouldDeleteAnyInfoRelatedToSync() = runBlockingTest {
+    fun deleteSyncInfo_shouldDeleteAnyInfoRelatedToSync() {
+        runBlocking {
+            subjectsSyncManager.deleteSyncInfo()
 
-        subjectsSyncManager.deleteSyncInfo()
-
-        coVerify { eventUpSyncScopeRepository.deleteAll() }
-        coVerify { eventDownSyncScopeRepository.deleteAll() }
-        verify { eventSyncCache.clearProgresses() }
-        verify { eventSyncCache.storeLastSuccessfulSyncTime(null) }
+            coVerify { eventUpSyncScopeRepository.deleteAll() }
+            coVerify { eventDownSyncScopeRepository.deleteAll() }
+            verify { eventSyncCache.clearProgresses() }
+            verify { eventSyncCache.storeLastSuccessfulSyncTime(null) }
+        }
     }
 
     private fun enqueueDownSyncWorkers() {
