@@ -2,19 +2,20 @@
   "vendor": "Rank One Computing",
   "license": {
     "product": "ROC SDK",
-    "version": "1.22",
-    "expiry": "2020-08-14",
+    "version": "1.23",
+    "expiry": "2020-11-14",
     "hostid": [
-      "2aef946b82e904bf9e8682ea9d5d87de70ff96114fba9c10d6191cbfec35035d",
-      "38af940671333c7e7486ae12658915a482543f1ddbc0f8663ed5040d3b3d2544",
-      "db3ace2be38b8092b76d8e38504c2d63c1c75c9e002532ce07700df26d4db340",
-      "f5da012267d8eb6a0b05383dd633c4c1baa9d3b5877eeac160e62f0a55edde1f",
-      "810226ad9539681f3abcdb5cce7d9719f75905e4a65fd5540982399aa87ea7a7",
-      "d6915184e87fedec2ddfbd07c539b93950cd2c3555fed04c2d0ab78cbf1a1106",
-      "83029f277508cf36fb1cf9772a50c641588ee3ada8fdb151767acdac5f92e85c",
-      "10402f4e90680c0005ffc41244266418757a95e5ef77276b386c5b0d0d24388e"
+      "2c5f96b6329c32a22347f3d9148bd06f45324a374c64ed6a4bdf5f970f2f5b42",
+      "b0fc5f524ff3df1e878af74e03977bbb05bd57fcd53c5c68cda4701b0f138399",
+      "8ab775f019204bdfaee38a5f3339f0a383f373a9a948c3e9d3ca99e1fac88b27",
+      "26402a8959eafbb8bac8413bcdb8578c5f4d1c6dd69a0a975017cb5b9150271c",
+      "95921480e9ce40f77514120aad8a7b7dbc929059e8bd67b7c3452c469d205bac",
+      "8d3492c71ecd71da1c04f96a51a6aa2c7e6a8bec7dbcdf192e70afdcb3fa5ed8",
+      "5f0bf7932671f76832387ecac4c43a80761b99af87e904329e3e30fd0d47bc1c",
+      "4ca79a86b37ac2f3e2f85b899a021b4decd58aaa102e1cc48c013f1bd59d32ad"
     ],
-    "salt": "f91ad688bcf693c5e6f24a5acb15e30c306c9cc49bb5adcb47c4b3304dec712a",
+    "salt": "950165a9e8becd0042552c0d5c8bc2e3934ff117b34af8ffe854d68802e009cc",
+    "os": "Android",
     "customer": "Simprints",
     "userdata": {
             "account": "RankOne",
@@ -26,6 +27,6 @@
             "templates": 1000000,
             "threads": 8
         },
-    "signature": "3041021e75500ba94ec9a1e187d588cd1d281d1b0e617f4026a567a4a19793e0f70e021f009a7d3100e2b20e750505bcf558e53a12ea0f93a5ae65ee9e55776778e19e"
+    "signature": "3040021e17dbb2282b5a54310064dbd8740fbb1e6e4052345b280da368702609ca14021e5489457953fef6e08ce0f9aac9b4119b1d4ff35fb3fd464c1520db5b0c0f"
   }
 }

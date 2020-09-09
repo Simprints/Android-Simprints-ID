@@ -4,6 +4,7 @@ import android.os.Parcelable
 
 interface IAppMatchResult : Parcelable {
     val guid: String
-    val confidence: Int
+    val confidenceScore: Int
     val tier: IAppResponseTier
+    val matchConfidence: IAppMatchConfidence
 }

@@ -12,6 +12,7 @@ import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 import com.simprints.clientapi.integration.key
 import com.simprints.clientapi.integration.value
+import com.simprints.moduleapi.app.responses.IAppMatchConfidence
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
@@ -22,7 +23,7 @@ class OdkVerifyResponseTest : BaseOdkClientApiTest() {
     @Test
     fun appModuleSendsAVerifyAppResponse_shouldReturnAOdkVerifyResponse() {
         val appVerifyResponse = AppVerifyResponse(
-            AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1)
+            AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1, IAppMatchConfidence.HIGH)
         )
         mockAppModuleResponse(appVerifyResponse, APP_VERIFICATION_ACTION)
 
@@ -40,9 +41,9 @@ class OdkVerifyResponseTest : BaseOdkClientApiTest() {
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.let {
             assertThat(it.getString(ODK_GUIDS_KEY)).isEqualTo(appVerifyResponse.matchResult.guid)
-            assertThat(it.getString(ODK_CONFIDENCES_KEY)).isEqualTo(appVerifyResponse.matchResult.confidence.toString())
+            assertThat(it.getString(ODK_CONFIDENCES_KEY)).isEqualTo(appVerifyResponse.matchResult.confidenceScore.toString())
             assertThat(it.getString(ODK_TIERS_KEY)).isEqualTo(appVerifyResponse.matchResult.tier.name)
-            assertThat(it.getBoolean(ODK_BIOMETRICS_COMPLETE_KEY)).isEqualTo(BaseClientApiTest.RETURN_FOR_FLOW_COMPLETED)
+            assertThat(it.getBoolean(ODK_VERIFY_BIOMETRICS_COMPLETE)).isEqualTo(BaseClientApiTest.RETURN_FOR_FLOW_COMPLETED)
         } ?: throw Exception("No bundle found")
     }
 }

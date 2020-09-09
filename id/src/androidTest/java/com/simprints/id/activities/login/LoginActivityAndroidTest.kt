@@ -190,19 +190,6 @@ class LoginActivityAndroidTest {
     }
 
     @Test
-    fun withSecurityStatusCompromisedOrProjectEnded_clickSignIn_shouldShowToast() {
-        loginActivity {
-            withMandatoryCredentialsPresent()
-            withSuppliedProjectIdAndIntentProjectIdMatching()
-            typeProjectId(VALID_PROJECT_ID)
-            typeProjectSecret(VALID_PROJECT_SECRET)
-            withSecurityStatusCompromisedOrProjectEnded()
-        } clickSignIn {
-            securityStateToastIsDisplayed()
-        }
-    }
-
-    @Test
     fun clickScanQr_shouldOpenQrCaptureActivity() {
         loginActivity {
         } clickScanQr {

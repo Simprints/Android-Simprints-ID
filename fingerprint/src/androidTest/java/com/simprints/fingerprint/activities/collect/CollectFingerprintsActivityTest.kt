@@ -21,8 +21,9 @@ import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
+import com.simprints.fingerprint.activities.collect.state.CaptureState
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
-import com.simprints.fingerprint.activities.collect.state.FingerCollectionState
+import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
 import com.simprints.fingerprint.activities.collect.tryagainsplash.SplashScreenActivity
 import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
@@ -81,7 +82,7 @@ class CollectFingerprintsActivityTest : KoinTest {
 
     private fun startingState(fingers: List<FingerIdentifier>): CollectFingerprintsState =
         CollectFingerprintsState(
-            fingerStates = fingers.map { FingerCollectionState.NotCollected(it) },
+            fingerStates = fingers.map { FingerState(it, listOf(CaptureState.NotCollected)) },
             currentFingerIndex = 0,
             isAskingRescan = false,
             isShowingConfirmDialog = false,
@@ -123,7 +124,7 @@ class CollectFingerprintsActivityTest : KoinTest {
 
         scenario.onActivity {
             state.value = startingState(TWO_FINGERS_IDS).updateCurrentFingerState { toScanning() }
-            state.value = startingState(TWO_FINGERS_IDS).updateCurrentFingerState { toTransferringImage(ScanResult(GOOD_QUALITY, TEMPLATE, null)) }
+            state.value = startingState(TWO_FINGERS_IDS).updateCurrentFingerState { toTransferringImage(ScanResult(GOOD_QUALITY, TEMPLATE, null, 60)) }
             it.assertViewPager(count = 2, currentIndex = 0)
             it.assertScanButtonText(R.string.please_wait_button)
         }
@@ -134,7 +135,7 @@ class CollectFingerprintsActivityTest : KoinTest {
         scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS_IDS).toIntent())
 
         scenario.onActivity {
-            state.value = startingState(TWO_FINGERS_IDS).updateCurrentFingerState { toCollected(ScanResult(GOOD_QUALITY, TEMPLATE, null)) }
+            state.value = startingState(TWO_FINGERS_IDS).updateCurrentFingerState { toCollected(ScanResult(GOOD_QUALITY, TEMPLATE, null, 60)) }
             it.assertViewPager(count = 2, currentIndex = 0)
             it.assertScanButtonText(R.string.good_scan_message)
         }
@@ -145,7 +146,7 @@ class CollectFingerprintsActivityTest : KoinTest {
         scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS_IDS).toIntent())
 
         scenario.onActivity {
-            state.value = startingState(TWO_FINGERS_IDS).updateCurrentFingerState { toCollected(ScanResult(BAD_QUALITY, TEMPLATE, null)) }
+            state.value = startingState(TWO_FINGERS_IDS).updateCurrentFingerState { toCollected(ScanResult(BAD_QUALITY, TEMPLATE, null, 60)) }
             it.assertViewPager(count = 2, currentIndex = 0)
             it.assertScanButtonText(R.string.rescan_label)
         }
@@ -156,7 +157,7 @@ class CollectFingerprintsActivityTest : KoinTest {
         scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS_IDS).toIntent())
 
         scenario.onActivity {
-            state.value = startingState(TWO_FINGERS_IDS).updateCurrentFingerState { toCollected(ScanResult(GOOD_QUALITY, TEMPLATE, null)) }
+            state.value = startingState(TWO_FINGERS_IDS).updateCurrentFingerState { toCollected(ScanResult(GOOD_QUALITY, TEMPLATE, null, 60)) }
                 .apply { isAskingRescan = true }
             it.assertViewPager(count = 2, currentIndex = 0)
             it.assertScanButtonText(R.string.rescan_label_question)
@@ -169,8 +170,8 @@ class CollectFingerprintsActivityTest : KoinTest {
 
         val initialState = startingState(FOUR_FINGERS_IDS).apply {
             fingerStates = fingerStates.toMutableList().also {
-                it[0] = FingerCollectionState.Collected(FOUR_FINGERS_IDS[0], ScanResult(GOOD_QUALITY, TEMPLATE, null))
-                it[1] = FingerCollectionState.Collected(FOUR_FINGERS_IDS[1], ScanResult(BAD_QUALITY, TEMPLATE, null))
+                it[0] = FingerState(FOUR_FINGERS_IDS[0], listOf(CaptureState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, null, 60))))
+                it[1] = FingerState(FOUR_FINGERS_IDS[1], listOf(CaptureState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, null, 60))))
             }
         }
 
@@ -292,10 +293,14 @@ class CollectFingerprintsActivityTest : KoinTest {
         if (::scenario.isInitialized) scenario.close()
     }
 
-    private fun CollectFingerprintsState.updateCurrentFingerState(block: FingerCollectionState.() -> FingerCollectionState) =
+    private fun CollectFingerprintsState.updateCurrentFingerState(block: CaptureState.() -> CaptureState) =
         apply {
             fingerStates = fingerStates.toMutableList().also { fingerStates ->
-                fingerStates[currentFingerIndex] = currentFingerState().block()
+                fingerStates[currentFingerIndex] = fingerStates[currentFingerIndex]
+                    .copy(captures = fingerStates[currentFingerIndex].captures.toMutableList()
+                        .apply {
+                            this[fingerStates[currentFingerIndex].currentCaptureIndex] = fingerStates[currentFingerIndex].currentCapture().block()
+                        })
             }
         }
 

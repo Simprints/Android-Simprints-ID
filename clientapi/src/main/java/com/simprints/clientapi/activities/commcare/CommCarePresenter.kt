@@ -4,7 +4,6 @@ import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.commcare.CommCareAction.*
 import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.*
-import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
@@ -66,7 +65,7 @@ class CommCarePresenter(
     override fun handleIdentifyResponse(identify: IdentifyResponse) {
         sharedPreferencesManager.stashSessionId(identify.sessionId)
         view.returnIdentification(ArrayList(identify.identifications.map {
-            Identification(it.guidFound, it.confidence, Tier.valueOf(it.tier.name))
+            Identification(it.guidFound, it.confidenceScore, Tier.valueOf(it.tier.name))
         }), identify.sessionId)
     }
 
@@ -83,7 +82,7 @@ class CommCarePresenter(
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
             view.returnVerification(
-                verify.matchResult.confidence,
+                verify.matchResult.confidenceScore,
                 Tier.valueOf(verify.matchResult.tier.name),
                 verify.matchResult.guidFound,
                 getCurrentSessionIdOrEmpty(),

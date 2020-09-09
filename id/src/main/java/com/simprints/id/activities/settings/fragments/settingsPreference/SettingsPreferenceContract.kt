@@ -30,6 +30,8 @@ interface SettingsPreferenceContract {
 
         fun showToastForInvalidSelectionOfFingers()
 
+        fun openFingerSelectionActivity()
+
         fun openSettingAboutActivity()
 
         fun openSyncInfoActivity()

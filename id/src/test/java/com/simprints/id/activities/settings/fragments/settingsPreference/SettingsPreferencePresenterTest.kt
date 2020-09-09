@@ -48,20 +48,6 @@ class SettingsPreferencePresenterTest {
     }
 
     @Test
-    fun defaultFingersPreference_bindChangeListener_preferenceShouldHaveListenerBoundedAndValues() {
-        val mockPreference = mockk<MultiSelectListPreference>(relaxed = true)
-        every { viewMock.getPreferenceForDefaultFingers() } returns mockPreference
-        every { viewMock.getKeyForDefaultFingersPreference() } returns PREFERENCE_KEY_FOR_FINGERS
-        every { mockPreference.key } returns PREFERENCE_KEY_FOR_FINGERS
-        every { presenter.loadDefaultFingersPreference(any()) } just Runs
-
-        presenter.loadValueAndBindChangeListener(mockPreference)
-
-        verify(atLeast = 1) { mockPreference.setOnPreferenceChangeListener(any()) }
-        verify(atLeast = 1) { presenter.loadDefaultFingersPreference(any()) }
-    }
-
-    @Test
     fun aboutPreference_userClicksOnIt_shouldStartAboutActivity() {
         val mockPreference = mockk<Preference>()
         every { viewMock.getPreferenceForAbout() } returns mockPreference

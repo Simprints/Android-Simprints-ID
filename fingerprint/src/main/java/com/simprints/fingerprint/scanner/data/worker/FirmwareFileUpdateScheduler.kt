@@ -2,6 +2,7 @@ package com.simprints.fingerprint.scanner.data.worker
 
 import android.content.Context
 import androidx.work.*
+import com.simprints.fingerprint.BuildConfig
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import java.util.concurrent.TimeUnit
@@ -29,7 +30,7 @@ class FirmwareFileUpdateScheduler(val context: Context, val preferencesManager: 
     }
 
     private fun buildWork(): PeriodicWorkRequest =
-        PeriodicWorkRequestBuilder<FirmwareFileUpdateWorker>(REPEAT_INTERVAL, REPEAT_INTERVAL_UNITS)
+        PeriodicWorkRequestBuilder<FirmwareFileUpdateWorker>(REPEAT_INTERVAL, REPEAT_INTERVAL_UNIT)
             .setConstraints(getConstraints())
             .build()
 
@@ -40,7 +41,7 @@ class FirmwareFileUpdateScheduler(val context: Context, val preferencesManager: 
 
     companion object {
         const val WORK_NAME = "firmware-file-update-work"
-        const val REPEAT_INTERVAL = 1L
-        val REPEAT_INTERVAL_UNITS = TimeUnit.DAYS
+        const val REPEAT_INTERVAL = BuildConfig.FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES
+        val REPEAT_INTERVAL_UNIT = TimeUnit.MINUTES
     }
 }

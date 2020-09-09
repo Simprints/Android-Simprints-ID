@@ -6,7 +6,8 @@ import com.simprints.fingerprint.activities.alert.AlertContract
 import com.simprints.fingerprint.activities.alert.AlertPresenter
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
-import com.simprints.fingerprint.activities.collect.domain.FingerOrderDeterminer
+import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
+import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.issues.nfcpair.NfcPairViewModel
 import com.simprints.fingerprint.activities.connect.issues.ota.OtaViewModel
@@ -36,8 +37,10 @@ import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManage
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelperImpl
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
+import com.simprints.fingerprint.controllers.fingerprint.config.ConfigurationController
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.orchestrator.Orchestrator
+import com.simprints.fingerprint.orchestrator.runnable.RunnableTaskDispatcher
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.controllers.v2.*
@@ -165,10 +168,13 @@ object KoinInjector {
         single<ComponentNfcAdapter> { AndroidNfcAdapter(NfcAdapter.getDefaultAdapter(get())) }
         single { NfcManager(get()) }
 
+        factory { ConfigurationController() }
+        factory { RunnableTaskDispatcher(get()) }
         factory { FinalResultBuilder() }
         factory { Orchestrator(get()) }
 
-        factory { FingerOrderDeterminer() }
+        factory { FingerPriorityDeterminer() }
+        factory { StartingStateDeterminer() }
     }
 
     private fun Module.defineBuildersForPresentersAndViewModels() {
@@ -179,9 +185,9 @@ object KoinInjector {
             RefusalPresenter(view, get(), get(), get())
         }
 
-        viewModel { OrchestratorViewModel(get(), get(), get()) }
+        viewModel { OrchestratorViewModel(get(), get(), get(), get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
-        viewModel { CollectFingerprintsViewModel(get(), get(), get(), get(), get(), get(), get()) }
+        viewModel { CollectFingerprintsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
