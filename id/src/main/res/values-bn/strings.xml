@@ -68,6 +68,16 @@
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
 
+    <!-- Finger Selection Activity -->
+    <string name="finger_selection_activity_title">আঙ্গুল নির্বাচন করুন</string>
+    <string name="finger_selection_confirm_dialog_text">সেটিংস সেভ করতে চাচ্ছেন?</string>
+    <string name="finger_selection_confirm_dialog_yes">সেভ</string>
+    <string name="finger_selection_confirm_dialog_no">বাতিল</string>
+    <string name="finger_selection_finger_label">আঙ্গুল </string>
+    <string name="finger_selection_quantity_label">সংখ্যা</string>
+    <string name="finger_selection_reset">পুনরায় নির্বাচন</string>
+    <string name="finger_selection_add_finger">আঙ্গুল যোগ করুন</string>
+    <string name="finger_selection_invalid">অবৈধ নির্বাচন- এক আঙ্গুল ৫ বারের বেশি আছে</string>
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
     <!-- Screen Text -->
