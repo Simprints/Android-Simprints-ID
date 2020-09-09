@@ -39,7 +39,7 @@ class OdkErrorResponseTest : BaseOdkClientApiTest() {
         val result = scenario.result
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.let {
-            assertThat(it.getBoolean(ODK_BIOMETRICS_COMPLETE_KEY)).isEqualTo(expectedBiometricsCompleteCheck)
+            assertThat(it.getBoolean(ODK_REGISTER_BIOMETRICS_COMPLETE)).isEqualTo(expectedBiometricsCompleteCheck)
         } ?: throw Exception("No bundle found")
     }
 }

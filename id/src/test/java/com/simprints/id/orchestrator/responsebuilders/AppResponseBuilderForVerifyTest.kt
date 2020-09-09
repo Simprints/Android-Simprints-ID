@@ -15,7 +15,20 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class AppResponseBuilderForVerifyTest {
 
-    private val responseBuilder = AppResponseBuilderForVerify()
+    companion object {
+        private val fingerprintConfidenceThresholds = mapOf(
+            FingerprintConfidenceThresholds.LOW to 15,
+            FingerprintConfidenceThresholds.MEDIUM to 30,
+            FingerprintConfidenceThresholds.HIGH to 40
+        )
+        private val faceConfidenceThresholds = mapOf(
+            FaceConfidenceThresholds.LOW to 15,
+            FaceConfidenceThresholds.MEDIUM to 30,
+            FaceConfidenceThresholds.HIGH to 40
+        )
+    }
+
+    private val responseBuilder = AppResponseBuilderForVerify(fingerprintConfidenceThresholds, faceConfidenceThresholds)
 
     @Test
     fun withFingerprintOnlySteps_shouldBuildAppResponse() {

@@ -88,7 +88,7 @@ def firebase = [
     storage      : "com.google.firebase:firebase-storage-ktx:19.1.1",
     mlkit        : "com.google.firebase:firebase-ml-vision:24.0.1",
     mlkit_barcode: "com.google.firebase:firebase-ml-vision-barcode-model:16.0.2",
-    crashlytics  : "com.google.firebase:firebase-crashlytics:17.0.0-beta02"
+    crashlytics  : "com.google.firebase:firebase-crashlytics:17.1.1"
 ]
 
 def retrofit_version = "2.7.1"
@@ -145,7 +145,7 @@ def rootbeer = [
     core: "com.scottyab:rootbeer-lib:$rootbeer_version"
 ]
 
-def cameraView = "com.otaliastudios:cameraview:2.2.0"
+def cameraView = "com.otaliastudios:cameraview:2.6.3"
 def circleImageView = "de.hdodenhof:circleimageview:3.0.1"
 
 // Testing

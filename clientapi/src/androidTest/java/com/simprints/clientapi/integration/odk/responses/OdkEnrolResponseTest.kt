@@ -30,7 +30,8 @@ class OdkEnrolResponseTest : BaseOdkClientApiTest() {
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.let {
             assertThat(it.getString(ODK_REGISTRATION_ID_KEY)).isEqualTo(appEnrolResponse.guid)
-            assertThat(it.getBoolean(ODK_BIOMETRICS_COMPLETE_KEY)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
+            assertThat(it.getBoolean(ODK_REGISTER_BIOMETRICS_COMPLETE)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
+            assertThat(it.getBoolean(ODK_REGISTER_BIOMETRICS_COMPLETE)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
         } ?: throw Exception("No bundle found")
     }
 }

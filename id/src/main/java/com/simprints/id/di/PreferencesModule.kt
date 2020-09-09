@@ -22,6 +22,8 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintIm
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
+import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
+import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 import dagger.Module
@@ -72,7 +74,6 @@ open class PreferencesModule {
     open fun provideSettingsPreferencesManager(
         prefs: ImprovedSharedPreferences,
         remoteConfigWrapper: RemoteConfigWrapper,
-        @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
         @Named("GroupSerializer") groupSerializer: Serializer<GROUP>,
         @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
         @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
@@ -80,11 +81,13 @@ open class PreferencesModule {
         @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
         @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         @Named("SaveFingerprintImagesStrategySerializer") saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
-        @Named("ScannerGenerationsSerializer") scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>
+        @Named("ScannerGenerationsSerializer") scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
+        @Named("FingerprintsToCollectSerializer") fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>,
+        @Named("FingerprintConfidenceThresholdsSerializer") fingerprintConfidenceThresholdsSerializer: Serializer<Map<FingerprintConfidenceThresholds, Int>>,
+        @Named("FaceConfidenceThresholdsSerializer") faceConfidenceThresholdsSerializer: Serializer<Map<FaceConfidenceThresholds, Int>>
     ): SettingsPreferencesManager = SettingsPreferencesManagerImpl(
         prefs,
         remoteConfigWrapper,
-        fingerIdToBooleanSerializer,
         groupSerializer,
         modalitiesSerializer,
         languagesStringArraySerializer,
@@ -92,7 +95,10 @@ open class PreferencesModule {
         subjectsDownSyncSettingSerializer,
         captureFingerprintStrategySerializer,
         saveFingerprintImagesStrategySerializer,
-        scannerGenerationsSerializer
+        scannerGenerationsSerializer,
+        fingerprintsToCollectSerializer,
+        fingerprintConfidenceThresholdsSerializer,
+        faceConfidenceThresholdsSerializer
     )
 
     @Provides

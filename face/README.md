@@ -32,3 +32,8 @@ RankOne files are split in 3 places:
 - assets - this is where the license should stay
 - jniLibs - these is ROC C code compiled
 - io/rankone/rocsdk/embedded - this is where the ROC API stays and we can make the bridge between Kotlin and C code
+
+## Other documents for face
+- [How matching works](/face/src/main/java/com/simprints/face/match/README.md)
+- [What to return on an exit form](/face/src/main/java/com/simprints/face/exitform/README.md)
+- [Configuration step](/face/src/main/java/com/simprints/face/configuration/README.md)

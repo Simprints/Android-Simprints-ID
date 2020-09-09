@@ -12,7 +12,6 @@ import com.simprints.face.data.moduleapi.face.FaceToDomainRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceConfigurationRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
-import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceConfigurationResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorReason
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorResponse
@@ -22,16 +21,10 @@ import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import timber.log.Timber
 
-class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportManager) :
-    ViewModel() {
-    lateinit var faceRequest: FaceRequest
-
-    val startCapture: MutableLiveData<LiveDataEventWithContent<FaceCaptureRequest>> =
-        MutableLiveData()
-    val startMatching: MutableLiveData<LiveDataEventWithContent<FaceMatchRequest>> =
-        MutableLiveData()
-    val startConfiguration: MutableLiveData<LiveDataEventWithContent<FaceConfigurationRequest>> =
-        MutableLiveData()
+class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportManager) : ViewModel() {
+    val startCapture: MutableLiveData<LiveDataEventWithContent<FaceCaptureRequest>> = MutableLiveData()
+    val startMatching: MutableLiveData<LiveDataEventWithContent<FaceMatchRequest>> = MutableLiveData()
+    val startConfiguration: MutableLiveData<LiveDataEventWithContent<FaceConfigurationRequest>> = MutableLiveData()
 
     val flowFinished: MutableLiveData<LiveDataEventWithContent<IFaceResponse>> = MutableLiveData()
 
@@ -44,7 +37,6 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
             is FaceCaptureRequest -> startCapture.send(request)
             is FaceMatchRequest -> startMatching.send(request)
         }
-        faceRequest = request
     }
 
     fun captureFinished(faceCaptureResponse: FaceResponse?) {
@@ -103,6 +95,10 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
             )
             errorEvent.send(ErrorType.CONFIGURATION_ERROR)
         }
+    }
+
+    fun unexpectedErrorHappened() {
+        errorEvent.send(ErrorType.UNEXPECTED_ERROR)
     }
 
 }

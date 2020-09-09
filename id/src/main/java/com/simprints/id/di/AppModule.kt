@@ -12,6 +12,7 @@ import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
 import com.simprints.id.activities.qrcapture.tools.*
+import com.simprints.id.activities.settings.fingerselection.FingerSelectionViewModelFactory
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.activities.setup.SetupViewModelFactory
@@ -257,8 +258,13 @@ open class AppModule {
     @Provides
     fun provideModuleRepository(
         preferencesManager: PreferencesManager,
-        crashReportManager: CrashReportManager
-    ): ModuleRepository = ModuleRepositoryImpl(preferencesManager, crashReportManager)
+        crashReportManager: CrashReportManager,
+        subjectLocalDataSource: SubjectLocalDataSource
+    ): ModuleRepository = ModuleRepositoryImpl(
+        preferencesManager,
+        crashReportManager,
+        subjectLocalDataSource
+    )
 
     @Provides
     open fun provideGuidSelectionManager(
@@ -317,6 +323,12 @@ open class AppModule {
         personRepository, subjectLocalDataSource, preferencesManager,
         loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository
     )
+
+    @Provides
+    open fun provideFingerSelectionViewModelFactory(
+        preferencesManager: PreferencesManager,
+        crashReportManager: CrashReportManager
+    ) = FingerSelectionViewModelFactory(preferencesManager, crashReportManager)
 
     @Provides
     open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =
@@ -388,8 +400,9 @@ open class AppModule {
     @Provides
     open fun provideEnrolLastBiometricsViewModel(
         enrolmentHelper: EnrolmentHelper,
-        timeHelper: TimeHelper
-    ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper)
+        timeHelper: TimeHelper,
+        preferencesManager: PreferencesManager
+    ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper, preferencesManager)
 
     @ExperimentalCoroutinesApi
     @Provides

@@ -36,5 +36,12 @@ enum class ErrorType(
         R.string.error_close_button,
         IDR.color.simprints_grey,
         UIR.drawable.ic_exclamation_92dp
+    ),
+    UNEXPECTED_ERROR(
+        R.string.error_unexpected_error_title,
+        R.string.error_unexpected_error_message,
+        R.string.error_close_button,
+        IDR.color.simprints_red,
+        UIR.drawable.ic_exclamation_92dp
     )
 }

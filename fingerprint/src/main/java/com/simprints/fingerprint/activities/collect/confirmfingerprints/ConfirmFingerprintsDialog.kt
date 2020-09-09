@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.collect.resources.nameTextId
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 
 class ConfirmFingerprintsDialog(private val context: Context,
-                                private val scannedFingers: Map<String, Boolean>,
+                                private val scannedFingers: List<Item>,
                                 private val callbackConfirm: () -> Unit,
                                 private val callbackRestart: () -> Unit) {
 
@@ -21,9 +23,15 @@ class ConfirmFingerprintsDialog(private val context: Context,
     @SuppressLint("DefaultLocale")
     private fun getMapOfFingersAndQualityAsText(): String =
         StringBuilder().also {
-            scannedFingers.forEach { (fingerName, scanThresholdPassed) ->
-                it.append(if (scanThresholdPassed) "✓ " else "× ")
-                it.append(fingerName.toUpperCase() + "\n")
+            scannedFingers.forEach { (fingerName, successes, scans) ->
+                if (scans == 1) {
+                    it.append(if (successes == 1) "✓ " else "× ")
+                } else {
+                    it.append("$successes / $scans ")
+                }
+                it.append(context.getString(fingerName.nameTextId()) + "\n")
             }
         }.toString()
+
+    data class Item(val finger: FingerIdentifier, val numberOfSuccessfulScans: Int, val numberOfScans: Int)
 }
