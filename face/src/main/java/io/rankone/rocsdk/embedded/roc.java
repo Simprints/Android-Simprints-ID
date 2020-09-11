@@ -310,24 +310,16 @@ public class roc implements rocConstants {
     return rocJNI.roc_log(message);
   }
 
-  public static void roc_uuid_set(roc_uuid uuid, byte[] input_byte_array) {
-    rocJNI.roc_uuid_set(roc_uuid.getCPtr(uuid), uuid, input_byte_array);
+  public static roc_uuid roc_uuid_from_bytes(byte[] input_byte_array, long length) {
+    return new roc_uuid(rocJNI.roc_uuid_from_bytes(input_byte_array, length), true);
   }
 
-  public static void roc_uuid_set_int(roc_uuid uuid, java.math.BigInteger val) {
-    rocJNI.roc_uuid_set_int(roc_uuid.getCPtr(uuid), uuid, val);
-  }
-
-  public static roc_uuid roc_uuid_get_int(java.math.BigInteger val) {
-    return new roc_uuid(rocJNI.roc_uuid_get_int(val), true);
+  public static roc_uuid roc_uuid_from_int(java.math.BigInteger val) {
+    return new roc_uuid(rocJNI.roc_uuid_from_int(val), true);
   }
 
   public static java.math.BigInteger roc_uuid_to_int(roc_uuid uuid) {
     return rocJNI.roc_uuid_to_int(roc_uuid.getCPtr(uuid), uuid);
-  }
-
-  public static void roc_uuid_set_null(roc_uuid uuid) {
-    rocJNI.roc_uuid_set_null(roc_uuid.getCPtr(uuid), uuid);
   }
 
   public static roc_uuid roc_uuid_get_null() {
@@ -346,12 +338,12 @@ public class roc implements rocConstants {
     return rocJNI.roc_uuid_is_less_than(roc_uuid.getCPtr(a), a, roc_uuid.getCPtr(b), b);
   }
 
-  public static void roc_hash_set(roc_hash hash, byte[] input_byte_array) {
-    rocJNI.roc_hash_set(roc_hash.getCPtr(hash), hash, input_byte_array);
+  public static roc_hash roc_hash_from_bytes(byte[] input_byte_array, long length) {
+    return new roc_hash(rocJNI.roc_hash_from_bytes(input_byte_array, length), true);
   }
 
-  public static void roc_hash_set_null(roc_hash hash) {
-    rocJNI.roc_hash_set_null(roc_hash.getCPtr(hash), hash);
+  public static roc_hash roc_hash_get_null() {
+    return new roc_hash(rocJNI.roc_hash_get_null(), true);
   }
 
   public static boolean roc_hash_is_null(roc_hash hash) {
@@ -366,8 +358,8 @@ public class roc implements rocConstants {
     return rocJNI.roc_hash_is_less_than(roc_hash.getCPtr(a), a, roc_hash.getCPtr(b), b);
   }
 
-  public static roc_hash roc_uuid_to_hash(roc_uuid uuid) {
-    return new roc_hash(rocJNI.roc_uuid_to_hash(roc_uuid.getCPtr(uuid), uuid), true);
+  public static roc_hash roc_hash_from_uuid(roc_uuid uuid) {
+    return new roc_hash(rocJNI.roc_hash_from_uuid(roc_uuid.getCPtr(uuid), uuid), true);
   }
 
   public static roc_uuid roc_hash_to_uuid(roc_hash hash) {
@@ -438,12 +430,8 @@ public class roc implements rocConstants {
     return rocJNI.roc_pose_to_string(pose);
   }
 
-  public static String roc_landmarks_to_detection(float right_eye_x, float right_eye_y, float left_eye_x, float left_eye_y, float chin_x, float chin_y, roc_detection detection) {
-    return rocJNI.roc_landmarks_to_detection(right_eye_x, right_eye_y, left_eye_x, left_eye_y, chin_x, chin_y, roc_detection.getCPtr(detection), detection);
-  }
-
-  public static String roc_adaptive_minimum_size(roc_image image, float relative_minimum_size, long absolute_minimum_size, SWIGTYPE_p_size_t adaptive_minimum_size) {
-    return rocJNI.roc_adaptive_minimum_size(roc_image.getCPtr(image), image, relative_minimum_size, absolute_minimum_size, SWIGTYPE_p_size_t.getCPtr(adaptive_minimum_size));
+  public static String roc_adaptive_minimum_size(long image_width, long image_height, float relative_min_size, long absolute_min_size, SWIGTYPE_p_size_t adaptive_min_size) {
+    return rocJNI.roc_adaptive_minimum_size(image_width, image_height, relative_min_size, absolute_min_size, SWIGTYPE_p_size_t.getCPtr(adaptive_min_size));
   }
 
   public static String roc_algorithm_option_to_string(int algorithm_option, SWIGTYPE_p_p_char str) {
@@ -511,6 +499,10 @@ public class roc implements rocConstants {
     return rocJNI.roc_embedded_detect_faces(roc_image.getCPtr(image), image, min_size, k, false_detection_rate, SWIGTYPE_p_size_t.getCPtr(n), roc_detection.getCPtr(detections), detections);
   }
 
+  public static String roc_landmarks_to_detection(roc_embedded_landmark right_eye, roc_embedded_landmark left_eye, roc_embedded_landmark chin, roc_detection detection) {
+    return rocJNI.roc_landmarks_to_detection(roc_embedded_landmark.getCPtr(right_eye), right_eye, roc_embedded_landmark.getCPtr(left_eye), left_eye, roc_embedded_landmark.getCPtr(chin), chin, roc_detection.getCPtr(detection), detection);
+  }
+
   public static int roc_embedded_landmark_face(roc_image image, roc_detection detection, roc_embedded_landmark landmarks, roc_embedded_landmark right_eye, roc_embedded_landmark left_eye, roc_embedded_landmark chin, SWIGTYPE_p_float pitch, SWIGTYPE_p_float yaw) {
     return rocJNI.roc_embedded_landmark_face(roc_image.getCPtr(image), image, roc_detection.getCPtr(detection), detection, roc_embedded_landmark.getCPtr(landmarks), landmarks, roc_embedded_landmark.getCPtr(right_eye), right_eye, roc_embedded_landmark.getCPtr(left_eye), left_eye, roc_embedded_landmark.getCPtr(chin), chin, SWIGTYPE_p_float.getCPtr(pitch), SWIGTYPE_p_float.getCPtr(yaw));
   }
@@ -519,12 +511,12 @@ public class roc implements rocConstants {
     return rocJNI.roc_embedded_liveness(roc_image.getCPtr(image), image, roc_embedded_landmark.getCPtr(landmarks), landmarks, fixed_focus, SWIGTYPE_p_float.getCPtr(spoof));
   }
 
-  public static int roc_embedded_represent_face(roc_image image, roc_detection detection, roc_embedded_landmark right_eye, roc_embedded_landmark left_eye, roc_embedded_landmark chin, SWIGTYPE_p_unsigned_char feature_vector, SWIGTYPE_p_float quality, SWIGTYPE_p_float age, roc_embedded_gender gender, roc_embedded_geographic_origin geographic_origin, roc_embedded_glasses glasses) {
-    return rocJNI.roc_embedded_represent_face(roc_image.getCPtr(image), image, roc_detection.getCPtr(detection), detection, roc_embedded_landmark.getCPtr(right_eye), right_eye, roc_embedded_landmark.getCPtr(left_eye), left_eye, roc_embedded_landmark.getCPtr(chin), chin, SWIGTYPE_p_unsigned_char.getCPtr(feature_vector), SWIGTYPE_p_float.getCPtr(quality), SWIGTYPE_p_float.getCPtr(age), roc_embedded_gender.getCPtr(gender), gender, roc_embedded_geographic_origin.getCPtr(geographic_origin), geographic_origin, roc_embedded_glasses.getCPtr(glasses), glasses);
+  public static int roc_embedded_represent_face(roc_image image, roc_detection detection, roc_embedded_landmark right_eye, roc_embedded_landmark left_eye, roc_embedded_landmark chin, SWIGTYPE_p_unsigned_char feature_vector, SWIGTYPE_p_float quality, SWIGTYPE_p_float age, SWIGTYPE_p_float facial_hair, roc_embedded_gender gender, roc_embedded_geographic_origin geographic_origin, roc_embedded_emotion emotion, roc_embedded_artwork artwork, roc_embedded_glasses glasses, roc_embedded_mask mask) {
+    return rocJNI.roc_embedded_represent_face(roc_image.getCPtr(image), image, roc_detection.getCPtr(detection), detection, roc_embedded_landmark.getCPtr(right_eye), right_eye, roc_embedded_landmark.getCPtr(left_eye), left_eye, roc_embedded_landmark.getCPtr(chin), chin, SWIGTYPE_p_unsigned_char.getCPtr(feature_vector), SWIGTYPE_p_float.getCPtr(quality), SWIGTYPE_p_float.getCPtr(age), SWIGTYPE_p_float.getCPtr(facial_hair), roc_embedded_gender.getCPtr(gender), gender, roc_embedded_geographic_origin.getCPtr(geographic_origin), geographic_origin, roc_embedded_emotion.getCPtr(emotion), emotion, roc_embedded_artwork.getCPtr(artwork), artwork, roc_embedded_glasses.getCPtr(glasses), glasses, roc_embedded_mask.getCPtr(mask), mask);
   }
 
-  public static float roc_embedded_compare_templates(long algorithm_id, SWIGTYPE_p_unsigned_char a, long a_size, SWIGTYPE_p_unsigned_char b, long b_size) {
-    return rocJNI.roc_embedded_compare_templates(algorithm_id, SWIGTYPE_p_unsigned_char.getCPtr(a), a_size, SWIGTYPE_p_unsigned_char.getCPtr(b), b_size);
+  public static float roc_embedded_compare_templates(SWIGTYPE_p_unsigned_char a, long a_size, SWIGTYPE_p_unsigned_char b, long b_size) {
+    return rocJNI.roc_embedded_compare_templates(SWIGTYPE_p_unsigned_char.getCPtr(a), a_size, SWIGTYPE_p_unsigned_char.getCPtr(b), b_size);
   }
 
   public static void roc_embedded_array_initialize(roc_embedded_array array, int element_size) {
