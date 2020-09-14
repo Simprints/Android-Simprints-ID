@@ -28,24 +28,24 @@
         android:id="@+id/progressOverlayBackground"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/simprints_white"
         android:alpha="0.6"
+        android:background="@color/simprints_white"
         android:elevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout"/>
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
 
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:translationZ="10dp"
         android:indeterminateTint="@color/simprints_blue"
-        app:layout_constraintTop_toTopOf="parent"
+        android:translationZ="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/progress_sync_overlay"
@@ -54,93 +54,56 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_default"
         android:translationZ="10dp"
-        app:layout_constraintTop_toBottomOf="@id/progressBar"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:text="Syncing..."/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/progressBar"
+        tools:text="Syncing..." />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/group_progress_overlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="progressOverlayBackground,progressBar,progress_sync_overlay"/>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/recordsToUploadCardView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginTop="15dp"
-        app:layout_constraintBottom_toBottomOf="@+id/recordsCardsBarrier"
-        app:layout_constraintEnd_toStartOf="@+id/recordsToDownloadCardView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recordsInLocalCardView">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="10dp">
-
-            <TextView
-                android:id="@+id/recordsToUploadText"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="5dp"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                tools:text="Records to upload"/>
-
-            <TextView
-                android:id="@+id/recordsToUploadCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textSize="16sp"
-                tools:text="0"/>
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
+        app:constraint_referenced_ids="progressOverlayBackground,progressBar,progress_sync_overlay" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/recordsToDownloadCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        app:layout_constraintBottom_toBottomOf="@+id/recordsToUploadCardView"
-        app:layout_constraintEnd_toStartOf="@+id/recordsToDeleteCardView"
-        app:layout_constraintStart_toEndOf="@+id/recordsToUploadCardView"
-        app:layout_constraintTop_toBottomOf="@+id/recordsInLocalCardView">
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintBottom_toTopOf="@id/recordsToDeleteCardView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recordsToUploadCardView">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:padding="10dp">
 
             <TextView
                 android:id="@+id/recordsToDownloadText"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_weight="0.8"
                 android:padding="5dp"
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
-                tools:text="Records to download"/>
+                tools:text="Records to download" />
 
             <TextView
                 android:id="@+id/recordsToDownloadCount"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_weight="0.2"
+                android:gravity="center"
                 android:textSize="16sp"
-                tools:text="0"/>
+                tools:text="137" />
 
         </LinearLayout>
 
@@ -149,40 +112,40 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/recordsToDeleteCardView"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
-        app:layout_constraintBottom_toBottomOf="@+id/recordsCardsBarrier"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_min="wrap"
-        app:layout_constraintStart_toEndOf="@+id/recordsToDownloadCardView"
-        app:layout_constraintTop_toBottomOf="@+id/recordsInLocalCardView">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recordsToDownloadCardView">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:padding="10dp">
 
             <TextView
                 android:id="@+id/recordsToDeleteText"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_weight="0.8"
                 android:padding="5dp"
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
-                tools:text="Records to delete"/>
+                tools:text="Records to delete" />
 
             <TextView
                 android:id="@+id/recordsToDeleteCount"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_weight="0.2"
+                android:gravity="center"
                 android:textSize="16sp"
-                tools:text="0"/>
+                tools:text="137" />
 
         </LinearLayout>
 
@@ -207,28 +170,113 @@
 
             <TextView
                 android:id="@+id/totalRecordsOnDeviceText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_weight="0.8"
                 android:padding="5dp"
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
-                tools:text="Total records on device"/>
+                tools:text="Total records on device" />
 
             <TextView
                 android:id="@+id/totalRecordsCount"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="0.2"
                 android:gravity="center"
                 android:textSize="16sp"
-                tools:text="137"/>
+                tools:text="137" />
 
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/recordsToUploadCardView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/recordsToDownloadCardView"
+        app:layout_constraintEnd_toStartOf="@+id/imagesToUploadCardView"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recordsInLocalCardView">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/recordsToUploadText"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_gravity="start"
+                android:gravity="center"
+                android:layout_weight="0.8"
+                android:padding="5dp"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                tools:text="Records to upload" />
+
+            <TextView
+                android:id="@+id/recordsToUploadCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="16sp"
+                tools:text="0" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/imagesToUploadCardView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/recordsToDownloadCardView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/recordsToUploadCardView"
+        app:layout_constraintTop_toBottomOf="@+id/recordsInLocalCardView">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/imagesToUploadText"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_gravity="start"
+                android:gravity="center"
+                android:layout_weight="0.8"
+                android:padding="5dp"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:text="Images to upload" />
+
+            <TextView
+                android:id="@+id/imagesToUploadCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="16sp"
+                android:text="0" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
 
     <TabHost
         android:id="@+id/modulesTabHost"
@@ -238,7 +286,7 @@
         app:layout_constraintBottom_toTopOf="@+id/moduleSelectionButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recordsToUploadCardView">
+        app:layout_constraintTop_toBottomOf="@+id/recordsToDeleteCardView">
 
         <LinearLayout
             android:layout_width="match_parent"
