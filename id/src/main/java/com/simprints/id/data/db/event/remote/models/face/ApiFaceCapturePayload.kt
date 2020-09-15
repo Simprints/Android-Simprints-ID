@@ -12,19 +12,19 @@ import com.simprints.id.data.db.event.remote.models.face.ApiFaceCapturePayload.A
 @Keep
 @JsonInclude(Include.NON_NULL)
 data class ApiFaceCapturePayload(val id: String,
-                            override val relativeStartTime: Long,
-                            val relativeEndTime: Long,
-                            override val version: Int,
-                            val attemptNb: Int,
-                            val qualityThreshold: Float,
-                            val result: ApiResult,
-                            val isFallback: Boolean,
-                            val face: ApiFace?) : ApiEventPayload(FaceCapture,version, relativeStartTime) {
+                                 override val startTime: Long,
+                                 val endTime: Long,
+                                 override val version: Int,
+                                 val attemptNb: Int,
+                                 val qualityThreshold: Float,
+                                 val result: ApiResult,
+                                 val isFallback: Boolean,
+                                 val face: ApiFace?) : ApiEventPayload(FaceCapture, version, startTime) {
 
-    constructor(domainPayload: FaceCapturePayload, baseStartTime: Long) : this(
+    constructor(domainPayload: FaceCapturePayload) : this(
         domainPayload.id,
-        domainPayload.createdAt - baseStartTime,
-        domainPayload.endedAt - baseStartTime,
+        domainPayload.createdAt,
+        domainPayload.endedAt,
         domainPayload.eventVersion,
         domainPayload.attemptNb,
         domainPayload.qualityThreshold,
@@ -50,7 +50,6 @@ data class ApiFaceCapturePayload(val id: String,
         TOO_FAR
     }
 }
-
 
 
 fun FaceCapturePayload.Face.fromDomainToApi() =

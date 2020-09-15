@@ -7,12 +7,12 @@ import com.simprints.id.data.db.event.remote.models.ApiIntentParsingPayload.ApiI
 import io.realm.internal.Keep
 
 @Keep
-data class ApiIntentParsingPayload(override val relativeStartTime: Long,
+data class ApiIntentParsingPayload(override val startTime: Long,
                                    override val version: Int,
-                                   val integration: ApiIntegrationInfo) : ApiEventPayload(ApiEventPayloadType.IntentParsing, version, relativeStartTime) {
+                                   val integration: ApiIntegrationInfo) : ApiEventPayload(ApiEventPayloadType.IntentParsing, version, startTime) {
 
-    constructor(domainPayload: IntentParsingPayload, baseStartTime: Long) : this(
-        domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: IntentParsingPayload) : this(
+        domainPayload.createdAt,
         domainPayload.eventVersion,
         domainPayload.integration.fromDomainToApi())
 

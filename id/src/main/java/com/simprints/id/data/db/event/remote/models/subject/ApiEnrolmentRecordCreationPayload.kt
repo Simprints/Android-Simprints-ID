@@ -12,14 +12,14 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
 @Keep
 @JsonInclude(Include.NON_NULL)
 data class ApiEnrolmentRecordCreationPayload(
-    @JsonIgnore override val relativeStartTime: Long, //Not added on API yet
-    override val version: Int,
-    val subjectId: String,
-    val projectId: String,
-    val moduleId: String,
-    val attendantId: String,
-    val biometricReferences: List<ApiBiometricReference>?
-) : ApiEventPayload(ApiEventPayloadType.EnrolmentRecordCreation, version, relativeStartTime) {
+        @JsonIgnore override val startTime: Long, //Not added on API yet
+        override val version: Int,
+        val subjectId: String,
+        val projectId: String,
+        val moduleId: String,
+        val attendantId: String,
+        val biometricReferences: List<ApiBiometricReference>?
+) : ApiEventPayload(ApiEventPayloadType.EnrolmentRecordCreation, version, startTime) {
 
     constructor(payload: EnrolmentRecordCreationPayload) :
         this(payload.createdAt, payload.eventVersion, payload.subjectId, payload.projectId, payload.moduleId,

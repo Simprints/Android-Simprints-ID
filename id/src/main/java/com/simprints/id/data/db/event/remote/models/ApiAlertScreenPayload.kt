@@ -9,12 +9,12 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.AlertScr
 
 
 @Keep
-data class ApiAlertScreenPayload(override val relativeStartTime: Long,
+data class ApiAlertScreenPayload(override val startTime: Long,
                                  override val version: Int,
-                                 val alertType: ApiAlertScreenEventType) : ApiEventPayload(AlertScreen, version, relativeStartTime) {
+                                 val alertType: ApiAlertScreenEventType) : ApiEventPayload(AlertScreen, version, startTime) {
 
-    constructor(domainPayload: AlertScreenPayload, baseStartTime: Long) :
-        this(domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: AlertScreenPayload) :
+        this(domainPayload.createdAt,
             domainPayload.eventVersion,
             domainPayload.alertType.fromDomainToApi())
 

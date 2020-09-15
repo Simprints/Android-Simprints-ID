@@ -7,12 +7,12 @@ import com.simprints.id.data.db.event.remote.models.face.ApiMatcher
 import com.simprints.id.data.db.event.remote.models.face.fromDomainToApi
 
 @Keep
-data class ApiOneToManyMatchPayload(override val relativeStartTime: Long,
+data class ApiOneToManyMatchPayload(override val startTime: Long,
                                     override val version: Int,
-                                    val relativeEndTime: Long,
+                                    val endTime: Long,
                                     val pool: ApiMatchPool,
                                     val matcher: ApiMatcher,
-                                    val result: List<ApiMatchEntry>?) : ApiEventPayload(ApiEventPayloadType.OneToManyMatch, version, relativeStartTime) {
+                                    val result: List<ApiMatchEntry>?) : ApiEventPayload(ApiEventPayloadType.OneToManyMatch, version, startTime) {
 
     @Keep
     data class ApiMatchPool(val type: ApiMatchPoolType, val count: Int) {
@@ -27,10 +27,10 @@ data class ApiOneToManyMatchPayload(override val relativeStartTime: Long,
         PROJECT;
     }
 
-    constructor(domainPayload: OneToManyMatchPayload, baseStartTime: Long) :
-        this(domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: OneToManyMatchPayload) :
+        this(domainPayload.createdAt,
             domainPayload.eventVersion,
-            domainPayload.endedAt - baseStartTime,
+            domainPayload.endedAt,
             ApiMatchPool(domainPayload.pool),
             domainPayload.matcher.fromDomainToApi(),
             domainPayload.result?.map { ApiMatchEntry(it) })

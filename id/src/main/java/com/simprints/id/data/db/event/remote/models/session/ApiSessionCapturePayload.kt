@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.event.remote.models.session
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.id.data.db.event.domain.models.session.Location
@@ -18,8 +17,8 @@ import java.util.*
 data class ApiSessionCapturePayload(override val version: Int,
                                     val id: String = UUID.randomUUID().toString(),
                                     val projectId: String,
-                                    val startTime: Long,
-                                    val relativeEndTime: Long,
+                                    override val startTime: Long,
+                                    val endTime: Long,
                                     val modalities: List<ApiModes>,
                                     val appVersionName: String,
                                     val libVersionName: String,
@@ -28,15 +27,14 @@ data class ApiSessionCapturePayload(override val version: Int,
                                     val device: ApiDevice,
                                     val databaseInfo: ApiDatabaseInfo,
                                     val location: ApiLocation? = null,
-                                    var relativeUploadTime: Long? = null,
-                                    @JsonIgnore override val relativeStartTime: Long = 0) : ApiEventPayload(ApiEventPayloadType.SessionCapture, version, relativeStartTime) {
+                                    var relativeUploadTime: Long? = null) : ApiEventPayload(ApiEventPayloadType.SessionCapture, version, startTime) {
 
     constructor(domainPayload: SessionCapturePayload) : this(
         domainPayload.eventVersion,
         domainPayload.id,
         domainPayload.projectId,
         domainPayload.createdAt,
-        domainPayload.endedAt - domainPayload.createdAt,
+        domainPayload.endedAt,
         domainPayload.modalities.map { it.fromDomainToApi() },
         domainPayload.appVersionName,
         domainPayload.libVersionName,

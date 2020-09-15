@@ -12,9 +12,9 @@ import com.simprints.id.data.db.event.remote.models.ApiScannerConnectionPayload.
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiScannerConnectionPayload(override val relativeStartTime: Long,
+data class ApiScannerConnectionPayload(override val startTime: Long,
                                        override val version: Int,
-                                       val scannerInfo: ApiScannerInfo) : ApiEventPayload(ApiEventPayloadType.ScannerConnection, version, relativeStartTime) {
+                                       val scannerInfo: ApiScannerInfo) : ApiEventPayload(ApiEventPayloadType.ScannerConnection, version, startTime) {
 
     @Keep
     @JsonInclude(Include.NON_NULL)
@@ -28,8 +28,8 @@ data class ApiScannerConnectionPayload(override val relativeStartTime: Long,
                 scannerInfo.generation.toApiScannerGeneration(), scannerInfo.hardwareVersion)
     }
 
-    constructor(domainPayload: ScannerConnectionPayload, baseStartTime: Long) : this(
-        domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: ScannerConnectionPayload) : this(
+        domainPayload.createdAt,
         domainPayload.eventVersion,
         ApiScannerInfo(domainPayload.scannerInfo))
 

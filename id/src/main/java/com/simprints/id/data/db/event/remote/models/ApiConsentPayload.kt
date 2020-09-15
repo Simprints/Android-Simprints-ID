@@ -9,11 +9,11 @@ import com.simprints.id.data.db.event.remote.models.ApiConsentPayload.ApiResult
 import com.simprints.id.data.db.event.remote.models.ApiConsentPayload.ApiType
 
 @Keep
-data class ApiConsentPayload(override val relativeStartTime: Long,
+data class ApiConsentPayload(override val startTime: Long,
                              override val version: Int,
-                             var relativeEndTime: Long,
+                             var endTime: Long,
                              val consentType: ApiType,
-                             var result: ApiResult) : ApiEventPayload(ApiEventPayloadType.Consent, version, relativeStartTime) {
+                             var result: ApiResult) : ApiEventPayload(ApiEventPayloadType.Consent, version, startTime) {
     @Keep
     enum class ApiType {
         INDIVIDUAL, PARENTAL
@@ -24,10 +24,10 @@ data class ApiConsentPayload(override val relativeStartTime: Long,
         ACCEPTED, DECLINED, NO_RESPONSE
     }
 
-    constructor(domainPayload: ConsentPayload, baseStartTime: Long) :
-        this(domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: ConsentPayload) :
+        this(domainPayload.createdAt,
             domainPayload.eventVersion,
-            domainPayload.endedAt - baseStartTime,
+            domainPayload.endedAt,
             domainPayload.consentType.fromDomainToApi(),
             domainPayload.result.fromDomainToApi())
 }

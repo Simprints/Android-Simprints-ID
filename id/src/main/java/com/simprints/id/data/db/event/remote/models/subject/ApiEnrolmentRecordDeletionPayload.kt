@@ -8,13 +8,13 @@ import io.realm.internal.Keep
 
 @Keep
 data class ApiEnrolmentRecordDeletionPayload(
-    @JsonIgnore override val relativeStartTime: Long, //Not added on API yet
-    override val version: Int,
-    val subjectId: String,
-    val projectId: String,
-    val moduleId: String,
-    val attendantId: String
-) : ApiEventPayload(ApiEventPayloadType.EnrolmentRecordDeletion, version, relativeStartTime) {
+        @JsonIgnore override val startTime: Long, //Not added on API yet
+        override val version: Int,
+        val subjectId: String,
+        val projectId: String,
+        val moduleId: String,
+        val attendantId: String
+) : ApiEventPayload(ApiEventPayloadType.EnrolmentRecordDeletion, version, startTime) {
 
     constructor(payload: EnrolmentRecordDeletionPayload) :
         this(payload.createdAt, payload.eventVersion, payload.subjectId, payload.projectId, payload.moduleId, payload.attendantId)

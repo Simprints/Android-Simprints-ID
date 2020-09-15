@@ -7,10 +7,10 @@ import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2
 
 
 @Keep
-data class ApiVero2InfoSnapshotPayload(override val relativeStartTime: Long,
+data class ApiVero2InfoSnapshotPayload(override val startTime: Long,
                                        override val version: Int,
                                        val scannerVersion: ApiVero2Version,
-                                       val battery: ApiBatteryInfo) : ApiEventPayload(ApiEventPayloadType.Vero2InfoSnapshot, version, relativeStartTime) {
+                                       val battery: ApiBatteryInfo) : ApiEventPayload(ApiEventPayloadType.Vero2InfoSnapshot, version, startTime) {
 
     @Keep
     data class ApiVero2Version(val master: Long,
@@ -39,8 +39,8 @@ data class ApiVero2InfoSnapshotPayload(override val relativeStartTime: Long,
             this(batteryInfo.charge, batteryInfo.voltage, batteryInfo.current, batteryInfo.temperature)
     }
 
-    constructor(domainPayload: Vero2InfoSnapshotPayload, baseStartTime: Long) :
-        this(domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: Vero2InfoSnapshotPayload) :
+        this(domainPayload.createdAt,
             domainPayload.eventVersion,
             ApiVero2Version(domainPayload.version),
             ApiBatteryInfo(domainPayload.battery))

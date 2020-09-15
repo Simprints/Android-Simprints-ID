@@ -7,10 +7,10 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 
 @Keep
 data class ApiConnectivitySnapshotPayload(
-    override val relativeStartTime: Long,
+    override val startTime: Long,
     override val version: Int,
     val networkType: String,
-    val connections: List<ApiConnection>) : ApiEventPayload(ApiEventPayloadType.ConnectivitySnapshot, version, relativeStartTime) {
+    val connections: List<ApiConnection>) : ApiEventPayload(ApiEventPayloadType.ConnectivitySnapshot, version, startTime) {
 
     @Keep
     class ApiConnection(val type: String, val state: String) {
@@ -18,8 +18,8 @@ data class ApiConnectivitySnapshotPayload(
             : this(connection.type, connection.state.toString())
     }
 
-    constructor(domainPayload: ConnectivitySnapshotPayload, baseStartTime: Long) :
-        this(domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: ConnectivitySnapshotPayload) :
+        this(domainPayload.createdAt,
             domainPayload.eventVersion,
             domainPayload.networkType,
             domainPayload.connections.map { ApiConnection(it) })
