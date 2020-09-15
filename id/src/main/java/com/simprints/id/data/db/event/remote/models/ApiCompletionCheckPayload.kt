@@ -4,11 +4,11 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.CompletionCheckEvent.CompletionCheckPayload
 
 @Keep
-data class ApiCompletionCheckPayload(override val relativeStartTime: Long,
+data class ApiCompletionCheckPayload(override val startTime: Long,
                                      override val version: Int,
-                                     val completed: Boolean) : ApiEventPayload(ApiEventPayloadType.CompletionCheck, version, relativeStartTime) {
+                                     val completed: Boolean) : ApiEventPayload(ApiEventPayloadType.CompletionCheck, version, startTime) {
 
-    constructor(domainPayload: CompletionCheckPayload, baseStartTime: Long) :
-        this(domainPayload.createdAt - baseStartTime, domainPayload.eventVersion, domainPayload.completed)
+    constructor(domainPayload: CompletionCheckPayload):
+        this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.completed)
 }
 

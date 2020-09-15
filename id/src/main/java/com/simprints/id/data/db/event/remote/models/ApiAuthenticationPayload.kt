@@ -6,11 +6,11 @@ import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.Authenti
 import com.simprints.id.data.db.event.remote.models.ApiAuthenticationPayload.ApiResult
 
 @Keep
-data class ApiAuthenticationPayload(override val relativeStartTime: Long,
+data class ApiAuthenticationPayload(override val startTime: Long,
                                     override val version: Int,
-                                    val relativeEndTime: Long,
+                                    val endTime: Long,
                                     val userInfo: ApiUserInfo,
-                                    val result: ApiResult) : ApiEventPayload(ApiEventPayloadType.Authentication, version, relativeStartTime) {
+                                    val result: ApiResult) : ApiEventPayload(ApiEventPayloadType.Authentication, version, startTime) {
 
     @Keep
     data class ApiUserInfo(val projectId: String, val userId: String) {
@@ -28,10 +28,10 @@ data class ApiAuthenticationPayload(override val relativeStartTime: Long,
         SAFETYNET_INVALID_CLAIM
     }
 
-    constructor(domainPayload: AuthenticationPayload, baseStartTime: Long) :
-        this(domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: AuthenticationPayload):
+        this(domainPayload.createdAt,
             domainPayload.eventVersion,
-            domainPayload.endedAt - baseStartTime,
+            domainPayload.endedAt,
             ApiUserInfo(domainPayload.userInfo),
             domainPayload.result.fromDomainToApi())
 }

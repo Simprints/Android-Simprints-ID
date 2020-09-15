@@ -50,6 +50,6 @@ data class OneToManyMatchEvent(
     }
 
     companion object {
-        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+        const val EVENT_VERSION = 1
     }
 }

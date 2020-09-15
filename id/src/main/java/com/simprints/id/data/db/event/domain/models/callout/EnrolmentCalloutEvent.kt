@@ -43,7 +43,7 @@ data class EnrolmentCalloutEvent(
         override val endedAt: Long = 0) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+        const val EVENT_VERSION = 1
     }
 
 }

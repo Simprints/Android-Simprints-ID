@@ -10,8 +10,12 @@ import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier
 import com.simprints.id.data.db.event.domain.models.subject.FingerprintTemplate
 import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReferenceType.FaceReference
 import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReferenceType.FingerprintReference
+import java.util.*
 import com.simprints.id.data.db.event.domain.models.subject.FaceReference as DomainFaceReference
 import com.simprints.id.data.db.event.domain.models.subject.FingerprintReference as DomainFingerprintReference
+
+private const val FACE_REFERENCE_KEY = "FaceReference"
+private const val FINGERPRINT_REFERENCE_KEY = "FingerprintReference"
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
@@ -20,17 +24,22 @@ import com.simprints.id.data.db.event.domain.models.subject.FingerprintReference
 )
 interface ApiBiometricReference {
     val type: ApiBiometricReferenceType
+    val id: String
 }
 
 @Keep
-data class ApiFaceReference(val templates: List<ApiFaceTemplate>,
-                            val metadata: HashMap<String, String>? = null) : ApiBiometricReference {
+data class ApiFaceReference(
+    override val id: String = UUID.randomUUID().toString(),
+    val templates: List<ApiFaceTemplate>,
+    val metadata: HashMap<String, String>? = null) : ApiBiometricReference {
     override val type: ApiBiometricReferenceType = FaceReference
 }
 
 @Keep
-data class ApiFingerprintReference(val templates: List<ApiFingerprintTemplate>,
-                                   val metadata: HashMap<String, String>? = null) : ApiBiometricReference {
+data class ApiFingerprintReference(
+    override val id: String = UUID.randomUUID().toString(),
+    val templates: List<ApiFingerprintTemplate>,
+    val metadata: HashMap<String, String>? = null) : ApiBiometricReference {
     override val type: ApiBiometricReferenceType = FingerprintReference
 }
 
@@ -40,15 +49,12 @@ enum class ApiBiometricReferenceType {
     @JsonProperty(FINGERPRINT_REFERENCE_KEY) FingerprintReference;
 }
 
-private const val FACE_REFERENCE_KEY = "FaceReference"
-private const val FINGERPRINT_REFERENCE_KEY = "FingerprintReference"
-
 fun BiometricReference.fromDomainToApi() = when (this) {
     is DomainFaceReference -> {
-        ApiFaceReference(templates.map { it.fromDomainToApi() }, metadata)
+        ApiFaceReference(id, templates.map { it.fromDomainToApi() }, metadata)
     }
     is DomainFingerprintReference -> {
-        ApiFingerprintReference(templates.map { it.fromDomainToApi() }, metadata)
+        ApiFingerprintReference(id, templates.map { it.fromDomainToApi() }, metadata)
     }
 }
 

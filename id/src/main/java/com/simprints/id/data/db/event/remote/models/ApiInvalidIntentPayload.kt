@@ -7,13 +7,13 @@ import com.simprints.id.data.db.event.domain.models.InvalidIntentEvent.InvalidIn
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiInvalidIntentPayload(override val relativeStartTime: Long,
+data class ApiInvalidIntentPayload(override val startTime: Long,
                                    override val version: Int,
                                    val action: String,
-                                   val extras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.InvalidIntent, version, relativeStartTime) {
+                                   val extras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.InvalidIntent, version, startTime) {
 
-    constructor(domainPayload: InvalidIntentPayload, baseStartTime: Long) :
-        this(domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: InvalidIntentPayload) :
+        this(domainPayload.createdAt,
             domainPayload.eventVersion,
             domainPayload.action,
             domainPayload.extras)

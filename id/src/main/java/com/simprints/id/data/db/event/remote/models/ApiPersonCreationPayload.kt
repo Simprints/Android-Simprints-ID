@@ -5,12 +5,12 @@ import com.simprints.id.data.db.event.domain.models.PersonCreationEvent.PersonCr
 
 
 @Keep
-data class ApiPersonCreationPayload(override val relativeStartTime: Long,
+data class ApiPersonCreationPayload(override val startTime: Long,
                                     override val version: Int,
-                                    val fingerprintCaptureIds: List<String>) : ApiEventPayload(ApiEventPayloadType.PersonCreation, version, relativeStartTime) {
+                                    val fingerprintCaptureIds: List<String>) : ApiEventPayload(ApiEventPayloadType.PersonCreation, version, startTime) {
 
-    constructor(domainPayload: PersonCreationPayload, baseStartTime: Long) :
-        this(domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: PersonCreationPayload) :
+        this(domainPayload.createdAt,
             domainPayload.eventVersion,
             domainPayload.fingerprintCaptureIds)
 }

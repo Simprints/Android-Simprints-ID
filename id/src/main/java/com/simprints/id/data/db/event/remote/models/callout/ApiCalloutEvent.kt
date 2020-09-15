@@ -14,12 +14,12 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.Callout
 @Keep
 @JsonInclude(Include.NON_NULL)
 data class ApiCalloutPayload(
-    override val relativeStartTime: Long,
+    override val startTime: Long,
     override val version: Int,
-    val callout: ApiCallout) : ApiEventPayload(Callout, version, relativeStartTime) {
+    val callout: ApiCallout) : ApiEventPayload(Callout, version, startTime) {
 
-    constructor(domainPayload: EnrolmentCalloutPayload, baseStartTime: Long) : this(
-        domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: EnrolmentCalloutPayload) : this(
+        domainPayload.createdAt,
         domainPayload.eventVersion,
         ApiEnrolmentCallout(
             domainPayload.projectId,
@@ -27,8 +27,8 @@ data class ApiCalloutPayload(
             domainPayload.moduleId,
             domainPayload.metadata))
 
-    constructor(domainPayload: IdentificationCalloutPayload, baseStartTime: Long) : this(
-        domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: IdentificationCalloutPayload) : this(
+        domainPayload.createdAt,
         domainPayload.eventVersion,
         ApiIdentificationCallout(
             domainPayload.projectId,
@@ -36,8 +36,8 @@ data class ApiCalloutPayload(
             domainPayload.moduleId,
             domainPayload.metadata))
 
-    constructor(domainPayload: VerificationCalloutPayload, baseStartTime: Long) : this(
-        domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: VerificationCalloutPayload) : this(
+        domainPayload.createdAt,
         domainPayload.eventVersion,
         ApiVerificationCallout(
             domainPayload.projectId,
@@ -46,15 +46,15 @@ data class ApiCalloutPayload(
             domainPayload.metadata,
             domainPayload.verifyGuid))
 
-    constructor(domainPayload: ConfirmationCalloutPayload, baseStartTime: Long) : this(
-        domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: ConfirmationCalloutPayload) : this(
+        domainPayload.createdAt,
         domainPayload.eventVersion,
         ApiConfirmationCallout(
             domainPayload.selectedGuid,
             domainPayload.sessionId))
 
-    constructor(domainPayload: EnrolmentLastBiometricsCalloutPayload, baseStartTime: Long) : this(
-        domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: EnrolmentLastBiometricsCalloutPayload) : this(
+        domainPayload.createdAt,
         domainPayload.eventVersion,
         ApiEnrolmentLastBiometricsCallout(
             domainPayload.projectId,

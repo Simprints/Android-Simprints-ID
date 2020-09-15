@@ -7,12 +7,12 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FaceFall
 
 
 @Keep
-data class ApiFaceFallbackCapturePayload(override val relativeStartTime: Long, //Not added on API yet
-                                         val relativeEndTime: Long,
-                                         override val version: Int) : ApiEventPayload(FaceFallbackCapture, version, relativeStartTime) {
+data class ApiFaceFallbackCapturePayload(override val startTime: Long, //Not added on API yet
+                                         val endTime: Long,
+                                         override val version: Int) : ApiEventPayload(FaceFallbackCapture, version, startTime) {
 
-    constructor(domainPayload: FaceFallbackCapturePayload, baseStartTime: Long) : this(
-        domainPayload.createdAt - baseStartTime,
-        domainPayload.endedAt - baseStartTime,
+    constructor(domainPayload: FaceFallbackCapturePayload) : this(
+        domainPayload.createdAt,
+        domainPayload.endedAt,
         domainPayload.eventVersion)
 }

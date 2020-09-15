@@ -12,14 +12,14 @@ import com.simprints.id.data.db.event.remote.models.face.ApiFaceCaptureConfirmat
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiFaceCaptureConfirmationPayload(override val relativeStartTime: Long, //Not added on API yet
-                                        val relativeEndTime: Long,
-                                        override val version: Int,
-                                        val result: ApiResult) : ApiEventPayload(FaceCaptureConfirmation, version, relativeStartTime) {
+data class ApiFaceCaptureConfirmationPayload(override val startTime: Long, //Not added on API yet
+                                             val endTime: Long,
+                                             override val version: Int,
+                                             val result: ApiResult) : ApiEventPayload(FaceCaptureConfirmation, version, startTime) {
 
-    constructor(domainPayload: FaceCaptureConfirmationPayload, baseStartTime: Long) : this(
-        domainPayload.createdAt - baseStartTime,
-        domainPayload.endedAt - baseStartTime,
+    constructor(domainPayload: FaceCaptureConfirmationPayload) : this(
+        domainPayload.createdAt,
+        domainPayload.endedAt,
         domainPayload.eventVersion,
         domainPayload.result.fromDomainToApi())
 

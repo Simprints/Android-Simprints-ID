@@ -88,6 +88,7 @@ import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -199,7 +200,12 @@ open class AppModule {
     @Singleton
     // https://github.com/lyft/Kronos-Android
     fun provideTimeHelper(app: Application): TimeHelper = KronosTimeHelperImpl(
-        AndroidClockFactory.createKronosClock(app) //StopShip: Changing cache time from 1 minute to 1 hour?
+        AndroidClockFactory.createKronosClock(
+            app,
+            requestTimeoutMs = TimeUnit.SECONDS.toMillis(60),
+            minWaitTimeBetweenSyncMs = TimeUnit.MINUTES.toMillis(30),
+            cacheExpirationMs = TimeUnit.MINUTES.toMillis(30)
+        )
     )
 
 

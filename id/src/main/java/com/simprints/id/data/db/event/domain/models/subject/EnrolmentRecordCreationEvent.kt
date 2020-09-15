@@ -7,7 +7,6 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.domain.modality.Modes
@@ -68,8 +67,10 @@ data class EnrolmentRecordCreationEvent(
         private fun buildFingerprintReference(fingerprintSamples: List<FingerprintSample>) =
             if (fingerprintSamples.isNotEmpty()) {
                 FingerprintReference(
+                    UUID.randomUUID().toString(),
                     fingerprintSamples.map {
-                        FingerprintTemplate(it.templateQualityScore,
+                        FingerprintTemplate(
+                            it.templateQualityScore,
                             EncodingUtils.byteArrayToBase64(it.template),
                             it.fingerIdentifier.fromSubjectToEvent())
                     }
@@ -81,6 +82,7 @@ data class EnrolmentRecordCreationEvent(
         private fun buildFaceReference(faceSamples: List<FaceSample>) =
             if (faceSamples.isNotEmpty()) {
                 FaceReference(
+                    UUID.randomUUID().toString(),
                     faceSamples.map {
                         FaceTemplate(
                             EncodingUtils.byteArrayToBase64(it.template)
@@ -91,6 +93,6 @@ data class EnrolmentRecordCreationEvent(
                 null
             }
 
-        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+        const val EVENT_VERSION = 1
     }
 }

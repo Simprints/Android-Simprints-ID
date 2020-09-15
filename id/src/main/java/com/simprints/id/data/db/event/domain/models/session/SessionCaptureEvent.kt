@@ -78,7 +78,7 @@ data class SessionCaptureEvent(
         // When the sync starts, any open activeSession started GRACE_PERIOD ms
         // before it will be considered closed
         const val GRACE_PERIOD: Long = 1000 * 60 * 5 // 5 minutes
-        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+        const val EVENT_VERSION = 1
     }
 
     fun updateProjectId(projectId: String) {

@@ -7,12 +7,12 @@ import com.simprints.id.data.db.event.domain.models.SuspiciousIntentEvent.Suspic
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiSuspiciousIntentPayload(override val relativeStartTime: Long,
+data class ApiSuspiciousIntentPayload(override val startTime: Long,
                                       override val version: Int,
-                                      val unexpectedExtras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.SuspiciousIntent, version, relativeStartTime) {
+                                      val unexpectedExtras: Map<String, Any?>) : ApiEventPayload(ApiEventPayloadType.SuspiciousIntent, version, startTime) {
 
-    constructor(domainPayload: SuspiciousIntentPayload, baseStartTime: Long) :
-        this(domainPayload.createdAt - baseStartTime,
+    constructor(domainPayload: SuspiciousIntentPayload) :
+        this(domainPayload.createdAt,
             domainPayload.eventVersion,
             domainPayload.unexpectedExtras)
 }

@@ -13,6 +13,7 @@ import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
+import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -39,6 +40,7 @@ open class EventSyncMasterWorker(private val appContext: Context,
     @Inject lateinit var preferenceManager: PreferencesManager
     @Inject lateinit var eventSyncCache: EventSyncCache
     @Inject lateinit var eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder
+    @Inject lateinit var timeHelper: TimeHelper
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(appContext)
@@ -59,6 +61,9 @@ open class EventSyncMasterWorker(private val appContext: Context,
             try {
                 getComponent<EventSyncMasterWorker> { it.inject(this@EventSyncMasterWorker) }
                 crashlyticsLog("Start")
+                //Requests timestamp now as device is surely ONLINE,
+                //so if needed the NTP cache gets refreshed.
+                timeHelper.now()
 
                 if (!isSyncRunning()) {
                     val startSyncReporterWorker = eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
