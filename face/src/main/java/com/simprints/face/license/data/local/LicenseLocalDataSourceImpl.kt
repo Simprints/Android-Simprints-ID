@@ -61,7 +61,6 @@ class LicenseLocalDataSourceImpl(val context: Context) : LicenseLocalDataSource 
         val encryptedFile = getEncryptedFile(file)
         encryptedFile.openFileInput().use { String(it.readBytes()) }
     } catch (t: Throwable) {
-        Timber.e(t)
         null
     }
 
