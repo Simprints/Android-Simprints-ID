@@ -10,14 +10,14 @@ class MatchResultExtTest {
 
     @Test
     fun matchResultShouldBeTransformedToOdkFormat(){
-        val listId = listOf(MatchResult("some_guid", 90, Tier.TIER_1), MatchResult("GUID2", 90, Tier.TIER_2))
+        val listId = listOf(MatchResult("some_guid", 40, Tier.TIER_1, MatchConfidence.HIGH), MatchResult("some_guid2", 25, Tier.TIER_2, MatchConfidence.MEDIUM))
         val okdIdsFormat = listId.getIdsString()
         val okdConfidenceFormat = listId.getConfidencesScoresString()
         val okdTierFormat = listId.getTiersString()
 
 
-        Truth.assertThat(okdIdsFormat).isEqualTo("some_guid GUID2")
-        Truth.assertThat(okdConfidenceFormat).isEqualTo("90 90")
+        Truth.assertThat(okdIdsFormat).isEqualTo("some_guid some_guid2")
+        Truth.assertThat(okdConfidenceFormat).isEqualTo("40 25")
         Truth.assertThat(okdTierFormat).isEqualTo("TIER_1 TIER_2")
     }
 }
