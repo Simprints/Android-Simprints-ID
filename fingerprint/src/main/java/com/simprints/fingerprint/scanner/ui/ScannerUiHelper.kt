@@ -29,4 +29,44 @@ class ScannerUiHelper {
         LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
         LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00)
     )
+
+    fun deduceLedStateFromQualityForLiveFeedback(quality : Int) =
+        when (quality) {
+            in 0 until 40 -> SmileLedState(
+                LedState(DigitalValue.FALSE, 0x00, 0x08 ,0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00)
+            )
+            in 40 until 60 -> SmileLedState(
+                LedState(DigitalValue.FALSE, 0x00, 0x08 ,0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x08, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00)
+            )
+            in 60 until 75 -> SmileLedState(
+                LedState(DigitalValue.FALSE, 0x00, 0x08 ,0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x08, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x08, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00)
+            )
+            in 75 until 85 -> SmileLedState(
+                LedState(DigitalValue.FALSE, 0x00, 0x08 ,0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x08, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x08, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x08, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00)
+            )
+            in 85 until 101 -> SmileLedState(
+                LedState(DigitalValue.FALSE, 0x00, 0x08 ,0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x08, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x08, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x08, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x08, 0x00)
+            )
+            else -> idleLedState()
+        }
 }
