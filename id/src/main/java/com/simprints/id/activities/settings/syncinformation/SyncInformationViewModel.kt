@@ -1,24 +1,26 @@
 package com.simprints.id.activities.settings.syncinformation
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.ON
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class SyncInformationViewModel(private val personRepository: SubjectRepository,
                                private val subjectLocalDataSource: SubjectLocalDataSource,
                                private val preferencesManager: PreferencesManager,
                                private val projectId: String,
-                               private val subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository) : ViewModel() {
+                               private val subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
+                               private val imageRepository: ImageRepository) : ViewModel() {
 
     val localRecordCountLiveData = MutableLiveData<Int>()
     val recordsToUpSyncCountLiveData = MutableLiveData<Int>()
@@ -26,19 +28,25 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
     val recordsToDeleteCountLiveData = MutableLiveData<Int>()
     val selectedModulesCountLiveData = MutableLiveData<List<ModuleCount>>()
     val unselectedModulesCountLiveData = MutableLiveData<List<ModuleCount>>()
+    val imagesToUploadCountLiveData = MutableLiveData<Int>()
 
     fun fetchRecordsInfo() {
         viewModelScope.launch {
             fetchAndUpdateLocalRecordCount()
+            fetchAndUpdateImagesToUploadCount()
             fetchAndUpdateRecordsToUpSyncCount()
-            fetchRecordsToUpdateAndDeleteCountIfNecessary()
             fetchAndUpdateSelectedModulesCount()
             fetchAndUpdatedUnselectedModulesCount()
+            fetchRecordsToUpdateAndDeleteCountIfNecessary()
         }
     }
 
     internal suspend fun fetchAndUpdateLocalRecordCount() {
         localRecordCountLiveData.value = subjectLocalDataSource.count(SubjectLocalDataSource.Query(projectId = projectId))
+    }
+
+    private fun fetchAndUpdateImagesToUploadCount() {
+        imagesToUploadCountLiveData.value = imageRepository.getNumberOfImagesToUpload()
     }
 
     internal suspend fun fetchAndUpdateRecordsToUpSyncCount() {

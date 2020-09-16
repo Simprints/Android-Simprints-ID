@@ -263,7 +263,7 @@
                 android:padding="5dp"
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
-                android:text="Images to upload" />
+                tools:text="Images to upload" />
 
             <TextView
                 android:id="@+id/imagesToUploadCount"
@@ -271,7 +271,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:textSize="16sp"
-                android:text="0" />
+                tools:text="0" />
 
         </LinearLayout>
 

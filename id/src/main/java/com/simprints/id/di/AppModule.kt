@@ -39,6 +39,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -318,10 +319,11 @@ open class AppModule {
         subjectLocalDataSource: SubjectLocalDataSource,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
-        subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository
+        subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
+        imageRepository: ImageRepository
     ) = SyncInformationViewModelFactory(
         personRepository, subjectLocalDataSource, preferencesManager,
-        loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository
+        loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository, imageRepository
     )
 
     @Provides

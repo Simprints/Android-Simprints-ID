@@ -62,7 +62,7 @@ class SyncInformationActivity : BaseSplitActivity() {
         super.onResume()
         clearValues()
         setFocusOnDefaultModulesTab()
-        fetchRecordsInfo()
+        observeForSyncState()
     }
 
     private fun setTextInLayout() {
@@ -76,6 +76,7 @@ class SyncInformationActivity : BaseSplitActivity() {
             getString(R.string.sync_info_records_to_delete)
         totalRecordsOnDeviceText.text =
             getString(R.string.sync_info_total_records_on_device)
+        imagesToUploadText.text = getString(R.string.sync_info_images_to_upload)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -156,7 +157,7 @@ class SyncInformationActivity : BaseSplitActivity() {
         observeDeleteRecordCount()
         observeSelectedModules()
         observeUnselectedModules()
-        observeForSyncState()
+        observeNumberOfImagesToUploadCount()
     }
 
     private fun observeLocalRecordCount() {
@@ -200,6 +201,12 @@ class SyncInformationActivity : BaseSplitActivity() {
         })
     }
 
+    private fun observeNumberOfImagesToUploadCount() {
+        viewModel.imagesToUploadCountLiveData.observe(this, Observer {
+            imagesToUploadCount.text = it.toString()
+        })
+    }
+
     private fun setupProgressOverlay() {
         progressOverlayBackground.setOnTouchListener { _, _ -> true }
         progress_sync_overlay.setOnTouchListener { _, _ -> true }
@@ -207,11 +214,13 @@ class SyncInformationActivity : BaseSplitActivity() {
         progressBar.setOnTouchListener { _, _ -> true }
     }
 
-    private fun isProgressOverlayVisible() = group_progress_overlay.visibility == View.VISIBLE
-
-    private fun showProgressOverlay() {
-        group_progress_overlay.visibility = View.VISIBLE
+    private fun showProgressOverlayIfNecessary() {
+        if (!isProgressOverlayVisible()) {
+            group_progress_overlay.visibility = View.VISIBLE
+        }
     }
+
+    private fun isProgressOverlayVisible() = group_progress_overlay.visibility == View.VISIBLE
 
     private fun hideProgressOverlay() {
         group_progress_overlay.visibility = View.GONE
@@ -247,9 +256,9 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     private fun observeForSyncState() {
         subjectsSyncManager.getLastSyncState().observe(this, Observer { syncState ->
-            if (syncState.isRunning() && !isProgressOverlayVisible()) {
-                showProgressOverlay()
-            } else if (!syncState.isRunning() && isProgressOverlayVisible()) {
+            if (syncState.isRunning()) {
+                showProgressOverlayIfNecessary()
+            } else {
                 hideProgressOverlay()
                 fetchRecordsInfo()
             }
