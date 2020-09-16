@@ -5,6 +5,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
@@ -38,8 +39,8 @@ class EnrolmentRecordMoveEventTest {
     }
 
     private fun createBiometricReferences(): List<BiometricReference> {
-        val fingerprintReference = FingerprintReference(listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
-        val faceReference = FaceReference(listOf(FaceTemplate("some_template")))
+        val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
+        val faceReference = FaceReference(GUID2, listOf(FaceTemplate("some_template")))
         return listOf(fingerprintReference, faceReference)
     }
 }

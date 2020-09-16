@@ -26,10 +26,11 @@ class SessionCaptureEventTest {
             Build.MANUFACTURER + "_" + Build.MODEL,
             GUID1)
 
-        val databaseInfoArg = DatabaseInfo(2)
+        val databaseInfoArg = DatabaseInfo(2, recordCount = 2)
         val locationArg = Location(0.0, 0.0)
 
         val event = SessionCaptureEvent(
+            GUID2,
             DEFAULT_PROJECT_ID,
             CREATED_AT,
             listOf(FINGERPRINT, FACE),
@@ -37,11 +38,9 @@ class SessionCaptureEventTest {
             libSimprintsVersionNameArg,
             languageArg,
             deviceArg,
-            databaseInfoArg,
-            locationArg,
-            GUID1,
-            GUID2,
-            eventLabels.copy(sessionId = GUID2))
+            databaseInfoArg)
+        event.payload.location = locationArg
+        event.payload.analyticsId = GUID1
         event.payload.endedAt = ENDED_AT
 
         assertThat(event.id).isNotNull()

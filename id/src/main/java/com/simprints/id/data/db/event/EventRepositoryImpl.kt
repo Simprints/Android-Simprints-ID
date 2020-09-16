@@ -33,6 +33,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
+import java.util.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 open class EventRepositoryImpl(
@@ -66,6 +67,7 @@ open class EventRepositoryImpl(
         reportExceptionIfNeeded {
             val count = eventLocalDataSource.count()
             val sessionCaptureEvent = SessionCaptureEvent(
+                UUID.randomUUID().toString(),
                 PROJECT_ID_FOR_NOT_SIGNED_IN,
                 timeHelper.now(),
                 preferencesManager.modalities.map { it.toMode() },
@@ -77,7 +79,6 @@ open class EventRepositoryImpl(
                     Build.MANUFACTURER + "_" + Build.MODEL,
                     deviceId),
                 DatabaseInfo(count))
-            sessionCaptureEvent.labels = sessionCaptureEvent.labels.appendSessionId(sessionCaptureEvent.id)
 
             closeAnyOpenSession()
             addEvent(sessionCaptureEvent)
@@ -159,7 +160,8 @@ open class EventRepositoryImpl(
 
     @VisibleForTesting
     suspend fun createBatches(query: LocalEventQuery): List<Batch> {
-        return createBatchesForEventsInSessions(query) + createBatchesForEventsNotInSessions(query)
+        val events = createBatchesForEventsInSessions(query) + createBatchesForEventsNotInSessions(query)
+        return events
     }
 
     private suspend fun createBatchesForEventsNotInSessions(query: LocalEventQuery): List<Batch> {

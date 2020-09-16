@@ -19,8 +19,8 @@ class EnrolmentRecordCreationEventTest {
 
     @Test
     fun create_EnrolmentRecordCreationEvent() {
-        val fingerprintReference = FingerprintReference(listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
-        val faceReference = FaceReference(listOf(FaceTemplate("some_template")))
+        val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
+        val faceReference = FaceReference(GUID2, listOf(FaceTemplate("some_template")))
         val event = EnrolmentRecordCreationEvent(
             CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, GUID2, listOf(FACE, FINGERPRINT), listOf(fingerprintReference, faceReference))
 

@@ -1,5 +1,6 @@
 package com.simprints.id.testtools.testingapi.remote
 
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
 import com.simprints.id.testtools.testingapi.exceptions.TestingRemoteApiError
@@ -19,7 +20,8 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
 
     private val remoteTestingApi = TestingApiClient(
         RemoteTestingApi::class,
-        RemoteTestingApi.baseUrl).api
+        RemoteTestingApi.baseUrl,
+        JsonHelper()).api
 
     override fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters): TestProject =
         remoteTestingApi.createProject(testProjectCreationParameters)

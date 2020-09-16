@@ -8,6 +8,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.data.db.event.domain.models.EventType.*
+import com.simprints.id.data.db.event.remote.fromDomainToApi
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
 import org.junit.Test
 
@@ -31,7 +32,7 @@ class RemoteEventQueryTest {
             assertThat(moduleIds).isEqualTo(DEFAULT_MODULES)
             assertThat(subjectId).isEqualTo(GUID1)
             assertThat(lastEventId).isEqualTo(GUID2)
-            assertThat(modes).isEqualTo(DEFAULT_MODES)
+            assertThat(modes).isEqualTo(DEFAULT_MODES.map { it.fromDomainToApi() })
             assertThat(types).isEqualTo(listOf(EnrolmentRecordCreation, EnrolmentRecordMove, EnrolmentRecordDeletion))
         }
     }

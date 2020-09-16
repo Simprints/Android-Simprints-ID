@@ -2,9 +2,7 @@ package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
-
 import com.simprints.id.data.db.event.domain.models.EventType.ALERT_SCREEN
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 
@@ -23,7 +21,7 @@ data class AlertScreenEvent(
     ) : this(
         UUID.randomUUID().toString(),
         labels,
-        AlertScreenPayload(createdAt, DEFAULT_EVENT_VERSION, alertType),
+        AlertScreenPayload(createdAt, EVENT_VERSION, alertType),
         ALERT_SCREEN)
 
     @Keep

@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
 import com.simprints.id.data.db.event.domain.models.EventType.AUTHORIZATION
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -19,7 +18,7 @@ data class AuthorizationEvent(
         createdAt: Long,
         result: AuthorizationResult,
         userInfo: UserInfo?,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,
