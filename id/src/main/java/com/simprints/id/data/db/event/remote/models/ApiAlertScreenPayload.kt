@@ -27,8 +27,6 @@ data class ApiAlertScreenPayload(override val startTime: Long,
         BLUETOOTH_NOT_SUPPORTED,
         LOW_BATTERY,
 
-        @Deprecated("Fingerprint module doesn't triggers it anymore")
-        UNKNOWN_BLUETOOTH_ISSUE,
         UNEXPECTED_ERROR,
         DISCONNECTED,
 

@@ -50,7 +50,6 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
             ONE_TO_ONE_MATCH -> (event as OneToOneMatchEvent).fromDomainToCore()
             ONE_TO_MANY_MATCH -> (event as OneToManyMatchEvent).fromDomainToCore()
             REFUSAL -> (event as RefusalEvent).fromDomainToCore()
-            PERSON_CREATION -> (event as PersonCreationEvent).fromDomainToCore()
             SCANNER_CONNECTION -> (event as ScannerConnectionEvent).fromDomainToCore()
             ALERT_SCREEN -> (event as AlertScreenEvent).fromDomainToCore()
             ALERT_SCREEN_WITH_SCANNER_ISSUE -> (event as AlertScreenEventWithScannerIssue).fromDomainToCore()

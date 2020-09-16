@@ -9,6 +9,7 @@ import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
+import com.simprints.id.data.db.subject.domain.uniqueId
 import com.simprints.id.domain.modality.Modes
 import java.util.*
 
@@ -67,7 +68,7 @@ data class EnrolmentRecordCreationEvent(
         private fun buildFingerprintReference(fingerprintSamples: List<FingerprintSample>) =
             if (fingerprintSamples.isNotEmpty()) {
                 FingerprintReference(
-                    UUID.randomUUID().toString(),
+                    fingerprintSamples.uniqueId(),
                     fingerprintSamples.map {
                         FingerprintTemplate(
                             it.templateQualityScore,
@@ -82,7 +83,7 @@ data class EnrolmentRecordCreationEvent(
         private fun buildFaceReference(faceSamples: List<FaceSample>) =
             if (faceSamples.isNotEmpty()) {
                 FaceReference(
-                    UUID.randomUUID().toString(),
+                    faceSamples.uniqueId(),
                     faceSamples.map {
                         FaceTemplate(
                             EncodingUtils.byteArrayToBase64(it.template)

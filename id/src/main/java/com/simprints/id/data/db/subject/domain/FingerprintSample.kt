@@ -23,7 +23,7 @@ open class FingerprintSample(
 
     companion object {
         fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) =
-            biometricReferences?.filterIsInstance(FingerprintReference::class.java)
+            biometricReferences?.filterIsInstance<FingerprintReference>()
                 ?.firstOrNull()?.templates?.map { buildFingerprintSample(it) } ?: emptyList()
 
         private fun buildFingerprintSample(template: FingerprintTemplate): FingerprintSample {
@@ -34,4 +34,17 @@ open class FingerprintSample(
             )
         }
     }
+}
+
+// Generates a unique id for a list of samples.
+// It concats the templates (sorted by quality score) and creates a UUID from that.
+fun List<FingerprintSample>.uniqueId() =
+    UUID.nameUUIDFromBytes(
+        contactTemplates()
+    ).toString()
+
+private fun List<FingerprintSample>.contactTemplates(): ByteArray {
+    return this.sortedBy { it.templateQualityScore }.fold(byteArrayOf(), { acc, sample ->
+        acc + sample.template
+    })
 }
