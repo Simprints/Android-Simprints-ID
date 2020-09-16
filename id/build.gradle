@@ -14,14 +14,13 @@ androidExtensions {
 
 android {
     compileSdkVersion 29
-    buildToolsVersion '29.0.3'
 
     defaultConfig {
         minSdkVersion config.min_sdk
         targetSdkVersion 29
         vectorDrawables.useSupportLibrary = true
-        versionName "2020.3.1"
-        versionCode 252
+        versionName "2020.3.2"
+        versionCode 257
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {

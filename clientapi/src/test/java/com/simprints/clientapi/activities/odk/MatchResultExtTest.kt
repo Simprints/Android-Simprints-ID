@@ -1,6 +1,7 @@
 package com.simprints.clientapi.activities.odk
 
 import com.google.common.truth.Truth
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier
 import org.junit.Test
@@ -11,7 +12,7 @@ class MatchResultExtTest {
     fun matchResultShouldBeTransformedToOdkFormat(){
         val listId = listOf(MatchResult("some_guid", 90, Tier.TIER_1), MatchResult("GUID2", 90, Tier.TIER_2))
         val okdIdsFormat = listId.getIdsString()
-        val okdConfidenceFormat = listId.getConfidencesString()
+        val okdConfidenceFormat = listId.getConfidencesScoresString()
         val okdTierFormat = listId.getTiersString()
 
 
