@@ -17,7 +17,7 @@ data class AlertScreenEvent(
     constructor(
         createdAt: Long,
         alertType: AlertScreenEventType,
-        labels: EventLabels = EventLabels() //StopShip
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,

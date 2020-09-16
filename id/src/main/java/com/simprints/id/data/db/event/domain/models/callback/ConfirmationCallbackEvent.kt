@@ -6,7 +6,6 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_CONFIRMATION
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -20,7 +19,7 @@ data class ConfirmationCallbackEvent(
     constructor(
         createdAt: Long,
         identificationOutcome: Boolean,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,

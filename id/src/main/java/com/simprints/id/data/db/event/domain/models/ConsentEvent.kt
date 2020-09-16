@@ -19,7 +19,7 @@ data class ConsentEvent(
         endTime: Long,
         consentType: ConsentPayload.Type,
         result: ConsentPayload.Result,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,

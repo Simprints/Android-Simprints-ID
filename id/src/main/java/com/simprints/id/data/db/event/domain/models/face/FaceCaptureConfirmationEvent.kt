@@ -23,7 +23,7 @@ data class FaceCaptureConfirmationEvent(
         startTime: Long,
         endTime: Long,
         result: Result,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,
