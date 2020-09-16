@@ -49,7 +49,7 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
         with(preferencesManagerMock) {
             every { language } returns "en"
-            every { fingerStatus } returns emptyMap()
+            every { fingerprintsToCollect } returns listOf()
             every { logoExists } returns true
             every { organizationName } returns "some_org"
             every { programName } returns "some_name"

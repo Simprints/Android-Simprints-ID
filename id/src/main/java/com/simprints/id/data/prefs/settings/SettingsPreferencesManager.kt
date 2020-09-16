@@ -1,12 +1,13 @@
 package com.simprints.id.data.prefs.settings
 
-import com.google.gson.JsonSyntaxException
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
+import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
+import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
@@ -21,8 +22,6 @@ interface SettingsPreferencesManager {
     var maxNumberOfModules: Int
     var syncGroup: GROUP
     var matchGroup: GROUP
-    /** @throws JsonSyntaxException */
-    var fingerStatus: Map<FingerIdentifier, Boolean>
 
     var programName: String
     var organizationName: String
@@ -39,10 +38,12 @@ interface SettingsPreferencesManager {
     var modalities: List<Modality>
     var subjectsDownSyncSetting: SubjectsDownSyncSetting
 
+    var fingerprintsToCollect: List<FingerIdentifier>
     var fingerImagesExist: Boolean
     var captureFingerprintStrategy: CaptureFingerprintStrategy
     var saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
     var scannerGenerations: List<ScannerGeneration>
+    var fingerprintQualityThreshold: Int
     var apiBaseUrl: String
 
     var faceMaxRetries: Int
@@ -50,8 +51,11 @@ interface SettingsPreferencesManager {
     var faceNbOfFramesCaptured: Int
     var faceMatchThreshold: Float
 
+    var fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>
+    var faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>
+
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
-    fun getRemoteConfigFingerStatus(): Map<FingerIdentifier, Boolean>
+    fun getRemoteConfigFingerprintsToCollect(): List<FingerIdentifier>
 
 }

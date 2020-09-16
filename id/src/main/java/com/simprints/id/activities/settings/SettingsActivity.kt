@@ -11,6 +11,7 @@ import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFro
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.core.tools.utils.LanguageHelper
+import com.simprints.id.activities.settings.fingerselection.FingerSelectionActivity
 import com.simprints.id.tools.extensions.isXLargeTablet
 import kotlinx.android.synthetic.main.settings_toolbar.*
 
@@ -68,6 +69,10 @@ class SettingsActivity : AppCompatPreferenceActivity() {
             setResult(LOGOUT_RESULT_CODE)
             finish()
         }
+    }
+
+    fun openFingerSelectionActivity() {
+        startActivity(Intent(this, FingerSelectionActivity::class.java))
     }
 
     fun openSettingAboutActivity() {

@@ -14,14 +14,13 @@ androidExtensions {
 
 android {
     compileSdkVersion 29
-    buildToolsVersion '29.0.3'
 
     defaultConfig {
         minSdkVersion config.min_sdk
         targetSdkVersion 29
         vectorDrawables.useSupportLibrary = true
-        versionName "2020.3.0-rc5"
-        versionCode 246
+        versionName "2020.3.2"
+        versionCode 257
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -55,6 +54,8 @@ android {
             signingConfig signingConfigs.release
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
             buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-152315-firebase-storage\"")
+            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
+            buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "30L")
         }
 
         debug {
@@ -67,12 +68,16 @@ android {
             signingConfig signingConfigs.debug
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
             buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-dev-firebase-storage\"")
+            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
 
         staging {
             initWith release
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCSmwYkm2iHlKi-cBjohMH-FS6jQuCqPTE\"")
             buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-firebase-staging.appspot.com\"")
+            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
     }
 

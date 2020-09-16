@@ -7,6 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.integration.*
 import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
+import com.simprints.moduleapi.app.responses.IAppMatchConfidence
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,7 +19,7 @@ class CommCareVerifyResponseTest : BaseCommCareClientApiTest() {
     @Test
     fun appModuleSendsAVerifyAppResponse_shouldReturnACommCareVerifyResponse() {
         val appVerifyResponse = AppVerifyResponse(
-            AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1)
+            AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1, IAppMatchConfidence.HIGH)
         )
         mockAppModuleResponse(appVerifyResponse, APP_VERIFICATION_ACTION)
 
@@ -38,7 +39,7 @@ class CommCareVerifyResponseTest : BaseCommCareClientApiTest() {
 
             assertThat(it.getString(VERIFICATION_GUID_KEY)).isEqualTo(appVerifyResponse.matchResult.guid)
             assertThat(it.getString(VERIFICATION_TIER_KEY)).isEqualTo(appVerifyResponse.matchResult.tier.name)
-            assertThat(it.getString(VERIFICATION_CONFIDENCE_KEY)).isEqualTo(appVerifyResponse.matchResult.confidence.toString())
+            assertThat(it.getString(VERIFICATION_CONFIDENCE_KEY)).isEqualTo(appVerifyResponse.matchResult.confidenceScore.toString())
             assertThat(it.getString(BIOMETRICS_COMPLETE_KEY)).isEqualTo(BaseClientApiTest.RETURN_FOR_FLOW_COMPLETED.toString())
         } ?: throw Exception("No bundle found")
     }

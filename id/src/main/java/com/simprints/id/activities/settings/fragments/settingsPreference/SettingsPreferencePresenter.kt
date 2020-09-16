@@ -96,8 +96,10 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             }
 
             view.getKeyForDefaultFingersPreference() -> {
-                loadDefaultFingersPreference(preference as MultiSelectListPreference)
-                preference.setChangeListener { value: HashSet<String> -> handleDefaultFingersChanged(preference, value) }
+                preference.setOnPreferenceClickListener {
+                    view.openFingerSelectionActivity()
+                    true
+                }
             }
             view.getKeyForSyncInfoPreference() -> {
                 preference.setOnPreferenceClickListener {
@@ -131,10 +133,6 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         }
     }
 
-    internal fun loadDefaultFingersPreference(preference: MultiSelectListPreference) {
-        preference.values = getHashSetFromFingersMap(preferencesManager.fingerStatus).toHashSet()
-    }
-
     private fun handleLanguagePreferenceChanged(listPreference: ListPreference, stringValue: String): Boolean {
         val index = listPreference.findIndexOfValue(stringValue)
         preferencesManager.language = stringValue
@@ -148,38 +146,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         return true
     }
 
-    private fun handleDefaultFingersChanged(preference: MultiSelectListPreference,
-                                            fingersHash: HashSet<String>): Boolean {
-        if (selectionContainsDefaultFingers(fingersHash)) {
-            preferencesManager.fingerStatus = getMapFromFingersHash(fingersHash)
-            logMessageForCrashReport("Default fingers set to ${preferencesManager.fingerStatus}")
-            setCrashlyticsKeyForFingers()
-        } else {
-            view.showToastForInvalidSelectionOfFingers()
-            fingersHash.clear()
-            fingersHash.addAll(preference.values)
-        }
-        return true
-    }
-
-    private fun selectionContainsDefaultFingers(fingersHash: HashSet<String>): Boolean =
-        fingersHash.containsAll(getHashSetFromFingersMap(preferencesManager.getRemoteConfigFingerStatus()))
-
-    private fun getHashSetFromFingersMap(fingersMap: Map<FingerIdentifier, Boolean>) =
-        fingersMap.filter { it.value }.keys.map { it.toString() }.toHashSet()
-
-    private fun getMapFromFingersHash(fingersHash: HashSet<String>): Map<FingerIdentifier, Boolean> =
-        mutableMapOf<FingerIdentifier, Boolean>().apply {
-            fingersHash.map { FingerIdentifier.valueOf(it) }.forEach { this[it] = true }
-        }
-
     private fun logMessageForCrashReport(message: String) {
         crashReportManager.logMessageForCrashReport(CrashReportTag.SETTINGS, CrashReportTrigger.UI, message = message)
     }
-
-    private fun setCrashlyticsKeyForFingers() {
-        crashReportManager.setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
-    }
-
-
 }

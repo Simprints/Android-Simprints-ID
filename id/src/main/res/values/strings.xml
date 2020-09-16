@@ -254,6 +254,17 @@
     <string name="preference_summary_sync_information">Further details on sync</string>
     <string name="preferences_general_key">preferences_general</string>
     <string name="preferences_app_details_key">app_details_key</string>
+
+    <!-- Finger Selection Activity -->
+    <string name="finger_selection_activity_title">Select Fingers</string>
+    <string name="finger_selection_confirm_dialog_text">Save settings?</string>
+    <string name="finger_selection_confirm_dialog_yes">Save</string>
+    <string name="finger_selection_confirm_dialog_no">Cancel</string>
+    <string name="finger_selection_finger_label">Finger</string>
+    <string name="finger_selection_quantity_label">Quantity</string>
+    <string name="finger_selection_reset">Reset</string>
+    <string name="finger_selection_add_finger">+ Add Finger</string>
+    <string name="finger_selection_invalid">Invalid Selection - there is more than 5 of one finger</string>
     
     <!--Sync Information Activity-->
     <string name="select_modules_button_title">Select modules</string>

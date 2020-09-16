@@ -3,12 +3,16 @@ package com.simprints.id.moduleselection
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.testtools.TestApplication
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,11 +20,18 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class)
+@ExperimentalCoroutinesApi
 class ModuleRepositoryImplTest {
 
-    private val preferencesManager: PreferencesManager = mockk(relaxed = true)
-    private val crashReportManager: CrashReportManager = mockk(relaxed = true)
-    private var repository = ModuleRepositoryImpl(preferencesManager, crashReportManager)
+    private val mockPreferencesManager: PreferencesManager = mockk(relaxed = true)
+    private val mockCrashReportManager: CrashReportManager = mockk(relaxed = true)
+    private val mockSubjectLocalDataSource: SubjectLocalDataSource = mockk(relaxed = true)
+
+    private var repository = ModuleRepositoryImpl(
+        mockPreferencesManager,
+        mockCrashReportManager,
+        mockSubjectLocalDataSource
+    )
 
     @Before
     fun setUp() {
@@ -28,7 +39,7 @@ class ModuleRepositoryImplTest {
     }
 
     @Test
-    fun whenSelectingAnAcceptableNumberOfModules_shouldLogOnCrashReport() {
+    fun whenSelectingAnAcceptableNumberOfModules_shouldLogOnCrashReport() = runBlockingTest {
         val selectedModules = listOf(
             Module("1", true),
             Module("2", true),
@@ -39,7 +50,24 @@ class ModuleRepositoryImplTest {
 
         repository.saveModules(selectedModules)
 
-        verify(atLeast = 1) { crashReportManager.setModuleIdsCrashlyticsKey(any()) }
+        verify(atLeast = 1) { mockCrashReportManager.setModuleIdsCrashlyticsKey(any()) }
+    }
+
+    @Test
+    fun saveModules_shouldDeleteRecordsFromUnselectedModules() = runBlockingTest {
+        val modules = listOf(
+            Module("1", true),
+            Module("2", true),
+            Module("3", false),
+            Module("4", true),
+            Module("5", false)
+        )
+
+        repository.saveModules(modules)
+
+        coVerify {
+            mockSubjectLocalDataSource.delete(any())
+        }
     }
 
     @Test
@@ -69,7 +97,7 @@ class ModuleRepositoryImplTest {
     }
 
     @Test
-    fun shouldFetchMaxNumberOfModulesFromRemoteConfig() {
+    fun shouldFetchMaxNumberOfModulesFromRemoteConfig() = runBlockingTest {
         every {
             repository.preferencesManager.maxNumberOfModules
         } returns 10
@@ -79,11 +107,11 @@ class ModuleRepositoryImplTest {
 
     private fun configureMock() {
         every {
-            preferencesManager.moduleIdOptions
+            mockPreferencesManager.moduleIdOptions
         } returns setOf("a", "b", "c", "d")
 
         every {
-            preferencesManager.selectedModules
+            mockPreferencesManager.selectedModules
         } returns setOf("b", "c")
     }
 
