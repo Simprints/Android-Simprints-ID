@@ -7,5 +7,6 @@ class UnavailableVero2FeatureException(val feature: UnavailableVero2Feature)
 
 enum class UnavailableVero2Feature {
     IMAGE_ACQUISITION,
-    OTA
+    OTA,
+    LIVE_FEEDBACK
 }
