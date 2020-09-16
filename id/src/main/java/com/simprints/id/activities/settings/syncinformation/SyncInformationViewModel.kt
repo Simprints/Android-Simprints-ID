@@ -27,7 +27,6 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
     val recordsToDownSyncCountLiveData = MutableLiveData<Int>()
     val recordsToDeleteCountLiveData = MutableLiveData<Int>()
     val selectedModulesCountLiveData = MutableLiveData<List<ModuleCount>>()
-    val unselectedModulesCountLiveData = MutableLiveData<List<ModuleCount>>()
     val imagesToUploadCountLiveData = MutableLiveData<Int>()
 
     fun fetchRecordsInfo() {
@@ -36,7 +35,6 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
             fetchAndUpdateImagesToUploadCount()
             fetchAndUpdateRecordsToUpSyncCount()
             fetchAndUpdateSelectedModulesCount()
-            fetchAndUpdatedUnselectedModulesCount()
             fetchRecordsToUpdateAndDeleteCountIfNecessary()
         }
     }
@@ -79,19 +77,5 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
             ModuleCount(it,
                 subjectLocalDataSource.count(SubjectLocalDataSource.Query(projectId = projectId, moduleId = it)))
         }
-    }
-
-    internal suspend fun fetchAndUpdatedUnselectedModulesCount() {
-        val unselectedModules = subjectLocalDataSource.load(
-            SubjectLocalDataSource.Query(projectId = projectId)
-        ).filter { !preferencesManager.selectedModules.contains(it.moduleId) }
-            .toList()
-            .groupBy { it.moduleId }
-
-        val unselectedModulesWithCount = unselectedModules.map {
-            ModuleCount(it.key, it.value.size)
-        }
-
-        unselectedModulesCountLiveData.value = unselectedModulesWithCount
     }
 }
