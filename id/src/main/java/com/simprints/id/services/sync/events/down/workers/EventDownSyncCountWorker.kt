@@ -110,7 +110,7 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
         } ?: false
     }
 
-    private suspend fun getDownCount(syncScope: EventDownSyncScope) =
+    private suspend fun getDownCount(downSyncScope: EventDownSyncScope) =
         downSyncScope.operations.map {
             val opWithLastState = eventDownSyncScopeRepository.refreshState(it)
             eventDownSyncHelper.countForDownSync(opWithLastState)

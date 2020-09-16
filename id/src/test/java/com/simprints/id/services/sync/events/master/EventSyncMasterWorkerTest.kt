@@ -7,6 +7,7 @@ import androidx.work.WorkInfo.State.BLOCKED
 import androidx.work.WorkInfo.State.ENQUEUED
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
@@ -71,6 +72,7 @@ class EventSyncMasterWorkerTest {
             upSyncWorkerBuilder = mockk(relaxed = true)
             eventSyncCache = mockk(relaxed = true)
             eventSyncSubMasterWorkersBuilder = mockk(relaxed = true)
+            timeHelper = TestTimeHelperImpl()
         }
         mockSubjectsDownSyncSetting(ON)
     }

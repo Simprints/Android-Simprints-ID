@@ -16,10 +16,10 @@ private val fingerIdentifiers = listOf("LEFT_THUMB", "LEFT_INDEX_FINGER", "LEFT_
 fun validateCommonParams(json: JSONObject, type: String) {
     assertThat(json.getString("id")).isNotNull()
     with(json.getJSONObject("labels")) {
-        assertThat(getJSONArray("sessionId").length()).isEqualTo(1)
-        assertThat(getJSONArray("deviceId").length()).isEqualTo(1)
-        assertThat(getJSONArray("projectId").length()).isEqualTo(1)
-        assertThat(json.length()).isEqualTo(3)
+        assertThat(this.getJSONArray("sessionId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("deviceId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("projectId").length()).isEqualTo(1)
+        assertThat(this.length()).isEqualTo(3)
     }
     with(json.getJSONObject("payload")) {
         assertThat(getString("type")).isEqualTo(type)
@@ -286,7 +286,19 @@ fun validateEnrolmentEventApiModel(json: JSONObject) {
 }
 
 fun validateEnrolmentRecordCreationEventApiModel(json: JSONObject) {
-    validateCommonParams(json, "EnrolmentRecordCreation")
+    assertThat(json.getString("id")).isNotNull()
+    with(json.getJSONObject("labels")) {
+        assertThat(this.getJSONArray("subjectId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("projectId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("moduleId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("attendantId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("mode").length()).isEqualTo(2)
+        assertThat(this.length()).isEqualTo(5)
+    }
+    with(json.getJSONObject("payload")) {
+        assertThat(getString("type")).isEqualTo("EnrolmentRecordCreation")
+    }
+    assertThat(json.length()).isEqualTo(3)
 
     with(json.getJSONObject("payload")) {
         assertThat(getInt("version")).isEqualTo(1)
@@ -294,16 +306,29 @@ fun validateEnrolmentRecordCreationEventApiModel(json: JSONObject) {
         assertThat(getString("projectId")).isNotEmpty()
         assertThat(getString("moduleId")).isNotEmpty()
         assertThat(getString("attendantId")).isNotEmpty()
+        assertThat(getLong("startTime"))
         val references = getJSONArray("biometricReferences")
         validateBiometricReferences(references)
 
-        assertThat(length()).isEqualTo(7)
+        assertThat(length()).isEqualTo(8)
     }
 }
 
 
 fun validateEnrolmentRecordDeletionEventApiModel(json: JSONObject) {
-    validateCommonParams(json, "EnrolmentRecordDeletion")
+    assertThat(json.getString("id")).isNotNull()
+    with(json.getJSONObject("labels")) {
+        assertThat(this.getJSONArray("subjectId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("projectId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("moduleId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("attendantId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("mode").length()).isEqualTo(1)
+        assertThat(this.length()).isEqualTo(5)
+    }
+    with(json.getJSONObject("payload")) {
+        assertThat(getString("type")).isEqualTo("EnrolmentRecordDeletion")
+    }
+    assertThat(json.length()).isEqualTo(3)
 
     with(json.getJSONObject("payload")) {
         assertThat(getInt("version")).isEqualTo(1)
@@ -317,7 +342,20 @@ fun validateEnrolmentRecordDeletionEventApiModel(json: JSONObject) {
 
 
 fun validateEnrolmentRecordMoveEventApiModel(json: JSONObject) {
-    validateCommonParams(json, "EnrolmentRecordMove")
+    assertThat(json.getString("id")).isNotNull()
+    with(json.getJSONObject("labels")) {
+        assertThat(this.getJSONArray("subjectId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("projectId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("moduleId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("attendantId").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("mode").length()).isEqualTo(1)
+        assertThat(this.length()).isEqualTo(5)
+    }
+    with(json.getJSONObject("payload")) {
+        assertThat(getString("type")).isEqualTo("EnrolmentRecordMove")
+    }
+    assertThat(json.length()).isEqualTo(3)
+
     with(json.getJSONObject("payload")) {
         assertThat(getInt("version")).isEqualTo(1)
         val creation = getJSONObject("enrolmentRecordCreation")
