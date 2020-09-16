@@ -6,6 +6,7 @@ import android.os.Build.VERSION
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.extentions.safeSealedWhens
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
@@ -104,7 +105,8 @@ class EventRemoteDataSourceImplAndroidTest {
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         eventRemoteDataSource = EventRemoteDataSourceImpl(
-            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device", remoteDbManager)
+            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device", remoteDbManager, JsonHelper()),
+            JsonHelper()
         )
         every { timeHelper.nowMinus(any(), any()) } returns 100
         every { timeHelper.now() } returns 100
@@ -331,7 +333,7 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addPersonCreationEvent() {
-        add(PersonCreationEvent(DEFAULT_TIME, listOf(randomUUID(), randomUUID()), listOf(randomUUID()), eventLabels))
+        add(PersonCreationEvent(DEFAULT_TIME, listOf(randomUUID(), randomUUID()), randomUUID(), listOf(randomUUID()), randomUUID(), eventLabels))
     }
 
     private fun MutableList<Event>.addRefusalEvent() {
@@ -391,7 +393,8 @@ class EventRemoteDataSourceImplAndroidTest {
             Build.MANUFACTURER + "_" + Build.MODEL,
             DefaultTestConstants.GUID1)
 
-        add(SessionCaptureEvent(
+        val event = SessionCaptureEvent(
+            randomUUID(),
             DEFAULT_PROJECT_ID,
             CREATED_AT,
             listOf(FINGERPRINT, FACE),
@@ -399,11 +402,11 @@ class EventRemoteDataSourceImplAndroidTest {
             "libSimprintsVersionName",
             "EN",
             deviceArg,
-            DatabaseInfo(0, 2),
-            Location(0.0, 0.0),
-            "analyticsId",
-            labels = EventLabels(deviceId = DefaultTestConstants.GUID1, projectId = DefaultTestConstants.GUID1)
-        ))
+            DatabaseInfo(0, 2)
+        )
+
+        event.payload.location = Location(0.0, 0.0)
+        event.payload.analyticsId = "analyticsId"
     }
 
     private fun MutableList<Event>.addEnrolmentRecordCreation() {

@@ -16,7 +16,7 @@ class PersonCreationEventTest {
         val labels = EventLabels(sessionId = GUID1)
         val fingerprintCaptureEventIds = listOf(GUID1)
         val faceCaptureEventIds = listOf(GUID2)
-        val event = PersonCreationEvent(CREATED_AT, fingerprintCaptureEventIds, faceCaptureEventIds, labels)
+        val event = PersonCreationEvent(CREATED_AT, fingerprintCaptureEventIds, GUID1, faceCaptureEventIds, GUID2, labels)
 
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
@@ -27,7 +27,9 @@ class PersonCreationEventTest {
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(PERSON_CREATION)
             assertThat(fingerprintCaptureIds).isEqualTo(fingerprintCaptureEventIds)
+            assertThat(fingerprintReferenceId).isEqualTo(GUID1)
             assertThat(faceCaptureEventIds).isEqualTo(faceCaptureEventIds)
+            assertThat(faceReferenceId).isEqualTo(GUID2)
         }
     }
 }

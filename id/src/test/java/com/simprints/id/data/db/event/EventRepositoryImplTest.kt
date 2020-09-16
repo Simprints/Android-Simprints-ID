@@ -9,6 +9,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID3
 import com.simprints.id.commontesttools.events.createAlertScreenEvent
+import com.simprints.id.commontesttools.events.createEnrolmentRecordCreationEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
@@ -23,6 +24,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.event.domain.validators.EventValidator
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
@@ -166,19 +168,20 @@ class EventRepositoryImplTest {
     @Test
     fun upload_shouldCreateTheRightBatches() {
         runBlocking {
-            createMultipleBatches()
+            val events = createMultipleBatchesAndMockDb()
 
             val bathes = (eventRepo as EventRepositoryImpl).createBatches(LocalEventQuery())
 
-            assertThat(bathes.first().events.size).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(bathes[0].events.size).isEqualTo(SESSION_BATCH_SIZE)
             assertThat(bathes[1].events.size).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(bathes[2].events.size).isEqualTo(SESSION_BATCH_SIZE / 2)
         }
     }
 
     @Test
     fun upload_shouldLoadTheRightEventsForBatches() {
         runBlocking {
-            createMultipleBatches()
+            createMultipleBatchesAndMockDb()
 
             eventRepo.uploadEvents(LocalEventQuery()).toList()
 
@@ -191,7 +194,7 @@ class EventRepositoryImplTest {
     @Test
     fun uploadSucceeds_shouldDeleteEvents() {
         runBlocking {
-            val events = createMultipleBatches()
+            val events = createMultipleBatchesAndMockDb()
 
             eventRepo.uploadEvents(LocalEventQuery()).toList()
 
@@ -206,7 +209,7 @@ class EventRepositoryImplTest {
     @Test
     fun upload_shouldEmitProgress() {
         runBlocking {
-            createMultipleBatches()
+            createMultipleBatchesAndMockDb()
 
             val progress = eventRepo.uploadEvents(LocalEventQuery()).toList()
 
@@ -218,7 +221,7 @@ class EventRepositoryImplTest {
     @Test
     fun upload_shouldDeleteUploadedEvents() {
         runBlocking {
-            val events = createMultipleBatches()
+            val events = createMultipleBatchesAndMockDb()
 
             eventRepo.uploadEvents(LocalEventQuery()).toList()
 
@@ -231,7 +234,7 @@ class EventRepositoryImplTest {
     @Test
     fun upload_shouldNotDeleteEventsAfterNetworkIssues() {
         runBlocking {
-            val events = createMultipleBatches()
+            val events = createMultipleBatchesAndMockDb()
             coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("Network issue")
 
             eventRepo.uploadEvents(LocalEventQuery()).toList()
@@ -244,7 +247,7 @@ class EventRepositoryImplTest {
     fun upload_shouldDeleteEventsAfterIntegrationIssues() {
         runBlocking {
             coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(Response.error<String>(404, "".toResponseBody(null)))
-            val events = createMultipleBatches()
+            val events = createMultipleBatchesAndMockDb()
 
             eventRepo.uploadEvents(LocalEventQuery()).toList()
 
@@ -254,17 +257,34 @@ class EventRepositoryImplTest {
         }
     }
 
-    private suspend fun createMultipleBatches(): List<Event> {
+    private suspend fun createMultipleBatchesAndMockDb(): List<Event> =
+        createSessionEventsAndMockDb() + createRecordEventsAndMockDb()
+
+    private fun createSessionEventsAndMockDb(): List<Event> {
         val smallSession1Events = mockSessionWithEvent(GUID1, SESSION_BATCH_SIZE / 2 - 1)
         val smallSession2Events = mockSessionWithEvent(GUID2, SESSION_BATCH_SIZE / 2 - 1)
         val bigSessionEvents = mockSessionWithEvent(GUID3, SESSION_BATCH_SIZE - 1)
+
         val events = smallSession1Events + smallSession2Events + bigSessionEvents
 
         coEvery {
             eventLocalDataSource.load(DbLocalEventQuery(projectId = DEFAULT_PROJECT_ID, type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE)))
-        } returns events.filterIsInstance<SessionCaptureEvent>().asFlow()
+        } returns (smallSession1Events + smallSession2Events + bigSessionEvents).filterIsInstance<SessionCaptureEvent>().asFlow()
 
         return events
+    }
+
+    private suspend fun createRecordEventsAndMockDb(): List<Event> {
+        val events = mutableListOf<EnrolmentRecordCreationEvent>()
+        (0 until SESSION_BATCH_SIZE / 2).forEach { _ ->
+            events += createEnrolmentRecordCreationEvent()
+        }
+
+        coEvery {
+            eventLocalDataSource.load(DbLocalEventQuery())
+        } returns events.asFlow()
+
+        return events.toList()
     }
 
     private fun mockSessionWithEvent(sessionId: String, nEvents: Int): List<Event> {

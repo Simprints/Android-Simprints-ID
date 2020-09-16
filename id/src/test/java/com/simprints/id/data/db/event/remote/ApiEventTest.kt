@@ -199,7 +199,7 @@ class ApiEventTest {
     }
 
     @Test
-    fun validate_EnrolmentRecordCreationEventApiModel() {
+    fun validate_enrolmentRecordCreationEventApiModel() {
         val event = createEnrolmentRecordCreationEvent()
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
@@ -209,7 +209,7 @@ class ApiEventTest {
     }
 
     @Test
-    fun validate_EnrolmentRecordMoveEventApiModel() {
+    fun validate_enrolmentRecordMoveEventApiModel() {
         val event = createEnrolmentRecordMoveEvent()
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
@@ -219,7 +219,7 @@ class ApiEventTest {
     }
 
     @Test
-    fun validate_EnrolmentRecordDeletionEventApiModel() {
+    fun validate_enrolmentRecordDeletionEventApiModel() {
         val event = createEnrolmentRecordDeletionEvent()
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
@@ -328,7 +328,7 @@ class ApiEventTest {
     }
 
     @Test
-    fun validate_ScannerFirmwareUpdateEvent() {
+    fun validate_scannerFirmwareUpdateEvent() {
         val event = createScannerFirmwareUpdateEvent()
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
@@ -395,9 +395,9 @@ class ApiEventTest {
     fun enforceThatAnyTestHasATest() {
         val type: ApiEventPayloadType? = null
         when (type) {
-            EnrolmentRecordCreation -> validate_EnrolmentRecordCreationEventApiModel()
-            EnrolmentRecordDeletion -> validate_EnrolmentRecordDeletionEventApiModel()
-            EnrolmentRecordMove -> validate_EnrolmentRecordMoveEventApiModel()
+            EnrolmentRecordCreation -> validate_enrolmentRecordCreationEventApiModel()
+            EnrolmentRecordDeletion -> validate_enrolmentRecordDeletionEventApiModel()
+            EnrolmentRecordMove -> validate_enrolmentRecordMoveEventApiModel()
             Callout -> Throwable("Callout has multiple version - there is a version for each")
             Callback -> Throwable("Callback has multiple version - there is a version for each")
             ArtificialTermination -> validate_artificialTerminationEventApiModel()
@@ -416,7 +416,7 @@ class ApiEventTest {
             CandidateRead -> validate_candidateReadEventApiModel()
             ScannerConnection -> validate_scannerConnectionEventApiModel()
             Vero2InfoSnapshot -> validate_vero2InfoSnapshotEvent()
-            ScannerFirmwareUpdate -> validate_ScannerFirmwareUpdateEvent()
+            ScannerFirmwareUpdate -> validate_scannerFirmwareUpdateEvent()
             InvalidIntent -> validate_IntentParsingEventApiModel()
             SuspiciousIntent -> validate_suspiciousIntentEventApiModel()
             IntentParsing -> validate_IntentParsingEventApiModel()

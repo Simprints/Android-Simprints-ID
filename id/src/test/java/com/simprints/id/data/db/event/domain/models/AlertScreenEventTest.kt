@@ -6,8 +6,8 @@ import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.EventType.ALERT_SCREEN
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
 import org.junit.Test
 
 class AlertScreenEventTest {
@@ -22,7 +22,7 @@ class AlertScreenEventTest {
         with(event.payload as AlertScreenPayload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
             assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
-            assertThat(eventVersion).isEqualTo(EnrolmentRecordMoveEvent.EVENT_VERSION)
+            assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(ALERT_SCREEN)
             assertThat(alertType).isEqualTo(BLUETOOTH_NOT_ENABLED)
         }

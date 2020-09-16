@@ -102,54 +102,61 @@ fun createFaceCaptureRetryEvent() = FaceCaptureRetryEvent(CREATED_AT, ENDED_AT, 
 fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(CREATED_AT, ENDED_AT, eventLabels)
 
 fun createSessionCaptureEvent(id: String = GUID1): SessionCaptureEvent {
+    val appVersionNameArg = "appVersionName"
+    val libSimprintsVersionNameArg = "libSimprintsVersionName"
+    val languageArg = "language"
     val deviceArg = Device(
         Build.VERSION.SDK_INT.toString(),
         Build.MANUFACTURER + "_" + Build.MODEL,
         GUID1)
 
+    val databaseInfoArg = DatabaseInfo(2, 2)
+    val locationArg = Location(0.0, 0.0)
+
     return SessionCaptureEvent(
+        id,
         DEFAULT_PROJECT_ID,
         CREATED_AT,
-        listOf(FACE, FINGERPRINT),
-        "appVersionName",
-        "libSimprintsVersionName",
-        "EN",
+        listOf(FINGERPRINT, FACE),
+        appVersionNameArg,
+        libSimprintsVersionNameArg,
+        languageArg,
         deviceArg,
-        DatabaseInfo(0, 2),
-        Location(0.0, 0.0),
-        id = id,
-        labels = EventLabels(deviceId = GUID1, projectId = GUID1)
-    )
+        databaseInfoArg).apply {
+            payload.location = locationArg
+            payload.analyticsId = GUID1
+            payload.endedAt = ENDED_AT
+        }
 }
 
 
 fun buildFakeBiometricReferences(): List<BiometricReference> {
-    val fingerprintReference = FingerprintReference(listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
-    val faceReference = FaceReference(listOf(FaceTemplate("some_template")))
+    val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
+    val faceReference = FaceReference(GUID2, listOf(FaceTemplate("some_template")))
     return listOf(fingerprintReference, faceReference)
 }
 
 fun createEnrolmentRecordCreationEvent() =
     EnrolmentRecordCreationEvent(
         CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(),
-        eventLabels.copy(subjectId = GUID1))
+        eventLabels.copy(sessionId = null, subjectId = GUID1))
 
 fun createEnrolmentRecordDeletionEvent() =
     EnrolmentRecordDeletionEvent(
         CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID,
-        eventLabels.copy(subjectId = GUID1))
+        eventLabels.copy(sessionId = null, subjectId = GUID1))
 
 fun createEnrolmentRecordMoveEvent() =
     EnrolmentRecordMoveEvent(
         CREATED_AT,
         EnrolmentRecordCreationInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, createBiometricReferences()),
         EnrolmentRecordDeletionInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID),
-        eventLabels.copy(subjectId = GUID1)
+        eventLabels.copy(sessionId = null, subjectId = GUID1)
     )
 
 fun createBiometricReferences(): List<BiometricReference> {
-    val fingerprintReference = FingerprintReference(listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
-    val faceReference = FaceReference(listOf(FaceTemplate("some_template")))
+    val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
+    val faceReference = FaceReference(GUID2, listOf(FaceTemplate("some_template")))
     return listOf(fingerprintReference, faceReference)
 }
 
@@ -193,7 +200,7 @@ fun createOneToOneMatchEvent(): OneToOneMatchEvent {
     return OneToOneMatchEvent(CREATED_AT, ENDED_AT, GUID1, RANK_ONE, matchEntry, eventLabels)
 }
 
-fun createPersonCreationEvent() = PersonCreationEvent(CREATED_AT, listOf(GUID1, GUID2), listOf(GUID1, GUID2), eventLabels)
+fun createPersonCreationEvent() = PersonCreationEvent(CREATED_AT, listOf(GUID1, GUID2), GUID1, listOf(GUID1, GUID2), GUID2, eventLabels)
 
 fun createRefusalEvent() = RefusalEvent(CREATED_AT, ENDED_AT, OTHER, "other_text", eventLabels)
 

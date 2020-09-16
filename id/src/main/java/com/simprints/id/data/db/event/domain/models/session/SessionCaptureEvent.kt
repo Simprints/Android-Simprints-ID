@@ -6,7 +6,6 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import com.simprints.id.domain.modality.Modes
 import java.util.*
 
@@ -21,36 +20,31 @@ data class SessionCaptureEvent(
     fun isOpen(): Boolean =
         payload.endedAt == 0L
 
-    constructor(projectId: String,
+    constructor(id: String,
+                projectId: String,
                 createdAt: Long,
                 modalities: List<Modes>,
                 appVersionName: String,
-                libVersionName: String = "",
+                libVersionName: String,
                 language: String,
                 device: Device,
                 databaseInfo: DatabaseInfo,
-                location: Location? = null,
-                analyticsId: String? = null,
-                id: String = UUID.randomUUID().toString(),
-                labels: EventLabels = EventLabels(sessionId = id)) :
+                extraLabels: EventLabels = EventLabels()) :
         this(
             id,
             SESSION_CAPTURE,
-            labels,
+            extraLabels.copy(sessionId = id, deviceId = device.deviceId, projectId = projectId, mode = modalities),
             SessionCapturePayload(
                 EVENT_VERSION,
                 id,
                 projectId,
                 createdAt,
-                0,
                 modalities,
                 appVersionName,
                 libVersionName,
-                analyticsId,
                 language,
                 device,
-                databaseInfo,
-                location)) {
+                databaseInfo)) {
 
         // Ensure that sessionId is equal to the id
         this.labels = labels.copy(sessionId = id)
@@ -62,15 +56,16 @@ data class SessionCaptureEvent(
         val id: String,
         var projectId: String,
         override val createdAt: Long,
-        override var endedAt: Long = 0,
         val modalities: List<Modes>,
         val appVersionName: String,
         val libVersionName: String,
-        var analyticsId: String?,
         val language: String,
         val device: Device,
         val databaseInfo: DatabaseInfo,
         var location: Location? = null,
+        var analyticsId: String? = null,
+        override var endedAt: Long = 0,
+        var uploadedAt: Long = 0,
         override val type: EventType = SESSION_CAPTURE
     ) : EventPayload()
 
