@@ -3,17 +3,9 @@ package com.simprints.id.data.db.event.remote.models.callback
 import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
 import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason
 import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.*
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.BLUETOOTH_NOT_SUPPORTED
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.DIFFERENT_PROJECT_ID_SIGNED_IN
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.DIFFERENT_USER_ID_SIGNED_IN
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.ENROLMENT_LAST_BIOMETRICS_FAILED
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.FACE_LICENSE_INVALID
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.FACE_LICENSE_MISSING
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.GUID_NOT_FOUND_ONLINE
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.LOGIN_NOT_COMPLETE
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.UNEXPECTED_ERROR
 import com.simprints.id.data.db.event.remote.models.callback.ApiErrorCallback.ApiReason
-import com.simprints.id.data.db.event.remote.models.callback.ApiErrorCallback.ApiReason.*
+import com.simprints.id.data.db.event.remote.models.callback.ApiErrorCallback.ApiReason.GUID_NOT_FOUND_OFFLINE
+import com.simprints.id.data.db.event.remote.models.callback.ApiErrorCallback.ApiReason.SCANNER_LOW_BATTERY
 import io.realm.internal.Keep
 
 @Keep
@@ -30,8 +22,7 @@ data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType
         BLUETOOTH_NOT_SUPPORTED,
         @Deprecated("User can't leave the app anymore in case of SCANNER_LOW_BATTERY. He exits through the ExitForm.")
         SCANNER_LOW_BATTERY,
-        @Deprecated("Fingerprint module doesn't triggers it anymore")
-        UNKNOWN_BLUETOOTH_ISSUE,
+
         LOGIN_NOT_COMPLETE,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
         FACE_LICENSE_MISSING,
@@ -66,7 +57,6 @@ fun ApiReason.fromApiToDomain(): Reason =
         ApiReason.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
         ApiReason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
         SCANNER_LOW_BATTERY -> UNEXPECTED_ERROR
-        UNKNOWN_BLUETOOTH_ISSUE -> UNEXPECTED_ERROR
         ApiReason.LOGIN_NOT_COMPLETE -> LOGIN_NOT_COMPLETE
         ApiReason.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
         ApiReason.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING

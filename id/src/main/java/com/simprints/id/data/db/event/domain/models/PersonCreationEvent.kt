@@ -3,10 +3,10 @@ package com.simprints.id.data.db.event.domain.models
 import androidx.annotation.Keep
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.db.event.domain.models.EventType.PERSON_CREATION
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
+import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
+import com.simprints.id.data.db.subject.domain.uniqueId
 import com.simprints.id.tools.time.TimeHelper
 import java.util.*
 
@@ -21,22 +21,26 @@ data class PersonCreationEvent(
     constructor(
         startTime: Long,
         fingerprintCaptureIds: List<String>,
+        fingerprintReferenceId: String?,
         faceCaptureIds: List<String>,
+        faceReferenceId: String?,
         labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
     ) : this(
         UUID.randomUUID().toString(),
         labels,
-        PersonCreationPayload(startTime, EVENT_VERSION, fingerprintCaptureIds, faceCaptureIds),
+        PersonCreationPayload(startTime, EVENT_VERSION, fingerprintCaptureIds, fingerprintReferenceId, faceCaptureIds, faceReferenceId),
         PERSON_CREATION)
 
 
-    // At the end of the sequence of capture, we build a Person object used either for enrolment or verification/identification
+    // At the end of the sequence of capture, we build a Person object used either for enrolment, verification or identification
     @Keep
     data class PersonCreationPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
         val fingerprintCaptureIds: List<String>,
+        val fingerprintReferenceId: String?,
         val faceCaptureIds: List<String>,
+        val faceReferenceId: String?,
         override val type: EventType = PERSON_CREATION,
         override val endedAt: Long = 0
     ) : EventPayload()
@@ -44,46 +48,43 @@ data class PersonCreationEvent(
     companion object {
         fun build(
             timeHelper: TimeHelper,
-            currentSession: SessionCaptureEvent,
-            fingerprintSamples: List<FingerprintSample>?,
-            faceSamples: List<FaceSample>?
+            faceCaptureEvents: List<FaceCaptureEvent>,
+            fingerprintCaptureEvents: List<FingerprintCaptureEvent>,
+            faceSamplesForPersonCreation: List<FaceSample>?,
+            fingerprintSamplesForPersonCreation: List<FingerprintSample>?
         ) = PersonCreationEvent(
             startTime = timeHelper.now(),
             fingerprintCaptureIds = extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
-                currentSession,
-                fingerprintSamples?.map { EncodingUtils.byteArrayToBase64(it.template) }
+                fingerprintCaptureEvents,
+                fingerprintSamplesForPersonCreation?.map { EncodingUtils.byteArrayToBase64(it.template) }
             ),
+            fingerprintReferenceId = fingerprintSamplesForPersonCreation?.uniqueId(),
             faceCaptureIds = extractFaceCaptureEventIdsBasedOnPersonTemplate(
-                currentSession,
-                faceSamples?.map { EncodingUtils.byteArrayToBase64(it.template) }
-            )
+                faceCaptureEvents,
+                faceSamplesForPersonCreation?.map { EncodingUtils.byteArrayToBase64(it.template) }
+            ),
+            faceReferenceId = faceSamplesForPersonCreation?.uniqueId()
         )
 
-        //STOPSHIP
-        // It extracts CaptureEvents Ids with the templates used to create the "Person" object for
-        // identification, verification, enrolment.
         private fun extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
-            sessionEvents: SessionCaptureEvent,
+            captureEvents: List<FingerprintCaptureEvent>,
             personTemplates: List<String>?
-        ): List<String> = emptyList()
-//            sessionEvents.getEvents()
-//            .filterIsInstance(FingerprintCaptureEvent::class.java)
-//            .filter {
-//                personTemplates?.contains(it.fingerprint?.template) ?: false
-//                    && it.result != FingerprintCaptureEvent.Result.SKIPPED
-//            }.map { it.id }
+        ): List<String> =
+            captureEvents
+                .filter {
+                    personTemplates?.contains(it.payload.fingerprint?.template) ?: false
+                        && it.payload.result != FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
+                }.map { it.id }
 
         private fun extractFaceCaptureEventIdsBasedOnPersonTemplate(
-            sessionEvents: SessionCaptureEvent,
+            captureEvents: List<FaceCaptureEvent>,
             personTemplates: List<String>?
-        ): List<String> = emptyList()
-//            sessionEvents.getEvents()
-//            .filterIsInstance(FaceCaptureEvent::class.java)
-//            .filter {
-//                personTemplates?.contains(it.face?.template) ?: false
-//            }.map { it.id }
+        ): List<String> =
+            captureEvents
+                .filter {
+                    personTemplates?.contains(it.payload.face?.template) ?: false
+                }.map { it.id }
 
         const val EVENT_VERSION = 1
-
     }
 }
