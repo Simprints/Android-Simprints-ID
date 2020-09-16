@@ -35,7 +35,6 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     private lateinit var viewModel: SyncInformationViewModel
     private lateinit var selectedModulesTabSpec: TabHost.TabSpec
-    private lateinit var unselectedModulesTabSpec: TabHost.TabSpec
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,11 +114,6 @@ class SyncInformationActivity : BaseSplitActivity() {
             adapter = moduleCountAdapterForSelected
             layoutManager = LinearLayoutManager(applicationContext)
         }
-
-        with(unselectedModulesView) {
-            adapter = moduleCountAdapterForUnselected
-            layoutManager = LinearLayoutManager(applicationContext)
-        }
     }
 
     private fun isModuleSyncAndModuleIdOptionsNotEmpty() =
@@ -137,10 +131,6 @@ class SyncInformationActivity : BaseSplitActivity() {
             .setIndicator(getString(R.string.sync_info_selected_modules))
             .setContent(R.id.selectedModulesView)
 
-        unselectedModulesTabSpec = modulesTabHost.newTabSpec(UNSELECTED_MODULES_TAB_TAG)
-            .setIndicator(getString(R.string.sync_info_unselected_modules))
-            .setContent(R.id.unselectedModulesView)
-
         modulesTabHost.addTab(selectedModulesTabSpec)
     }
 
@@ -156,7 +146,6 @@ class SyncInformationActivity : BaseSplitActivity() {
         observeDownSyncRecordCount()
         observeDeleteRecordCount()
         observeSelectedModules()
-        observeUnselectedModules()
         observeNumberOfImagesToUploadCount()
     }
 
@@ -187,17 +176,6 @@ class SyncInformationActivity : BaseSplitActivity() {
     private fun observeSelectedModules() {
         viewModel.selectedModulesCountLiveData.observe(this, Observer {
             addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
-        })
-    }
-
-    private fun observeUnselectedModules() {
-        viewModel.unselectedModulesCountLiveData.observe(this, Observer {
-            if (it.isEmpty()) {
-                removeUnselectedModulesTab()
-            } else {
-                addUnselectedModulesTabIfNecessary()
-                addTotalRowAndSubmitList(it, moduleCountAdapterForUnselected)
-            }
         })
     }
 
@@ -240,18 +218,6 @@ class SyncInformationActivity : BaseSplitActivity() {
         moduleCountsArray.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)
 
         moduleCountAdapter.submitList(moduleCountsArray)
-    }
-
-    private fun removeUnselectedModulesTab() {
-        with(modulesTabHost.tabWidget) {
-            removeView(getChildTabViewAt(UNSELECTED_MODULES_TAB_INDEX))
-        }
-    }
-
-    private fun addUnselectedModulesTabIfNecessary() {
-        if (modulesTabHost.tabWidget.tabCount != MAX_MODULES_TAB_COUNT) {
-            modulesTabHost.addTab(unselectedModulesTabSpec)
-        }
     }
 
     private fun observeForSyncState() {
