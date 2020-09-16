@@ -58,7 +58,7 @@ const val DEFAULT_ENDED_AT: Long = 0L
 val CREATED_AT_RANGE = LongRange(CREATED_AT - 10, CREATED_AT + 10)
 val ENDED_AT_RANGE = LongRange(ENDED_AT - 10, ENDED_AT + 10)
 
-val eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = GUID1)
+val eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = DEFAULT_PROJECT_ID)
 
 fun createConfirmationCallbackEvent() = ConfirmationCallbackEvent(CREATED_AT, true, eventLabels)
 
@@ -139,19 +139,19 @@ fun buildFakeBiometricReferences(): List<BiometricReference> {
 fun createEnrolmentRecordCreationEvent() =
     EnrolmentRecordCreationEvent(
         CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(),
-        eventLabels.copy(sessionId = null, subjectId = GUID1))
+        EventLabels(sessionId = null, projectId = DEFAULT_PROJECT_ID, subjectId = GUID1))
 
 fun createEnrolmentRecordDeletionEvent() =
     EnrolmentRecordDeletionEvent(
         CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID,
-        eventLabels.copy(sessionId = null, subjectId = GUID1))
+        EventLabels(sessionId = null, projectId = DEFAULT_PROJECT_ID, subjectId = GUID1, mode = listOf(FINGERPRINT)))
 
 fun createEnrolmentRecordMoveEvent() =
     EnrolmentRecordMoveEvent(
         CREATED_AT,
         EnrolmentRecordCreationInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, createBiometricReferences()),
         EnrolmentRecordDeletionInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID),
-        eventLabels.copy(sessionId = null, subjectId = GUID1)
+        EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(DEFAULT_MODULE_ID), attendantId = GUID1, mode = listOf(FINGERPRINT))
     )
 
 fun createBiometricReferences(): List<BiometricReference> {

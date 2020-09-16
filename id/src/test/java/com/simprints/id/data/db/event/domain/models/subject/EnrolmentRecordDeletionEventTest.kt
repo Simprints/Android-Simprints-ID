@@ -19,7 +19,7 @@ class EnrolmentRecordDeletionEventTest {
         val event = EnrolmentRecordDeletionEvent(CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, GUID2)
 
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).isEqualTo(EventLabels())
+        assertThat(event.labels).isEqualTo(EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(DEFAULT_MODULE_ID), attendantId = GUID2))
         assertThat(event.type).isEqualTo(ENROLMENT_RECORD_DELETION)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

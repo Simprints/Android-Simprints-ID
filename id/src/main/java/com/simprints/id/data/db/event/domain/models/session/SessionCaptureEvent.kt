@@ -33,7 +33,7 @@ data class SessionCaptureEvent(
         this(
             id,
             SESSION_CAPTURE,
-            extraLabels.copy(sessionId = id, deviceId = device.deviceId, projectId = projectId, mode = modalities),
+            extraLabels.copy(sessionId = id, deviceId = device.deviceId, projectId = projectId),
             SessionCapturePayload(
                 EVENT_VERSION,
                 id,

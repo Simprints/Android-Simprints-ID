@@ -82,17 +82,6 @@ class EventDownSyncCountWorkerTest {
     }
 
     @Test
-    fun countWorker_anUnexpectedErrorOccurs_shouldFail() {
-        runBlocking {
-            coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope() } throws Throwable("Impossible to extract downSyncScope")
-
-            countWorker.doWork()
-
-            verify { countWorker.resultSetter.failure() }
-        }
-    }
-
-    @Test
     fun countWorkerFailed_syncStillRunning_shouldRetry() {
         runBlocking {
             coEvery { countWorker.eventDownSyncHelper.countForDownSync(any()) } throws Throwable("IO Error")

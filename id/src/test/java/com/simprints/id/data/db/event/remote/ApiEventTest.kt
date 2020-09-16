@@ -391,7 +391,7 @@ class ApiEventTest {
     }
 
 
-    // Never invoked, but used to enforce that the implementation of a test for every event class
+    // Never invoked, but used to enforce the implementation of a test for every event event class
     fun enforceThatAnyTestHasATest() {
         val type: ApiEventPayloadType? = null
         when (type) {
