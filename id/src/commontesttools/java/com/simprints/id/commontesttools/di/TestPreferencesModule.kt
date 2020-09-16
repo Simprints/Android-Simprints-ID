@@ -36,7 +36,9 @@ class TestPreferencesModule(
         captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
         scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
-        fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>
+        fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>,
+        fingerprintConfidenceThresholdsSerializer: Serializer<Map<FingerprintConfidenceThresholds, Int>>,
+        faceConfidenceThresholdsSerializer: Serializer<Map<FaceConfidenceThresholds, Int>>
     ): SettingsPreferencesManager = settingsPreferencesManagerRule.resolveDependency {
         super.provideSettingsPreferencesManager(
             prefs,
@@ -49,7 +51,9 @@ class TestPreferencesModule(
             captureFingerprintStrategySerializer,
             saveFingerprintImagesStrategySerializer,
             scannerGenerationsSerializer,
-            fingerprintsToCollectSerializer
+            fingerprintsToCollectSerializer,
+            fingerprintConfidenceThresholdsSerializer,
+            faceConfidenceThresholdsSerializer
         )
     }
 

@@ -49,6 +49,9 @@ interface SettingsPreferencesManager {
     var faceNbOfFramesCaptured: Int
     var faceMatchThreshold: Float
 
+    var fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>
+    var faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>
+
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
     fun getRemoteConfigFingerprintsToCollect(): List<FingerIdentifier>

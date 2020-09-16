@@ -9,6 +9,7 @@ import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class SecurityStateWorker(
@@ -32,7 +33,7 @@ class SecurityStateWorker(
             success()
         } catch (t: Throwable) {
             crashReportManager.logExceptionOrSafeException(t)
-            retry()
+            success()
         }
     }
 

@@ -33,7 +33,9 @@ open class SettingsPreferencesManagerImpl(
     captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
     saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
     scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
-    private val fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>
+    private val fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>,
+    fingerprintConfidenceThresholdsSerializer: Serializer<Map<FingerprintConfidenceThresholds, Int>>,
+    faceConfidenceThresholdsSerializer: Serializer<Map<FaceConfidenceThresholds, Int>>
 ) : SettingsPreferencesManager {
 
     /**
@@ -323,6 +325,24 @@ open class SettingsPreferencesManagerImpl(
             FACE_MATCH_THRESHOLD_DEFAULT
         )
 
+    override var fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>
+        by RemoteConfigComplexPreference(
+            prefs,
+            remoteConfigWrapper,
+            FINGERPRINT_CONFIDENCE_THRESHOLDS,
+            FINGERPRINT_CONFIDENCE_THRESHOLDS_DEFAULT,
+            fingerprintConfidenceThresholdsSerializer
+        )
+
+    override var faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>
+        by RemoteConfigComplexPreference(
+            prefs,
+            remoteConfigWrapper,
+            FACE_CONFIDENCE_THRESHOLDS,
+            FACE_CONFIDENCE_THRESHOLDS_DEFAULT,
+            faceConfidenceThresholdsSerializer
+        )
+
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()
     }
@@ -422,6 +442,20 @@ open class SettingsPreferencesManagerImpl(
         const val FACE_NB_OF_FRAMES_CAPTURED_DEFAULT = 2
         const val FACE_MATCH_THRESHOLD = "FaceMatchThreshold"
         const val FACE_MATCH_THRESHOLD_DEFAULT = 0f
+
+        const val FINGERPRINT_CONFIDENCE_THRESHOLDS = "FingerprintConfidenceThresholds"
+        val FINGERPRINT_CONFIDENCE_THRESHOLDS_DEFAULT = mapOf(
+            FingerprintConfidenceThresholds.LOW to 0,
+            FingerprintConfidenceThresholds.MEDIUM to 0,
+            FingerprintConfidenceThresholds.HIGH to 700
+        )
+
+        const val FACE_CONFIDENCE_THRESHOLDS = "FaceConfidenceThresholds"
+        val FACE_CONFIDENCE_THRESHOLDS_DEFAULT = mapOf(
+            FaceConfidenceThresholds.LOW to 0,
+            FaceConfidenceThresholds.MEDIUM to 0,
+            FaceConfidenceThresholds.HIGH to 700
+        )
     }
 
 }

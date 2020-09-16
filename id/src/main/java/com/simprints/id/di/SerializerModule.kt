@@ -1,6 +1,7 @@
 package com.simprints.id.di
 
-import com.simprints.core.tools.json.JsonHelper
+import androidx.room.PrimaryKey
+import com.google.gson.Gson
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
@@ -9,7 +10,10 @@ import com.simprints.id.data.prefs.settings.fingerprint.serializers.Fingerprints
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.ScannerGenerationsSerializer
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
+import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
+import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
+import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
+import com.simprints.id.tools.json.SimJsonHelper
 import com.simprints.id.tools.serializers.*
 import dagger.Module
 import dagger.Provides
@@ -28,6 +32,11 @@ class SerializerModule {
 
     @Provides
     @Singleton
+    @Named("IntSerializer")
+    fun provideIntegerSerializer(): Serializer<Int> = IntegerSerializer()
+
+    @Provides
+    @Singleton
     @Named("FingerIdentifierSerializer")
     fun provideFingerIdentifierSerializer(): Serializer<FingerIdentifier> = EnumSerializer(FingerIdentifier::class.java)
 
@@ -43,12 +52,42 @@ class SerializerModule {
 
     @Provides
     @Singleton
+    @Named("FingerprintConfidenceSerializer")
+    fun provideFingerprintConfidenceSerializer(): Serializer<FingerprintConfidenceThresholds> =
+        EnumSerializer(FingerprintConfidenceThresholds::class.java)
+
+    @Provides
+    @Singleton
+    @Named("FaceConfidenceSerializer")
+    fun provideFaceConfidenceSerializer(): Serializer<FaceConfidenceThresholds> =
+        EnumSerializer(FaceConfidenceThresholds::class.java)
+
+    @Provides
+    @Singleton
     @Named("ModalitiesSerializer")
     fun provideModalSerializer(): Serializer<List<Modality>> = ModalitiesListSerializer()
 
     @Provides
     @Singleton
     fun provideJsonHelper(): JsonHelper = JsonHelper()
+
+    @Provides
+    @Singleton
+    @Named("FingerprintConfidenceThresholdsSerializer")
+    fun provideFingerprintConfidenceThresholdsSerializer(
+        @Named("FingerprintConfidenceSerializer") fingerprintConfidenceSerializer: Serializer<FingerprintConfidenceThresholds>,
+        @Named("IntSerializer") intSerializer: Serializer<Int>,
+        gson: Gson
+    ): Serializer<Map<FingerprintConfidenceThresholds, Int>> = MapSerializer(fingerprintConfidenceSerializer, intSerializer, gson)
+
+    @Provides
+    @Singleton
+    @Named("FaceConfidenceThresholdsSerializer")
+    fun provideFaceConfidenceThresholdsSerializer(
+        @Named("FaceConfidenceSerializer") faceConfidenceThresholdsSerializer: Serializer<FaceConfidenceThresholds>,
+        @Named("IntSerializer") intSerializer: Serializer<Int>,
+        gson: Gson
+    ): Serializer<Map<FaceConfidenceThresholds, Int>> = MapSerializer(faceConfidenceThresholdsSerializer, intSerializer, gson)
 
     @Provides
     @Singleton

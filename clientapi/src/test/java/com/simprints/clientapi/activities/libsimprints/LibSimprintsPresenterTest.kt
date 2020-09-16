@@ -10,6 +10,7 @@ import com.simprints.clientapi.domain.responses.EnrolResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
@@ -174,8 +175,8 @@ class LibSimprintsPresenterTest {
 
     @Test
     fun handleIdentification_ShouldReturnValidIdentification() {
-        val id1 = MatchResult(UUID.randomUUID().toString(), 100, TIER_1)
-        val id2 = MatchResult(UUID.randomUUID().toString(), 15, TIER_5)
+        val id1 = MatchResult(UUID.randomUUID().toString(), 100, TIER_1, MatchConfidence.HIGH)
+        val id2 = MatchResult(UUID.randomUUID().toString(), 15, TIER_5, MatchConfidence.LOW)
         val expectedReturnedList = arrayListOf(id1, id2)
         val sessionId = UUID.randomUUID().toString()
 
@@ -192,7 +193,7 @@ class LibSimprintsPresenterTest {
                 withArg { listOfIdentificationsReturned ->
                     expectedReturnedList.forEach { expected ->
                         listOfIdentificationsReturned.find {
-                            it.confidence == expected.confidence.toFloat() &&
+                            it.confidence == expected.confidenceScore.toFloat() &&
                                 it.guid == expected.guidFound &&
                                 it.tier.name == expected.tier.name
                         }
@@ -207,7 +208,7 @@ class LibSimprintsPresenterTest {
 
     @Test
     fun handleVerification_ShouldReturnValidVerification() {
-        val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
+        val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1, MatchConfidence.HIGH))
         val sessionId = UUID.randomUUID().toString()
 
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns sessionId
@@ -224,7 +225,7 @@ class LibSimprintsPresenterTest {
         }
 
         val libVerification = Verification(
-            verification.matchResult.confidence,
+            verification.matchResult.confidenceScore,
             Tier.valueOf(verification.matchResult.tier.name),
             verification.matchResult.guidFound)
 

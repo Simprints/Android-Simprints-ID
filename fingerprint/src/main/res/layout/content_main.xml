@@ -29,17 +29,6 @@
             android:layout_marginRight="40dp"
             android:layout_weight="5" />
 
-        <ProgressBar
-            android:id="@+id/pb_timeout"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
-            android:maxHeight="10dip"
-            android:minHeight="10dp"
-            android:progressDrawable="@drawable/timer_progress_bar" />
-
         <TextView
             android:id="@+id/missingFingerText"
             android:layout_width="wrap_content"

@@ -10,6 +10,7 @@ import com.simprints.clientapi.integration.AppMatchResult
 import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFICATIONS
 import com.simprints.libsimprints.Identification
+import com.simprints.moduleapi.app.responses.IAppMatchConfidence
 import com.simprints.moduleapi.app.responses.IAppMatchResult
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 import org.junit.Test
@@ -22,7 +23,7 @@ class CommCareIdentifyResponseTest : BaseCommCareClientApiTest() {
     @Test
     fun appModuleSendsAnIdentifyAppResponse_shouldReturnACommCareIdentifyResponse() {
         val appIdentifyResponse = AppIdentifyResponse(listOf(
-            AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1)
+            AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1, IAppMatchConfidence.HIGH)
         ), "session_id")
         mockAppModuleResponse(appIdentifyResponse, APP_IDENTIFY_ACTION)
 
@@ -47,7 +48,7 @@ class CommCareIdentifyResponseTest : BaseCommCareClientApiTest() {
     }
 
     private fun assertEqualIdentification(identification: Identification, appMatchResult: IAppMatchResult) {
-        assertThat(identification.confidence.toLong()).isEqualTo(appMatchResult.confidence.toLong())
+        assertThat(identification.confidence.toLong()).isEqualTo(appMatchResult.confidenceScore.toLong())
         assertThat(identification.guid).isEqualTo(appMatchResult.guid)
         assertThat(identification.tier.name).isEqualTo(appMatchResult.tier.name)
     }
