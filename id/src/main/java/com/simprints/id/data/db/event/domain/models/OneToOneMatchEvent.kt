@@ -1,9 +1,7 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-
 import com.simprints.id.data.db.event.domain.models.EventType.ONE_TO_ONE_MATCH
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -20,7 +18,7 @@ data class OneToOneMatchEvent(
         candidateId: String,
         matcher: Matcher,
         result: MatchEntry?,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,

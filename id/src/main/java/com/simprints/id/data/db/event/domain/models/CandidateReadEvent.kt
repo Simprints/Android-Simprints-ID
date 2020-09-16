@@ -2,7 +2,6 @@ package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.EventType.CANDIDATE_READ
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -19,7 +18,7 @@ data class CandidateReadEvent(
         candidateId: String,
         localResult: CandidateReadPayload.LocalResult,
         remoteResult: CandidateReadPayload.RemoteResult?,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,

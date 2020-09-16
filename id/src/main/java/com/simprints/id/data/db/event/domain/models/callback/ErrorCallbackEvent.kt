@@ -22,7 +22,7 @@ data class ErrorCallbackEvent(
     constructor(
         createdAt: Long,
         reason: ErrorCallbackPayload.Reason,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,

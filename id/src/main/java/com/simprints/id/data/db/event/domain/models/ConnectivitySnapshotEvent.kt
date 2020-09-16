@@ -1,9 +1,7 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-
 import com.simprints.id.data.db.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import java.util.*
@@ -20,7 +18,7 @@ data class ConnectivitySnapshotEvent(
         createdAt: Long,
         networkType: String,
         connections: List<SimNetworkUtils.Connection>,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,

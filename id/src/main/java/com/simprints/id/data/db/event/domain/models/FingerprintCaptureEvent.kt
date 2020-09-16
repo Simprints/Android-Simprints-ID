@@ -23,7 +23,7 @@ data class FingerprintCaptureEvent(
         result: FingerprintCapturePayload.Result,
         fingerprint: FingerprintCapturePayload.Fingerprint?,
         id: String = UUID.randomUUID().toString(),
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         id,
         labels,

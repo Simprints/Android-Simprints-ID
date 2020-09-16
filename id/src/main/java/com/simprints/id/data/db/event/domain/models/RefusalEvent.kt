@@ -18,7 +18,7 @@ data class RefusalEvent(
         endTime: Long,
         reason: RefusalPayload.Answer,
         otherText: String,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,

@@ -1,9 +1,7 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-
 import com.simprints.id.data.db.event.domain.models.EventType.INVALID_INTENT
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -18,7 +16,7 @@ data class InvalidIntentEvent(
         creationTime: Long,
         action: String,
         extras: Map<String, Any?>,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,

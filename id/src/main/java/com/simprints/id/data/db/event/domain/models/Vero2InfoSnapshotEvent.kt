@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -19,7 +18,7 @@ data class Vero2InfoSnapshotEvent(
         createdAt: Long,
         version: Vero2Version,
         battery: BatteryInfo,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,

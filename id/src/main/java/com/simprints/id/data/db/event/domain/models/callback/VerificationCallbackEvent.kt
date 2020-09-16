@@ -21,7 +21,7 @@ data class VerificationCallbackEvent(
     constructor(
         createdAt: Long,
         score: CallbackComparisonScore,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,

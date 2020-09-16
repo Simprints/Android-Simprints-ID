@@ -24,7 +24,7 @@ data class PersonCreationEvent(
         fingerprintReferenceId: String?,
         faceCaptureIds: List<String>,
         faceReferenceId: String?,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,
