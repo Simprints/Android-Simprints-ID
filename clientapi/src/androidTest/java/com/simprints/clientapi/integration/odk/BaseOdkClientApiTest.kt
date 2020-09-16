@@ -34,17 +34,18 @@ open class BaseOdkClientApiTest : BaseClientApiTest() {
 
     companion object {
         internal const val ODK_GUIDS_KEY = "odk-guids"
-        internal const val ODK_BIOMETRICS_COMPLETE_CHECK_KEY = "odk-biometrics-complete"
         internal const val ODK_CONFIDENCES_KEY = "odk-confidences"
         internal const val ODK_TIERS_KEY = "odk-tiers"
         internal const val ODK_EXIT_REASON = "odk-exit-reason"
         internal const val ODK_EXIT_EXTRA = "odk-exit-extra"
+        internal const val ODK_SESSION_ID = "odk-session-id"
 
         internal const val ODK_REGISTRATION_ID_KEY = "odk-registration-id"
         internal const val ODK_REGISTER_BIOMETRICS_COMPLETE = "odk-register-biometrics-complete"
 
         internal const val ODK_IDENTIFY_BIOMETRICS_COMPLETE = "odk-identify-biometrics-complete"
-        internal const val ODK_IDENTIFY_SESSION_ID = "odk-identify-session-id"
+        internal const val ODK_MATCH_CONFIDENCE_FLAGS_KEY = "odk-match-confidence-flags"
+        internal const val ODK_HIGHEST_MATCH_CONFIDENCE_FLAG_KEY = "odk-highest-match-confidence-flag"
 
         internal const val ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE = "odk-confirm-identity-biometrics-complete"
 

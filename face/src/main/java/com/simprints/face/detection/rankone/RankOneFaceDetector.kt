@@ -29,13 +29,13 @@ class RankOneFaceDetector : FaceDetector {
         }
     }
 
-    override suspend fun analyze(previewFrame: PreviewFrame): Face? = withContext(Dispatchers.IO) {
+    override suspend fun analyze(previewFrame: PreviewFrame): Face? = withContext(Dispatchers.Default) {
         val bytes = yuv420ToY888(previewFrame.bytes, previewFrame.width, previewFrame.height)
         val rocImage = getRocImage(bytes, previewFrame.width, previewFrame.height)
         return@withContext analyze(rocImage, previewFrame.width, previewFrame.height)
     }
 
-    override suspend fun analyze(bitmap: Bitmap): Face? = withContext(Dispatchers.IO) {
+    override suspend fun analyze(bitmap: Bitmap): Face? = withContext(Dispatchers.Default) {
         val rocColorImage = roc_image()
         val rocGrayImage = roc_image()
 

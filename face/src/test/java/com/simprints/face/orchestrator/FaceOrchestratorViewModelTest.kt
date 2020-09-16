@@ -35,7 +35,6 @@ class FaceOrchestratorViewModelTest {
         val startCaptureObserver = viewModel.startCapture.testObserver()
 
         viewModel.start(generateCaptureRequest(1))
-        assertThat(viewModel.faceRequest).isInstanceOf(FaceCaptureRequest::class.java)
 
         assertThat(startCaptureObserver.observedValues.size).isEqualTo(1)
     }

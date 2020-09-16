@@ -2,7 +2,6 @@ package com.simprints.id.data.prefs
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_DEFAULT
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_KEY
 import com.simprints.id.commontesttools.di.TestPreferencesModule
@@ -14,11 +13,10 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.kotlintest.shouldThrow
 import io.mockk.every
 import io.mockk.verify
-import junit.framework.Assert.assertEquals
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,13 +44,13 @@ class SettingsPreferencesManagerTest {
     @Test
     fun fetchingRemoteConfigPrimitive_worksAndDoesNotGetOverridden() {
         val originalValue = settingsPreferencesManager.logoExists
-        Assert.assertEquals(SettingsPreferencesManagerImpl.LOGO_EXISTS_DEFAULT, originalValue)
+        assertEquals(SettingsPreferencesManagerImpl.LOGO_EXISTS_DEFAULT, originalValue)
 
         settingsPreferencesManager.logoExists = !originalValue
 
         val newValue = settingsPreferencesManager.logoExists
 
-        Assert.assertEquals(originalValue, newValue)
+        assertEquals(originalValue, newValue)
 
         verify(exactly = 2) { remoteConfigSpy.getBoolean(SettingsPreferencesManagerImpl.LOGO_EXISTS_KEY) }
     }
@@ -60,7 +58,7 @@ class SettingsPreferencesManagerTest {
     @Test
     fun fetchingOverridableRemoteConfigPrimitive_worksAndBecomesOverridden() {
         val originalValue = settingsPreferencesManager.language
-        Assert.assertEquals(SHARED_PREFS_LANGUAGE_DEFAULT, originalValue)
+        assertEquals(SHARED_PREFS_LANGUAGE_DEFAULT, originalValue)
 
         settingsPreferencesManager.language = SHARED_PREFS_LANGUAGE_DEFAULT + "q"
 
@@ -74,13 +72,13 @@ class SettingsPreferencesManagerTest {
     @Test
     fun fetchingRemoteConfigEnum_worksAndDoesNotGetOverridden() {
         val oldMatchGroup = settingsPreferencesManager.matchGroup
-        Assert.assertEquals(SettingsPreferencesManagerImpl.MATCH_GROUP_DEFAULT, oldMatchGroup)
+        assertEquals(SettingsPreferencesManagerImpl.MATCH_GROUP_DEFAULT, oldMatchGroup)
 
         settingsPreferencesManager.matchGroup = GROUP.MODULE
 
         val newMatchGroup = settingsPreferencesManager.matchGroup
 
-        Assert.assertEquals(oldMatchGroup, newMatchGroup)
+        assertEquals(oldMatchGroup, newMatchGroup)
 
         verify(exactly = 2) { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY) }
     }
@@ -91,7 +89,7 @@ class SettingsPreferencesManagerTest {
 
         val matchGroup = settingsPreferencesManager.matchGroup
 
-        Assert.assertEquals(SettingsPreferencesManagerImpl.MATCH_GROUP_DEFAULT, matchGroup)
+        assertEquals(SettingsPreferencesManagerImpl.MATCH_GROUP_DEFAULT, matchGroup)
     }
 
     @Test
@@ -104,53 +102,36 @@ class SettingsPreferencesManagerTest {
     }
 
     @Test
-    fun fetchingOverridableRemoteConfigFingerIdMap_worksAndBecomesOverridden() {
-        val oldFingerStatus = settingsPreferencesManager.fingerStatus
-        Assert.assertEquals(SettingsPreferencesManagerImpl.FINGER_STATUS_DEFAULT, oldFingerStatus)
+    fun fetchingOverridableRemoteConfigFingersToCollect_worksAndBecomesOverridden() {
+        val oldFingersToCollect = settingsPreferencesManager.fingerprintsToCollect
+        assertEquals(SettingsPreferencesManagerImpl.FINGERPRINTS_TO_COLLECT_DEFAULT, oldFingersToCollect)
 
-        settingsPreferencesManager.fingerStatus = NON_DEFAULT_FINGER_STATUS_TARGET
+        settingsPreferencesManager.fingerprintsToCollect = NON_DEFAULT_FINGERS_TO_COLLECT
 
-        val newFingerStatus = settingsPreferencesManager.fingerStatus
+        val newFingerStatus = settingsPreferencesManager.fingerprintsToCollect
 
-        Assert.assertEquals(NON_DEFAULT_FINGER_STATUS_TARGET, newFingerStatus)
+        assertEquals(NON_DEFAULT_FINGERS_TO_COLLECT, newFingerStatus)
 
-        verify(exactly = 1) { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY) }
+        verify(exactly = 1) { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGERPRINTS_TO_COLLECT_KEY) }
     }
 
     @Test
     fun fetchingOverridableRemoteConfigFingerIdMap_worksForNonDefaultValue() {
-        every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY) } returns NON_DEFAULT_FINGER_STATUS_SERIALIZED
+        every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGERPRINTS_TO_COLLECT_KEY) } returns NON_DEFAULT_FINGERS_TO_COLLECT_SERIALIZED
 
-        val fingerStatus = settingsPreferencesManager.fingerStatus
+        val fingerStatus = settingsPreferencesManager.fingerprintsToCollect
 
-        Assert.assertEquals(NON_DEFAULT_FINGER_STATUS_TARGET, fingerStatus)
-    }
-
-    @Test
-    fun fetchingOverridableRemoteConfigFingerIdMap_throwsIfMalformed() {
-        every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY) } returns MALFORMED_FINGER_STATUS_SERIALIZED
-
-        shouldThrow<JsonSyntaxException> {
-            settingsPreferencesManager.fingerStatus
-        }
+        assertEquals(NON_DEFAULT_FINGERS_TO_COLLECT, fingerStatus)
     }
 
     companion object {
 
-        private const val NON_DEFAULT_FINGER_STATUS_SERIALIZED = "{\"RIGHT_5TH_FINGER\":\"true\",\"RIGHT_4TH_FINGER\":\"true\",\"RIGHT_3RD_FINGER\":\"false\",\"RIGHT_INDEX_FINGER\":\"false\",\"RIGHT_THUMB\":\"false\",\"LEFT_THUMB\":\"true\",\"LEFT_INDEX_FINGER\":\"false\",\"LEFT_3RD_FINGER\":\"false\",\"LEFT_4TH_FINGER\":\"false\",\"LEFT_5TH_FINGER\":\"true\"}"
-        private val NON_DEFAULT_FINGER_STATUS_TARGET = mapOf(
-            FingerIdentifier.RIGHT_THUMB to false,
-            FingerIdentifier.RIGHT_INDEX_FINGER to false,
-            FingerIdentifier.RIGHT_3RD_FINGER to false,
-            FingerIdentifier.RIGHT_4TH_FINGER to true,
-            FingerIdentifier.RIGHT_5TH_FINGER to true,
-            FingerIdentifier.LEFT_THUMB to true,
-            FingerIdentifier.LEFT_INDEX_FINGER to false,
-            FingerIdentifier.LEFT_3RD_FINGER to false,
-            FingerIdentifier.LEFT_4TH_FINGER to false,
-            FingerIdentifier.LEFT_5TH_FINGER to true
+        private const val NON_DEFAULT_FINGERS_TO_COLLECT_SERIALIZED = "RIGHT_4TH_FINGER,RIGHT_5TH_FINGER,LEFT_THUMB,LEFT_5TH_FINGER"
+        private val NON_DEFAULT_FINGERS_TO_COLLECT = listOf(
+            FingerIdentifier.RIGHT_4TH_FINGER,
+            FingerIdentifier.RIGHT_5TH_FINGER,
+            FingerIdentifier.LEFT_THUMB,
+            FingerIdentifier.LEFT_5TH_FINGER
         )
-
-        private const val MALFORMED_FINGER_STATUS_SERIALIZED = "\"gibberish{\\\"000}\\\"\\\"\""
     }
 }

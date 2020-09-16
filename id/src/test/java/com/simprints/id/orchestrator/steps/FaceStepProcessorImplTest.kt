@@ -47,12 +47,12 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         with(preferencesManagerMock) {
-            every { this@with.language } returns "en"
-            every { this@with.fingerStatus } returns emptyMap()
-            every { this@with.logoExists } returns true
-            every { this@with.organizationName } returns "some_org"
-            every { this@with.programName } returns "some_name"
-            every { this@with.faceNbOfFramesCaptured } returns 2
+            every { language } returns "en"
+            every { fingerprintsToCollect } returns listOf()
+            every { logoExists } returns true
+            every { organizationName } returns "some_org"
+            every { programName } returns "some_name"
+            every { faceNbOfFramesCaptured } returns 2
         }
 
         faceStepProcess = FaceStepProcessorImpl(faceRequestFactory, preferencesManagerMock)

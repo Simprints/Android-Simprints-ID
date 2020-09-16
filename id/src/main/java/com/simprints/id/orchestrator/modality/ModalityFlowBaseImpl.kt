@@ -60,9 +60,9 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         steps.add(buildSetupStep())
     }
 
-    private fun buildModalityConfigurationSteps(modalities: List<Modality>) = modalities.mapNotNull {
+    private fun buildModalityConfigurationSteps(modalities: List<Modality>) = modalities.map {
         when (it) {
-            Modality.FINGER -> null // TODO : Change back to buildConfigurationStep once handling for the step is implemented on Fingerprint's side
+            Modality.FINGER -> fingerprintStepProcessor.buildConfigurationStep()
             Modality.FACE -> faceStepProcessor.buildConfigurationStep(projectId, deviceId)
         }
     }

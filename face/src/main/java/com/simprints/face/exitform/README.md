@@ -4,7 +4,7 @@ To understand how the Exit Form should work, take a look at the [Confluence page
 
 For more information about the Exit Form flow as a whole, check the platform Exit Form README.
 
-The layout used inside the face module for the Exit Form is the same one used in the [FaceExitFormActivity.kt](../../../../../../../../id/src/main/java/com/simprints/id/activities/faceexitform/FaceExitFormActivity.kt) with some small modifications because the scrolling was not working correctly.
+The layout used inside the face module for the Exit Form is the same one used in the [FaceExitFormActivity.kt](/id/src/main/java/com/simprints/id/activities/faceexitform/FaceExitFormActivity.kt) with some small modifications because the scrolling was not working correctly.
 
 The ExitForm is another fragment that is added to the Capture navigation graph. When the user presses back, the fragment is added to the backstack on top of the current fragment. To go back where the user was (i.e. when user presses "Capture Face" button), the ExitForm just needs to pop itself from the back stack.
 

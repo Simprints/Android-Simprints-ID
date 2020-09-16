@@ -14,6 +14,7 @@ import com.simprints.moduleapi.app.responses.IAppMatchResult
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 import com.simprints.clientapi.integration.value
 import com.simprints.clientapi.integration.key
+import com.simprints.moduleapi.app.responses.IAppMatchConfidence
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
@@ -24,7 +25,7 @@ class StandardVerifyResponseTest : BaseStandardClientApiTest() {
     @Test
     fun appModuleSendsAVerifyAppResponse_shouldReturnAStandardVerifyResponse() {
         val appVerifyResponse = AppVerifyResponse(
-            AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1)
+            AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1, IAppMatchConfidence.HIGH)
         )
         mockAppModuleResponse(appVerifyResponse, APP_VERIFICATION_ACTION)
 
@@ -53,7 +54,7 @@ class StandardVerifyResponseTest : BaseStandardClientApiTest() {
     }
 
     private fun assertEqualIdentification(verification: Verification, appMatchResult: IAppMatchResult) {
-        assertThat(verification.confidence.toLong()).isEqualTo(appMatchResult.confidence.toLong())
+        assertThat(verification.confidence.toLong()).isEqualTo(appMatchResult.confidenceScore.toLong())
         assertThat(verification.guid).isEqualTo(appMatchResult.guid)
         assertThat(verification.tier.name).isEqualTo(appMatchResult.tier.name)
     }

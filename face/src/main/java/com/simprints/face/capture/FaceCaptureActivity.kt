@@ -7,18 +7,17 @@ import android.os.Bundle
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.whenNonNull
 import com.simprints.core.tools.whenNull
 import com.simprints.face.R
+import com.simprints.face.base.FaceActivity
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class FaceCaptureActivity : BaseSplitActivity() {
-
+class FaceCaptureActivity : FaceActivity() {
     private val vm: FaceCaptureViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +56,11 @@ class FaceCaptureActivity : BaseSplitActivity() {
             setResult(Activity.RESULT_OK, intent)
             finish()
         })
+
+        vm.unexpectedErrorEvent.observe(this, LiveDataEventObserver {
+            setResult(Activity.RESULT_CANCELED)
+            finish()
+        })
     }
 
     override fun onBackPressed() {
@@ -68,12 +72,11 @@ class FaceCaptureActivity : BaseSplitActivity() {
     }
 
     enum class BackButtonContext {
-        CAPTURE, CONFIRMATION, RETRY;
+        CAPTURE, RETRY;
 
         companion object {
             fun fromFragmentId(fragmentId: Int?): BackButtonContext? = when (fragmentId) {
                 R.id.preparationFragment, R.id.liveFeedbackFragment -> CAPTURE
-                R.id.confirmationFragment -> CONFIRMATION
                 R.id.retryFragment -> RETRY
                 else -> null
             }

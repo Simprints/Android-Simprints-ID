@@ -4,13 +4,16 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
+import com.simprints.id.domain.moduleapi.app.responses.entities.MatchConfidence.Companion.computeMatchConfidenceForFace
+import com.simprints.id.domain.moduleapi.app.responses.entities.MatchConfidence.Companion.computeMatchConfidenceForFingerprint
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.orchestrator.steps.Step
 
-class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
+class AppResponseBuilderForVerify(private val fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>,
+                                  private val faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>) : BaseAppResponseBuilder() {
 
     override suspend fun buildAppResponse(modalities: List<Modality>,
                                           appRequest: AppRequest,
@@ -53,7 +56,9 @@ class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
 
     private fun getMatchResultForFingerprintResponse(fingerprintResponse: FingerprintMatchResponse) =
         fingerprintResponse.result.map {
-            MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore))
+            MatchResult(it.personId, it.confidenceScore.toInt(),
+                Tier.computeTier(it.confidenceScore),
+                computeMatchConfidenceForFingerprint(it.confidenceScore.toInt(), fingerprintConfidenceThresholds))
         }.first()
 
     private fun buildAppVerifyResponseForFace(faceResponse: FaceMatchResponse) =
@@ -61,6 +66,8 @@ class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
 
     private fun getMatchResultForFaceResponse(faceResponse: FaceMatchResponse) =
         faceResponse.result.map {
-            MatchResult(it.guidFound, it.confidence.toInt(), Tier.computeTier(it.confidence))
+            MatchResult(it.guidFound, it.confidence.toInt(),
+                Tier.computeTier(it.confidence),
+                computeMatchConfidenceForFace(it.confidence.toInt(), faceConfidenceThresholds))
         }.first()
 }

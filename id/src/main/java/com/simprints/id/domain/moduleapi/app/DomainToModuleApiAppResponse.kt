@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.*
 import com.simprints.id.domain.moduleapi.app.responses.AppResponseType.*
+import com.simprints.id.domain.moduleapi.app.responses.entities.MatchConfidence
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.moduleapi.app.responses.*
@@ -46,7 +47,8 @@ object DomainToModuleApiAppResponse {
 
     private fun fromDomainToModuleApiAppVerifyResponse(verify: AppVerifyResponse): IAppVerifyResponse =
         with(verify.matchingResult) {
-            IAppVerifyResponseImpl(IAppMatchResultImpl(guidFound, confidence, fromDomainToAppIAppResponseTier(tier)))
+            IAppVerifyResponseImpl(IAppMatchResultImpl(guidFound, confidence,
+                fromDomainToAppIAppResponseTier(tier), fromDomainToAppIMatchConfidence(matchConfidence)))
         }
 
     private fun fromDomainToModuleApiAppIdentifyResponse(identify: AppIdentifyResponse): IAppIdentifyResponse =
@@ -56,7 +58,8 @@ object DomainToModuleApiAppResponse {
         IAppRefusalFormResponseImpl(refusaResponse.answer.reason.toString(), refusaResponse.answer.optionalText)
 
     private fun fromDomainToModuleApiAppMatchResult(result: MatchResult): IAppMatchResult =
-        IAppMatchResultImpl(result.guidFound, result.confidence, fromDomainToAppIAppResponseTier(result.tier))
+        IAppMatchResultImpl(result.guidFound, result.confidence,
+            fromDomainToAppIAppResponseTier(result.tier), fromDomainToAppIMatchConfidence(result.matchConfidence))
 
     private fun fromDomainToModuleApiAppConfirmIdentityResponse(response: AppConfirmationResponse) =
         IAppConfirmationResponseImpl(response.identificationOutcome)
@@ -68,6 +71,14 @@ object DomainToModuleApiAppResponse {
             Tier.TIER_3 -> IAppResponseTier.TIER_3
             Tier.TIER_4 -> IAppResponseTier.TIER_4
             Tier.TIER_5 -> IAppResponseTier.TIER_5
+        }
+
+    private fun fromDomainToAppIMatchConfidence(matchConfidence: MatchConfidence): IAppMatchConfidence =
+        when(matchConfidence) {
+            MatchConfidence.NONE -> IAppMatchConfidence.NONE
+            MatchConfidence.LOW -> IAppMatchConfidence.LOW
+            MatchConfidence.MEDIUM -> IAppMatchConfidence.MEDIUM
+            MatchConfidence.HIGH -> IAppMatchConfidence.HIGH
         }
 }
 
@@ -103,8 +114,9 @@ private class IAppVerifyResponseImpl(override val matchResult: IAppMatchResult) 
 @Parcelize
 private data class IAppMatchResultImpl(
     override val guid: String,
-    override val confidence: Int,
-    override val tier: IAppResponseTier) : Parcelable, IAppMatchResult
+    override val confidenceScore: Int,
+    override val tier: IAppResponseTier,
+    override val matchConfidence: IAppMatchConfidence) : Parcelable, IAppMatchResult
 
 @Parcelize
 private data class IAppConfirmationResponseImpl(
