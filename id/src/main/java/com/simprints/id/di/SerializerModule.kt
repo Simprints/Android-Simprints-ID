@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
-import androidx.room.PrimaryKey
-import com.google.gson.Gson
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
@@ -12,8 +11,7 @@ import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
-import com.simprints.id.tools.json.SimJsonHelper
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.tools.serializers.*
 import dagger.Module
 import dagger.Provides
@@ -77,8 +75,8 @@ class SerializerModule {
     fun provideFingerprintConfidenceThresholdsSerializer(
         @Named("FingerprintConfidenceSerializer") fingerprintConfidenceSerializer: Serializer<FingerprintConfidenceThresholds>,
         @Named("IntSerializer") intSerializer: Serializer<Int>,
-        gson: Gson
-    ): Serializer<Map<FingerprintConfidenceThresholds, Int>> = MapSerializer(fingerprintConfidenceSerializer, intSerializer, gson)
+        jsonHelper: JsonHelper
+    ): Serializer<Map<FingerprintConfidenceThresholds, Int>> = MapSerializer(fingerprintConfidenceSerializer, intSerializer, jsonHelper)
 
     @Provides
     @Singleton
@@ -86,8 +84,8 @@ class SerializerModule {
     fun provideFaceConfidenceThresholdsSerializer(
         @Named("FaceConfidenceSerializer") faceConfidenceThresholdsSerializer: Serializer<FaceConfidenceThresholds>,
         @Named("IntSerializer") intSerializer: Serializer<Int>,
-        gson: Gson
-    ): Serializer<Map<FaceConfidenceThresholds, Int>> = MapSerializer(faceConfidenceThresholdsSerializer, intSerializer, gson)
+        jsonHelper: JsonHelper
+    ): Serializer<Map<FaceConfidenceThresholds, Int>> = MapSerializer(faceConfidenceThresholdsSerializer, intSerializer, jsonHelper)
 
     @Provides
     @Singleton

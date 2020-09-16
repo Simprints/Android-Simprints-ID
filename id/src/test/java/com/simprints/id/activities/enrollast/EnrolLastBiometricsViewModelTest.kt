@@ -2,7 +2,6 @@ package com.simprints.id.activities.enrollast
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState.Failed
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState.Success
@@ -16,7 +15,6 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
 import com.simprints.id.orchestrator.EnrolmentHelper
-import com.simprints.id.orchestrator.SOME_GUID1
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.orchestrator.steps.Step
@@ -88,7 +86,7 @@ class EnrolLastBiometricsViewModelTest {
 
             with(viewModel.getViewStateLiveData()) {
                 assertThat(this.value).isInstanceOf(Success::class.java)
-                assertThat((this.value as Success).newGuid).isEqualTo(SOME_GUID1)
+                assertThat((this.value as Success).newGuid).isEqualTo(GUID1)
             }
         }
     }
@@ -178,7 +176,7 @@ class EnrolLastBiometricsViewModelTest {
 
     private fun buildRequestWithFingerprintPreviousStepsHavingAHighConfidence(confidence: Float) =
         EnrolLastBiometricsRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
-            DEFAULT_MODULE_ID, buildFingerprintMatchStepsWithConfidence(confidence), SOME_GUID)
+            DEFAULT_MODULE_ID, buildFingerprintMatchStepsWithConfidence(confidence), GUID1)
 
     private fun buildFingerprintMatchStepsWithConfidence(confidence: Float) = listOf(
         Step(
@@ -195,7 +193,7 @@ class EnrolLastBiometricsViewModelTest {
 
     private fun buildRequestWithFacePreviousStepsHavingAHighConfidence(confidence: Float) =
         EnrolLastBiometricsRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
-            DEFAULT_MODULE_ID, buildFaceMatchStepsWithConfidence(confidence), SOME_GUID)
+            DEFAULT_MODULE_ID, buildFaceMatchStepsWithConfidence(confidence), GUID1)
 
     private fun buildFaceMatchStepsWithConfidence(confidence: Float) = listOf(
         Step(
