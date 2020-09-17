@@ -79,7 +79,6 @@ class EventRemoteDataSourceImplAndroidTest {
 
     companion object {
         const val SIGNED_ID_USER = "some_signed_user"
-        const val CLOUD_ASYNC_SESSION_CREATION_TIMEOUT = 5000L
         const val DEFAULT_TIME = 1000L
     }
 

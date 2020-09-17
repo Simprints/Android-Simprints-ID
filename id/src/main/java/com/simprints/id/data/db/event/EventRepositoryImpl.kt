@@ -6,7 +6,9 @@ import androidx.annotation.VisibleForTesting
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
+import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
+import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.TIMED_OUT
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
@@ -49,6 +51,10 @@ open class EventRepositoryImpl(
 ) : EventRepository {
 
     companion object {
+        // When the sync starts, any open activeSession started GRACE_PERIOD ms
+        // before it will be considered closed
+        const val GRACE_PERIOD: Long = 1000 * 60 * 5 // 5 minutes
+
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
         const val SESSION_BATCH_SIZE = 20
     }
@@ -80,7 +86,7 @@ open class EventRepositoryImpl(
                     deviceId),
                 DatabaseInfo(count))
 
-            closeAnyOpenSession()
+            closeSessionsAndAddReasonEvent(loadOpenSessions(), NEW_SESSION)
             addEvent(sessionCaptureEvent)
         }
     }
@@ -159,10 +165,8 @@ open class EventRepositoryImpl(
     }
 
     @VisibleForTesting
-    suspend fun createBatches(query: LocalEventQuery): List<Batch> {
-        val events = createBatchesForEventsInSessions(query) + createBatchesForEventsNotInSessions(query)
-        return events
-    }
+    suspend fun createBatches(query: LocalEventQuery): List<Batch> =
+        createBatchesForEventsInSessions(query) + createBatchesForEventsNotInSessions(query)
 
     private suspend fun createBatchesForEventsNotInSessions(query: LocalEventQuery): List<Batch> {
         val events = eventLocalDataSource.load(query.fromDomainToDb()).filter { it.labels.sessionId == null }.toList()
@@ -170,7 +174,7 @@ open class EventRepositoryImpl(
     }
 
     private suspend fun createBatchesForEventsInSessions(query: LocalEventQuery): List<Batch> {
-        val sessionsToUpload = closeSessionsForQuery(query)
+        val sessionsToUpload = merge(loadCloseSessions(query), markAndLoadOldOpenSessions(query))
 
         return sessionsToUpload.fold(mutableListOf()) { batches, session ->
             val lastBatch = batches.lastOrNull()
@@ -191,11 +195,36 @@ open class EventRepositoryImpl(
         }
     }
 
-    private suspend fun closeSessionsForQuery(query: LocalEventQuery) =
-        eventLocalDataSource.load(
-            query.copy(type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE), projectId = currentProject).fromDomainToDb()).also {
-            Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Loading sessions for query ${query.copy(type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE), projectId = currentProject)}")
+    private suspend fun markAndLoadOldOpenSessions(query: LocalEventQuery): Flow<Event> {
+        val queryForOldOpenSessions = query.copy(
+            type = SESSION_CAPTURE,
+            endTime = LongRange(0, 0),
+            startTime = LongRange(0, timeHelper.now() - GRACE_PERIOD),
+            projectId = currentProject).fromDomainToDb()
+
+        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Loading old open sessions for query $queryForOldOpenSessions")
+
+        val events = eventLocalDataSource.load(queryForOldOpenSessions)
+        return if(events.count() > 0) {
+            closeSessionsAndAddReasonEvent(events, TIMED_OUT)
+            eventLocalDataSource.load(queryForOldOpenSessions)
+        } else {
+            events
         }
+
+    }
+
+    private suspend fun loadCloseSessions(query: LocalEventQuery): Flow<Event> {
+        val queryForOldOpenSessions = query.copy(
+            type = SESSION_CAPTURE,
+            endTime = LongRange(1, Long.MAX_VALUE),
+            projectId = currentProject)
+            .fromDomainToDb()
+
+        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Loading close sessions for query $queryForOldOpenSessions")
+
+        return eventLocalDataSource.load(queryForOldOpenSessions)
+    }
 
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent =
         reportExceptionIfNeeded {
@@ -208,18 +237,18 @@ open class EventRepositoryImpl(
             eventLocalDataSource.load(DbLocalEventQuery(sessionId = sessionId))
         }
 
-    private suspend fun closeAnyOpenSession() {
-        val openSessions = loadOpenSessions()
+    private suspend fun closeSessionsAndAddReasonEvent(openSessions: Flow<Event>,
+                                                       reason: ArtificialTerminationPayload.Reason) {
 
         openSessions.collect { session ->
             val artificialTerminationEvent = ArtificialTerminationEvent(
                 timeHelper.now(),
-                NEW_SESSION
+                reason
             )
             artificialTerminationEvent.labels = artificialTerminationEvent.labels.appendSessionId(session.id)
             addEvent(artificialTerminationEvent)
 
-            session.payload.endedAt = timeHelper.now()
+            (session as SessionCaptureEvent).payload.endedAt = timeHelper.now()
             addEvent(session)
         }
     }
