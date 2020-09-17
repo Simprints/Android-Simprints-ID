@@ -22,12 +22,19 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
                                private val subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
                                private val imageRepository: ImageRepository) : ViewModel() {
 
-    val localRecordCountLiveData = MutableLiveData<Int>()
-    val recordsToUpSyncCountLiveData = MutableLiveData<Int>()
-    val recordsToDownSyncCountLiveData = MutableLiveData<Int>()
-    val recordsToDeleteCountLiveData = MutableLiveData<Int>()
-    val selectedModulesCountLiveData = MutableLiveData<List<ModuleCount>>()
-    val imagesToUploadCountLiveData = MutableLiveData<Int>()
+    fun getLocalRecordCountLiveData(): LiveData<Int> = localRecordCountLiveData
+    fun getRecordsToUpSyncCountLiveData(): LiveData<Int> = recordsToUpSyncCountLiveData
+    fun getRecordsToDownSyncCountLiveData(): LiveData<Int> = recordsToDownSyncCountLiveData
+    fun getRecordsToDeleteCountLiveData(): LiveData<Int> = recordsToDeleteCountLiveData
+    fun getSelectedModulesCountLiveData(): LiveData<List<ModuleCount>> = selectedModulesCountLiveData
+    fun getImagesToUploadCountLiveData(): LiveData<Int> = imagesToUploadCountLiveData
+
+    private val localRecordCountLiveData = MutableLiveData<Int>()
+    private val recordsToUpSyncCountLiveData = MutableLiveData<Int>()
+    private val recordsToDownSyncCountLiveData = MutableLiveData<Int>()
+    private val recordsToDeleteCountLiveData = MutableLiveData<Int>()
+    private val selectedModulesCountLiveData = MutableLiveData<List<ModuleCount>>()
+    private val imagesToUploadCountLiveData = MutableLiveData<Int>()
 
     fun fetchRecordsInfo() {
         viewModelScope.launch {
