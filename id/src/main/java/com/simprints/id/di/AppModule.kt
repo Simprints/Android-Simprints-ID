@@ -70,6 +70,7 @@ import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.tools.*
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
@@ -320,10 +321,12 @@ open class AppModule {
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
-        imageRepository: ImageRepository
+        imageRepository: ImageRepository,
+        subjectsSyncManager: SubjectsSyncManager
     ) = SyncInformationViewModelFactory(
         personRepository, subjectLocalDataSource, preferencesManager,
-        loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository, imageRepository
+        loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository,
+        imageRepository, subjectsSyncManager
     )
 
     @Provides
