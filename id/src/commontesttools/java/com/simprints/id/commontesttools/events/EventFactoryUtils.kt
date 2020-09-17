@@ -101,7 +101,7 @@ fun createFaceCaptureRetryEvent() = FaceCaptureRetryEvent(CREATED_AT, ENDED_AT, 
 
 fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(CREATED_AT, ENDED_AT, eventLabels)
 
-fun createSessionCaptureEvent(id: String = GUID1): SessionCaptureEvent {
+fun createSessionCaptureEvent(id: String = GUID1, createdAt: Long = CREATED_AT): SessionCaptureEvent {
     val appVersionNameArg = "appVersionName"
     val libSimprintsVersionNameArg = "libSimprintsVersionName"
     val languageArg = "language"
@@ -116,7 +116,7 @@ fun createSessionCaptureEvent(id: String = GUID1): SessionCaptureEvent {
     return SessionCaptureEvent(
         id,
         DEFAULT_PROJECT_ID,
-        CREATED_AT,
+        createdAt,
         listOf(FINGERPRINT, FACE),
         appVersionNameArg,
         libSimprintsVersionNameArg,

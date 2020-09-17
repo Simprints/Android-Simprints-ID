@@ -70,9 +70,6 @@ data class SessionCaptureEvent(
     ) : EventPayload()
 
     companion object {
-        // When the sync starts, any open activeSession started GRACE_PERIOD ms
-        // before it will be considered closed
-        const val GRACE_PERIOD: Long = 1000 * 60 * 5 // 5 minutes
         const val EVENT_VERSION = 1
     }
 
