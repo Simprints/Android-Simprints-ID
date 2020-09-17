@@ -19,17 +19,17 @@ import com.simprints.id.domain.GROUP
 import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.ON
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
 import kotlinx.android.synthetic.main.activity_sync_information.*
-import timber.log.Timber
 import javax.inject.Inject
 
 class SyncInformationActivity : BaseSplitActivity() {
 
-    @Inject lateinit var viewModelFactory: SyncInformationViewModelFactory
-    @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
+    @Inject
+    lateinit var viewModelFactory: SyncInformationViewModelFactory
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
+    @Inject
+    lateinit var subjectsSyncManager: SubjectsSyncManager
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
 
@@ -61,7 +61,7 @@ class SyncInformationActivity : BaseSplitActivity() {
         super.onResume()
         clearValues()
         setFocusOnDefaultModulesTab()
-        observeForSyncState()
+        viewModel.updateSyncInfo()
     }
 
     private fun setTextInLayout() {
@@ -93,6 +93,7 @@ class SyncInformationActivity : BaseSplitActivity() {
         recordsToDownloadCount.text = getString(R.string.empty)
         totalRecordsCount.text = getString(R.string.empty)
         recordsToDeleteCount.text = getString(R.string.empty)
+        imagesToUploadCount.text = getString(R.string.empty)
     }
 
     private fun setFocusOnDefaultModulesTab() {
@@ -141,47 +142,11 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun observeUi() {
-        observeLocalRecordCount()
-        observeUpSyncRecordCount()
-        observeDownSyncRecordCount()
-        observeDeleteRecordCount()
-        observeSelectedModules()
-        observeNumberOfImagesToUploadCount()
-    }
-
-    private fun observeLocalRecordCount() {
-        viewModel.getLocalRecordCountLiveData().observe(this, Observer {
-            totalRecordsCount.text = it.toString()
-        })
-    }
-
-    private fun observeUpSyncRecordCount() {
-        viewModel.getRecordsToUpSyncCountLiveData().observe(this, Observer {
-            recordsToUploadCount.text = it.toString()
-        })
-    }
-
-    private fun observeDownSyncRecordCount() {
-        viewModel.getRecordsToDownSyncCountLiveData().observe(this, Observer {
-            recordsToDownloadCount.text = it.toString()
-        })
-    }
-
-    private fun observeDeleteRecordCount() {
-        viewModel.getRecordsToDeleteCountLiveData().observe(this, Observer {
-            recordsToDeleteCount.text = it.toString()
-        })
-    }
-
-    private fun observeSelectedModules() {
-        viewModel.getSelectedModulesCountLiveData().observe(this, Observer {
-            addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
-        })
-    }
-
-    private fun observeNumberOfImagesToUploadCount() {
-        viewModel.getImagesToUploadCountLiveData().observe(this, Observer {
-            imagesToUploadCount.text = it.toString()
+        viewModel.getViewStateLiveData().observe(this, Observer {
+            when(it) {
+                ViewState.Syncing -> showProgressOverlayIfNecessary()
+                is ViewState.SyncDataFetched -> hideProgressAndShowSyncData(it)
+            }
         })
     }
 
@@ -199,6 +164,16 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun isProgressOverlayVisible() = group_progress_overlay.visibility == View.VISIBLE
+
+    private fun hideProgressAndShowSyncData(it: ViewState.SyncDataFetched) {
+        hideProgressOverlay()
+        totalRecordsCount.text = it.recordsInLocal.toString()
+        recordsToUploadCount.text = it.recordsToUpSync.toString()
+        recordsToDownloadCount.text = it.recordsToDownSync?.toString() ?: ""
+        recordsToDeleteCount.text = it.recordsToDelete?.toString() ?: ""
+        imagesToUploadCount.text = it.imagesToUpload.toString()
+        addTotalRowAndSubmitList(it.moduleCounts, moduleCountAdapterForSelected)
+    }
 
     private fun hideProgressOverlay() {
         group_progress_overlay.visibility = View.GONE
@@ -220,23 +195,8 @@ class SyncInformationActivity : BaseSplitActivity() {
         moduleCountAdapter.submitList(moduleCountsArray)
     }
 
-    private fun observeForSyncState() {
-        subjectsSyncManager.getLastSyncState().observe(this, Observer { syncState ->
-            if (syncState.isRunning()) {
-                showProgressOverlayIfNecessary()
-            } else {
-                hideProgressOverlay()
-                fetchRecordsInfo()
-            }
-        })
-    }
-
-    private fun fetchRecordsInfo() {
-        viewModel.fetchRecordsInfo()
-    }
-
     private fun setupRecordsCountCards() {
-        if(!isDownSyncAllowed()) {
+        if (!isDownSyncAllowed()) {
             recordsToDownloadCardView.visibility = View.GONE
             recordsToDeleteCardView.visibility = View.GONE
         }
@@ -246,13 +206,14 @@ class SyncInformationActivity : BaseSplitActivity() {
         subjectsDownSyncSetting == ON || subjectsDownSyncSetting == EXTRA
     }
 
-    private fun SubjectsSyncState.isRunning(): Boolean {
-        val downSyncStates = downSyncWorkersInfo
-        val upSyncStates = upSyncWorkersInfo
-        val allSyncStates = downSyncStates + upSyncStates
-        return allSyncStates.any {
-            it.state is SubjectsSyncWorkerState.Running || it.state is SubjectsSyncWorkerState.Enqueued
-        }
+    sealed class ViewState {
+        object Syncing : ViewState()
+        data class SyncDataFetched(val recordsInLocal: Int,
+                                   val recordsToDownSync: Int?,
+                                   val recordsToUpSync: Int,
+                                   val recordsToDelete: Int?,
+                                   val imagesToUpload: Int,
+                                   val moduleCounts: List<ModuleCount>): ViewState()
     }
 
     companion object {

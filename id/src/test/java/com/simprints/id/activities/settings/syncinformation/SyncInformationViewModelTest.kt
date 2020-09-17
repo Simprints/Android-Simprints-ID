@@ -47,7 +47,7 @@ class SyncInformationViewModelTest {
         val totalRecordsInLocal = 322
         mockSubjectLocalDataSourceCount(totalRecordsInLocal)
 
-        viewModel.fetchAndUpdateLocalRecordCount()
+        viewModel.fetchLocalRecordCount()
 
         assertThat(viewModel.localRecordCountLiveData.value).isEqualTo(totalRecordsInLocal)
     }
