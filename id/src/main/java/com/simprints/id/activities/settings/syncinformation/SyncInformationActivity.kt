@@ -22,6 +22,7 @@ import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDo
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
 import kotlinx.android.synthetic.main.activity_sync_information.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class SyncInformationActivity : BaseSplitActivity() {
@@ -31,7 +32,6 @@ class SyncInformationActivity : BaseSplitActivity() {
     @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
-    private val moduleCountAdapterForUnselected by lazy { ModuleCountAdapter() }
 
     private lateinit var viewModel: SyncInformationViewModel
     private lateinit var selectedModulesTabSpec: TabHost.TabSpec
@@ -150,37 +150,37 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun observeLocalRecordCount() {
-        viewModel.localRecordCountLiveData.observe(this, Observer {
+        viewModel.getLocalRecordCountLiveData().observe(this, Observer {
             totalRecordsCount.text = it.toString()
         })
     }
 
     private fun observeUpSyncRecordCount() {
-        viewModel.recordsToUpSyncCountLiveData.observe(this, Observer {
+        viewModel.getRecordsToUpSyncCountLiveData().observe(this, Observer {
             recordsToUploadCount.text = it.toString()
         })
     }
 
     private fun observeDownSyncRecordCount() {
-        viewModel.recordsToDownSyncCountLiveData.observe(this, Observer {
+        viewModel.getRecordsToDownSyncCountLiveData().observe(this, Observer {
             recordsToDownloadCount.text = it.toString()
         })
     }
 
     private fun observeDeleteRecordCount() {
-        viewModel.recordsToDeleteCountLiveData.observe(this, Observer {
+        viewModel.getRecordsToDeleteCountLiveData().observe(this, Observer {
             recordsToDeleteCount.text = it.toString()
         })
     }
 
     private fun observeSelectedModules() {
-        viewModel.selectedModulesCountLiveData.observe(this, Observer {
+        viewModel.getSelectedModulesCountLiveData().observe(this, Observer {
             addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
         })
     }
 
     private fun observeNumberOfImagesToUploadCount() {
-        viewModel.imagesToUploadCountLiveData.observe(this, Observer {
+        viewModel.getImagesToUploadCountLiveData().observe(this, Observer {
             imagesToUploadCount.text = it.toString()
         })
     }
@@ -257,9 +257,6 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     companion object {
         private const val SELECTED_MODULES_TAB_TAG = "SelectedModules"
-        private const val UNSELECTED_MODULES_TAB_TAG = "UnselectedModules"
-        private const val UNSELECTED_MODULES_TAB_INDEX = 1
-        private const val MAX_MODULES_TAB_COUNT = 2
         private const val TOTAL_RECORDS_INDEX = 0
     }
 }
