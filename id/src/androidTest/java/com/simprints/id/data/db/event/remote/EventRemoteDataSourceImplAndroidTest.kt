@@ -73,6 +73,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import timber.log.Timber
 
 @RunWith(AndroidJUnit4::class)
 class EventRemoteDataSourceImplAndroidTest {
@@ -146,7 +147,8 @@ class EventRemoteDataSourceImplAndroidTest {
                 addCompletionCheckEvent()
             }
 
-            executeUpload(events)
+            Timber.d("TEST2", events)
+            //executeUpload(events)
         }
     }
 
@@ -406,6 +408,7 @@ class EventRemoteDataSourceImplAndroidTest {
 
         event.payload.location = Location(0.0, 0.0)
         event.payload.analyticsId = "analyticsId"
+        add(event)
     }
 
     private fun MutableList<Event>.addEnrolmentRecordCreation() {

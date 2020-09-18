@@ -8,7 +8,7 @@ import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.Subje
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope.ProjectScope
 import com.simprints.id.domain.modality.Modes
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
     JsonSubTypes.Type(value = ProjectScope::class),
     JsonSubTypes.Type(value = SubjectUserScope::class),

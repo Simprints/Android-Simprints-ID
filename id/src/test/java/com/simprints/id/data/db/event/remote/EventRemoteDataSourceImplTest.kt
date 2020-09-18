@@ -151,7 +151,7 @@ class EventRemoteDataSourceImplTest {
             with(query) {
                 coVerify {
                     eventRemoteInterface.downloadEvents(
-                        projectId, moduleIds, userId, subjectId, modes, lastEventId, types.map { it.key }
+                        projectId, moduleIds, userId, subjectId, modes, lastEventId, types.map { it.name }
                     )
                 }
             }

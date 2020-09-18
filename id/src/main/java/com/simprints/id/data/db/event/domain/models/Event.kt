@@ -51,7 +51,7 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreat
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
     JsonSubTypes.Type(value = ConfirmationCallbackEvent::class, name = CALLBACK_CONFIRMATION_KEY),
     JsonSubTypes.Type(value = EnrolmentCallbackEvent::class, name = CALLBACK_ENROLMENT_KEY),
@@ -95,7 +95,6 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveE
     JsonSubTypes.Type(value = SuspiciousIntentEvent::class, name = SUSPICIOUS_INTENT_KEY),
     JsonSubTypes.Type(value = Vero2InfoSnapshotEvent::class, name = VERO_2_INFO_SNAPSHOT_KEY)
 )
-
 abstract class Event {
     abstract val type: EventType
     abstract val id: String

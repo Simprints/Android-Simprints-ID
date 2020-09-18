@@ -4,42 +4,76 @@ import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.*
 
 
-// Unused key field - used to enforce adding a const (key) when a new event is added.
-// the key is required to serialise/deserialize events correctly with Jackson (see annotation in ApiEventPayload)
-enum class ApiEventPayloadType(val key: String) {
+enum class ApiEventPayloadType {
 
-    EnrolmentRecordCreation(ApiEventPayloadType.ENROLMENT_RECORD_CREATION_KEY),
-    EnrolmentRecordDeletion(ApiEventPayloadType.ENROLMENT_RECORD_DELETION_KEY),
-    EnrolmentRecordMove(ApiEventPayloadType.ENROLMENT_RECORD_MOVE_KEY),
-    Callout(ApiEventPayloadType.CALLOUT_KEY),
-    Callback(ApiEventPayloadType.CALLBACK_KEY),
-    ArtificialTermination(ApiEventPayloadType.ARTIFICIAL_TERMINATION_KEY),
-    Authentication(ApiEventPayloadType.AUTHENTICATION_KEY),
-    Consent(ApiEventPayloadType.CONSENT_KEY),
-    Enrolment(ApiEventPayloadType.ENROLMENT_KEY),
-    Authorization(ApiEventPayloadType.AUTHORIZATION_KEY),
-    FingerprintCapture(ApiEventPayloadType.FINGERPRINT_CAPTURE_KEY),
-    OneToOneMatch(ApiEventPayloadType.ONE_TO_ONE_MATCH_KEY),
-    OneToManyMatch(ApiEventPayloadType.ONE_TO_MANY_MATCH_KEY),
-    PersonCreation(ApiEventPayloadType.PERSON_CREATION_KEY),
-    AlertScreen(ApiEventPayloadType.ALERT_SCREEN_KEY),
-    GuidSelection(ApiEventPayloadType.GUID_SELECTION_KEY),
-    ConnectivitySnapshot(ApiEventPayloadType.CONNECTIVITY_SNAPSHOT_KEY),
-    Refusal(ApiEventPayloadType.REFUSAL_KEY),
-    CandidateRead(ApiEventPayloadType.CANDIDATE_READ_KEY),
-    ScannerConnection(ApiEventPayloadType.SCANNER_CONNECTION_KEY),
-    Vero2InfoSnapshot(ApiEventPayloadType.VERO_2_INFO_SNAPSHOT_KEY),
-    ScannerFirmwareUpdate(ApiEventPayloadType.SCANNER_FIRMWARE_UPDATE_KEY),
-    InvalidIntent(ApiEventPayloadType.INVALID_INTENT_KEY),
-    SuspiciousIntent(ApiEventPayloadType.SUSPICIOUS_INTENT_KEY),
-    IntentParsing(ApiEventPayloadType.INTENT_PARSING_KEY),
-    CompletionCheck(ApiEventPayloadType.COMPLETION_CHECK_KEY),
-    SessionCapture(ApiEventPayloadType.SESSION_CAPTURE_KEY),
-    FaceOnboardingComplete(ApiEventPayloadType.FACE_ONBOARDING_COMPLETE_KEY),
-    FaceFallbackCapture(ApiEventPayloadType.FACE_FALLBACK_CAPTURE_KEY),
-    FaceCapture(ApiEventPayloadType.FACE_CAPTURE_KEY),
-    FaceCaptureConfirmation(ApiEventPayloadType.FACE_CAPTURE_CONFIRMATION_KEY),
-    FaceCaptureRetry(ApiEventPayloadType.FACE_CAPTURE_RETRY_KEY);
+    // a constant key is required to serialise/deserialize
+    // ApiEventPayload correctly with Jackson (see annotation in ApiEventPayload).
+    // Add a key in the companion object for each enum value
+
+    /* key added: ENROLMENT_RECORD_CREATION_KEY */
+    EnrolmentRecordCreation,
+    /* key added: ENROLMENT_RECORD_DELETION_KEY */
+    EnrolmentRecordDeletion,
+    /* key added: ENROLMENT_RECORD_MOVE_KEY */
+    EnrolmentRecordMove,
+    /* key added: CALLOUT_KEY */
+    Callout,
+    /* key added: CALLBACK_KEY */
+    Callback,
+    /* key added: ARTIFICIAL_TERMINATION_KEY */
+    ArtificialTermination,
+    /* key added: AUTHENTICATION_KEY */
+    Authentication,
+    /* key added: CONSENT_KEY */
+    Consent,
+    /* key added: ENROLMENT_KEY */
+    Enrolment,
+    /* key added: AUTHORIZATION_KEY */
+    Authorization,
+    /* key added: FINGERPRINT_CAPTURE_KEY */
+    FingerprintCapture,
+    /* key added: ONE_TO_ONE_MATCH_KEY */
+    OneToOneMatch,
+    /* key added: ONE_TO_MANY_MATCH_KEY */
+    OneToManyMatch,
+    /* key added: PERSON_CREATION_KEY */
+    PersonCreation,
+    /* key added: ALERT_SCREEN_KEY */
+    AlertScreen,
+    /* key added: GUID_SELECTION_KEY */
+    GuidSelection,
+    /* key added: CONNECTIVITY_SNAPSHOT_KEY */
+    ConnectivitySnapshot,
+    /* key added: REFUSAL_KEY */
+    Refusal,
+    /* key added: CANDIDATE_READ_KEY */
+    CandidateRead,
+    /* key added: SCANNER_CONNECTION_KEY */
+    ScannerConnection,
+    /* key added: VERO_2_INFO_SNAPSHOT_KEY */
+    Vero2InfoSnapshot,
+    /* key added: SCANNER_FIRMWARE_UPDATE_KEY */
+    ScannerFirmwareUpdate,
+    /* key added: INVALID_INTENT_KEY */
+    InvalidIntent,
+    /* key added: SUSPICIOUS_INTENT_KEY */
+    SuspiciousIntent,
+    /* key added: INTENT_PARSING_KEY */
+    IntentParsing,
+    /* key added: COMPLETION_CHECK_KEY */
+    CompletionCheck,
+    /* key added: SESSION_CAPTURE_KEY */
+    SessionCapture,
+    /* key added: FACE_ONBOARDING_COMPLETE_KEY */
+    FaceOnboardingComplete,
+    /* key added: FACE_FALLBACK_CAPTURE_KEY */
+    FaceFallbackCapture,
+    /* key added: FACE_CAPTURE_KEY */
+    FaceCapture,
+    /* key added: FACE_CAPTURE_CONFIRMATION_KEY */
+    FaceCaptureConfirmation,
+    /* key added: FACE_CAPTURE_RETRY_KEY */
+    FaceCaptureRetry;
 
     companion object {
         const val ENROLMENT_RECORD_CREATION_KEY = "EnrolmentRecordCreation"
