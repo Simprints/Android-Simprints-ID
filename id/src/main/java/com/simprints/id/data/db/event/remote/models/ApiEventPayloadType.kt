@@ -3,7 +3,9 @@ package com.simprints.id.data.db.event.remote.models
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.*
 
-//Unused key field - used to enforce adding a const when a new event is added. Required for Jackson in ApiEventPayload
+
+// Unused key field - used to enforce adding a const (key) when a new event is added.
+// the key is required to serialise/deserialize events correctly with Jackson (see annotation in ApiEventPayload)
 enum class ApiEventPayloadType(val key: String) {
 
     EnrolmentRecordCreation(ApiEventPayloadType.ENROLMENT_RECORD_CREATION_KEY),

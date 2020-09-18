@@ -54,7 +54,7 @@ import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordCr
 import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMovePayload
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes(
     JsonSubTypes.Type(value = ApiFaceCaptureConfirmationPayload::class, name = Companion.FACE_CAPTURE_CONFIRMATION_KEY),
     JsonSubTypes.Type(value = ApiFaceCapturePayload::class, name = Companion.FACE_CAPTURE_KEY),
