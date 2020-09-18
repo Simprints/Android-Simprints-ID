@@ -32,16 +32,16 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
         viewStateLiveData.addSource(subjectsSyncManager.getLastSyncState().map { it.isRunning() }) {
             viewModelScope.launch {
                 if (it) {
-                    viewStateLiveData.value = SyncInformationActivity.ViewState.Syncing
+                    viewStateLiveData.value = SyncInformationActivity.ViewState.LoadingState.Syncing
                 } else {
-                    viewStateLiveData.value = SyncInformationActivity.ViewState.Syncing
+                    viewStateLiveData.value = SyncInformationActivity.ViewState.LoadingState.Calculating
                     viewStateLiveData.value = fetchRecords()
                 }
             }
         }
     }
 
-    private suspend fun fetchRecords(): SyncDataFetched {
+    internal suspend fun fetchRecords(): SyncDataFetched {
         val recordsInLocalCount = fetchLocalRecordCount()
         val imagesToUploadCount = fetchAndUpdateImagesToUploadCount()
         val recordsToUpSyncCount = fetchAndUpdateRecordsToUpSyncCount()

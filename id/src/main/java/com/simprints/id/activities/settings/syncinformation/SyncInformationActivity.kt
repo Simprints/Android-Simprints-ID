@@ -12,6 +12,8 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.ModuleSelectionActivity
+import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.LoadingState.Calculating
+import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.LoadingState.Syncing
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.PreferencesManager
@@ -144,7 +146,7 @@ class SyncInformationActivity : BaseSplitActivity() {
     private fun observeUi() {
         viewModel.getViewStateLiveData().observe(this, Observer {
             when(it) {
-                ViewState.Syncing -> showProgressOverlayIfNecessary()
+                Syncing, Calculating -> showProgressOverlayIfNecessary(it as ViewState.LoadingState)
                 is ViewState.SyncDataFetched -> hideProgressAndShowSyncData(it)
             }
         })
@@ -153,11 +155,15 @@ class SyncInformationActivity : BaseSplitActivity() {
     private fun setupProgressOverlay() {
         progressOverlayBackground.setOnTouchListener { _, _ -> true }
         progress_sync_overlay.setOnTouchListener { _, _ -> true }
-        progress_sync_overlay.text = getString(R.string.progress_sync_overlay)
         progressBar.setOnTouchListener { _, _ -> true }
     }
 
-    private fun showProgressOverlayIfNecessary() {
+    private fun showProgressOverlayIfNecessary(loadingState: ViewState.LoadingState) {
+        progress_sync_overlay.text = when (loadingState) {
+            Syncing -> getString(R.string.progress_sync_overlay)
+            Calculating -> getString(R.string.calculating_overlay)
+        }
+
         if (!isProgressOverlayVisible()) {
             group_progress_overlay.visibility = View.VISIBLE
         }
@@ -207,7 +213,10 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     sealed class ViewState {
-        object Syncing : ViewState()
+        sealed class LoadingState: ViewState() {
+            object Syncing : LoadingState()
+            object Calculating : LoadingState()
+        }
         data class SyncDataFetched(val recordsInLocal: Int,
                                    val recordsToDownSync: Int?,
                                    val recordsToUpSync: Int,
