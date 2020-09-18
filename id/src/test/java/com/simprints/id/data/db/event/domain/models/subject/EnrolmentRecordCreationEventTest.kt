@@ -9,7 +9,6 @@ import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.id.domain.modality.Modes.FACE
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
@@ -30,7 +29,7 @@ class EnrolmentRecordCreationEventTest {
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
             assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
-            assertThat(eventVersion).isEqualTo(EVENT_VERSION)
+            assertThat(eventVersion).isEqualTo(2)
             assertThat(type).isEqualTo(ENROLMENT_RECORD_CREATION)
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
             assertThat(subjectId).isEqualTo(GUID1)

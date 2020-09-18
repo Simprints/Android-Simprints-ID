@@ -1,6 +1,7 @@
 package com.simprints.core.tools.json
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -12,6 +13,7 @@ class JsonHelper {
     val jackson: ObjectMapper by lazy {
         ObjectMapper()
             .registerKotlinModule()
+            .setSerializationInclusion(Include.NON_NULL)
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }
 

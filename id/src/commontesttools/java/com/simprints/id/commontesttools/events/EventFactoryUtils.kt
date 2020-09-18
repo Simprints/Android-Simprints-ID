@@ -129,36 +129,28 @@ fun createSessionCaptureEvent(id: String = GUID1, createdAt: Long = CREATED_AT):
         }
 }
 
-
-fun buildFakeBiometricReferences(): List<BiometricReference> {
-    val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
-    val faceReference = FaceReference(GUID2, listOf(FaceTemplate("some_template")))
+private fun buildFakeBiometricReferences(): List<BiometricReference> {
+    val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, "fake_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
+    val faceReference = FaceReference(GUID2, listOf(FaceTemplate("fake_template")))
     return listOf(fingerprintReference, faceReference)
 }
 
 fun createEnrolmentRecordCreationEvent() =
     EnrolmentRecordCreationEvent(
         CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(),
-        EventLabels(sessionId = null, projectId = DEFAULT_PROJECT_ID, subjectId = GUID1))
+        EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
 
 fun createEnrolmentRecordDeletionEvent() =
     EnrolmentRecordDeletionEvent(
         CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID,
-        EventLabels(sessionId = null, projectId = DEFAULT_PROJECT_ID, subjectId = GUID1, mode = listOf(FINGERPRINT)))
+        EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
 
 fun createEnrolmentRecordMoveEvent() =
     EnrolmentRecordMoveEvent(
         CREATED_AT,
-        EnrolmentRecordCreationInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, createBiometricReferences()),
+        EnrolmentRecordCreationInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, buildFakeBiometricReferences()),
         EnrolmentRecordDeletionInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID),
-        EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(DEFAULT_MODULE_ID), attendantId = GUID1, mode = listOf(FINGERPRINT))
-    )
-
-fun createBiometricReferences(): List<BiometricReference> {
-    val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, "some_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
-    val faceReference = FaceReference(GUID2, listOf(FaceTemplate("some_template")))
-    return listOf(fingerprintReference, faceReference)
-}
+        EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
 
 fun createAlertScreenEvent() = AlertScreenEvent(CREATED_AT, BLUETOOTH_NOT_ENABLED, eventLabels)
 
