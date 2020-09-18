@@ -54,7 +54,7 @@ import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordCr
 import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMovePayload
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
     JsonSubTypes.Type(value = ApiFaceCaptureConfirmationPayload::class, name = Companion.FACE_CAPTURE_CONFIRMATION_KEY),
     JsonSubTypes.Type(value = ApiFaceCapturePayload::class, name = Companion.FACE_CAPTURE_KEY),
@@ -85,7 +85,9 @@ import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMo
     JsonSubTypes.Type(value = ApiScannerConnectionPayload::class, name = Companion.SCANNER_CONNECTION_KEY),
     JsonSubTypes.Type(value = ApiScannerFirmwareUpdatePayload::class, name = Companion.SCANNER_FIRMWARE_UPDATE_KEY),
     JsonSubTypes.Type(value = ApiSuspiciousIntentPayload::class, name = Companion.SUSPICIOUS_INTENT_KEY),
-    JsonSubTypes.Type(value = ApiVero2InfoSnapshotPayload::class, name = Companion.VERO_2_INFO_SNAPSHOT_KEY)
+    JsonSubTypes.Type(value = ApiVero2InfoSnapshotPayload::class, name = Companion.VERO_2_INFO_SNAPSHOT_KEY),
+    JsonSubTypes.Type(value = ApiCallbackPayload::class, name = Companion.CALLOUT_KEY),
+    JsonSubTypes.Type(value = ApiCalloutPayload::class, name = Companion.CALLBACK_KEY)
 )
 abstract class ApiEventPayload(
     val type: ApiEventPayloadType,

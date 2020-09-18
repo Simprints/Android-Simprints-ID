@@ -83,7 +83,7 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
                     subjectId = subjectId,
                     modes = modes,
                     lastEventId = lastEventId,
-                    eventType = types.map { it.key }
+                    eventType = types.map { it.name }
                 )
             }
         }.byteStream()

@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.event.remote.models.subject
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.id.data.db.event.domain.models.subject.BiometricReference
@@ -17,7 +16,7 @@ import com.simprints.id.data.db.event.domain.models.subject.FingerprintReference
 private const val FACE_REFERENCE_KEY = "FaceReference"
 private const val FINGERPRINT_REFERENCE_KEY = "FingerprintReference"
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
     JsonSubTypes.Type(value = ApiFaceReference::class, name = FACE_REFERENCE_KEY),
     JsonSubTypes.Type(value = ApiFingerprintReference::class, name = FINGERPRINT_REFERENCE_KEY)
@@ -45,8 +44,15 @@ data class ApiFingerprintReference(
 
 @Keep
 enum class ApiBiometricReferenceType {
-    @JsonProperty(FACE_REFERENCE_KEY) FaceReference,
-    @JsonProperty(FINGERPRINT_REFERENCE_KEY) FingerprintReference;
+    // a constant key is required to serialise/deserialize
+    // ApiBiometricReference correctly with Jackson (see annotation in ApiBiometricReference).
+    // Add a key in the companion object for each enum value
+
+    /* key added: FACE_REFERENCE_KEY */
+    FaceReference,
+
+    /* key added: FINGERPRINT_REFERENCE_KEY */
+    FingerprintReference;
 }
 
 fun BiometricReference.fromDomainToApi() = when (this) {

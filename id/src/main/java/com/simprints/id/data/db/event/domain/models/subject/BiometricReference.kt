@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReferenc
 import com.simprints.id.data.db.event.remote.models.subject.ApiFaceReference
 import com.simprints.id.data.db.event.remote.models.subject.ApiFingerprintReference
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes(
     JsonSubTypes.Type(value = FaceReference::class, name = FACE_REFERENCE_KEY),
     JsonSubTypes.Type(value = FingerprintReference::class, name = FINGERPRINT_REFERENCE_KEY)
@@ -25,9 +25,17 @@ data class FingerprintReference(override val id: String,
                                 val templates: List<FingerprintTemplate>,
                                 val metadata: HashMap<String, String>? = null) : BiometricReference(id, BiometricReferenceType.FINGERPRINT_REFERENCE)
 
-enum class BiometricReferenceType(private val key: String) {
-    FACE_REFERENCE(BiometricReferenceType.FACE_REFERENCE_KEY),
-    FINGERPRINT_REFERENCE(BiometricReferenceType.FINGERPRINT_REFERENCE_KEY);
+enum class BiometricReferenceType {
+
+    // a constant key is required to serialise/deserialize
+    // BiometricReference correctly with Jackson (see annotation in BiometricReference).
+    // Add a key in the companion object for each enum value
+
+    /* key added: FACE_REFERENCE */
+    FACE_REFERENCE,
+
+    /* key added: FINGERPRINT_REFERENCE */
+    FINGERPRINT_REFERENCE;
 
     companion object {
         const val FACE_REFERENCE_KEY = "FACE_REFERENCE"

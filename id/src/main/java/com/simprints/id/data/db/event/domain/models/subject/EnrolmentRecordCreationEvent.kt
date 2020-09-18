@@ -94,6 +94,6 @@ data class EnrolmentRecordCreationEvent(
                 null
             }
 
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 2
     }
 }
