@@ -86,7 +86,7 @@ open class EventRepositoryImpl(
                     deviceId),
                 DatabaseInfo(count))
 
-            closeSessionsAndAddReasonEvent(loadOpenSessions(), NEW_SESSION)
+            closeSessionsAndAddArtificialTerminationEvent(loadOpenSessions(), NEW_SESSION)
             addEvent(sessionCaptureEvent)
         }
     }
@@ -206,7 +206,7 @@ open class EventRepositoryImpl(
 
         val events = eventLocalDataSource.load(queryForOldOpenSessions)
         return if(events.count() > 0) {
-            closeSessionsAndAddReasonEvent(events, TIMED_OUT)
+            closeSessionsAndAddArtificialTerminationEvent(events, TIMED_OUT)
             eventLocalDataSource.load(queryForOldOpenSessions)
         } else {
             events
@@ -237,15 +237,15 @@ open class EventRepositoryImpl(
             eventLocalDataSource.load(DbLocalEventQuery(sessionId = sessionId))
         }
 
-    private suspend fun closeSessionsAndAddReasonEvent(openSessions: Flow<Event>,
-                                                       reason: ArtificialTerminationPayload.Reason) {
-
+    private suspend fun closeSessionsAndAddArtificialTerminationEvent(openSessions: Flow<Event>,
+                                                                      reason: ArtificialTerminationPayload.Reason) {
         openSessions.collect { session ->
             val artificialTerminationEvent = ArtificialTerminationEvent(
                 timeHelper.now(),
                 reason
             )
             artificialTerminationEvent.labels = artificialTerminationEvent.labels.appendSessionId(session.id)
+
             addEvent(artificialTerminationEvent)
 
             (session as SessionCaptureEvent).payload.endedAt = timeHelper.now()

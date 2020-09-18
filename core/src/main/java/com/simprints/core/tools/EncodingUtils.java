@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 // For some reason, mocking this class in Kotlin fails (required by Fingerprint module)
 public class EncodingUtils {
 
-    public static @NonNull
+    public static @NonNull //Do not use in unit test - android.util.Base64 requires android sdk
     String byteArrayToBase64(@NonNull byte[] bytes)
     {
         return Base64.encodeToString(bytes, Base64.DEFAULT);

@@ -122,7 +122,7 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun addEvent_shouldAddEventIntoDb() {
+    fun addEventIntoASession_shouldStoreItIntoTheDbWithRightLabels() {
         runBlocking {
             mockDbToHaveOneOpenSession()
             val newEvent = createAlertScreenEvent()
@@ -132,6 +132,21 @@ class EventRepositoryImplTest {
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
                     newEvent.copy(labels = EventLabels(sessionId = GUID1, deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID)))
+            }
+        }
+    }
+
+    @Test
+    fun addEvent_shouldStoreItIntoTheDbWithRightLabels() {
+        runBlocking {
+            val newEvent = createAlertScreenEvent()
+            newEvent.labels = EventLabels()
+
+            eventRepo.addEvent(newEvent)
+
+            coVerify {
+                eventLocalDataSource.insertOrUpdate(
+                    newEvent.copy(labels = EventLabels(deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID)))
             }
         }
     }

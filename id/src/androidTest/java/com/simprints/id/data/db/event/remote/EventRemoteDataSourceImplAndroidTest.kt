@@ -8,14 +8,13 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.events.CREATED_AT
-import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
-import com.simprints.id.commontesttools.events.createBiometricReferences
 import com.simprints.id.commontesttools.events.eventLabels
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.domain.models.*
@@ -25,6 +24,7 @@ import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.Authenti
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
+import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
@@ -42,18 +42,14 @@ import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.Location
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
+import com.simprints.id.data.db.event.domain.models.subject.*
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
+import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.domain.modality.Modes.FACE
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
-import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.id.network.SimApiClientFactoryImpl
@@ -73,7 +69,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import timber.log.Timber
 
 @RunWith(AndroidJUnit4::class)
 class EventRemoteDataSourceImplAndroidTest {
@@ -115,40 +110,12 @@ class EventRemoteDataSourceImplAndroidTest {
     @Test
     fun aSessionWithAllEvents_shouldGetUploaded() {
         runBlocking {
-            val events = mutableListOf<Event>().apply {
-                addAlertScreenEvents()
-                addArtificialTerminationEvent()
-                addAuthenticationEvent()
-                addAuthorizationEvent()
-                addCandidateReadEvent()
-                addConnectivitySnapshotEvent()
-                addConsentEvent()
-                addEnrolmentEvent()
-                addFingerprintCaptureEvent()
-                addFaceCaptureEvent()
-                addFaceCaptureConfirmationEvent()
-                addFaceCaptureRetryEvent()
-                addFaceFallbackCaptureEvent()
-                addFaceOnboardingCompleteEvent()
-                addGuidSelectionEvent()
-                addIntentParsingEvent()
-                addInvalidIntentEvent()
-                addOneToOneMatchEvent()
-                addOneToManyMatchEvent()
-                addPersonCreationEvent()
-                addRefusalEvent()
-                addScannerConnectionEvent()
-                addVero2InfoSnapshotEvents()
-                addScannerFirmwareUpdateEvent()
-                addSessionCaptureEvent()
-                addSuspiciousIntentEvent()
-                addCallbackEvent()
-                addCalloutEvent()
-                addCompletionCheckEvent()
+            val events = mutableListOf<Event>()
+            EventType.values().forEach {
+                events.addEventFor(it)
             }
 
-            Timber.d("TEST2", events)
-            //executeUpload(events)
+            executeUpload(events)
         }
     }
 
@@ -392,11 +359,11 @@ class EventRemoteDataSourceImplAndroidTest {
         val deviceArg = Device(
             VERSION.SDK_INT.toString(),
             Build.MANUFACTURER + "_" + Build.MODEL,
-            DefaultTestConstants.GUID1)
+            GUID1)
 
         val event = SessionCaptureEvent(
             randomUUID(),
-            DEFAULT_PROJECT_ID,
+            testProject.id,
             CREATED_AT,
             listOf(FINGERPRINT, FACE),
             "appVersionName",
@@ -413,89 +380,136 @@ class EventRemoteDataSourceImplAndroidTest {
 
     private fun MutableList<Event>.addEnrolmentRecordCreation() {
         add(EnrolmentRecordCreationEvent(
-            CREATED_AT, DefaultTestConstants.GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(),
-            eventLabels.copy(subjectId = DefaultTestConstants.GUID1)))
+            CREATED_AT, GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(),
+            EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
+        )
     }
 
     private fun MutableList<Event>.addEnrolmentRecordMoveEvent() {
         add(EnrolmentRecordMoveEvent(
             CREATED_AT,
-            EnrolmentRecordCreationInMove(DefaultTestConstants.GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, createBiometricReferences()),
-            EnrolmentRecordDeletionInMove(DefaultTestConstants.GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID),
-            eventLabels.copy(subjectId = DefaultTestConstants.GUID1)
-        ))
+            EnrolmentRecordCreationInMove(GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, buildFakeBiometricReferences()),
+            EnrolmentRecordDeletionInMove(GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID),
+            EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
+        )
     }
 
     private fun MutableList<Event>.addEnrolmentRecordDeletionEvent() {
         add(EnrolmentRecordDeletionEvent(
-            CREATED_AT, DefaultTestConstants.GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID,
-            eventLabels.copy(subjectId = DefaultTestConstants.GUID1)))
+            CREATED_AT, GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID,
+            EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
+        )
     }
 
-    private fun MutableList<Event>.addCallbackEvent() {
-        add(EnrolmentCallbackEvent(DEFAULT_TIME, randomUUID(), eventLabels))
-
+    private fun MutableList<Event>.addCallbackErrorEvent() {
         ErrorCallbackPayload.Reason.values().forEach {
             add(ErrorCallbackEvent(DEFAULT_TIME, it, eventLabels))
         }
+    }
 
+    private fun MutableList<Event>.addCallbackEnrolmentEvent() {
+        add(EnrolmentCallbackEvent(DEFAULT_TIME, randomUUID(), eventLabels))
+    }
+
+    private fun MutableList<Event>.addCallbackRefusalEvent() {
+        add(RefusalCallbackEvent(DEFAULT_TIME, "reason", "other_text", eventLabels))
+    }
+
+    private fun MutableList<Event>.addCallbackVerificationEvent() {
+        Tier.values().forEach {
+            add(VerificationCallbackEvent(DEFAULT_TIME, CallbackComparisonScore(randomUUID(), 0, it), eventLabels))
+        }
+    }
+
+    private fun MutableList<Event>.addCallbackIdentificationEvent() {
         Tier.values().forEach {
             add(IdentificationCallbackEvent(DEFAULT_TIME, randomUUID(), listOf(CallbackComparisonScore(randomUUID(), 0, it)), eventLabels))
         }
+    }
 
-        add(RefusalCallbackEvent(DEFAULT_TIME, "reason", "other_text", eventLabels))
-        add(VerificationCallbackEvent(DEFAULT_TIME, CallbackComparisonScore(randomUUID(), 0, TIER_1), eventLabels))
+    private fun MutableList<Event>.addCallbackConfirmationEvent() {
         add(ConfirmationCallbackEvent(DEFAULT_TIME, true, eventLabels))
     }
 
-    private fun MutableList<Event>.addCalloutEvent() {
-        add(EnrolmentCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata", eventLabels))
-        add(ConfirmationCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, randomUUID(), randomUUID(), eventLabels))
-        add(IdentificationCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata", eventLabels))
-        add(VerificationCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, randomUUID(), "metadata", eventLabels))
-        add(EnrolmentLastBiometricsCalloutEvent(DEFAULT_TIME, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata", randomUUID(), eventLabels))
+    private fun MutableList<Event>.addCalloutEnrolmentEvent() {
+        add(EnrolmentCalloutEvent(DEFAULT_TIME, testProject.id, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata", eventLabels))
     }
 
+    private fun MutableList<Event>.addCalloutIdentificationEvent() {
+        add(IdentificationCalloutEvent(DEFAULT_TIME, testProject.id, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata", eventLabels))
+    }
+
+    private fun MutableList<Event>.addCalloutVerificationEvent() {
+        add(VerificationCalloutEvent(DEFAULT_TIME, testProject.id, DEFAULT_USER_ID, DEFAULT_MODULE_ID, randomUUID(), "metadata", eventLabels))
+    }
+
+    private fun MutableList<Event>.addCalloutLastBiomentricsEvent() {
+        add(EnrolmentLastBiometricsCalloutEvent(DEFAULT_TIME, testProject.id, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata", randomUUID(), eventLabels))
+    }
+
+    private fun MutableList<Event>.addCalloutConfirmationCallbackEvent() {
+        add(ConfirmationCalloutEvent(DEFAULT_TIME, testProject.id, randomUUID(), randomUUID(), eventLabels))
+    }
+
+    private fun buildFakeBiometricReferences(): List<BiometricReference> {
+        val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, buildFakeFingerprintTemplate(), LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
+        val faceReference = FaceReference(GUID2, listOf(FaceTemplate(buildFakeFaceTemplate())))
+        return listOf(fingerprintReference, faceReference)
+    }
+
+    private fun buildFakeFingerprintTemplate() = EncodingUtils.byteArrayToBase64(
+        SubjectsGeneratorUtils.getRandomFingerprintSample().template
+    )
+
+    private fun buildFakeFaceTemplate() = EncodingUtils.byteArrayToBase64(
+        SubjectsGeneratorUtils.getRandomFaceSample().template
+    )
+
     // Never invoked, but used to enforce that the implementation of a test for every event class
-    fun enforceThatAnyTestHasATest() {
-        val events: MutableList<Event> = mutableListOf<Event>()
-        val type: ApiEventPayloadType? = null
+    fun MutableList<Event>.addEventFor(type: EventType) {
 
         when (type) {
-            EnrolmentRecordCreation -> events.addEnrolmentRecordCreation()
-            EnrolmentRecordDeletion -> events.addEnrolmentRecordDeletionEvent()
-            EnrolmentRecordMove -> events.addEnrolmentRecordMoveEvent()
-            Callout -> events.addCalloutEvent()
-            Callback -> events.addCallbackEvent()
-            ArtificialTermination -> events.addArtificialTerminationEvent()
-            Authentication -> events.addAuthenticationEvent()
-            Consent -> events.addConsentEvent()
-            Enrolment -> events.addEnrolmentEvent()
-            Authorization -> events.addAuthorizationEvent()
-            FingerprintCapture -> events.addFingerprintCaptureEvent()
-            OneToOneMatch -> events.addOneToOneMatchEvent()
-            OneToManyMatch -> events.addOneToManyMatchEvent()
-            PersonCreation -> events.addPersonCreationEvent()
-            AlertScreen -> events.addAlertScreenEvents()
-            GuidSelection -> events.addGuidSelectionEvent()
-            ConnectivitySnapshot -> events.addConnectivitySnapshotEvent()
-            Refusal -> events.addRefusalEvent()
-            CandidateRead -> events.addCandidateReadEvent()
-            ScannerConnection -> events.addScannerConnectionEvent()
-            Vero2InfoSnapshot -> events.addVero2InfoSnapshotEvents()
-            ScannerFirmwareUpdate -> events.addScannerFirmwareUpdateEvent()
-            InvalidIntent -> events.addInvalidIntentEvent()
-            SuspiciousIntent -> events.addSuspiciousIntentEvent()
-            IntentParsing -> events.addInvalidIntentEvent()
-            CompletionCheck -> events.addCompletionCheckEvent()
-            SessionCapture -> events.addSessionCaptureEvent()
-            FaceOnboardingComplete -> events.addFaceOnboardingCompleteEvent()
-            FaceFallbackCapture -> events.addFaceFallbackCaptureEvent()
-            FaceCapture -> events.addFaceCaptureEvent()
-            FaceCaptureConfirmation -> events.addFaceCaptureConfirmationEvent()
-            FaceCaptureRetry -> events.addFaceCaptureRetryEvent()
-            null -> {
-            }
+            SESSION_CAPTURE -> addSessionCaptureEvent()
+            ENROLMENT_RECORD_CREATION -> addEnrolmentRecordCreation()
+            ENROLMENT_RECORD_DELETION -> addEnrolmentRecordDeletionEvent()
+            ENROLMENT_RECORD_MOVE -> addEnrolmentRecordMoveEvent()
+            ARTIFICIAL_TERMINATION -> addArtificialTerminationEvent()
+            AUTHENTICATION -> addAuthenticationEvent()
+            CONSENT -> addConsentEvent()
+            ENROLMENT -> addEnrolmentEvent()
+            AUTHORIZATION -> addAuthorizationEvent()
+            FINGERPRINT_CAPTURE -> addFingerprintCaptureEvent()
+            ONE_TO_ONE_MATCH -> addOneToOneMatchEvent()
+            ONE_TO_MANY_MATCH -> addOneToManyMatchEvent()
+            PERSON_CREATION -> addPersonCreationEvent()
+            ALERT_SCREEN -> addAlertScreenEvents()
+            GUID_SELECTION -> addGuidSelectionEvent()
+            CONNECTIVITY_SNAPSHOT -> addConnectivitySnapshotEvent()
+            REFUSAL -> addRefusalEvent()
+            CANDIDATE_READ -> addCandidateReadEvent()
+            SCANNER_CONNECTION -> addScannerConnectionEvent()
+            VERO_2_INFO_SNAPSHOT -> addVero2InfoSnapshotEvents()
+            SCANNER_FIRMWARE_UPDATE -> addScannerFirmwareUpdateEvent()
+            INVALID_INTENT -> addInvalidIntentEvent()
+            CALLOUT_CONFIRMATION -> addCalloutConfirmationCallbackEvent()
+            CALLOUT_IDENTIFICATION -> addCalloutIdentificationEvent()
+            CALLOUT_ENROLMENT -> addCalloutEnrolmentEvent()
+            CALLOUT_VERIFICATION -> addCalloutVerificationEvent()
+            CALLOUT_LAST_BIOMETRICS -> addCalloutLastBiomentricsEvent()
+            CALLBACK_IDENTIFICATION -> addCallbackIdentificationEvent()
+            CALLBACK_ENROLMENT -> addCallbackEnrolmentEvent()
+            CALLBACK_REFUSAL -> addCallbackRefusalEvent()
+            CALLBACK_VERIFICATION -> addCallbackVerificationEvent()
+            CALLBACK_ERROR -> addCallbackErrorEvent()
+            CALLBACK_CONFIRMATION -> addCallbackConfirmationEvent()
+            SUSPICIOUS_INTENT -> addSuspiciousIntentEvent()
+            INTENT_PARSING -> addIntentParsingEvent()
+            COMPLETION_CHECK -> addCompletionCheckEvent()
+            FACE_ONBOARDING_COMPLETE -> addFaceOnboardingCompleteEvent()
+            FACE_FALLBACK_CAPTURE -> addFaceFallbackCaptureEvent()
+            FACE_CAPTURE -> addFaceCaptureEvent()
+            FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
+            FACE_CAPTURE_RETRY -> addFaceCaptureRetryEvent()
         }.safeSealedWhens
     }
 
