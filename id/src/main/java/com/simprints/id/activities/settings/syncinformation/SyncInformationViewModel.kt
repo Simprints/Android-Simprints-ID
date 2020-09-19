@@ -57,15 +57,15 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
         )
     }
 
-    internal suspend fun fetchLocalRecordCount() =
+    private suspend fun fetchLocalRecordCount() =
         subjectLocalDataSource.count(SubjectLocalDataSource.Query(projectId = projectId))
 
     private fun fetchAndUpdateImagesToUploadCount() = imageRepository.getNumberOfImagesToUpload()
 
-    internal suspend fun fetchAndUpdateRecordsToUpSyncCount() =
+    private suspend fun fetchAndUpdateRecordsToUpSyncCount() =
         subjectLocalDataSource.count(SubjectLocalDataSource.Query(toSync = true))
 
-    internal suspend fun fetchRecordsToUpdateAndDeleteCountIfNecessary(): Pair<Int?, Int?> {
+    private suspend fun fetchRecordsToUpdateAndDeleteCountIfNecessary(): Pair<Int?, Int?> {
         return if(isDownSyncAllowed()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
@@ -77,7 +77,7 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
         subjectsDownSyncSetting == ON || subjectsDownSyncSetting == EXTRA
     }
 
-    internal suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): Pair<Int?, Int?> {
+    private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): Pair<Int?, Int?> {
         return try {
             val downSyncScope = subjectsDownSyncScopeRepository.getDownSyncScope()
             val counts = personRepository.countToDownSync(downSyncScope)
@@ -88,7 +88,7 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
         }
     }
 
-    internal suspend fun fetchAndUpdateSelectedModulesCount() = preferencesManager.selectedModules.map {
+    private suspend fun fetchAndUpdateSelectedModulesCount() = preferencesManager.selectedModules.map {
             ModuleCount(it,
                 subjectLocalDataSource.count(SubjectLocalDataSource.Query(projectId = projectId, moduleId = it)))
         }
