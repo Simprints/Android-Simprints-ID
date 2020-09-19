@@ -74,16 +74,6 @@ class SyncInformationViewModelTest {
     }
 
     @Test
-    fun syncComplete_shouldCallFetchRecords() {
-        every { subjectsSyncManagerMock.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
-
-        viewModel.updateSyncInfo()
-        viewModel.getViewStateLiveData().testObserver()
-
-        coVerify { viewModel.fetchRecords() }
-    }
-
-    @Test
     fun syncComplete_fetchFromRemoteAndLocalSucceeds_shouldHaveCorrectViewState() {
         val localCount = 322
         val imagesToUpload = 12

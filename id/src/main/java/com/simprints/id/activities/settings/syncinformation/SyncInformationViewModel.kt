@@ -3,6 +3,7 @@ package com.simprints.id.activities.settings.syncinformation
 import androidx.lifecycle.*
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.SyncDataFetched
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
+import com.simprints.id.data.db.common.models.SubjectsCount
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
@@ -14,9 +15,8 @@ import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDo
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
-class SyncInformationViewModel(private val personRepository: SubjectRepository,
+class SyncInformationViewModel(private val subjectRepository: SubjectRepository,
                                private val subjectLocalDataSource: SubjectLocalDataSource,
                                private val preferencesManager: PreferencesManager,
                                private val projectId: String,
@@ -41,17 +41,17 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
         }
     }
 
-    internal suspend fun fetchRecords(): SyncDataFetched {
+    private suspend fun fetchRecords(): SyncDataFetched {
         val recordsInLocalCount = fetchLocalRecordCount()
         val imagesToUploadCount = fetchAndUpdateImagesToUploadCount()
         val recordsToUpSyncCount = fetchAndUpdateRecordsToUpSyncCount()
         val modulesCount = fetchAndUpdateSelectedModulesCount()
-        val (recordsToDownSync, recordsToDelete) = fetchRecordsToUpdateAndDeleteCountIfNecessary()
+        val subjectCounts = fetchRecordsToCreateAndDeleteCountOrNull()
         return SyncDataFetched(
             recordsInLocal = recordsInLocalCount,
-            recordsToDownSync = recordsToDownSync,
+            recordsToDownSync = subjectCounts?.created,
             recordsToUpSync = recordsToUpSyncCount,
-            recordsToDelete = recordsToDelete,
+            recordsToDelete = subjectCounts?.deleted,
             imagesToUpload = imagesToUploadCount,
             moduleCounts = modulesCount
         )
@@ -65,11 +65,11 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
     private suspend fun fetchAndUpdateRecordsToUpSyncCount() =
         subjectLocalDataSource.count(SubjectLocalDataSource.Query(toSync = true))
 
-    private suspend fun fetchRecordsToUpdateAndDeleteCountIfNecessary(): Pair<Int?, Int?> {
+    private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): SubjectsCount? {
         return if(isDownSyncAllowed()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
-            Pair(null, null)
+            null
         }
     }
 
@@ -77,14 +77,13 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
         subjectsDownSyncSetting == ON || subjectsDownSyncSetting == EXTRA
     }
 
-    private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): Pair<Int?, Int?> {
+    private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): SubjectsCount? {
         return try {
             val downSyncScope = subjectsDownSyncScopeRepository.getDownSyncScope()
-            val counts = personRepository.countToDownSync(downSyncScope)
-            Pair(counts.created, counts.deleted)
+            subjectRepository.countToDownSync(downSyncScope)
         } catch (t: Throwable) {
             t.printStackTrace()
-            Pair(null, null)
+            null
         }
     }
 
@@ -97,7 +96,6 @@ class SyncInformationViewModel(private val personRepository: SubjectRepository,
         val downSyncStates = downSyncWorkersInfo
         val upSyncStates = upSyncWorkersInfo
         val allSyncStates = downSyncStates + upSyncStates
-        Timber.d("Sync states -- ${allSyncStates.map { it.state.state }} ")
         return allSyncStates.any {
             it.state is SubjectsSyncWorkerState.Running || it.state is SubjectsSyncWorkerState.Enqueued
         }
