@@ -14,6 +14,8 @@ import kotlin.experimental.and
 class RankOneFaceDetector : FaceDetector {
     private val maxFaces = 1
     private val falseDetectionRate = 0.1f
+    private val relativeMinSize = 0.2f
+    private val absoluteMinSize = 36L
 
     data class ROCFace(
         var face: roc_detection,
@@ -140,7 +142,13 @@ class RankOneFaceDetector : FaceDetector {
     private fun getRocTemplateFromImage(image: roc_image, rocFace: ROCFace): Boolean {
         val adaptiveMinimumSize = roc.new_size_t()
         roc.roc_ensure(
-            roc.roc_adaptive_minimum_size(image.width, image.height, 0.2f, 36, adaptiveMinimumSize)
+            roc.roc_adaptive_minimum_size(
+                image.width,
+                image.height,
+                relativeMinSize,
+                absoluteMinSize,
+                adaptiveMinimumSize
+            )
         )
 
         val n = roc.new_size_t()

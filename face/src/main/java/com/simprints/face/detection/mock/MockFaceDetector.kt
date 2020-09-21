@@ -12,8 +12,6 @@ import kotlin.random.Random
 class MockFaceDetector : FaceDetector {
     private val mockDelay = 200L
     override fun analyze(previewFrame: PreviewFrame): Face? {
-//        delay(mockDelay)
-
         return Face(
             previewFrame.width,
             previewFrame.height,
