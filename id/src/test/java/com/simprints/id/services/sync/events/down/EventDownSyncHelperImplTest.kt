@@ -56,7 +56,7 @@ class EventDownSyncHelperImplTest {
     }
 
     @Test
-    fun countForDownSync_shouldReturnEventRepoChannel() {
+    fun countForDownSync_shouldReturnRepoEventChannel() {
         runBlockingTest {
             eventDownSyncHelper.countForDownSync(op)
             coVerify { eventRepository.countEventsToDownload(any()) }
@@ -64,7 +64,7 @@ class EventDownSyncHelperImplTest {
     }
 
     @Test
-    fun downSync_shouldConsumeEventRepoChannel() {
+    fun downSync_shouldConsumeRepoEventChannel() {
         runBlockingTest {
             eventDownSyncHelper.downSync(this, op)
 
