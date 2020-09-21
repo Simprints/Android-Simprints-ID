@@ -59,7 +59,6 @@ dependencies {
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter
     implementation deps.retrofit.jackson
-    implementation deps.gson.extras
     implementation deps.jackson.core
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
