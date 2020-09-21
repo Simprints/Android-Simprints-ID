@@ -22,12 +22,11 @@ abstract class EventSyncStatusDatabase : RoomDatabase() {
     abstract val upSyncOperationsDaoDb: DbEventUpSyncOperationStateDao
 
     companion object {
-        const val ROOM_DB_NAME = "room_db"
+        private const val ROOM_DB_NAME = "room_db"
 
         fun getDatabase(context: Context): EventSyncStatusDatabase = Room
             .databaseBuilder(context.applicationContext, EventSyncStatusDatabase::class.java, ROOM_DB_NAME)
             .fallbackToDestructiveMigration()
-            .allowMainThreadQueries()
             .build()
     }
 }

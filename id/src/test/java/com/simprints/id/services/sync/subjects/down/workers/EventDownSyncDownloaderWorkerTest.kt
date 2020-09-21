@@ -4,6 +4,9 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.Data
 import androidx.work.WorkInfo
+import androidx.work.WorkInfo.State
+import androidx.work.WorkInfo.State.RUNNING
+import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
@@ -19,7 +22,6 @@ import com.simprints.id.services.sync.events.down.workers.extractDownSyncProgres
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.coEvery
 import io.mockk.every
@@ -43,10 +45,11 @@ class EventDownSyncDownloaderWorkerTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).setupWorkManager().setupFirebase()
         app.component = mockk(relaxed = true)
         val correctInputData = JsonHelper().toJson(projectDownSyncScope.operations.first())
         eventDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
+        eventDownSyncDownloaderWorker.firebasePerformanceTraceFactory = mockk(relaxed = true)
+        eventDownSyncDownloaderWorker.crashReportManager = mockk(relaxed = true)
     }
 
     @Test
@@ -97,7 +100,7 @@ class EventDownSyncDownloaderWorkerTest {
         val syncCacheMock = mockk<EventSyncCache>()
         every { syncCacheMock.readProgress(any()) } returns 1
 
-        val workInfo = WorkInfo(UUID.randomUUID(), WorkInfo.State.RUNNING, workDataOf(), listOf(), workDataOf(PROGRESS_DOWN_SYNC to progress), 2)
+        val workInfo = WorkInfo(UUID.randomUUID(), State.RUNNING, workDataOf(), listOf(), workDataOf(PROGRESS_DOWN_SYNC to progress), 2)
         assertThat(workInfo.extractDownSyncProgress(syncCacheMock)).isEqualTo(progress)
     }
 
@@ -107,7 +110,7 @@ class EventDownSyncDownloaderWorkerTest {
         val syncCacheMock = mockk<EventSyncCache>()
         every { syncCacheMock.readProgress(any()) } returns 1
 
-        val workInfo = WorkInfo(UUID.randomUUID(), WorkInfo.State.SUCCEEDED, workDataOf(OUTPUT_DOWN_SYNC to progress), listOf(), workDataOf(), 2)
+        val workInfo = WorkInfo(UUID.randomUUID(), SUCCEEDED, workDataOf(OUTPUT_DOWN_SYNC to progress), listOf(), workDataOf(), 2)
         assertThat(workInfo.extractDownSyncProgress(syncCacheMock)).isEqualTo(progress)
     }
 
@@ -117,7 +120,7 @@ class EventDownSyncDownloaderWorkerTest {
         val syncCacheMock = mockk<EventSyncCache>()
         every { syncCacheMock.readProgress(any()) } returns progress
 
-        val workInfo = WorkInfo(UUID.randomUUID(), WorkInfo.State.RUNNING, workDataOf(), listOf(), workDataOf(), 2)
+        val workInfo = WorkInfo(UUID.randomUUID(), RUNNING, workDataOf(), listOf(), workDataOf(), 2)
         assertThat(workInfo.extractDownSyncProgress(syncCacheMock)).isEqualTo(progress)
     }
 

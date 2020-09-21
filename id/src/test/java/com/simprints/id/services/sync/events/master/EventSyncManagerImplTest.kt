@@ -48,10 +48,7 @@ class EventSyncManagerImplTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this)
-            .setupWorkManager()
-            .setupFirebase()
-
+        UnitTestConfig(this).setupWorkManager()
         MockKAnnotations.init(this, relaxed = true)
         subjectsSyncManager = EventSyncManagerImpl(ctx, eventSyncStateProcessor, eventDownSyncScopeRepository, eventUpSyncScopeRepository, eventSyncCache)
     }

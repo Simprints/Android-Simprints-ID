@@ -6,7 +6,6 @@ import com.simprints.id.commontesttools.DefaultTestConstants.modulesDownSyncScop
 import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
 import com.simprints.id.commontesttools.DefaultTestConstants.userDownSyncScope
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilderImpl
@@ -23,7 +22,6 @@ import org.junit.Test
 
 class EventDownSyncWorkersBuilderImplTest {
 
-    private val modes = listOf(Modes.FINGERPRINT, Modes.FACE)
     private lateinit var eventDownSyncWorkersFactory: EventDownSyncWorkersBuilder
     private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 

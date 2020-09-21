@@ -19,7 +19,6 @@ import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWork
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
@@ -40,7 +39,6 @@ class EventDownSyncCountWorkerTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).fullSetup()
         countWorker = TestListenableWorkerBuilder<EventDownSyncCountWorker>(app)
             .setTags(listOf(tagForMasterSyncId))
             .setInputData(workDataOf(INPUT_COUNT_WORKER_DOWN to JsonHelper().toJson(projectDownSyncScope)))

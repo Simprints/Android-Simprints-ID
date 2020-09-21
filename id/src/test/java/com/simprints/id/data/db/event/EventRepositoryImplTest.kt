@@ -169,13 +169,14 @@ class EventRepositoryImplTest {
     fun createBatches_shouldSplitEventsCorrectlyIntoBatches() {
         runBlocking {
             mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE)
-            mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
+            mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE + 10)
 
             val bathes = (eventRepo as EventRepositoryImpl).createBatches(LocalEventQuery())
 
             assertThat(bathes[0].events.size).isEqualTo(SESSION_BATCH_SIZE)
             assertThat(bathes[1].events.size).isEqualTo(SESSION_BATCH_SIZE)
-            assertThat(bathes[2].events.size).isEqualTo(SESSION_BATCH_SIZE / 2)
+            assertThat(bathes[2].events.size).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(bathes[3].events.size).isEqualTo(10)
         }
     }
 
