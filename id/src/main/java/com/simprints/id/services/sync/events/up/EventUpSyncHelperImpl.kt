@@ -44,7 +44,7 @@ class EventUpSyncHelperImpl(
                 Timber.d(t)
                 lastOperation = lastOperation.copy(lastState = FAILED, lastSyncTime = timerHelper.now())
                 emitProgress(lastOperation, count)
-                close(t)
+                close()
             }
         }
 
