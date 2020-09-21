@@ -8,6 +8,8 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
+import com.simprints.id.commontesttools.SubjectsGeneratorUtils
+import com.simprints.id.commontesttools.encodingUtilsForTests
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
@@ -129,12 +131,6 @@ fun createSessionCaptureEvent(id: String = GUID1, createdAt: Long = CREATED_AT):
         }
 }
 
-private fun buildFakeBiometricReferences(): List<BiometricReference> {
-    val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, "fake_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
-    val faceReference = FaceReference(GUID2, listOf(FaceTemplate("fake_template")))
-    return listOf(fingerprintReference, faceReference)
-}
-
 fun createEnrolmentRecordCreationEvent() =
     EnrolmentRecordCreationEvent(
         CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(),
@@ -151,6 +147,20 @@ fun createEnrolmentRecordMoveEvent() =
         EnrolmentRecordCreationInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, buildFakeBiometricReferences()),
         EnrolmentRecordDeletionInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID),
         EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
+
+fun buildFakeBiometricReferences(): List<BiometricReference> {
+    val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, buildFakeFingerprintTemplate(), LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
+    val faceReference = FaceReference(GUID2, listOf(FaceTemplate(buildFakeFaceTemplate())))
+    return listOf(fingerprintReference, faceReference)
+}
+
+fun buildFakeFingerprintTemplate() = encodingUtilsForTests.byteArrayToBase64(
+    SubjectsGeneratorUtils.getRandomFingerprintSample().template
+)
+
+private fun buildFakeFaceTemplate() = encodingUtilsForTests.byteArrayToBase64(
+    SubjectsGeneratorUtils.getRandomFaceSample().template
+)
 
 fun createAlertScreenEvent() = AlertScreenEvent(CREATED_AT, BLUETOOTH_NOT_ENABLED, eventLabels)
 

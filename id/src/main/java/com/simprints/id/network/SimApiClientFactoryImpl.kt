@@ -2,12 +2,14 @@ package com.simprints.id.network
 
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
 import kotlin.reflect.KClass
 
 class SimApiClientFactoryImpl(
     val baseUrlProvider: BaseUrlProvider,
     val deviceId: String,
     private val remoteDbManager: RemoteDbManager,
+    private val performanceTracer: FirebasePerformanceTraceFactory,
     private val jsonHelper: JsonHelper
 ): SimApiClientFactory {
 
@@ -20,6 +22,7 @@ class SimApiClientFactoryImpl(
             baseUrlProvider.getApiBaseUrl(),
             deviceId,
             remoteDbManager.getCurrentToken(),
+            performanceTracer,
             jsonHelper
         )
     }
@@ -30,6 +33,7 @@ class SimApiClientFactoryImpl(
             baseUrlProvider.getApiBaseUrl(),
             deviceId,
             null,
+            performanceTracer,
             jsonHelper
         )
     }

@@ -15,6 +15,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
 import com.simprints.id.commontesttools.events.eventLabels
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.domain.models.*
@@ -42,10 +43,11 @@ import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.Location
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.domain.models.subject.*
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
-import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.domain.modality.Modes.FACE
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
@@ -100,7 +102,7 @@ class EventRemoteDataSourceImplAndroidTest {
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         eventRemoteDataSource = EventRemoteDataSourceImpl(
-            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device", remoteDbManager, JsonHelper()),
+            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device", remoteDbManager, mockk(relaxed = true), JsonHelper()),
             JsonHelper()
         )
         every { timeHelper.nowMinus(any(), any()) } returns 100
@@ -450,20 +452,6 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addCalloutConfirmationCallbackEvent() {
         add(ConfirmationCalloutEvent(DEFAULT_TIME, testProject.id, randomUUID(), randomUUID(), eventLabels))
     }
-
-    private fun buildFakeBiometricReferences(): List<BiometricReference> {
-        val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, buildFakeFingerprintTemplate(), LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
-        val faceReference = FaceReference(GUID2, listOf(FaceTemplate(buildFakeFaceTemplate())))
-        return listOf(fingerprintReference, faceReference)
-    }
-
-    private fun buildFakeFingerprintTemplate() = EncodingUtils.byteArrayToBase64(
-        SubjectsGeneratorUtils.getRandomFingerprintSample().template
-    )
-
-    private fun buildFakeFaceTemplate() = EncodingUtils.byteArrayToBase64(
-        SubjectsGeneratorUtils.getRandomFaceSample().template
-    )
 
     // Never invoked, but used to enforce that the implementation of a test for every event class
     fun MutableList<Event>.addEventFor(type: EventType) {

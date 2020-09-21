@@ -34,6 +34,7 @@ class FetchGuidHelperImpl(private val downSyncHelper: EventDownSyncHelper,
                     modes = preferencesManager.modalities.map { it.toMode() },
                     types = EventDownSyncScope.subjectEvents))
 
+            //StopShip: Error handling
             downSyncHelper.downSync(coroutineScope, op).consumeAsFlow().toList()
 
             Timber.d("[FETCH_GUID] Network request done")

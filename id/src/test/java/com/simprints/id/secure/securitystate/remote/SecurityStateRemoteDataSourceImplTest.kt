@@ -47,6 +47,7 @@ class SecurityStateRemoteDataSourceImplTest {
             mockWebServer.url("/").toString(),
             DEVICE_ID,
             randomUUID(),
+            mockk(),
             JsonHelper()
         )
 
