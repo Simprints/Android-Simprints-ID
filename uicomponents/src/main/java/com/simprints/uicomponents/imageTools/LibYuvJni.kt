@@ -5,12 +5,6 @@ import com.simprints.uicomponents.models.Size
 
 class LibYuvJni {
 
-    companion object {
-        init {
-            System.loadLibrary("yuvjni")
-        }
-    }
-
     fun cropRotateYuvNV21(
         srcSize: Size, srcBytes: ByteArray,
         rect: Rect,

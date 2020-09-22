@@ -28,6 +28,8 @@ This is a mock detector that always return true and wait a bit (200ms) before re
 
 RankOne is the SDK of choice for face recognition - after we did some extensive testing with lots of other providers. RankOne gives an SDK to copy to inside Simprints. It lives inside the [face module](src/main/java/io/rankone/rocsdk/embedded).
 
+Current RankOne version = 1.23 (with OpenMP disabled)
+
 RankOne files are split in 3 places:
 - assets - this is where the license should stay
 - jniLibs - these is ROC C code compiled
