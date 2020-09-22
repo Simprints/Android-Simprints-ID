@@ -1,7 +1,6 @@
 package com.simprints.id.activities.consent
 
 import android.content.Context
-import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.R
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -109,7 +108,7 @@ data class GeneralConsentTextHelper(val generalConsentOptionsJson: String,
 
     private fun buildGeneralConsentOptions() = try {
         jsonHelper.fromJson<GeneralConsentOptions>(generalConsentOptionsJson)
-    } catch (e: JsonSyntaxException) {
+    } catch (e: Throwable) {
         crashReportManager.logExceptionOrSafeException(Exception("Malformed General Consent Text Error", e))
         GeneralConsentOptions()
     }
