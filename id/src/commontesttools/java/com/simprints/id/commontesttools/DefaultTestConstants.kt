@@ -8,6 +8,7 @@ import com.simprints.id.domain.modality.Modes
 import java.util.*
 
 object DefaultTestConstants {
+    const val DEFAULT_DEVICE_ID = "device_id"
     const val DEFAULT_PROJECT_ID = "vkbpRLfHvpQqaeoxZgyx"
     const val DEFAULT_MODULE_ID = "the_one_and_only_module"
     const val DEFAULT_MODULE_ID_2 = "the_one_and_only_module2"
