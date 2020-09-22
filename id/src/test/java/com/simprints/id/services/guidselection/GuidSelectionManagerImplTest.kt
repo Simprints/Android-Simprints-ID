@@ -38,6 +38,7 @@ class GuidSelectionManagerImplTest {
         MockKAnnotations.init(this, relaxed = true)
         guidSelectionManager = GuidSelectionManagerImpl(DEFAULT_DEVICE_ID, loginInfoManager, analyticsManager, crashReportManager, timerHelper, eventRepository)
         every { timerHelper.now() } returns CREATED_AT
+        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }
 
     @Test
@@ -56,7 +57,7 @@ class GuidSelectionManagerImplTest {
 
             guidSelectionManager.handleConfirmIdentityRequest(guidSelectionRequest)
 
-            coVerify(exactly = 1) { eventRepository.addEventToCurrentSession(GuidSelectionEvent(CREATED_AT, GUID2)) }
+            coVerify(exactly = 1) { eventRepository.addEventToCurrentSession(any<GuidSelectionEvent>()) }
         }
     }
 
@@ -64,7 +65,6 @@ class GuidSelectionManagerImplTest {
     fun handleConfirmIdentityRequest_shouldReportToAnalytics() {
         runBlocking {
             every { loginInfoManager.isProjectIdSignedIn(any()) } returns true
-            every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
 
             guidSelectionManager.handleConfirmIdentityRequest(guidSelectionRequest)
 
@@ -84,6 +84,8 @@ class GuidSelectionManagerImplTest {
     @Test
     fun handleConfirmIdentityRequest_somethingWrongHappens_shouldLogException() {
         runBlocking {
+            every { loginInfoManager.isProjectIdSignedIn(any()) } throws Throwable("Error")
+
             guidSelectionManager.handleConfirmIdentityRequest(guidSelectionRequest)
 
             coVerify(exactly = 1) { crashReportManager.logExceptionOrSafeException(any()) }
