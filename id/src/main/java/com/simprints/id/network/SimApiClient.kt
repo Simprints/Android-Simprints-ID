@@ -1,6 +1,6 @@
 package com.simprints.id.network
 
-import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
+import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
 
 interface SimApiClient<T : SimRemoteInterface> {
 
