@@ -41,9 +41,9 @@ abstract class ClientRequestValidator(private val extractor: ClientRequestExtrac
     }
 
     private fun hasValidMetadata(): Boolean = try {
-        JsonHelper().validJsonOrThrow(extractor.getMetadata())
+        JsonHelper().validateJsonOrThrow(extractor.getMetadata())
         true
-    } catch (t: Throwable) {
+    } catch (ex: Throwable) {
         false
     }
 }
