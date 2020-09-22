@@ -1,11 +1,11 @@
 package com.simprints.clientapi.clientrequests.validators
 
-import com.google.gson.Gson
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.exceptions.InvalidMetadataException
 import com.simprints.clientapi.exceptions.InvalidModuleIdException
 import com.simprints.clientapi.exceptions.InvalidProjectIdException
 import com.simprints.clientapi.exceptions.InvalidUserIdException
+import com.simprints.core.tools.json.JsonHelper
 
 
 abstract class ClientRequestValidator(private val extractor: ClientRequestExtractor) {
@@ -42,9 +42,9 @@ abstract class ClientRequestValidator(private val extractor: ClientRequestExtrac
 
     // TODO: inject gson dependency
     private fun hasValidMetadata(): Boolean = try {
-        Gson().fromJson(extractor.getMetadata(), Any::class.java)
+        JsonHelper().fromJson<Any>(extractor.getMetadata())
         true
-    } catch (ex: com.google.gson.JsonSyntaxException) {
+    } catch (t: Throwable) {
         false
     }
 
